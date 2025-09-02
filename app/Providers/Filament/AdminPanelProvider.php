@@ -47,7 +47,9 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->widgets([
                 AccountWidget::class,
-                // Custom widgets temporarily disabled
+                \App\Filament\Widgets\EnhancedAnalyticsWidget::class,
+                \App\Filament\Widgets\RecentActivityWidget::class,
+                \App\Filament\Widgets\LowStockAlertsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

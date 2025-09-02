@@ -2,6 +2,8 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+use App\Jobs\CheckLowStockJob;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +19,16 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+// Schedule low stock checks every 6 hours
+Schedule::job(new CheckLowStockJob)->everySixHours();
+
+// Schedule cache warmup every hour
+Schedule::call(function () {
+    \App\Services\CacheService::warmupCaches();
+})->hourly();
+
+// Clear old activity logs (keep 90 days)
+Schedule::call(function () {
+    \Spatie\Activitylog\Models\Activity::where('created_at', '<', now()->subDays(90))->delete();
+})->daily();
