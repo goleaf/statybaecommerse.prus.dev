@@ -201,8 +201,8 @@ class OrderResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // RelationManagers\ItemsRelationManager::class, // Temporarily disabled
-            // RelationManagers\DocumentsRelationManager::class, // Temporarily disabled
+            // RelationManagers\ItemsRelationManager::class, // Needs further API fixes
+            // RelationManagers\DocumentsRelationManager::class, // Needs creation
         ];
     }
 

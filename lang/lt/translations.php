@@ -150,9 +150,16 @@ return [
     // Partners
     'partner_information' => 'Partnerio informacija',
     'partner_settings' => 'Partnerio nustatymai',
+    'partner_description_help' => 'Aprašykite partnerį ir jo verslą',
+    'partner_notes_help' => 'Vidinės pastabos apie šį partnerį',
+    'notes' => 'Pastabos',
     // Partner Tiers
     'partner_tier_information' => 'Partnerio lygio informacija',
+    'partner_tier_settings' => 'Partnerio lygio nustatymai',
     'tier_information' => 'Lygio informacija',
+    'tier_description_help' => 'Aprašykite šio lygio privalumus ir reikalavimus',
+    'tier_benefits_help' => 'Išvardinkite konkrečius privalumus, kuriuos gauna šio lygio partneriai',
+    'benefits' => 'Privalumai',
     // General Status
     'starts_at' => 'Prasideda',
     'ends_at' => 'Baigiasi',

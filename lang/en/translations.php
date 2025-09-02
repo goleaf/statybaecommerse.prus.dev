@@ -150,9 +150,16 @@ return [
     // Partners
     'partner_information' => 'Partner Information',
     'partner_settings' => 'Partner Settings',
+    'partner_description_help' => 'Describe the partner and their business',
+    'partner_notes_help' => 'Internal notes about this partner',
+    'notes' => 'Notes',
     // Partner Tiers
     'partner_tier_information' => 'Partner Tier Information',
+    'partner_tier_settings' => 'Partner Tier Settings',
     'tier_information' => 'Tier Information',
+    'tier_description_help' => 'Describe the benefits and requirements of this tier',
+    'tier_benefits_help' => 'List the specific benefits partners get at this tier',
+    'benefits' => 'Benefits',
     // General Status
     'starts_at' => 'Starts At',
     'ends_at' => 'Ends At',

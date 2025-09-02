@@ -105,17 +105,41 @@ final class PartnerResource extends Resource
                     ])
                     ->columns(2),
                 
+                // Multilanguage Tabs for Partner Content
+                Tabs::make('partner_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'partner_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.description'),
+                                    'maxLength' => 1000,
+                                    'rows' => 3,
+                                    'placeholder' => __('translations.partner_description_help'),
+                                ],
+                                'notes' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.notes'),
+                                    'maxLength' => 1000,
+                                    'rows' => 3,
+                                    'placeholder' => __('translations.partner_notes_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('partner_tab')
+                    ->contained(false),
+                
                 Forms\Components\Section::make(__('admin.partner.form.additional'))
                     ->components([
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('admin.partner.form.description'))
-                            ->maxLength(1000)
-                            ->rows(3),
-                        
-                        Forms\Components\Textarea::make('notes')
-                            ->label(__('admin.partner.form.notes'))
-                            ->maxLength(1000)
-                            ->rows(3),
+                        // Non-translatable additional fields can go here
                     ])
                     ->columns(1),
             ]);

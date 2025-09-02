@@ -132,7 +132,7 @@ final class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-cog-6-tooth'),
             ])
             ->plugins([
-                // Plugins temporarily disabled to fix base system
+                \pxlrbt\FilamentSpotlight\SpotlightPlugin::make(),
             ])
             ->spa();
     }

@@ -41,17 +41,9 @@ final class PartnerTierResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('admin.partner_tier.form.basic_info'))
+                // Partner Tier Settings (Non-translatable)
+                Forms\Components\Section::make(__('translations.partner_tier_settings'))
                     ->components([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('admin.partner_tier.form.name'))
-                            ->required()
-                            ->maxLength(255),
-                        
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('admin.partner_tier.form.description'))
-                            ->maxLength(1000)
-                            ->rows(3),
                         
                         Forms\Components\TextInput::make('discount_percentage')
                             ->label(__('admin.partner_tier.form.discount_percentage'))
@@ -73,6 +65,37 @@ final class PartnerTierResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
+
+                // Multilanguage Tabs for Partner Tier Content
+                Tabs::make('partner_tier_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'tier_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.description'),
+                                    'maxLength' => 1000,
+                                    'rows' => 3,
+                                    'placeholder' => __('translations.tier_description_help'),
+                                ],
+                                'benefits' => [
+                                    'type' => 'rich_editor',
+                                    'label' => __('translations.benefits'),
+                                    'toolbar' => ['bold', 'italic', 'link', 'bulletList', 'orderedList'],
+                                    'placeholder' => __('translations.tier_benefits_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('partner_tier_tab')
+                    ->contained(false),
                 
                 Forms\Components\Section::make(__('admin.partner_tier.form.requirements'))
                     ->components([

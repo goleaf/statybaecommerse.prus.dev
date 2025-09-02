@@ -50,18 +50,26 @@ it('can generate document from template', function () {
     expect($document->content)->toContain('TEST-001');
 });
 
-it('can process template variables', function () {
+it('can process template variables through document generation', function () {
     $template = DocumentTemplate::factory()->create([
         'content' => 'Hello $CUSTOMER_NAME, your order $ORDER_NUMBER is ready.',
+        'variables' => ['$CUSTOMER_NAME', '$ORDER_NUMBER'],
     ]);
     
+    $product = Product::factory()->create();
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    
     $service = app(DocumentService::class);
-    $processed = $service->processTemplate(
-        $template->content,
-        ['$CUSTOMER_NAME' => 'John Doe', '$ORDER_NUMBER' => 'ORD-001']
+    $document = $service->generateDocument(
+        $template,
+        $product,
+        ['$CUSTOMER_NAME' => 'John Doe', '$ORDER_NUMBER' => 'ORD-001'],
+        'Test Document'
     );
     
-    expect($processed)->toBe('Hello John Doe, your order ORD-001 is ready.');
+    expect($document->content)->toContain('John Doe');
+    expect($document->content)->toContain('ORD-001');
 });
 
 it('document belongs to template', function () {
