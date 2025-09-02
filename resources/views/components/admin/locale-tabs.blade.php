@@ -17,11 +17,11 @@
                         <span class="uppercase">{{ $loc }}</span>
                         <template x-if="indicators['{{ $loc }}'] === 'missing'">
                             <span class="inline-block w-2 h-2 rounded-full bg-red-500"
-                                  title="{{ __('Missing translation') }}"></span>
+                                  title="{{ __('translation_missing') }}"></span>
                         </template>
                         <template x-if="indicators['{{ $loc }}'] === 'fallback'">
                             <span class="inline-block w-2 h-2 rounded-full bg-amber-500"
-                                  title="{{ __('Using fallback') }}"></span>
+                                  title="{{ __('translation_fallback') }}"></span>
                         </template>
                     </span>
                 </button>

@@ -31,24 +31,39 @@ abstract class Controller
 
     protected function t(string $key, array $params = [], ?int $count = null): string
     {
+        // Use the new unified translation files (lt.php, en.php)
+        $translationKey = $this->normalizeTranslationKey($key);
+        
         return $count === null
-            ? __($key, $params)
-            : trans_choice($key, $count, $params);
+            ? __($translationKey, $params)
+            : trans_choice($translationKey, $count, $params);
+    }
+
+    protected function normalizeTranslationKey(string $key): string
+    {
+        // Convert dot notation to snake_case for new translation structure
+        // e.g., 'nav.home' becomes 'nav_home'
+        if (str_contains($key, '.')) {
+            return str_replace('.', '_', $key);
+        }
+        
+        return $key;
     }
 
     protected function tArray(array $data): array
     {
         $translateNode = function ($node) use (&$translateNode) {
             if (is_string($node)) {
-                return __($node);
+                return __($this->normalizeTranslationKey($node));
             }
             if (is_array($node)) {
                 if (array_key_exists('key', $node)) {
                     $key = (string) $node['key'];
+                    $normalizedKey = $this->normalizeTranslationKey($key);
                     $params = (array) ($node['params'] ?? []);
                     $count = $node['count'] ?? null;
 
-                    return $count === null ? __($key, $params) : trans_choice($key, (int) $count, $params);
+                    return $count === null ? __($normalizedKey, $params) : trans_choice($normalizedKey, (int) $count, $params);
                 }
                 foreach ($node as $k => $v) {
                     $node[$k] = $translateNode($v);

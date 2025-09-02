@@ -2,7 +2,7 @@
 
 namespace App\Services\Payments;
 
-use Shopper\Core\Models\Order;
+use App\Models\Order;
 
 final class PaymentService
 {

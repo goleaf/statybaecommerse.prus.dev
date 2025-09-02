@@ -40,13 +40,12 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
-            "Shopper\\": "app/Shopper/",
+
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/helpers.php",
-            "app/Support/ShopNamespaceAlias.php"
+            "app/helpers.php"
         ]
     },
     "autoload-dev": {

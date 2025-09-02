@@ -31,7 +31,7 @@ class Show extends Component
 
     public function mount(string $slug): void
     {
-        abort_if(!shopper_feature_enabled('collection'), 404);
+        abort_if(!app_feature_enabled('collection'), 404);
         $this->slug = $slug;
         $locale = app()->getLocale();
         $this->collection = CollectionModel::query()

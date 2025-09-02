@@ -9,7 +9,7 @@
 
 @section('content')
     <x-container class="py-8">
-        <a href="#results" class="sr-only focus:not-sr-only focus:underline">{{ __('Skip to results') }}</a>
+        <a href="#results" class="sr-only focus:not-sr-only focus:underline">{{ __('skip_to_results') }}</a>
         @if (session('status'))
             <x-alert type="success" class="mb-4">{{ session('status') }}</x-alert>
         @endif
@@ -27,7 +27,7 @@
         @endif
         <x-breadcrumbs>
             <x-slot name="links">
-                <x-link :href="route('brand.index', ['locale' => app()->getLocale()])">{{ __('Brands') }}</x-link>
+                <x-link :href="route('brand.index', ['locale' => app()->getLocale()])">{{ __('nav_brands') }}</x-link>
             </x-slot>
         </x-breadcrumbs>
 

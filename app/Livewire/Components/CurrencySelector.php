@@ -80,8 +80,8 @@ class CurrencySelector extends Component
             if (class_exists(ZoneSessionManager::class) && session()->has('zone')) {
                 return ZoneSessionManager::getSession()->countryFlag ?? null;
             }
-            if (function_exists('shopper_setting')) {
-                $countryId = shopper_setting('country_id');
+            try {
+                $countryId = \App\Models\Setting::where('key', 'country_id')->value('value');
                 if (!empty($countryId)) {
                     return Country::query()->find($countryId)?->svg_flag;
                 }

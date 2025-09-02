@@ -1,11 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Enums;
 
-
-use Shopper\Core\Traits\HasEnumStaticMethods;
+// Legacy Shopper trait removed - using native PHP enum features
 
 /**
  * @method static string Stripe()
@@ -14,8 +11,6 @@ use Shopper\Core\Traits\HasEnumStaticMethods;
  */
 enum PaymentType: string
 {
-    use HasEnumStaticMethods;
-
     case Stripe = 'stripe';
 
     case NotchPay = 'notch-pay';

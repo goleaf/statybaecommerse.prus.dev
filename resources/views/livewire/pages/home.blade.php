@@ -12,8 +12,8 @@
         ];
     @endphp
     <x-meta
-            :title="__('Home') . ' - ' . config('app.name')"
-            :description="__('Discover new arrivals and trending products tailored for your locale.')"
+            :title="__('nav_home') . ' - ' . config('app.name')"
+            :description="__('meta_description_home')"
             :og-image="Vite::asset('resources/images/hero.png')"
             canonical="{{ url()->current() }}"
             :jsonld="json_encode($websiteJsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)" />
@@ -46,15 +46,15 @@
         <div class="sm:max-w-xl">
             <div>
                 <h1 class="font font-heading text-4xl font-extrabold tracking-tight text-black sm:text-6xl hero-title">
-                    {{ __('New arrivals are here') }}
+                    {{ __('home_new_arrivals') }}
                 </h1>
                 <p class="mt-4 text-xl text-gray-500">
-                    {{ __('The new arrivals have, well, newly arrived. Check out the latest options from our summer small-batch release while they\'re still in stock.') }}
+                    {{ __('home_new_arrivals_desc') }}
                 </p>
             </div>
             <div class="py-10">
                 <x-buttons.primary href="#" class="group px-8 py-3 text-center text-base font-medium hero-cta">
-                    {{ __('Shop now') }}
+                    {{ __('home_shop_now') }}
                     <span
                           class="ml-2 translate-x-0 transform transition duration-200 ease-in-out group-hover:translate-x-1">
                         <x-untitledui-arrow-narrow-right class="size-6" stroke-width="1.5" aria-hidden="true" />
@@ -79,7 +79,7 @@
                 <section aria-labelledby="brand-heading" class="mx-auto max-w-xl lg:max-w-none mb-16">
                     <h2 id="brand-heading"
                         class="font-heading text-2xl font-extrabold tracking-tight text-gray-950 sm:text-3xl">
-                        {{ __('Brands') }}
+                        {{ __('nav_brands') }}
                     </h2>
                     <div class="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
                         @foreach ($brands as $brand)
@@ -90,7 +90,7 @@
                                     class="group block border rounded-md p-4 bg-white hover:shadow-sm">
                                 <div class="aspect-[3/2] flex items-center justify-center">
                                     @if ($brand->getLogoUrl('sm'))
-                                        <img loading="lazy" 
+                                        <img loading="lazy"
                                              src="{{ $brand->getLogoUrl('sm') }}"
                                              srcset="{{ $brand->getLogoUrl('xs') }} 64w, {{ $brand->getLogoUrl('sm') }} 128w, {{ $brand->getLogoUrl('md') }} 200w"
                                              sizes="128px"
@@ -103,7 +103,8 @@
                                              width="120" height="80"
                                              class="max-h-16 object-contain" />
                                     @else
-                                        <span class="text-sm text-gray-600">{{ $brand->trans('name') ?? $brand->name }}</span>
+                                        <span
+                                              class="text-sm text-gray-600">{{ $brand->trans('name') ?? $brand->name }}</span>
                                     @endif
                                 </div>
                             </x-link>
@@ -115,10 +116,10 @@
                 <section aria-labelledby="collection-heading" class="mx-auto max-w-xl lg:max-w-none">
                     <h2 id="collection-heading"
                         class="font-heading text-2xl font-extrabold tracking-tight text-gray-950 sm:text-3xl">
-                        {{ __('Shop by Collection') }}
+                        {{ __('home_shop_by_collection') }}
                     </h2>
                     <p class="mt-2 text-base/6 max-w-3xl text-gray-500">
-                        {{ __('Explore our curated furniture collections, designed to elevate every space. From modern minimalism to classic elegance, find timeless pieces that blend style, comfort, and functionality for your home.') }}
+                        {{ __('home_collections_desc') }}
                     </p>
 
                     <div class="mt-10 space-y-12 lg:grid lg:grid-cols-3 lg:gap-x-8 lg:space-y-0">
@@ -141,7 +142,8 @@
                                          class="aspect-[3/2] w-full object-cover group-hover:opacity-75 lg:aspect-[3/2]" />
                                 @else
                                     <div class="aspect-[3/2] w-full bg-gray-200 flex items-center justify-center">
-                                        <span class="text-lg text-gray-500 font-medium">{{ strtoupper(substr($collection->trans('name') ?? $collection->name, 0, 3)) }}</span>
+                                        <span
+                                              class="text-lg text-gray-500 font-medium">{{ strtoupper(substr($collection->trans('name') ?? $collection->name, 0, 3)) }}</span>
                                     </div>
                                 @endif
                                 <h3 class="mt-2 text-base font-semibold text-gray-900">
@@ -155,7 +157,7 @@
 
             <section aria-labelledby="products-list" class="mt-16 max-w-3xl lg:mt-32 lg:max-w-none">
                 <h2 class="font-heading text-2xl font-semibold tracking-tight text-gray-950 sm:text-3xl">
-                    {{ __('Trending products') }}
+                    {{ __('home_trending_products') }}
                 </h2>
 
                 <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">

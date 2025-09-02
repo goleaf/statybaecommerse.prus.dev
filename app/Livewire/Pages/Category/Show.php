@@ -49,7 +49,7 @@ class Show extends Component
 
     public function mount(string $slug): void
     {
-        abort_if(!shopper_feature_enabled('category'), 404);
+        abort_if(!app_feature_enabled('category'), 404);
         $this->slug = $slug;
         $locale = app()->getLocale();
         $this->category = CategoryModel::query()

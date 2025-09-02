@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
@@ -19,7 +19,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class AdminPanelProvider extends PanelProvider
+final class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
@@ -28,8 +28,17 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('E-Commerce Admin')
+            ->brandLogo(asset('images/logo-admin.svg'))
+            ->brandLogoHeight('2rem')
+            ->favicon(asset('images/favicon.ico'))
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
+                'gray' => Color::Slate,
+                'success' => Color::Green,
+                'warning' => Color::Amber,
+                'danger' => Color::Red,
+                'info' => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
@@ -39,7 +48,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
-                FilamentInfoWidget::class,
+                // Custom widgets will be auto-discovered
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -54,6 +63,79 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->sidebarCollapsibleOnDesktop()
+            ->navigationGroups([
+                'Dashboard' => [
+                    'label' => __('Dashboard'),
+                    'icon' => 'heroicon-o-home',
+                    'sort' => 1,
+                ],
+                'Catalog' => [
+                    'label' => __('Catalog'),
+                    'icon' => 'heroicon-o-cube',
+                    'sort' => 2,
+                ],
+                'Orders' => [
+                    'label' => __('Orders'),
+                    'icon' => 'heroicon-o-shopping-bag',
+                    'sort' => 3,
+                ],
+                'Customers' => [
+                    'label' => __('Customers'),
+                    'icon' => 'heroicon-o-users',
+                    'sort' => 4,
+                ],
+                'Marketing' => [
+                    'label' => __('Marketing'),
+                    'icon' => 'heroicon-o-megaphone',
+                    'sort' => 5,
+                ],
+                'Partners' => [
+                    'label' => __('Partners'),
+                    'icon' => 'heroicon-o-building-office',
+                    'sort' => 6,
+                ],
+                'Content' => [
+                    'label' => __('Content'),
+                    'icon' => 'heroicon-o-document-text',
+                    'sort' => 7,
+                ],
+                'Settings' => [
+                    'label' => __('Settings'),
+                    'icon' => 'heroicon-o-cog-6-tooth',
+                    'sort' => 8,
+                ],
+                'System' => [
+                    'label' => __('System'),
+                    'icon' => 'heroicon-o-server',
+                    'sort' => 9,
+                ],
+            ])
+            ->userMenuItems([
+                'profile' => \Filament\Navigation\MenuItem::make()
+                    ->label(__('Profile'))
+                    ->url(fn(): string => route('profile.edit'))
+                    ->icon('heroicon-o-user-circle'),
+                'settings' => \Filament\Navigation\MenuItem::make()
+                    ->label(__('Settings'))
+                    ->url(fn(): string => static::getUrl('settings'))
+                    ->icon('heroicon-o-cog-6-tooth'),
+            ])
+            ->plugins([
+                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+                \Jeffgreco13\FilamentBreezy\BreezyCore::make()
+                    ->myProfile(
+                        shouldRegisterUserMenu: true,
+                        shouldRegisterNavigation: false,
+                        navigationGroup: 'Settings',
+                        hasAvatars: true,
+                        slug: 'my-profile'
+                    ),
+            ])
+            ->spa();
     }
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Livewire\Modals\Account;
 
@@ -8,11 +6,11 @@ use App\Actions\CountriesWithZone;
 use App\Actions\ZoneSessionManager;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Validate;
 use LivewireUI\Modal\ModalComponent;
-use Shopper\Core\Enum\AddressType;
+// Legacy Shopper\Core\Enum\AddressType removed - using custom enum
 use App\Models\Address;
 use App\Models\Country;
 
@@ -60,7 +58,8 @@ class AddressForm extends ModalComponent
                 column: 'id',
                 values: (new CountriesWithZone)
                     ->handle()
-                    ->where('zoneId', ZoneSessionManager::getSession()?->zoneId)->pluck('countryId')
+                    ->where('zoneId', ZoneSessionManager::getSession()?->zoneId)
+                    ->pluck('countryId')
             )
             ->pluck('name', 'id');
 

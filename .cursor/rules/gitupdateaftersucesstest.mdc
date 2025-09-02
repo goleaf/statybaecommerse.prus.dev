@@ -14,3 +14,5 @@ alwaysApply: true
 - working with any module create for admin side all blades and maximum functions
 - working with any module create for frontend side all blades and maximum functions
 - working with any blade make translation using database for translations files
+- working with any blade make translation using database for translations files
+refactor all blades and controller and another files, make multi translations using files as array, use maximum 1 file for 1 language, do not create additional language files. use for translation snake standart of arrray names keys

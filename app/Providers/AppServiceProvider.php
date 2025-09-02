@@ -27,10 +27,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Ensure Shopper brand form alias is registered even if package config merge order changes
-        if (class_exists(\Shop\Livewire\SlideOvers\BrandForm::class)) {
-            Livewire::component('shopper-slide-overs.brand-form', \Shop\Livewire\SlideOvers\BrandForm::class);
-        }
+        // Legacy Shopper components removed - using native Filament resources
 
         Model::saved(function ($model): void {
             $this->flushSitemapIfCatalog($model);
@@ -125,9 +122,9 @@ class AppServiceProvider extends ServiceProvider
 
     private function flushDiscountsIfNeeded($model): void
     {
-        if ($model instanceof \Shop\Core\Models\Discount ||
-                $model instanceof \Shop\Core\Models\DiscountCode ||
-                $model instanceof \Shop\Core\Models\DiscountCondition) {
+        if ($model instanceof \App\Models\Discount ||
+                $model instanceof \App\Models\DiscountCode ||
+                $model instanceof \App\Models\DiscountCondition) {
             try {
                 Cache::tags(['discounts'])->flush();
             } catch (\Throwable $e) {

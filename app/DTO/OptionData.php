@@ -1,11 +1,9 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\Models\Attribute;
 use Illuminate\Support\Collection;
-use Shopper\Core\Models\Attribute;
 
 class OptionData
 {

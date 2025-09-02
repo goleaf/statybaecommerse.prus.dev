@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CurrencyResource\Pages;
 
 use App\Filament\Resources\CurrencyResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
 
 final class ViewCurrency extends ViewRecord
 {

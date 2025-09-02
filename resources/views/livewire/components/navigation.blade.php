@@ -2,26 +2,26 @@
     <div class="flex items-center gap-6">
         @if (Route::has('brand.index'))
             <x-link :href="route('brand.index', ['locale' => app()->getLocale()])"
-                    class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('Brands') }}</x-link>
+                    class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('nav_brands') }}</x-link>
         @endif
 
         <x-link :href="route('locations.index', ['locale' => app()->getLocale()])"
-                class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('Locations') }}</x-link>
+                class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('nav_locations') }}</x-link>
 
         <x-link :href="route('search.index', ['locale' => app()->getLocale()])"
-                class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('Search') }}</x-link>
+                class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('nav_search') }}</x-link>
 
         <x-link :href="route('cart.index', ['locale' => app()->getLocale()])"
-                class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('Cart') }}</x-link>
+                class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('nav_cart') }}</x-link>
 
         @auth
             @can('view system')
                 <x-link :href="route('admin.discounts.presets')"
-                        class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('Admin') }}</x-link>
+                        class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('nav_admin') }}</x-link>
             @endcan
             @can('view orders')
                 <x-link :href="route('exports.index')"
-                        class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('Exports') }}</x-link>
+                        class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('nav_exports') }}</x-link>
             @endcan
         @endauth
     </div>

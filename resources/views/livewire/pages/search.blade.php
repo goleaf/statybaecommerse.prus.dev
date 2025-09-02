@@ -1,5 +1,5 @@
 <div class="container mx-auto px-4 py-8" wire:loading.attr="aria-busy" aria-busy="false">
-    <a href="#results" class="sr-only focus:not-sr-only focus:underline">{{ __('Skip to results') }}</a>
+    <a href="#results" class="sr-only focus:not-sr-only focus:underline">{{ __('search_skip_to_results') }}</a>
     @if (session('status'))
         <x-alert type="success" class="mb-4">{{ session('status') }}</x-alert>
     @endif
@@ -16,24 +16,24 @@
         </x-alert>
     @endif
     <div class="flex items-center justify-between mb-4">
-        <h1 class="text-2xl font-semibold">{{ __('Search') }}</h1>
+        <h1 class="text-2xl font-semibold">{{ __('nav_search') }}</h1>
         <div class="flex items-center gap-2">
-            <label for="sort" class="sr-only">{{ __('Sort') }}</label>
+            <label for="sort" class="sr-only">{{ __('search_sort') }}</label>
             <select id="sort" wire:model.live="sort" class="rounded-md border-gray-300 text-sm">
-                <option value="">{{ __('Newest') }}</option>
-                <option value="name_asc">{{ __('Name (A–Z)') }}</option>
-                <option value="name_desc">{{ __('Name (Z–A)') }}</option>
+                <option value="">{{ __('search_newest') }}</option>
+                <option value="name_asc">{{ __('search_name_asc') }}</option>
+                <option value="name_desc">{{ __('search_name_desc') }}</option>
             </select>
         </div>
     </div>
 
     <div wire:loading role="status" aria-live="polite" class="mb-3 text-sm text-gray-600">
-        {{ __('Loading…') }}
+        {{ __('loading') }}
     </div>
 
     <form method="GET" action="{{ route('search.index', ['locale' => app()->getLocale()]) }}" class="mb-6">
-        <input type="text" name="q" value="{{ $term }}" placeholder="{{ __('Search products') }}"
-               aria-label="{{ __('Search products') }}"
+        <input type="text" name="q" value="{{ $term }}" placeholder="{{ __('search_products') }}"
+               aria-label="{{ __('search_products') }}"
                class="w-full md:w-1/2 rounded-md border-gray-300" />
     </form>
 
@@ -44,12 +44,12 @@
         @endfor
     </div>
     @if ($products->isEmpty())
-        <p class="text-gray-500" aria-live="polite">{{ __('No results found.') }}</p>
+        <p class="text-gray-500" aria-live="polite">{{ __('search_no_results_found') }}</p>
     @else
         <p class="text-sm text-gray-600 mb-2" aria-live="polite">
-            {{ trans_choice(':count result found|:count results found', $products->total() ?? $products->count(), ['count' => $products->total() ?? $products->count()]) }}
+            {{ trans_choice(__('search_result_count'), $products->total() ?? $products->count(), ['count' => $products->total() ?? $products->count()]) }}
             @if ($term)
-                — {{ __('for') }} “{{ $term }}”
+                — {{ __('search_for') }} "{{ $term }}"
             @endif
         </p>
         <div id="results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -57,7 +57,7 @@
                 <x-product.card :product="$product" />
             @endforeach
         </div>
-        <nav class="mt-6" aria-label="{{ __('Pagination') }}">{{ $products->links() }}</nav>
+        <nav class="mt-6" aria-label="{{ __('search_pagination') }}">{{ $products->links() }}</nav>
     @endif
 </div>
 
@@ -120,8 +120,8 @@
         $preSizes = '(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 200px';
     @endphp
     <x-meta
-            :title="__('Search') . ' - ' . config('app.name')"
-            :description="__('Search products across categories, brands, and collections.')"
+            :title="__('nav_search') . ' - ' . config('app.name')"
+            :description="__('search_help')"
             robots="noindex,follow"
             :og-image="$ogImage"
             :prev="$products instanceof \Illuminate\Contracts\Pagination\Paginator ||

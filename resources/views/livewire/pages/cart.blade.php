@@ -1,12 +1,12 @@
 <div>
     <div class="py-10">
         <x-container>
-            <h1 class="text-2xl font-semibold mb-6">{{ __('Your cart') }}</h1>
+            <h1 class="text-2xl font-semibold mb-6">{{ __('cart_your_cart') }}</h1>
 
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 <div class="lg:col-span-2 space-y-4">
                     @if ($items->isEmpty())
-                        <p class="text-gray-500">{{ __('Your cart is empty.') }}</p>
+                        <p class="text-gray-500">{{ __('cart_your_cart_empty') }}</p>
                     @else
                         <div class="divide-y divide-gray-100 border border-gray-100 rounded-md">
                             @foreach ($items as $item)
@@ -30,7 +30,7 @@
                                             {{ shopper_money_format(amount: (float) $item->price * (int) $item->quantity, currency: current_currency()) }}
                                         </p>
                                         <button wire:click="removeItem({{ (int) $item->id }})"
-                                                class="text-sm text-red-600 hover:underline">{{ __('Remove') }}</button>
+                                                class="text-sm text-red-600 hover:underline">{{ __('cart_remove') }}</button>
                                     </div>
                                 </div>
                             @endforeach

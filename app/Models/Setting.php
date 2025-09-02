@@ -1,0 +1,78 @@
+<?php declare(strict_types=1);
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+final class Setting extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'key',
+        'value',
+        'type',
+        'description',
+        'is_public',
+    ];
+
+    protected $casts = [
+        'value' => 'array',
+        'is_public' => 'boolean',
+    ];
+
+    public function getValueAttribute($value)
+    {
+        if ($this->type === 'boolean') {
+            return (bool) json_decode($value);
+        }
+
+        if ($this->type === 'number') {
+            return is_numeric($value) ? (float) $value : 0;
+        }
+
+        if (in_array($this->type, ['json', 'array'])) {
+            return json_decode($value, true);
+        }
+
+        return $value;
+    }
+
+    public function setValueAttribute($value): void
+    {
+        if ($this->type === 'boolean') {
+            $this->attributes['value'] = json_encode((bool) $value);
+        } elseif ($this->type === 'number') {
+            $this->attributes['value'] = (string) $value;
+        } elseif (in_array($this->type, ['json', 'array'])) {
+            $this->attributes['value'] = json_encode($value);
+        } else {
+            $this->attributes['value'] = (string) $value;
+        }
+    }
+
+    public static function get(string $key, $default = null)
+    {
+        $setting = static::where('key', $key)->first();
+        return $setting ? $setting->value : $default;
+    }
+
+    public static function set(string $key, $value, string $type = 'string', ?string $description = null): void
+    {
+        static::updateOrCreate(
+            ['key' => $key],
+            [
+                'value' => $value,
+                'type' => $type,
+                'description' => $description,
+            ]
+        );
+    }
+
+    public static function getPublic(string $key, $default = null)
+    {
+        $setting = static::where('key', $key)->where('is_public', true)->first();
+        return $setting ? $setting->value : $default;
+    }
+}

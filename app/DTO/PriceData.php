@@ -1,16 +1,14 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\DTO;
 
-use Shopper\Core\Helpers\Price;
+// Legacy Shopper Price helper removed - using native Laravel decimal handling
 
 class PriceData
 {
     public function __construct(
-        public Price $value,
-        public ?Price $compare,
+        public float $value,
+        public ?float $compare,
         public ?float $percentage,
     ) {}
 }

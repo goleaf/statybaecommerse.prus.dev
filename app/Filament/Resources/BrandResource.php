@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
@@ -14,75 +14,145 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use BackedEnum;
 use UnitEnum;
 
-class BrandResource extends Resource
+final class BrandResource extends Resource
 {
     protected static ?string $model = Brand::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Catalog';
+    protected static ?string $navigationGroup = 'Catalog';
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    protected static ?string $navigationLabel = null;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.brands');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.models.brand');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.models.brands');
+    }
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
-            ->components([
-                Forms\Components\Section::make('Brand Information')
+        return $form
+            ->schema([
+                Forms\Components\Section::make(__('admin.sections.brand_information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
+                            ->label(__('admin.fields.name'))
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
                             ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
                         Forms\Components\TextInput::make('slug')
+                            ->label(__('admin.fields.slug'))
                             ->required()
                             ->maxLength(255)
-                            ->unique(Brand::class, 'slug', ignoreRecord: true),
+                            ->unique(Brand::class, 'slug', ignoreRecord: true)
+                            ->helperText(__('admin.help.slug_auto_generated')),
                         Forms\Components\Textarea::make('description')
+                            ->label(__('admin.fields.description'))
                             ->maxLength(1000)
                             ->rows(3),
                         Forms\Components\TextInput::make('website')
+                            ->label(__('admin.fields.website'))
                             ->url()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->prefixIcon('heroicon-m-globe-alt'),
                         Forms\Components\Toggle::make('is_enabled')
-                            ->label('Enabled')
-                            ->default(true),
+                            ->label(__('admin.fields.enabled'))
+                            ->default(true)
+                            ->helperText(__('admin.help.brand_enabled')),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Brand Images')
+                Forms\Components\Section::make(__('admin.sections.brand_images'))
                     ->schema([
                         Forms\Components\SpatieMediaLibraryFileUpload::make('logo')
-                            ->label('Brand Logo')
+                            ->label(__('admin.fields.brand_logo'))
                             ->collection('logo')
                             ->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios(['1:1'])
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'])
-                            ->maxSize(5120) // 5MB
-                            ->helperText('Upload brand logo. Will be converted to WebP format with multiple resolutions automatically.')
+                            ->maxSize(5120)  // 5MB
+                            ->helperText(__('admin.help.brand_logo_upload'))
                             ->columnSpanFull(),
                         Forms\Components\SpatieMediaLibraryFileUpload::make('banner')
-                            ->label('Brand Banner')
+                            ->label(__('admin.fields.brand_banner'))
                             ->collection('banner')
                             ->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios(['2:1', '16:9'])
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
-                            ->maxSize(10240) // 10MB
-                            ->helperText('Upload brand banner image. Will be converted to WebP format with multiple resolutions automatically.')
+                            ->maxSize(10240)  // 10MB
+                            ->helperText(__('admin.help.brand_banner_upload'))
                             ->columnSpanFull(),
                     ])
                     ->columns(1),
-                Forms\Components\Section::make('SEO')
+                Forms\Components\Section::make(__('admin.sections.seo'))
                     ->schema([
                         Forms\Components\TextInput::make('seo_title')
-                            ->maxLength(255),
+                            ->label(__('admin.fields.seo_title'))
+                            ->maxLength(255)
+                            ->helperText(__('admin.help.seo_title')),
                         Forms\Components\Textarea::make('seo_description')
+                            ->label(__('admin.fields.seo_description'))
                             ->maxLength(300)
-                            ->rows(3),
+                            ->rows(3)
+                            ->helperText(__('admin.help.seo_description')),
                     ])
                     ->columns(1),
+                Forms\Components\Section::make(__('admin.sections.translations'))
+                    ->schema([
+                        Forms\Components\Repeater::make('translations')
+                            ->relationship('translations')
+                            ->schema([
+                                Forms\Components\Select::make('locale')
+                                    ->label(__('admin.fields.language'))
+                                    ->options([
+                                        'en' => __('admin.languages.english'),
+                                        'lt' => __('admin.languages.lithuanian'),
+                                    ])
+                                    ->required()
+                                    ->distinct(),
+                                Forms\Components\TextInput::make('name')
+                                    ->label(__('admin.fields.name'))
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('slug')
+                                    ->label(__('admin.fields.slug'))
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\Textarea::make('description')
+                                    ->label(__('admin.fields.description'))
+                                    ->maxLength(1000)
+                                    ->rows(3),
+                                Forms\Components\TextInput::make('seo_title')
+                                    ->label(__('admin.fields.seo_title'))
+                                    ->maxLength(255),
+                                Forms\Components\Textarea::make('seo_description')
+                                    ->label(__('admin.fields.seo_description'))
+                                    ->maxLength(300)
+                                    ->rows(2),
+                            ])
+                            ->columns(2)
+                            ->defaultItems(0)
+                            ->addActionLabel(__('admin.actions.add_translation'))
+                            ->reorderableWithButtons()
+                            ->collapsible()
+                            ->cloneable(),
+                    ]),
             ]);
     }
 
@@ -91,33 +161,49 @@ class BrandResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('logo')
-                    ->label('Logo')
+                    ->label(__('admin.fields.logo'))
                     ->collection('logo')
                     ->conversion('logo-sm')
                     ->circular()
                     ->size(40),
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('admin.fields.name'))
                     ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->searchable()
-                    ->toggleable(),
+                    ->sortable()
+                    ->weight('medium')
+                    ->description(fn ($record): string => $record->slug ?? ''),
                 Tables\Columns\TextColumn::make('website')
+                    ->label(__('admin.fields.website'))
                     ->url()
                     ->openUrlInNewTab()
-                    ->toggleable(),
+                    ->toggleable()
+                    ->icon('heroicon-m-globe-alt')
+                    ->placeholder(__('admin.placeholders.no_website')),
                 Tables\Columns\IconColumn::make('is_enabled')
+                    ->label(__('admin.fields.enabled'))
                     ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->trueColor('success')
+                    ->falseColor('danger'),
                 Tables\Columns\TextColumn::make('products_count')
                     ->counts('products')
-                    ->label('Products')
-                    ->sortable(),
+                    ->label(__('admin.fields.products_count'))
+                    ->sortable()
+                    ->badge()
+                    ->color('primary'),
+                Tables\Columns\TextColumn::make('translations_count')
+                    ->counts('translations')
+                    ->label(__('admin.fields.translations'))
+                    ->badge()
+                    ->color('info')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('admin.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('admin.fields.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -125,20 +211,54 @@ class BrandResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\Filter::make('enabled')
-                    ->query(fn($query) => $query->where('is_enabled', true)),
+                    ->label(__('admin.filters.enabled_only'))
+                    ->query(fn($query) => $query->where('is_enabled', true))
+                    ->toggle(),
+                Tables\Filters\Filter::make('has_products')
+                    ->label(__('admin.filters.has_products'))
+                    ->query(fn($query) => $query->has('products'))
+                    ->toggle(),
+                Tables\Filters\Filter::make('has_translations')
+                    ->label(__('admin.filters.has_translations'))
+                    ->query(fn($query) => $query->has('translations'))
+                    ->toggle(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('toggle_status')
+                        ->label(fn($record) => $record->is_enabled ? __('admin.actions.disable') : __('admin.actions.enable'))
+                        ->icon(fn($record) => $record->is_enabled ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                        ->color(fn($record) => $record->is_enabled ? 'warning' : 'success')
+                        ->action(fn($record) => $record->update(['is_enabled' => !$record->is_enabled]))
+                        ->requiresConfirmation(),
+                    Tables\Actions\DeleteAction::make(),
+                ])->label(__('admin.actions.actions')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('enable')
+                        ->label(__('admin.actions.enable_selected'))
+                        ->icon('heroicon-o-eye')
+                        ->color('success')
+                        ->action(fn($records) => $records->each->update(['is_enabled' => true]))
+                        ->requiresConfirmation(),
+                    Tables\Actions\BulkAction::make('disable')
+                        ->label(__('admin.actions.disable_selected'))
+                        ->icon('heroicon-o-eye-slash')
+                        ->color('warning')
+                        ->action(fn($records) => $records->each->update(['is_enabled' => false]))
+                        ->requiresConfirmation(),
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
-            ]);
+                ])->label(__('admin.actions.bulk_actions')),
+            ])
+            ->defaultSort('name', 'asc')
+            ->persistSortInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession();
     }
 
     public static function getRelations(): array

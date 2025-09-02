@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CurrencyResource\Pages;
 
 use App\Filament\Resources\CurrencyResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
 final class EditCurrency extends EditRecord
 {

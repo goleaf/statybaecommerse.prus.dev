@@ -138,11 +138,13 @@ final class Collection extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('images')
+        $this
+            ->addMediaCollection('images')
             ->singleFile()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
 
-        $this->addMediaCollection('banner')
+        $this
+            ->addMediaCollection('banner')
             ->singleFile()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }

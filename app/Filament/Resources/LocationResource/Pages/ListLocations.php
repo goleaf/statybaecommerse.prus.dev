@@ -13,7 +13,8 @@ final class ListLocations extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label(__('translations.create')),
         ];
     }
 }

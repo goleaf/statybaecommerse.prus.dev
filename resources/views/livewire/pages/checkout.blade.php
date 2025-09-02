@@ -12,21 +12,21 @@
                 </x-link>
                 <x-link :href="route('home', ['locale' => app()->getLocale()])"
                         class="inline-flex items-center font-medium text-gray-600 hover:text-gray-900">
-                    {{ __('Back to store') }}
+                    {{ __('checkout_back_to_store') }}
                 </x-link>
             </div>
         </x-container>
     </header>
 
     <x-container class="relative grid grid-cols-1 gap-x-16 lg:grid-cols-2 xl:gap-x-48">
-        <h1 class="sr-only">{{ __('Order information') }}</h1>
+        <h1 class="sr-only">{{ __('checkout_order_information') }}</h1>
 
         <section
                  aria-labelledby="summary-heading"
                  class="bg-primary-950 px-4 pb-10 pt-16 sm:px-6 lg:col-start-2 lg:row-start-1 lg:bg-transparent lg:px-0 lg:pb-16">
             <div class="mx-auto max-w-lg lg:max-w-none">
                 <h2 id="summary-heading" class="text-lg font-medium text-white">
-                    {{ __('Cart summary') }}
+                    {{ __('cart_summary') }}
                 </h2>
 
                 <ul role="list" class="divide-y divide-white/10 text-sm font-medium text-white">
@@ -40,7 +40,7 @@
                 @endif
                 @if (session()->has('checkout.coupon.code'))
                     <div class="mt-2 text-xs text-white/80">
-                        {{ __('Applied coupon:') }} <span
+                        {{ __('checkout_applied_coupon') }} <span
                               class="font-semibold">{{ session('checkout.coupon.code') }}</span>
                     </div>
                 @endif

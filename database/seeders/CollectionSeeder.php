@@ -97,33 +97,34 @@ class CollectionSeeder extends Seeder
     {
         try {
             $response = Http::timeout(30)->get($imageUrl);
-            
+
             if ($response->successful()) {
                 $extension = 'jpg';
                 $filename = Str::slug($name) . '.' . $extension;
-                
+
                 // Ensure temp directory exists
                 $tempDir = storage_path('app/temp');
                 if (!is_dir($tempDir)) {
                     mkdir($tempDir, 0755, true);
                 }
-                
+
                 $tempPath = $tempDir . '/' . $filename;
-                
+
                 // Save temporary file
                 file_put_contents($tempPath, $response->body());
-                
+
                 // Add media to collection
-                $collection->addMedia($tempPath)
+                $collection
+                    ->addMedia($tempPath)
                     ->usingName($name)
                     ->usingFileName($filename)
                     ->toMediaCollection($collectionName);
-                
+
                 // Clean up temporary file
                 if (file_exists($tempPath)) {
                     unlink($tempPath);
                 }
-                
+
                 $this->command->info("✓ Added {$collectionName} image for {$collection->name}");
             }
         } catch (\Exception $e) {

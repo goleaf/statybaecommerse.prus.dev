@@ -4,7 +4,7 @@ namespace App\Traits;
 
 use App\DTO\PriceData;
 use Illuminate\Support\Facades\DB;
-use Shopper\Core\Helpers\Price;
+// Legacy Shopper\Core\Helpers\Price removed - using native Laravel helpers
 
 trait HasProductPricing
 {

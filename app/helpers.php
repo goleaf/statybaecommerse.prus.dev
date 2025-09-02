@@ -16,10 +16,10 @@ if (!function_exists('current_currency')) {
             return ZoneSessionManager::getSession()->currencyCode;
         }
 
-        // During tests or before Shopper migrations, fallback safely without DB access
-        if (Schema::hasTable('sh_settings')) {
+        // During tests or before settings table exists, fallback safely without DB access
+        if (Schema::hasTable('settings')) {
             try {
-                $code = shopper_currency();
+                $code = \App\Models\Setting::where('key', 'currency_code')->value('value');
                 if (is_string($code) && $code !== '') {
                     return $code;
                 }
@@ -33,13 +33,13 @@ if (!function_exists('current_currency')) {
     }
 }
 
-if (!function_exists('shopper_currency')) {
-    function shopper_currency(): string
+if (!function_exists('app_currency')) {
+    function app_currency(): string
     {
         $code = (string) (config('app.currency', 'EUR'));
-        if (Schema::hasTable('sh_settings')) {
+        if (Schema::hasTable('settings')) {
             try {
-                $db = DB::table('sh_settings')->where('key', 'currency_code')->value('value');
+                $db = \App\Models\Setting::where('key', 'currency_code')->value('value');
                 if (is_string($db) && $db !== '') {
                     return $db;
                 }
@@ -64,8 +64,8 @@ if (!function_exists('format_money')) {
     }
 }
 
-if (!function_exists('shopper_money_format')) {
-    function shopper_money_format(float|int|string $amount, ?string $currency = null): string
+if (!function_exists('app_money_format')) {
+    function app_money_format(float|int|string $amount, ?string $currency = null): string
     {
         return format_money((float) $amount, $currency ?: current_currency());
     }
@@ -95,10 +95,10 @@ if (!function_exists('format_datetime')) {
     }
 }
 
-if (!function_exists('shopper_feature_enabled')) {
-    function shopper_feature_enabled(string $featureName): bool
+if (!function_exists('app_feature_enabled')) {
+    function app_feature_enabled(string $featureName): bool
     {
-        $feature = config('shopper.features.' . $featureName);
+        $feature = config('app.features.' . $featureName);
         if ($feature instanceof \App\Support\FeatureState) {
             return $feature === \App\Support\FeatureState::Enabled;
         }
@@ -174,35 +174,9 @@ if (!function_exists('debug_order')) {
     }
 }
 
-if (!function_exists('shopper_table')) {
-    function shopper_table(string $name): string
+if (!function_exists('app_placeholder_url')) {
+    function app_placeholder_url(): string
     {
-        $prefix = (string) config('shopper.core.table_prefix', 'sh_');
-        return $prefix . $name;
-    }
-}
-
-if (!function_exists('shopper_panel_assets')) {
-    function shopper_panel_assets(string $asset): string
-    {
-        return url(shopper()->prefix() . $asset);
-    }
-}
-
-if (!function_exists('shopper_fallback_url')) {
-    function shopper_fallback_url(): string
-    {
-        return shopper_panel_assets('/images/placeholder.jpg');
-    }
-}
-
-if (!function_exists('shopper')) {
-    function shopper(): \Shopper\ShopperPanel
-    {
-        static $panel = null;
-        if ($panel === null) {
-            $panel = new \Shopper\ShopperPanel(prefix: (string) config('shopper.core.prefix', '/admin'));
-        }
-        return $panel;
+        return asset('images/placeholder.jpg');
     }
 }

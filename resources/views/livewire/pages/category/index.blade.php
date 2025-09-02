@@ -1,7 +1,7 @@
 @section('meta')
     <x-meta
-            :title="__('Categories') . ' - ' . config('app.name')"
-            :description="__('Browse product categories')"
+            :title="__('nav_categories') . ' - ' . config('app.name')"
+            :description="__('categories_browse')"
             canonical="{{ url()->current() }}" />
 @endsection
 
@@ -21,13 +21,13 @@
             </ul>
         </x-alert>
     @endif
-    <h1 class="text-2xl font-semibold mb-6">{{ __('Categories') }}</h1>
+    <h1 class="text-2xl font-semibold mb-6">{{ __('nav_categories') }}</h1>
     @if ($roots->isEmpty())
-        <div class="text-slate-500">{{ __('No categories available.') }}</div>
+        <div class="text-slate-500">{{ __('categories_no_available') }}</div>
     @else
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <aside class="lg:col-span-1">
-                <h2 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Browse categories') }}</h2>
+                <h2 class="text-sm font-semibold text-gray-900 mb-3">{{ __('categories_browse') }}</h2>
                 <x-category.tree :nodes="$tree" />
             </aside>
             <div class="lg:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-6">
@@ -36,7 +36,7 @@
                        class="block border rounded-lg p-4 hover:shadow-sm">
                         <div class="aspect-square bg-gray-50 flex items-center justify-center mb-3">
                             @if ($root->getImageUrl('md'))
-                                <img loading="lazy" 
+                                <img loading="lazy"
                                      src="{{ $root->getImageUrl('md') }}"
                                      srcset="{{ $root->getImageUrl('sm') }} 200w, {{ $root->getImageUrl('md') }} 400w, {{ $root->getImageUrl('lg') }} 600w"
                                      sizes="(max-width: 640px) 200px, 400px"
@@ -49,7 +49,8 @@
                                      class="max-h-24 object-contain" />
                             @else
                                 <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                                    <span class="text-xs text-gray-500 font-medium">{{ strtoupper(substr($root->trans('name') ?? $root->name, 0, 2)) }}</span>
+                                    <span
+                                          class="text-xs text-gray-500 font-medium">{{ strtoupper(substr($root->trans('name') ?? $root->name, 0, 2)) }}</span>
                                 </div>
                             @endif
                         </div>

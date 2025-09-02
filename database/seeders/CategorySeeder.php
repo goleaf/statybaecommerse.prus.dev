@@ -141,12 +141,12 @@ class CategorySeeder extends Seeder
         );
 
         // Add main image if category was created and doesn't have one
-        if (($category->wasRecentlyCreated || !$category->hasMedia('images')) && isset($categoryData['image_url'])) {
+        if ($category && ($category->wasRecentlyCreated || !$category->hasMedia('images')) && isset($categoryData['image_url'])) {
             $this->downloadAndAttachImage($category, $categoryData['image_url'], 'images', $categoryData['name'] . ' Image');
         }
 
         // Add banner if category was created and doesn't have one
-        if (($category->wasRecentlyCreated || !$category->hasMedia('banner')) && isset($categoryData['banner_url'])) {
+        if ($category && ($category->wasRecentlyCreated || !$category->hasMedia('banner')) && isset($categoryData['banner_url'])) {
             $this->downloadAndAttachImage($category, $categoryData['banner_url'], 'banner', $categoryData['name'] . ' Banner');
         }
 
@@ -165,33 +165,34 @@ class CategorySeeder extends Seeder
     {
         try {
             $response = Http::timeout(30)->get($imageUrl);
-            
+
             if ($response->successful()) {
                 $extension = 'jpg';
                 $filename = Str::slug($name) . '.' . $extension;
-                
+
                 // Ensure temp directory exists
                 $tempDir = storage_path('app/temp');
                 if (!is_dir($tempDir)) {
                     mkdir($tempDir, 0755, true);
                 }
-                
+
                 $tempPath = $tempDir . '/' . $filename;
-                
+
                 // Save temporary file
                 file_put_contents($tempPath, $response->body());
-                
+
                 // Add media to category
-                $category->addMedia($tempPath)
+                $category
+                    ->addMedia($tempPath)
                     ->usingName($name)
                     ->usingFileName($filename)
                     ->toMediaCollection($collection);
-                
+
                 // Clean up temporary file
                 if (file_exists($tempPath)) {
                     unlink($tempPath);
                 }
-                
+
                 $this->command->info("✓ Added {$collection} image for {$category->name}");
             }
         } catch (\Exception $e) {

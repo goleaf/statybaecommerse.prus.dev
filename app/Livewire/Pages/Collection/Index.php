@@ -12,7 +12,7 @@ class Index extends Component
 {
     public function render(): View
     {
-        abort_if(!shopper_feature_enabled('collection'), 404);
+        abort_if(!app_feature_enabled('collection'), 404);
         $collections = CollectionModel::query()
             ->where('is_enabled', true)
             ->orderBy('name')

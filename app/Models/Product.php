@@ -83,7 +83,7 @@ final class Product extends Model implements HasMedia
     public function availableQuantity(): int
     {
         if (!$this->manage_stock) {
-            return 999; // Unlimited when not managing stock
+            return 999;  // Unlimited when not managing stock
         }
 
         return max($this->stock_quantity - $this->reservedQuantity(), 0);

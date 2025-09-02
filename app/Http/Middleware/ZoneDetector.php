@@ -1,24 +1,22 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
 use App\Actions\CountriesWithZone;
 use App\Actions\ZoneSessionManager;
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response;
+use Closure;
 
 class ZoneDetector
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! ZoneSessionManager::checkSession()) {
+        if (!ZoneSessionManager::checkSession()) {
             $countries = (new CountriesWithZone)->handle();
 
-            $currencyZone = $countries->firstWhere('currencyCode', shopper_currency());
+            $currencyZone = $countries->firstWhere('currencyCode', app_currency());
 
             if ($currencyZone) {
                 ZoneSessionManager::setSession($currencyZone);
@@ -34,7 +32,7 @@ class ZoneDetector
     {
         $defaultZone = $countries->firstWhere('zoneCode', config('starterkit.default_zone'));
 
-        if (! ZoneSessionManager::checkSession() && $defaultZone) {
+        if (!ZoneSessionManager::checkSession() && $defaultZone) {
             ZoneSessionManager::setSession($defaultZone);
         }
     }

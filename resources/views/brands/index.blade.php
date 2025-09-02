@@ -3,8 +3,8 @@
 <x-dynamic-component :component="$layout">
     @section('meta')
         <x-meta
-                :title="__('Brands') . ' - ' . config('app.name')"
-                :description="__('Browse our brands catalog by locale.')"
+                :title="__('nav_brands') . ' - ' . config('app.name')"
+                :description="__('brands_browse')"
                 :prev="$brands->previousPageUrl()"
                 :next="$brands->nextPageUrl()"
                 canonical="{{ url()->current() }}" />
@@ -28,19 +28,19 @@
         @endif
 
         <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-semibold">{{ __('Brands') }}</h1>
+            <h1 class="text-2xl font-semibold">{{ __('nav_brands') }}</h1>
             <div class="flex items-center gap-2">
-                <label for="sort" class="sr-only">{{ __('Sort') }}</label>
+                <label for="sort" class="sr-only">{{ __('sort') }}</label>
                 <select id="sort" class="rounded-md border-gray-300 text-sm"
                         onchange="location.href='?sort='+this.value;">
-                    <option value="name_asc" {{ request('sort') !== 'name_desc' ? 'selected' : '' }}>{{ __('Name (A–Z)') }}</option>
-                    <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>{{ __('Name (Z–A)') }}</option>
+                    <option value="name_asc" {{ request('sort') !== 'name_desc' ? 'selected' : '' }}>{{ __('name_asc') }}</option>
+                    <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>{{ __('name_desc') }}</option>
                 </select>
             </div>
         </div>
 
         @if ($brands->isEmpty())
-            <div class="text-slate-500">{{ __('No brands available.') }}</div>
+            <div class="text-slate-500">{{ __('brands_no_available') }}</div>
         @else
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach ($brands as $brand)

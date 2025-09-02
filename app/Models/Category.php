@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class Category extends Model implements HasMedia
 {
@@ -126,12 +126,12 @@ final class Category extends Model implements HasMedia
     {
         $depth = 0;
         $parent = $this->parent;
-        
+
         while ($parent) {
             $depth++;
             $parent = $parent->parent;
         }
-        
+
         return $depth;
     }
 
@@ -143,11 +143,11 @@ final class Category extends Model implements HasMedia
     public function getAllProductsCountAttribute(): int
     {
         $count = $this->products_count;
-        
+
         foreach ($this->children as $child) {
             $count += $child->all_products_count;
         }
-        
+
         return $count;
     }
 
@@ -176,11 +176,13 @@ final class Category extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('images')
+        $this
+            ->addMediaCollection('images')
             ->singleFile()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
 
-        $this->addMediaCollection('banner')
+        $this
+            ->addMediaCollection('banner')
             ->singleFile()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
