@@ -41,12 +41,9 @@ final class CurrencyResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('admin.currency.form.basic_info'))
+                // Currency Settings (Non-translatable)
+                Forms\Components\Section::make(__('translations.currency_settings'))
                     ->components([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('admin.currency.form.name'))
-                            ->required()
-                            ->maxLength(255),
                         
                         Forms\Components\TextInput::make('code')
                             ->label(__('admin.currency.form.code'))
@@ -79,6 +76,25 @@ final class CurrencyResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
+
+                // Multilanguage Tabs for Currency Content
+                Tabs::make('currency_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'currency_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.currency_name_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('currency_tab')
+                    ->contained(false),
                 
                 Forms\Components\Section::make(__('admin.currency.form.formatting'))
                     ->components([

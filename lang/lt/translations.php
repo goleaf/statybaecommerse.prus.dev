@@ -346,4 +346,12 @@ return [
     'contact_information' => 'Kontaktinė informacija',
     'notes' => 'Pastabos',
     'full_name' => 'Pilnas vardas',
+    // Zones
+    'zone_settings' => 'Zonos nustatymai',
+    'zone_information' => 'Zonos informacija',
+    'zone_description_help' => 'Aprašykite geografinę ar pristatymo zoną',
+    // Currencies
+    'currency_settings' => 'Valiutos nustatymai',
+    'currency_information' => 'Valiutos informacija',
+    'currency_name_help' => 'Valiutos pavadinimas rodymui (pvz., Euras, JAV doleris)',
 ];

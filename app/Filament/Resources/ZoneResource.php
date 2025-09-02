@@ -42,23 +42,39 @@ final class ZoneResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('admin.zone.form.basic_info'))
+                // Zone Settings (Non-translatable)
+                Forms\Components\Section::make(__('translations.zone_settings'))
                     ->components([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('admin.zone.form.name'))
-                            ->required()
-                            ->maxLength(255),
-                        
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('admin.zone.form.description'))
-                            ->maxLength(1000)
-                            ->rows(3),
-                        
                         Forms\Components\Toggle::make('enabled')
-                            ->label(__('admin.zone.form.enabled'))
+                            ->label(__('translations.enabled'))
                             ->default(true),
                     ])
-                    ->columns(2),
+                    ->columns(1),
+
+                // Multilanguage Tabs for Zone Content
+                Tabs::make('zone_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'zone_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.description'),
+                                    'maxLength' => 1000,
+                                    'rows' => 3,
+                                    'placeholder' => __('translations.zone_description_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('zone_tab')
+                    ->contained(false),
                 
                 Forms\Components\Section::make(__('admin.zone.form.countries'))
                     ->components([

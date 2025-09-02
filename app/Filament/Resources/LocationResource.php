@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\LocationResource\Pages;
 use App\Models\Location;
+use App\Services\MultiLanguageTabService;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -12,6 +13,8 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class LocationResource extends Resource
 {
@@ -27,21 +30,9 @@ final class LocationResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('translations.location_information'))
+                // Location Address Information (Non-translatable)
+                Forms\Components\Section::make(__('translations.location_address'))
                     ->components([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('translations.name'))
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('slug')
-                            ->label(__('translations.slug'))
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(Location::class, 'slug', ignoreRecord: true),
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('translations.description'))
-                            ->maxLength(1000)
-                            ->rows(3),
                         Forms\Components\TextInput::make('address')
                             ->label(__('translations.address'))
                             ->maxLength(255),
@@ -76,6 +67,38 @@ final class LocationResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
+
+                // Multilanguage Tabs for Location Content
+                Tabs::make('location_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'location_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'slug' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.slug'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.slug_auto_generated'),
+                                ],
+                                'description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.description'),
+                                    'maxLength' => 1000,
+                                    'rows' => 3,
+                                    'placeholder' => __('translations.location_description_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('location_tab')
+                    ->contained(false),
             ]);
     }
 

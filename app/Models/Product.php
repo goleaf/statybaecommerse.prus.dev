@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 #[ObservedBy([ProductObserver::class])]
 final class Product extends Model implements HasMedia
@@ -25,6 +27,7 @@ final class Product extends Model implements HasMedia
     use HasProductPricing;
     use HasTranslations;
     use InteractsWithMedia;
+    use LogsActivity;
 
     protected $fillable = [
         'name',
@@ -68,6 +71,16 @@ final class Product extends Model implements HasMedia
 
     protected $table = 'products';
     protected string $translationModel = \App\Models\Translations\ProductTranslation::class;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'slug', 'description', 'sku', 'price', 'sale_price', 'stock_quantity', 'is_visible'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "Product {$eventName}")
+            ->useLogName('product');
+    }
 
     public function isPublished(): bool
     {

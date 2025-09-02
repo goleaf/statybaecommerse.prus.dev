@@ -346,4 +346,22 @@ return [
     'contact_information' => 'Contact Information',
     'notes' => 'Notes',
     'full_name' => 'Full Name',
+    // Zones
+    'zone_settings' => 'Zone Settings',
+    'zone_information' => 'Zone Information',
+    'zone_description_help' => 'Describe the geographic or shipping zone',
+    // Currencies
+    'currency_settings' => 'Currency Settings',
+    'currency_information' => 'Currency Information',
+    'currency_name_help' => 'Display name for this currency (e.g., Euro, US Dollar)',
+    // Locations
+    'location_information' => 'Location Information',
+    'location_address' => 'Location Address',
+    'location_description_help' => 'Describe this location or facility',
+    'address' => 'Address',
+    'city' => 'City',
+    'state' => 'State',
+    'postal_code' => 'Postal Code',
+    'country' => 'Country',
+    'is_default' => 'Default Location',
 ];
