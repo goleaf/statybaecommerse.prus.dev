@@ -159,15 +159,29 @@ return new class extends Migration {
         }
 
         // Enhance users table for admin features
-        if (Schema::hasTable('users') && !Schema::hasColumn('users', 'avatar_url')) {
+        if (Schema::hasTable('users')) {
             Schema::table('users', function (Blueprint $table): void {
-                $table->string('avatar_url')->nullable()->after('email_verified_at');
-                $table->timestamp('last_login_at')->nullable()->after('avatar_url');
-                $table->string('last_login_ip')->nullable()->after('last_login_at');
-                $table->boolean('is_admin')->default(false)->after('last_login_ip');
-                $table->boolean('is_active')->default(true)->after('is_admin');
-                $table->json('preferences')->nullable()->after('is_active');
-                $table->string('timezone')->default('UTC')->after('preferences');
+                if (!Schema::hasColumn('users', 'avatar_url')) {
+                    $table->string('avatar_url')->nullable()->after('email_verified_at');
+                }
+                if (!Schema::hasColumn('users', 'last_login_at')) {
+                    $table->timestamp('last_login_at')->nullable()->after('avatar_url');
+                }
+                if (!Schema::hasColumn('users', 'last_login_ip')) {
+                    $table->string('last_login_ip')->nullable()->after('last_login_at');
+                }
+                if (!Schema::hasColumn('users', 'is_admin')) {
+                    $table->boolean('is_admin')->default(false)->after('last_login_ip');
+                }
+                if (!Schema::hasColumn('users', 'is_active')) {
+                    $table->boolean('is_active')->default(true)->after('is_admin');
+                }
+                if (!Schema::hasColumn('users', 'preferences')) {
+                    $table->json('preferences')->nullable()->after('is_active');
+                }
+                if (!Schema::hasColumn('users', 'timezone')) {
+                    $table->string('timezone')->default('UTC')->after('preferences');
+                }
             });
         }
 
