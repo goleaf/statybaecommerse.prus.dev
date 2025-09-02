@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
+use App\Services\MultiLanguageTabService;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -12,6 +13,8 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class AttributeResource extends Resource
 {
@@ -27,23 +30,9 @@ final class AttributeResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('translations.attribute_information'))
+                // Attribute Settings (Non-translatable)
+                Forms\Components\Section::make(__('translations.attribute_settings'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('translations.name'))
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
-                        Forms\Components\TextInput::make('slug')
-                            ->label(__('translations.slug'))
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(Attribute::class, 'slug', ignoreRecord: true),
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('translations.description'))
-                            ->maxLength(1000)
-                            ->rows(3),
                         Forms\Components\Select::make('type')
                             ->label(__('translations.type'))
                             ->options([
@@ -57,6 +46,10 @@ final class AttributeResource extends Resource
                             ])
                             ->required()
                             ->default('text'),
+                        Forms\Components\TextInput::make('sort_order')
+                            ->label(__('translations.sort_order'))
+                            ->numeric()
+                            ->default(0),
                         Forms\Components\Toggle::make('is_required')
                             ->label(__('translations.required'))
                             ->default(false),
@@ -66,12 +59,42 @@ final class AttributeResource extends Resource
                         Forms\Components\Toggle::make('is_searchable')
                             ->label(__('translations.searchable'))
                             ->default(false),
-                        Forms\Components\TextInput::make('sort_order')
-                            ->label(__('translations.sort_order'))
-                            ->numeric()
-                            ->default(0),
+                        Forms\Components\Toggle::make('is_enabled')
+                            ->label(__('translations.enabled'))
+                            ->default(true),
                     ])
-                    ->columns(2),
+                    ->columns(3),
+
+                // Multilanguage Tabs for Translatable Content
+                Tabs::make('attribute_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'attribute_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.attribute_name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'slug' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.slug'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.slug_auto_generated'),
+                                ],
+                                'description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.attribute_description'),
+                                    'maxLength' => 1000,
+                                    'rows' => 3,
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('attribute_tab')
+                    ->contained(false),
             ]);
     }
 

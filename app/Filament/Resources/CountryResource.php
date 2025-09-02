@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CountryResource\Pages;
 use App\Models\Country;
+use App\Services\MultiLanguageTabService;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -12,6 +13,8 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class CountryResource extends Resource
 {
@@ -71,30 +74,29 @@ final class CountryResource extends Resource
                             ->placeholder('Add currency codes (e.g., EUR, USD)'),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Translations')
-                    ->schema([
-                        Forms\Components\Repeater::make('translations')
-                            ->relationship('translations')
-                            ->schema([
-                                Forms\Components\Select::make('locale')
-                                    ->options([
-                                        'en' => 'English',
-                                        'lt' => 'Lithuanian',
-                                    ])
-                                    ->required(),
-                                Forms\Components\TextInput::make('name')
-                                    ->required()
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('name_official')
-                                    ->label('Official Name')
-                                    ->maxLength(255),
-                            ])
-                            ->columns(3)
-                            ->defaultItems(2)
-                            ->addActionLabel('Add Translation')
-                            ->reorderableWithButtons()
-                            ->collapsible(),
-                    ]),
+                // Multilanguage Tabs for Country Names
+                Tabs::make('country_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'country_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.country_name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'name_official' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.country_official_name'),
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.official_name_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('country_tab')
+                    ->contained(false),
             ]);
     }
 

@@ -71,6 +71,7 @@ class LithuanianBuilderShopSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@statybaecommerse.lt'],
             [
+                'name' => 'Administratorius Sistema',
                 'first_name' => 'Administratorius',
                 'last_name' => 'Sistema',
                 'password' => bcrypt('password'),
@@ -83,6 +84,7 @@ class LithuanianBuilderShopSeeder extends Seeder
         $manager = User::firstOrCreate(
             ['email' => 'manager@statybaecommerse.lt'],
             [
+                'name' => 'Vadybininkas Parduotuvės',
                 'first_name' => 'Vadybininkas',
                 'last_name' => 'Parduotuvės',
                 'password' => bcrypt('password'),

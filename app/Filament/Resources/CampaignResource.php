@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Models\Campaign;
+use App\Services\MultiLanguageTabService;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class CampaignResource extends Resource
 {
@@ -33,37 +36,56 @@ final class CampaignResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('Campaign Information'))
+                // Campaign Status and Settings (Non-translatable)
+                Forms\Components\Section::make(__('translations.campaign_settings'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('Name'))
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => 
-                                $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
-                        Forms\Components\TextInput::make('slug')
-                            ->label(__('Slug'))
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(Campaign::class, 'slug', ignoreRecord: true),
-                        Forms\Components\RichEditor::make('description')
-                            ->label(__('Description'))
-                            ->maxLength(65535),
                         Forms\Components\Select::make('status')
-                            ->label(__('Status'))
+                            ->label(__('translations.status'))
                             ->options([
-                                'draft' => __('Draft'),
-                                'active' => __('Active'),
-                                'scheduled' => __('Scheduled'),
-                                'paused' => __('Paused'),
-                                'completed' => __('Completed'),
-                                'cancelled' => __('Cancelled'),
+                                'draft' => __('translations.draft'),
+                                'active' => __('translations.active'),
+                                'scheduled' => __('translations.scheduled'),
+                                'paused' => __('translations.paused'),
+                                'completed' => __('translations.completed'),
+                                'cancelled' => __('translations.cancelled'),
                             ])
                             ->default('draft')
                             ->required(),
                     ])
-                    ->columns(2),
+                    ->columns(1),
+
+                // Multilanguage Tabs for Campaign Content
+                Tabs::make('campaign_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'campaign_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.campaign_name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'slug' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.slug'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.slug_auto_generated'),
+                                ],
+                                'description' => [
+                                    'type' => 'rich_editor',
+                                    'label' => __('translations.campaign_description'),
+                                    'toolbar' => [
+                                        'bold', 'italic', 'link', 'bulletList', 'orderedList', 
+                                        'h2', 'h3', 'blockquote', 'table'
+                                    ],
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('campaign_tab')
+                    ->contained(false),
                 Forms\Components\Section::make(__('Scheduling'))
                     ->schema([
                         Forms\Components\DateTimePicker::make('starts_at')

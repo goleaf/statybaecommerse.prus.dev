@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Models\CustomerGroup;
+use App\Services\MultiLanguageTabService;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -12,6 +13,8 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class CustomerGroupResource extends Resource
 {
@@ -27,16 +30,9 @@ final class CustomerGroupResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('translations.customer_group_information'))
+                // Customer Group Settings (Non-translatable)
+                Forms\Components\Section::make(__('translations.customer_group_settings'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('translations.name'))
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('translations.description'))
-                            ->maxLength(1000)
-                            ->rows(3),
                         Forms\Components\TextInput::make('discount_percentage')
                             ->label(__('translations.discount_percentage'))
                             ->numeric()
@@ -49,6 +45,30 @@ final class CustomerGroupResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
+
+                // Multilanguage Tabs for Customer Group Content
+                Tabs::make('customer_group_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'group_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.description'),
+                                    'maxLength' => 1000,
+                                    'rows' => 3,
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('customer_group_tab')
+                    ->contained(false),
             ]);
     }
 

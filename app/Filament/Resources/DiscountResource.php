@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DiscountResource\Pages;
 use App\Models\Discount;
+use App\Services\MultiLanguageTabService;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -12,6 +13,8 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class DiscountResource extends Resource
 {

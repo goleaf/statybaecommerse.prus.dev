@@ -17,13 +17,12 @@ return new class extends Migration
             $table->string('status')->default('draft'); // draft, published, archived
             $table->string('format')->default('html'); // html, pdf
             $table->string('file_path')->nullable(); // Path to generated PDF file
-            $table->morphs('documentable'); // Related model (Order, Customer, etc.)
+            $table->morphs('documentable'); // Related model (Order, Customer, etc.) - creates index automatically
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('generated_at')->nullable();
             $table->timestamps();
             
             $table->index(['status', 'created_at']);
-            $table->index(['documentable_type', 'documentable_id']);
             $table->index('created_by');
         });
     }

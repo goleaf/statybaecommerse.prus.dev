@@ -139,6 +139,11 @@ final class Product extends Model implements HasMedia
         return $this->morphMany(Inventory::class, 'inventoriable');
     }
 
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
     public function attributes(): BelongsToMany
     {
         return $this->belongsToMany(

@@ -28,47 +28,63 @@ return new class extends Migration {
         }
 
         // Enhance categories table
-        if (Schema::hasTable('categories') && !Schema::hasColumn('categories', 'meta_title')) {
+        if (Schema::hasTable('categories')) {
             Schema::table('categories', function (Blueprint $table): void {
-                $table->string('meta_title')->nullable()->after('description');
-                $table->text('meta_description')->nullable()->after('meta_title');
-                $table->json('meta_keywords')->nullable()->after('meta_description');
-                $table->boolean('is_featured')->default(false)->after('is_visible');
-                $table->integer('sort_order')->default(0)->after('is_featured');
-                $table->string('icon')->nullable()->after('sort_order');
-                $table->string('color')->nullable()->after('icon');
+                if (!Schema::hasColumn('categories', 'meta_title')) {
+                    $table->string('meta_title')->nullable()->after('description');
+                }
+                if (!Schema::hasColumn('categories', 'meta_description')) {
+                    $table->text('meta_description')->nullable()->after('meta_title');
+                }
+                if (!Schema::hasColumn('categories', 'meta_keywords')) {
+                    $table->json('meta_keywords')->nullable()->after('meta_description');
+                }
+                if (!Schema::hasColumn('categories', 'is_featured')) {
+                    $table->boolean('is_featured')->default(false)->after('is_visible');
+                }
+                if (!Schema::hasColumn('categories', 'sort_order')) {
+                    $table->integer('sort_order')->default(0)->after('is_featured');
+                }
+                if (!Schema::hasColumn('categories', 'icon')) {
+                    $table->string('icon')->nullable()->after('sort_order');
+                }
+                if (!Schema::hasColumn('categories', 'color')) {
+                    $table->string('color')->nullable()->after('icon');
+                }
             });
         }
 
         // Enhance brands table
-        if (Schema::hasTable('brands') && !Schema::hasColumn('brands', 'meta_title')) {
+        if (Schema::hasTable('brands')) {
             Schema::table('brands', function (Blueprint $table): void {
-                $table->string('meta_title')->nullable()->after('description');
-                $table->text('meta_description')->nullable()->after('meta_title');
-                $table->json('meta_keywords')->nullable()->after('meta_description');
-                $table->boolean('is_featured')->default(false)->after('is_visible');
-                $table->integer('sort_order')->default(0)->after('is_featured');
-                $table->string('website')->nullable()->after('sort_order');
-                $table->string('contact_email')->nullable()->after('website');
-                $table->string('contact_phone')->nullable()->after('contact_email');
+                if (!Schema::hasColumn('brands', 'meta_title')) {
+                    $table->string('meta_title')->nullable()->after('description');
+                }
+                if (!Schema::hasColumn('brands', 'meta_description')) {
+                    $table->text('meta_description')->nullable()->after('meta_title');
+                }
+                if (!Schema::hasColumn('brands', 'meta_keywords')) {
+                    $table->json('meta_keywords')->nullable()->after('meta_description');
+                }
+                if (!Schema::hasColumn('brands', 'is_featured')) {
+                    $table->boolean('is_featured')->default(false)->after('is_visible');
+                }
+                if (!Schema::hasColumn('brands', 'sort_order')) {
+                    $table->integer('sort_order')->default(0)->after('is_featured');
+                }
+                if (!Schema::hasColumn('brands', 'website')) {
+                    $table->string('website')->nullable()->after('sort_order');
+                }
+                if (!Schema::hasColumn('brands', 'contact_email')) {
+                    $table->string('contact_email')->nullable()->after('website');
+                }
+                if (!Schema::hasColumn('brands', 'contact_phone')) {
+                    $table->string('contact_phone')->nullable()->after('contact_email');
+                }
             });
         }
 
-        // Create activity log table for admin audit trail
-        if (!Schema::hasTable('activity_log')) {
-            Schema::create('activity_log', function (Blueprint $table): void {
-                $table->bigIncrements('id');
-                $table->string('log_name')->nullable()->index();
-                $table->text('description');
-                $table->nullableMorphs('subject', 'subject');
-                $table->nullableMorphs('causer', 'causer');
-                $table->json('properties')->nullable();
-                $table->uuid('batch_uuid')->nullable();
-                $table->timestamps();
-
-                $table->index('log_name');
-            });
-        }
+        // Activity log table is created by the Spatie Activity Log plugin migration
 
         // Create notifications table for admin notifications
         if (!Schema::hasTable('notifications')) {
@@ -114,12 +130,10 @@ return new class extends Migration {
             Schema::create('filament_notifications', function (Blueprint $table): void {
                 $table->uuid('id')->primary();
                 $table->string('type');
-                $table->morphs('notifiable');
+                $table->morphs('notifiable'); // This already creates the index
                 $table->text('data');
                 $table->timestamp('read_at')->nullable();
                 $table->timestamps();
-
-                $table->index(['notifiable_type', 'notifiable_id']);
             });
         }
 

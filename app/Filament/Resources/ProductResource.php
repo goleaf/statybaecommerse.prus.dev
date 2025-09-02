@@ -176,40 +176,66 @@ final class ProductResource extends Resource
                             ->required(),
                     ])
                     ->columns(4),
-                Forms\Components\Section::make('Translations')
-                    ->schema([
-                        Forms\Components\Repeater::make('translations')
-                            ->relationship('translations')
-                            ->schema([
-                                Forms\Components\Select::make('locale')
-                                    ->options([
-                                        'en' => 'English',
-                                        'lt' => 'Lithuanian',
-                                    ])
-                                    ->required(),
-                                Forms\Components\TextInput::make('name')
-                                    ->required()
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('slug')
-                                    ->required()
-                                    ->maxLength(255),
-                                Forms\Components\Textarea::make('summary')
-                                    ->maxLength(500)
-                                    ->rows(2),
-                                Forms\Components\RichEditor::make('description')
-                                    ->maxLength(65535),
-                                Forms\Components\TextInput::make('seo_title')
-                                    ->maxLength(255),
-                                Forms\Components\Textarea::make('seo_description')
-                                    ->maxLength(300)
-                                    ->rows(2),
-                            ])
-                            ->columns(2)
-                            ->defaultItems(2)
-                            ->addActionLabel('Add Translation')
-                            ->reorderableWithButtons()
-                            ->collapsible(),
-                    ]),
+                // Multilanguage Tabs for Translatable Content
+                Tabs::make('product_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'basic_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'slug' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.slug'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.slug_auto_generated'),
+                                ],
+                                'summary' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.summary'),
+                                    'maxLength' => 500,
+                                    'rows' => 2,
+                                    'placeholder' => __('translations.product_summary_help'),
+                                ],
+                                'description' => [
+                                    'type' => 'rich_editor',
+                                    'label' => __('translations.description'),
+                                    'toolbar' => [
+                                        'bold', 'italic', 'link', 'bulletList', 'orderedList', 
+                                        'h2', 'h3', 'blockquote', 'codeBlock', 'table'
+                                    ],
+                                ],
+                            ],
+                            'seo_information' => [
+                                'seo_title' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.seo_title'),
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.seo_title_help'),
+                                ],
+                                'seo_description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.seo_description'),
+                                    'maxLength' => 300,
+                                    'rows' => 3,
+                                    'placeholder' => __('translations.seo_description_help'),
+                                ],
+                                'meta_keywords' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.meta_keywords'),
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.meta_keywords_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('product_tab')
+                    ->contained(false),
             ]);
     }
 

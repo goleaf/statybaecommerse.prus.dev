@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Models\DocumentTemplate;
+use App\Services\MultiLanguageTabService;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -12,6 +13,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class DocumentTemplateResource extends Resource
 {
@@ -82,35 +85,47 @@ final class DocumentTemplateResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make(__('documents.template_content'))
-                    ->schema([
-                        Forms\Components\RichEditor::make('content')
-                            ->label(__('documents.content'))
-                            ->required()
-                            ->columnSpanFull()
-                            ->toolbarButtons([
-                                'blockquote',
-                                'bold',
-                                'bulletList',
-                                'codeBlock',
-                                'h2',
-                                'h3',
-                                'italic',
-                                'link',
-                                'orderedList',
-                                'redo',
-                                'strike',
-                                'table',
-                                'undo',
-                            ])
-                            ->helperText(__('documents.content_help')),
+                // Multilanguage Tabs for Template Content
+                Tabs::make('template_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'template_content' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.template_name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.template_description'),
+                                    'maxLength' => 1000,
+                                    'rows' => 3,
+                                ],
+                                'content' => [
+                                    'type' => 'rich_editor',
+                                    'label' => __('translations.template_content'),
+                                    'toolbar' => [
+                                        'blockquote', 'bold', 'bulletList', 'codeBlock', 'h2', 'h3',
+                                        'italic', 'link', 'orderedList', 'redo', 'strike', 'table', 'undo'
+                                    ],
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('template_tab')
+                    ->contained(false),
 
+                Forms\Components\Section::make(__('documents.template_variables'))
+                    ->schema([
                         Forms\Components\TagsInput::make('variables')
                             ->label(__('documents.variables'))
                             ->helperText(__('documents.variables_help'))
                             ->placeholder('$CUSTOMER_NAME, $ORDER_TOTAL, $CURRENT_DATE')
                             ->columnSpanFull(),
-                    ]),
+                    ])
+                    ->collapsed(),
 
                 Forms\Components\Section::make(__('documents.print_settings'))
                     ->schema([
