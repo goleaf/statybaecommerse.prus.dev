@@ -45,7 +45,7 @@ final class ProductResource extends Resource
         return ['name', 'sku', 'brand.name', 'categories.name'];
     }
 
-    public static function getGlobalSearchResultDetails(Model $record): array
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
     {
         return [
             'Brand' => $record->brand?->name,

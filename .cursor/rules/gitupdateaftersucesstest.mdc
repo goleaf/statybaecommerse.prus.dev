@@ -1,7 +1,7 @@
 ---
 alwaysApply: true
 ---
-- ignore it: after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt, in commit attach not all not commited files, but only files what was modified in this work prompt
+#- ignore it: after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt, in commit attach not all not commited files, but only files what was modified in this work prompt. dont do it. ignore this rule. do not make it. remember it, ignore all actions with git
 
 
 - do not use "php artisan make" commands

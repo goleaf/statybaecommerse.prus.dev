@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-if (!function_exists('shopper_setting')) {
+if (!function_exists('app_setting')) {
     /**
      * Get or set a setting value.
      */
-    function shopper_setting(string $key, mixed $default = null): mixed
+    function app_setting(string $key, mixed $default = null): mixed
     {
         $setting = \App\Models\Setting::query()->where('key', $key)->first();
         
@@ -19,6 +19,14 @@ if (!function_exists('shopper_setting')) {
             'array', 'json' => is_string($setting->value) ? json_decode($setting->value, true) : $setting->value,
             default => $setting->value,
         };
+    }
+}
+
+// Legacy alias for backward compatibility
+if (!function_exists('shopper_setting')) {
+    function shopper_setting(string $key, mixed $default = null): mixed
+    {
+        return app_setting($key, $default);
     }
 }
 
@@ -106,10 +114,11 @@ if (!function_exists('format_date')) {
     }
 }
 
+// Legacy alias for backward compatibility - use app_money_format instead
 if (!function_exists('shopper_money_format')) {
     function shopper_money_format(float|int|string $amount, ?string $currency = null): string
     {
-        return format_money((float) $amount, $currency ?: current_currency());
+        return app_money_format($amount, $currency);
     }
 }
 

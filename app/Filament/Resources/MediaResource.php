@@ -18,7 +18,7 @@ final class MediaResource extends Resource
 {
     protected static ?string $model = Media::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-photo';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
     protected static string|UnitEnum|null $navigationGroup = 'Content';
 
@@ -182,7 +182,7 @@ final class MediaResource extends Resource
         return ['name', 'file_name', 'collection_name'];
     }
 
-    public static function getGlobalSearchResultDetails(Model $record): array
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
     {
         return [
             'Collection' => $record->collection_name,

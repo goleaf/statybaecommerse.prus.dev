@@ -40,14 +40,18 @@ final class AdminPanelProvider extends PanelProvider
                 'danger' => Color::Red,
                 'info' => Color::Sky,
             ])
-            // ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            // ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([
                 Dashboard::class,
             ])
             ->widgets([
                 AccountWidget::class,
+                \App\Filament\Widgets\ComprehensiveStatsWidget::class,
+                \App\Filament\Widgets\QuickActionsWidget::class,
                 \App\Filament\Widgets\EnhancedAnalyticsWidget::class,
+                \App\Filament\Widgets\AdvancedOrdersWidget::class,
                 \App\Filament\Widgets\RecentActivityWidget::class,
                 \App\Filament\Widgets\LowStockAlertsWidget::class,
             ])
@@ -69,6 +73,13 @@ final class AdminPanelProvider extends PanelProvider
             ->databaseNotificationsPolling('30s')
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->sidebarCollapsibleOnDesktop()
+            ->topNavigation()
+            ->maxContentWidth('full')
+            ->font('Inter')
+            ->darkMode()
+            ->brandName('Statyba E-Commerce')
+            ->globalSearch()
+            ->globalSearchDebounce('500ms')
             ->navigationGroups([
                 'Dashboard' => [
                     'label' => __('Dashboard'),
@@ -132,8 +143,7 @@ final class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-cog-6-tooth'),
             ])
             ->plugins([
-                // All plugins temporarily disabled due to Filament v4 compatibility issues
-                // Will implement functionality manually using native Filament v4 features
+                \Filament\SpatieLaravelMediaLibraryPlugin\SpatieMediaLibraryPlugin::make(),
             ])
             ->spa();
     }

@@ -22,6 +22,7 @@ class User extends Authenticatable implements HasLocalePreferenceContract
     use HasFactory, HasRoles, Notifiable, LogsActivity;
 
     protected $fillable = [
+        'name',
         'email',
         'password',
         'preferred_locale',
@@ -33,6 +34,16 @@ class User extends Authenticatable implements HasLocalePreferenceContract
         'birth_date',
         'timezone',
         'opt_in',
+        'phone',
+        'date_of_birth',
+        'is_active',
+        'accepts_marketing',
+        'two_factor_enabled',
+        'last_login_at',
+        'preferences',
+        'avatar_url',
+        'last_login_ip',
+        'is_admin',
     ];
 
     protected $hidden = [
@@ -107,6 +118,12 @@ class User extends Authenticatable implements HasLocalePreferenceContract
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
+    }
+
+    public function wishlist(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'user_wishlists')
+            ->withTimestamps();
     }
 
     public function cartItems(): HasMany

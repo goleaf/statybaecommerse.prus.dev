@@ -1,120 +1,109 @@
 <?php declare(strict_types=1);
 
 return [
-    // General
-    'documents' => 'Dokumentai',
-    'document' => 'Dokumentas',
-    'templates' => 'Šablonai',
-    'template' => 'Šablonas',
-    'generate_document' => 'Generuoti dokumentą',
-    'document_generated' => 'Dokumentas sėkmingai sugeneruotas',
-    'generate' => 'Generuoti',
-    'generate_pdf' => 'Generuoti PDF',
-    'download' => 'Atsisiųsti',
-    'yes' => 'Taip',
-    'no' => 'Ne',
+    // Document Types
+    'invoice' => 'Sąskaita faktūra',
+    'receipt' => 'Kvitas',
+    'contract' => 'Sutartis',
+    'agreement' => 'Susitarimas',
+    'catalog' => 'Katalogas',
+    'report' => 'Ataskaita',
+    'certificate' => 'Sertifikatas',
+    'quote' => 'Pasiūlymas',
+    'proposal' => 'Projektas',
+    'terms' => 'Taisyklės ir sąlygos',
 
-    // Fields
-    'name' => 'Pavadinimas',
-    'slug' => 'Nuoroda',
-    'title' => 'Antraštė',
+    // Document Categories
+    'sales' => 'Pardavimai',
+    'marketing' => 'Rinkodara',
+    'legal' => 'Teisiniai',
+    'finance' => 'Finansai',
+    'operations' => 'Operacijos',
+    'customer_service' => 'Klientų aptarnavimas',
+    'hr' => 'Žmogiškieji ištekliai',
+    'technical' => 'Techniniai',
+
+    // Document Status
+    'draft' => 'Juodraštis',
+    'published' => 'Publikuotas',
+    'archived' => 'Archyvuotas',
+    'pending' => 'Laukia peržiūros',
+
+    // Document Format
+    'html' => 'HTML',
+    'pdf' => 'PDF',
+    'docx' => 'Word dokumentas',
+    'xlsx' => 'Excel skaičiuoklė',
+
+    // Document Fields
+    'document_information' => 'Dokumento informacija',
+    'template_information' => 'Šablono informacija',
+    'title' => 'Pavadinimas',
     'description' => 'Aprašymas',
     'content' => 'Turinys',
+    'variables' => 'Kintamieji',
+    'settings' => 'Nustatymai',
     'type' => 'Tipas',
     'category' => 'Kategorija',
     'status' => 'Būsena',
     'format' => 'Formatas',
-    'variables' => 'Kintamieji',
-    'settings' => 'Nustatymai',
-    'is_active' => 'Aktyvus',
-    'created_at' => 'Sukurta',
+    'file_path' => 'Failo kelias',
     'created_by' => 'Sukūrė',
     'generated_at' => 'Sugeneruota',
-    'file_path' => 'Failo kelias',
-    'notes' => 'Pastabos',
-    'documents_count' => 'Dokumentų skaičius',
+    'is_active' => 'Aktyvus',
 
-    // Types
-    'types' => [
-        'invoice' => 'Sąskaita faktūra',
-        'receipt' => 'Kvitas',
-        'contract' => 'Sutartis',
-        'agreement' => 'Susitarimas',
-        'catalog' => 'Katalogas',
-        'report' => 'Ataskaita',
-        'certificate' => 'Sertifikatas',
-        'document' => 'Dokumentas',
-    ],
+    // Document Actions
+    'generate' => 'Generuoti dokumentą',
+    'generate_pdf' => 'Generuoti PDF',
+    'download' => 'Atsisiųsti',
+    'preview' => 'Peržiūrėti',
+    'duplicate' => 'Dubliuoti',
+    'archive' => 'Archyvuoti',
+    'restore' => 'Atkurti',
 
-    // Categories
-    'categories' => [
-        'sales' => 'Pardavimai',
-        'marketing' => 'Rinkodara',
-        'legal' => 'Teisiniai',
-        'finance' => 'Finansai',
-        'operations' => 'Operacijos',
-        'customer_service' => 'Klientų aptarnavimas',
-    ],
-
-    // Statuses
-    'statuses' => [
-        'draft' => 'Juodraštis',
-        'published' => 'Publikuotas',
-        'archived' => 'Archyvuotas',
-    ],
-
-    // Sections
-    'template_information' => 'Šablono informacija',
-    'template_content' => 'Šablono turinys',
-    'print_settings' => 'Spausdinimo nustatymai',
-    'document_information' => 'Dokumento informacija',
-    'metadata' => 'Metaduomenys',
-
-    // Form fields
+    // Variables
+    'available_variables' => 'Galimi kintamieji',
     'variable_name' => 'Kintamojo pavadinimas',
-    'variable_value' => 'Kintamojo reikšmė',
-    'add_variable' => 'Pridėti kintamąjį',
-    'setting_key' => 'Nustatymo raktas',
-    'setting_value' => 'Nustatymo reikšmė',
-    'add_setting' => 'Pridėti nustatymą',
-    'related_model' => 'Susijęs modelis',
-    'related_model_type' => 'Susijusio modelio tipas',
-    'related_model_id' => 'Susijusio modelio ID',
-    'created_from' => 'Sukurta nuo',
-    'created_until' => 'Sukurta iki',
+    'variable_description' => 'Aprašymas',
+    'variable_value' => 'Reikšmė',
+    'variable_help' => 'Naudokite kintamuosius kaip $CUSTOMER_NAME, $ORDER_TOTAL šablono turinyje',
 
-    // Help texts
-    'content_help' => 'Naudokite kintamuosius kaip $CUSTOMER_NAME, $ORDER_TOTAL savo turinyje. Jie bus pakeisti tikromis reikšmėmis generuojant dokumentus.',
-    'variables_help' => 'Apibrėžkite galimus šio šablono kintamuosius. Naudokite formatą: $VARIABLE_NAME',
-    
-    // Print-specific
-    'phone' => 'Telefonas',
-    'email' => 'El. paštas',
-    'vat_number' => 'PVM mokėtojo kodas',
-    'generated_on' => 'Sugeneruota',
-    'all_rights_reserved' => 'Visos teisės saugomos',
-    'preview' => 'Peržiūra',
+    // Print Settings
+    'print_settings' => 'Spausdinimo nustatymai',
+    'page_size' => 'Puslapio dydis',
+    'orientation' => 'Orientacija',
+    'margins' => 'Paraštės',
+    'header' => 'Antraštė',
+    'footer' => 'Poraštė',
+    'css' => 'Pasirinktinis CSS',
 
-    // Email notifications
-    'email' => [
-        'subject' => 'Dokumentas sugeneruotas: :title',
-        'greeting' => 'Sveiki :name,',
-        'generated' => 'Naujas :type dokumentas ":title" buvo sukurtas jums.',
-        'details' => 'Sugeneruota :date su būsena: :status',
-        'view_document' => 'Peržiūrėti dokumentą',
-        'footer' => 'Ačiū, kad naudojatės mūsų paslaugomis!',
-    ],
+    // Page Settings
+    'portrait' => 'Stačias',
+    'landscape' => 'Gulsčias',
+    'a4' => 'A4',
+    'a3' => 'A3',
+    'letter' => 'Letter',
+    'legal' => 'Legal',
 
-    // Database notifications
-    'notification' => [
-        'generated' => 'Dokumentas ":title" buvo sugeneruotas',
-    ],
+    // Messages
+    'document_generated' => 'Dokumentas sėkmingai sugeneruotas',
+    'document_deleted' => 'Dokumentas sėkmingai ištrintas',
+    'template_created' => 'Šablonas sėkmingai sukurtas',
+    'template_updated' => 'Šablonas sėkmingai atnaujintas',
+    'template_deleted' => 'Šablonas sėkmingai ištrintas',
+    'pdf_generated' => 'PDF sėkmingai sugeneruotas',
+    'generation_failed' => 'Dokumento generavimas nepavyko',
 
-    // Error messages
-    'errors' => [
-        'dangerous_content' => 'Šablono turinys turi potencialiai pavojingų elementų',
-        'malformed_html' => 'Šablono turinys turi netaisyklingą HTML',
-        'generation_failed' => 'Dokumento generavimas nepavyko',
-        'pdf_generation_failed' => 'PDF generavimas nepavyko',
-    ],
+    // Common Variables
+    'yes' => 'Taip',
+    'no' => 'Ne',
+    'true' => 'Tiesa',
+    'false' => 'Netiesa',
+    'enabled' => 'Įjungta',
+    'disabled' => 'Išjungta',
+
+    // Help Text
+    'template_help' => 'Naudokite HTML turinį su kintamaisiais kaip $CUSTOMER_NAME, $ORDER_TOTAL',
+    'variables_help' => 'Apibrėžkite kintamuosius, kuriuos galima naudoti dokumentų šablonuose',
+    'settings_help' => 'Konfigūruokite spausdinimo nustatymus PDF generavimui',
 ];

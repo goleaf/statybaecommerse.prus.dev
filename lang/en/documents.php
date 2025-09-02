@@ -1,120 +1,109 @@
 <?php declare(strict_types=1);
 
 return [
-    // General
-    'documents' => 'Documents',
-    'document' => 'Document',
-    'templates' => 'Templates',
-    'template' => 'Template',
-    'generate_document' => 'Generate Document',
-    'document_generated' => 'Document generated successfully',
-    'generate' => 'Generate',
-    'generate_pdf' => 'Generate PDF',
-    'download' => 'Download',
-    'yes' => 'Yes',
-    'no' => 'No',
+    // Document Types
+    'invoice' => 'Invoice',
+    'receipt' => 'Receipt',
+    'contract' => 'Contract',
+    'agreement' => 'Agreement',
+    'catalog' => 'Catalog',
+    'report' => 'Report',
+    'certificate' => 'Certificate',
+    'quote' => 'Quote',
+    'proposal' => 'Proposal',
+    'terms' => 'Terms and Conditions',
 
-    // Fields
-    'name' => 'Name',
-    'slug' => 'Slug',
+    // Document Categories
+    'sales' => 'Sales',
+    'marketing' => 'Marketing',
+    'legal' => 'Legal',
+    'finance' => 'Finance',
+    'operations' => 'Operations',
+    'customer_service' => 'Customer Service',
+    'hr' => 'Human Resources',
+    'technical' => 'Technical',
+
+    // Document Status
+    'draft' => 'Draft',
+    'published' => 'Published',
+    'archived' => 'Archived',
+    'pending' => 'Pending Review',
+
+    // Document Format
+    'html' => 'HTML',
+    'pdf' => 'PDF',
+    'docx' => 'Word Document',
+    'xlsx' => 'Excel Spreadsheet',
+
+    // Document Fields
+    'document_information' => 'Document Information',
+    'template_information' => 'Template Information',
     'title' => 'Title',
     'description' => 'Description',
     'content' => 'Content',
+    'variables' => 'Variables',
+    'settings' => 'Settings',
     'type' => 'Type',
     'category' => 'Category',
     'status' => 'Status',
     'format' => 'Format',
-    'variables' => 'Variables',
-    'settings' => 'Settings',
-    'is_active' => 'Active',
-    'created_at' => 'Created At',
+    'file_path' => 'File Path',
     'created_by' => 'Created By',
     'generated_at' => 'Generated At',
-    'file_path' => 'File Path',
-    'notes' => 'Notes',
-    'documents_count' => 'Documents Count',
+    'is_active' => 'Active',
 
-    // Types
-    'types' => [
-        'invoice' => 'Invoice',
-        'receipt' => 'Receipt',
-        'contract' => 'Contract',
-        'agreement' => 'Agreement',
-        'catalog' => 'Catalog',
-        'report' => 'Report',
-        'certificate' => 'Certificate',
-        'document' => 'Document',
-    ],
-
-    // Categories
-    'categories' => [
-        'sales' => 'Sales',
-        'marketing' => 'Marketing',
-        'legal' => 'Legal',
-        'finance' => 'Finance',
-        'operations' => 'Operations',
-        'customer_service' => 'Customer Service',
-    ],
-
-    // Statuses
-    'statuses' => [
-        'draft' => 'Draft',
-        'published' => 'Published',
-        'archived' => 'Archived',
-    ],
-
-    // Sections
-    'template_information' => 'Template Information',
-    'template_content' => 'Template Content',
-    'print_settings' => 'Print Settings',
-    'document_information' => 'Document Information',
-    'metadata' => 'Metadata',
-
-    // Form fields
-    'variable_name' => 'Variable Name',
-    'variable_value' => 'Variable Value',
-    'add_variable' => 'Add Variable',
-    'setting_key' => 'Setting Key',
-    'setting_value' => 'Setting Value',
-    'add_setting' => 'Add Setting',
-    'related_model' => 'Related Model',
-    'related_model_type' => 'Related Model Type',
-    'related_model_id' => 'Related Model ID',
-    'created_from' => 'Created From',
-    'created_until' => 'Created Until',
-
-    // Help texts
-    'content_help' => 'Use variables like $CUSTOMER_NAME, $ORDER_TOTAL in your content. They will be replaced with actual values when generating documents.',
-    'variables_help' => 'Define available variables for this template. Use format: $VARIABLE_NAME',
-    
-    // Print-specific
-    'phone' => 'Phone',
-    'email' => 'Email',
-    'vat_number' => 'VAT Number',
-    'generated_on' => 'Generated on',
-    'all_rights_reserved' => 'All rights reserved',
+    // Document Actions
+    'generate' => 'Generate Document',
+    'generate_pdf' => 'Generate PDF',
+    'download' => 'Download',
     'preview' => 'Preview',
+    'duplicate' => 'Duplicate',
+    'archive' => 'Archive',
+    'restore' => 'Restore',
 
-    // Email notifications
-    'email' => [
-        'subject' => 'Document Generated: :title',
-        'greeting' => 'Hello :name,',
-        'generated' => 'A new :type document ":title" has been generated for you.',
-        'details' => 'Generated on :date with status: :status',
-        'view_document' => 'View Document',
-        'footer' => 'Thank you for using our service!',
-    ],
+    // Variables
+    'available_variables' => 'Available Variables',
+    'variable_name' => 'Variable Name',
+    'variable_description' => 'Description',
+    'variable_value' => 'Value',
+    'variable_help' => 'Use variables like $CUSTOMER_NAME, $ORDER_TOTAL in your template content',
 
-    // Database notifications
-    'notification' => [
-        'generated' => 'Document ":title" has been generated',
-    ],
+    // Print Settings
+    'print_settings' => 'Print Settings',
+    'page_size' => 'Page Size',
+    'orientation' => 'Orientation',
+    'margins' => 'Margins',
+    'header' => 'Header',
+    'footer' => 'Footer',
+    'css' => 'Custom CSS',
 
-    // Error messages
-    'errors' => [
-        'dangerous_content' => 'Template content contains potentially dangerous elements',
-        'malformed_html' => 'Template content contains malformed HTML',
-        'generation_failed' => 'Document generation failed',
-        'pdf_generation_failed' => 'PDF generation failed',
-    ],
+    // Page Settings
+    'portrait' => 'Portrait',
+    'landscape' => 'Landscape',
+    'a4' => 'A4',
+    'a3' => 'A3',
+    'letter' => 'Letter',
+    'legal' => 'Legal',
+
+    // Messages
+    'document_generated' => 'Document generated successfully',
+    'document_deleted' => 'Document deleted successfully',
+    'template_created' => 'Template created successfully',
+    'template_updated' => 'Template updated successfully',
+    'template_deleted' => 'Template deleted successfully',
+    'pdf_generated' => 'PDF generated successfully',
+    'generation_failed' => 'Document generation failed',
+
+    // Common Variables
+    'yes' => 'Yes',
+    'no' => 'No',
+    'true' => 'True',
+    'false' => 'False',
+    'enabled' => 'Enabled',
+    'disabled' => 'Disabled',
+
+    // Help Text
+    'template_help' => 'Use HTML content with variables like $CUSTOMER_NAME, $ORDER_TOTAL',
+    'variables_help' => 'Define variables that can be used in document templates',
+    'settings_help' => 'Configure print settings for PDF generation',
 ];

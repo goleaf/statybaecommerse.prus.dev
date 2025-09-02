@@ -1,0 +1,101 @@
+<?php declare(strict_types=1);
+
+namespace App\Filament\Widgets;
+
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
+use App\Models\Review;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\DB;
+
+final class ComprehensiveStatsWidget extends BaseWidget
+{
+    protected function getStats(): array
+    {
+        $todayOrders = Order::whereDate('created_at', today())->count();
+        $todayRevenue = Order::whereDate('created_at', today())
+            ->where('status', '!=', 'cancelled')
+            ->sum('total');
+
+        $monthlyOrders = Order::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+        
+        $monthlyRevenue = Order::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->where('status', '!=', 'cancelled')
+            ->sum('total');
+
+        $totalProducts = Product::count();
+        $activeProducts = Product::where('is_visible', true)->count();
+        
+        $totalUsers = User::count();
+        $newUsersToday = User::whereDate('created_at', today())->count();
+
+        $pendingReviews = Review::where('is_approved', false)->count();
+        $averageRating = Review::where('is_approved', true)->avg('rating');
+
+        $lowStockProducts = Product::where('stock_quantity', '<=', 5)->count();
+
+        return [
+            Stat::make(__('Today Orders'), $todayOrders)
+                ->description(__('Orders placed today'))
+                ->descriptionIcon('heroicon-m-shopping-bag')
+                ->color('success')
+                ->chart($this->getOrdersChart(7)),
+
+            Stat::make(__('Today Revenue'), '€' . number_format($todayRevenue, 2))
+                ->description(__('Revenue generated today'))
+                ->descriptionIcon('heroicon-m-currency-euro')
+                ->color('success'),
+
+            Stat::make(__('Monthly Orders'), $monthlyOrders)
+                ->description(__('Orders this month'))
+                ->descriptionIcon('heroicon-m-calendar-days')
+                ->color('primary')
+                ->chart($this->getOrdersChart(30)),
+
+            Stat::make(__('Monthly Revenue'), '€' . number_format($monthlyRevenue, 2))
+                ->description(__('Revenue this month'))
+                ->descriptionIcon('heroicon-m-banknotes')
+                ->color('primary'),
+
+            Stat::make(__('Total Products'), $totalProducts)
+                ->description($activeProducts . ' ' . __('active'))
+                ->descriptionIcon('heroicon-m-cube')
+                ->color('info'),
+
+            Stat::make(__('Total Users'), $totalUsers)
+                ->description($newUsersToday . ' ' . __('new today'))
+                ->descriptionIcon('heroicon-m-users')
+                ->color('warning'),
+
+            Stat::make(__('Pending Reviews'), $pendingReviews)
+                ->description(__('Avg rating: ') . number_format($averageRating ?? 0, 1))
+                ->descriptionIcon('heroicon-m-star')
+                ->color($pendingReviews > 0 ? 'danger' : 'success'),
+
+            Stat::make(__('Low Stock'), $lowStockProducts)
+                ->description(__('Products with ≤5 items'))
+                ->descriptionIcon('heroicon-m-exclamation-triangle')
+                ->color($lowStockProducts > 0 ? 'danger' : 'success'),
+        ];
+    }
+
+    private function getOrdersChart(int $days): array
+    {
+        return Order::selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->where('created_at', '>=', now()->subDays($days))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->pluck('count')
+            ->toArray();
+    }
+
+    protected function getColumns(): int
+    {
+        return 4;
+    }
+}

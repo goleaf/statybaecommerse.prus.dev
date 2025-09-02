@@ -85,6 +85,9 @@ class CurrencySelector extends Component
                 if (!empty($countryId)) {
                     return Country::query()->find($countryId)?->svg_flag;
                 }
+            } catch (\Throwable $e) {
+                // Fallback to default
+                return null;
             }
         } catch (\Throwable $e) {
             return null;

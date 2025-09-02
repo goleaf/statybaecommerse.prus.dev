@@ -150,7 +150,7 @@ final class ActivityLogResource extends Resource
         return ['description', 'log_name'];
     }
 
-    public static function getGlobalSearchResultDetails(Model $record): array
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
     {
         return [
             'Log Type' => $record->log_name,
