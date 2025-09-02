@@ -74,8 +74,8 @@ trait HasProductPricing
         return new PriceData(
             value: $value,
             compare: $compare,
-            percentage: $compare && $compare->getAmount() > 0
-                ? round((($compare->getAmount() - $value->getAmount()) / $compare->getAmount()) * 100)
+            percentage: $compare && $compare > 0
+                ? round((($compare - $value) / $compare) * 100)
                 : null
         );
     }
