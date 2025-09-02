@@ -82,6 +82,7 @@
 
 <body
       class="antialiased bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 selection:bg-primary-600 selection:text-white">
+    <x-impersonation-banner />
     <a href="#main-content"
        class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:text-black focus:px-3 focus:py-2 rounded">{{ __('Skip to content') }}</a>
     <main id="main-content" role="main" tabindex="-1">

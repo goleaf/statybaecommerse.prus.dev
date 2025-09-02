@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(App\Http\Middleware\SetLocale::class);
         // Detect and persist customer sales zone for storefront
         $middleware->append(App\Http\Middleware\ZoneDetector::class);
+        // Handle user impersonation for admin support
+        $middleware->append(App\Http\Middleware\HandleImpersonation::class);
         // Register Spatie permission middlewares (Laravel 11+/12 style)
         $middleware->alias([
             'role' => Spatie\Permission\Middleware\RoleMiddleware::class,

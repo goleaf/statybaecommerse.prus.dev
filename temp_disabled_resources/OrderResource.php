@@ -13,6 +13,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class OrderResource extends Resource
@@ -222,5 +223,26 @@ class OrderResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()
+            ->with(['user']);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['number', 'user.name', 'user.email', 'status', 'notes'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Customer' => $record->user?->name,
+            'Status' => ucfirst($record->status),
+            'Total' => '€' . number_format($record->total, 2),
+            'Date' => $record->created_at->format('Y-m-d'),
+        ];
     }
 }

@@ -178,9 +178,17 @@ final class UserResource extends Resource
                 Tables\Actions\Action::make('impersonate')
                     ->icon('heroicon-o-user-circle')
                     ->color('warning')
-                    ->url(fn(User $record): string => route('impersonate', $record))
-                    ->openUrlInNewTab()
-                    ->visible(fn() => auth()->user()->can('impersonate users')),
+                    ->action(function (User $record) {
+                        if (auth()->user()->can('impersonate users') && $record->id !== auth()->id()) {
+                            session(['impersonating' => $record->id]);
+                            return redirect()->to('/')
+                                ->with('success', __('Now impersonating :name', ['name' => $record->name]));
+                        }
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading(__('Impersonate User'))
+                    ->modalDescription(__('You will be logged in as this user. You can return to your account anytime.'))
+                    ->visible(fn(User $record) => auth()->user()->can('impersonate users') && $record->id !== auth()->id()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -227,5 +235,20 @@ final class UserResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email', 'phone'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Email' => $record->email,
+            'Phone' => $record->phone ?? __('Not provided'),
+            'Status' => $record->is_active ? __('Active') : __('Inactive'),
+            'Joined' => $record->created_at->format('Y-m-d'),
+        ];
     }
 }

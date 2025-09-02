@@ -40,16 +40,14 @@ final class AdminPanelProvider extends PanelProvider
                 'danger' => Color::Red,
                 'info' => Color::Sky,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            // ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
-                \SolutionForest\TabLayoutPlugin\Widgets\TabsWidget::class,
-                // Custom widgets will be auto-discovered
+                // Custom widgets temporarily disabled
             ])
             ->middleware([
                 EncryptCookies::class,

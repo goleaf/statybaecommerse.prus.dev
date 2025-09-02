@@ -5,7 +5,7 @@
             <div class="ml-4">
                 <h4 class="font-heading font-medium text-gray-900">{{ __('Free shipping') }}</h4>
                 <p class="text-sm leading-5 text-gray-500">
-                    {{ __('From :amount', ['amount' => shopper_money_format(amount: 5000, currency: function_exists('current_currency') ? current_currency() : 'USD')]) }}
+                    {{ __('From :amount', ['amount' => shopper_money_format(amount: 5000, currency: current_currency())]) }}
                 </p>
             </div>
         </div>

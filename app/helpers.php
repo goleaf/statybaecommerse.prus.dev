@@ -106,6 +106,13 @@ if (!function_exists('format_date')) {
     }
 }
 
+if (!function_exists('shopper_money_format')) {
+    function shopper_money_format(float|int|string $amount, ?string $currency = null): string
+    {
+        return format_money((float) $amount, $currency ?: current_currency());
+    }
+}
+
 if (!function_exists('format_datetime')) {
     function format_datetime(\DateTimeInterface|string|null $dateTime): string
     {
