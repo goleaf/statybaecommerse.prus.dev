@@ -25,7 +25,7 @@ return new class extends Migration {
             $table
                 ->foreign('variant_id')
                 ->references('id')
-                ->on('sh_product_variants')
+                ->on('product_variants')
                 ->cascadeOnDelete();
 
             $table

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
+use App\Services\MultiLanguageTabService;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class CouponResource extends Resource
 {
@@ -28,24 +31,46 @@ final class CouponResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Coupon Information')
+                // Coupon Settings (Non-translatable)
+                Forms\Components\Section::make(__('translations.coupon_settings'))
                     ->components([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
                         Forms\Components\TextInput::make('code')
+                            ->label(__('translations.coupon_code'))
                             ->required()
                             ->maxLength(255)
                             ->unique(Coupon::class, 'code', ignoreRecord: true)
-                            ->uppercase(),
-                        Forms\Components\Textarea::make('description')
-                            ->maxLength(1000)
-                            ->rows(3),
+                            ->uppercase()
+                            ->helperText(__('translations.coupon_code_help')),
                         Forms\Components\Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('translations.active'))
                             ->default(true),
                     ])
                     ->columns(2),
+
+                // Multilanguage Tabs for Coupon Content
+                Tabs::make('coupon_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'coupon_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.description'),
+                                    'maxLength' => 1000,
+                                    'rows' => 3,
+                                    'placeholder' => __('translations.coupon_description_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('coupon_tab')
+                    ->contained(false),
                 Forms\Components\Section::make('Discount Settings')
                     ->components([
                         Forms\Components\Select::make('type')

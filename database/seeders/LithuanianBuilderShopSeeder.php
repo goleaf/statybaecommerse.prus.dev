@@ -291,7 +291,8 @@ class LithuanianBuilderShopSeeder extends Seeder
                     $quantity = fake()->numberBetween(1, 3);
                     $price = $product->sale_price ?? $product->price;
                     
-                    $order->items()->create([
+                    OrderItem::create([
+                        'order_id' => $order->id,
                         'product_id' => $product->id,
                         'product_name' => $product->name,
                         'product_sku' => $product->sku,

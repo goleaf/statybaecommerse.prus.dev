@@ -10,24 +10,19 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "awcodes/filament-curator": "^3.7",
         "barryvdh/laravel-dompdf": "^3.1",
         "filament/filament": "^4.0",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
-        "jeffgreco13/filament-breezy": "^3.0",
         "laravel/framework": "^12.0",
         "laravel/horizon": "^5.33",
         "laravel/scout": "^10.19",
         "laravel/tinker": "^2.10.1",
         "livewire/volt": "^1.0",
         "predis/predis": "^3.2",
-        "pxlrbt/filament-spotlight": "^2.0",
         "solution-forest/tab-layout-plugin": "^3.2",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-medialibrary": "^11",
-        "spatie/laravel-permission": "^6.21",
-        "stechstudio/filament-impersonate": "*",
-        "z3d0x/filament-fabricator": "^2.6"
+        "spatie/laravel-permission": "^6.21"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",

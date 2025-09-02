@@ -176,6 +176,40 @@ final class ProductResource extends Resource
                             ->required(),
                     ])
                     ->columns(4),
+                // Media Section
+                Forms\Components\Section::make(__('Media'))
+                    ->components([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                            ->label(__('Product Images'))
+                            ->multiple()
+                            ->reorderable()
+                            ->maxFiles(10)
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('1:1')
+                            ->imageResizeTargetWidth('800')
+                            ->imageResizeTargetHeight('800')
+                            ->optimize('webp')
+                            ->collection('product-images')
+                            ->conversion('thumb')
+                            ->helperText(__('Upload product images. First image will be used as main image.')),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('gallery')
+                            ->label(__('Gallery Images'))
+                            ->multiple()
+                            ->reorderable()
+                            ->maxFiles(20)
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('16:9')
+                            ->imageResizeTargetWidth('1200')
+                            ->imageResizeTargetHeight('675')
+                            ->optimize('webp')
+                            ->collection('product-gallery')
+                            ->conversion('gallery')
+                            ->helperText(__('Additional product gallery images for detailed view.')),
+                    ])
+                    ->columns(1)
+                    ->collapsible(),
                 // Multilanguage Tabs for Translatable Content
                 Tabs::make('product_translations')
                     ->tabs(
@@ -243,9 +277,13 @@ final class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image')
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
+                    ->label(__('Image'))
+                    ->collection('product-images')
+                    ->conversion('thumb')
                     ->defaultImageUrl('/images/placeholder-product.jpg')
-                    ->circular(),
+                    ->circular()
+                    ->size(60),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()

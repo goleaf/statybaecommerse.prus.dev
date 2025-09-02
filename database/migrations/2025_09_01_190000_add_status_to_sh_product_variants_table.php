@@ -7,12 +7,12 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        if (!Schema::hasTable('sh_product_variants')) {
+        if (!Schema::hasTable('product_variants')) {
             return;
         }
 
-        if (!Schema::hasColumn('sh_product_variants', 'status')) {
-            Schema::table('sh_product_variants', function (Blueprint $table): void {
+        if (!Schema::hasColumn('product_variants', 'status')) {
+            Schema::table('product_variants', function (Blueprint $table): void {
                 $table->string('status', 32)->default('active')->index();
             });
         }
@@ -20,12 +20,12 @@ return new class extends Migration {
 
     public function down(): void
     {
-        if (!Schema::hasTable('sh_product_variants')) {
+        if (!Schema::hasTable('product_variants')) {
             return;
         }
 
-        if (Schema::hasColumn('sh_product_variants', 'status')) {
-            Schema::table('sh_product_variants', function (Blueprint $table): void {
+        if (Schema::hasColumn('product_variants', 'status')) {
+            Schema::table('product_variants', function (Blueprint $table): void {
                 $table->dropColumn('status');
             });
         }

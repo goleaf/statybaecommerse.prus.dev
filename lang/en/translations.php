@@ -364,4 +364,13 @@ return [
     'postal_code' => 'Postal Code',
     'country' => 'Country',
     'is_default' => 'Default Location',
+    // Coupons
+    'coupon_settings' => 'Coupon Settings',
+    'coupon_information' => 'Coupon Information',
+    'coupon_code' => 'Coupon Code',
+    'coupon_code_help' => 'Unique code customers will use (e.g., SAVE20, WELCOME10)',
+    'coupon_description_help' => 'Describe the coupon offer and benefits',
+    // Discount Codes
+    'discount_code_information' => 'Discount Code Information',
+    'discount_code_description_help' => 'Describe the discount code benefits and conditions',
 ];

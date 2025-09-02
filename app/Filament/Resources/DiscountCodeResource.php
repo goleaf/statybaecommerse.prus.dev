@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DiscountCodeResource\Pages;
 use App\Models\DiscountCode;
+use App\Services\MultiLanguageTabService;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class DiscountCodeResource extends Resource
 {
@@ -53,10 +56,7 @@ final class DiscountCodeResource extends Resource
                             ->required()
                             ->searchable()
                             ->preload(),
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('Description'))
-                            ->maxLength(500)
-                            ->rows(3),
+                        // Multilanguage description will be in tabs below
                         Forms\Components\Select::make('status')
                             ->label(__('Status'))
                             ->options([
@@ -69,6 +69,26 @@ final class DiscountCodeResource extends Resource
                             ->required(),
                     ])
                     ->columns(2),
+
+                // Multilanguage Tabs for Discount Code Content
+                Tabs::make('discount_code_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'discount_code_information' => [
+                                'description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.description'),
+                                    'maxLength' => 500,
+                                    'rows' => 3,
+                                    'placeholder' => __('translations.discount_code_description_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('discount_code_tab')
+                    ->contained(false),
+
                 Forms\Components\Section::make(__('Usage Limits'))
                     ->components([
                         Forms\Components\TextInput::make('max_uses')

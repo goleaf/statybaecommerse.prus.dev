@@ -132,7 +132,8 @@ final class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-cog-6-tooth'),
             ])
             ->plugins([
-                \pxlrbt\FilamentSpotlight\SpotlightPlugin::make(),
+                // All plugins temporarily disabled due to Filament v4 compatibility issues
+                // Will implement functionality manually using native Filament v4 features
             ])
             ->spa();
     }

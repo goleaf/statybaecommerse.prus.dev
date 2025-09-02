@@ -354,4 +354,23 @@ return [
     'currency_settings' => 'Valiutos nustatymai',
     'currency_information' => 'Valiutos informacija',
     'currency_name_help' => 'Valiutos pavadinimas rodymui (pvz., Euras, JAV doleris)',
+    // Locations
+    'location_information' => 'Vietos informacija',
+    'location_address' => 'Vietos adresas',
+    'location_description_help' => 'Aprašykite šią vietą ar objektą',
+    'address' => 'Adresas',
+    'city' => 'Miestas',
+    'state' => 'Valstija/regionas',
+    'postal_code' => 'Pašto kodas',
+    'country' => 'Šalis',
+    'is_default' => 'Numatytoji vieta',
+    // Coupons
+    'coupon_settings' => 'Kupono nustatymai',
+    'coupon_information' => 'Kupono informacija',
+    'coupon_code' => 'Kupono kodas',
+    'coupon_code_help' => 'Unikalus kodas, kurį naudos klientai (pvz., SAVE20, WELCOME10)',
+    'coupon_description_help' => 'Aprašykite kupono pasiūlymą ir privalumus',
+    // Discount Codes
+    'discount_code_information' => 'Nuolaidos kodo informacija',
+    'discount_code_description_help' => 'Aprašykite nuolaidos kodo privalumus ir sąlygas',
 ];
