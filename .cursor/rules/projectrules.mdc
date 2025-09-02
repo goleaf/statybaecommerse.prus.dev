@@ -1,0 +1,9 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+always use documentation from https://filamentphp.com/docs
+always use documentation from https://laravelshopper.dev/docs/2.x
+always use documentation from https://laravel.com/docs/12.x/
+always use mcp

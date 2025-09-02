@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+@import "./links.css";
+@import "./swiper.css";
+@import "@fontsource/space-grotesk/latin.css";
+@import "@fontsource/figtree/latin.css";
+@import "@fontsource/inter/latin.css";
+@import "@fontsource/instrument-sans/latin.css";
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../**/*.blade.php";
+@source "../**/*.js";
+
+[x-cloak] {
+  display: none !important;
+}
+
+body {
+  @apply antialiased bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+}
+
+/* Selection colors (Tailwind v4 does not support variant utilities in @apply) */
+::selection {
+  background-color: #0d9488; /* teal-600 */
+  color: #ffffff;
+}
