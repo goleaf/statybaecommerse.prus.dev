@@ -28,13 +28,13 @@ final class ProductCatalogTest extends TestCase
         Livewire::test(ProductCatalog::class)
             ->assertViewHas('products', function ($paginatedProducts) use ($products, $hiddenProduct) {
                 $productIds = $paginatedProducts->pluck('id')->toArray();
-                
+
                 foreach ($products as $product) {
                     if (!in_array($product->id, $productIds)) {
                         return false;
                     }
                 }
-                
+
                 return !in_array($hiddenProduct->id, $productIds);
             });
     }
@@ -45,7 +45,7 @@ final class ProductCatalogTest extends TestCase
             'name' => 'iPhone 15',
             'is_visible' => true,
         ]);
-        
+
         $nonMatchingProduct = Product::factory()->create([
             'name' => 'Samsung Galaxy',
             'is_visible' => true,
@@ -55,8 +55,8 @@ final class ProductCatalogTest extends TestCase
             ->set('search', 'iPhone')
             ->assertViewHas('products', function ($paginatedProducts) use ($matchingProduct, $nonMatchingProduct) {
                 $productIds = $paginatedProducts->pluck('id')->toArray();
-                return in_array($matchingProduct->id, $productIds) && 
-                       !in_array($nonMatchingProduct->id, $productIds);
+                return in_array($matchingProduct->id, $productIds) &&
+                    !in_array($nonMatchingProduct->id, $productIds);
             });
     }
 
@@ -65,15 +65,15 @@ final class ProductCatalogTest extends TestCase
         $category = Category::factory()->create();
         $productInCategory = Product::factory()->create(['is_visible' => true]);
         $productNotInCategory = Product::factory()->create(['is_visible' => true]);
-        
+
         $productInCategory->categories()->attach($category);
 
         Livewire::test(ProductCatalog::class)
             ->set('selectedCategories', [$category->id])
             ->assertViewHas('products', function ($paginatedProducts) use ($productInCategory, $productNotInCategory) {
                 $productIds = $paginatedProducts->pluck('id')->toArray();
-                return in_array($productInCategory->id, $productIds) && 
-                       !in_array($productNotInCategory->id, $productIds);
+                return in_array($productInCategory->id, $productIds) &&
+                    !in_array($productNotInCategory->id, $productIds);
             });
     }
 
@@ -93,19 +93,19 @@ final class ProductCatalogTest extends TestCase
             ->set('selectedBrands', [$brand->id])
             ->assertViewHas('products', function ($paginatedProducts) use ($productWithBrand, $productWithoutBrand) {
                 $productIds = $paginatedProducts->pluck('id')->toArray();
-                return in_array($productWithBrand->id, $productIds) && 
-                       !in_array($productWithoutBrand->id, $productIds);
+                return in_array($productWithBrand->id, $productIds) &&
+                    !in_array($productWithoutBrand->id, $productIds);
             });
     }
 
     public function test_can_filter_by_price_range(): void
     {
         $cheapProduct = Product::factory()->create([
-            'price' => 50.00,
+            'price' => 50.0,
             'is_visible' => true,
         ]);
         $expensiveProduct = Product::factory()->create([
-            'price' => 500.00,
+            'price' => 500.0,
             'is_visible' => true,
         ]);
 
@@ -114,8 +114,8 @@ final class ProductCatalogTest extends TestCase
             ->set('priceMax', 1000)
             ->assertViewHas('products', function ($paginatedProducts) use ($cheapProduct, $expensiveProduct) {
                 $productIds = $paginatedProducts->pluck('id')->toArray();
-                return !in_array($cheapProduct->id, $productIds) && 
-                       in_array($expensiveProduct->id, $productIds);
+                return !in_array($cheapProduct->id, $productIds) &&
+                    in_array($expensiveProduct->id, $productIds);
             });
     }
 
@@ -134,8 +134,8 @@ final class ProductCatalogTest extends TestCase
             ->set('availability', 'in_stock')
             ->assertViewHas('products', function ($paginatedProducts) use ($inStockProduct, $outOfStockProduct) {
                 $productIds = $paginatedProducts->pluck('id')->toArray();
-                return in_array($inStockProduct->id, $productIds) && 
-                       !in_array($outOfStockProduct->id, $productIds);
+                return in_array($inStockProduct->id, $productIds) &&
+                    !in_array($outOfStockProduct->id, $productIds);
             });
     }
 
@@ -143,12 +143,12 @@ final class ProductCatalogTest extends TestCase
     {
         $productA = Product::factory()->create([
             'name' => 'Apple iPhone',
-            'price' => 1000.00,
+            'price' => 1000.0,
             'is_visible' => true,
         ]);
         $productB = Product::factory()->create([
             'name' => 'Samsung Galaxy',
-            'price' => 800.00,
+            'price' => 800.0,
             'is_visible' => true,
         ]);
 

@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
+use App\Services\MultiLanguageTabService;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use BackedEnum;
 use UnitEnum;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class BrandResource extends Resource
 {
@@ -47,24 +50,9 @@ final class BrandResource extends Resource
     {
         return $schema
             ->schema([
+                // Main Brand Information (Non-translatable)
                 Forms\Components\Section::make(__('admin.sections.brand_information'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('admin.fields.name'))
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
-                        Forms\Components\TextInput::make('slug')
-                            ->label(__('admin.fields.slug'))
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(Brand::class, 'slug', ignoreRecord: true)
-                            ->helperText(__('admin.help.slug_auto_generated')),
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('admin.fields.description'))
-                            ->maxLength(1000)
-                            ->rows(3),
                         Forms\Components\TextInput::make('website')
                             ->label(__('admin.fields.website'))
                             ->url()
@@ -76,6 +64,8 @@ final class BrandResource extends Resource
                             ->helperText(__('admin.help.brand_enabled')),
                     ])
                     ->columns(2),
+
+                // Brand Images Section
                 Forms\Components\Section::make(__('admin.sections.brand_images'))
                     ->schema([
                         Forms\Components\SpatieMediaLibraryFileUpload::make('logo')
@@ -100,59 +90,52 @@ final class BrandResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(1),
-                Forms\Components\Section::make(__('admin.sections.seo'))
-                    ->schema([
-                        Forms\Components\TextInput::make('seo_title')
-                            ->label(__('admin.fields.seo_title'))
-                            ->maxLength(255)
-                            ->helperText(__('admin.help.seo_title')),
-                        Forms\Components\Textarea::make('seo_description')
-                            ->label(__('admin.fields.seo_description'))
-                            ->maxLength(300)
-                            ->rows(3)
-                            ->helperText(__('admin.help.seo_description')),
-                    ])
-                    ->columns(1),
-                Forms\Components\Section::make(__('admin.sections.translations'))
-                    ->schema([
-                        Forms\Components\Repeater::make('translations')
-                            ->relationship('translations')
-                            ->schema([
-                                Forms\Components\Select::make('locale')
-                                    ->label(__('admin.fields.language'))
-                                    ->options([
-                                        'en' => __('admin.languages.english'),
-                                        'lt' => __('admin.languages.lithuanian'),
-                                    ])
-                                    ->required()
-                                    ->distinct(),
-                                Forms\Components\TextInput::make('name')
-                                    ->label(__('admin.fields.name'))
-                                    ->required()
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('slug')
-                                    ->label(__('admin.fields.slug'))
-                                    ->required()
-                                    ->maxLength(255),
-                                Forms\Components\Textarea::make('description')
-                                    ->label(__('admin.fields.description'))
-                                    ->maxLength(1000)
-                                    ->rows(3),
-                                Forms\Components\TextInput::make('seo_title')
-                                    ->label(__('admin.fields.seo_title'))
-                                    ->maxLength(255),
-                                Forms\Components\Textarea::make('seo_description')
-                                    ->label(__('admin.fields.seo_description'))
-                                    ->maxLength(300)
-                                    ->rows(2),
-                            ])
-                            ->columns(2)
-                            ->defaultItems(0)
-                            ->addActionLabel(__('admin.actions.add_translation'))
-                            ->reorderableWithButtons()
-                            ->collapsible()
-                            ->cloneable(),
-                    ]),
+
+                // Multilanguage Tabs for Translatable Content
+                Tabs::make('brand_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'basic_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('admin.fields.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'slug' => [
+                                    'type' => 'text',
+                                    'label' => __('admin.fields.slug'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                    'placeholder' => __('admin.help.slug_auto_generated'),
+                                ],
+                                'description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('admin.fields.description'),
+                                    'maxLength' => 1000,
+                                    'rows' => 3,
+                                ],
+                            ],
+                            'seo_information' => [
+                                'seo_title' => [
+                                    'type' => 'text',
+                                    'label' => __('admin.fields.seo_title'),
+                                    'maxLength' => 255,
+                                    'placeholder' => __('admin.help.seo_title'),
+                                ],
+                                'seo_description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('admin.fields.seo_description'),
+                                    'maxLength' => 300,
+                                    'rows' => 3,
+                                    'placeholder' => __('admin.help.seo_description'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('brand_tab')
+                    ->contained(false),
             ]);
     }
 

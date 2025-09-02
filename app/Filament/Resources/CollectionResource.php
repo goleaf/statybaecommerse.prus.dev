@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
+use App\Services\MultiLanguageTabService;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class CollectionResource extends Resource
 {
@@ -28,68 +31,84 @@ final class CollectionResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Collection Information')
+                // Main Collection Information (Non-translatable)
+                Forms\Components\Section::make(__('translations.collection_information'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
-                        Forms\Components\TextInput::make('slug')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(Collection::class, 'slug', ignoreRecord: true),
-                        Forms\Components\Textarea::make('description')
-                            ->maxLength(1000)
-                            ->rows(3),
-                        Forms\Components\Toggle::make('is_enabled')
-                            ->label('Enabled')
+                        Forms\Components\TextInput::make('sort_order')
+                            ->label(__('translations.sort_order'))
+                            ->numeric()
+                            ->default(0),
+                        Forms\Components\TextInput::make('max_products')
+                            ->label(__('translations.max_products'))
+                            ->numeric()
+                            ->nullable()
+                            ->helperText(__('translations.max_products_help')),
+                        Forms\Components\Toggle::make('is_visible')
+                            ->label(__('translations.visible'))
                             ->default(true),
-                        Forms\Components\Toggle::make('is_featured')
-                            ->label('Featured')
-                            ->default(false),
+                        Forms\Components\Toggle::make('is_automatic')
+                            ->label(__('translations.automatic_collection'))
+                            ->default(false)
+                            ->live(),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Collection Rules')
+
+                // Collection Rules Section
+                Forms\Components\Section::make(__('translations.collection_rules'))
                     ->schema([
-                        Forms\Components\Select::make('type')
-                            ->options([
-                                'manual' => 'Manual',
-                                'automatic' => 'Automatic',
-                            ])
-                            ->required()
-                            ->live()
-                            ->default('manual'),
-                        Forms\Components\Textarea::make('conditions')
-                            ->visible(fn(Forms\Get $get): bool => $get('type') === 'automatic')
-                            ->helperText('JSON conditions for automatic collection')
-                            ->rows(5),
+                        Forms\Components\Textarea::make('rules')
+                            ->label(__('translations.collection_rules'))
+                            ->visible(fn(Forms\Get $get): bool => $get('is_automatic') === true)
+                            ->helperText(__('translations.collection_rules_help'))
+                            ->rows(5)
+                            ->columnSpanFull(),
                     ])
-                    ->columns(1),
-                Forms\Components\Section::make('Translations')
-                    ->schema([
-                        Forms\Components\Repeater::make('translations')
-                            ->relationship('translations')
-                            ->schema([
-                                Forms\Components\Select::make('locale')
-                                    ->options([
-                                        'en' => 'English',
-                                        'lt' => 'Lithuanian',
-                                    ])
-                                    ->required(),
-                                Forms\Components\TextInput::make('name')
-                                    ->required()
-                                    ->maxLength(255),
-                                Forms\Components\Textarea::make('description')
-                                    ->maxLength(1000)
-                                    ->rows(3),
-                            ])
-                            ->columns(3)
-                            ->defaultItems(2)
-                            ->addActionLabel('Add Translation')
-                            ->reorderableWithButtons()
-                            ->collapsible(),
-                    ]),
+                    ->visible(fn(Forms\Get $get): bool => $get('is_automatic') === true),
+
+                // Multilanguage Tabs for Translatable Content
+                Tabs::make('collection_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'basic_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'slug' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.slug'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.slug_auto_generated'),
+                                ],
+                                'description' => [
+                                    'type' => 'rich_editor',
+                                    'label' => __('translations.description'),
+                                    'toolbar' => ['bold', 'italic', 'link', 'bulletList', 'orderedList', 'h2', 'h3'],
+                                ],
+                            ],
+                            'seo_information' => [
+                                'seo_title' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.seo_title'),
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.seo_title_help'),
+                                ],
+                                'seo_description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.seo_description'),
+                                    'maxLength' => 300,
+                                    'rows' => 3,
+                                    'placeholder' => __('translations.seo_description_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('collection_tab')
+                    ->contained(false),
             ]);
     }
 

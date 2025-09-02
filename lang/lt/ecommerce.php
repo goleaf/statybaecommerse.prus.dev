@@ -18,7 +18,6 @@ return [
     'settings' => 'Nustatymai',
     'legal_pages' => 'Teisiniai puslapiai',
     'legal_page' => 'Teisinis puslapis',
-    
     // Product related
     'name' => 'Pavadinimas',
     'description' => 'Aprašymas',
@@ -36,7 +35,6 @@ return [
     'add_to_cart' => 'Į krepšelį',
     'buy_now' => 'Pirkti dabar',
     'quick_view' => 'Greitas peržiūrėjimas',
-    
     // Shopping Cart
     'cart' => 'Krepšelis',
     'shopping_cart' => 'Prekių krepšelis',
@@ -52,7 +50,6 @@ return [
     'continue_shopping' => 'Tęsti apsipirkimą',
     'cart_empty' => 'Jūsų krepšelis tuščias',
     'quantity' => 'Kiekis',
-    
     // Checkout
     'billing_address' => 'Sąskaitos adresas',
     'shipping_address' => 'Pristatymo adresas',
@@ -64,7 +61,6 @@ return [
     'order_number' => 'Užsakymo numeris',
     'order_date' => 'Užsakymo data',
     'order_status' => 'Užsakymo būsena',
-    
     // Filters and Search
     'search' => 'Paieška',
     'search_products' => 'Ieškoti produktų...',
@@ -86,7 +82,6 @@ return [
     'products_found' => 'produktų rasta',
     'no_products_found' => 'Produktų nerasta',
     'try_adjusting_filters' => 'Pabandykite koreguoti paieškos ar filtravimo kriterijus.',
-    
     // User Account
     'account' => 'Paskyra',
     'profile' => 'Profilis',
@@ -99,7 +94,6 @@ return [
     'forgot_password' => 'Pamiršau slaptažodį',
     'reset_password' => 'Atkurti slaptažodį',
     'change_password' => 'Keisti slaptažodį',
-    
     // Admin specific
     'admin_panel' => 'Administravimo skydas',
     'manage_products' => 'Valdyti produktus',
@@ -109,7 +103,6 @@ return [
     'system_settings' => 'Sistemos nustatymai',
     'reports' => 'Ataskaitos',
     'analytics' => 'Analitika',
-    
     // Status
     'active' => 'Aktyvus',
     'inactive' => 'Neaktyvus',
@@ -125,7 +118,6 @@ return [
     'delivered' => 'Pristatyta',
     'cancelled' => 'Atšaukta',
     'refunded' => 'Grąžinta',
-    
     // Actions
     'create' => 'Sukurti',
     'edit' => 'Redaguoti',
@@ -147,7 +139,6 @@ return [
     'choose' => 'Pasirinkti',
     'upload' => 'Įkelti',
     'browse' => 'Naršyti',
-    
     // Messages
     'success' => 'Sėkmė',
     'error' => 'Klaida',
@@ -163,7 +154,6 @@ return [
     'access_denied' => 'Prieiga uždrausta',
     'page_not_found' => 'Puslapis nerastas',
     'server_error' => 'Serverio klaida',
-    
     // Forms
     'first_name' => 'Vardas',
     'last_name' => 'Pavardė',
@@ -180,7 +170,6 @@ return [
     'subject' => 'Tema',
     'required' => 'Privalomas',
     'optional' => 'Neprivalomas',
-    
     // Time
     'created' => 'Sukurta',
     'updated' => 'Atnaujinta',
@@ -195,7 +184,6 @@ return [
     'this_week' => 'Šią savaitę',
     'this_month' => 'Šį mėnesį',
     'this_year' => 'Šiais metais',
-    
     // Languages
     'language' => 'Kalba',
     'languages' => 'Kalbos',
@@ -205,7 +193,6 @@ return [
     'translation' => 'Vertimas',
     'translations' => 'Vertimai',
     'add_translation' => 'Pridėti vertimą',
-    
     // Misc
     'key' => 'Raktas',
     'value' => 'Reikšmė',

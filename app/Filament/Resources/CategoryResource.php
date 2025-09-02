@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
+use App\Services\MultiLanguageTabService;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 class CategoryResource extends Resource
 {
@@ -28,69 +31,98 @@ class CategoryResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Category Information')
+                // Main Category Information (Non-translatable)
+                Forms\Components\Section::make(__('translations.category_information'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
-                        Forms\Components\TextInput::make('slug')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(Category::class, 'slug', ignoreRecord: true),
                         Forms\Components\Select::make('parent_id')
+                            ->label(__('translations.parent_category'))
                             ->relationship('parent', 'name')
                             ->searchable()
                             ->preload()
                             ->nullable(),
-                        Forms\Components\Textarea::make('description')
-                            ->maxLength(1000)
-                            ->rows(3),
                         Forms\Components\TextInput::make('sort_order')
+                            ->label(__('translations.sort_order'))
                             ->numeric()
                             ->default(0),
                         Forms\Components\Toggle::make('is_enabled')
-                            ->label('Enabled')
+                            ->label(__('translations.enabled'))
                             ->default(true),
                         Forms\Components\Toggle::make('is_visible')
-                            ->label('Visible')
+                            ->label(__('translations.visible'))
                             ->default(true),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('SEO')
-                    ->schema([
-                        Forms\Components\TextInput::make('seo_title')
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('seo_description')
-                            ->maxLength(300)
-                            ->rows(3),
-                    ])
-                    ->columns(1),
-                Forms\Components\Section::make('Category Images')
+
+                // Category Images Section
+                Forms\Components\Section::make(__('translations.category_images'))
                     ->schema([
                         Forms\Components\SpatieMediaLibraryFileUpload::make('images')
-                            ->label('Category Image')
+                            ->label(__('translations.category_image'))
                             ->collection('images')
                             ->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios(['1:1'])
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'])
                             ->maxSize(5120)  // 5MB
-                            ->helperText('Upload category image. Will be converted to WebP format with multiple resolutions automatically.')
+                            ->helperText(__('translations.category_image_help'))
                             ->columnSpanFull(),
                         Forms\Components\SpatieMediaLibraryFileUpload::make('banner')
-                            ->label('Category Banner')
+                            ->label(__('translations.category_banner'))
                             ->collection('banner')
                             ->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios(['2:1', '16:9'])
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
                             ->maxSize(10240)  // 10MB
-                            ->helperText('Upload category banner image. Will be converted to WebP format with multiple resolutions automatically.')
+                            ->helperText(__('translations.category_banner_help'))
                             ->columnSpanFull(),
                     ])
                     ->columns(1),
+
+                // Multilanguage Tabs for Translatable Content
+                Tabs::make('category_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'basic_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'slug' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.slug'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.slug_auto_generated'),
+                                ],
+                                'description' => [
+                                    'type' => 'rich_editor',
+                                    'label' => __('translations.description'),
+                                    'toolbar' => ['bold', 'italic', 'link', 'bulletList', 'orderedList', 'h2', 'h3'],
+                                ],
+                            ],
+                            'seo_information' => [
+                                'seo_title' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.seo_title'),
+                                    'maxLength' => 255,
+                                    'placeholder' => __('translations.seo_title_help'),
+                                ],
+                                'seo_description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.seo_description'),
+                                    'maxLength' => 300,
+                                    'rows' => 3,
+                                    'placeholder' => __('translations.seo_description_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('category_tab')
+                    ->contained(false),
             ]);
     }
 

@@ -9,8 +9,8 @@ use App\Filament\Widgets\RecentOrdersWidget;
 use App\Filament\Widgets\StatsOverviewWidget;
 use App\Filament\Widgets\TopSellingProductsWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 final class Dashboard extends BaseDashboard
 {
@@ -38,7 +38,7 @@ final class Dashboard extends BaseDashboard
         ];
     }
 
-    public function getColumns(): int | array
+    public function getColumns(): int|array
     {
         return [
             'md' => 2,

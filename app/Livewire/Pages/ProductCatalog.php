@@ -58,7 +58,8 @@ final class ProductCatalog extends Component
             ->where('is_visible', true)
             ->when($this->search, function (Builder $query) {
                 $query->where(function (Builder $subQuery) {
-                    $subQuery->where('name', 'like', '%' . $this->search . '%')
+                    $subQuery
+                        ->where('name', 'like', '%' . $this->search . '%')
                         ->orWhere('description', 'like', '%' . $this->search . '%')
                         ->orWhere('sku', 'like', '%' . $this->search . '%')
                         ->orWhereHas('brand', function (Builder $brandQuery) {
@@ -181,9 +182,9 @@ final class ProductCatalog extends Component
     public function addToCart(int $productId): void
     {
         $product = Product::findOrFail($productId);
-        
+
         $cartItems = session()->get('cart', []);
-        
+
         if (isset($cartItems[$productId])) {
             $cartItems[$productId]['quantity']++;
         } else {
@@ -194,14 +195,13 @@ final class ProductCatalog extends Component
                 'image' => $product->getFirstMediaUrl('images'),
             ];
         }
-        
+
         session()->put('cart', $cartItems);
-        
+
         $this->dispatch('cart-updated');
-        $this->dispatch('notify', 
+        $this->dispatch('notify',
             message: __('Product added to cart'),
-            type: 'success'
-        );
+            type: 'success');
     }
 
     public function render()

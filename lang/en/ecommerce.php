@@ -18,7 +18,6 @@ return [
     'settings' => 'Settings',
     'legal_pages' => 'Legal Pages',
     'legal_page' => 'Legal Page',
-    
     // Product related
     'name' => 'Name',
     'description' => 'Description',
@@ -36,7 +35,6 @@ return [
     'add_to_cart' => 'Add to Cart',
     'buy_now' => 'Buy Now',
     'quick_view' => 'Quick View',
-    
     // Shopping Cart
     'cart' => 'Cart',
     'shopping_cart' => 'Shopping Cart',
@@ -52,7 +50,6 @@ return [
     'continue_shopping' => 'Continue Shopping',
     'cart_empty' => 'Your cart is empty',
     'quantity' => 'Quantity',
-    
     // Checkout
     'billing_address' => 'Billing Address',
     'shipping_address' => 'Shipping Address',
@@ -64,7 +61,6 @@ return [
     'order_number' => 'Order Number',
     'order_date' => 'Order Date',
     'order_status' => 'Order Status',
-    
     // Filters and Search
     'search' => 'Search',
     'search_products' => 'Search products...',
@@ -86,7 +82,6 @@ return [
     'products_found' => 'products found',
     'no_products_found' => 'No products found',
     'try_adjusting_filters' => 'Try adjusting your search or filter criteria.',
-    
     // User Account
     'account' => 'Account',
     'profile' => 'Profile',
@@ -99,7 +94,6 @@ return [
     'forgot_password' => 'Forgot Password',
     'reset_password' => 'Reset Password',
     'change_password' => 'Change Password',
-    
     // Admin specific
     'admin_panel' => 'Admin Panel',
     'manage_products' => 'Manage Products',
@@ -109,7 +103,6 @@ return [
     'system_settings' => 'System Settings',
     'reports' => 'Reports',
     'analytics' => 'Analytics',
-    
     // Status
     'active' => 'Active',
     'inactive' => 'Inactive',
@@ -125,7 +118,6 @@ return [
     'delivered' => 'Delivered',
     'cancelled' => 'Cancelled',
     'refunded' => 'Refunded',
-    
     // Actions
     'create' => 'Create',
     'edit' => 'Edit',
@@ -147,7 +139,6 @@ return [
     'choose' => 'Choose',
     'upload' => 'Upload',
     'browse' => 'Browse',
-    
     // Messages
     'success' => 'Success',
     'error' => 'Error',
@@ -163,7 +154,6 @@ return [
     'access_denied' => 'Access denied',
     'page_not_found' => 'Page not found',
     'server_error' => 'Server error',
-    
     // Forms
     'first_name' => 'First Name',
     'last_name' => 'Last Name',
@@ -180,7 +170,6 @@ return [
     'subject' => 'Subject',
     'required' => 'Required',
     'optional' => 'Optional',
-    
     // Time
     'created' => 'Created',
     'updated' => 'Updated',
@@ -195,7 +184,6 @@ return [
     'this_week' => 'This Week',
     'this_month' => 'This Month',
     'this_year' => 'This Year',
-    
     // Languages
     'language' => 'Language',
     'languages' => 'Languages',
@@ -205,7 +193,6 @@ return [
     'translation' => 'Translation',
     'translations' => 'Translations',
     'add_translation' => 'Add Translation',
-    
     // Misc
     'key' => 'Key',
     'value' => 'Value',

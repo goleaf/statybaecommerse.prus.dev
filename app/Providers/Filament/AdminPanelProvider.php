@@ -132,7 +132,20 @@ final class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-cog-6-tooth'),
             ])
             ->plugins([
-                // Filament Shield and Breezy plugins removed - using native Filament v4 features
+                \Awcodes\Curator\CuratorPlugin::make(),
+                \Jeffgreco13\FilamentBreezy\BreezyCore::make()
+                    ->myProfile(
+                        shouldRegisterUserMenu: true,
+                        shouldRegisterNavigation: false,
+                        hasAvatars: true,
+                        slug: 'my-profile'
+                    )
+                    ->enableTwoFactorAuthentication(
+                        force: false,
+                    ),
+                \pxlrbt\FilamentSpotlight\SpotlightPlugin::make(),
+                \Z3d0X\FilamentFabricator\FilamentFabricatorPlugin::make(),
+                \StethoScope\FilamentImpersonate\FilamentImpersonatePlugin::make(),
             ])
             ->spa();
     }

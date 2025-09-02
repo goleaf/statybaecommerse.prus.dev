@@ -4,10 +4,10 @@ namespace App\Filament\Widgets;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\User;
 use App\Models\Review;
-use Filament\Widgets\StatsOverviewWidget as BaseStatsOverviewWidget;
+use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Widgets\StatsOverviewWidget as BaseStatsOverviewWidget;
 use Illuminate\Support\Carbon;
 
 final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
@@ -27,16 +27,16 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
             ->whereMonth('created_at', now()->subMonth()->month)
             ->sum('total_amount');
 
-        $revenueChange = $lastMonthRevenue > 0 
-            ? (($monthlyRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100 
+        $revenueChange = $lastMonthRevenue > 0
+            ? (($monthlyRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100
             : 0;
 
         $totalOrders = Order::count();
         $monthlyOrders = Order::whereMonth('created_at', now()->month)->count();
         $lastMonthOrders = Order::whereMonth('created_at', now()->subMonth()->month)->count();
-        
-        $ordersChange = $lastMonthOrders > 0 
-            ? (($monthlyOrders - $lastMonthOrders) / $lastMonthOrders) * 100 
+
+        $ordersChange = $lastMonthOrders > 0
+            ? (($monthlyOrders - $lastMonthOrders) / $lastMonthOrders) * 100
             : 0;
 
         $totalProducts = Product::count();
@@ -58,38 +58,31 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
                 ->descriptionIcon($revenueChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueChange >= 0 ? 'success' : 'danger')
                 ->chart($this->getRevenueChart()),
-
             Stat::make(__('Monthly Revenue'), '€' . number_format($monthlyRevenue, 2))
                 ->description(__('This month'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
-
             Stat::make(__('Total Orders'), number_format($totalOrders))
                 ->description($ordersChange >= 0 ? '+' . number_format($ordersChange, 1) . '%' : number_format($ordersChange, 1) . '%')
                 ->descriptionIcon($ordersChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($ordersChange >= 0 ? 'success' : 'danger')
                 ->chart($this->getOrdersChart()),
-
             Stat::make(__('Products'), number_format($totalProducts))
                 ->description(number_format($activeProducts) . ' ' . __('active'))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('info'),
-
             Stat::make(__('Customers'), number_format($totalCustomers))
                 ->description(number_format($newCustomers) . ' ' . __('new this month'))
                 ->descriptionIcon('heroicon-m-users')
                 ->color('warning'),
-
             Stat::make(__('Avg Order Value'), '€' . number_format($averageOrderValue, 2))
                 ->description(__('Per order'))
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
-
             Stat::make(__('Reviews'), number_format($totalReviews))
                 ->description(number_format($averageRating, 1) . ' ' . __('avg rating'))
                 ->descriptionIcon('heroicon-m-star')
                 ->color('warning'),
-
             Stat::make(__('Conversion Rate'), '2.4%')
                 ->description('+0.3% ' . __('from last month'))
                 ->descriptionIcon('heroicon-m-arrow-trending-up')

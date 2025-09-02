@@ -4,12 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         // Add additional fields to existing tables for enhanced Filament functionality
-        
+
         // Enhance products table
         if (Schema::hasTable('products') && !Schema::hasColumn('products', 'meta_title')) {
             Schema::table('products', function (Blueprint $table): void {
@@ -66,7 +65,7 @@ return new class extends Migration
                 $table->json('properties')->nullable();
                 $table->uuid('batch_uuid')->nullable();
                 $table->timestamps();
-                
+
                 $table->index('log_name');
             });
         }
@@ -119,7 +118,7 @@ return new class extends Migration
                 $table->text('data');
                 $table->timestamp('read_at')->nullable();
                 $table->timestamps();
-                
+
                 $table->index(['notifiable_type', 'notifiable_id']);
             });
         }

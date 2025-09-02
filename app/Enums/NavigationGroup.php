@@ -11,6 +11,7 @@ enum NavigationGroup: string implements HasLabel, HasIcon
     case Orders = 'orders';
     case Customers = 'customers';
     case Marketing = 'marketing';
+    case Content = 'content';
     case Settings = 'settings';
     case Reports = 'reports';
 
@@ -21,6 +22,7 @@ enum NavigationGroup: string implements HasLabel, HasIcon
             self::Orders => __('navigation.groups.orders'),
             self::Customers => __('navigation.groups.customers'),
             self::Marketing => __('navigation.groups.marketing'),
+            self::Content => __('navigation.groups.content'),
             self::Settings => __('navigation.groups.settings'),
             self::Reports => __('navigation.groups.reports'),
         };
@@ -33,6 +35,7 @@ enum NavigationGroup: string implements HasLabel, HasIcon
             self::Orders => 'heroicon-o-shopping-bag',
             self::Customers => 'heroicon-o-users',
             self::Marketing => 'heroicon-o-megaphone',
+            self::Content => 'heroicon-o-document-text',
             self::Settings => 'heroicon-o-cog-6-tooth',
             self::Reports => 'heroicon-o-chart-bar',
         };

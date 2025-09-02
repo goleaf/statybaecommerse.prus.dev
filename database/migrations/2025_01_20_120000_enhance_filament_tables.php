@@ -72,13 +72,25 @@ return new class extends Migration
         }
 
         // Add additional columns to orders table
-        Schema::table('orders', function (Blueprint $table) {
-            $table->string('tracking_number')->nullable()->after('notes');
-            $table->json('metadata')->nullable()->after('tracking_number');
-            $table->string('locale', 5)->default('lt')->after('metadata');
-            $table->decimal('weight', 8, 2)->nullable()->after('locale');
-            $table->string('fulfillment_status')->default('unfulfilled')->after('weight');
-        });
+        if (Schema::hasTable('orders')) {
+            Schema::table('orders', function (Blueprint $table) {
+                if (!Schema::hasColumn('orders', 'tracking_number')) {
+                    $table->string('tracking_number')->nullable()->after('notes');
+                }
+                if (!Schema::hasColumn('orders', 'metadata')) {
+                    $table->json('metadata')->nullable()->after('tracking_number');
+                }
+                if (!Schema::hasColumn('orders', 'locale')) {
+                    $table->string('locale', 5)->default('lt')->after('metadata');
+                }
+                if (!Schema::hasColumn('orders', 'weight')) {
+                    $table->decimal('weight', 8, 2)->nullable()->after('locale');
+                }
+                if (!Schema::hasColumn('orders', 'fulfillment_status')) {
+                    $table->string('fulfillment_status')->default('unfulfilled')->after('weight');
+                }
+            });
+        }
 
         // Create product_variants table for enhanced product management
         Schema::create('product_variants', function (Blueprint $table) {

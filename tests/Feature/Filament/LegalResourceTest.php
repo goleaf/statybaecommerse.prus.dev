@@ -18,14 +18,15 @@ final class LegalResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->admin = User::factory()->create();
         $this->actingAs($this->admin);
     }
 
     public function test_can_render_legal_index_page(): void
     {
-        $this->get(LegalResource::getUrl('index'))
+        $this
+            ->get(LegalResource::getUrl('index'))
             ->assertOk();
     }
 
@@ -39,7 +40,8 @@ final class LegalResourceTest extends TestCase
 
     public function test_can_render_legal_create_page(): void
     {
-        $this->get(LegalResource::getUrl('create'))
+        $this
+            ->get(LegalResource::getUrl('create'))
             ->assertOk();
     }
 
@@ -79,7 +81,8 @@ final class LegalResourceTest extends TestCase
     {
         $legal = Legal::factory()->create();
 
-        $this->get(LegalResource::getUrl('edit', ['record' => $legal]))
+        $this
+            ->get(LegalResource::getUrl('edit', ['record' => $legal]))
             ->assertOk();
     }
 
@@ -97,8 +100,10 @@ final class LegalResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         expect($legal->refresh())
-            ->key->toBe($newData->key)
-            ->is_enabled->toBe($newData->is_enabled);
+            ->key
+            ->toBe($newData->key)
+            ->is_enabled
+            ->toBe($newData->is_enabled);
     }
 
     public function test_can_delete_legal_page(): void

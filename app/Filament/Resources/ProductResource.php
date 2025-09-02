@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Services\MultiLanguageTabService;
 use Filament\Schemas\Schema;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
@@ -23,6 +24,8 @@ use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class ProductResource extends Resource
 {
