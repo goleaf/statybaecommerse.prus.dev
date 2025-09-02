@@ -8,14 +8,16 @@ use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
+use BackedEnum;
 
 final class BackupResource extends Resource
 {
     protected static ?string $model = null; // No model - this is a utility resource
 
-    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static string|UnitEnum|null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 15;
 

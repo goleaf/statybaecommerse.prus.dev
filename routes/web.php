@@ -15,7 +15,7 @@ Route::get('/health', fn() => response()->json(['ok' => true]))->name('health');
 Route::get('/', fn() => redirect('/home'))->name('root.redirect');
 
 // Enhanced frontend routes
-Route::get('/home', Pages\EnhancedHome::class)->name('home');
+Route::get('/home', Pages\Home::class)->name('home');
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
 Route::get('/categories', Pages\Category\Index::class)->name('categories.index');
 Route::get('/categories/{slug}', Pages\Category\Show::class)->name('categories.show');
