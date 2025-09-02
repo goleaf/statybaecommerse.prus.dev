@@ -30,16 +30,9 @@ final class DiscountResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('translations.discount_information'))
+                // Discount Settings (Non-translatable)
+                Forms\Components\Section::make(__('translations.discount_settings'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('translations.name'))
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('translations.description'))
-                            ->maxLength(1000)
-                            ->rows(3),
                         Forms\Components\Select::make('type')
                             ->label(__('translations.type'))
                             ->options([
