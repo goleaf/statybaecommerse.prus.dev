@@ -4,15 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
-use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 class BrandResource extends Resource
 {
@@ -50,7 +50,6 @@ class BrandResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-
                 Forms\Components\Section::make('SEO')
                     ->schema([
                         Forms\Components\TextInput::make('seo_title')

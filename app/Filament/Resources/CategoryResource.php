@@ -4,15 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
-use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 class CategoryResource extends Resource
 {
@@ -34,37 +34,30 @@ class CategoryResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
-
+                            ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
                         Forms\Components\TextInput::make('slug')
                             ->required()
                             ->maxLength(255)
                             ->unique(Category::class, 'slug', ignoreRecord: true),
-
                         Forms\Components\Select::make('parent_id')
                             ->relationship('parent', 'name')
                             ->searchable()
                             ->preload()
                             ->nullable(),
-
                         Forms\Components\Textarea::make('description')
                             ->maxLength(1000)
                             ->rows(3),
-
                         Forms\Components\TextInput::make('sort_order')
                             ->numeric()
                             ->default(0),
-
                         Forms\Components\Toggle::make('is_enabled')
                             ->label('Enabled')
                             ->default(true),
-
                         Forms\Components\Toggle::make('is_visible')
                             ->label('Visible')
                             ->default(true),
                     ])
                     ->columns(2),
-
                 Forms\Components\Section::make('SEO')
                     ->schema([
                         Forms\Components\TextInput::make('seo_title')
@@ -74,7 +67,6 @@ class CategoryResource extends Resource
                             ->rows(3),
                     ])
                     ->columns(1),
-
                 Forms\Components\Section::make('Media')
                     ->schema([
                         Forms\Components\FileUpload::make('image')
@@ -93,45 +85,36 @@ class CategoryResource extends Resource
                 Tables\Columns\ImageColumn::make('image')
                     ->size(50)
                     ->circular(),
-
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable()
                     ->toggleable(),
-
                 Tables\Columns\TextColumn::make('parent.name')
                     ->label('Parent Category')
                     ->sortable()
                     ->toggleable(),
-
                 Tables\Columns\TextColumn::make('sort_order')
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
-
                 Tables\Columns\IconColumn::make('is_enabled')
                     ->boolean()
                     ->label('Enabled')
                     ->sortable(),
-
                 Tables\Columns\IconColumn::make('is_visible')
                     ->boolean()
                     ->label('Visible')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('products_count')
                     ->counts('products')
                     ->label('Products')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
