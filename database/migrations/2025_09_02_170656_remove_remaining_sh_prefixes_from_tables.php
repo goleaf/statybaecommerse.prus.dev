@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,22 +13,22 @@ return new class extends Migration
         $tablesToRename = [
             'sh_attribute_product' => 'attribute_product',
             'sh_attribute_value_product_variant' => 'attribute_value_product_variant',
-            'sh_brands' => 'brands_legacy', // Will be handled separately
+            'sh_brands' => 'brands_legacy',  // Will be handled separately
             'sh_carrier_options' => 'carrier_options',
             'sh_carriers' => 'carriers',
-            'sh_categories' => 'categories_legacy', // Will be handled separately
-            'sh_collections' => 'collections_legacy', // Will be handled separately
+            'sh_categories' => 'categories_legacy',  // Will be handled separately
+            'sh_collections' => 'collections_legacy',  // Will be handled separately
             'sh_discountables' => 'discountables',
             'sh_inventory_histories' => 'inventory_histories',
             'sh_order_addresses' => 'order_addresses',
-            'sh_order_items' => 'order_items_legacy', // Will be handled separately
+            'sh_order_items' => 'order_items_legacy',  // Will be handled separately
             'sh_order_refunds' => 'order_refunds',
-            'sh_order_shipping' => 'order_shipping_legacy', // Will be handled separately
-            'sh_orders' => 'orders_legacy', // Will be handled separately
+            'sh_order_shipping' => 'order_shipping_legacy',  // Will be handled separately
+            'sh_orders' => 'orders_legacy',  // Will be handled separately
             'sh_payment_methods' => 'payment_methods',
             'sh_product_has_relations' => 'product_has_relations',
-            'sh_products' => 'products_legacy', // Will be handled separately
-            'sh_reviews' => 'reviews_legacy', // Will be handled separately
+            'sh_products' => 'products_legacy',  // Will be handled separately
+            'sh_reviews' => 'reviews_legacy',  // Will be handled separately
             'sh_settings' => 'settings',
             'sh_user_addresses' => 'user_addresses',
             'sh_users_geolocation_history' => 'users_geolocation_history',

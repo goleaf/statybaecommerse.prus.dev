@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             LithuanianBuilderShopSeeder::class,
             BrandSeeder::class,
+            CategorySeeder::class,
+            CollectionSeeder::class,
         ]);
     }
 }

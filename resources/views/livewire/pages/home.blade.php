@@ -127,11 +127,23 @@
                                 'locale' => app()->getLocale(),
                                 'slug' => $collection->trans('slug') ?? $collection->slug,
                             ])" class="group block">
-                                <img
-                                     src="{{ $collection->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: ($collection->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'small') ?: $collection->getFirstMediaUrl(config('shopper.media.storage.collection_name'))) }}"
-                                     alt="{{ $collection->trans('name') ?? $collection->name }}"
-                                     loading="lazy" width="600" height="400"
-                                     class="aspect-[3/2] w-full object-cover group-hover:opacity-75 lg:aspect-[3/2]" />
+                                @if ($collection->getImageUrl('lg'))
+                                    <img src="{{ $collection->getImageUrl('md') }}"
+                                         srcset="{{ $collection->getImageUrl('sm') }} 200w, {{ $collection->getImageUrl('md') }} 400w, {{ $collection->getImageUrl('lg') }} 600w"
+                                         sizes="(max-width: 1024px) 50vw, 600px"
+                                         alt="{{ $collection->trans('name') ?? $collection->name }}"
+                                         loading="lazy" width="600" height="400"
+                                         class="aspect-[3/2] w-full object-cover group-hover:opacity-75 lg:aspect-[3/2]" />
+                                @elseif ($collection->getImageUrl())
+                                    <img src="{{ $collection->getImageUrl() }}"
+                                         alt="{{ $collection->trans('name') ?? $collection->name }}"
+                                         loading="lazy" width="600" height="400"
+                                         class="aspect-[3/2] w-full object-cover group-hover:opacity-75 lg:aspect-[3/2]" />
+                                @else
+                                    <div class="aspect-[3/2] w-full bg-gray-200 flex items-center justify-center">
+                                        <span class="text-lg text-gray-500 font-medium">{{ strtoupper(substr($collection->trans('name') ?? $collection->name, 0, 3)) }}</span>
+                                    </div>
+                                @endif
                                 <h3 class="mt-2 text-base font-semibold text-gray-900">
                                     {{ $collection->trans('name') ?? $collection->name }}
                                 </h3>

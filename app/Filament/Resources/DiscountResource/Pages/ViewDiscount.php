@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\DiscountResource\Pages;
 
 use App\Filament\Resources\DiscountResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Actions;
 
 final class ViewDiscount extends ViewRecord
 {

@@ -174,6 +174,7 @@ return new class extends Migration
             $table->text('content');
             $table->boolean('is_approved')->default(false);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');

@@ -35,11 +35,22 @@
                     <a href="{{ route('category.show', ['locale' => app()->getLocale(), 'slug' => $root->trans('slug') ?? $root->slug]) }}"
                        class="block border rounded-lg p-4 hover:shadow-sm">
                         <div class="aspect-square bg-gray-50 flex items-center justify-center mb-3">
-                            @php($thumb = $root->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: ($root->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'small') ?: $root->getFirstMediaUrl(config('shopper.media.storage.collection_name'))))
-                            @if ($thumb)
-                                <img loading="lazy" src="{{ $thumb }}"
+                            @if ($root->getImageUrl('md'))
+                                <img loading="lazy" 
+                                     src="{{ $root->getImageUrl('md') }}"
+                                     srcset="{{ $root->getImageUrl('sm') }} 200w, {{ $root->getImageUrl('md') }} 400w, {{ $root->getImageUrl('lg') }} 600w"
+                                     sizes="(max-width: 640px) 200px, 400px"
+                                     alt="{{ $root->trans('name') ?? $root->name }}"
+                                     width="400" height="400"
+                                     class="max-h-24 object-contain" />
+                            @elseif ($root->getImageUrl())
+                                <img loading="lazy" src="{{ $root->getImageUrl() }}"
                                      alt="{{ $root->trans('name') ?? $root->name }}"
                                      class="max-h-24 object-contain" />
+                            @else
+                                <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <span class="text-xs text-gray-500 font-medium">{{ strtoupper(substr($root->trans('name') ?? $root->name, 0, 2)) }}</span>
+                                </div>
                             @endif
                         </div>
                         <div class="text-base font-medium">{{ $root->trans('name') ?? $root->name }}</div>

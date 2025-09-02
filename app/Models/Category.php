@@ -156,21 +156,118 @@ final class Category extends Model implements HasMedia
         return $this->getFirstMediaUrl('images') ?: null;
     }
 
+    public function getImageUrl(?string $size = null): ?string
+    {
+        if (!$size) {
+            return $this->getFirstMediaUrl('images') ?: null;
+        }
+
+        return $this->getFirstMediaUrl('images', "image-{$size}") ?: $this->getFirstMediaUrl('images');
+    }
+
+    public function getBannerUrl(?string $size = null): ?string
+    {
+        if (!$size) {
+            return $this->getFirstMediaUrl('banner') ?: null;
+        }
+
+        return $this->getFirstMediaUrl('banner', "banner-{$size}") ?: $this->getFirstMediaUrl('banner');
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('images')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
+
+        $this->addMediaCollection('banner')
             ->singleFile()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
 
     public function registerMediaConversions(Media $media = null): void
     {
-        $this->addMediaConversion('thumb')
+        // Image conversions with multiple resolutions
+        $this
+            ->addMediaConversion('image-xs')
+            ->performOnCollections('images')
+            ->width(64)
+            ->height(64)
+            ->format('webp')
+            ->quality(85)
+            ->sharpen(10)
+            ->optimize();
+
+        $this
+            ->addMediaConversion('image-sm')
+            ->performOnCollections('images')
+            ->width(128)
+            ->height(128)
+            ->format('webp')
+            ->quality(85)
+            ->sharpen(10)
+            ->optimize();
+
+        $this
+            ->addMediaConversion('image-md')
+            ->performOnCollections('images')
+            ->width(200)
+            ->height(200)
+            ->format('webp')
+            ->quality(85)
+            ->sharpen(10)
+            ->optimize();
+
+        $this
+            ->addMediaConversion('image-lg')
+            ->performOnCollections('images')
+            ->width(400)
+            ->height(400)
+            ->format('webp')
+            ->quality(90)
+            ->sharpen(5)
+            ->optimize();
+
+        // Banner conversions with multiple resolutions
+        $this
+            ->addMediaConversion('banner-sm')
+            ->performOnCollections('banner')
+            ->width(800)
+            ->height(400)
+            ->format('webp')
+            ->quality(85)
+            ->sharpen(10)
+            ->optimize();
+
+        $this
+            ->addMediaConversion('banner-md')
+            ->performOnCollections('banner')
+            ->width(1200)
+            ->height(600)
+            ->format('webp')
+            ->quality(85)
+            ->sharpen(5)
+            ->optimize();
+
+        $this
+            ->addMediaConversion('banner-lg')
+            ->performOnCollections('banner')
+            ->width(1920)
+            ->height(960)
+            ->format('webp')
+            ->quality(90)
+            ->sharpen(5)
+            ->optimize();
+
+        // Legacy conversions for backward compatibility
+        $this
+            ->addMediaConversion('thumb')
             ->width(200)
             ->height(200)
             ->sharpen(10);
 
-        $this->addMediaConversion('small')
+        $this
+            ->addMediaConversion('small')
             ->width(400)
             ->height(400)
             ->sharpen(10);

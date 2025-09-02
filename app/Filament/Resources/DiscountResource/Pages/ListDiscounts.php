@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\DiscountResource\Pages;
 
 use App\Filament\Resources\DiscountResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
 
 final class ListDiscounts extends ListRecords
 {

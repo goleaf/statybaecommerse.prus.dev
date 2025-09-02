@@ -2,35 +2,39 @@
 
 namespace Database\Factories;
 
+use App\Models\Product;
+use App\Models\Review;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<\App\Models\Review>
+ */
 class ReviewFactory extends Factory
 {
-    protected $model = \Shop\Core\Models\Review::class;
+    protected $model = Review::class;
 
     public function definition(): array
     {
-        $productId = \App\Models\Product::query()->inRandomOrder()->value('id');
-        if (!$productId) {
-            $productId = \App\Models\Product::factory()->create()->id;
-        }
-
-        $userId = \App\Models\User::query()->inRandomOrder()->value('id');
-        if (!$userId) {
-            $userId = \App\Models\User::factory()->create()->id;
-        }
-
         return [
-            'reviewrateable_type' => \App\Models\Product::class,
-            'reviewrateable_id' => $productId,
-            'author_type' => \App\Models\User::class,
-            'author_id' => $userId,
-            'title' => $this->faker->sentence(6),
-            'content' => $this->faker->paragraphs(2, true),
+            'product_id' => Product::factory(),
+            'user_id' => User::factory(),
+            'reviewer_name' => $this->faker->name(),
+            'reviewer_email' => $this->faker->email(),
             'rating' => $this->faker->numberBetween(1, 5),
-            'is_recommended' => $this->faker->boolean(10),
-            'approved' => $this->faker->boolean(60),
-            'locale' => $this->faker->randomElement(array_map('trim', explode(',', (string) config('app.supported_locales', 'en')))),
+            'title' => $this->faker->sentence(4),
+            'content' => $this->faker->paragraph(),
+            'is_approved' => $this->faker->boolean(80),
         ];
+    }
+
+    public function approved(): static
+    {
+        return $this->state(['is_approved' => true]);
+    }
+
+    public function pending(): static
+    {
+        return $this->state(['is_approved' => false]);
     }
 }

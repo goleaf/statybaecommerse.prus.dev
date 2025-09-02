@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CountryResource\Pages;
 
 use App\Filament\Resources\CountryResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Actions;
 
 final class ViewCountry extends ViewRecord
 {

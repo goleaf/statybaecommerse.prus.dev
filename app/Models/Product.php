@@ -51,23 +51,20 @@ final class Product extends Model implements HasMedia
         'type',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'price' => 'decimal:2',
-            'sale_price' => 'decimal:2',
-            'weight' => 'decimal:2',
-            'length' => 'decimal:2',
-            'width' => 'decimal:2',
-            'height' => 'decimal:2',
-            'is_visible' => 'boolean',
-            'is_featured' => 'boolean',
-            'manage_stock' => 'boolean',
-            'published_at' => 'datetime',
-            'stock_quantity' => 'integer',
-            'low_stock_threshold' => 'integer',
-        ];
-    }
+    protected $casts = [
+        'price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
+        'weight' => 'decimal:2',
+        'length' => 'decimal:2',
+        'width' => 'decimal:2',
+        'height' => 'decimal:2',
+        'is_visible' => 'boolean',
+        'is_featured' => 'boolean',
+        'manage_stock' => 'boolean',
+        'published_at' => 'datetime',
+        'stock_quantity' => 'integer',
+        'low_stock_threshold' => 'integer',
+    ];
 
     protected $table = 'products';
     protected string $translationModel = \App\Models\Translations\ProductTranslation::class;
@@ -79,38 +76,17 @@ final class Product extends Model implements HasMedia
 
     public function reservedQuantity(): int
     {
-        $productId = (int) $this->id;
-
-        $sum = (int) DB::table('product_variants as v')
-            ->join('variant_inventories as vi', 'vi.variant_id', '=', 'v.id')
-            ->where('v.product_id', $productId)
-            ->sum('vi.reserved');
-
-        if ($sum === 0) {
-            $sum = (int) DB::table('variant_inventories as vi')
-                ->where('vi.variant_id', $productId)
-                ->sum('vi.reserved');
-        }
-
-        return max($sum, 0);
+        // For simple products, no reservations for now
+        return 0;
     }
 
     public function availableQuantity(): int
     {
-        $productId = (int) $this->id;
-
-        $sum = (int) DB::table('product_variants as v')
-            ->join('variant_inventories as vi', 'vi.variant_id', '=', 'v.id')
-            ->where('v.product_id', $productId)
-            ->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END'));
-
-        if ($sum === 0) {
-            $sum = (int) DB::table('variant_inventories as vi')
-                ->where('vi.variant_id', $productId)
-                ->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END'));
+        if (!$this->manage_stock) {
+            return 999; // Unlimited when not managing stock
         }
 
-        return max($sum, 0);
+        return max($this->stock_quantity - $this->reservedQuantity(), 0);
     }
 
     public function isOutOfStock(): bool
@@ -246,15 +222,90 @@ final class Product extends Model implements HasMedia
         return $this->getFirstMediaUrl('images', 'thumb') ?: null;
     }
 
+    public function getImageUrl(?string $size = null): ?string
+    {
+        if (!$size) {
+            return $this->getFirstMediaUrl('images') ?: null;
+        }
+
+        return $this->getFirstMediaUrl('images', "image-{$size}") ?: $this->getFirstMediaUrl('images');
+    }
+
+    public function getGalleryImages(): array
+    {
+        return $this->getMedia('images')->map(function ($media) {
+            return [
+                'original' => $media->getFullUrl(),
+                'lg' => $media->getFullUrl('image-lg'),
+                'md' => $media->getFullUrl('image-md'),
+                'sm' => $media->getFullUrl('image-sm'),
+                'xs' => $media->getFullUrl('image-xs'),
+                'alt' => $media->name,
+            ];
+        })->toArray();
+    }
+
     public function registerMediaCollections(): void
     {
         $this
             ->addMediaCollection('images')
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
     }
 
     public function registerMediaConversions(Media $media = null): void
     {
+        // Product image conversions with multiple resolutions
+        $this
+            ->addMediaConversion('image-xs')
+            ->performOnCollections('images')
+            ->width(150)
+            ->height(150)
+            ->format('webp')
+            ->quality(85)
+            ->sharpen(10)
+            ->optimize();
+
+        $this
+            ->addMediaConversion('image-sm')
+            ->performOnCollections('images')
+            ->width(300)
+            ->height(300)
+            ->format('webp')
+            ->quality(85)
+            ->sharpen(10)
+            ->optimize();
+
+        $this
+            ->addMediaConversion('image-md')
+            ->performOnCollections('images')
+            ->width(500)
+            ->height(500)
+            ->format('webp')
+            ->quality(85)
+            ->sharpen(10)
+            ->optimize();
+
+        $this
+            ->addMediaConversion('image-lg')
+            ->performOnCollections('images')
+            ->width(800)
+            ->height(800)
+            ->format('webp')
+            ->quality(90)
+            ->sharpen(5)
+            ->optimize();
+
+        $this
+            ->addMediaConversion('image-xl')
+            ->performOnCollections('images')
+            ->width(1200)
+            ->height(1200)
+            ->format('webp')
+            ->quality(90)
+            ->sharpen(5)
+            ->optimize();
+
+        // Legacy conversions for backward compatibility
         $this
             ->addMediaConversion('thumb')
             ->width(300)

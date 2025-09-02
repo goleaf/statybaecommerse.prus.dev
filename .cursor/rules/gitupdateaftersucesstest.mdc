@@ -1,7 +1,16 @@
 ---
 alwaysApply: true
 ---
-- after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt
+- after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt, in commit attach not all not commited files, but only files what was modified in this work prompt
 
 
 - do not use "php artisan make" commands
+
+- making all works, make all items with translations
+- for every string of information always create translation for lt and for en language
+- by default always use lithuanian language
+- by default always use euro money type
+- if working with any file, make translations realtime for all sides, for frontend and admin side
+- working with any module create for admin side all blades and maximum functions
+- working with any module create for frontend side all blades and maximum functions
+- working with any blade make translation using database for translations files

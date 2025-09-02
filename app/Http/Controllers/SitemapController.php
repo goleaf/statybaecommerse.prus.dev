@@ -12,7 +12,7 @@ class SitemapController extends Controller
     public function index(): Response
     {
         $locales = collect(explode(',', (string) config('app.supported_locales', 'en')))
-            ->map(fn ($v) => trim($v))
+            ->map(fn($v) => trim($v))
             ->filter()
             ->values();
         $urls = [];
@@ -25,49 +25,49 @@ class SitemapController extends Controller
             }
 
             // Home & index pages per locale
-            $urls[] = url('/'.$loc);
-            $urls[] = url('/'.$loc.'/categories');
-            $urls[] = url('/'.$loc.'/collections');
-            $urls[] = url('/'.$loc.'/brands');
+            $urls[] = url('/' . $loc);
+            $urls[] = url('/' . $loc . '/categories');
+            $urls[] = url('/' . $loc . '/collections');
+            $urls[] = url('/' . $loc . '/brands');
 
             // Categories with translated slugs fallback to base slug
-            if (! Schema::hasTable('sh_categories')) {
-                continue; // Skip dynamic sections when tables are missing in testing
+            if (!Schema::hasTable('categories')) {
+                continue;  // Skip dynamic sections when tables are missing in testing
             }
-            $categoryQuery = DB::table('sh_categories as c')
-                ->leftJoin('sh_category_translations as t', function ($join) use ($loc) {
+            $categoryQuery = DB::table('categories as c')
+                ->leftJoin('category_translations as t', function ($join) use ($loc) {
                     $join->on('t.category_id', '=', 'c.id')->where('t.locale', '=', $loc);
                 })
                 ->limit(1000)
                 ->selectRaw('COALESCE(t.slug, c.slug) as slug');
-            if (Schema::hasColumn('sh_categories', 'is_enabled')) {
+            if (Schema::hasColumn('categories', 'is_enabled')) {
                 $categoryQuery->where('c.is_enabled', true);
             }
             $categorySlugs = $categoryQuery->pluck('slug');
             foreach ($categorySlugs as $slug) {
-                $urls[] = url('/'.$loc.'/categories/'.$slug);
+                $urls[] = url('/' . $loc . '/categories/' . $slug);
             }
 
             // Collections
-            if (! Schema::hasTable('sh_collections')) {
+            if (!Schema::hasTable('collections')) {
                 continue;
             }
-            $collectionQuery = DB::table('sh_collections as c')
-                ->leftJoin('sh_collection_translations as t', function ($join) use ($loc) {
+            $collectionQuery = DB::table('collections as c')
+                ->leftJoin('collection_translations as t', function ($join) use ($loc) {
                     $join->on('t.collection_id', '=', 'c.id')->where('t.locale', '=', $loc);
                 })
                 ->limit(1000)
                 ->selectRaw('COALESCE(t.slug, c.slug) as slug');
-            if (Schema::hasColumn('sh_collections', 'is_enabled')) {
+            if (Schema::hasColumn('collections', 'is_enabled')) {
                 $collectionQuery->where('c.is_enabled', true);
             }
             $collectionSlugs = $collectionQuery->pluck('slug');
             foreach ($collectionSlugs as $slug) {
-                $urls[] = url('/'.$loc.'/collections/'.$slug);
+                $urls[] = url('/' . $loc . '/collections/' . $slug);
             }
 
             // Brands
-            if (! Schema::hasTable('sh_brands')) {
+            if (!Schema::hasTable('sh_brands')) {
                 continue;
             }
             $brandQuery = DB::table('sh_brands as b')
@@ -81,11 +81,11 @@ class SitemapController extends Controller
             }
             $brandSlugs = $brandQuery->pluck('slug');
             foreach ($brandSlugs as $slug) {
-                $urls[] = url('/'.$loc.'/brands/'.$slug);
+                $urls[] = url('/' . $loc . '/brands/' . $slug);
             }
 
             // Products (visible & published)
-            if (! Schema::hasTable('sh_products')) {
+            if (!Schema::hasTable('sh_products')) {
                 continue;
             }
             $productQuery = DB::table('sh_products as p')
@@ -102,11 +102,11 @@ class SitemapController extends Controller
             }
             $productSlugs = $productQuery->pluck('slug');
             foreach ($productSlugs as $slug) {
-                $urls[] = url('/'.$loc.'/products/'.$slug);
+                $urls[] = url('/' . $loc . '/products/' . $slug);
             }
 
             // Legal pages (enabled) with translated slugs
-            if (! Schema::hasTable('sh_legals')) {
+            if (!Schema::hasTable('sh_legals')) {
                 continue;
             }
             $legalQuery = DB::table('sh_legals as l')
@@ -119,11 +119,11 @@ class SitemapController extends Controller
             }
             $legalSlugs = $legalQuery->pluck('slug');
             foreach ($legalSlugs as $slug) {
-                $urls[] = url('/'.$loc.'/legal/'.$slug);
+                $urls[] = url('/' . $loc . '/legal/' . $slug);
             }
 
             // Cache per-locale URLs for 1 day
-            $perLocale = array_values(array_filter($urls, fn ($u) => str_starts_with($u, url('/'.$loc))));
+            $perLocale = array_values(array_filter($urls, fn($u) => str_starts_with($u, url('/' . $loc))));
             Cache::put("sitemap:urls:{$loc}", $perLocale, now()->addDay());
         }
 
@@ -135,11 +135,11 @@ class SitemapController extends Controller
     public function locale(string $locale): Response
     {
         $supported = collect(explode(',', (string) config('app.supported_locales', 'en')))
-            ->map(fn ($v) => trim($v))
+            ->map(fn($v) => trim($v))
             ->filter()
             ->values();
 
-        if (! $supported->contains($locale)) {
+        if (!$supported->contains($locale)) {
             $locale = (string) config('app.locale', 'en');
         }
 
@@ -152,13 +152,13 @@ class SitemapController extends Controller
         $urls = [];
 
         // Home & index pages per locale
-        $urls[] = url('/'.$locale);
-        $urls[] = url('/'.$locale.'/categories');
-        $urls[] = url('/'.$locale.'/collections');
-        $urls[] = url('/'.$locale.'/brands');
+        $urls[] = url('/' . $locale);
+        $urls[] = url('/' . $locale . '/categories');
+        $urls[] = url('/' . $locale . '/collections');
+        $urls[] = url('/' . $locale . '/brands');
 
         // Categories with translated slugs fallback to base slug
-        if (! Schema::hasTable('sh_categories')) {
+        if (!Schema::hasTable('sh_categories')) {
             $xml = view('sitemap.xml', ['urls' => $urls])->render();
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
@@ -174,11 +174,11 @@ class SitemapController extends Controller
         }
         $categorySlugs = $categoryQuery->pluck('slug');
         foreach ($categorySlugs as $slug) {
-            $urls[] = url('/'.$locale.'/categories/'.$slug);
+            $urls[] = url('/' . $locale . '/categories/' . $slug);
         }
 
         // Collections
-        if (! Schema::hasTable('sh_collections')) {
+        if (!Schema::hasTable('sh_collections')) {
             $xml = view('sitemap.xml', ['urls' => $urls])->render();
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
@@ -194,11 +194,11 @@ class SitemapController extends Controller
         }
         $collectionSlugs = $collectionQuery->pluck('slug');
         foreach ($collectionSlugs as $slug) {
-            $urls[] = url('/'.$locale.'/collections/'.$slug);
+            $urls[] = url('/' . $locale . '/collections/' . $slug);
         }
 
         // Brands
-        if (! Schema::hasTable('sh_brands')) {
+        if (!Schema::hasTable('sh_brands')) {
             $xml = view('sitemap.xml', ['urls' => $urls])->render();
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
@@ -214,11 +214,11 @@ class SitemapController extends Controller
         }
         $brandSlugs = $brandQuery->pluck('slug');
         foreach ($brandSlugs as $slug) {
-            $urls[] = url('/'.$locale.'/brands/'.$slug);
+            $urls[] = url('/' . $locale . '/brands/' . $slug);
         }
 
         // Products (visible & published)
-        if (! Schema::hasTable('sh_products')) {
+        if (!Schema::hasTable('sh_products')) {
             $xml = view('sitemap.xml', ['urls' => $urls])->render();
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
@@ -237,11 +237,11 @@ class SitemapController extends Controller
         }
         $productSlugs = $productQuery->pluck('slug');
         foreach ($productSlugs as $slug) {
-            $urls[] = url('/'.$locale.'/products/'.$slug);
+            $urls[] = url('/' . $locale . '/products/' . $slug);
         }
 
         // Legal pages (enabled) with translated slugs
-        if (! Schema::hasTable('sh_legals')) {
+        if (!Schema::hasTable('sh_legals')) {
             $xml = view('sitemap.xml', ['urls' => $urls])->render();
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
@@ -256,7 +256,7 @@ class SitemapController extends Controller
         }
         $legalSlugs = $legalQuery->pluck('slug');
         foreach ($legalSlugs as $slug) {
-            $urls[] = url('/'.$locale.'/legal/'.$slug);
+            $urls[] = url('/' . $locale . '/legal/' . $slug);
         }
 
         Cache::put("sitemap:urls:{$locale}", $urls, now()->addDay());

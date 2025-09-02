@@ -67,12 +67,28 @@ class CategoryResource extends Resource
                             ->rows(3),
                     ])
                     ->columns(1),
-                Forms\Components\Section::make('Media')
+                Forms\Components\Section::make('Category Images')
                     ->schema([
-                        Forms\Components\FileUpload::make('image')
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                            ->label('Category Image')
+                            ->collection('images')
                             ->image()
-                            ->directory('categories')
-                            ->visibility('public'),
+                            ->imageEditor()
+                            ->imageEditorAspectRatios(['1:1'])
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'])
+                            ->maxSize(5120)  // 5MB
+                            ->helperText('Upload category image. Will be converted to WebP format with multiple resolutions automatically.')
+                            ->columnSpanFull(),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('banner')
+                            ->label('Category Banner')
+                            ->collection('banner')
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios(['2:1', '16:9'])
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+                            ->maxSize(10240)  // 10MB
+                            ->helperText('Upload category banner image. Will be converted to WebP format with multiple resolutions automatically.')
+                            ->columnSpanFull(),
                     ])
                     ->columns(1),
             ]);
@@ -82,9 +98,12 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image')
-                    ->size(50)
-                    ->circular(),
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('images')
+                    ->label('Image')
+                    ->collection('images')
+                    ->conversion('image-sm')
+                    ->circular()
+                    ->size(40),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
