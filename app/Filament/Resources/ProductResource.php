@@ -59,9 +59,9 @@ final class ProductResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make('Product Information')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255)
@@ -118,7 +118,7 @@ final class ProductResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Pricing & Inventory')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('price')
                             ->numeric()
                             ->prefix('€')
@@ -155,7 +155,7 @@ final class ProductResource extends Resource
                     ])
                     ->columns(4),
                 Forms\Components\Section::make('Settings')
-                    ->schema([
+                    ->components([
                         Forms\Components\Toggle::make('track_inventory')
                             ->label('Track Inventory')
                             ->default(true),
@@ -346,6 +346,7 @@ final class ProductResource extends Resource
         return [
             RelationManagers\VariantsRelationManager::class,
             RelationManagers\ReviewsRelationManager::class,
+            RelationManagers\DocumentsRelationManager::class,
         ];
     }
 

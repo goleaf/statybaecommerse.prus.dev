@@ -30,10 +30,10 @@ class CategoryResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 // Main Category Information (Non-translatable)
                 Forms\Components\Section::make(__('translations.category_information'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Select::make('parent_id')
                             ->label(__('translations.parent_category'))
                             ->relationship('parent', 'name')
@@ -55,7 +55,7 @@ class CategoryResource extends Resource
 
                 // Category Images Section
                 Forms\Components\Section::make(__('translations.category_images'))
-                    ->schema([
+                    ->components([
                         Forms\Components\SpatieMediaLibraryFileUpload::make('images')
                             ->label(__('translations.category_image'))
                             ->collection('images')

@@ -19,9 +19,9 @@ final class AddressesRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make(__('admin.address_information'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('first_name')
                             ->label(__('admin.first_name'))
                             ->required()
@@ -40,7 +40,7 @@ final class AddressesRelationManager extends RelationManager
                     ])
                     ->columns(2),
                 Forms\Components\Section::make(__('admin.address_details'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('street_address')
                             ->label(__('admin.street_address'))
                             ->required()

@@ -37,9 +37,9 @@ final class CurrencyResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make(__('admin.currency.form.basic_info'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('name')
                             ->label(__('admin.currency.form.name'))
                             ->required()
@@ -78,7 +78,7 @@ final class CurrencyResource extends Resource
                     ->columns(2),
                 
                 Forms\Components\Section::make(__('admin.currency.form.formatting'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('thousands_separator')
                             ->label(__('admin.currency.form.thousands_separator'))
                             ->default(',')

@@ -49,10 +49,10 @@ final class BrandResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 // Main Brand Information (Non-translatable)
                 Forms\Components\Section::make(__('admin.sections.brand_information'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('website')
                             ->label(__('admin.fields.website'))
                             ->url()
@@ -67,7 +67,7 @@ final class BrandResource extends Resource
 
                 // Brand Images Section
                 Forms\Components\Section::make(__('admin.sections.brand_images'))
-                    ->schema([
+                    ->components([
                         Forms\Components\SpatieMediaLibraryFileUpload::make('logo')
                             ->label(__('admin.fields.brand_logo'))
                             ->collection('logo')

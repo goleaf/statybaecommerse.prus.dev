@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
+use App\Services\MultiLanguageTabService;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -12,6 +13,8 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use BackedEnum;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class ReviewResource extends Resource
 {
@@ -26,9 +29,9 @@ final class ReviewResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make(__('translations.review_information'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Select::make('product_id')
                             ->label(__('translations.product'))
                             ->relationship('product', 'name')
@@ -41,15 +44,7 @@ final class ReviewResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required(),
-                        Forms\Components\TextInput::make('title')
-                            ->label(__('translations.title'))
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('content')
-                            ->label(__('translations.content'))
-                            ->required()
-                            ->maxLength(2000)
-                            ->rows(4),
+                        // Multilanguage content will be in tabs below
                         Forms\Components\Select::make('rating')
                             ->label(__('translations.rating'))
                             ->options([
@@ -69,6 +64,32 @@ final class ReviewResource extends Resource
                             ->visible(fn(Forms\Get $get) => $get('is_approved')),
                     ])
                     ->columns(2),
+
+                // Multilanguage Tabs for Review Content
+                Tabs::make('review_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'review_content' => [
+                                'title' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.title'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'content' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.content'),
+                                    'required' => true,
+                                    'maxLength' => 2000,
+                                    'rows' => 4,
+                                    'placeholder' => __('translations.review_content_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('review_tab')
+                    ->contained(false),
             ]);
     }
 

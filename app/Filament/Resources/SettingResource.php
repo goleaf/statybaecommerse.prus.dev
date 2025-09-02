@@ -28,9 +28,9 @@ final class SettingResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make('Setting Details')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('key')
                             ->required()
                             ->unique(Setting::class, 'key', ignoreRecord: true)
@@ -58,7 +58,7 @@ final class SettingResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Value')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('value')
                             ->label('String Value')
                             ->visible(fn(Forms\Get $get): bool => $get('type') === 'string')

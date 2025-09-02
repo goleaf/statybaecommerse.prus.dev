@@ -29,10 +29,10 @@ final class DiscountResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 // Discount Settings (Non-translatable)
                 Forms\Components\Section::make(__('translations.discount_settings'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Select::make('type')
                             ->label(__('translations.type'))
                             ->options([
@@ -80,11 +80,36 @@ final class DiscountResource extends Resource
                             ->default(false),
                     ])
                     ->columns(2),
+
+                // Multilanguage Tabs for Discount Content
+                Tabs::make('discount_translations')
+                    ->tabs(
+                        MultiLanguageTabService::createSectionedTabs([
+                            'discount_information' => [
+                                'name' => [
+                                    'type' => 'text',
+                                    'label' => __('translations.name'),
+                                    'required' => true,
+                                    'maxLength' => 255,
+                                ],
+                                'description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('translations.description'),
+                                    'maxLength' => 1000,
+                                    'rows' => 3,
+                                    'placeholder' => __('translations.discount_description_help'),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                    ->persistTabInQueryString('discount_tab')
+                    ->contained(false),
                 Forms\Components\Section::make(__('translations.discount_conditions'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Repeater::make('conditions')
                             ->relationship('conditions')
-                            ->schema([
+                            ->components([
                                 Forms\Components\Select::make('type')
                                     ->label(__('translations.condition_type'))
                                     ->options([

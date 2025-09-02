@@ -28,9 +28,9 @@ class OrderResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make('Order Information')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('number')
                             ->required()
                             ->maxLength(255)
@@ -55,7 +55,7 @@ class OrderResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Pricing')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('subtotal')
                             ->numeric()
                             ->prefix('€')
@@ -79,7 +79,7 @@ class OrderResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Addresses')
-                    ->schema([
+                    ->components([
                         Forms\Components\KeyValue::make('billing_address')
                             ->label('Billing Address'),
                         Forms\Components\KeyValue::make('shipping_address')
@@ -87,7 +87,7 @@ class OrderResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Dates')
-                    ->schema([
+                    ->components([
                         Forms\Components\DateTimePicker::make('shipped_at')
                             ->label('Shipped At'),
                         Forms\Components\DateTimePicker::make('delivered_at')
@@ -95,7 +95,7 @@ class OrderResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Notes')
-                    ->schema([
+                    ->components([
                         Forms\Components\Textarea::make('notes')
                             ->rows(3),
                     ]),
@@ -201,8 +201,8 @@ class OrderResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\ItemsRelationManager::class,
-            RelationManagers\DocumentsRelationManager::class,
+            // RelationManagers\ItemsRelationManager::class, // Temporarily disabled
+            // RelationManagers\DocumentsRelationManager::class, // Temporarily disabled
         ];
     }
 

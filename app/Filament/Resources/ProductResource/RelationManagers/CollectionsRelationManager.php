@@ -18,7 +18,7 @@ final class CollectionsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('collection_id')
                     ->relationship('collections', 'name')
                     ->searchable()

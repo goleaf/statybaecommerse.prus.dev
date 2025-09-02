@@ -34,7 +34,7 @@ final class DiscountCodeResource extends Resource
         return $schema
             ->components([
                 Forms\Components\Section::make(__('Discount Code Information'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('code')
                             ->label(__('Code'))
                             ->required()
@@ -70,7 +70,7 @@ final class DiscountCodeResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make(__('Usage Limits'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('max_uses')
                             ->label(__('Maximum Uses'))
                             ->numeric()
@@ -95,7 +95,7 @@ final class DiscountCodeResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make(__('Validity Period'))
-                    ->schema([
+                    ->components([
                         Forms\Components\DateTimePicker::make('valid_from')
                             ->label(__('Valid From'))
                             ->native(false)
@@ -113,7 +113,7 @@ final class DiscountCodeResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make(__('Targeting'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Select::make('customer_groups')
                             ->label(__('Customer Groups'))
                             ->relationship('customerGroups', 'name')
@@ -134,7 +134,7 @@ final class DiscountCodeResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make(__('Settings'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Toggle::make('is_single_use')
                             ->label(__('Single Use Only'))
                             ->default(false)

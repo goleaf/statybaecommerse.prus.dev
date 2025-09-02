@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Models\Document;
 use App\Models\DocumentTemplate;
+use App\Notifications\DocumentGenerated;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -15,8 +17,15 @@ final class DocumentService
         DocumentTemplate $template,
         Model $relatedModel,
         array $variables = [],
-        string $title = null
+        string $title = null,
+        bool $sendNotification = false
     ): Document {
+        // Validate template content for security
+        $this->validateTemplateContent($template->content);
+        
+        // Sanitize variables
+        $variables = $this->sanitizeVariables($variables);
+        
         $processedContent = $this->processTemplate($template->content, $variables);
         
         $document = Document::create([
@@ -31,6 +40,11 @@ final class DocumentService
             'created_by' => Auth::id(),
             'generated_at' => now(),
         ]);
+
+        // Send notification if requested
+        if ($sendNotification && Auth::user()) {
+            Auth::user()->notify(new DocumentGenerated($document, false));
+        }
 
         return $document;
     }
@@ -58,6 +72,11 @@ final class DocumentService
             'status' => 'published',
         ]);
 
+        // Send notification with PDF attachment
+        if (Auth::user()) {
+            Auth::user()->notify(new DocumentGenerated($document, true));
+        }
+
         return Storage::disk('public')->url($filename);
     }
 
@@ -83,28 +102,30 @@ final class DocumentService
 
     public function getAvailableVariables(): array
     {
-        return [
-            // Global variables
-            '$COMPANY_NAME' => config('app.name'),
-            '$CURRENT_DATE' => now()->format('Y-m-d'),
-            '$CURRENT_DATETIME' => now()->format('Y-m-d H:i:s'),
-            '$CURRENT_YEAR' => now()->year,
-            '$CURRENT_USER' => Auth::user()?->name ?? '',
-            
-            // Common e-commerce variables
-            '$ORDER_NUMBER' => 'Order number',
-            '$ORDER_DATE' => 'Order date',
-            '$ORDER_TOTAL' => 'Order total',
-            '$CUSTOMER_NAME' => 'Customer name',
-            '$CUSTOMER_EMAIL' => 'Customer email',
-            '$CUSTOMER_PHONE' => 'Customer phone',
-            '$CUSTOMER_ADDRESS' => 'Customer address',
-            '$PRODUCT_NAME' => 'Product name',
-            '$PRODUCT_SKU' => 'Product SKU',
-            '$PRODUCT_PRICE' => 'Product price',
-            '$BRAND_NAME' => 'Brand name',
-            '$CATEGORY_NAME' => 'Category name',
-        ];
+        return Cache::remember('document_variables_' . app()->getLocale(), 3600, function() {
+            return [
+                // Global variables
+                '$COMPANY_NAME' => config('app.name'),
+                '$CURRENT_DATE' => now()->format('Y-m-d'),
+                '$CURRENT_DATETIME' => now()->format('Y-m-d H:i:s'),
+                '$CURRENT_YEAR' => now()->year,
+                '$CURRENT_USER' => Auth::user()?->name ?? '',
+                
+                // Common e-commerce variables
+                '$ORDER_NUMBER' => 'Order number',
+                '$ORDER_DATE' => 'Order date',
+                '$ORDER_TOTAL' => 'Order total',
+                '$CUSTOMER_NAME' => 'Customer name',
+                '$CUSTOMER_EMAIL' => 'Customer email',
+                '$CUSTOMER_PHONE' => 'Customer phone',
+                '$CUSTOMER_ADDRESS' => 'Customer address',
+                '$PRODUCT_NAME' => 'Product name',
+                '$PRODUCT_SKU' => 'Product SKU',
+                '$PRODUCT_PRICE' => 'Product price',
+                '$BRAND_NAME' => 'Brand name',
+                '$CATEGORY_NAME' => 'Category name',
+            ];
+        });
     }
 
     public function extractVariablesFromModel(Model $model, string $prefix = ''): array
@@ -120,5 +141,67 @@ final class DocumentService
         }
         
         return $variables;
+    }
+
+    public function generateDocumentAsync(
+        DocumentTemplate $template,
+        Model $relatedModel,
+        array $variables = [],
+        string $title = null
+    ): void {
+        dispatch(function() use ($template, $relatedModel, $variables, $title) {
+            $this->generateDocument($template, $relatedModel, $variables, $title, true);
+        });
+    }
+
+    public function previewTemplate(DocumentTemplate $template, array $sampleVariables = []): string
+    {
+        $variables = array_merge($this->getSampleVariables(), $sampleVariables);
+        return $this->processTemplate($template->content, $variables);
+    }
+
+    public function getSampleVariables(): array
+    {
+        return [
+            '$COMPANY_NAME' => config('app.name', 'Sample Company'),
+            '$CURRENT_DATE' => now()->format('Y-m-d'),
+            '$CURRENT_YEAR' => now()->year,
+            '$ORDER_NUMBER' => 'ORD-2025-001',
+            '$ORDER_DATE' => now()->format('Y-m-d'),
+            '$ORDER_TOTAL' => '€99.99',
+            '$ORDER_SUBTOTAL' => '€85.00',
+            '$ORDER_TAX' => '€14.99',
+            '$ORDER_SHIPPING' => '€5.00',
+            '$CUSTOMER_NAME' => 'John Doe',
+            '$CUSTOMER_EMAIL' => 'john.doe@example.com',
+            '$CUSTOMER_PHONE' => '+370 600 12345',
+            '$PRODUCT_NAME' => 'Sample Product',
+            '$PRODUCT_SKU' => 'SKU-001',
+            '$PRODUCT_PRICE' => '€49.99',
+            '$BRAND_NAME' => 'Sample Brand',
+        ];
+    }
+
+    private function validateTemplateContent(string $content): void
+    {
+        // Prevent XSS in templates
+        if (preg_match('/<script|javascript:|on\w+=/i', $content)) {
+            throw new \InvalidArgumentException(__('documents.errors.dangerous_content'));
+        }
+
+        // Check for malformed HTML
+        if (preg_match('/<[^>]*[<>][^>]*>/i', $content)) {
+            throw new \InvalidArgumentException(__('documents.errors.malformed_html'));
+        }
+    }
+
+    private function sanitizeVariables(array $variables): array
+    {
+        return array_map(function($value) {
+            if (is_string($value)) {
+                return strip_tags($value);
+            }
+            return $value;
+        }, $variables);
     }
 }

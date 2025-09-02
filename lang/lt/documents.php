@@ -93,4 +93,28 @@ return [
     'vat_number' => 'PVM mokėtojo kodas',
     'generated_on' => 'Sugeneruota',
     'all_rights_reserved' => 'Visos teisės saugomos',
+    'preview' => 'Peržiūra',
+
+    // Email notifications
+    'email' => [
+        'subject' => 'Dokumentas sugeneruotas: :title',
+        'greeting' => 'Sveiki :name,',
+        'generated' => 'Naujas :type dokumentas ":title" buvo sukurtas jums.',
+        'details' => 'Sugeneruota :date su būsena: :status',
+        'view_document' => 'Peržiūrėti dokumentą',
+        'footer' => 'Ačiū, kad naudojatės mūsų paslaugomis!',
+    ],
+
+    // Database notifications
+    'notification' => [
+        'generated' => 'Dokumentas ":title" buvo sugeneruotas',
+    ],
+
+    // Error messages
+    'errors' => [
+        'dangerous_content' => 'Šablono turinys turi potencialiai pavojingų elementų',
+        'malformed_html' => 'Šablono turinys turi netaisyklingą HTML',
+        'generation_failed' => 'Dokumento generavimas nepavyko',
+        'pdf_generation_failed' => 'PDF generavimas nepavyko',
+    ],
 ];

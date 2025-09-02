@@ -26,9 +26,9 @@ final class LocationResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make(__('translations.location_information'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('name')
                             ->label(__('translations.name'))
                             ->required()

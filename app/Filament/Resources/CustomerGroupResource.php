@@ -29,10 +29,10 @@ final class CustomerGroupResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 // Customer Group Settings (Non-translatable)
                 Forms\Components\Section::make(__('translations.customer_group_settings'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('discount_percentage')
                             ->label(__('translations.discount_percentage'))
                             ->numeric()

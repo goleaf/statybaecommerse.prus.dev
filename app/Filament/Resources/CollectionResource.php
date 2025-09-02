@@ -30,10 +30,10 @@ final class CollectionResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 // Main Collection Information (Non-translatable)
                 Forms\Components\Section::make(__('translations.collection_information'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('sort_order')
                             ->label(__('translations.sort_order'))
                             ->numeric()
@@ -55,7 +55,7 @@ final class CollectionResource extends Resource
 
                 // Collection Rules Section
                 Forms\Components\Section::make(__('translations.collection_rules'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Textarea::make('rules')
                             ->label(__('translations.collection_rules'))
                             ->visible(fn(Forms\Get $get): bool => $get('is_automatic') === true)

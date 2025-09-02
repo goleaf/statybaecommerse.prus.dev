@@ -38,9 +38,9 @@ final class ZoneResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make(__('admin.zone.form.basic_info'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('name')
                             ->label(__('admin.zone.form.name'))
                             ->required()
@@ -58,7 +58,7 @@ final class ZoneResource extends Resource
                     ->columns(2),
                 
                 Forms\Components\Section::make(__('admin.zone.form.countries'))
-                    ->schema([
+                    ->components([
                         Forms\Components\CheckboxList::make('countries')
                             ->label(__('admin.zone.form.countries_list'))
                             ->relationship('countries', 'name')

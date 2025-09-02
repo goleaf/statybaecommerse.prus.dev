@@ -133,6 +133,32 @@ return [
     'website' => 'Svetainė',
     'enabled' => 'Įjungta',
     'products' => 'Produktai',
+    // Additional Fields
+    'maximum_amount' => 'Maksimali suma',
+    'discount_settings' => 'Nuolaidos nustatymai',
+    'discount_description_help' => 'Aprašykite nuolaidos privalumus ir sąlygas',
+    // Reviews
+    'review_information' => 'Atsiliepimo informacija',
+    'review_content' => 'Atsiliepimo turinys',
+    'reviewer' => 'Atsiliepimo autorius',
+    'rating' => 'Įvertinimas',
+    'star' => 'Žvaigždutė',
+    'stars' => 'Žvaigždutės',
+    'approved' => 'Patvirtinta',
+    'approved_at' => 'Patvirtinta',
+    'review_content_help' => 'Parašykite savo detalų atsiliepimą čia',
+    // Partners
+    'partner_information' => 'Partnerio informacija',
+    'partner_settings' => 'Partnerio nustatymai',
+    // Partner Tiers
+    'partner_tier_information' => 'Partnerio lygio informacija',
+    'tier_information' => 'Lygio informacija',
+    // General Status
+    'starts_at' => 'Prasideda',
+    'ends_at' => 'Baigiasi',
+    'usage_limit' => 'Naudojimo limitas',
+    'usage_limit_per_customer' => 'Limitas vienam klientui',
+    'exclude_sale_items' => 'Neįskaičiuoti išpardavimo prekių',
     // Category Information
     'category_information' => 'Kategorijos informacija',
     'category_images' => 'Kategorijos paveikslėliai',

@@ -18,7 +18,7 @@ final class ReviewsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('product_id')
                     ->relationship('product', 'name')
                     ->required()

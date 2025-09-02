@@ -38,7 +38,7 @@ final class CampaignResource extends Resource
             ->components([
                 // Campaign Status and Settings (Non-translatable)
                 Forms\Components\Section::make(__('translations.campaign_settings'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Select::make('status')
                             ->label(__('translations.status'))
                             ->options([
@@ -87,7 +87,7 @@ final class CampaignResource extends Resource
                     ->persistTabInQueryString('campaign_tab')
                     ->contained(false),
                 Forms\Components\Section::make(__('Scheduling'))
-                    ->schema([
+                    ->components([
                         Forms\Components\DateTimePicker::make('starts_at')
                             ->label(__('Starts At'))
                             ->required()
@@ -109,7 +109,7 @@ final class CampaignResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make(__('Discounts'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Select::make('discounts')
                             ->label(__('Associated Discounts'))
                             ->relationship('discounts', 'name')
@@ -118,7 +118,7 @@ final class CampaignResource extends Resource
                             ->preload(),
                     ]),
                 Forms\Components\Section::make(__('Settings'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Toggle::make('is_featured')
                             ->label(__('Featured'))
                             ->default(false),

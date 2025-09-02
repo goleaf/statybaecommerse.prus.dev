@@ -29,9 +29,9 @@ final class CountryResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make('Country Information')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('cca2')
                             ->label('Country Code (2-letter)')
                             ->required()
@@ -52,7 +52,7 @@ final class CountryResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Geographic Information')
-                    ->schema([
+                    ->components([
                         Forms\Components\Select::make('region')
                             ->options([
                                 'Europe' => 'Europe',

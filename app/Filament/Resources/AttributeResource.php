@@ -29,10 +29,10 @@ final class AttributeResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 // Attribute Settings (Non-translatable)
                 Forms\Components\Section::make(__('translations.attribute_settings'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Select::make('type')
                             ->label(__('translations.type'))
                             ->options([

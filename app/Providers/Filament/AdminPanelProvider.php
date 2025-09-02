@@ -132,7 +132,7 @@ final class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-cog-6-tooth'),
             ])
             ->plugins([
-                // Plugins temporarily disabled due to compatibility issues with Filament v4
+                // Plugins temporarily disabled to fix base system
             ])
             ->spa();
     }

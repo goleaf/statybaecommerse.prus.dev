@@ -19,9 +19,9 @@ final class OrdersRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make(__('admin.order_information'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('number')
                             ->label(__('admin.order_number'))
                             ->required()

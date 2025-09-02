@@ -28,9 +28,9 @@ final class DocumentResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make(__('documents.document_information'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Select::make('document_template_id')
                             ->label(__('documents.template'))
                             ->relationship('template', 'name')
@@ -74,7 +74,7 @@ final class DocumentResource extends Resource
                     ->columns(2),
 
                 Forms\Components\Section::make(__('documents.content'))
-                    ->schema([
+                    ->components([
                         Forms\Components\RichEditor::make('content')
                             ->label(__('documents.content'))
                             ->required()
@@ -97,7 +97,7 @@ final class DocumentResource extends Resource
                     ]),
 
                 Forms\Components\Section::make(__('documents.variables'))
-                    ->schema([
+                    ->components([
                         Forms\Components\KeyValue::make('variables')
                             ->label(__('documents.variables'))
                             ->keyLabel(__('documents.variable_name'))
@@ -108,7 +108,7 @@ final class DocumentResource extends Resource
                     ->collapsed(),
 
                 Forms\Components\Section::make(__('documents.metadata'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('documentable_type')
                             ->label(__('documents.related_model_type'))
                             ->disabled(),

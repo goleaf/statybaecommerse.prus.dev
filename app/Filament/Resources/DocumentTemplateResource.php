@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Models\DocumentTemplate;
+use App\Services\DocumentService;
 use App\Services\MultiLanguageTabService;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -29,9 +30,9 @@ final class DocumentTemplateResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make(__('documents.template_information'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('name')
                             ->label(__('documents.name'))
                             ->required()
@@ -118,7 +119,7 @@ final class DocumentTemplateResource extends Resource
                     ->contained(false),
 
                 Forms\Components\Section::make(__('documents.template_variables'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TagsInput::make('variables')
                             ->label(__('documents.variables'))
                             ->helperText(__('documents.variables_help'))
@@ -128,7 +129,7 @@ final class DocumentTemplateResource extends Resource
                     ->collapsed(),
 
                 Forms\Components\Section::make(__('documents.print_settings'))
-                    ->schema([
+                    ->components([
                         Forms\Components\KeyValue::make('settings')
                             ->label(__('documents.settings'))
                             ->keyLabel(__('documents.setting_key'))
@@ -209,6 +210,19 @@ final class DocumentTemplateResource extends Resource
                     ->label(__('documents.is_active')),
             ])
             ->actions([
+                Tables\Actions\Action::make('preview')
+                    ->label(__('documents.preview'))
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->action(function (DocumentTemplate $record) {
+                        $service = app(DocumentService::class);
+                        $preview = $service->previewTemplate($record);
+                        
+                        return response($preview)
+                            ->header('Content-Type', 'text/html')
+                            ->header('X-Frame-Options', 'SAMEORIGIN');
+                    })
+                    ->openUrlInNewTab(),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

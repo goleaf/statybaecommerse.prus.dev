@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
+use App\Services\MultiLanguageTabService;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 use BackedEnum;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class PartnerTierResource extends Resource
 {
@@ -37,9 +40,9 @@ final class PartnerTierResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make(__('admin.partner_tier.form.basic_info'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('name')
                             ->label(__('admin.partner_tier.form.name'))
                             ->required()
@@ -72,7 +75,7 @@ final class PartnerTierResource extends Resource
                     ->columns(2),
                 
                 Forms\Components\Section::make(__('admin.partner_tier.form.requirements'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('minimum_order_value')
                             ->label(__('admin.partner_tier.form.minimum_order_value'))
                             ->numeric()

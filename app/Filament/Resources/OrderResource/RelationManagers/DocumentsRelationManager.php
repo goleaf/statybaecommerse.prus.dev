@@ -19,9 +19,9 @@ final class DocumentsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make(__('documents.document_information'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('title')
                             ->label(__('documents.title'))
                             ->required()

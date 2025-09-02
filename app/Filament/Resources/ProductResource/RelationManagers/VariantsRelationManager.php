@@ -18,9 +18,9 @@ final class VariantsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make('Variant Information')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('sku')
                             ->required()
                             ->maxLength(255)
@@ -43,7 +43,7 @@ final class VariantsRelationManager extends RelationManager
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Inventory')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('stock_quantity')
                             ->numeric()
                             ->default(0)
@@ -59,7 +59,7 @@ final class VariantsRelationManager extends RelationManager
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Physical Properties')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('weight')
                             ->numeric()
                             ->suffix('kg')

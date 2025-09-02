@@ -27,9 +27,9 @@ final class CouponResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make('Coupon Information')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
@@ -47,7 +47,7 @@ final class CouponResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Discount Settings')
-                    ->schema([
+                    ->components([
                         Forms\Components\Select::make('type')
                             ->options([
                                 'percentage' => 'Percentage',
@@ -69,7 +69,7 @@ final class CouponResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Validity Period')
-                    ->schema([
+                    ->components([
                         Forms\Components\DateTimePicker::make('starts_at')
                             ->label('Start Date'),
                         Forms\Components\DateTimePicker::make('expires_at')

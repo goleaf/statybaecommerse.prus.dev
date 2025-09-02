@@ -93,4 +93,28 @@ return [
     'vat_number' => 'VAT Number',
     'generated_on' => 'Generated on',
     'all_rights_reserved' => 'All rights reserved',
+    'preview' => 'Preview',
+
+    // Email notifications
+    'email' => [
+        'subject' => 'Document Generated: :title',
+        'greeting' => 'Hello :name,',
+        'generated' => 'A new :type document ":title" has been generated for you.',
+        'details' => 'Generated on :date with status: :status',
+        'view_document' => 'View Document',
+        'footer' => 'Thank you for using our service!',
+    ],
+
+    // Database notifications
+    'notification' => [
+        'generated' => 'Document ":title" has been generated',
+    ],
+
+    // Error messages
+    'errors' => [
+        'dangerous_content' => 'Template content contains potentially dangerous elements',
+        'malformed_html' => 'Template content contains malformed HTML',
+        'generation_failed' => 'Document generation failed',
+        'pdf_generation_failed' => 'PDF generation failed',
+    ],
 ];

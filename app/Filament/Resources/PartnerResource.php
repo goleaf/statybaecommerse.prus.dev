@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use App\Models\PartnerTier;
+use App\Services\MultiLanguageTabService;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 use BackedEnum;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class PartnerResource extends Resource
 {
@@ -38,9 +41,9 @@ final class PartnerResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make(__('admin.partner.form.basic_info'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('name')
                             ->label(__('admin.partner.form.name'))
                             ->required()
@@ -77,7 +80,7 @@ final class PartnerResource extends Resource
                     ->columns(2),
                 
                 Forms\Components\Section::make(__('admin.partner.form.address'))
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('address')
                             ->label(__('admin.partner.form.address_line'))
                             ->maxLength(255),
@@ -103,7 +106,7 @@ final class PartnerResource extends Resource
                     ->columns(2),
                 
                 Forms\Components\Section::make(__('admin.partner.form.additional'))
-                    ->schema([
+                    ->components([
                         Forms\Components\Textarea::make('description')
                             ->label(__('admin.partner.form.description'))
                             ->maxLength(1000)

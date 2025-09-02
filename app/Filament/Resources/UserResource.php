@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\DocumentAction;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
@@ -29,9 +30,9 @@ final class UserResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Section::make('User Information')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
@@ -51,7 +52,7 @@ final class UserResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Profile Information')
-                    ->schema([
+                    ->components([
                         Forms\Components\TextInput::make('phone')
                             ->tel()
                             ->maxLength(255),
@@ -71,7 +72,7 @@ final class UserResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Roles & Permissions')
-                    ->schema([
+                    ->components([
                         Forms\Components\Select::make('roles')
                             ->relationship('roles', 'name')
                             ->multiple()
@@ -85,7 +86,7 @@ final class UserResource extends Resource
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Settings')
-                    ->schema([
+                    ->components([
                         Forms\Components\Toggle::make('is_active')
                             ->label('Active')
                             ->default(true),
@@ -161,6 +162,16 @@ final class UserResource extends Resource
                     ->label('Customer Groups'),
             ])
             ->actions([
+                DocumentAction::make()
+                    ->variables(fn(User $record) => [
+                        '$CUSTOMER_NAME' => $record->name,
+                        '$CUSTOMER_FIRST_NAME' => $record->first_name ?? '',
+                        '$CUSTOMER_LAST_NAME' => $record->last_name ?? '',
+                        '$CUSTOMER_EMAIL' => $record->email,
+                        '$CUSTOMER_PHONE' => $record->phone_number ?? '',
+                        '$CUSTOMER_COMPANY' => $record->company ?? '',
+                        '$CUSTOMER_GROUP' => $record->customerGroups->pluck('name')->implode(', '),
+                    ]),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

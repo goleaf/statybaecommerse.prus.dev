@@ -133,6 +133,32 @@ return [
     'website' => 'Website',
     'enabled' => 'Enabled',
     'products' => 'Products',
+    // Additional Fields
+    'maximum_amount' => 'Maximum Amount',
+    'discount_settings' => 'Discount Settings',
+    'discount_description_help' => 'Describe the discount benefits and conditions',
+    // Reviews
+    'review_information' => 'Review Information',
+    'review_content' => 'Review Content',
+    'reviewer' => 'Reviewer',
+    'rating' => 'Rating',
+    'star' => 'Star',
+    'stars' => 'Stars',
+    'approved' => 'Approved',
+    'approved_at' => 'Approved At',
+    'review_content_help' => 'Write your detailed review here',
+    // Partners
+    'partner_information' => 'Partner Information',
+    'partner_settings' => 'Partner Settings',
+    // Partner Tiers
+    'partner_tier_information' => 'Partner Tier Information',
+    'tier_information' => 'Tier Information',
+    // General Status
+    'starts_at' => 'Starts At',
+    'ends_at' => 'Ends At',
+    'usage_limit' => 'Usage Limit',
+    'usage_limit_per_customer' => 'Usage Limit Per Customer',
+    'exclude_sale_items' => 'Exclude Sale Items',
     // Category Information
     'category_information' => 'Category Information',
     'category_images' => 'Category Images',
