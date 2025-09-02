@@ -19,6 +19,7 @@ use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
+use Filament\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
@@ -405,4 +406,12 @@ final class ProductResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()
+            ->with(['brand', 'category']);
+    }
+
+
 }

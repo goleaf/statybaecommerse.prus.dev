@@ -202,7 +202,7 @@ return new class extends Migration {
         if (Schema::hasTable('cart_items') && Schema::hasColumn('cart_items', 'variant_id')) {
             Schema::table('cart_items', function (Blueprint $table) {
                 try {
-                    $table->foreign('variant_id')->references('id')->on('sh_product_variants')->onDelete('set null');
+                    $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('set null');
                 } catch (\Exception $e) {
                     // Foreign key might already exist
                 }
@@ -212,7 +212,7 @@ return new class extends Migration {
         if (Schema::hasTable('order_items') && Schema::hasColumn('order_items', 'variant_id')) {
             Schema::table('order_items', function (Blueprint $table) {
                 try {
-                    $table->foreign('variant_id')->references('id')->on('sh_product_variants')->onDelete('set null');
+                    $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('set null');
                 } catch (\Exception $e) {
                     // Foreign key might already exist
                 }

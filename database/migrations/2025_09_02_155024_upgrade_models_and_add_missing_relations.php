@@ -179,7 +179,7 @@ return new class extends Migration {
                 $table->unsignedBigInteger('attribute_value_id');
                 $table->timestamps();
 
-                $table->foreign('variant_id')->references('id')->on('sh_product_variants')->onDelete('cascade');
+                $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
                 $table->foreign('attribute_value_id')->references('id')->on('sh_attribute_values')->onDelete('cascade');
                 $table->unique(['variant_id', 'attribute_value_id'], 'variant_attribute_value_unique');
             });

@@ -18,10 +18,10 @@ return new class extends Migration {
         }
 
         // Backfill from variant inventories if table exists
-        if (Schema::hasTable('sh_products') && Schema::hasTable('sh_variant_inventories') && Schema::hasTable('sh_product_variants')) {
-            $rows = DB::table('sh_products as p')
-                ->leftJoin('sh_product_variants as v', 'v.product_id', '=', 'p.id')
-                ->leftJoin('sh_variant_inventories as vi', 'vi.variant_id', '=', 'v.id')
+        if (Schema::hasTable('products') && Schema::hasTable('variant_inventories') && Schema::hasTable('product_variants')) {
+            $rows = DB::table('products as p')
+                ->leftJoin('product_variants as v', 'v.product_id', '=', 'p.id')
+                ->leftJoin('variant_inventories as vi', 'vi.variant_id', '=', 'v.id')
                 ->select('p.id', DB::raw('COALESCE(SUM(CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END), 0) as qty'))
                 ->groupBy('p.id')
                 ->get();
