@@ -5,8 +5,9 @@ namespace App\Livewire\Pages;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -19,10 +20,10 @@ final class ProductCatalog extends Component
     public string $search = '';
 
     #[Url]
-    public array $categories = [];
+    public array $selectedCategories = [];
 
     #[Url]
-    public array $brands = [];
+    public array $selectedBrands = [];
 
     #[Url]
     public string $sortBy = 'name';
@@ -31,47 +32,144 @@ final class ProductCatalog extends Component
     public string $sortDirection = 'asc';
 
     #[Url]
-    public int $minPrice = 0;
+    public int $priceMin = 0;
 
     #[Url]
-    public int $maxPrice = 10000;
+    public int $priceMax = 10000;
+
+    #[Url]
+    public string $availability = 'all';
+
+    #[Url]
+    public int $perPage = 12;
 
     public bool $showFilters = false;
 
     public function mount(): void
     {
-        // Initialize default values
+        $this->priceMax = (int) Product::max('price') ?: 10000;
     }
 
-    public function updatingSearch(): void
+    #[Computed]
+    public function products(): LengthAwarePaginator
+    {
+        return Product::query()
+            ->with(['brand', 'categories', 'media', 'variants'])
+            ->where('is_visible', true)
+            ->when($this->search, function (Builder $query) {
+                $query->where(function (Builder $subQuery) {
+                    $subQuery->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('description', 'like', '%' . $this->search . '%')
+                        ->orWhere('sku', 'like', '%' . $this->search . '%')
+                        ->orWhereHas('brand', function (Builder $brandQuery) {
+                            $brandQuery->where('name', 'like', '%' . $this->search . '%');
+                        });
+                });
+            })
+            ->when($this->selectedCategories, function (Builder $query) {
+                $query->whereHas('categories', function (Builder $categoryQuery) {
+                    $categoryQuery->whereIn('categories.id', $this->selectedCategories);
+                });
+            })
+            ->when($this->selectedBrands, function (Builder $query) {
+                $query->whereIn('brand_id', $this->selectedBrands);
+            })
+            ->when($this->priceMin > 0, function (Builder $query) {
+                $query->where('price', '>=', $this->priceMin);
+            })
+            ->when($this->priceMax < 10000, function (Builder $query) {
+                $query->where('price', '<=', $this->priceMax);
+            })
+            ->when($this->availability === 'in_stock', function (Builder $query) {
+                $query->where('stock_quantity', '>', 0);
+            })
+            ->when($this->availability === 'out_of_stock', function (Builder $query) {
+                $query->where('stock_quantity', '<=', 0);
+            })
+            ->orderBy($this->sortBy, $this->sortDirection)
+            ->paginate($this->perPage);
+    }
+
+    #[Computed]
+    public function categories()
+    {
+        return Category::query()
+            ->withCount(['products' => function (Builder $query) {
+                $query->where('is_visible', true);
+            }])
+            ->having('products_count', '>', 0)
+            ->orderBy('name')
+            ->get();
+    }
+
+    #[Computed]
+    public function brands()
+    {
+        return Brand::query()
+            ->withCount(['products' => function (Builder $query) {
+                $query->where('is_visible', true);
+            }])
+            ->having('products_count', '>', 0)
+            ->orderBy('name')
+            ->get();
+    }
+
+    public function updatedSearch(): void
     {
         $this->resetPage();
     }
 
-    public function updatingCategories(): void
+    public function updatedSelectedCategories(): void
     {
         $this->resetPage();
     }
 
-    public function updatingBrands(): void
+    public function updatedSelectedBrands(): void
     {
         $this->resetPage();
     }
 
-    public function sortBy(string $field): void
+    public function updatedSortBy(): void
     {
-        if ($this->sortBy === $field) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortBy = $field;
-            $this->sortDirection = 'asc';
-        }
+        $this->resetPage();
+    }
+
+    public function updatedSortDirection(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPriceMin(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPriceMax(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedAvailability(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage(): void
+    {
         $this->resetPage();
     }
 
     public function clearFilters(): void
     {
-        $this->reset(['search', 'categories', 'brands', 'minPrice', 'maxPrice']);
+        $this->reset([
+            'search',
+            'selectedCategories',
+            'selectedBrands',
+            'priceMin',
+            'priceMax',
+            'availability',
+        ]);
+        $this->priceMax = (int) Product::max('price') ?: 10000;
         $this->resetPage();
     }
 
@@ -80,58 +178,38 @@ final class ProductCatalog extends Component
         $this->showFilters = !$this->showFilters;
     }
 
-    public function getProductsProperty()
+    public function addToCart(int $productId): void
     {
-        return Product::query()
-            ->with(['brand', 'categories', 'media'])
-            ->where('is_visible', true)
-            ->where('status', 'published')
-            ->where(function (Builder $query) {
-                if ($this->search) {
-                    $query->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('description', 'like', '%' . $this->search . '%')
-                        ->orWhere('sku', 'like', '%' . $this->search . '%');
-                }
-            })
-            ->when($this->categories, function (Builder $query) {
-                $query->whereHas('categories', function (Builder $q) {
-                    $q->whereIn('categories.id', $this->categories);
-                });
-            })
-            ->when($this->brands, function (Builder $query) {
-                $query->whereIn('brand_id', $this->brands);
-            })
-            ->whereBetween('price', [$this->minPrice, $this->maxPrice])
-            ->orderBy($this->sortBy, $this->sortDirection)
-            ->paginate(12);
+        $product = Product::findOrFail($productId);
+        
+        $cartItems = session()->get('cart', []);
+        
+        if (isset($cartItems[$productId])) {
+            $cartItems[$productId]['quantity']++;
+        } else {
+            $cartItems[$productId] = [
+                'name' => $product->name,
+                'price' => $product->price,
+                'quantity' => 1,
+                'image' => $product->getFirstMediaUrl('images'),
+            ];
+        }
+        
+        session()->put('cart', $cartItems);
+        
+        $this->dispatch('cart-updated');
+        $this->dispatch('notify', 
+            message: __('Product added to cart'),
+            type: 'success'
+        );
     }
 
-    public function getCategoriesProperty()
-    {
-        return Category::query()
-            ->where('is_visible', true)
-            ->whereNull('parent_id')
-            ->with('children')
-            ->orderBy('sort_order')
-            ->get();
-    }
-
-    public function getBrandsProperty()
-    {
-        return Brand::query()
-            ->where('is_enabled', true)
-            ->withCount('products')
-            ->having('products_count', '>', 0)
-            ->orderBy('name')
-            ->get();
-    }
-
-    public function render(): View
+    public function render()
     {
         return view('livewire.pages.product-catalog', [
             'products' => $this->products,
-            'availableCategories' => $this->categories,
-            'availableBrands' => $this->brands,
-        ]);
+            'categories' => $this->categories,
+            'brands' => $this->brands,
+        ])->title(__('Products'));
     }
 }

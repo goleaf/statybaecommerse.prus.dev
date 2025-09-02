@@ -25,9 +25,9 @@ class ExtendedDemoSeeder extends Seeder
 			$collections = \App\Models\Collection::factory()->count(8)->create();
 
 			// Attributes + values
-			$attributes = \Shop\Core\Models\Attribute::factory()->count(5)->create();
+			$attributes = \App\Models\Attribute::factory()->count(5)->create();
 			foreach ($attributes as $attr) {
-				\Shop\Core\Models\AttributeValue::factory()->count(random_int(5, 12))->create(['attribute_id' => $attr->id]);
+				\App\Models\AttributeValue::factory()->count(random_int(5, 12))->create(['attribute_id' => $attr->id]);
 			}
 
 			// Products

@@ -8,8 +8,12 @@ use Illuminate\Support\Facades\DB;
 
 final class OrdersChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Orders Overview';
     protected static ?int $sort = 2;
+
+    public function getHeading(): ?string
+    {
+        return 'Orders Overview';
+    }
 
     protected function getData(): array
     {

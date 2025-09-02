@@ -2,29 +2,32 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\DocumentAction;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
+use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static ?string $navigationGroup = 'Orders';
+    protected static string|UnitEnum|null $navigationGroup = 'Orders';
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make('Order Information')
                     ->schema([
@@ -166,6 +169,21 @@ class OrderResource extends Resource
                     }),
             ])
             ->actions([
+                DocumentAction::make()
+                    ->variables(fn(Order $record) => [
+                        '$ORDER_NUMBER' => $record->number,
+                        '$ORDER_DATE' => $record->created_at->format('Y-m-d'),
+                        '$ORDER_TOTAL' => number_format($record->total, 2) . ' ' . $record->currency,
+                        '$ORDER_SUBTOTAL' => number_format($record->subtotal, 2) . ' ' . $record->currency,
+                        '$ORDER_TAX' => number_format($record->tax_amount, 2) . ' ' . $record->currency,
+                        '$ORDER_SHIPPING' => number_format($record->shipping_amount, 2) . ' ' . $record->currency,
+                        '$ORDER_DISCOUNT' => number_format($record->discount_amount, 2) . ' ' . $record->currency,
+                        '$ORDER_STATUS' => ucfirst($record->status),
+                        '$CUSTOMER_NAME' => $record->user?->name ?? 'Guest',
+                        '$CUSTOMER_EMAIL' => $record->user?->email ?? '',
+                        '$BILLING_ADDRESS' => is_array($record->billing_address) ? implode(', ', $record->billing_address) : $record->billing_address,
+                        '$SHIPPING_ADDRESS' => is_array($record->shipping_address) ? implode(', ', $record->shipping_address) : $record->shipping_address,
+                    ]),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

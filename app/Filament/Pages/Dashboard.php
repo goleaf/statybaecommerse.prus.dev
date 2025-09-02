@@ -2,27 +2,43 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\EcommerceStatsWidget;
+use App\Filament\Widgets\LatestOrdersWidget;
+use App\Filament\Widgets\OrdersChartWidget;
+use App\Filament\Widgets\RecentOrdersWidget;
+use App\Filament\Widgets\StatsOverviewWidget;
+use App\Filament\Widgets\TopSellingProductsWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
+use UnitEnum;
+use BackedEnum;
 
 final class Dashboard extends BaseDashboard
 {
-    protected static ?string $navigationIcon = 'heroicon-o-home';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
-    protected static string $view = 'filament-panels::pages.dashboard';
+    public function getTitle(): string
+    {
+        return __('Dashboard');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Dashboard');
+    }
 
     public function getWidgets(): array
     {
         return [
-            \App\Filament\Widgets\StatsOverviewWidget::class,
-            \App\Filament\Widgets\OrdersChartWidget::class,
-            \App\Filament\Widgets\RecentOrdersWidget::class,
-            \App\Filament\Widgets\TopSellingProductsWidget::class,
-            \App\Filament\Widgets\LowStockProductsWidget::class,
-            \App\Filament\Widgets\RevenueChartWidget::class,
+            StatsOverviewWidget::class,
+            EcommerceStatsWidget::class,
+            OrdersChartWidget::class,
+            LatestOrdersWidget::class,
+            TopSellingProductsWidget::class,
+            RecentOrdersWidget::class,
         ];
     }
 
-    public function getColumns(): int | string | array
+    public function getColumns(): int | array
     {
         return [
             'md' => 2,

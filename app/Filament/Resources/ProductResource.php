@@ -2,13 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\DocumentAction;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -18,15 +19,18 @@ use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
+use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cube';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cube';
 
-    protected static ?string $navigationGroup = 'Catalog';
+    protected static string|UnitEnum|null $navigationGroup = 'Catalog';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -49,9 +53,9 @@ final class ProductResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make('Product Information')
                     ->schema([
@@ -284,6 +288,16 @@ final class ProductResource extends Resource
                     ->label('Featured Only'),
             ])
             ->actions([
+                DocumentAction::make()
+                    ->variables(fn(Product $record) => [
+                        '$PRODUCT_NAME' => $record->name,
+                        '$PRODUCT_SKU' => $record->sku,
+                        '$PRODUCT_PRICE' => number_format($record->price, 2) . ' EUR',
+                        '$PRODUCT_DESCRIPTION' => $record->description,
+                        '$PRODUCT_BRAND' => $record->brand?->name ?? '',
+                        '$PRODUCT_CATEGORY' => $record->category?->name ?? '',
+                        '$PRODUCT_WEIGHT' => $record->weight ? $record->weight . ' kg' : '',
+                    ]),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

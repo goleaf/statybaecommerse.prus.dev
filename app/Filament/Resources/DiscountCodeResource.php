@@ -10,15 +10,17 @@ use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
+use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class DiscountCodeResource extends Resource
 {
     protected static ?string $model = DiscountCode::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-ticket';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-ticket';
 
-    protected static ?string $navigationGroup = 'Marketing';
+    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 2;
 

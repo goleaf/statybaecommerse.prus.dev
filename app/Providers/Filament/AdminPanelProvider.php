@@ -48,6 +48,7 @@ final class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
+                \SolutionForest\TabLayoutPlugin\Widgets\TabsWidget::class,
                 // Custom widgets will be auto-discovered
             ])
             ->middleware([
@@ -104,15 +105,20 @@ final class AdminPanelProvider extends PanelProvider
                     'icon' => 'heroicon-o-document-text',
                     'sort' => 7,
                 ],
+                'Documents' => [
+                    'label' => __('Documents'),
+                    'icon' => 'heroicon-o-document-duplicate',
+                    'sort' => 8,
+                ],
                 'Settings' => [
                     'label' => __('Settings'),
                     'icon' => 'heroicon-o-cog-6-tooth',
-                    'sort' => 8,
+                    'sort' => 9,
                 ],
                 'System' => [
                     'label' => __('System'),
                     'icon' => 'heroicon-o-server',
-                    'sort' => 9,
+                    'sort' => 10,
                 ],
             ])
             ->userMenuItems([
@@ -126,15 +132,7 @@ final class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-cog-6-tooth'),
             ])
             ->plugins([
-                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
-                \Jeffgreco13\FilamentBreezy\BreezyCore::make()
-                    ->myProfile(
-                        shouldRegisterUserMenu: true,
-                        shouldRegisterNavigation: false,
-                        navigationGroup: 'Settings',
-                        hasAvatars: true,
-                        slug: 'my-profile'
-                    ),
+                // Filament Shield and Breezy plugins removed - using native Filament v4 features
             ])
             ->spa();
     }

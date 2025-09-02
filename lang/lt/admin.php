@@ -11,7 +11,6 @@ return [
     'content' => 'Turinys',
     'settings' => 'Nustatymai',
     'system' => 'Sistema',
-    
     // Common Actions
     'create' => 'Sukurti',
     'edit' => 'Redaguoti',
@@ -32,7 +31,6 @@ return [
     'resume' => 'Tęsti',
     'publish' => 'Publikuoti',
     'unpublish' => 'Nebepublikuoti',
-    
     // Common Fields
     'name' => 'Pavadinimas',
     'title' => 'Antraštė',
@@ -65,7 +63,6 @@ return [
     'updated_at' => 'Atnaujinta',
     'created' => 'Sukurta',
     'updated' => 'Atnaujinta',
-    
     // Status Options
     'draft' => 'Juodraštis',
     'active' => 'Aktyvus',
@@ -86,14 +83,12 @@ return [
     'delivered' => 'Pristatytas',
     'returned' => 'Grąžintas',
     'refunded' => 'Grąžinti pinigai',
-    
     // Priority Options
     'low' => 'Žemas',
     'normal' => 'Normalus',
     'high' => 'Aukštas',
     'urgent' => 'Skubus',
     'critical' => 'Kritinis',
-    
     // Campaigns
     'campaigns' => 'Kampanijos',
     'campaign' => 'Kampanija',
@@ -120,7 +115,6 @@ return [
     'unlimited' => 'Neribota',
     'active_campaigns' => 'Aktyvios kampanijos',
     'featured_only' => 'Tik rekomenduojamos',
-    
     // Discount Codes
     'discount_codes' => 'Nuolaidų kodai',
     'discount_code' => 'Nuolaidų kodas',
@@ -150,7 +144,6 @@ return [
     'codes_generated' => 'Kodai sugeneruoti',
     ':count discount codes have been generated successfully.' => ':count nuolaidų kodai buvo sėkmingai sugeneruoti.',
     'never' => 'Niekada',
-    
     // Partners
     'partners' => 'Partneriai',
     'partner' => 'Partneris',
@@ -183,7 +176,6 @@ return [
     'users' => 'Naudotojai',
     'send_email' => 'Siųsti el. laišką',
     'expiring_soon' => 'Greitai baigsis',
-    
     // Products
     'products' => 'Produktai',
     'product' => 'Produktas',
@@ -220,7 +212,6 @@ return [
     'comment' => 'Komentaras',
     'approved' => 'Patvirtintas',
     'pending_approval' => 'Laukia patvirtinimo',
-    
     // Orders
     'order' => 'Užsakymas',
     'order_number' => 'Užsakymo numeris',
@@ -239,7 +230,6 @@ return [
     'quantity' => 'Kiekis',
     'unit_price' => 'Vieneto kaina',
     'line_total' => 'Eilutės suma',
-    
     // Currencies & Locales
     'currencies' => 'Valiutos',
     'currency' => 'Valiuta',
@@ -250,7 +240,6 @@ return [
     'language' => 'Kalba',
     'country' => 'Šalis',
     'countries' => 'Šalys',
-    
     // Media
     'media' => 'Medija',
     'upload' => 'Įkelti',
@@ -260,7 +249,6 @@ return [
     'type' => 'Tipas',
     'alt_text' => 'Alt tekstas',
     'caption' => 'Antraštė',
-    
     // Permissions & Roles
     'permissions' => 'Leidimai',
     'permission' => 'Leidimas',
@@ -268,7 +256,6 @@ return [
     'role' => 'Vaidmuo',
     'assign_role' => 'Priskirti vaidmenį',
     'assign_permission' => 'Priskirti leidimą',
-    
     // Statistics & Analytics
     'statistics' => 'Statistika',
     'analytics' => 'Analitika',
@@ -280,7 +267,6 @@ return [
     'revenue' => 'Pajamos',
     'profit' => 'Pelnas',
     'margin' => 'Marža',
-    
     // Notifications
     'notifications' => 'Pranešimai',
     'notification' => 'Pranešimas',
@@ -288,7 +274,6 @@ return [
     'mark_all_read' => 'Pažymėti visus kaip perskaitytus',
     'unread' => 'Neperskaitytas',
     'read' => 'Perskaitytas',
-    
     // Import/Export
     'import_export' => 'Importas/Eksportas',
     'import_data' => 'Importuoti duomenis',
@@ -304,7 +289,6 @@ return [
     'warnings' => 'Įspėjimai',
     'success_count' => 'Sėkmingų skaičius',
     'error_count' => 'Klaidų skaičius',
-    
     // Inventory
     'inventory' => 'Atsargos',
     'stock' => 'Atsargos',
@@ -320,7 +304,6 @@ return [
     'warehouses' => 'Sandėliai',
     'location' => 'Vieta',
     'locations' => 'Vietos',
-    
     // Shipping
     'shipping_methods' => 'Pristatymo būdai',
     'shipping_method' => 'Pristatymo būdas',
@@ -332,7 +315,6 @@ return [
     'calculated' => 'Apskaičiuotas',
     'pickup' => 'Pasiėmimas',
     'delivery' => 'Pristatymas',
-    
     // Taxes
     'taxes' => 'Mokesčiai',
     'tax_rate' => 'Mokesčio tarifas',
@@ -342,7 +324,6 @@ return [
     'vat' => 'PVM',
     'gst' => 'GST',
     'sales_tax' => 'Pardavimo mokestis',
-    
     // Coupons
     'coupons' => 'Kuponai',
     'coupon' => 'Kuponas',
@@ -357,7 +338,6 @@ return [
     'usage_limit' => 'Panaudojimo limitas',
     'used' => 'Panaudota',
     'remaining' => 'Liko',
-    
     // SEO
     'seo' => 'SEO',
     'meta_title' => 'Meta antraštė',
@@ -367,7 +347,6 @@ return [
     'robots' => 'Robotai',
     'sitemap' => 'Svetainės žemėlapis',
     'schema_markup' => 'Schema ženklinimas',
-    
     // Backup & Maintenance
     'backup' => 'Atsarginė kopija',
     'backups' => 'Atsarginės kopijos',
@@ -379,7 +358,6 @@ return [
     'logs' => 'Žurnalai',
     'log' => 'Žurnalas',
     'system_info' => 'Sistemos informacija',
-    
     // Common Messages
     'success' => 'Sėkmė',
     'error' => 'Klaida',
@@ -404,7 +382,6 @@ return [
     'server_error' => 'Įvyko serverio klaida.',
     'network_error' => 'Įvyko tinklo klaida.',
     'timeout_error' => 'Užklausos laikas baigėsi.',
-    
     // Time & Dates
     'today' => 'Šiandien',
     'yesterday' => 'Vakar',

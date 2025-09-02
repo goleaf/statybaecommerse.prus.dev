@@ -5,20 +5,22 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
+use BackedEnum;
 
 final class PartnerTierResource extends Resource
 {
     protected static ?string $model = PartnerTier::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-star';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
-    protected static ?string $navigationGroup = 'Marketing';
+    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 2;
 
@@ -32,9 +34,9 @@ final class PartnerTierResource extends Resource
         return __('admin.partner_tier.plural');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make(__('admin.partner_tier.form.basic_info'))
                     ->schema([

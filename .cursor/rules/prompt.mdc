@@ -1,4 +1,4 @@
-continue, remove legacy code and files, upgrade all system to filament, make frontend and backend, making maximum of usability and maximum all control, read information in docs, make all changes, use existing seeds to make and use existing filament project, make migrations for new tables on filament framework, maximum tests
+continue, remove legacy code and files, upgrade all system to filament, make frontend and backend, making maximum of usability and maximum all control, read information in docs, make all changes, use existing seeds to make and use existing filament project, make migrations for new tables on filament framework, maximum tests, do not use "php artisan make" commands
 
 
 

@@ -1,5 +1,27 @@
 <?php declare(strict_types=1);
 
+if (!function_exists('shopper_setting')) {
+    /**
+     * Get or set a setting value.
+     */
+    function shopper_setting(string $key, mixed $default = null): mixed
+    {
+        $setting = \App\Models\Setting::query()->where('key', $key)->first();
+        
+        if (!$setting) {
+            return $default;
+        }
+        
+        return match ($setting->type) {
+            'boolean' => (bool) $setting->value,
+            'integer' => (int) $setting->value,
+            'float' => (float) $setting->value,
+            'array', 'json' => is_string($setting->value) ? json_decode($setting->value, true) : $setting->value,
+            default => $setting->value,
+        };
+    }
+}
+
 use App\Actions\ZoneSessionManager;
 use Illuminate\Support\Facades\Schema;
 

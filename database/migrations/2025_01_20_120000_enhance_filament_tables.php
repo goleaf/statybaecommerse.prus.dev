@@ -8,30 +8,68 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Add additional columns to products table for enhanced Filament functionality
-        Schema::table('products', function (Blueprint $table) {
-            $table->decimal('compare_price', 10, 2)->nullable()->after('price');
-            $table->decimal('cost_price', 10, 2)->nullable()->after('compare_price');
-            $table->string('barcode')->nullable()->after('sku');
-            $table->boolean('track_inventory')->default(true)->after('manage_stock');
-            $table->text('short_description')->nullable()->after('description');
-            $table->json('metadata')->nullable()->after('seo_description');
-            $table->timestamp('published_at')->nullable()->after('is_featured');
-            $table->string('video_url')->nullable()->after('metadata');
-        });
+        // Check if columns already exist before adding them
+        if (Schema::hasTable('products')) {
+            Schema::table('products', function (Blueprint $table) {
+                if (!Schema::hasColumn('products', 'compare_price')) {
+                    $table->decimal('compare_price', 10, 2)->nullable()->after('price');
+                }
+                if (!Schema::hasColumn('products', 'cost_price')) {
+                    $table->decimal('cost_price', 10, 2)->nullable()->after('compare_price');
+                }
+                if (!Schema::hasColumn('products', 'barcode')) {
+                    $table->string('barcode')->nullable()->after('sku');
+                }
+                if (!Schema::hasColumn('products', 'track_inventory')) {
+                    $table->boolean('track_inventory')->default(true)->after('manage_stock');
+                }
+                if (!Schema::hasColumn('products', 'short_description')) {
+                    $table->text('short_description')->nullable()->after('description');
+                }
+                if (!Schema::hasColumn('products', 'metadata')) {
+                    $table->json('metadata')->nullable()->after('seo_description');
+                }
+                if (!Schema::hasColumn('products', 'published_at')) {
+                    $table->timestamp('published_at')->nullable()->after('is_featured');
+                }
+                if (!Schema::hasColumn('products', 'video_url')) {
+                    $table->string('video_url')->nullable()->after('metadata');
+                }
+            });
+        }
 
         // Add additional columns to users table for enhanced customer management
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('phone')->nullable()->after('email');
-            $table->date('date_of_birth')->nullable()->after('phone');
-            $table->enum('gender', ['male', 'female', 'other'])->nullable()->after('date_of_birth');
-            $table->string('preferred_locale', 5)->default('lt')->after('gender');
-            $table->boolean('is_active')->default(true)->after('preferred_locale');
-            $table->boolean('accepts_marketing')->default(false)->after('is_active');
-            $table->boolean('two_factor_enabled')->default(false)->after('accepts_marketing');
-            $table->timestamp('last_login_at')->nullable()->after('two_factor_enabled');
-            $table->json('preferences')->nullable()->after('last_login_at');
-        });
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+                if (!Schema::hasColumn('users', 'phone')) {
+                    $table->string('phone')->nullable()->after('email');
+                }
+                if (!Schema::hasColumn('users', 'date_of_birth')) {
+                    $table->date('date_of_birth')->nullable()->after('phone');
+                }
+                if (!Schema::hasColumn('users', 'gender')) {
+                    $table->enum('gender', ['male', 'female', 'other'])->nullable()->after('date_of_birth');
+                }
+                if (!Schema::hasColumn('users', 'preferred_locale')) {
+                    $table->string('preferred_locale', 5)->default('lt')->after('gender');
+                }
+                if (!Schema::hasColumn('users', 'is_active')) {
+                    $table->boolean('is_active')->default(true)->after('preferred_locale');
+                }
+                if (!Schema::hasColumn('users', 'accepts_marketing')) {
+                    $table->boolean('accepts_marketing')->default(false)->after('is_active');
+                }
+                if (!Schema::hasColumn('users', 'two_factor_enabled')) {
+                    $table->boolean('two_factor_enabled')->default(false)->after('accepts_marketing');
+                }
+                if (!Schema::hasColumn('users', 'last_login_at')) {
+                    $table->timestamp('last_login_at')->nullable()->after('two_factor_enabled');
+                }
+                if (!Schema::hasColumn('users', 'preferences')) {
+                    $table->json('preferences')->nullable()->after('last_login_at');
+                }
+            });
+        }
 
         // Add additional columns to orders table
         Schema::table('orders', function (Blueprint $table) {

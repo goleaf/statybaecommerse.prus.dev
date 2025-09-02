@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
-use Shopper\Core\Models\Currency;
-use Shopper\Core\Models\Inventory;
-use Shopper\Core\Models\Setting;
+use App\Models\Currency;
+use App\Models\Location;
+use App\Models\Setting;
 
 class ShopperSetupSeeder extends Seeder
 {
@@ -36,7 +36,7 @@ class ShopperSetupSeeder extends Seeder
         $this->set('phone_number', '+37060000000');
 
         // Country id (Lithuania)
-        $countryId = \Shop\Core\Models\Country::query()->where('cca2', 'LT')->value('id');
+        $countryId = \App\Models\Country::query()->where('code', 'LT')->value('id');
         if ($countryId) {
             $this->set('country_id', $countryId);
         }
@@ -46,18 +46,21 @@ class ShopperSetupSeeder extends Seeder
         $this->set('instagram_link', 'https://instagram.com/' . Str::slug($name));
         $this->set('twitter_link', 'https://twitter.com/' . Str::slug($name));
 
-        // Default inventory if none exists
-        if (!Inventory::query()->exists()) {
-            Inventory::query()->create([
+        // Default location if none exists
+        if (!Location::query()->exists()) {
+            Location::query()->create([
                 'name' => $name,
                 'code' => Str::slug($name),
                 'email' => $email,
-                'street_address' => shopper_setting('street_address'),
-                'postal_code' => shopper_setting('postal_code'),
-                'city' => shopper_setting('city'),
-                'phone_number' => shopper_setting('phone_number'),
-                'country_id' => shopper_setting('country_id'),
+                'address_line_1' => 'Didžioji g. 1',
+                'city' => 'Vilnius',
+                'state' => 'Vilnius County',
+                'postal_code' => '01128',
+                'country_code' => 'LT',
+                'phone' => '+37060000000',
                 'is_default' => true,
+                'is_enabled' => true,
+                'type' => 'warehouse',
             ]);
         }
     }

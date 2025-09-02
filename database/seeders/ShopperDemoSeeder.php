@@ -5,12 +5,12 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Shopper\Core\Models\Brand;
-use Shopper\Core\Models\Category;
-use Shopper\Core\Models\Legal;
-use Shopper\Core\Models\Price;
-use Shopper\Core\Models\Product;
-use Shopper\Core\Models\ProductVariant;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Legal;
+use App\Models\Price;
+use App\Models\Product;
+use App\Models\ProductVariant;
 
 class ShopperDemoSeeder extends Seeder
 {
@@ -56,7 +56,7 @@ class ShopperDemoSeeder extends Seeder
         if (Storage::disk('public')->exists($path)) {
             $product
                 ->addMedia(Storage::disk('public')->path($path))
-                ->toMediaCollection(config('shopper.media.storage.collection_name'));
+                ->toMediaCollection('products');
         }
 
         // Price in default currency (EUR)
@@ -67,7 +67,7 @@ class ShopperDemoSeeder extends Seeder
             'amount' => 1999,
             'compare_amount' => 2499,
             'cost_amount' => 1200,
-            'currency_id' => (int) (string) shopper_setting('default_currency_id'),
+            'currency_id' => \App\Models\Currency::query()->where('code', 'EUR')->value('id') ?? 1,
         ]);
 
         // Variant
@@ -81,20 +81,20 @@ class ShopperDemoSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        // Seed variant stock into default warehouse
-        $inventoryId = \Shop\Core\Models\Inventory::query()->where('is_default', true)->value('id')
-            ?: \Shop\Core\Models\Inventory::query()->value('id');
-        if ($inventoryId) {
-            \Illuminate\Support\Facades\DB::table('sh_variant_inventories')->upsert([
+        // Seed variant stock into default location
+        $locationId = \App\Models\Location::query()->where('is_default', true)->value('id')
+            ?: \App\Models\Location::query()->value('id');
+        if ($locationId) {
+            \Illuminate\Support\Facades\DB::table('variant_inventories')->upsert([
                 [
                     'variant_id' => $variant->id,
-                    'inventory_id' => (int) $inventoryId,
+                    'location_id' => (int) $locationId,
                     'stock' => 20,
                     'reserved' => 0,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ],
-            ], ['variant_id', 'inventory_id'], ['stock', 'reserved', 'updated_at']);
+            ], ['variant_id', 'location_id'], ['stock', 'reserved', 'updated_at']);
         }
 
         // Legal pages
