@@ -21,8 +21,8 @@ trait HasProductPricing
             return null;
         }
 
-        $value = Price::from($basePrice->amount, $currencyCode);
-        $compare = $basePrice->compare_amount ? Price::from($basePrice->compare_amount, $currencyCode) : null;
+        $value = (float) $basePrice->amount;
+        $compare = $basePrice->compare_amount ? (float) $basePrice->compare_amount : null;
 
         // Apply price lists (B2B/group/partner net pricing) if available
         try {

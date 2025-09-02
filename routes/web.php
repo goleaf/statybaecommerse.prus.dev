@@ -19,11 +19,14 @@ Route::get('/home', Pages\Home::class)->name('home');
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
 Route::get('/categories', Pages\Category\Index::class)->name('categories.index');
 Route::get('/categories/{slug}', Pages\Category\Show::class)->name('categories.show');
+Route::get('/brands/{slug}', Pages\Brand\Show::class)->name('brands.show');
 Route::get('/collections', Pages\Collection\Index::class)->name('collections.index');
 Route::get('/collections/{slug}', Pages\Collection\Show::class)->name('collections.show');
 Route::get('/products/{slug}', Pages\SingleProduct::class)->name('products.show');
 Route::get('/search', Pages\Search::class)->name('search.index');
 Route::get('/cart', Pages\Cart::class)->name('cart.index');
+Route::get('/locations', Pages\Location\Index::class)->name('locations.index');
+Route::get('/locations/{slug}', Pages\Location\Show::class)->name('locations.show');
 Route::get('/legal/{slug}', Pages\LegalPage::class)->name('legal.show');
 
 // Auth routes

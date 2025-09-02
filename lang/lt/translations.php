@@ -425,4 +425,13 @@ return [
     'all_products_well_stocked' => 'Visi produktai turi pakankamai atsargų',
     'add_stock' => 'Pridėti atsargų',
     'stock_updated' => 'Atsargos sėkmingai atnaujintos!',
+    
+    // Vietų frontend vertimai
+    'locations' => 'Vietos',
+    'no_locations_found' => 'Vietų nerasta',
+    'default' => 'Numatytoji',
+    'default_location' => 'Numatytoji vieta',
+    'contact_information' => 'Kontaktinė informacija',
+    'location_type' => 'Vietos tipas',
+    'back_to_locations' => 'Grįžti į vietas',
 ];

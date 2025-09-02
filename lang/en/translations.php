@@ -425,4 +425,13 @@ return [
     'all_products_well_stocked' => 'All products are well stocked',
     'add_stock' => 'Add Stock',
     'stock_updated' => 'Stock updated successfully!',
+    
+    // Location frontend translations
+    'locations' => 'Locations',
+    'no_locations_found' => 'No locations found',
+    'default' => 'Default',
+    'default_location' => 'Default Location',
+    'contact_information' => 'Contact Information',
+    'location_type' => 'Location Type',
+    'back_to_locations' => 'Back to Locations',
 ];

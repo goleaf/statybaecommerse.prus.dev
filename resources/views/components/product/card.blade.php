@@ -6,7 +6,7 @@
     <div class="mt-4 flex justify-between">
         <div>
             <h3 class="text-sm font-medium text-gray-700">
-                <x-link :href="route('product.show', [
+                <x-link :href="route('products.show', [
                     'locale' => app()->getLocale(),
                     'slug' => $product->trans('slug') ?? $product->slug,
                 ])">
@@ -18,7 +18,7 @@
             @if ($product->brand_id)
                 <p class="mt-1 text-sm text-gray-500">
                     @if ($product->brand)
-                        <x-link :href="route('brand.show', [
+                        <x-link :href="route('brands.show', [
                             'locale' => app()->getLocale(),
                             'slug' => $product->brand->trans('slug') ?? $product->brand->slug,
                         ])">
