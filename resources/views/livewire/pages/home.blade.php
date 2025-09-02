@@ -83,7 +83,7 @@
                     </h2>
                     <div class="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
                         @foreach ($brands as $brand)
-                            <x-link :href="route('brand.show', [
+                            <x-link :href="route('brands.show', [
                                 'locale' => app()->getLocale(),
                                 'slug' => $brand->trans('slug') ?? $brand->slug,
                             ])"
@@ -124,7 +124,7 @@
 
                     <div class="mt-10 space-y-12 lg:grid lg:grid-cols-3 lg:gap-x-8 lg:space-y-0">
                         @foreach ($collections as $collection)
-                            <x-link :href="route('collection.show', [
+                            <x-link :href="route('collections.show', [
                                 'locale' => app()->getLocale(),
                                 'slug' => $collection->trans('slug') ?? $collection->slug,
                             ])" class="group block">

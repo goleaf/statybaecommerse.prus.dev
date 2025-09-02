@@ -24,7 +24,7 @@ Route::get('/collections/{slug}', Pages\Collection\Show::class)->name('collectio
 Route::get('/products/{slug}', Pages\SingleProduct::class)->name('products.show');
 Route::get('/search', Pages\Search::class)->name('search.index');
 Route::get('/cart', Pages\Cart::class)->name('cart.index');
-Route::get('/legal/{slug}', Pages\Legal::class)->name('legal.show');
+Route::get('/legal/{slug}', Pages\LegalPage::class)->name('legal.show');
 
 // Auth routes
 require __DIR__ . '/auth.php';

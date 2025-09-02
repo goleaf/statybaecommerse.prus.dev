@@ -1,51 +1,25 @@
-@section('meta')
-    <x-meta
-            :title="$page->trans('title') ?? $page->title"
-            :description="Str::limit(strip_tags($page->trans('content') ?? ($page->content ?? '')), 150)"
-            canonical="{{ url()->current() }}" />
-@endsection
-
 <div>
-    <div class="container mx-auto px-4 py-8" wire:loading.attr="aria-busy" aria-busy="false">
-        @php
-            $__status = session('status');
-            $__error = session('error');
-            $__hasErrors = $errors->any();
-        @endphp
-        @if ($__status)
-            <x-alert type="success" class="mb-4">{{ $__status }}</x-alert>
+    <x-container class="py-8">
+        @if($translation)
+            <div class="max-w-4xl mx-auto">
+                <h1 class="text-3xl font-bold text-gray-900 mb-8">{{ $translation->title }}</h1>
+                
+                <div class="prose prose-lg max-w-none">
+                    {!! $translation->content !!}
+                </div>
+                
+                <div class="mt-8 pt-8 border-t border-gray-200">
+                    <p class="text-sm text-gray-500">
+                        {{ __('Last updated') }}: {{ $legal->updated_at->format('F j, Y') }}
+                    </p>
+                </div>
+            </div>
+        @else
+            <div class="text-center py-12">
+                <div class="text-gray-400 text-6xl mb-4">📄</div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('Legal page') }}</h3>
+                <p class="text-gray-500">{{ __('This legal page is not available yet.') }}</p>
+            </div>
         @endif
-        @if ($__error)
-            <x-alert type="error" class="mb-4">{{ $__error }}</x-alert>
-        @endif
-        @if ($__hasErrors)
-            <x-alert type="error" class="mb-4">
-                <ul class="list-disc pl-5">
-                    @foreach ($errors->all() as $message)
-                        <li>{{ $message }}</li>
-                    @endforeach
-                </ul>
-            </x-alert>
-        @endif
-        <h1 class="text-2xl font-semibold mb-6">{{ $page->trans('title') ?? $page->title }}</h1>
-
-        <article class="prose max-w-none">
-            {!! $page->trans('content') ?? $page->content !!}
-        </article>
-    </div>
+    </x-container>
 </div>
-
-@push('scripts')
-    @php
-        $schema = [
-            '@context' => 'https://schema.org',
-            '@type' => 'WebPage',
-            'name' => $page->trans('title') ?? $page->title,
-            'description' => Str::limit(strip_tags($page->trans('content') ?? ($page->content ?? '')), 300),
-            'url' => url()->current(),
-        ];
-    @endphp
-    <script type="application/ld+json">
-        {!! json_encode($schema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}
-    </script>
-@endpush

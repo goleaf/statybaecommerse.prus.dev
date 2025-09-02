@@ -1,68 +1,44 @@
-@section('meta')
-    <x-meta
-            :title="__('nav_categories') . ' - ' . config('app.name')"
-            :description="__('categories_browse')"
-            canonical="{{ url()->current() }}" />
-@endsection
-
-<div class="container mx-auto px-4 py-8" wire:loading.attr="aria-busy" aria-busy="false">
-    @if (session('status'))
-        <x-alert type="success" class="mb-4">{{ session('status') }}</x-alert>
-    @endif
-    @if (session('error'))
-        <x-alert type="error" class="mb-4">{{ session('error') }}</x-alert>
-    @endif
-    @if ($errors->any())
-        <x-alert type="error" class="mb-4">
-            <ul class="list-disc pl-5">
-                @foreach ($errors->all() as $message)
-                    <li>{{ $message }}</li>
-                @endforeach
-            </ul>
-        </x-alert>
-    @endif
-    <h1 class="text-2xl font-semibold mb-6">{{ __('nav_categories') }}</h1>
-    @if ($roots->isEmpty())
-        <div class="text-slate-500">{{ __('categories_no_available') }}</div>
-    @else
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <aside class="lg:col-span-1">
-                <h2 class="text-sm font-semibold text-gray-900 mb-3">{{ __('categories_browse') }}</h2>
-                <x-category.tree :nodes="$tree" />
-            </aside>
-            <div class="lg:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-6">
-                @foreach ($roots as $root)
-                    <a href="{{ route('category.show', ['locale' => app()->getLocale(), 'slug' => $root->trans('slug') ?? $root->slug]) }}"
-                       class="block border rounded-lg p-4 hover:shadow-sm">
-                        <div class="aspect-square bg-gray-50 flex items-center justify-center mb-3">
-                            @if ($root->getImageUrl('md'))
-                                <img loading="lazy"
-                                     src="{{ $root->getImageUrl('md') }}"
-                                     srcset="{{ $root->getImageUrl('sm') }} 200w, {{ $root->getImageUrl('md') }} 400w, {{ $root->getImageUrl('lg') }} 600w"
-                                     sizes="(max-width: 640px) 200px, 400px"
-                                     alt="{{ $root->trans('name') ?? $root->name }}"
-                                     width="400" height="400"
-                                     class="max-h-24 object-contain" />
-                            @elseif ($root->getImageUrl())
-                                <img loading="lazy" src="{{ $root->getImageUrl() }}"
-                                     alt="{{ $root->trans('name') ?? $root->name }}"
-                                     class="max-h-24 object-contain" />
+<div>
+    <x-container class="py-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">{{ __('Categories') }}</h1>
+        
+        @if($categories->count() > 0)
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                @foreach($categories as $category)
+                    <a href="{{ route('categories.show', $category->slug) }}" 
+                       class="group bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow duration-200">
+                        <div class="aspect-square bg-gray-100 relative overflow-hidden">
+                            @if($category->getFirstMediaUrl('images'))
+                                <img src="{{ $category->getFirstMediaUrl('images', 'medium') }}"
+                                     alt="{{ $category->name }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
                             @else
-                                <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                                    <span
-                                          class="text-xs text-gray-500 font-medium">{{ strtoupper(substr($root->trans('name') ?? $root->name, 0, 2)) }}</span>
+                                <div class="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                                    <span class="text-white text-2xl font-bold">{{ strtoupper(substr($category->name, 0, 2)) }}</span>
                                 </div>
                             @endif
                         </div>
-                        <div class="text-base font-medium">{{ $root->trans('name') ?? $root->name }}</div>
-                        @if ($root->trans('description') ?? $root->description)
-                            <div class="mt-1 text-sm text-slate-500 line-clamp-2">
-                                {{ \Illuminate\Support\Str::limit(strip_tags($root->trans('description') ?? $root->description), 100) }}
-                            </div>
-                        @endif
+                        
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                {{ $category->name }}
+                            </h3>
+                            @if($category->description)
+                                <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $category->description }}</p>
+                            @endif
+                            <p class="text-xs text-gray-400 mt-2">
+                                {{ $category->products_count ?? $category->products()->count() }} {{ __('products') }}
+                            </p>
+                        </div>
                     </a>
                 @endforeach
             </div>
-        </div>
-    @endif
+        @else
+            <div class="text-center py-12">
+                <div class="text-gray-400 text-6xl mb-4">📂</div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('No categories available') }}</h3>
+                <p class="text-gray-500">{{ __('Categories will appear here once they are added') }}</p>
+            </div>
+        @endif
+    </x-container>
 </div>

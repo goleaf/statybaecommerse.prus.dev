@@ -13,12 +13,15 @@ use Illuminate\Support\Facades\Cache;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 final class Category extends Model implements HasMedia
 {
     use HasFactory, SoftDeletes;
     use HasTranslations;
     use InteractsWithMedia;
+    use LogsActivity;
 
     protected $table = 'categories';
 
@@ -51,6 +54,16 @@ final class Category extends Model implements HasMedia
         static::deleted(function (): void {
             self::flushCaches();
         });
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'slug', 'description', 'is_visible', 'sort_order'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "Category {$eventName}")
+            ->useLogName('category');
     }
 
     public static function flushCaches(): void

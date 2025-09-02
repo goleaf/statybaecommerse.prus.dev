@@ -266,4 +266,15 @@ return [
         'secure_shopping' => 'Secure Shopping',
         'copyright' => 'All rights reserved',
     ],
+
+    // Home page translations
+    'nav_home' => 'Home',
+    'meta_description_home' => 'Discover our amazing products and collections',
+    'home_new_arrivals' => 'New Arrivals',
+    'home_new_arrivals_desc' => 'Discover the latest products in our collection',
+    'home_shop_now' => 'Shop Now',
+    'nav_brands' => 'Our Brands',
+    'home_shop_by_collection' => 'Shop by Collection',
+    'home_collections_desc' => 'Explore our curated collections of premium products',
+    'home_trending_products' => 'Trending Products',
 ];

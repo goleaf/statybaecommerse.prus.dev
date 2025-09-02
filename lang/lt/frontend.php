@@ -266,4 +266,15 @@ return [
         'secure_shopping' => 'Saugūs pirkimai',
         'copyright' => 'Visos teisės saugomos',
     ],
+
+    // Home page translations
+    'nav_home' => 'Pagrindinis',
+    'meta_description_home' => 'Atraskite mūsų nuostabius produktus ir kolekcijas',
+    'home_new_arrivals' => 'Naujos prekės',
+    'home_new_arrivals_desc' => 'Atraskite naujausius produktus mūsų kolekcijoje',
+    'home_shop_now' => 'Pirkti dabar',
+    'nav_brands' => 'Mūsų prekės ženklai',
+    'home_shop_by_collection' => 'Pirkti pagal kolekciją',
+    'home_collections_desc' => 'Ištyrinėkite mūsų kruopščiai parinktų aukščiausios kokybės produktų kolekcijas',
+    'home_trending_products' => 'Populiarūs produktai',
 ];
