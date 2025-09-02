@@ -9,7 +9,7 @@ class Legal extends Model
 {
     use HasTranslations;
 
-    protected $table = 'sh_legals';
+    protected $table = 'legals';
     protected $guarded = [];
     protected string $translationModel = \App\Models\Translations\LegalTranslation::class;
 }

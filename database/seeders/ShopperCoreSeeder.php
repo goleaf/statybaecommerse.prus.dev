@@ -2,25 +2,23 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\Channel;
 use App\Models\Country;
 use App\Models\Currency;
-use App\Models\Inventory;
+use App\Models\Location;
 use App\Models\Zone;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ShopperCoreSeeder extends Seeder
 {
     public function run(): void
     {
-        // Seed reference data from Shopper core (conditionally to avoid duplicates)
+        // Seed reference data manually (replacing Shopper core seeders)
         if (Country::query()->count() === 0) {
-            $this->call([\Shop\Core\Database\Seeders\CountriesTableSeeder::class]);
+            $this->call([CountriesTableSeeder::class]);
         }
-        if (Currency::query()->count() === 0) {
-            $this->call([\Shop\Core\Database\Seeders\CurrenciesTableSeeder::class]);
-        }
+        $this->seedCurrencies();
 
         // Settings: General and socials minimal defaults (skip for now as Setting model may not exist)
         // $this->setting('store_name', config('app.name', 'Web Store'));
@@ -46,8 +44,8 @@ class ShopperCoreSeeder extends Seeder
         }
 
         // Location (using our new Location model)
-        if (\App\Models\Location::query()->count() === 0) {
-            \App\Models\Location::query()->create([
+        if (Location::query()->count() === 0) {
+            Location::query()->create([
                 'name' => 'Pagrindinis Sandėlis',
                 'code' => 'SNDL',
                 'address_line_1' => 'Didžioji g. 1',
@@ -67,10 +65,12 @@ class ShopperCoreSeeder extends Seeder
         if (Zone::query()->count() === 0 && $defaultCurrency) {
             Zone::query()->create([
                 'name' => 'Lithuania',
+                'slug' => 'lithuania',
                 'code' => 'LT',
                 'is_enabled' => true,
+                'metadata' => ['description' => 'Lithuania shipping zone'],
                 'currency_id' => $defaultCurrency->id,
-                'tax_rate' => 21.0, // Lithuania VAT rate
+                'tax_rate' => 21.0,  // Lithuania VAT rate
                 'shipping_rate' => 5.0,
                 'is_default' => true,
             ]);
@@ -83,21 +83,17 @@ class ShopperCoreSeeder extends Seeder
             return;
         }
 
-        $dataPath = base_path('vendor/shopper/core/database/data/currencies.php');
-        if (file_exists($dataPath)) {
-            /** @var array<string, array{name:string,symbol:string,format:string,exchange_rate:float}> $currencies */
-            $currencies = include $dataPath;
-            foreach ($currencies as $code => $currency) {
-                Currency::query()->updateOrCreate([
-                    'code' => $code,
-                ], [
-                    'name' => $currency['name'],
-                    'symbol' => $currency['symbol'],
-                    'format' => $currency['format'],
-                    'exchange_rate' => $currency['exchange_rate'] ?? 1.0,
-                    'is_enabled' => in_array($code, ['EUR'], true),
-                ]);
-            }
+        $currencies = [
+            ['name' => 'Euro', 'code' => 'EUR', 'symbol' => '€', 'format' => '€#,##0.00', 'exchange_rate' => 1.0, 'is_enabled' => true, 'is_default' => true, 'decimal_places' => 2],
+            ['name' => 'US Dollar', 'code' => 'USD', 'symbol' => '$', 'format' => '$#,##0.00', 'exchange_rate' => 1.1, 'is_enabled' => true, 'is_default' => false, 'decimal_places' => 2],
+            ['name' => 'British Pound', 'code' => 'GBP', 'symbol' => '£', 'format' => '£#,##0.00', 'exchange_rate' => 0.85, 'is_enabled' => false, 'is_default' => false, 'decimal_places' => 2],
+        ];
+
+        foreach ($currencies as $currency) {
+            DB::table('currencies')->updateOrInsert(
+                ['code' => $currency['code']],
+                $currency
+            );
         }
     }
 }

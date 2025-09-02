@@ -81,13 +81,13 @@ final class Product extends Model implements HasMedia
     {
         $productId = (int) $this->id;
 
-        $sum = (int) DB::table('sh_product_variants as v')
-            ->join('sh_variant_inventories as vi', 'vi.variant_id', '=', 'v.id')
+        $sum = (int) DB::table('product_variants as v')
+            ->join('variant_inventories as vi', 'vi.variant_id', '=', 'v.id')
             ->where('v.product_id', $productId)
             ->sum('vi.reserved');
 
         if ($sum === 0) {
-            $sum = (int) DB::table('sh_variant_inventories as vi')
+            $sum = (int) DB::table('variant_inventories as vi')
                 ->where('vi.variant_id', $productId)
                 ->sum('vi.reserved');
         }
@@ -99,13 +99,13 @@ final class Product extends Model implements HasMedia
     {
         $productId = (int) $this->id;
 
-        $sum = (int) DB::table('sh_product_variants as v')
-            ->join('sh_variant_inventories as vi', 'vi.variant_id', '=', 'v.id')
+        $sum = (int) DB::table('product_variants as v')
+            ->join('variant_inventories as vi', 'vi.variant_id', '=', 'v.id')
             ->where('v.product_id', $productId)
             ->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END'));
 
         if ($sum === 0) {
-            $sum = (int) DB::table('sh_variant_inventories as vi')
+            $sum = (int) DB::table('variant_inventories as vi')
                 ->where('vi.variant_id', $productId)
                 ->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END'));
         }
@@ -166,8 +166,8 @@ final class Product extends Model implements HasMedia
     public function attributes(): BelongsToMany
     {
         return $this->belongsToMany(
-            Attribute::class, 
-            'sh_product_attributes',
+            Attribute::class,
+            'product_attributes',
             'product_id',
             'attribute_id'
         )->withTimestamps();
@@ -175,7 +175,8 @@ final class Product extends Model implements HasMedia
 
     public function scopePublished($query)
     {
-        return $query->where('is_visible', true)
+        return $query
+            ->where('is_visible', true)
             ->where('status', 'published')
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());

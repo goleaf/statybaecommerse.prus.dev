@@ -3,16 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class DiscountCode extends Model
 {
     use HasFactory;
 
-    protected $table = 'sh_discount_codes';
+    protected $table = 'discount_codes';
 
     protected $fillable = [
         'discount_id',
@@ -52,8 +52,9 @@ class DiscountCode extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where(function ($q) {
-            $q->whereNull('expires_at')
-              ->orWhere('expires_at', '>=', now());
+            $q
+                ->whereNull('expires_at')
+                ->orWhere('expires_at', '>=', now());
         });
     }
 

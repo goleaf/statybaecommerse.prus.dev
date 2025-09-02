@@ -14,7 +14,7 @@ final class Discount extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'sh_discounts';
+    protected $table = 'discounts';
 
     protected $fillable = [
         'name',
@@ -182,42 +182,42 @@ final class Discount extends Model
 
     public function brands(): BelongsToMany
     {
-        return $this->belongsToMany(Brand::class, 'sh_discount_brands');
+        return $this->belongsToMany(Brand::class, 'discount_brands');
     }
 
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class, 'sh_discount_categories');
+        return $this->belongsToMany(Category::class, 'discount_categories');
     }
 
     public function collections(): BelongsToMany
     {
-        return $this->belongsToMany(Collection::class, 'sh_discount_collections');
+        return $this->belongsToMany(Collection::class, 'discount_collections');
     }
 
     public function customers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'sh_discount_customers', 'discount_id', 'user_id');
+        return $this->belongsToMany(User::class, 'discount_customers', 'discount_id', 'user_id');
     }
 
     public function zones(): BelongsToMany
     {
-        return $this->belongsToMany(Zone::class, 'sh_discount_zones');
+        return $this->belongsToMany(Zone::class, 'discount_zones');
     }
 
     public function campaigns(): BelongsToMany
     {
-        return $this->belongsToMany(Campaign::class, 'sh_campaign_discount');
+        return $this->belongsToMany(Campaign::class, 'campaign_discount');
     }
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'sh_discount_products');
+        return $this->belongsToMany(Product::class, 'discount_products');
     }
 
     public function customerGroups(): BelongsToMany
     {
-        return $this->belongsToMany(CustomerGroup::class, 'sh_discount_customer_groups');
+        return $this->belongsToMany(CustomerGroup::class, 'discount_customer_groups');
     }
 
     public function scopeByType(Builder $query, string $type): Builder

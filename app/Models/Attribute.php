@@ -4,16 +4,16 @@ namespace App\Models;
 
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Attribute extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
 
-    protected $table = 'sh_attributes';
+    protected $table = 'attributes';
 
     protected $fillable = [
         'name',
@@ -46,13 +46,15 @@ final class Attribute extends Model
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'sh_product_attributes')
+        return $this
+            ->belongsToMany(Product::class, 'product_attributes')
             ->withTimestamps();
     }
 
     public function variants(): BelongsToMany
     {
-        return $this->belongsToMany(ProductVariant::class, 'sh_product_variant_attributes')
+        return $this
+            ->belongsToMany(ProductVariant::class, 'product_variant_attributes')
             ->withTimestamps();
     }
 

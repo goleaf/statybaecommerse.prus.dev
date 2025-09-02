@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 
 final class OrderShipping extends Model
 {
     use HasFactory;
 
-    protected $table = 'sh_order_shippings';
+    protected $table = 'order_shippings';
 
     protected $fillable = [
         'order_id',

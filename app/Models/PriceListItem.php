@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 
 final class PriceListItem extends Model
 {
     use HasFactory;
 
-    protected $table = 'sh_price_list_items';
+    protected $table = 'price_list_items';
 
     protected $fillable = [
         'price_list_id',

@@ -57,7 +57,7 @@ class DiscountEngine
         }
 
         return Cache::tags(['discounts'])->remember($cacheKey, now()->addMinutes(3), function () use ($context, $now) {
-            return collect(DB::table('sh_discounts')
+            return collect(DB::table('discounts')
                 ->where('status', 'active')
                 ->where(function ($q) use ($now) {
                     $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
@@ -78,12 +78,12 @@ class DiscountEngine
         $userId = data_get($context, 'user_id');
         $groupIds = collect(data_get($context, 'group_ids', []))->map(fn($v) => (int) $v)->filter()->values();
         if ($groupIds->isEmpty() && $userId) {
-            $groupIds = DB::table('sh_customer_group_user')->where('user_id', $userId)->pluck('group_id');
+            $groupIds = DB::table('customer_group_user')->where('user_id', $userId)->pluck('group_id');
         }
         $partnerTier = data_get($context, 'partner_tier');
         if (!$partnerTier && $userId) {
-            $partnerTier = DB::table('sh_partner_users as pu')
-                ->join('sh_partners as p', 'p.id', '=', 'pu.partner_id')
+            $partnerTier = DB::table('partner_users as pu')
+                ->join('partners as p', 'p.id', '=', 'pu.partner_id')
                 ->where('pu.user_id', $userId)
                 ->value('p.tier');
         }
@@ -99,7 +99,7 @@ class DiscountEngine
             if (!empty($d->per_day_limit)) {
                 $start = $now->copy()->startOfDay();
                 $end = $now->copy()->endOfDay();
-                $countToday = DB::table('sh_discount_redemptions')
+                $countToday = DB::table('discount_redemptions')
                     ->where('discount_id', $d->id)
                     ->whereBetween('redeemed_at', [$start, $end])
                     ->count();
@@ -130,15 +130,15 @@ class DiscountEngine
                 }
             }
             if (!empty($d->first_order_only) && $userId) {
-                $hasOrder = DB::table('sh_orders')->where('customer_id', $userId)->whereIn('status', ['placed', 'paid', 'fulfilled', 'completed'])->exists();
+                $hasOrder = DB::table('orders')->where('customer_id', $userId)->whereIn('status', ['placed', 'paid', 'fulfilled', 'completed'])->exists();
                 if ($hasOrder) {
                     return false;
                 }
             }
             // Groups condition: if present, require intersection
-            $hasGroupCondition = DB::table('sh_discount_conditions')->where('discount_id', $d->id)->where('type', 'customer_group')->exists();
+            $hasGroupCondition = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'customer_group')->exists();
             if ($hasGroupCondition) {
-                $values = DB::table('sh_discount_conditions')->where('discount_id', $d->id)->where('type', 'customer_group')->pluck('value');
+                $values = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'customer_group')->pluck('value');
                 $allowed = collect($values)->map(function ($v) {
                     $arr = is_string($v) ? json_decode($v, true) : (array) $v;
                     return collect($arr)->map(fn($x) => (int) $x);
@@ -148,9 +148,9 @@ class DiscountEngine
                 }
             }
             // Zone condition: if present, require zone id match
-            $hasZoneCondition = DB::table('sh_discount_conditions')->where('discount_id', $d->id)->where('type', 'zone')->exists();
+            $hasZoneCondition = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'zone')->exists();
             if ($hasZoneCondition) {
-                $values = DB::table('sh_discount_conditions')->where('discount_id', $d->id)->where('type', 'zone')->pluck('value');
+                $values = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'zone')->pluck('value');
                 $allowedZoneIds = collect($values)->map(function ($v) {
                     $arr = is_string($v) ? json_decode($v, true) : (array) $v;
                     return collect($arr)->map(fn($x) => (int) $x);
@@ -160,9 +160,9 @@ class DiscountEngine
                 }
             }
             // User condition: if present, require explicit user id
-            $hasUserCondition = DB::table('sh_discount_conditions')->where('discount_id', $d->id)->where('type', 'user')->exists();
+            $hasUserCondition = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'user')->exists();
             if ($hasUserCondition && $userId) {
-                $values = DB::table('sh_discount_conditions')->where('discount_id', $d->id)->where('type', 'user')->pluck('value');
+                $values = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'user')->pluck('value');
                 $allowedUserIds = collect($values)->map(function ($v) {
                     $arr = is_string($v) ? json_decode($v, true) : (array) $v;
                     return collect($arr)->map(fn($x) => (int) $x);
@@ -172,9 +172,9 @@ class DiscountEngine
                 }
             }
             // Partner tier condition
-            $hasPartnerTierCondition = DB::table('sh_discount_conditions')->where('discount_id', $d->id)->where('type', 'partner_tier')->exists();
+            $hasPartnerTierCondition = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'partner_tier')->exists();
             if ($hasPartnerTierCondition) {
-                $values = DB::table('sh_discount_conditions')->where('discount_id', $d->id)->where('type', 'partner_tier')->pluck('value');
+                $values = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'partner_tier')->pluck('value');
                 $allowedTiers = collect($values)->map(function ($v) {
                     $arr = is_string($v) ? json_decode($v, true) : (array) $v;
                     return collect($arr)->map(fn($x) => (string) $x);
@@ -197,8 +197,8 @@ class DiscountEngine
 
         // Preload product attributes for scoping
         $productIds = $items->pluck('product_id')->filter()->unique()->values();
-        $productToBrand = DB::table('sh_products')->whereIn('id', $productIds)->pluck('brand_id', 'id');
-        $productToCategories = DB::table('sh_category_product')->whereIn('product_id', $productIds)->get()->groupBy('product_id')->map(fn($rows) => collect($rows)->pluck('category_id')->values());
+        $productToBrand = DB::table('products')->whereIn('id', $productIds)->pluck('brand_id', 'id');
+        $productToCategories = DB::table('product_categories')->whereIn('product_id', $productIds)->get()->groupBy('product_id')->map(fn($rows) => collect($rows)->pluck('category_id')->values());
 
         $discountAmount = 0.0;
         $shippingDiscount = 0.0;
@@ -209,7 +209,7 @@ class DiscountEngine
         foreach ($eligible as $d) {
             // If a code is provided, require a matching code record for this discount
             if ($code) {
-                $hasCode = DB::table('sh_discount_codes')
+                $hasCode = DB::table('discount_codes')
                     ->where('discount_id', $d->id)
                     ->whereRaw('UPPER(code) = ?', [$code])
                     ->exists();
@@ -219,7 +219,7 @@ class DiscountEngine
             }
 
             // Load conditions
-            $conditions = DB::table('sh_discount_conditions')->where('discount_id', $d->id)->get();
+            $conditions = DB::table('discount_conditions')->where('discount_id', $d->id)->get();
             $lineScopeTypes = ['product', 'category', 'brand', 'collection', 'attribute_value'];
             $hasLineScope = $conditions->whereIn('type', $lineScopeTypes)->isNotEmpty();
             $cartTotalCond = $conditions->firstWhere('type', 'cart_total');
@@ -409,14 +409,14 @@ class DiscountEngine
                     }
                     break;
                 case 'collection':
-                    // Simplified: treat as category-like; real impl would check pivot sh_collection_product
-                    $inCollection = DB::table('sh_collection_product')->where('product_id', $productId)->whereIn('collection_id', $values)->exists();
+                    // Simplified: treat as category-like; real impl would check pivot product_collections
+                    $inCollection = DB::table('product_collections')->where('product_id', $productId)->whereIn('collection_id', $values)->exists();
                     if ($inCollection) {
                         return true;
                     }
                     break;
                 case 'attribute_value':
-                    // If variant attributes are available, check pivot sh_variant_attribute_values; omitted for brevity
+                    // If variant attributes are available, check pivot product_variant_attributes; omitted for brevity
                     break;
             }
         }
@@ -433,7 +433,7 @@ class DiscountEngine
         // If any exclusive discount applied, keep only that one with max amount
         // (requires discount record; re-fetch minimal info)
         $appliedWithFlags = $applied->map(function ($a) {
-            $d = DB::table('sh_discounts')->select('id', 'exclusive', 'stacking_policy')->where('id', (int) $a['id'])->first();
+            $d = DB::table('discounts')->select('id', 'exclusive', 'stacking_policy')->where('id', (int) $a['id'])->first();
             return array_merge($a, [
                 'exclusive' => (bool) data_get($d, 'exclusive', false),
                 'stacking_policy' => data_get($d, 'stacking_policy', 'stack'),

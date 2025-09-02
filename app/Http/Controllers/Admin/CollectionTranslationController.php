@@ -21,7 +21,7 @@ class CollectionTranslationController extends Controller
         DB::transaction(function () use ($id, $locale, $data): void {
             $id = (int) $id;
             $now = now();
-            $exists = DB::table('sh_collection_translations')
+            $exists = DB::table('collection_translations')
                 ->where('collection_id', $id)
                 ->where('locale', $locale)
                 ->exists();
@@ -34,12 +34,12 @@ class CollectionTranslationController extends Controller
             ];
 
             if ($exists) {
-                DB::table('sh_collection_translations')
+                DB::table('collection_translations')
                     ->where('collection_id', $id)
                     ->where('locale', $locale)
                     ->update($payload);
             } else {
-                DB::table('sh_collection_translations')->insert(array_merge($payload, [
+                DB::table('collection_translations')->insert(array_merge($payload, [
                     'collection_id' => $id,
                     'locale' => $locale,
                     'created_at' => $now,

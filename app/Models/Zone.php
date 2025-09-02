@@ -7,18 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Zone extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
-    protected $table = 'sh_zones';
+    protected $table = 'zones';
 
     protected $fillable = [
         'name',
+        'slug',
         'code',
         'is_enabled',
+        'metadata',
         'currency_id',
         'tax_rate',
         'shipping_rate',
@@ -32,6 +33,7 @@ final class Zone extends Model
             'is_default' => 'boolean',
             'tax_rate' => 'decimal:4',
             'shipping_rate' => 'decimal:4',
+            'metadata' => 'array',
         ];
     }
 
@@ -47,7 +49,7 @@ final class Zone extends Model
 
     public function countries(): BelongsToMany
     {
-        return $this->belongsToMany(Country::class, 'sh_country_zone', 'zone_id', 'country_id');
+        return $this->belongsToMany(Country::class, 'country_zone', 'zone_id', 'country_id');
     }
 
     public function orders(): HasMany

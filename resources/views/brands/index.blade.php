@@ -47,11 +47,22 @@
                     <a href="{{ route('brand.show', ['locale' => app()->getLocale(), 'slug' => $brand->trans('slug') ?? $brand->slug]) }}"
                        class="block border rounded-lg p-4 hover:shadow-sm">
                         <div class="aspect-square bg-gray-50 flex items-center justify-center mb-3">
-                            @php($thumb = method_exists($brand, 'getFirstMediaUrl') ? ($brand->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: ($brand->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'small') ?: $brand->getFirstMediaUrl(config('shopper.media.storage.collection_name')))) : null)
-                            @if ($thumb)
-                                <img loading="lazy" src="{{ $thumb }}"
+                            @if ($brand->getLogoUrl('md'))
+                                <img loading="lazy" 
+                                     src="{{ $brand->getLogoUrl('md') }}"
+                                     srcset="{{ $brand->getLogoUrl('sm') }} 128w, {{ $brand->getLogoUrl('md') }} 200w, {{ $brand->getLogoUrl('lg') }} 400w"
+                                     sizes="(max-width: 640px) 128px, 200px"
+                                     alt="{{ $brand->trans('name') ?? $brand->name }}"
+                                     width="200" height="200"
+                                     class="max-h-24 object-contain" />
+                            @elseif ($brand->getLogoUrl())
+                                <img loading="lazy" src="{{ $brand->getLogoUrl() }}"
                                      alt="{{ $brand->trans('name') ?? $brand->name }}"
                                      class="max-h-24 object-contain" />
+                            @else
+                                <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <span class="text-xs text-gray-500 font-medium">{{ strtoupper(substr($brand->trans('name') ?? $brand->name, 0, 2)) }}</span>
+                                </div>
                             @endif
                         </div>
                         <div class="text-lg font-medium">{{ $brand->trans('name') ?? $brand->name }}</div>

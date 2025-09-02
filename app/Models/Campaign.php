@@ -3,16 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Campaign extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'sh_discount_campaigns';
+    protected $table = 'discount_campaigns';
 
     protected $fillable = [
         'name',
@@ -36,7 +36,7 @@ final class Campaign extends Model
 
     public function discounts(): BelongsToMany
     {
-        return $this->belongsToMany(Discount::class, 'sh_campaign_discount');
+        return $this->belongsToMany(Discount::class, 'campaign_discount');
     }
 
     public function channel(): BelongsTo
@@ -51,14 +51,17 @@ final class Campaign extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('status', 'active')
+        return $query
+            ->where('status', 'active')
             ->where(function ($q) {
-                $q->whereNull('starts_at')
-                  ->orWhere('starts_at', '<=', now());
+                $q
+                    ->whereNull('starts_at')
+                    ->orWhere('starts_at', '<=', now());
             })
             ->where(function ($q) {
-                $q->whereNull('ends_at')
-                  ->orWhere('ends_at', '>=', now());
+                $q
+                    ->whereNull('ends_at')
+                    ->orWhere('ends_at', '>=', now());
             });
     }
 
@@ -69,10 +72,12 @@ final class Campaign extends Model
 
     public function scopeExpired($query)
     {
-        return $query->where('status', 'expired')
+        return $query
+            ->where('status', 'expired')
             ->orWhere(function ($q) {
-                $q->whereNotNull('ends_at')
-                  ->where('ends_at', '<', now());
+                $q
+                    ->whereNotNull('ends_at')
+                    ->where('ends_at', '<', now());
             });
     }
 

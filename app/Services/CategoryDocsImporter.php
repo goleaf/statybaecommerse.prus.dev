@@ -39,7 +39,7 @@ final class CategoryDocsImporter
                             'parent_id' => $parentId,
                             'is_enabled' => true,
                         ];
-                        $category->update($this->filterExistingColumns('sh_categories', $payload));
+                        $category->update($this->filterExistingColumns('categories', $payload));
                         $updated++;
                     } else {
                         $position = $positionCounterByParent[$parentId ?? 0] = ($positionCounterByParent[$parentId ?? 0] ?? 0) + 1;
@@ -50,7 +50,7 @@ final class CategoryDocsImporter
                             'position' => $position,
                             'is_enabled' => true,
                         ];
-                        Category::query()->create($this->filterExistingColumns('sh_categories', $payload));
+                        Category::query()->create($this->filterExistingColumns('categories', $payload));
                         $created++;
                     }
 
@@ -74,7 +74,7 @@ final class CategoryDocsImporter
                         'parent_id' => $parentId,
                         'is_enabled' => true,
                     ];
-                    $category->update($this->filterExistingColumns('sh_categories', $payload));
+                    $category->update($this->filterExistingColumns('categories', $payload));
                     $updated++;
                 } else {
                     $position = $positionCounterByParent[$parentId ?? 0] = ($positionCounterByParent[$parentId ?? 0] ?? 0) + 1;
@@ -85,7 +85,7 @@ final class CategoryDocsImporter
                         'position' => $position,
                         'is_enabled' => true,
                     ];
-                    Category::query()->create($this->filterExistingColumns('sh_categories', $payload));
+                    Category::query()->create($this->filterExistingColumns('categories', $payload));
                     $created++;
                 }
 
@@ -145,7 +145,7 @@ final class CategoryDocsImporter
                     'parent_id' => $parentId,
                     'is_enabled' => true,
                 ];
-                $category->update($this->filterExistingColumns('sh_categories', $payload));
+                $category->update($this->filterExistingColumns('categories', $payload));
                 $updated++;
             } else {
                 $position = $positionCounterByParent[$parentId ?? 0] = ($positionCounterByParent[$parentId ?? 0] ?? 0) + 1;
@@ -156,12 +156,11 @@ final class CategoryDocsImporter
                     'position' => $position,
                     'is_enabled' => true,
                 ];
-                Category::query()->create($this->filterExistingColumns('sh_categories', $payload));
+                Category::query()->create($this->filterExistingColumns('categories', $payload));
                 $created++;
             }
         }
     }
-}
 
     private function filterExistingColumns(string $table, array $payload): array
     {

@@ -4,12 +4,12 @@ namespace App\Actions;
 
 use App\Actions\ZoneSessionManager;
 use App\Mail\OrderPlaced;
+use App\Models\Country;
+use App\Models\Order;
 use Darryldecode\Cart\Facades\CartFacade;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use App\Models\Country;
-use App\Models\Order;
 
 class CreateOrder
 {
@@ -62,7 +62,7 @@ class CreateOrder
             // Validate coupon limits if provided
             $codeRow = null;
             if ($couponCode) {
-                $codeRow = DB::table('sh_discount_codes')
+                $codeRow = DB::table('discount_codes')
                     ->whereRaw('UPPER(code) = ?', [$couponCode])
                     ->first();
                 if ($codeRow) {
@@ -133,9 +133,9 @@ class CreateOrder
                 }
 
                 // Enforce per-customer limit
-                $perCustomer = DB::table('sh_discounts')->where('id', $discountId)->value('per_customer_limit');
+                $perCustomer = DB::table('discounts')->where('id', $discountId)->value('per_customer_limit');
                 if ($perCustomer) {
-                    $used = DB::table('sh_discount_redemptions')
+                    $used = DB::table('discount_redemptions')
                         ->where('discount_id', $discountId)
                         ->where('user_id', $customer->id)
                         ->count();
@@ -148,10 +148,10 @@ class CreateOrder
                 if ($codeRow && (int) $codeRow->discount_id === $discountId) {
                     $codeId = (int) $codeRow->id;
                     // increment usage_count
-                    DB::table('sh_discount_codes')->where('id', $codeId)->increment('usage_count');
+                    DB::table('discount_codes')->where('id', $codeId)->increment('usage_count');
                 }
 
-                DB::table('sh_discount_redemptions')->insert([
+                DB::table('discount_redemptions')->insert([
                     'discount_id' => $discountId,
                     'code_id' => $codeId,
                     'order_id' => $order->id,

@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BrandTranslation extends Model
 {
-    protected $table = 'sh_brand_translations';
+    protected $table = 'brand_translations';
     protected $guarded = [];
     public $timestamps = true;
 }
-
-

@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 
 class DiscountRedemption extends Model
 {
     use HasFactory;
 
-    protected $table = 'sh_discount_redemptions';
+    protected $table = 'discount_redemptions';
 
     protected $fillable = [
         'discount_id',

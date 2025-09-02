@@ -1,5 +1,7 @@
 ---
-description:
-globs:
 alwaysApply: true
 ---
+- after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt
+
+
+- do not use "php artisan make" commands

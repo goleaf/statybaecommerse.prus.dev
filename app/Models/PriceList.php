@@ -3,17 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class PriceList extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'sh_price_lists';
+    protected $table = 'price_lists';
 
     protected $fillable = [
         'name',
@@ -53,12 +53,12 @@ final class PriceList extends Model
 
     public function customerGroups(): BelongsToMany
     {
-        return $this->belongsToMany(CustomerGroup::class, 'sh_group_price_list', 'price_list_id', 'group_id');
+        return $this->belongsToMany(CustomerGroup::class, 'group_price_list', 'price_list_id', 'group_id');
     }
 
     public function partners(): BelongsToMany
     {
-        return $this->belongsToMany(Partner::class, 'sh_partner_price_list', 'price_list_id', 'partner_id');
+        return $this->belongsToMany(Partner::class, 'partner_price_list', 'price_list_id', 'partner_id');
     }
 
     public function scopeEnabled($query)
@@ -68,14 +68,17 @@ final class PriceList extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_enabled', true)
+        return $query
+            ->where('is_enabled', true)
             ->where(function ($q) {
-                $q->whereNull('starts_at')
-                  ->orWhere('starts_at', '<=', now());
+                $q
+                    ->whereNull('starts_at')
+                    ->orWhere('starts_at', '<=', now());
             })
             ->where(function ($q) {
-                $q->whereNull('ends_at')
-                  ->orWhere('ends_at', '>=', now());
+                $q
+                    ->whereNull('ends_at')
+                    ->orWhere('ends_at', '>=', now());
             });
     }
 

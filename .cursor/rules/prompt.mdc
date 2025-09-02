@@ -1,3 +1,25 @@
+continue, remove legacy code and files, upgrade all system to filament, make frontend and backend, making maximum of usability and maximum all control, read information in docs, make all changes, use existing seeds to make and use existing filament project, make migrations for new tables on filament framework, maximum tests
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 You are acting as a senior Laravel/Filament engineer inside this repository. Follow these rules exactly and **work in tight loops** with MCP (terminal, fs, git) until **all tests pass** with high coverage.
 
 ## Objectives (do all)

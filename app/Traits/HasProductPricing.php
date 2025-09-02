@@ -1,24 +1,23 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Traits;
 
 use App\DTO\PriceData;
-use Shopper\Core\Helpers\Price;
 use Illuminate\Support\Facades\DB;
+use Shopper\Core\Helpers\Price;
 
 trait HasProductPricing
 {
     public function getPrice(): ?PriceData
     {
         $currencyCode = current_currency();
-        $basePrice = $this->loadMissing('prices', 'prices.currency')
+        $basePrice = $this
+            ->loadMissing('prices', 'prices.currency')
             ->prices
-            ->reject(fn ($price) => $price->currency->code !== $currencyCode)
+            ->reject(fn($price) => $price->currency->code !== $currencyCode)
             ->first();
 
-        if (! $basePrice) {
+        if (!$basePrice) {
             return null;
         }
 
@@ -27,37 +26,40 @@ trait HasProductPricing
 
         // Apply price lists (B2B/group/partner net pricing) if available
         try {
-            $currencyId = DB::table('sh_currencies')->where('code', $currencyCode)->value('id');
+            $currencyId = DB::table('currencies')->where('code', $currencyCode)->value('id');
             $zoneId = session('zone.id');
             $userId = optional(auth()->user())->id;
 
-            $candidate = DB::table('sh_price_lists as pl')
+            $candidate = DB::table('price_lists as pl')
                 ->where('pl.is_enabled', true)
                 ->where('pl.currency_id', $currencyId)
-                ->when($zoneId, fn ($q) => $q->where(function ($qq) use ($zoneId) {
+                ->when($zoneId, fn($q) => $q->where(function ($qq) use ($zoneId) {
                     $qq->whereNull('pl.zone_id')->orWhere('pl.zone_id', $zoneId);
                 }))
                 ->where(function ($q) use ($userId) {
-                    $q->whereExists(function ($sq) use ($userId) {
-                        $sq->select(DB::raw(1))
-                            ->from('sh_group_price_list as gpl')
-                            ->join('sh_customer_group_user as cgu', 'cgu.group_id', '=', 'gpl.group_id')
-                            ->whereColumn('gpl.price_list_id', 'pl.id')
-                            ->where('cgu.user_id', $userId);
-                    })
-                    ->orWhereExists(function ($sq) use ($userId) {
-                        $sq->select(DB::raw(1))
-                            ->from('sh_partner_price_list as ppl')
-                            ->join('sh_partner_users as pu', 'pu.partner_id', '=', 'ppl.partner_id')
-                            ->whereColumn('ppl.price_list_id', 'pl.id')
-                            ->where('pu.user_id', $userId);
-                    });
+                    $q
+                        ->whereExists(function ($sq) use ($userId) {
+                            $sq
+                                ->select(DB::raw(1))
+                                ->from('group_price_list as gpl')
+                                ->join('customer_group_user as cgu', 'cgu.group_id', '=', 'gpl.group_id')
+                                ->whereColumn('gpl.price_list_id', 'pl.id')
+                                ->where('cgu.user_id', $userId);
+                        })
+                        ->orWhereExists(function ($sq) use ($userId) {
+                            $sq
+                                ->select(DB::raw(1))
+                                ->from('partner_price_list as ppl')
+                                ->join('partner_users as pu', 'pu.partner_id', '=', 'ppl.partner_id')
+                                ->whereColumn('ppl.price_list_id', 'pl.id')
+                                ->where('pu.user_id', $userId);
+                        });
                 })
                 ->orderBy('pl.priority')
                 ->first();
 
             if ($candidate) {
-                $net = DB::table('sh_price_list_items')
+                $net = DB::table('price_list_items')
                     ->where('price_list_id', $candidate->id)
                     ->where('product_id', $this->id)
                     ->value('net_amount');

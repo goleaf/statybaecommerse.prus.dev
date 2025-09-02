@@ -6,10 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class LegalTranslation extends Model
 {
-    protected $table = 'sh_legal_translations';
+    protected $table = 'legal_translations';
     protected $guarded = [];
     public $timestamps = true;
 }
-
-
-

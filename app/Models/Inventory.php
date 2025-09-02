@@ -3,15 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Model;
 
 final class Inventory extends Model
 {
     use HasFactory;
 
-    protected $table = 'sh_inventories';
+    protected $table = 'inventories';
 
     protected $fillable = [
         'inventoriable_id',

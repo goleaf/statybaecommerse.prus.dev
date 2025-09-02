@@ -25,7 +25,7 @@ class CurrencySelector extends Component
                 now()->addHours(6),
                 function () {
                     try {
-                        if (Schema::hasTable('sh_currencies')) {
+                        if (Schema::hasTable('currencies')) {
                             return Currency::query()
                                 ->where('is_enabled', true)
                                 ->orderBy('code')
@@ -56,7 +56,7 @@ class CurrencySelector extends Component
                     try {
                         if (function_exists('setting')) {
                             $id = optional(setting('default_currency_id'))->value ?? null;
-                            if ($id && Schema::hasTable('sh_currencies')) {
+                            if ($id && Schema::hasTable('currencies')) {
                                 return Currency::query()->whereKey($id)->value('code');
                             }
                         }

@@ -3,16 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Price extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'sh_prices';
+    protected $table = 'prices';
 
     protected $fillable = [
         'priceable_id',
@@ -54,14 +54,17 @@ final class Price extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_enabled', true)
+        return $query
+            ->where('is_enabled', true)
             ->where(function ($q) {
-                $q->whereNull('starts_at')
-                  ->orWhere('starts_at', '<=', now());
+                $q
+                    ->whereNull('starts_at')
+                    ->orWhere('starts_at', '<=', now());
             })
             ->where(function ($q) {
-                $q->whereNull('ends_at')
-                  ->orWhere('ends_at', '>=', now());
+                $q
+                    ->whereNull('ends_at')
+                    ->orWhere('ends_at', '>=', now());
             });
     }
 

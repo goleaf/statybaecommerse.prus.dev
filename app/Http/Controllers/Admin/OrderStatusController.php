@@ -68,13 +68,13 @@ class OrderStatusController extends Controller
         $order = Order::query()->where('number', $number)->firstOrFail();
 
         DB::transaction(function () use ($order, $data): void {
-            $row = DB::table('sh_order_shippings')
+            $row = DB::table('order_shippings')
                 ->where('order_id', $order->id)
                 ->orderByDesc('id')
                 ->first();
 
             if ($row) {
-                DB::table('sh_order_shippings')
+                DB::table('order_shippings')
                     ->where('id', $row->id)
                     ->update([
                         'tracking_number' => $data['tracking_number'] ?? null,
@@ -82,7 +82,7 @@ class OrderStatusController extends Controller
                         'updated_at' => now(),
                     ]);
             } else {
-                DB::table('sh_order_shippings')->insert([
+                DB::table('order_shippings')->insert([
                     'order_id' => $order->id,
                     'tracking_number' => $data['tracking_number'] ?? null,
                     'tracking_url' => $data['tracking_url'] ?? null,

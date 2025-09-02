@@ -50,6 +50,30 @@ class BrandResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
+                Forms\Components\Section::make('Brand Images')
+                    ->schema([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('logo')
+                            ->label('Brand Logo')
+                            ->collection('logo')
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios(['1:1'])
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'])
+                            ->maxSize(5120) // 5MB
+                            ->helperText('Upload brand logo. Will be converted to WebP format with multiple resolutions automatically.')
+                            ->columnSpanFull(),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('banner')
+                            ->label('Brand Banner')
+                            ->collection('banner')
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios(['2:1', '16:9'])
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+                            ->maxSize(10240) // 10MB
+                            ->helperText('Upload brand banner image. Will be converted to WebP format with multiple resolutions automatically.')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(1),
                 Forms\Components\Section::make('SEO')
                     ->schema([
                         Forms\Components\TextInput::make('seo_title')
@@ -66,6 +90,12 @@ class BrandResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('logo')
+                    ->label('Logo')
+                    ->collection('logo')
+                    ->conversion('logo-sm')
+                    ->circular()
+                    ->size(40),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),

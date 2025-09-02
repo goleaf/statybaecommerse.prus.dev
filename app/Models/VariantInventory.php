@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 
 final class VariantInventory extends Model
 {
     use HasFactory;
 
-    protected $table = 'sh_variant_inventories';
+    protected $table = 'variant_inventories';
 
     protected $fillable = [
         'variant_id',

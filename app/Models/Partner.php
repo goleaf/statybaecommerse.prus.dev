@@ -3,17 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Partner extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'sh_partners';
+    protected $table = 'partners';
 
     protected $fillable = [
         'name',
@@ -44,12 +44,12 @@ final class Partner extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'sh_partner_users');
+        return $this->belongsToMany(User::class, 'partner_users');
     }
 
     public function priceLists(): BelongsToMany
     {
-        return $this->belongsToMany(PriceList::class, 'sh_partner_price_list', 'partner_id', 'price_list_id');
+        return $this->belongsToMany(PriceList::class, 'partner_price_list', 'partner_id', 'price_list_id');
     }
 
     public function orders(): HasMany

@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -16,32 +15,61 @@ class CategoryFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique()->words(2, true);
+        $lithuanianCategories = [
+            // Pagrindinės kategorijos
+            'Elektriniai įrankiai',
+            'Rankiniai įrankiai',
+            'Statybinės medžiagos',
+            'Saugos priemonės',
+            'Matavimo įranga',
+            'Tvirtinimo elementai',
+            'Dažai ir lakavimo priemonės',
+            'Santechnikos įranga',
+            'Elektros instaliacijos',
+            'Šildymo sistemos',
+            'Ventiliacijos sistemos',
+            'Izoliacijos medžiagos',
+            'Stogo dangos',
+            'Fasadų apdaila',
+            'Grindų dangos',
+            'Durys ir langai',
+            'Laiptai ir pastoliai',
+            'Sodo ir kiemo įranga',
+            'Apsaugos sistemos',
+            'Apšvietimo sprendimai'
+        ];
+
+        $name = $this->faker->randomElement($lithuanianCategories);
+        
         return [
-            'name' => Str::title($name),
+            'name' => $name,
             'slug' => Str::slug($name),
-            'description' => $this->faker->boolean(60) ? '<p>' . $this->faker->paragraphs(2, true) . '</p>' : null,
-            'parent_id' => null,
-            'position' => $this->faker->numberBetween(0, 100),
-            'is_enabled' => true,
-            'seo_title' => $this->faker->boolean(40) ? $this->faker->sentence(6) : null,
-            'seo_description' => $this->faker->boolean(40) ? $this->faker->sentence(12) : null,
-            'metadata' => null,
+            'description' => $this->generateCategoryDescription($name),
+            'parent_id' => null, // Will be set by seeder for subcategories
+            'sort_order' => $this->faker->numberBetween(0, 100),
+            'is_visible' => true,
+            'seo_title' => $name . ' - Profesionalūs sprendimai statybininkams',
+            'seo_description' => 'Platus ' . strtolower($name) . ' asortimentas geriausiomis kainomis. Greitas pristatymas visoje Lietuvoje.',
         ];
     }
 
-    public function configure(): static
+    private function generateCategoryDescription(string $categoryName): string
     {
-        return $this->afterCreating(function (Category $category): void {
-            $paths = ['demo/category.jpg', 'demo/category.png', 'demo/tshirt.jpg'];
-            foreach ($paths as $path) {
-                if (Storage::disk('public')->exists($path)) {
-                    $category
-                        ->addMedia(Storage::disk('public')->path($path))
-                        ->toMediaCollection('categories');
-                    break;
-                }
-            }
-        });
+        $descriptions = [
+            "Profesionalūs {$categoryName} skirti statybos ir remonto darbams. Platus pasirinkimas patikimiausių gamintojų.",
+            "Aukštos kokybės {$categoryName} tiek profesionalams, tiek namų meistrams. Konkurencingos kainos ir greitas pristatymas.",
+            "Viskas, ko reikia {$categoryName} srityje. Nuo pagrindinių įrankių iki specializuotos įrangos.",
+            "Patikimi {$categoryName} su garantija. Konsultacijos ir techninė pagalba įsigijus prekes.",
+            "Platus {$categoryName} asortimentas visoms statybos reikmėms. Kokybė už prieinamą kainą."
+        ];
+
+        return $this->faker->randomElement($descriptions);
+    }
+
+    public function withParent(Category $parent): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'parent_id' => $parent->id,
+        ]);
     }
 }

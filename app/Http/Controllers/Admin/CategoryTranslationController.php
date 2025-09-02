@@ -23,7 +23,7 @@ class CategoryTranslationController extends Controller
         DB::transaction(function () use ($id, $locale, $data): void {
             $id = (int) $id;
             $now = now();
-            $exists = DB::table('sh_category_translations')
+            $exists = DB::table('category_translations')
                 ->where('category_id', $id)
                 ->where('locale', $locale)
                 ->exists();
@@ -38,12 +38,12 @@ class CategoryTranslationController extends Controller
             ];
 
             if ($exists) {
-                DB::table('sh_category_translations')
+                DB::table('category_translations')
                     ->where('category_id', $id)
                     ->where('locale', $locale)
                     ->update($payload);
             } else {
-                DB::table('sh_category_translations')->insert(array_merge($payload, [
+                DB::table('category_translations')->insert(array_merge($payload, [
                     'category_id' => $id,
                     'locale' => $locale,
                     'created_at' => $now,

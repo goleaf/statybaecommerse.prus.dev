@@ -19,11 +19,17 @@ class User extends Authenticatable implements HasLocalePreferenceContract
     use HasFactory, HasRoles, Notifiable;
 
     protected $fillable = [
-        'name',
         'email',
         'password',
         'preferred_locale',
         'email_verified_at',
+        'first_name',
+        'last_name',
+        'gender',
+        'phone_number',
+        'birth_date',
+        'timezone',
+        'opt_in',
     ];
 
     protected $hidden = [
@@ -102,7 +108,7 @@ class User extends Authenticatable implements HasLocalePreferenceContract
 
     public function customerGroups(): BelongsToMany
     {
-        return $this->belongsToMany(CustomerGroup::class, 'sh_customer_group_user', 'user_id', 'group_id');
+        return $this->belongsToMany(CustomerGroup::class, 'customer_group_user', 'user_id', 'group_id');
     }
 
     public function discountRedemptions(): HasMany
@@ -122,19 +128,19 @@ class User extends Authenticatable implements HasLocalePreferenceContract
 
     public function getBillingAddressAttribute(): ?Address
     {
-        return $this->addresses()->byType('billing')->default()->first() 
+        return $this->addresses()->byType('billing')->default()->first()
             ?? $this->addresses()->default()->first();
     }
 
     public function getShippingAddressAttribute(): ?Address
     {
-        return $this->addresses()->byType('shipping')->default()->first() 
+        return $this->addresses()->byType('shipping')->default()->first()
             ?? $this->addresses()->default()->first();
     }
 
     public function partners(): BelongsToMany
     {
-        return $this->belongsToMany(Partner::class, 'sh_partner_users');
+        return $this->belongsToMany(Partner::class, 'partner_users');
     }
 
     public function getActivePartnerAttribute(): ?Partner

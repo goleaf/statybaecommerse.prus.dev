@@ -2,50 +2,81 @@
 
 namespace App\Models;
 
+use App\Models\Translations\CountryTranslation;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Country extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasTranslations, SoftDeletes;
 
-    protected $table = 'sh_countries';
+    protected string $translationModel = CountryTranslation::class;
+
+    protected $table = 'countries';
 
     protected $fillable = [
-        'name',
-        'code',
-        'iso_code',
-        'phone_code',
-        'is_enabled',
+        'region',
+        'subregion',
+        'cca2',
+        'cca3',
+        'flag',
+        'latitude',
+        'longitude',
+        'phone_calling_code',
+        'currencies',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_enabled' => 'boolean',
+            'latitude' => 'decimal:8',
+            'longitude' => 'decimal:8',
+            'currencies' => 'array',
         ];
     }
 
     public function zones(): BelongsToMany
     {
-        return $this->belongsToMany(Zone::class, 'sh_country_zone', 'country_id', 'zone_id');
+        return $this->belongsToMany(Zone::class, 'country_zone', 'country_id', 'zone_id');
     }
 
     public function addresses(): HasMany
     {
-        return $this->hasMany(Address::class, 'country_code', 'code');
-    }
-
-    public function scopeEnabled($query)
-    {
-        return $query->where('is_enabled', true);
+        return $this->hasMany(Address::class, 'country_code', 'cca2');
     }
 
     public function getDisplayNameAttribute(): string
     {
-        return $this->phone_code ? "{$this->name} (+{$this->phone_code})" : $this->name;
+        $name = $this->trans('name') ?: $this->getOriginal('name');
+        return $this->phone_calling_code ? "{$name} (+{$this->phone_calling_code})" : $name;
+    }
+
+    public function getTranslatedNameAttribute(): string
+    {
+        return $this->trans('name') ?: $this->getOriginal('name') ?: 'Unknown';
+    }
+
+    public function getTranslatedOfficialNameAttribute(): string
+    {
+        return $this->trans('name_official') ?: $this->getOriginal('name_official') ?: $this->getTranslatedNameAttribute();
+    }
+
+    public function getCodeAttribute(): string
+    {
+        return $this->cca2;
+    }
+
+    public function getIsoCodeAttribute(): string
+    {
+        return $this->cca3;
+    }
+
+    public function getPhoneCodeAttribute(): string
+    {
+        return $this->phone_calling_code;
     }
 }

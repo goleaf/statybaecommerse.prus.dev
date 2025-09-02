@@ -31,10 +31,27 @@
             </x-slot>
         </x-breadcrumbs>
 
+        <!-- Brand Banner -->
+        @if ($brand->getBannerUrl('lg'))
+            <div class="w-full h-48 md:h-64 lg:h-80 mb-8 rounded-lg overflow-hidden bg-gray-50">
+                <img src="{{ $brand->getBannerUrl('md') }}"
+                     srcset="{{ $brand->getBannerUrl('sm') }} 800w, {{ $brand->getBannerUrl('md') }} 1200w, {{ $brand->getBannerUrl('lg') }} 1920w"
+                     sizes="(max-width: 768px) 800px, (max-width: 1024px) 1200px, 1920px"
+                     alt="{{ $brand->trans('name') ?? $brand->name }} banner"
+                     class="w-full h-full object-cover" />
+            </div>
+        @endif
+
         <div class="flex items-center gap-4 mb-6">
-            @php($thumb = method_exists($brand, 'getFirstMediaUrl') ? $brand->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) : null)
-            @if ($thumb)
-                <img src="{{ $thumb }}" alt="{{ $brand->trans('name') ?? $brand->name }}"
+            @if ($brand->getLogoUrl('md'))
+                <img src="{{ $brand->getLogoUrl('md') }}" 
+                     srcset="{{ $brand->getLogoUrl('sm') }} 128w, {{ $brand->getLogoUrl('md') }} 200w, {{ $brand->getLogoUrl('lg') }} 400w"
+                     sizes="200px"
+                     alt="{{ $brand->trans('name') ?? $brand->name }} logo"
+                     width="200" height="200"
+                     class="h-16 w-16 object-contain" />
+            @elseif ($brand->getLogoUrl())
+                <img src="{{ $brand->getLogoUrl() }}" alt="{{ $brand->trans('name') ?? $brand->name }}"
                      class="h-12 w-12 object-contain" />
             @endif
             <h1 class="text-2xl font-semibold">{{ $brand->trans('name') ?? $brand->name }}</h1>

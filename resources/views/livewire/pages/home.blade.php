@@ -89,15 +89,21 @@
                             ])"
                                     class="group block border rounded-md p-4 bg-white hover:shadow-sm">
                                 <div class="aspect-[3/2] flex items-center justify-center">
-                                    @php($thumb = method_exists($brand, 'getFirstMediaUrl') ? ($brand->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: ($brand->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'small') ?: $brand->getFirstMediaUrl(config('shopper.media.storage.collection_name')))) : null)
-                                    @if ($thumb)
-                                        <img loading="lazy" src="{{ $thumb }}"
+                                    @if ($brand->getLogoUrl('sm'))
+                                        <img loading="lazy" 
+                                             src="{{ $brand->getLogoUrl('sm') }}"
+                                             srcset="{{ $brand->getLogoUrl('xs') }} 64w, {{ $brand->getLogoUrl('sm') }} 128w, {{ $brand->getLogoUrl('md') }} 200w"
+                                             sizes="128px"
+                                             alt="{{ $brand->trans('name') ?? $brand->name }}"
+                                             width="128" height="128"
+                                             class="max-h-16 object-contain" />
+                                    @elseif ($brand->getLogoUrl())
+                                        <img loading="lazy" src="{{ $brand->getLogoUrl() }}"
                                              alt="{{ $brand->trans('name') ?? $brand->name }}"
                                              width="120" height="80"
                                              class="max-h-16 object-contain" />
                                     @else
-                                        <span
-                                              class="text-sm text-gray-600">{{ $brand->trans('name') ?? $brand->name }}</span>
+                                        <span class="text-sm text-gray-600">{{ $brand->trans('name') ?? $brand->name }}</span>
                                     @endif
                                 </div>
                             </x-link>

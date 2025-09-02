@@ -22,7 +22,7 @@ class BrandTranslationController extends Controller
         DB::transaction(function () use ($id, $locale, $data): void {
             $id = (int) $id;
             $now = now();
-            $exists = DB::table('sh_brand_translations')
+            $exists = DB::table('brand_translations')
                 ->where('brand_id', $id)
                 ->where('locale', $locale)
                 ->exists();
@@ -37,12 +37,12 @@ class BrandTranslationController extends Controller
             ];
 
             if ($exists) {
-                DB::table('sh_brand_translations')
+                DB::table('brand_translations')
                     ->where('brand_id', $id)
                     ->where('locale', $locale)
                     ->update($payload);
             } else {
-                DB::table('sh_brand_translations')->insert(array_merge($payload, [
+                DB::table('brand_translations')->insert(array_merge($payload, [
                     'brand_id' => $id,
                     'locale' => $locale,
                     'created_at' => $now,
