@@ -24,46 +24,40 @@ final class BasicFilamentSeeder extends Seeder
         $permissions = [
             // Product permissions
             'view_products',
-            'create_products', 
+            'create_products',
             'edit_products',
             'delete_products',
             'bulk_delete_products',
-            
             // Category permissions
             'view_categories',
             'create_categories',
             'edit_categories',
             'delete_categories',
             'bulk_delete_categories',
-            
             // Brand permissions
             'view_brands',
             'create_brands',
             'edit_brands',
             'delete_brands',
             'bulk_delete_brands',
-            
             // Order permissions
             'view_orders',
             'create_orders',
             'edit_orders',
             'delete_orders',
             'bulk_delete_orders',
-            
             // Customer permissions
             'view_customers',
             'create_customers',
             'edit_customers',
             'delete_customers',
             'bulk_delete_customers',
-            
             // Legal pages permissions
             'view_legals',
             'create_legals',
             'edit_legals',
             'delete_legals',
             'bulk_delete_legals',
-            
             // System permissions
             'view_settings',
             'edit_settings',
@@ -89,35 +83,67 @@ final class BasicFilamentSeeder extends Seeder
         // Admin role
         $admin = Role::firstOrCreate(['name' => 'admin']);
         $adminPermissions = [
-            'view_products', 'create_products', 'edit_products', 'delete_products',
-            'view_categories', 'create_categories', 'edit_categories', 'delete_categories',
-            'view_brands', 'create_brands', 'edit_brands', 'delete_brands',
-            'view_orders', 'create_orders', 'edit_orders',
-            'view_customers', 'create_customers', 'edit_customers',
-            'view_legals', 'create_legals', 'edit_legals', 'delete_legals',
-            'view_analytics', 'view_dashboard_stats', 'export_data',
+            'view_products',
+            'create_products',
+            'edit_products',
+            'delete_products',
+            'view_categories',
+            'create_categories',
+            'edit_categories',
+            'delete_categories',
+            'view_brands',
+            'create_brands',
+            'edit_brands',
+            'delete_brands',
+            'view_orders',
+            'create_orders',
+            'edit_orders',
+            'view_customers',
+            'create_customers',
+            'edit_customers',
+            'view_legals',
+            'create_legals',
+            'edit_legals',
+            'delete_legals',
+            'view_analytics',
+            'view_dashboard_stats',
+            'export_data',
         ];
         $admin->givePermissionTo($adminPermissions);
 
         // Manager role
         $manager = Role::firstOrCreate(['name' => 'manager']);
         $managerPermissions = [
-            'view_products', 'edit_products',
-            'view_categories', 'edit_categories',
-            'view_brands', 'edit_brands',
-            'view_orders', 'edit_orders',
-            'view_customers', 'edit_customers',
-            'view_analytics', 'view_dashboard_stats',
+            'view_products',
+            'edit_products',
+            'view_categories',
+            'edit_categories',
+            'view_brands',
+            'edit_brands',
+            'view_orders',
+            'edit_orders',
+            'view_customers',
+            'edit_customers',
+            'view_analytics',
+            'view_dashboard_stats',
         ];
         $manager->givePermissionTo($managerPermissions);
 
         // Editor role
         $editor = Role::firstOrCreate(['name' => 'editor']);
         $editorPermissions = [
-            'view_products', 'create_products', 'edit_products',
-            'view_categories', 'create_categories', 'edit_categories',
-            'view_brands', 'create_brands', 'edit_brands',
-            'view_legals', 'create_legals', 'edit_legals',
+            'view_products',
+            'create_products',
+            'edit_products',
+            'view_categories',
+            'create_categories',
+            'edit_categories',
+            'view_brands',
+            'create_brands',
+            'edit_brands',
+            'view_legals',
+            'create_legals',
+            'edit_legals',
         ];
         $editor->givePermissionTo($editorPermissions);
     }

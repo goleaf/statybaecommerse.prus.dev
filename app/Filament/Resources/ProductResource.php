@@ -10,23 +10,23 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\MultiLanguageTabService;
-use Filament\Schemas\Schema;
+use Filament\Actions\Action;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use UnitEnum;
-use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use BackedEnum;
+use UnitEnum;
 
 final class ProductResource extends Resource
 {
@@ -187,12 +187,12 @@ final class ProductResource extends Resource
                                 ->color('success')
                                 ->action(function (Product $record) {
                                     $imageService = app(\App\Services\Images\ProductImageService::class);
-                                    
+
                                     try {
                                         // Generate 3 random images
                                         for ($i = 0; $i < 3; $i++) {
                                             $imagePath = $imageService->generateProductImage($record);
-                                            
+
                                             $record
                                                 ->addMedia($imagePath)
                                                 ->withCustomProperties([
@@ -204,17 +204,16 @@ final class ProductResource extends Resource
                                                 ->usingName($record->name . ' - ' . __('translations.image') . ' ' . ($i + 1))
                                                 ->usingFileName('product_' . $record->id . '_generated_' . ($i + 1) . '.webp')
                                                 ->toMediaCollection('images');
-                                            
+
                                             if (file_exists($imagePath)) {
                                                 unlink($imagePath);
                                             }
                                         }
-                                        
+
                                         \Filament\Notifications\Notification::make()
                                             ->title(__('translations.image_generated'))
                                             ->success()
                                             ->send();
-                                            
                                     } catch (\Throwable $e) {
                                         \Filament\Notifications\Notification::make()
                                             ->title('Klaida generuojant paveikslėlius')
@@ -227,9 +226,8 @@ final class ProductResource extends Resource
                                 ->modalHeading(__('translations.generate_images'))
                                 ->modalDescription('Ar tikrai norite sugeneruoti atsitiktinius paveikslėlius šiam produktui?')
                                 ->modalSubmitActionLabel(__('translations.generate_images'))
-                                ->visible(fn (?Product $record) => $record?->exists),
+                                ->visible(fn(?Product $record) => $record?->exists),
                         ]),
-                        
                         Forms\Components\SpatieMediaLibraryFileUpload::make('images')
                             ->label(__('translations.product_images'))
                             ->multiple()
@@ -276,7 +274,7 @@ final class ProductResource extends Resource
                                     'type' => 'rich_editor',
                                     'label' => __('translations.description'),
                                     'toolbar' => [
-                                        'bold', 'italic', 'link', 'bulletList', 'orderedList', 
+                                        'bold', 'italic', 'link', 'bulletList', 'orderedList',
                                         'h2', 'h3', 'blockquote', 'codeBlock', 'table'
                                     ],
                                 ],
@@ -321,11 +319,10 @@ final class ProductResource extends Resource
                     ->defaultImageUrl('/images/placeholder-product.jpg')
                     ->circular()
                     ->size(80)
-                    ->tooltip(fn (Product $record): string => 
-                        $record->hasImages() 
+                    ->tooltip(fn(Product $record): string =>
+                        $record->hasImages()
                             ? __('translations.images') . ': ' . $record->getImagesCount()
-                            : __('translations.no_image')
-                    ),
+                            : __('translations.no_image')),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()
@@ -421,15 +418,15 @@ final class ProductResource extends Resource
                             $imageService = app(\App\Services\Images\ProductImageService::class);
                             $successCount = 0;
                             $errorCount = 0;
-                            
+
                             foreach ($records as $product) {
                                 try {
                                     // Generate 2-3 random images per product
                                     $imageCount = random_int(2, 3);
-                                    
+
                                     for ($i = 0; $i < $imageCount; $i++) {
                                         $imagePath = $imageService->generateProductImage($product);
-                                        
+
                                         $product
                                             ->addMedia($imagePath)
                                             ->withCustomProperties([
@@ -441,12 +438,12 @@ final class ProductResource extends Resource
                                             ->usingName($product->name . ' - ' . __('translations.image') . ' ' . ($i + 1))
                                             ->usingFileName('product_' . $product->id . '_bulk_' . ($i + 1) . '.webp')
                                             ->toMediaCollection('images');
-                                        
+
                                         if (file_exists($imagePath)) {
                                             unlink($imagePath);
                                         }
                                     }
-                                    
+
                                     $successCount++;
                                 } catch (\Throwable $e) {
                                     $errorCount++;
@@ -456,7 +453,7 @@ final class ProductResource extends Resource
                                     ]);
                                 }
                             }
-                            
+
                             \Filament\Notifications\Notification::make()
                                 ->title(__('translations.image_generated'))
                                 ->body("Sėkmingai sugeneruota: {$successCount}, Klaidos: {$errorCount}")
@@ -507,6 +504,4 @@ final class ProductResource extends Resource
         return parent::getGlobalSearchEloquentQuery()
             ->with(['brand', 'category']);
     }
-
-
 }

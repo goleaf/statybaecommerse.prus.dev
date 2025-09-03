@@ -8,8 +8,8 @@ use App\Models\Legal;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -338,4 +338,3 @@ final class FilamentEnhancedSeeder extends Seeder
         }
     }
 }
-

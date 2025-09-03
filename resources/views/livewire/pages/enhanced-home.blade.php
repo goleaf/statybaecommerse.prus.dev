@@ -1,383 +1,331 @@
-@section('meta')
-    @php
-        $websiteJsonLd = [
-            '@context' => 'https://schema.org',
-            '@type' => 'WebSite',
-            'url' => url('/'),
-            'name' => config('app.name'),
-            'description' => __('meta_description_home'),
-            'potentialAction' => [
-                '@type' => 'SearchAction',
-                'target' => route('search.index', ['locale' => app()->getLocale()]) . '?q={search_term_string}',
-                'query-input' => 'required name=search_term_string',
-            ],
-        ];
-    @endphp
-    <x-meta
-        :title="__('nav_home') . ' - ' . config('app.name')"
-        :description="__('meta_description_home')"
-        :og-image="Vite::asset('resources/images/hero.png')"
-        canonical="{{ url()->current() }}"
-        :jsonld="json_encode($websiteJsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)" />
-@endsection
-
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-    {{-- Hero Section --}}
-    <section class="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 dark:from-blue-800 dark:via-purple-800 dark:to-blue-900">
-        <div class="absolute inset-0 bg-black/20"></div>
-        <div class="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
+        <div class="absolute inset-0 bg-black opacity-20"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
             <div class="text-center">
-                <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
-                    {{ __('home_new_arrivals') }}
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
+                    {{ __('Welcome to') }} <span class="text-yellow-300">{{ config('app.name') }}</span>
                 </h1>
-                <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-100 sm:text-xl">
-                    {{ __('home_new_arrivals_desc') }}
+                <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
+                    {{ __('Discover amazing products with the best quality and prices. Your satisfaction is our priority.') }}
                 </p>
-                
-                {{-- Enhanced Search Bar --}}
-                <div class="mx-auto mt-10 max-w-xl">
-                    <form wire:submit="search" class="flex gap-x-4">
-                        <input 
-                            wire:model="searchQuery"
-                            type="search" 
-                            placeholder="{{ __('search_placeholder') }}"
-                            class="min-w-0 flex-auto rounded-xl border-0 bg-white/10 px-6 py-4 text-white placeholder:text-gray-300 focus:ring-2 focus:ring-white/25 backdrop-blur-sm"
-                        />
-                        <button 
-                            type="submit"
-                            class="flex-none rounded-xl bg-white px-6 py-4 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-all duration-200"
-                        >
-                            {{ __('search') }}
-                        </button>
-                    </form>
-                </div>
-
-                <div class="mt-10 flex items-center justify-center gap-x-6">
-                    <a href="{{ route('products.index') }}" 
-                       class="rounded-xl bg-white px-8 py-4 text-sm font-semibold text-gray-900 shadow-lg hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-all duration-200 transform hover:scale-105">
-                        {{ __('home_shop_now') }}
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="{{ route('products.index') }}" class="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors shadow-lg">
+                        {{ __('Shop Now') }}
                     </a>
-                    <a href="{{ route('categories.index') }}" 
-                       class="text-sm font-semibold leading-6 text-white hover:text-gray-200 transition-colors duration-200">
-                        {{ __('categories_browse') }} <span aria-hidden="true">→</span>
+                    <a href="{{ route('categories.index') }}" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-indigo-600 transition-colors">
+                        {{ __('Browse Categories') }}
                     </a>
                 </div>
             </div>
         </div>
         
-        {{-- Floating Elements --}}
-        <div class="absolute top-1/4 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
-        <div class="absolute bottom-1/4 right-10 w-32 h-32 bg-purple-400/20 rounded-full blur-xl animate-pulse delay-1000"></div>
-        <div class="absolute top-1/3 right-1/4 w-16 h-16 bg-blue-400/20 rounded-full blur-xl animate-pulse delay-500"></div>
-    </section>
-
-    {{-- Quick Stats --}}
-    <section class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
-        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('platform_statistics') }}</h2>
-            </div>
-            <div class="grid grid-cols-2 gap-6 sm:grid-cols-4">
-                <div class="text-center">
-                    <x-shared.badge variant="primary" size="lg" class="text-2xl font-bold px-4 py-2">
-                        {{ $this->featuredProducts->count() }}+
-                    </x-shared.badge>
-                    <div class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('admin.models.products') }}</div>
-                </div>
-                <div class="text-center">
-                    <x-shared.badge variant="success" size="lg" class="text-2xl font-bold px-4 py-2">
-                        {{ $this->topCategories->count() }}+
-                    </x-shared.badge>
-                    <div class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('admin.models.categories') }}</div>
-                </div>
-                <div class="text-center">
-                    <x-shared.badge variant="warning" size="lg" class="text-2xl font-bold px-4 py-2">
-                        {{ $this->topBrands->count() }}+
-                    </x-shared.badge>
-                    <div class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('admin.models.brands') }}</div>
-                </div>
-                <div class="text-center">
-                    <x-shared.badge variant="info" size="lg" class="text-2xl font-bold px-4 py-2">
-                        {{ $this->featuredCollections->count() }}+
-                    </x-shared.badge>
-                    <div class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('admin.models.collections') }}</div>
+        <!-- Stats Bar -->
+        <div class="relative bg-white bg-opacity-10 backdrop-blur-sm border-t border-white border-opacity-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
+                    <div class="text-white">
+                        <div class="text-2xl md:text-3xl font-bold">{{ number_format($stats['products_count']) }}</div>
+                        <div class="text-sm md:text-base opacity-80">{{ __('Products') }}</div>
+                    </div>
+                    <div class="text-white">
+                        <div class="text-2xl md:text-3xl font-bold">{{ number_format($stats['categories_count']) }}</div>
+                        <div class="text-sm md:text-base opacity-80">{{ __('Categories') }}</div>
+                    </div>
+                    <div class="text-white">
+                        <div class="text-2xl md:text-3xl font-bold">{{ number_format($stats['brands_count']) }}</div>
+                        <div class="text-sm md:text-base opacity-80">{{ __('Brands') }}</div>
+                    </div>
+                    <div class="text-white">
+                        <div class="text-2xl md:text-3xl font-bold">{{ number_format($stats['reviews_count']) }}</div>
+                        <div class="text-sm md:text-base opacity-80">{{ __('Reviews') }}</div>
+                    </div>
+                    <div class="text-white col-span-2 md:col-span-1">
+                        <div class="text-2xl md:text-3xl font-bold">{{ number_format($stats['avg_rating'], 1) }}/5</div>
+                        <div class="text-sm md:text-base opacity-80">{{ __('Avg Rating') }}</div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    {{-- Featured Collections --}}
-    <section class="py-16 sm:py-24">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <x-shared.section 
-                title="{{ __('home_shop_by_collection') }}"
-                description="{{ __('home_collections_desc') }}"
-                icon="heroicon-o-squares-2x2"
-                titleSize="text-3xl"
-                centered="true"
-            />
-                
-                <div class="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    @foreach($this->featuredCollections as $collection)
-                        <div class="group relative overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-gray-200 transition-all duration-300 hover:shadow-xl hover:ring-gray-300 dark:bg-gray-800 dark:ring-gray-700 dark:hover:ring-gray-600">
-                            @if($collection->getFirstMediaUrl('images'))
-                                <div class="aspect-w-16 aspect-h-9 overflow-hidden">
-                                    <img 
-                                        src="{{ $collection->getFirstMediaUrl('images') }}" 
-                                        alt="{{ $collection->name }}"
-                                        class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                        loading="lazy"
-                                    />
-                                </div>
-                            @endif
-                            
-                            <div class="p-6">
-                                <x-shared.badge variant="secondary" class="mb-3">
-                                    {{ __('collection') }}
-                                </x-shared.badge>
-                                
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
-                                    {{ $collection->name }}
-                                </h3>
-                                @if($collection->description)
-                                    <p class="mt-2 text-gray-600 dark:text-gray-300 line-clamp-2">
-                                        {{ $collection->description }}
-                                    </p>
-                                @endif
-                                
-                                <div class="mt-4">
-                                    <x-shared.button 
-                                        href="{{ route('collections.show', ['slug' => $collection->slug, 'locale' => app()->getLocale()]) }}"
-                                        variant="primary"
-                                        size="sm"
-                                        icon="heroicon-o-arrow-right"
-                                        iconPosition="right"
-                                        class="group-hover:shadow-md transition-shadow duration-200"
-                                    >
-                                        {{ __('shared.view') }}
-                                    </x-shared.button>
-                                </div>
-                            </div>
+    <!-- Featured Categories -->
+    @if($featuredCategories->count() > 0)
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ __('Featured Categories') }}</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ __('Explore our most popular product categories') }}</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                @foreach($featuredCategories as $category)
+                <a href="{{ route('categories.show', $category->slug) }}" class="group">
+                    <div class="bg-gray-100 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                        @if($category->icon)
+                        <div class="w-12 h-12 mx-auto mb-4 text-indigo-600">
+                            @svg($category->icon, 'w-12 h-12')
                         </div>
-                    @endforeach
-                </div>
-        </div>
-    </section>
-
-    {{-- Featured Products --}}
-    <section class="bg-gray-50 py-16 dark:bg-gray-900 sm:py-24">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-                    {{ __('home_trending_products') }}
-                </h2>
-                <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-                    {{ __('Discover our most popular products chosen by customers') }}
-                </p>
-            </div>
-
-            <div class="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                @foreach($this->featuredProducts as $product)
-                    <x-shared.product-card 
-                        :product="$product" 
-                        :showQuickAdd="true" 
-                        :showWishlist="true" 
-                        :showCompare="true" 
-                    />
+                        @elseif($category->getFirstMediaUrl('images'))
+                        <img src="{{ $category->getFirstMediaUrl('images', 'thumb') }}" alt="{{ $category->name }}" class="w-12 h-12 mx-auto mb-4 rounded-lg object-cover">
+                        @else
+                        <div class="w-12 h-12 mx-auto mb-4 bg-indigo-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                        </div>
+                        @endif
+                        <h3 class="font-semibold text-gray-900 mb-1">{{ $category->name }}</h3>
+                        <p class="text-sm text-gray-500">{{ $category->products_count }} {{ __('products') }}</p>
+                    </div>
+                </a>
                 @endforeach
             </div>
-
-            <div class="mt-12 text-center">
-                <x-shared.button 
-                    href="{{ route('products.index') }}"
-                    variant="primary"
-                    size="lg"
-                    icon="heroicon-o-arrow-right"
-                    iconPosition="right"
-                    class="transform hover:scale-105 transition-all duration-200 shadow-lg"
-                >
-                    {{ __('View All Products') }}
-                </x-shared.button>
-            </div>
         </div>
     </section>
-
-    {{-- New Arrivals --}}
-    @if($this->newArrivals->isNotEmpty())
-        <section class="py-16 sm:py-24">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-                        {{ __('New Arrivals') }}
-                    </h2>
-                    <a href="{{ route('products.index', ['sort' => 'newest']) }}" 
-                       class="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
-                        {{ __('View all') }} →
-                    </a>
-                </div>
-
-                <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    @foreach($this->newArrivals->take(8) as $product)
-                        <x-product-card :product="$product" :show-quick-add="true" />
-                    @endforeach
-                </div>
-            </div>
-        </section>
     @endif
 
-    {{-- Top Categories --}}
-    <section class="bg-gray-50 py-16 dark:bg-gray-900 sm:py-24">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-                    {{ __('categories_browse') }}
-                </h2>
-                <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-                    {{ __('Explore our comprehensive range of categories') }}
-                </p>
+    <!-- Featured Products -->
+    @if($featuredProducts->count() > 0)
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ __('Featured Products') }}</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ __('Hand-picked products just for you') }}</p>
             </div>
-
-            <div class="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                @foreach($this->topCategories as $category)
-                    <a href="{{ route('categories.show', ['slug' => $category->slug, 'locale' => app()->getLocale()]) }}" 
-                       class="group relative overflow-hidden rounded-xl bg-white p-6 shadow-md ring-1 ring-gray-200 transition-all duration-300 hover:shadow-lg hover:ring-gray-300 dark:bg-gray-800 dark:ring-gray-700">
-                        @if($category->getFirstMediaUrl('images'))
-                            <div class="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
-                                <img 
-                                    src="{{ $category->getFirstMediaUrl('images') }}" 
-                                    alt="{{ $category->name }}"
-                                    class="h-full w-full object-cover"
-                                />
-                            </div>
-                        @endif
-                        
-                        <div class="relative text-center">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
-                                {{ $category->name }}
-                            </h3>
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                {{ $category->products_count }} {{ __('admin.models.products') }}
-                            </p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @foreach($featuredProducts as $product)
+                <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden group">
+                    <div class="aspect-w-1 aspect-h-1 bg-gray-200 relative overflow-hidden">
+                        @if($product->getFirstMediaUrl('images'))
+                        <img src="{{ $product->getFirstMediaUrl('images', 'medium') }}" alt="{{ $product->name }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                        @else
+                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
                         </div>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    </section>
-
-    {{-- Top Brands --}}
-    <section class="py-16 sm:py-24">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-                    {{ __('brands_browse') }}
-                </h2>
-                <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-                    {{ __('Shop from our trusted brand partners') }}
-                </p>
-            </div>
-
-            <div class="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-                @foreach($this->topBrands as $brand)
-                    <a href="{{ route('brands.show', ['slug' => $brand->slug, 'locale' => app()->getLocale()]) }}" 
-                       class="group flex flex-col items-center justify-center rounded-xl bg-white p-6 shadow-md ring-1 ring-gray-200 transition-all duration-300 hover:shadow-lg hover:ring-gray-300 dark:bg-gray-800 dark:ring-gray-700">
-                        @if($brand->getFirstMediaUrl('logo'))
-                            <img 
-                                src="{{ $brand->getFirstMediaUrl('logo') }}" 
-                                alt="{{ $brand->name }}"
-                                class="h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-110"
-                                loading="lazy"
-                            />
                         @endif
                         
-                        <h3 class="mt-3 text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 text-center">
-                            {{ $brand->name }}
-                        </h3>
-                        
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            {{ $brand->products_count }} {{ __('admin.models.products') }}
-                        </p>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    </section>
-
-    {{-- Newsletter Signup --}}
-    <section class="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 dark:from-blue-800 dark:via-purple-800 dark:to-blue-900">
-        <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-                <div class="text-center mb-8">
-                    <div class="flex items-center justify-center mb-4">
-                        <svg class="h-8 w-8 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        <h2 class="text-white text-3xl font-bold">{{ __('Stay updated with our latest products') }}</h2>
+                        @if($product->is_featured)
+                        <div class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
+                            {{ __('Featured') }}
+                        </div>
+                        @endif
                     </div>
-                    <p class="text-blue-100 text-lg">{{ __('Get notified about new arrivals, special offers, and exclusive deals') }}</p>
-                </div>
-                
-                <form class="mx-auto mt-8 max-w-md" wire:submit="subscribeNewsletter">
-                    <div class="space-y-4">
-                        <label for="newsletter-email" class="block text-sm font-medium text-white">{{ __('newsletter_subscription') }}</label>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-gray-900 line-clamp-2">
+                                <a href="{{ route('products.show', $product->slug) }}" class="hover:text-indigo-600">
+                                    {{ $product->name }}
+                                </a>
+                            </h3>
+                            @if($product->brand)
+                            <span class="text-xs text-gray-500 ml-2">{{ $product->brand->name }}</span>
+                            @endif
+                        </div>
                         
-                        <div class="flex gap-x-4">
-                            <input 
-                                wire:model="newsletterEmail"
-                                type="email" 
-                                id="newsletter-email"
-                                placeholder="{{ __('Enter your email') }}"
-                                class="min-w-0 flex-auto rounded-lg bg-white/10 border border-white/20 px-4 py-3 text-white placeholder:text-blue-200 focus:border-white/40 focus:ring-2 focus:ring-white/25 focus:outline-none backdrop-blur-sm"
-                            />
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="flex flex-col">
+                                <span class="text-lg font-bold text-gray-900">€{{ number_format($product->price, 2) }}</span>
+                                @if($product->stock_quantity > 0)
+                                <span class="text-xs text-green-600">{{ __('In stock') }}</span>
+                                @else
+                                <span class="text-xs text-red-600">{{ __('Out of stock') }}</span>
+                                @endif
+                            </div>
+                            
                             <button 
-                                type="submit"
-                                class="flex-none inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-medium text-gray-900 shadow-lg hover:bg-gray-100 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white/25 transition-all duration-200"
+                                wire:click="addToCart({{ $product->id }})"
+                                @if($product->stock_quantity <= 0) disabled @endif
+                                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                             >
-                                {{ __('Subscribe') }}
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                </svg>
+                                {{ __('Add to Cart') }}
                             </button>
                         </div>
                     </div>
-                </form>
+                </div>
+                @endforeach
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="{{ route('products.index') }}" class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+                    {{ __('View All Products') }}
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
             </div>
         </div>
     </section>
+    @endif
+
+    <!-- Latest Products -->
+    @if($latestProducts->count() > 0)
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ __('Latest Products') }}</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ __('Fresh arrivals you don\'t want to miss') }}</p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @foreach($latestProducts as $product)
+                <div class="bg-white rounded-2xl border border-gray-200 hover:border-indigo-300 transition-colors duration-300 overflow-hidden group">
+                    <div class="aspect-w-1 aspect-h-1 bg-gray-200 relative overflow-hidden">
+                        @if($product->getFirstMediaUrl('images'))
+                        <img src="{{ $product->getFirstMediaUrl('images', 'medium') }}" alt="{{ $product->name }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                        @else
+                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        @endif
+                        
+                        <div class="absolute top-2 left-2 bg-green-400 text-green-900 px-2 py-1 rounded-full text-xs font-semibold">
+                            {{ __('New') }}
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-gray-900 line-clamp-2">
+                                <a href="{{ route('products.show', $product->slug) }}" class="hover:text-indigo-600">
+                                    {{ $product->name }}
+                                </a>
+                            </h3>
+                            @if($product->brand)
+                            <span class="text-xs text-gray-500 ml-2">{{ $product->brand->name }}</span>
+                            @endif
+                        </div>
+                        
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="flex flex-col">
+                                <span class="text-lg font-bold text-gray-900">€{{ number_format($product->price, 2) }}</span>
+                                @if($product->stock_quantity > 0)
+                                <span class="text-xs text-green-600">{{ __('In stock') }}</span>
+                                @else
+                                <span class="text-xs text-red-600">{{ __('Out of stock') }}</span>
+                                @endif
+                            </div>
+                            
+                            <button 
+                                wire:click="addToCart({{ $product->id }})"
+                                @if($product->stock_quantity <= 0) disabled @endif
+                                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                            >
+                                {{ __('Add to Cart') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    <!-- Featured Brands -->
+    @if($featuredBrands->count() > 0)
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ __('Featured Brands') }}</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ __('Trusted brands we work with') }}</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                @foreach($featuredBrands as $brand)
+                <a href="{{ route('brands.show', $brand->slug) }}" class="group">
+                    <div class="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105 border border-gray-200">
+                        @if($brand->getFirstMediaUrl('images'))
+                        <img src="{{ $brand->getFirstMediaUrl('images', 'thumb') }}" alt="{{ $brand->name }}" class="w-16 h-16 mx-auto mb-3 rounded-lg object-contain">
+                        @else
+                        <div class="w-16 h-16 mx-auto mb-3 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <span class="text-lg font-bold text-gray-600">{{ substr($brand->name, 0, 2) }}</span>
+                        </div>
+                        @endif
+                        <h3 class="font-semibold text-gray-900 text-sm">{{ $brand->name }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">{{ $brand->products_count }} {{ __('products') }}</p>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    <!-- Latest Reviews -->
+    @if($latestReviews->count() > 0)
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ __('What Our Customers Say') }}</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ __('Real reviews from real customers') }}</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($latestReviews as $review)
+                <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="flex items-center">
+                            @for($i = 1; $i <= 5; $i++)
+                            <svg class="w-4 h-4 {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            @endfor
+                        </div>
+                        <span class="ml-2 text-sm text-gray-600">{{ $review->rating }}/5</span>
+                    </div>
+                    
+                    <p class="text-gray-700 mb-4 line-clamp-3">{{ $review->content }}</p>
+                    
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-semibold text-gray-900 text-sm">{{ $review->user?->name ?? __('Anonymous') }}</p>
+                            <p class="text-xs text-gray-500">{{ $review->created_at->format('M j, Y') }}</p>
+                        </div>
+                        @if($review->product)
+                        <a href="{{ route('products.show', $review->product->slug) }}" class="text-xs text-indigo-600 hover:text-indigo-800">
+                            {{ Str::limit($review->product->name, 30) }}
+                        </a>
+                        @endif
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    <!-- Newsletter Section -->
+    <section class="py-16 bg-indigo-600">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">{{ __('Stay Updated') }}</h2>
+            <p class="text-xl text-indigo-200 mb-8">{{ __('Get the latest updates on new products and exclusive offers') }}</p>
+            
+            <form class="max-w-md mx-auto flex gap-4">
+                <input 
+                    type="email" 
+                    placeholder="{{ __('Enter your email') }}" 
+                    class="flex-1 px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
+                    required
+                >
+                <button 
+                    type="submit" 
+                    class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                >
+                    {{ __('Subscribe') }}
+                </button>
+            </form>
+            
+            <p class="text-sm text-indigo-200 mt-4">
+                {{ __('We respect your privacy. Unsubscribe at any time.') }}
+            </p>
+        </div>
+    </section>
 </div>
-
-@push('scripts')
-<script>
-    // Enhanced interactivity
-    document.addEventListener('DOMContentLoaded', function() {
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-
-        // Add to cart animation
-        window.addEventListener('cart:added', function(e) {
-            // Create floating notification
-            const notification = document.createElement('div');
-            notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
-            notification.textContent = `${e.detail.product} added to cart!`;
-            document.body.appendChild(notification);
-            
-            // Animate in
-            setTimeout(() => notification.classList.remove('translate-x-full'), 100);
-            
-            // Animate out and remove
-            setTimeout(() => {
-                notification.classList.add('translate-x-full');
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        });
-    });
-</script>
-@endpush
