@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use Filament\Actions\Action;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -60,7 +61,7 @@ final class RecentActivityWidget extends BaseWidget
                     ->tooltip(fn ($state) => $state->format('Y-m-d H:i:s')),
             ])
             ->actions([
-                Tables\Actions\Action::make('view_details')
+                Action::make('view_details')
                     ->label(__('Details'))
                     ->icon('heroicon-m-eye')
                     ->modalContent(function (Activity $record) {

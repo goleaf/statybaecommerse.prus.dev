@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import "./links.css";
 @import "./swiper.css";
+@import "./filament-enhancements.css";
+@import "./shared/components.css";
 @import "@fontsource/space-grotesk/latin.css";
 @import "@fontsource/figtree/latin.css";
 @import "@fontsource/inter/latin.css";

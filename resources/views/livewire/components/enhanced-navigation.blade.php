@@ -91,15 +91,16 @@
                 </div>
             </div>
 
-            {{-- Right Side Actions --}}
+            {{-- Right Side Actions with Filament Components --}}
             <div class="flex items-center space-x-4">
-                {{-- Search Toggle --}}
-                <button @click="searchOpen = !searchOpen" 
-                        class="rounded-full bg-gray-100 p-2 text-gray-600 hover:bg-gray-200 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white transition-all duration-200">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </button>
+                {{-- Search Toggle with Filament Icon Button --}}
+                <x-filament::icon-button 
+                    @click="searchOpen = !searchOpen"
+                    icon="heroicon-o-magnifying-glass"
+                    color="gray"
+                    tooltip="{{ __('search_toggle') }}"
+                    class="transition-all duration-200"
+                />
 
                 {{-- Language Switcher --}}
                 <livewire:shared.language-switcher />
@@ -141,18 +142,17 @@
                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors duration-200">
                                 {{ __('account_addresses') }}
                             </a>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" 
-                                        class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors duration-200">
-                                    {{ __('auth_logout') }}
-                                </button>
-                            </form>
+                            <livewire:actions.logout />
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" 
-                       class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
+                    <a 
+                        href="{{ route('login') }}"
+                        class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm hover:shadow-md transition-all duration-200"
+                    >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
                         {{ __('auth_login') }}
                     </a>
                 @endauth
@@ -171,7 +171,7 @@
         </div>
     </div>
 
-    {{-- Search Overlay --}}
+    {{-- Enhanced Search Overlay with Filament Components --}}
     <div x-show="searchOpen" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
@@ -181,29 +181,46 @@
          x-transition:leave-end="opacity-0"
          class="absolute inset-x-0 top-full z-50 bg-white shadow-lg dark:bg-gray-800">
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <form wire:submit="search" class="flex gap-4">
-                <input 
-                    wire:model="searchQuery"
-                    x-ref="searchInput"
-                    type="search" 
-                    placeholder="{{ __('search_placeholder') }}"
-                    class="flex-1 rounded-lg border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                    @focus-search.window="$refs.searchInput.focus()"
-                />
-                <button 
-                    type="submit"
-                    class="rounded-lg bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
-                >
-                    {{ __('Search') }}
-                </button>
-                <button 
-                    type="button"
-                    @click="searchOpen = false"
-                    class="rounded-lg border border-gray-300 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-all duration-200"
-                >
-                    {{ __('btn_cancel') }}
-                </button>
-            </form>
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="text-center mb-6">
+                    <div class="flex items-center justify-center mb-4">
+                        <svg class="h-8 w-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <h2 class="text-2xl font-bold text-gray-900">{{ __('search_products') }}</h2>
+                    </div>
+                </div>
+                
+                <form wire:submit="search" class="flex gap-4">
+                    <input 
+                        wire:model="searchQuery"
+                        x-ref="searchInput"
+                        type="search" 
+                        placeholder="{{ __('search_placeholder') }}"
+                        class="flex-1 rounded-lg border-gray-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                        @focus-search.window="$refs.searchInput.focus()"
+                    />
+                    <button 
+                        type="submit"
+                        class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        {{ __('Search') }}
+                    </button>
+                    <button 
+                        type="button"
+                        @click="searchOpen = false"
+                        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        {{ __('btn_cancel') }}
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 

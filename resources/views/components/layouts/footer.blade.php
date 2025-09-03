@@ -49,19 +49,19 @@
                             @if (($features['category'] ?? null) === \App\Support\FeatureState::Enabled)
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('category.index', ['locale' => app()->getLocale()]) }}">{{ __('Categories') }}</x-footer-link>
+                                                   href="{{ route('categories.index', ['locale' => app()->getLocale()]) }}">{{ __('Categories') }}</x-footer-link>
                                 </li>
                             @endif
                             @if (($features['collection'] ?? null) === \App\Support\FeatureState::Enabled)
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('collection.index', ['locale' => app()->getLocale()]) }}">{{ __('Collections') }}</x-footer-link>
+                                                   href="{{ route('collections.index', ['locale' => app()->getLocale()]) }}">{{ __('Collections') }}</x-footer-link>
                                 </li>
                             @endif
                             @if (($features['brand'] ?? null) === \App\Support\FeatureState::Enabled)
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('brand.index', ['locale' => app()->getLocale()]) }}">{{ __('Brands') }}</x-footer-link>
+                                                   href="{{ route('brands.index', ['locale' => app()->getLocale()]) }}">{{ __('Brands') }}</x-footer-link>
                                 </li>
                             @endif
                             <li>
@@ -82,23 +82,30 @@
                             <p class="text-sm leading-6 text-gray-500">
                                 {{ __('Subscribe to our newsletter and get VIP access to all our exclusive offers, promotions and much more!') }}
                             </p>
-                            <form class="mt-5 sm:flex" target="_blank" novalidate>
-                                <label for="email" class="sr-only">{{ __('Email') }}</label>
-                                <input
-                                       type="email"
-                                       name="EMAIL"
-                                       id="email"
-                                       class="block w-full border-gray-300 py-2 text-sm placeholder-gray-500 focus:border-transparent focus:ring-2 focus:ring-primary-500 sm:flex-1"
-                                       placeholder="{{ __('Enter your email') }}"
-                                       required />
-                                <x-buttons.primary
-                                                   type="submit"
-                                                   whiteBorder
-                                                   class="mt-3 px-4 py-2 uppercase tracking-wider sm:ml-3 sm:mt-0 sm:inline-flex sm:w-auto sm:flex-shrink-0 sm:items-center">
-                                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6-6 6" />
-                                    </svg>
-                                </x-buttons.primary>
+                            {{-- Enhanced Newsletter Form --}}
+                            <form class="mt-5" target="_blank" novalidate>
+                                <div class="space-y-2">
+                                    <label for="newsletter-email" class="block text-sm font-medium text-gray-700">{{ __('Email') }}</label>
+                                    <div class="flex gap-3">
+                                        <input
+                                            type="email"
+                                            id="newsletter-email"
+                                            name="EMAIL"
+                                            placeholder="{{ __('Enter your email') }}"
+                                            class="flex-1 rounded-lg border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                                            required
+                                        />
+                                        <button
+                                            type="submit"
+                                            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                                        >
+                                            {{ __('Subscribe') }}
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
                             </form>
                             <!--End mc_embed_signup-->
                         </div>

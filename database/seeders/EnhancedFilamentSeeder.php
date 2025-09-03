@@ -403,3 +403,4 @@ final class EnhancedFilamentSeeder extends Seeder
         $this->command->info('Sample customers created successfully!');
     }
 }
+

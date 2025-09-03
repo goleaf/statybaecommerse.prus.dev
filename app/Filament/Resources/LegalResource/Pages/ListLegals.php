@@ -17,3 +17,4 @@ final class ListLegals extends ListRecords
         ];
     }
 }
+

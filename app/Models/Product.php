@@ -254,20 +254,86 @@ final class Product extends Model implements HasMedia
         return $this->getMedia('images')->map(function ($media) {
             return [
                 'original' => $media->getFullUrl(),
+                'xl' => $media->getFullUrl('image-xl'),
                 'lg' => $media->getFullUrl('image-lg'),
                 'md' => $media->getFullUrl('image-md'),
                 'sm' => $media->getFullUrl('image-sm'),
                 'xs' => $media->getFullUrl('image-xs'),
-                'alt' => $media->name,
+                'alt' => $media->getCustomProperty('alt_text') ?: $media->name,
+                'title' => $media->name,
+                'generated' => $media->getCustomProperty('generated', false),
             ];
         })->toArray();
+    }
+
+    public function getMainImage(?string $conversion = 'image-md'): ?string
+    {
+        return $this->getFirstMediaUrl('images', $conversion) ?: null;
+    }
+
+    public function getAllImageSizes(): array
+    {
+        $mainMedia = $this->getFirstMedia('images');
+        
+        if (!$mainMedia) {
+            return [];
+        }
+
+        return [
+            'original' => $mainMedia->getFullUrl(),
+            'xl' => $mainMedia->getFullUrl('image-xl'),
+            'lg' => $mainMedia->getFullUrl('image-lg'),
+            'md' => $mainMedia->getFullUrl('image-md'),
+            'sm' => $mainMedia->getFullUrl('image-sm'),
+            'xs' => $mainMedia->getFullUrl('image-xs'),
+        ];
+    }
+
+    public function getResponsiveImageAttributes(?string $defaultSize = 'md'): array
+    {
+        $images = $this->getAllImageSizes();
+        
+        if (empty($images)) {
+            return [
+                'src' => null,
+                'srcset' => '',
+                'sizes' => '',
+                'alt' => $this->name,
+            ];
+        }
+
+        $srcset = [
+            $images['xs'] . ' 150w',
+            $images['sm'] . ' 300w',
+            $images['md'] . ' 500w',
+            $images['lg'] . ' 800w',
+            $images['xl'] . ' 1200w',
+        ];
+
+        return [
+            'src' => $images[$defaultSize] ?? $images['md'],
+            'srcset' => implode(', ', array_filter($srcset)),
+            'sizes' => '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px',
+            'alt' => __('translations.product_image_alt', ['name' => $this->name, 'number' => 1]),
+        ];
+    }
+
+    public function hasImages(): bool
+    {
+        return $this->getMedia('images')->isNotEmpty();
+    }
+
+    public function getImagesCount(): int
+    {
+        return $this->getMedia('images')->count();
     }
 
     public function registerMediaCollections(): void
     {
         $this
             ->addMediaCollection('images')
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'])
+            ->singleFile(false);
     }
 
     public function registerMediaConversions(Media $media = null): void

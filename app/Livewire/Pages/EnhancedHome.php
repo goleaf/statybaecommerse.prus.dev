@@ -6,6 +6,8 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Product;
+use App\Livewire\Concerns\WithCart;
+use App\Livewire\Concerns\WithNotifications;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -14,7 +16,9 @@ use Livewire\Attributes\Computed;
 #[Layout('layouts.templates.app')]
 final class EnhancedHome extends Component
 {
+    use WithCart, WithNotifications;
     public string $searchQuery = '';
+    public string $newsletterEmail = '';
     public array $filters = [
         'category' => '',
         'brand' => '',
@@ -163,28 +167,19 @@ final class EnhancedHome extends Component
         ]));
     }
 
-    public function addToCart(int $productId): void
+    // addToCart method now provided by WithCart trait
+
+    public function subscribeNewsletter(): void
     {
-        $product = Product::find($productId);
-        
-        if (!$product || !$product->is_visible) {
-            $this->dispatch('notify', [
-                'type' => 'error',
-                'message' => __('Product not available'),
-            ]);
-            return;
-        }
-
-        // Add to cart logic here
-        $this->dispatch('cart:added', [
-            'product' => $product->name,
-            'id' => $productId,
+        $this->validate([
+            'newsletterEmail' => 'required|email|max:255',
         ]);
 
-        $this->dispatch('notify', [
-            'type' => 'success',
-            'message' => __('Product added to cart'),
-        ]);
+        // Here you would typically save to newsletter subscription model
+        // For now, just show success message
+        $this->notifySuccess(__('Successfully subscribed to newsletter!'));
+
+        $this->reset('newsletterEmail');
     }
 
     public function render(): View

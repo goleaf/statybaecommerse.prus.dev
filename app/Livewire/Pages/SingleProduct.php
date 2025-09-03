@@ -13,13 +13,22 @@ final class SingleProduct extends Component
     {
         $this->product = Product::where('slug', $slug)
             ->where('is_visible', true)
-            ->with(['brand', 'category', 'media', 'variants', 'reviews'])
+            ->with(['brand', 'categories', 'media', 'variants', 'reviews'])
             ->firstOrFail();
     }
 
     public function getRelatedProductsProperty()
     {
-        return Product::where('category_id', $this->product->category_id)
+        // Get related products from the same categories
+        $categoryIds = $this->product->categories->pluck('id')->toArray();
+        
+        if (empty($categoryIds)) {
+            return collect();
+        }
+        
+        return Product::whereHas('categories', function ($query) use ($categoryIds) {
+                $query->whereIn('category_id', $categoryIds);
+            })
             ->where('id', '!=', $this->product->id)
             ->where('is_visible', true)
             ->with(['media', 'brand'])

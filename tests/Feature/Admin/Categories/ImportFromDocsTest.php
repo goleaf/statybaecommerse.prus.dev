@@ -28,8 +28,8 @@ it('renders categories index with import action visible for authorized users', f
     $admin = User::factory()->create();
     if (method_exists($admin, 'assignRole')) {
         try {
-            \Spatie\Permission\Models\Role::findOrCreate(config('shopper.core.users.admin_role', 'administrator'));
-            $admin->assignRole(config('shopper.core.users.admin_role', 'administrator'));
+            \Spatie\Permission\Models\Role::findOrCreate('administrator');
+            $admin->assignRole('administrator');
         } catch (\Throwable $e) {
             // fallback: ignore role assignment in testing if tables not present
         }

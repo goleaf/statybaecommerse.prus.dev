@@ -11,7 +11,7 @@ final class ProductObserver
     public function created(Product $product): void
     {
         try {
-            $collection = config('shopper.media.storage.collection_name');
+            $collection = 'gallery'; // Default collection name for product images
             if ($product->getMedia($collection)->isNotEmpty()) {
                 return;
             }

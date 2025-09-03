@@ -5,26 +5,20 @@ namespace App\Livewire\Pages;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
+use App\Livewire\Concerns\WithFilters;
+use App\Livewire\Concerns\WithCart;
+use App\Livewire\Concerns\WithNotifications;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 final class ProductCatalog extends Component
 {
-    use WithPagination;
+    use WithFilters, WithCart, WithNotifications;
 
-    public string $search = '';
     public ?int $categoryId = null;
     public ?int $brandId = null;
-    public string $sortBy = 'created_at';
-    public string $sortDirection = 'desc';
 
     public function mount(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatedSearch(): void
     {
         $this->resetPage();
     }
@@ -41,20 +35,28 @@ final class ProductCatalog extends Component
 
     public function getProductsProperty()
     {
-        return Product::query()
-            ->with(['brand', 'category', 'media'])
+        $query = Product::query()
+            ->with(['brand', 'categories', 'media', 'prices'])
             ->where('is_visible', true)
-            ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('description', 'like', '%' . $this->search . '%')
-                      ->orWhere('sku', 'like', '%' . $this->search . '%');
-                });
-            })
-            ->when($this->categoryId, fn($query) => $query->where('category_id', $this->categoryId))
-            ->when($this->brandId, fn($query) => $query->where('brand_id', $this->brandId))
-            ->orderBy($this->sortBy, $this->sortDirection)
-            ->paginate(12);
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
+
+        // Apply shared filters
+        $query = $this->applySearchFilters($query);
+        
+        // Apply specific filters
+        if ($this->categoryId) {
+            $query->whereHas('categories', fn($q) => $q->where('categories.id', $this->categoryId));
+        }
+        
+        if ($this->brandId) {
+            $query->where('brand_id', $this->brandId);
+        }
+
+        // Apply sorting
+        $query = $this->applySorting($query);
+
+        return $query->paginate(12);
     }
 
     public function getCategoriesProperty(): Collection
@@ -65,6 +67,12 @@ final class ProductCatalog extends Component
     public function getBrandsProperty(): Collection
     {
         return Brand::where('is_visible', true)->orderBy('name')->get();
+    }
+
+    public function applyFilters(): void
+    {
+        $this->resetPage();
+        $this->notifySuccess(__('Filters applied successfully'));
     }
 
     public function render()

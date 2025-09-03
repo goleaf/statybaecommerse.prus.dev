@@ -1,16 +1,12 @@
 <div class="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow duration-200">
     <!-- Product Image -->
     <div class="aspect-square bg-gray-100 relative overflow-hidden">
-        @if ($product->getImageUrl('md'))
-            <img src="{{ $product->getImageUrl('sm') }}"
-                 srcset="{{ $product->getImageUrl('xs') }} 150w, {{ $product->getImageUrl('sm') }} 300w, {{ $product->getImageUrl('md') }} 500w"
-                 sizes="(max-width: 640px) 50vw, 300px"
-                 alt="{{ $product->trans('name') ?? $product->name }}"
-                 loading="lazy"
-                 class="w-full h-full object-cover">
-        @elseif ($product->getImageUrl())
-            <img src="{{ $product->getImageUrl() }}"
-                 alt="{{ $product->trans('name') ?? $product->name }}"
+        @if ($product->hasImages())
+            @php $imageAttrs = $product->getResponsiveImageAttributes('md'); @endphp
+            <img src="{{ $imageAttrs['src'] }}"
+                 srcset="{{ $imageAttrs['srcset'] }}"
+                 sizes="{{ $imageAttrs['sizes'] }}"
+                 alt="{{ $imageAttrs['alt'] }}"
                  loading="lazy"
                  class="w-full h-full object-cover">
         @else

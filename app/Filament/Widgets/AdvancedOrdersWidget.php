@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
+use Filament\Actions\Action;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -40,16 +41,18 @@ final class AdvancedOrdersWidget extends BaseWidget
                     ->sortable()
                     ->url(fn (Order $record): string => route('filament.admin.resources.users.view', $record->user))
                     ->openUrlInNewTab(),
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label(__('Status'))
-                    ->colors([
-                        'gray' => 'pending',
-                        'warning' => 'confirmed',
-                        'primary' => 'processing',
-                        'info' => 'shipped',
-                        'success' => 'delivered',
-                        'danger' => 'cancelled',
-                    ]),
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'gray',
+                        'confirmed' => 'warning',
+                        'processing' => 'primary',
+                        'shipped' => 'info',
+                        'delivered' => 'success',
+                        'cancelled' => 'danger',
+                        default => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('total')
                     ->label(__('Total'))
                     ->money('EUR')

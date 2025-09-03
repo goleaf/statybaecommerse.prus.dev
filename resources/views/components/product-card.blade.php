@@ -41,58 +41,58 @@
             </div>
         @endif
         
-        {{-- Badges --}}
+        {{-- Enhanced Badges with Filament Components --}}
         <div class="absolute top-3 left-3 flex flex-col gap-2">
             @if($product->is_featured)
-                <span class="inline-flex items-center rounded-md bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                <x-filament::badge color="warning" icon="heroicon-o-star">
                     {{ __('Featured') }}
-                </span>
+                </x-filament::badge>
             @endif
             
             @if($hasDiscount)
-                <span class="inline-flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
+                <x-filament::badge color="danger" icon="heroicon-o-tag">
                     {{ __('Sale') }}
-                </span>
+                </x-filament::badge>
             @endif
             
             @if($product->created_at->isAfter(now()->subDays(7)))
-                <span class="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
+                <x-filament::badge color="success" icon="heroicon-o-sparkles">
                     {{ __('New') }}
-                </span>
+                </x-filament::badge>
             @endif
         </div>
 
-        {{-- Action Buttons --}}
+        {{-- Enhanced Action Buttons with Filament Components --}}
         <div class="absolute top-3 right-3 flex flex-col gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             @if($showWishlist)
-                <button 
-                    class="rounded-full bg-white/90 p-2 text-gray-600 shadow-md hover:bg-white hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-200 dark:bg-gray-800/90 dark:text-gray-300 dark:hover:bg-gray-800"
-                    title="{{ __('Add to Wishlist') }}"
-                >
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                    </svg>
-                </button>
+                <x-filament::icon-button 
+                    icon="heroicon-o-heart"
+                    color="gray"
+                    tooltip="{{ __('Add to Wishlist') }}"
+                    class="bg-white/90 shadow-md hover:bg-white hover:text-red-500 transition-all duration-200"
+                />
             @endif
             
             @if($showCompare)
-                <button 
-                    class="rounded-full bg-white/90 p-2 text-gray-600 shadow-md hover:bg-white hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 dark:bg-gray-800/90 dark:text-gray-300 dark:hover:bg-gray-800"
-                    title="{{ __('Add to Compare') }}"
-                >
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                </button>
+                <x-filament::icon-button 
+                    icon="heroicon-o-scale"
+                    color="gray"
+                    tooltip="{{ __('Add to Compare') }}"
+                    class="bg-white/90 shadow-md hover:bg-white hover:text-blue-500 transition-all duration-200"
+                />
             @endif
         </div>
 
-        {{-- Quick View Overlay --}}
+        {{-- Enhanced Quick View Overlay --}}
         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-            <a href="{{ route('products.show', ['slug' => $product->slug, 'locale' => app()->getLocale()]) }}" 
-               class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white/25 transition-all duration-200 transform hover:scale-105">
+            <x-filament::button 
+                href="{{ route('products.show', ['slug' => $product->slug, 'locale' => app()->getLocale()]) }}"
+                color="white"
+                icon="heroicon-o-eye"
+                class="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+            >
                 {{ __('Quick View') }}
-            </a>
+            </x-filament::button>
         </div>
     </div>
     
@@ -154,33 +154,34 @@
             @endif
             
             @if($showQuickAdd)
-                <button 
+                <x-filament::button 
                     wire:click="addToCart({{ $product->id }})"
-                    class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                    title="{{ __('cart_add_to_cart') }}"
+                    color="primary"
+                    icon="heroicon-o-shopping-cart"
+                    size="sm"
+                    class="transform hover:scale-105 transition-transform duration-200"
+                    tooltip="{{ __('cart_add_to_cart') }}"
                 >
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
-                    </svg>
-                </button>
+                    {{ __('cart_add_to_cart') }}
+                </x-filament::button>
             @endif
         </div>
         
-        {{-- Stock Status --}}
+        {{-- Enhanced Stock Status with Filament Badges --}}
         @if($product->stock_quantity !== null)
             <div class="mt-2">
                 @if($product->stock_quantity > 10)
-                    <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
+                    <x-filament::badge color="success" icon="heroicon-o-check-circle" size="sm">
                         {{ __('product_in_stock') }}
-                    </span>
+                    </x-filament::badge>
                 @elseif($product->stock_quantity > 0)
-                    <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                    <x-filament::badge color="warning" icon="heroicon-o-exclamation-triangle" size="sm">
                         {{ __('product_low_stock') }} ({{ $product->stock_quantity }})
-                    </span>
+                    </x-filament::badge>
                 @else
-                    <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
+                    <x-filament::badge color="danger" icon="heroicon-o-x-circle" size="sm">
                         {{ __('product_out_of_stock') }}
-                    </span>
+                    </x-filament::badge>
                 @endif
             </div>
         @endif

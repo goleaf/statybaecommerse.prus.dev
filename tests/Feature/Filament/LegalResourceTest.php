@@ -160,3 +160,4 @@ final class LegalResourceTest extends TestCase
             ->assertCanNotSeeTableRecords([$legalB]);
     }
 }
+

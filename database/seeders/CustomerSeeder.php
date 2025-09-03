@@ -30,7 +30,7 @@ class CustomerSeeder extends Seeder
             ]);
             if (method_exists($user, 'assignRole')) {
                 try {
-                    $user->assignRole(config('shopper.core.users.customer_role', 'customer'));
+                    $user->assignRole('customer');
                 } catch (\Throwable $e) {
                     // ignore if role doesn't exist yet
                 }

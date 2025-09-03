@@ -101,3 +101,4 @@ final class ComprehensiveStatsWidget extends BaseWidget
         return auth()->user()->can('view_dashboard_stats');
     }
 }
+

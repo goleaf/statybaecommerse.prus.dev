@@ -41,19 +41,19 @@ final class AdminPanelProvider extends PanelProvider
                 'info' => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            // ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages') // Temporarily disabled
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([
                 Dashboard::class,
             ])
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 AccountWidget::class,
+                FilamentInfoWidget::class,
+                \App\Filament\Widgets\EnhancedDashboardWidget::class,
                 \App\Filament\Widgets\ComprehensiveStatsWidget::class,
-                \App\Filament\Widgets\QuickActionsWidget::class,
-                \App\Filament\Widgets\EnhancedAnalyticsWidget::class,
-                \App\Filament\Widgets\AdvancedOrdersWidget::class,
-                \App\Filament\Widgets\RecentActivityWidget::class,
-                \App\Filament\Widgets\LowStockAlertsWidget::class,
+                \App\Filament\Widgets\ModernSalesWidget::class,
+                \App\Filament\Widgets\ProductManagementWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -80,9 +80,13 @@ final class AdminPanelProvider extends PanelProvider
             ->brandName('Statyba E-Commerce')
             ->globalSearch()
             ->globalSearchDebounce('500ms')
+            ->breadcrumbs()
+            ->unsavedChangesAlerts()
+            ->databaseTransactions()
+            ->readOnlyRelationManagersOnResourceViewPagesByDefault()
             ->navigationGroups([
                 'Dashboard' => [
-                    'label' => __('Dashboard'),
+                    'label' => __('admin.navigation.dashboard'),
                     'icon' => 'heroicon-o-home',
                     'sort' => 1,
                 ],
@@ -92,12 +96,12 @@ final class AdminPanelProvider extends PanelProvider
                     'sort' => 2,
                 ],
                 'Orders' => [
-                    'label' => __('Orders'),
+                    'label' => __('admin.navigation.orders'),
                     'icon' => 'heroicon-o-shopping-bag',
                     'sort' => 3,
                 ],
                 'Customers' => [
-                    'label' => __('Customers'),
+                    'label' => __('admin.navigation.customers'),
                     'icon' => 'heroicon-o-users',
                     'sort' => 4,
                 ],
@@ -107,7 +111,7 @@ final class AdminPanelProvider extends PanelProvider
                     'sort' => 5,
                 ],
                 'Partners' => [
-                    'label' => __('Partners'),
+                    'label' => __('admin.navigation.partners'),
                     'icon' => 'heroicon-o-building-office',
                     'sort' => 6,
                 ],
@@ -117,12 +121,12 @@ final class AdminPanelProvider extends PanelProvider
                     'sort' => 7,
                 ],
                 'Documents' => [
-                    'label' => __('Documents'),
+                    'label' => __('admin.navigation.documents'),
                     'icon' => 'heroicon-o-document-duplicate',
                     'sort' => 8,
                 ],
                 'Settings' => [
-                    'label' => __('Settings'),
+                    'label' => __('admin.navigation.settings'),
                     'icon' => 'heroicon-o-cog-6-tooth',
                     'sort' => 9,
                 ],
@@ -143,7 +147,7 @@ final class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-cog-6-tooth'),
             ])
             ->plugins([
-                \Filament\SpatieLaravelMediaLibraryPlugin\SpatieMediaLibraryPlugin::make(),
+                // Plugins temporarily disabled for upgrade
             ])
             ->spa();
     }

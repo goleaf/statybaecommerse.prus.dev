@@ -9,3 +9,4 @@ final class CreateLegal extends CreateRecord
 {
     protected static string $resource = LegalResource::class;
 }
+

@@ -216,3 +216,4 @@ return [
     'unique_identifier' => 'Unique identifier for this legal page',
     'basic_information' => 'Basic Information',
 ];
+

@@ -17,8 +17,10 @@ Route::get('/', Pages\EnhancedHome::class)->name('root');
 // Enhanced frontend routes
 Route::get('/home', Pages\EnhancedHome::class)->name('home');
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
+Route::get('/products-gallery', Pages\ProductGallery::class)->name('products.gallery');
 Route::get('/categories', Pages\Category\Index::class)->name('categories.index');
 Route::get('/categories/{slug}', Pages\Category\Show::class)->name('categories.show');
+Route::get('/brands', Pages\Brand\Index::class)->name('brands.index');
 Route::get('/brands/{slug}', Pages\Brand\Show::class)->name('brands.show');
 Route::get('/collections', Pages\Collection\Index::class)->name('collections.index');
 Route::get('/collections/{slug}', Pages\Collection\Show::class)->name('collections.show');
@@ -28,6 +30,11 @@ Route::get('/cart', Pages\Cart::class)->name('cart.index');
 Route::get('/locations', Pages\Location\Index::class)->name('locations.index');
 Route::get('/locations/{slug}', Pages\Location\Show::class)->name('locations.show');
 Route::get('/legal/{slug}', Pages\LegalPage::class)->name('legal.show');
+
+// Development route for component showcase (remove in production)
+if (app()->environment(['local', 'development'])) {
+    Route::get('/components-showcase', Pages\ComponentShowcase::class)->name('components.showcase');
+}
 
 // Auth routes
 require __DIR__ . '/auth.php';

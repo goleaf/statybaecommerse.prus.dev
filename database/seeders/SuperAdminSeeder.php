@@ -27,8 +27,8 @@ class SuperAdminSeeder extends Seeder
             'remember_token' => Str::random(10),
         ]);
 
-        if (! $user->hasRole(config('shopper.core.users.admin_role', 'administrator'))) {
-            $user->assignRole(config('shopper.core.users.admin_role', 'administrator'));
+        if (! $user->hasRole('administrator')) {
+            $user->assignRole('administrator');
         }
     }
 }

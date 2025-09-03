@@ -240,3 +240,4 @@ final class ProductCatalogTest extends TestCase
             });
     }
 }
+

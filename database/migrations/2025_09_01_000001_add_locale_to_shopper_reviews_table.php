@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        $tableName = config('shopper.core.table_prefix', 'sh_') . 'reviews';
+        $tableName = 'reviews';
 
         if (Schema::hasTable($tableName) && !Schema::hasColumn($tableName, 'locale')) {
             Schema::table($tableName, function (Blueprint $table): void {
@@ -19,7 +19,7 @@ return new class extends Migration {
 
     public function down(): void
     {
-        $tableName = config('shopper.core.table_prefix', 'sh_') . 'reviews';
+        $tableName = 'reviews';
 
         if (Schema::hasTable($tableName) && Schema::hasColumn($tableName, 'locale')) {
             Schema::table($tableName, function (Blueprint $table): void {

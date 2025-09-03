@@ -23,7 +23,7 @@ final class ProductTest extends TestCase
             'published_at' => now()->subDay(),
         ]);
 
-        $response = $this->get(route('product.show', [
+        $response = $this->get(route('products.show', [
             'locale' => 'en',
             'slug' => $product->slug,
         ]));
@@ -40,7 +40,7 @@ final class ProductTest extends TestCase
             'status' => 'draft',
         ]);
 
-        $response = $this->get(route('product.show', [
+        $response = $this->get(route('products.show', [
             'locale' => 'en',
             'slug' => $product->slug,
         ]));
@@ -237,7 +237,7 @@ final class ProductTest extends TestCase
             'seo_description' => 'Custom SEO Description',
         ]);
 
-        $response = $this->get(route('product.show', [
+        $response = $this->get(route('products.show', [
             'locale' => 'en',
             'slug' => $product->slug,
         ]));

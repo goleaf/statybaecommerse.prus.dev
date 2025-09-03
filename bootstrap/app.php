@@ -30,7 +30,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         App\Providers\AuthServiceProvider::class,
         App\Providers\HorizonServiceProvider::class,
-        App\Providers\TelescopeServiceProvider::class,
         App\Providers\Filament\AdminPanelProvider::class,
     ])
     ->create();

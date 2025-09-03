@@ -54,26 +54,15 @@
                     <div wire:loading role="status" aria-live="polite" class="mb-4 text-sm text-gray-600">
                         {{ __('Loading…') }}
                     </div>
-                    @php($thumb = $product->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: ($product->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'small') ?: $product->getFirstMediaUrl(config('shopper.media.storage.collection_name'))))
-                    <livewire:components.product.images
-                                                        :thumbnail="$thumb"
-                                                        :images="$this->product
-                                                            ->getMedia(config('shopper.media.storage.collection_name'))
-                                                            ->map(function ($media) {
-                                                                return [
-                                                                    'src' =>
-                                                                        $media->getUrl('large') ?: $media->getUrl(),
-                                                                    'srcset' => trim(
-                                                                        ($media->getUrl('medium') ?: '') .
-                                                                            ' 500w, ' .
-                                                                            ($media->getUrl('large') ?: ''),
-                                                                    ),
-                                                                    'alt' =>
-                                                                        $this->product->trans('name') ??
-                                                                        $this->product->name,
-                                                                ];
-                                                            })
-                                                            ->toArray()" />
+                    
+                    {{-- Enhanced Image Gallery Component --}}
+                    <livewire:components.product-image-gallery 
+                        :product="$product" 
+                        image-size="xl" 
+                    />
+                    
+                    {{-- Alternative: Static Component --}}
+                    {{-- <x-product.detail-images :product="$product" /> --}}
 
                     @if ((string) config('shopper.features.review') === \App\Support\FeatureState::Enabled->value)
                         <livewire:components.product.reviews :productId="$product->id" />

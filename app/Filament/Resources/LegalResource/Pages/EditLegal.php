@@ -18,3 +18,4 @@ final class EditLegal extends EditRecord
         ];
     }
 }
+

@@ -178,36 +178,72 @@ final class ProductResource extends Resource
                     ])
                     ->columns(4),
                 // Media Section
-                Forms\Components\Section::make(__('Media'))
+                Forms\Components\Section::make(__('translations.media'))
                     ->components([
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('media')
-                            ->label(__('Product Images'))
+                        Forms\Components\Actions::make([
+                            Forms\Components\Actions\Action::make('generate_images')
+                                ->label(__('translations.generate_images'))
+                                ->icon('heroicon-o-photo')
+                                ->color('success')
+                                ->action(function (Product $record) {
+                                    $imageService = app(\App\Services\Images\ProductImageService::class);
+                                    
+                                    try {
+                                        // Generate 3 random images
+                                        for ($i = 0; $i < 3; $i++) {
+                                            $imagePath = $imageService->generateProductImage($record);
+                                            
+                                            $record
+                                                ->addMedia($imagePath)
+                                                ->withCustomProperties([
+                                                    'generated' => true,
+                                                    'product_name' => $record->name,
+                                                    'image_number' => $i + 1,
+                                                    'alt_text' => __('translations.product_image_alt', ['name' => $record->name, 'number' => $i + 1]),
+                                                ])
+                                                ->usingName($record->name . ' - ' . __('translations.image') . ' ' . ($i + 1))
+                                                ->usingFileName('product_' . $record->id . '_generated_' . ($i + 1) . '.webp')
+                                                ->toMediaCollection('images');
+                                            
+                                            if (file_exists($imagePath)) {
+                                                unlink($imagePath);
+                                            }
+                                        }
+                                        
+                                        \Filament\Notifications\Notification::make()
+                                            ->title(__('translations.image_generated'))
+                                            ->success()
+                                            ->send();
+                                            
+                                    } catch (\Throwable $e) {
+                                        \Filament\Notifications\Notification::make()
+                                            ->title('Klaida generuojant paveikslėlius')
+                                            ->body($e->getMessage())
+                                            ->danger()
+                                            ->send();
+                                    }
+                                })
+                                ->requiresConfirmation()
+                                ->modalHeading(__('translations.generate_images'))
+                                ->modalDescription('Ar tikrai norite sugeneruoti atsitiktinius paveikslėlius šiam produktui?')
+                                ->modalSubmitActionLabel(__('translations.generate_images'))
+                                ->visible(fn (?Product $record) => $record?->exists),
+                        ]),
+                        
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                            ->label(__('translations.product_images'))
                             ->multiple()
                             ->reorderable()
-                            ->maxFiles(10)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->maxFiles(15)
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
                             ->imageResizeMode('cover')
                             ->imageCropAspectRatio('1:1')
                             ->imageResizeTargetWidth('800')
                             ->imageResizeTargetHeight('800')
                             ->optimize('webp')
-                            ->collection('product-images')
-                            ->conversion('thumb')
-                            ->helperText(__('Upload product images. First image will be used as main image.')),
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('gallery')
-                            ->label(__('Gallery Images'))
-                            ->multiple()
-                            ->reorderable()
-                            ->maxFiles(20)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->imageResizeMode('cover')
-                            ->imageCropAspectRatio('16:9')
-                            ->imageResizeTargetWidth('1200')
-                            ->imageResizeTargetHeight('675')
-                            ->optimize('webp')
-                            ->collection('product-gallery')
-                            ->conversion('gallery')
-                            ->helperText(__('Additional product gallery images for detailed view.')),
+                            ->collection('images')
+                            ->conversion('image-md')
+                            ->helperText(__('translations.product_images') . '. ' . __('translations.webp_format') . ' ' . __('translations.image_optimization')),
                     ])
                     ->columns(1)
                     ->collapsible(),
@@ -278,13 +314,18 @@ final class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
-                    ->label(__('Image'))
-                    ->collection('product-images')
-                    ->conversion('thumb')
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('images')
+                    ->label(__('translations.image'))
+                    ->collection('images')
+                    ->conversion('image-sm')
                     ->defaultImageUrl('/images/placeholder-product.jpg')
                     ->circular()
-                    ->size(60),
+                    ->size(80)
+                    ->tooltip(fn (Product $record): string => 
+                        $record->hasImages() 
+                            ? __('translations.images') . ': ' . $record->getImagesCount()
+                            : __('translations.no_image')
+                    ),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()
@@ -372,6 +413,60 @@ final class ProductResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('generate_images')
+                        ->label(__('translations.generate_images'))
+                        ->icon('heroicon-o-photo')
+                        ->color('success')
+                        ->action(function (\Illuminate\Database\Eloquent\Collection $records) {
+                            $imageService = app(\App\Services\Images\ProductImageService::class);
+                            $successCount = 0;
+                            $errorCount = 0;
+                            
+                            foreach ($records as $product) {
+                                try {
+                                    // Generate 2-3 random images per product
+                                    $imageCount = random_int(2, 3);
+                                    
+                                    for ($i = 0; $i < $imageCount; $i++) {
+                                        $imagePath = $imageService->generateProductImage($product);
+                                        
+                                        $product
+                                            ->addMedia($imagePath)
+                                            ->withCustomProperties([
+                                                'generated' => true,
+                                                'product_name' => $product->name,
+                                                'image_number' => $i + 1,
+                                                'alt_text' => __('translations.product_image_alt', ['name' => $product->name, 'number' => $i + 1]),
+                                            ])
+                                            ->usingName($product->name . ' - ' . __('translations.image') . ' ' . ($i + 1))
+                                            ->usingFileName('product_' . $product->id . '_bulk_' . ($i + 1) . '.webp')
+                                            ->toMediaCollection('images');
+                                        
+                                        if (file_exists($imagePath)) {
+                                            unlink($imagePath);
+                                        }
+                                    }
+                                    
+                                    $successCount++;
+                                } catch (\Throwable $e) {
+                                    $errorCount++;
+                                    \Illuminate\Support\Facades\Log::warning('Bulk image generation failed', [
+                                        'product_id' => $product->id,
+                                        'error' => $e->getMessage()
+                                    ]);
+                                }
+                            }
+                            
+                            \Filament\Notifications\Notification::make()
+                                ->title(__('translations.image_generated'))
+                                ->body("Sėkmingai sugeneruota: {$successCount}, Klaidos: {$errorCount}")
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading(__('translations.generate_images'))
+                        ->modalDescription('Ar tikrai norite sugeneruoti atsitiktinius paveikslėlius pažymėtiems produktams?')
+                        ->modalSubmitActionLabel(__('translations.generate_images')),
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),

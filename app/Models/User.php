@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailNotification;
 use Illuminate\Contracts\Translation\HasLocalePreference;
@@ -17,7 +19,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class User extends Authenticatable implements HasLocalePreferenceContract
+class User extends Authenticatable implements HasLocalePreferenceContract, FilamentUser
 {
     use HasFactory, HasRoles, Notifiable, LogsActivity;
 
@@ -192,5 +194,11 @@ class User extends Authenticatable implements HasLocalePreferenceContract
     {
         $partner = $this->active_partner;
         return $partner ? $partner->effective_discount_rate : 0;
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Allow access if user is active and has admin role
+        return $this->is_active && $this->hasRole('admin');
     }
 }

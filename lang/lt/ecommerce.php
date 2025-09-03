@@ -216,3 +216,4 @@ return [
     'unique_identifier' => 'Unikalus šio teisinio puslapio identifikatorius',
     'basic_information' => 'Pagrindinė informacija',
 ];
+

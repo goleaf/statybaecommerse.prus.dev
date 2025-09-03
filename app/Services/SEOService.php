@@ -67,7 +67,7 @@ final class SEOService
         $keywords = collect([
             $product->name,
             $product->brand?->name,
-            $product->category?->name,
+            $product->categories->first()?->name,
             $product->sku,
         ])
         ->filter()
