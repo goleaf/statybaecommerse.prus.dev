@@ -6,106 +6,93 @@ use App\Models\Product;
 
 trait WithCart
 {
-    use WithNotifications;
-
-    public function addToCart(int $productId, int $quantity = 1, array $options = []): void
+    public function addToCart(int $productId, int $quantity = 1): void
     {
-        $product = Product::find($productId);
+        $product = Product::findOrFail($productId);
         
-        if (!$product || !$product->is_visible) {
-            $this->notifyError(__('translations.product_not_available'));
+        if ($product->stock_quantity < $quantity) {
+            $this->notifyError(__('Not enough stock available'));
             return;
         }
-
-        // Check stock availability
-        if ($product->stock_quantity !== null && $product->stock_quantity < $quantity) {
-            $this->notifyWarning(__('translations.insufficient_stock'));
-            return;
-        }
-
-        // Add to session cart (simplified for now)
-        $cart = session('cart', []);
-        $cartKey = $productId . '_' . md5(serialize($options));
         
-        if (isset($cart[$cartKey])) {
-            $cart[$cartKey]['quantity'] += $quantity;
+        $cartItems = session()->get('cart', []);
+        
+        if (isset($cartItems[$productId])) {
+            $cartItems[$productId]['quantity'] += $quantity;
         } else {
-            $cart[$cartKey] = [
-                'product_id' => $productId,
+            $cartItems[$productId] = [
+                'name' => $product->name,
+                'price' => $product->price,
                 'quantity' => $quantity,
-                'options' => $options,
-                'added_at' => now()->toISOString(),
+                'image' => $product->getFirstMediaUrl('images'),
+                'sku' => $product->sku,
             ];
         }
-
-        session(['cart' => $cart]);
-
-        $this->dispatch('cart:updated', [
-            'product' => $product->name,
-            'quantity' => $quantity,
-        ]);
-
-        $this->notifySuccess(__('translations.product_added_to_cart'));
+        
+        session()->put('cart', $cartItems);
+        
+        $this->dispatch('cart-updated');
+        $this->notifySuccess(__('Product added to cart'));
     }
 
-    public function removeFromCart(string $cartKey): void
+    public function removeFromCart(int $productId): void
     {
-        $cart = session('cart', []);
-        unset($cart[$cartKey]);
-        session(['cart' => $cart]);
-
-        $this->dispatch('cart:updated');
-        $this->notifySuccess(__('translations.product_removed_from_cart'));
+        $cartItems = session()->get('cart', []);
+        
+        if (isset($cartItems[$productId])) {
+            unset($cartItems[$productId]);
+            session()->put('cart', $cartItems);
+            
+            $this->dispatch('cart-updated');
+            $this->notifySuccess(__('Product removed from cart'));
+        }
     }
 
-    public function updateCartQuantity(string $cartKey, int $quantity): void
+    public function updateCartQuantity(int $productId, int $quantity): void
     {
         if ($quantity <= 0) {
-            $this->removeFromCart($cartKey);
+            $this->removeFromCart($productId);
             return;
         }
 
-        $cart = session('cart', []);
-        if (isset($cart[$cartKey])) {
-            $cart[$cartKey]['quantity'] = $quantity;
-            session(['cart' => $cart]);
+        $product = Product::find($productId);
+        if (!$product || $product->stock_quantity < $quantity) {
+            $this->notifyError(__('Not enough stock available'));
+            return;
+        }
+
+        $cartItems = session()->get('cart', []);
+        
+        if (isset($cartItems[$productId])) {
+            $cartItems[$productId]['quantity'] = $quantity;
+            session()->put('cart', $cartItems);
             
-            $this->dispatch('cart:updated');
+            $this->dispatch('cart-updated');
         }
     }
 
-    public function getCartItemsProperty(): array
+    public function getCartCount(): int
     {
-        $cart = session('cart', []);
-        $items = [];
-
-        foreach ($cart as $key => $item) {
-            $product = Product::find($item['product_id']);
-            if ($product) {
-                $items[$key] = [
-                    'product' => $product,
-                    'quantity' => $item['quantity'],
-                    'options' => $item['options'],
-                    'added_at' => $item['added_at'],
-                ];
-            }
-        }
-
-        return $items;
+        $cartItems = session()->get('cart', []);
+        return array_sum(array_column($cartItems, 'quantity'));
     }
 
-    public function getCartTotalProperty(): float
+    public function getCartTotal(): float
     {
+        $cartItems = session()->get('cart', []);
         $total = 0;
-        foreach ($this->cartItems as $item) {
-            $price = $item['product']->prices->first()?->amount ?? 0;
-            $total += $price * $item['quantity'];
+        
+        foreach ($cartItems as $item) {
+            $total += $item['price'] * $item['quantity'];
         }
+        
         return $total;
     }
 
-    public function getCartCountProperty(): int
+    public function clearCart(): void
     {
-        return array_sum(array_column($this->cartItems, 'quantity'));
+        session()->forget('cart');
+        $this->dispatch('cart-updated');
+        $this->notifySuccess(__('Cart cleared'));
     }
 }

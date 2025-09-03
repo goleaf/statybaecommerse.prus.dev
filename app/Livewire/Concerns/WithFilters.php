@@ -2,35 +2,42 @@
 
 namespace App\Livewire\Concerns;
 
+use Illuminate\Database\Eloquent\Builder;
+use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 
 trait WithFilters
 {
     use WithPagination;
 
+    #[Url]
     public string $search = '';
-    public array $selectedCategories = [];
-    public array $selectedBrands = [];
-    public array $selectedAttributes = [];
-    public ?float $minPrice = null;
-    public ?float $maxPrice = null;
-    public string $sortBy = 'created_at';
-    public string $sortDirection = 'desc';
-    public bool $inStock = false;
-    public bool $onSale = false;
 
-    protected $queryString = [
-        'search' => ['except' => ''],
-        'selectedCategories' => ['except' => []],
-        'selectedBrands' => ['except' => []],
-        'selectedAttributes' => ['except' => []],
-        'minPrice' => ['except' => null],
-        'maxPrice' => ['except' => null],
-        'sortBy' => ['except' => 'created_at'],
-        'sortDirection' => ['except' => 'desc'],
-        'inStock' => ['except' => false],
-        'onSale' => ['except' => false],
-    ];
+    #[Url]
+    public array $selectedCategories = [];
+
+    #[Url]
+    public array $selectedBrands = [];
+
+    #[Url]
+    public string $sortBy = 'name';
+
+    #[Url]
+    public string $sortDirection = 'asc';
+
+    #[Url]
+    public int $priceMin = 0;
+
+    #[Url]
+    public int $priceMax = 10000;
+
+    #[Url]
+    public string $availability = 'all';
+
+    #[Url]
+    public int $perPage = 12;
+
+    public bool $showFilters = false;
 
     public function updatedSearch(): void
     {
@@ -47,21 +54,6 @@ trait WithFilters
         $this->resetPage();
     }
 
-    public function updatedSelectedAttributes(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatedMinPrice(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatedMaxPrice(): void
-    {
-        $this->resetPage();
-    }
-
     public function updatedSortBy(): void
     {
         $this->resetPage();
@@ -72,12 +64,22 @@ trait WithFilters
         $this->resetPage();
     }
 
-    public function updatedInStock(): void
+    public function updatedPriceMin(): void
     {
         $this->resetPage();
     }
 
-    public function updatedOnSale(): void
+    public function updatedPriceMax(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedAvailability(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage(): void
     {
         $this->resetPage();
     }
@@ -88,78 +90,56 @@ trait WithFilters
             'search',
             'selectedCategories',
             'selectedBrands',
-            'selectedAttributes',
-            'minPrice',
-            'maxPrice',
-            'inStock',
-            'onSale',
+            'priceMin',
+            'priceMax',
+            'availability',
         ]);
         $this->resetPage();
     }
 
-    public function applyFilters(): void
+    public function toggleFilters(): void
     {
-        $this->resetPage();
-        $this->dispatch('filters-applied');
+        $this->showFilters = !$this->showFilters;
     }
 
-    protected function applySearchFilters($query)
+    protected function applySearchFilters(Builder $query): Builder
     {
-        if (!empty($this->search)) {
-            $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('summary', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%');
+        return $query
+            ->when($this->search, function (Builder $q) {
+                $q->where(function (Builder $subQuery) {
+                    $subQuery
+                        ->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('description', 'like', '%' . $this->search . '%')
+                        ->orWhere('sku', 'like', '%' . $this->search . '%')
+                        ->orWhereHas('brand', function (Builder $brandQuery) {
+                            $brandQuery->where('name', 'like', '%' . $this->search . '%');
+                        });
+                });
+            })
+            ->when($this->selectedCategories, function (Builder $q) {
+                $q->whereHas('categories', function (Builder $categoryQuery) {
+                    $categoryQuery->whereIn('categories.id', $this->selectedCategories);
+                });
+            })
+            ->when($this->selectedBrands, function (Builder $q) {
+                $q->whereIn('brand_id', $this->selectedBrands);
+            })
+            ->when($this->priceMin > 0, function (Builder $q) {
+                $q->where('price', '>=', $this->priceMin);
+            })
+            ->when($this->priceMax < 10000, function (Builder $q) {
+                $q->where('price', '<=', $this->priceMax);
+            })
+            ->when($this->availability === 'in_stock', function (Builder $q) {
+                $q->where('stock_quantity', '>', 0);
+            })
+            ->when($this->availability === 'out_of_stock', function (Builder $q) {
+                $q->where('stock_quantity', '<=', 0);
             });
-        }
-
-        if (!empty($this->selectedCategories)) {
-            $query->whereHas('categories', function ($q) {
-                $q->whereIn('categories.id', $this->selectedCategories);
-            });
-        }
-
-        if (!empty($this->selectedBrands)) {
-            $query->whereIn('brand_id', $this->selectedBrands);
-        }
-
-        if ($this->minPrice !== null) {
-            $query->whereHas('prices', function ($q) {
-                $q->where('amount', '>=', $this->minPrice);
-            });
-        }
-
-        if ($this->maxPrice !== null) {
-            $query->whereHas('prices', function ($q) {
-                $q->where('amount', '<=', $this->maxPrice);
-            });
-        }
-
-        if ($this->inStock) {
-            $query->where(function ($q) {
-                $q->whereNull('stock_quantity')
-                  ->orWhere('stock_quantity', '>', 0);
-            });
-        }
-
-        if ($this->onSale) {
-            $query->whereNotNull('sale_price')
-                  ->where('sale_price', '>', 0);
-        }
-
-        return $query;
     }
 
-    protected function applySorting($query)
+    protected function applySorting(Builder $query): Builder
     {
-        match ($this->sortBy) {
-            'name' => $query->orderBy('name', $this->sortDirection),
-            'price' => $query->orderBy('price', $this->sortDirection),
-            'created_at' => $query->orderBy('created_at', $this->sortDirection),
-            'updated_at' => $query->orderBy('updated_at', $this->sortDirection),
-            default => $query->orderBy('created_at', $this->sortDirection),
-        };
-
-        return $query;
+        return $query->orderBy($this->sortBy, $this->sortDirection);
     }
 }

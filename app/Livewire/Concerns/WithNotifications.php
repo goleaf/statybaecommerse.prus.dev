@@ -4,39 +4,39 @@ namespace App\Livewire\Concerns;
 
 trait WithNotifications
 {
-    public function notifySuccess(string $message, ?string $title = null): void
+    public function notifySuccess(string $message, string $title = null): void
     {
         $this->dispatch('notify', [
             'type' => 'success',
+            'title' => $title ?? __('Success'),
             'message' => $message,
-            'title' => $title,
         ]);
     }
 
-    public function notifyError(string $message, ?string $title = null): void
+    public function notifyError(string $message, string $title = null): void
     {
         $this->dispatch('notify', [
             'type' => 'error',
+            'title' => $title ?? __('Error'),
             'message' => $message,
-            'title' => $title,
         ]);
     }
 
-    public function notifyWarning(string $message, ?string $title = null): void
+    public function notifyWarning(string $message, string $title = null): void
     {
         $this->dispatch('notify', [
             'type' => 'warning',
+            'title' => $title ?? __('Warning'),
             'message' => $message,
-            'title' => $title,
         ]);
     }
 
-    public function notifyInfo(string $message, ?string $title = null): void
+    public function notifyInfo(string $message, string $title = null): void
     {
         $this->dispatch('notify', [
             'type' => 'info',
+            'title' => $title ?? __('Information'),
             'message' => $message,
-            'title' => $title,
         ]);
     }
 }
