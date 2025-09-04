@@ -11,6 +11,23 @@ final class Review extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($review) {
+            if ($review->rating < 1 || $review->rating > 5) {
+                throw new \InvalidArgumentException('Rating must be between 1 and 5');
+            }
+        });
+        
+        static::updating(function ($review) {
+            if ($review->rating < 1 || $review->rating > 5) {
+                throw new \InvalidArgumentException('Rating must be between 1 and 5');
+            }
+        });
+    }
+
     protected $table = 'reviews';
 
     protected $fillable = [
@@ -23,6 +40,8 @@ final class Review extends Model
         'content',
         'is_approved',
         'locale',
+        'approved_at',
+        'rejected_at',
     ];
 
     protected function casts(): array
@@ -30,6 +49,8 @@ final class Review extends Model
         return [
             'rating' => 'integer',
             'is_approved' => 'boolean',
+            'approved_at' => 'datetime',
+            'rejected_at' => 'datetime',
         ];
     }
 
@@ -56,6 +77,27 @@ final class Review extends Model
     public function scopeByRating($query, int $rating)
     {
         return $query->where('rating', $rating);
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('is_approved', false)->whereNull('rejected_at');
+    }
+
+    public function approve(): bool
+    {
+        $this->is_approved = true;
+        $this->approved_at = now();
+        $this->rejected_at = null;
+        return $this->save();
+    }
+
+    public function reject(): bool
+    {
+        $this->is_approved = false;
+        $this->rejected_at = now();
+        $this->approved_at = null;
+        return $this->save();
     }
 }
 

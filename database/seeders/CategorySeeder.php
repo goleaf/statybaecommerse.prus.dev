@@ -3,13 +3,19 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
+    private LocalImageGeneratorService $imageGenerator;
+
+    public function __construct()
+    {
+        $this->imageGenerator = new LocalImageGeneratorService();
+    }
+
     /**
      * Run the database seeder.
      */
@@ -159,44 +165,36 @@ class CategorySeeder extends Seeder
     }
 
     /**
-     * Download image from URL and attach it to the category
+     * Generate local WebP image and attach it to the category
      */
     private function downloadAndAttachImage(Category $category, string $imageUrl, string $collection, string $name): void
     {
         try {
-            $response = Http::timeout(30)->get($imageUrl);
+            // Generate local WebP image instead of downloading
+            $imagePath = $this->imageGenerator->generateCategoryImage($category->name);
 
-            if ($response->successful()) {
-                $extension = 'jpg';
-                $filename = Str::slug($name) . '.' . $extension;
-
-                // Ensure temp directory exists
-                $tempDir = storage_path('app/temp');
-                if (!is_dir($tempDir)) {
-                    mkdir($tempDir, 0755, true);
-                }
-
-                $tempPath = $tempDir . '/' . $filename;
-
-                // Save temporary file
-                file_put_contents($tempPath, $response->body());
+            if (file_exists($imagePath)) {
+                $filename = Str::slug($name) . '.webp';
 
                 // Add media to category
                 $category
-                    ->addMedia($tempPath)
+                    ->addMedia($imagePath)
+                    ->withCustomProperties(['source' => 'local_generated'])
                     ->usingName($name)
                     ->usingFileName($filename)
                     ->toMediaCollection($collection);
 
                 // Clean up temporary file
-                if (file_exists($tempPath)) {
-                    unlink($tempPath);
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
                 }
 
-                $this->command->info("✓ Added {$collection} image for {$category->name}");
+                $this->command->info("✓ Generated {$collection} WebP image for {$category->name}");
+            } else {
+                $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}");
             }
         } catch (\Exception $e) {
-            $this->command->warn("✗ Failed to download {$collection} image for {$category->name}: " . $e->getMessage());
+            $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}: " . $e->getMessage());
         }
     }
 }

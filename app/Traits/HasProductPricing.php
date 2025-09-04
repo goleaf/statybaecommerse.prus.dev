@@ -4,7 +4,7 @@ namespace App\Traits;
 
 use App\DTO\PriceData;
 use Illuminate\Support\Facades\DB;
-// Legacy Shopper\Core\Helpers\Price removed - using native Laravel helpers
+// Using native Laravel helpers and custom PriceData DTO
 
 trait HasProductPricing
 {
@@ -64,7 +64,7 @@ trait HasProductPricing
                     ->where('product_id', $this->id)
                     ->value('net_amount');
                 if ($net !== null) {
-                    $value = Price::from((float) $net, $currencyCode);
+                    $value = (float) $net;
                 }
             }
         } catch (\Throwable $e) {

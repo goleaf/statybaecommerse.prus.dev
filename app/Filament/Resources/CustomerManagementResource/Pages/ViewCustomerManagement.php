@@ -6,7 +6,7 @@ use App\Filament\Resources\CustomerManagementResource;
 use App\Models\User;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components;
 
 final class ViewCustomerManagement extends ViewRecord
@@ -25,10 +25,10 @@ final class ViewCustomerManagement extends ViewRecord
         return __('Customer Details');
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
+        return $schema
+            ->components([
                 Components\Section::make(__('Customer Information'))
                     ->schema([
                         Components\TextEntry::make('name')

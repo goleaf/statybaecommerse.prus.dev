@@ -7,14 +7,19 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class WebPConversionService
 {
+    private const WEBP_QUALITY = 90;
+    private const MAX_WIDTH = 1920;
+    private const MAX_HEIGHT = 1920;
+    private const THUMBNAIL_WIDTH = 400;
+    private const THUMBNAIL_HEIGHT = 400;
+
     public function convertExistingImages(): void
     {
         Log::info('Starting WebP conversion for existing images');
 
         Media::query()
-            ->where('collection_name', 'images')
             ->where('mime_type', '!=', 'image/webp')
-            ->whereIn('mime_type', ['image/jpeg', 'image/jpg', 'image/png'])
+            ->whereIn('mime_type', ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'])
             ->chunkById(50, function ($mediaItems) {
                 foreach ($mediaItems as $media) {
                     $this->convertMediaToWebP($media);
@@ -28,128 +33,309 @@ final class WebPConversionService
     {
         try {
             $originalPath = $media->getPath();
-            
+
             if (!file_exists($originalPath)) {
-                Log::warning("Original file not found for media ID: {$media->id}");
+                Log::warning("Original file not found: {$originalPath}");
                 return false;
             }
 
-            // Check if already WebP
-            if ($media->mime_type === 'image/webp') {
-                return true;
-            }
+            // Create WebP version
+            $webpPath = $this->generateWebPPath($originalPath);
 
-            $webpPath = $this->convertImageToWebP($originalPath);
-            
-            if ($webpPath && file_exists($webpPath)) {
+            if ($this->convertImageToWebP($originalPath, $webpPath)) {
                 // Update media record
                 $media->update([
-                    'file_name' => pathinfo($webpPath, PATHINFO_BASENAME),
+                    'file_name' => basename($webpPath),
                     'mime_type' => 'image/webp',
                     'size' => filesize($webpPath),
                 ]);
 
-                // Replace original file
-                if (rename($webpPath, $originalPath)) {
-                    Log::info("Successfully converted media ID {$media->id} to WebP");
-                    return true;
+                // Remove original file if different from WebP
+                if ($originalPath !== $webpPath && file_exists($originalPath)) {
+                    unlink($originalPath);
                 }
+
+                Log::info("Successfully converted {$media->name} to WebP");
+                return true;
             }
 
             return false;
-        } catch (\Throwable $e) {
-            Log::error("Failed to convert media ID {$media->id} to WebP: " . $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error("Failed to convert media {$media->id} to WebP: " . $e->getMessage());
             return false;
         }
     }
 
-    private function convertImageToWebP(string $imagePath): ?string
+    public function convertImageToWebP(string $sourcePath, string $outputPath): bool
     {
+        if (!extension_loaded('gd')) {
+            Log::error('GD extension is required for WebP conversion');
+            return false;
+        }
+
         if (!function_exists('imagewebp')) {
-            throw new \RuntimeException('WebP support is not available in GD extension.');
+            Log::error('WebP support is not available in GD extension');
+            return false;
         }
 
-        $info = getimagesize($imagePath);
-        if (!$info) {
-            return null;
+        $imageInfo = getimagesize($sourcePath);
+        if (!$imageInfo) {
+            Log::error("Invalid image file: {$sourcePath}");
+            return false;
         }
 
-        $image = match ($info[2]) {
-            IMAGETYPE_JPEG => imagecreatefromjpeg($imagePath),
-            IMAGETYPE_PNG => imagecreatefrompng($imagePath),
-            IMAGETYPE_GIF => imagecreatefromgif($imagePath),
-            default => null,
+        $mimeType = $imageInfo['mime'];
+
+        // Create image resource based on type
+        $image = match ($mimeType) {
+            'image/jpeg' => imagecreatefromjpeg($sourcePath),
+            'image/png' => imagecreatefrompng($sourcePath),
+            'image/gif' => imagecreatefromgif($sourcePath),
+            'image/webp' => imagecreatefromwebp($sourcePath),
+            default => null
         };
 
         if (!$image) {
-            return null;
+            Log::error("Failed to create image resource from: {$sourcePath}");
+            return false;
         }
 
         // Preserve transparency for PNG
-        if ($info[2] === IMAGETYPE_PNG) {
+        if ($mimeType === 'image/png') {
             imagealphablending($image, false);
             imagesavealpha($image, true);
         }
 
-        $webpPath = preg_replace('/\.[^.]+$/', '.webp', $imagePath);
-        
-        if (!imagewebp($image, $webpPath, 85)) {
-            imagedestroy($image);
-            return null;
+        // Ensure output directory exists
+        $outputDir = dirname($outputPath);
+        if (!is_dir($outputDir)) {
+            mkdir($outputDir, 0755, true);
         }
 
+        // Convert to WebP
+        $success = imagewebp($image, $outputPath, self::WEBP_QUALITY);
         imagedestroy($image);
-        return $webpPath;
+
+        if (!$success) {
+            Log::error("Failed to save WebP image: {$outputPath}");
+            return false;
+        }
+
+        return true;
+    }
+
+    public function convertAllCollections(): void
+    {
+        $collections = ['images', 'logo', 'banner', 'icon', 'gallery'];
+
+        foreach ($collections as $collection) {
+            Log::info("Converting {$collection} collection to WebP");
+
+            Media::query()
+                ->where('collection_name', $collection)
+                ->where('mime_type', '!=', 'image/webp')
+                ->whereIn('mime_type', ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'])
+                ->chunkById(25, function ($mediaItems) {
+                    foreach ($mediaItems as $media) {
+                        $this->convertMediaToWebP($media);
+                    }
+                });
+        }
     }
 
     public function getWebPSupport(): array
     {
         return [
-            'gd_webp_support' => function_exists('imagewebp'),
-            'imagick_webp_support' => extension_loaded('imagick') && in_array('WEBP', \Imagick::queryFormats()),
-            'system_webp_support' => $this->checkSystemWebPSupport(),
+            'gd_extension' => extension_loaded('gd'),
+            'webp_function' => function_exists('imagewebp'),
+            'webp_support' => $this->checkWebPSupport(),
         ];
     }
 
-    private function checkSystemWebPSupport(): bool
+    private function checkWebPSupport(): bool
     {
-        if (function_exists('imagewebp')) {
-            // Create a small test image
-            $testImage = imagecreatetruecolor(1, 1);
-            $tmpPath = sys_get_temp_dir() . '/webp_test_' . uniqid() . '.webp';
-            
-            $result = imagewebp($testImage, $tmpPath);
-            imagedestroy($testImage);
-            
-            if ($result && file_exists($tmpPath)) {
-                unlink($tmpPath);
-                return true;
-            }
+        if (!function_exists('imagewebp')) {
+            return false;
         }
-        
+
+        // Create a small test image
+        $testImage = imagecreatetruecolor(1, 1);
+        $tmpPath = sys_get_temp_dir() . '/webp_test_' . uniqid() . '.webp';
+
+        $result = imagewebp($testImage, $tmpPath, 85);
+        imagedestroy($testImage);
+
+        if ($result && file_exists($tmpPath)) {
+            unlink($tmpPath);
+            return true;
+        }
+
         return false;
     }
 
-    public function optimizeImageQuality(string $imagePath, int $quality = 85): bool
+    private function generateWebPPath(string $originalPath): string
+    {
+        $pathInfo = pathinfo($originalPath);
+        return $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.webp';
+    }
+
+    /**
+     * Convert and optimize image to WebP with size constraints
+     */
+    public function convertAndOptimizeToWebP(string $sourcePath, ?string $outputPath = null, bool $createThumbnail = false): array
+    {
+        if (!file_exists($sourcePath)) {
+            throw new \InvalidArgumentException("Source file does not exist: {$sourcePath}");
+        }
+
+        $results = [];
+
+        // Generate output path if not provided
+        if (!$outputPath) {
+            $pathInfo = pathinfo($sourcePath);
+            $outputPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.webp';
+        }
+
+        // Convert main image
+        $mainImage = $this->processImage($sourcePath, $outputPath, self::MAX_WIDTH, self::MAX_HEIGHT);
+        if ($mainImage) {
+            $results['main'] = $mainImage;
+        }
+
+        // Create thumbnail if requested
+        if ($createThumbnail) {
+            $thumbnailPath = $this->generateThumbnailPath($outputPath);
+            $thumbnail = $this->processImage($sourcePath, $thumbnailPath, self::THUMBNAIL_WIDTH, self::THUMBNAIL_HEIGHT);
+            if ($thumbnail) {
+                $results['thumbnail'] = $thumbnail;
+            }
+        }
+
+        return $results;
+    }
+
+    private function processImage(string $sourcePath, string $outputPath, int $maxWidth, int $maxHeight): ?array
     {
         try {
-            $info = getimagesize($imagePath);
-            if (!$info || $info[2] !== IMAGETYPE_WEBP) {
-                return false;
+            $imageInfo = getimagesize($sourcePath);
+            if (!$imageInfo) {
+                throw new \InvalidArgumentException("Invalid image file: {$sourcePath}");
             }
 
-            $image = imagecreatefromwebp($imagePath);
+            [$originalWidth, $originalHeight, $imageType] = $imageInfo;
+
+            // Create image resource based on type
+            $image = match ($imageType) {
+                IMAGETYPE_JPEG => imagecreatefromjpeg($sourcePath),
+                IMAGETYPE_PNG => imagecreatefrompng($sourcePath),
+                IMAGETYPE_GIF => imagecreatefromgif($sourcePath),
+                IMAGETYPE_WEBP => imagecreatefromwebp($sourcePath),
+                default => throw new \InvalidArgumentException("Unsupported image type: {$imageType}")
+            };
+
             if (!$image) {
-                return false;
+                throw new \RuntimeException("Failed to create image resource from: {$sourcePath}");
             }
 
-            $result = imagewebp($image, $imagePath, $quality);
+            // Calculate new dimensions maintaining aspect ratio
+            [$newWidth, $newHeight] = $this->calculateDimensions($originalWidth, $originalHeight, $maxWidth, $maxHeight);
+
+            // Create resized image if dimensions changed
+            if ($newWidth !== $originalWidth || $newHeight !== $originalHeight) {
+                $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+
+                // Preserve transparency for PNG/GIF
+                if ($imageType === IMAGETYPE_PNG || $imageType === IMAGETYPE_GIF) {
+                    imagealphablending($resizedImage, false);
+                    imagesavealpha($resizedImage, true);
+                    $transparent = imagecolorallocatealpha($resizedImage, 255, 255, 255, 127);
+                    imagefill($resizedImage, 0, 0, $transparent);
+                }
+
+                imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
+                imagedestroy($image);
+                $image = $resizedImage;
+            }
+
+            // Ensure output directory exists
+            $outputDir = dirname($outputPath);
+            if (!is_dir($outputDir)) {
+                mkdir($outputDir, 0755, true);
+            }
+
+            // Save as WebP
+            $success = imagewebp($image, $outputPath, self::WEBP_QUALITY);
             imagedestroy($image);
 
-            return $result;
+            if (!$success) {
+                throw new \RuntimeException("Failed to save WebP image: {$outputPath}");
+            }
+
+            return [
+                'path' => $outputPath,
+                'size' => filesize($outputPath),
+                'width' => $newWidth,
+                'height' => $newHeight,
+                'original_size' => filesize($sourcePath),
+                'compression_ratio' => round((1 - filesize($outputPath) / filesize($sourcePath)) * 100, 2)
+            ];
         } catch (\Throwable $e) {
-            Log::error("Failed to optimize WebP quality: " . $e->getMessage());
-            return false;
+            Log::error('Image processing failed', [
+                'source' => $sourcePath,
+                'output' => $outputPath,
+                'error' => $e->getMessage()
+            ]);
+            return null;
         }
+    }
+
+    private function calculateDimensions(int $originalWidth, int $originalHeight, int $maxWidth, int $maxHeight): array
+    {
+        if ($originalWidth <= $maxWidth && $originalHeight <= $maxHeight) {
+            return [$originalWidth, $originalHeight];
+        }
+
+        $widthRatio = $maxWidth / $originalWidth;
+        $heightRatio = $maxHeight / $originalHeight;
+        $ratio = min($widthRatio, $heightRatio);
+
+        return [
+            (int) round($originalWidth * $ratio),
+            (int) round($originalHeight * $ratio)
+        ];
+    }
+
+    private function generateThumbnailPath(string $mainPath): string
+    {
+        $pathInfo = pathinfo($mainPath);
+        return $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '_thumb.webp';
+    }
+
+    /**
+     * Batch convert multiple images with progress tracking
+     */
+    public function batchConvertImages(array $imagePaths, callable $progressCallback = null): array
+    {
+        $results = [];
+        $total = count($imagePaths);
+
+        foreach ($imagePaths as $index => $imagePath) {
+            try {
+                $result = $this->convertAndOptimizeToWebP($imagePath, null, true);
+                $results[$imagePath] = $result;
+
+                if ($progressCallback) {
+                    $progressCallback($index + 1, $total, $imagePath, $result);
+                }
+            } catch (\Throwable $e) {
+                $results[$imagePath] = ['error' => $e->getMessage()];
+
+                if ($progressCallback) {
+                    $progressCallback($index + 1, $total, $imagePath, ['error' => $e->getMessage()]);
+                }
+            }
+        }
+
+        return $results;
     }
 }

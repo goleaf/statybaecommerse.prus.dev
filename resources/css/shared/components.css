@@ -102,15 +102,15 @@
 }
 
 .loading-text {
-    @apply loading-skeleton h-4 w-24;
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded h-4 w-24;
 }
 
 .loading-title {
-    @apply loading-skeleton h-6 w-48;
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded h-6 w-48;
 }
 
 .loading-image {
-    @apply loading-skeleton aspect-square w-full;
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded aspect-square w-full;
 }
 
 /* Responsive Grid Utilities */
@@ -153,43 +153,56 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 @keyframes slideUp {
-    from { 
+    from {
         opacity: 0;
         transform: translateY(20px);
     }
-    to { 
+
+    to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
 @keyframes slideDown {
-    from { 
+    from {
         opacity: 0;
         transform: translateY(-20px);
     }
-    to { 
+
+    to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
 @keyframes scaleIn {
-    from { 
+    from {
         opacity: 0;
         transform: scale(0.95);
     }
-    to { 
+
+    to {
         opacity: 1;
         transform: scale(1);
     }
@@ -229,7 +242,7 @@
 }
 
 .search-backdrop {
-    @apply fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity;
+    @apply fixed inset-0 bg-gray-500/75 transition-opacity;
 }
 
 /* Print Styles */
@@ -237,15 +250,15 @@
     .no-print {
         display: none !important;
     }
-    
+
     .print-only {
         display: block !important;
     }
-    
+
     .card {
         @apply shadow-none border border-gray-300;
     }
-    
+
     .btn-primary,
     .btn-secondary,
     .btn-danger,

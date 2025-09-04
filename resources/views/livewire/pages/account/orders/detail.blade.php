@@ -1,5 +1,5 @@
 <?php
-use Shopper\Core\Models\Order;
+use App\Models\Order;
 
 use function Livewire\Volt\{layout, mount, state, title};
 
@@ -8,7 +8,7 @@ layout('components.layouts.templates.account');
 state(['order' => null]);
 
 mount(function (string $number): void {
-    $this->order = Order::with(['items', 'items.product', 'shippingOption', 'shippingAddress', 'paymentMethod'])
+    $this->order = Order::with(['items', 'items.product', 'shipping'])
         ->where('number', $number)
         ->firstOrFail();
 });
@@ -51,7 +51,7 @@ title(__('Details of your order'));
                     {{ __('Total') }}
                 </dt>
                 <dd class="mt-1 text-gray-500">
-                    {{ shopper_money_format($order->total() + $order->shippingOption->price, $order->currency_code) }}
+                    {{ app_money_format($order->total ?? 0.0, $order->currency) }}
                 </dd>
             </div>
             <div class="text-sm">
@@ -62,7 +62,7 @@ title(__('Details of your order'));
             </div>
         </div>
 
-        <x-order.items :items="$order->items" :currency_code="$order->currency_code" />
+        <x-order.items :items="$order->items" :currency_code="$order->currency" />
 
         <div class="max-w-xl">
             <div class="flex items-end justify-end">

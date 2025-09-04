@@ -2,160 +2,197 @@
 
 namespace App\Livewire\Components;
 
+use App\Models\AnalyticsEvent;
 use App\Models\Product;
-use App\Models\ProductVariant;
-use Illuminate\Contracts\View\View;
-use Livewire\Attributes\Validate;
+use App\Models\ProductComparison;
+use App\Models\UserWishlist;
+use App\Models\WishlistItem;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 final class EnhancedProductCard extends Component
 {
     public Product $product;
     public bool $showQuickView = false;
-    public bool $showVariants = false;
-    public ?ProductVariant $selectedVariant = null;
-    public int $quantity = 1;
-    public bool $isWishlisted = false;
-    public bool $showCompare = false;
+    public bool $showCompare = true;
+    public bool $showWishlist = true;
+    public string $layout = 'grid'; // grid, list, minimal
+    public bool $isInWishlist = false;
+    public bool $isInComparison = false;
 
-    #[Validate('required|integer|min:1')]
-    public int $quickViewQuantity = 1;
-
-    public function mount(Product $product): void
+    public function mount(): void
     {
-        $this->product = $product;
-        $this->selectedVariant = $product->variants->first();
         $this->checkWishlistStatus();
-    }
-
-    public function toggleQuickView(): void
-    {
-        $this->showQuickView = !$this->showQuickView;
-        if ($this->showQuickView) {
-            $this->dispatch('open-quick-view', productId: $this->product->id);
-        }
-    }
-
-    public function selectVariant(int $variantId): void
-    {
-        $this->selectedVariant = $this->product->variants->find($variantId);
-        $this->showVariants = false;
+        $this->checkComparisonStatus();
     }
 
     public function addToCart(): void
     {
-        if (!$this->selectedVariant) {
-            session()->flash('error', __('Please select a variant'));
-            return;
-        }
+        $this->dispatch('add-to-cart', [
+            'product_id' => $this->product->id,
+            'quantity' => 1,
+        ]);
 
-        if ($this->selectedVariant->stock_quantity < $this->quantity) {
-            session()->flash('error', __('Insufficient stock'));
-            return;
-        }
+        // Track analytics
+        AnalyticsEvent::track('add_to_cart', [
+            'product_id' => $this->product->id,
+            'product_name' => $this->product->name,
+            'product_price' => $this->product->price,
+        ]);
 
-        // Add to cart logic
-        $cartItems = session()->get('cart', []);
-        $key = $this->selectedVariant->id;
-
-        if (isset($cartItems[$key])) {
-            $cartItems[$key]['quantity'] += $this->quantity;
-        } else {
-            $cartItems[$key] = [
-                'product_id' => $this->product->id,
-                'variant_id' => $this->selectedVariant->id,
-                'quantity' => $this->quantity,
-                'price' => $this->selectedVariant->price,
-                'name' => $this->product->name,
-                'image' => $this->product->getFirstMediaUrl('gallery'),
-            ];
-        }
-
-        session()->put('cart', $cartItems);
-        $this->dispatch('cart-updated');
-        session()->flash('success', __('Product added to cart'));
-    }
-
-    public function quickAddToCart(): void
-    {
-        $this->quantity = $this->quickViewQuantity;
-        $this->addToCart();
-        $this->showQuickView = false;
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => __('translations.product_added_to_cart', ['name' => $this->product->name]),
+        ]);
     }
 
     public function toggleWishlist(): void
     {
         if (!auth()->check()) {
-            $this->redirect(route('login'));
+            $this->dispatch('notify', [
+                'type' => 'warning',
+                'message' => __('translations.login_required_for_wishlist'),
+            ]);
             return;
         }
 
-        $user = auth()->user();
-        
-        if ($this->isWishlisted) {
-            // Remove from wishlist
-            $user->wishlist()->detach($this->product->id);
-            $this->isWishlisted = false;
-            session()->flash('success', __('Removed from wishlist'));
-        } else {
-            // Add to wishlist
-            $user->wishlist()->attach($this->product->id);
-            $this->isWishlisted = true;
-            session()->flash('success', __('Added to wishlist'));
+        $wishlist = UserWishlist::where('user_id', auth()->id())
+            ->where('is_default', true)
+            ->first();
+
+        if (!$wishlist) {
+            $wishlist = UserWishlist::create([
+                'user_id' => auth()->id(),
+                'name' => __('translations.my_wishlist'),
+                'is_default' => true,
+            ]);
         }
+
+        if ($this->isInWishlist) {
+            $wishlist->removeProduct($this->product->id);
+            $this->isInWishlist = false;
+            $message = __('translations.product_removed_from_wishlist');
+        } else {
+            $wishlist->addProduct($this->product->id);
+            $this->isInWishlist = true;
+            $message = __('translations.product_added_to_wishlist');
+        }
+
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => $message,
+        ]);
 
         $this->dispatch('wishlist-updated');
     }
 
-    public function addToCompare(): void
+    public function toggleComparison(): void
     {
-        $compareItems = session()->get('compare', []);
-        
-        if (count($compareItems) >= 4) {
-            session()->flash('error', __('You can compare maximum 4 products'));
-            return;
+        $sessionId = session()->getId();
+        $userId = auth()->id();
+
+        $comparison = ProductComparison::where(function ($query) use ($sessionId, $userId) {
+            if ($userId) {
+                $query->where('user_id', $userId);
+            } else {
+                $query->where('session_id', $sessionId);
+            }
+        })
+        ->where('product_id', $this->product->id)
+        ->first();
+
+        if ($comparison) {
+            $comparison->delete();
+            $this->isInComparison = false;
+            $message = __('translations.product_removed_from_comparison');
+        } else {
+            ProductComparison::create([
+                'session_id' => $sessionId,
+                'user_id' => $userId,
+                'product_id' => $this->product->id,
+            ]);
+            $this->isInComparison = true;
+            $message = __('translations.product_added_to_comparison');
         }
 
-        if (!in_array($this->product->id, $compareItems)) {
-            $compareItems[] = $this->product->id;
-            session()->put('compare', $compareItems);
-            $this->dispatch('compare-updated');
-            session()->flash('success', __('Added to comparison'));
-        }
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => $message,
+        ]);
+
+        $this->dispatch('comparison-updated');
     }
 
-    public function getDiscountPercentageProperty(): ?float
+    public function quickView(): void
     {
-        if (!$this->selectedVariant || !$this->selectedVariant->compare_price) {
-            return null;
-        }
+        // Track analytics
+        AnalyticsEvent::track('product_view', [
+            'product_id' => $this->product->id,
+            'product_name' => $this->product->name,
+            'view_type' => 'quick_view',
+        ]);
 
-        return round((($this->selectedVariant->compare_price - $this->selectedVariant->price) / $this->selectedVariant->compare_price) * 100);
+        $this->dispatch('open-quick-view', [
+            'product_id' => $this->product->id,
+        ]);
     }
 
-    public function getAverageRatingProperty(): float
+    public function viewProduct(): void
     {
-        return $this->product->reviews()->where('is_approved', true)->avg('rating') ?? 0;
+        // Track analytics
+        AnalyticsEvent::track('product_view', [
+            'product_id' => $this->product->id,
+            'product_name' => $this->product->name,
+            'view_type' => 'full_page',
+        ]);
+
+        return $this->redirect(route('products.show', $this->product));
     }
 
-    public function getReviewCountProperty(): int
+    #[On('wishlist-updated')]
+    public function refreshWishlistStatus(): void
     {
-        return $this->product->reviews()->where('is_approved', true)->count();
+        $this->checkWishlistStatus();
+    }
+
+    #[On('comparison-updated')]
+    public function refreshComparisonStatus(): void
+    {
+        $this->checkComparisonStatus();
     }
 
     private function checkWishlistStatus(): void
     {
-        if (auth()->check()) {
-            $this->isWishlisted = auth()->user()->wishlist()->where('product_id', $this->product->id)->exists();
+        if (!auth()->check()) {
+            $this->isInWishlist = false;
+            return;
         }
+
+        $this->isInWishlist = WishlistItem::whereHas('wishlist', function ($query) {
+            $query->where('user_id', auth()->id());
+        })
+        ->where('product_id', $this->product->id)
+        ->exists();
     }
 
-    public function render(): View
+    private function checkComparisonStatus(): void
     {
-        return view('livewire.components.enhanced-product-card', [
-            'discountPercentage' => $this->discountPercentage,
-            'averageRating' => $this->averageRating,
-            'reviewCount' => $this->reviewCount,
-        ]);
+        $sessionId = session()->getId();
+        $userId = auth()->id();
+
+        $this->isInComparison = ProductComparison::where(function ($query) use ($sessionId, $userId) {
+            if ($userId) {
+                $query->where('user_id', $userId);
+            } else {
+                $query->where('session_id', $sessionId);
+            }
+        })
+        ->where('product_id', $this->product->id)
+        ->exists();
+    }
+
+    public function render()
+    {
+        return view('livewire.components.enhanced-product-card');
     }
 }

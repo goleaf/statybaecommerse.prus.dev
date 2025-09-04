@@ -65,7 +65,7 @@
                                 'inline-flex flex-col items-center gap-1 overflow-hidden text-sm/5 text-gray-500 px-2 py-1.5 ring-1 ring-gray-100 hover:ring-gray-200',
                                 'ring-2 ring-primary-600' => $variant->id === $selectedVariantId,
                             ])>
-                        @php($thumb = $variant->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: ($variant->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'small') ?: ($variant->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'medium') ?: $variant->getFirstMediaUrl(config('shopper.media.storage.collection_name')))))
+                        @php($thumb = $variant->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: ($variant->getFirstMediaUrl(config('media.storage.collection_name'), 'small') ?: ($variant->getFirstMediaUrl(config('media.storage.collection_name'), 'medium') ?: $variant->getFirstMediaUrl(config('media.storage.collection_name')))))
                         @if ($thumb)
                             <img
                                  src="{{ $thumb }}"

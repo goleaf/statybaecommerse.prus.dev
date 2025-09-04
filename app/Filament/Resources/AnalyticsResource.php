@@ -6,13 +6,14 @@ use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\DatabaseDateService;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 final class AnalyticsResource extends Resource
 {
@@ -47,9 +48,9 @@ final class AnalyticsResource extends Resource
                     ->with(['user', 'items.product'])
                     ->select([
                         'orders.*',
-                        DB::raw('DATE(orders.created_at) as order_date'),
-                        DB::raw('MONTH(orders.created_at) as order_month'),
-                        DB::raw('YEAR(orders.created_at) as order_year'),
+                        DB::raw(DatabaseDateService::dateExpression('orders.created_at') . ' as order_date'),
+                        DB::raw(DatabaseDateService::monthExpression('orders.created_at') . ' as order_month'),
+                        DB::raw(DatabaseDateService::yearExpression('orders.created_at') . ' as order_year'),
                     ])
             )
             ->columns([
@@ -58,23 +59,19 @@ final class AnalyticsResource extends Resource
                     ->date()
                     ->sortable()
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('reference')
                     ->label(__('Order #'))
                     ->searchable()
                     ->copyable()
                     ->weight('medium'),
-
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('Customer'))
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('items_count')
                     ->label(__('Items'))
                     ->counts('items')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('total')
                     ->label(__('Total'))
                     ->money('EUR')
@@ -87,11 +84,10 @@ final class AnalyticsResource extends Resource
                             ->money('EUR')
                             ->label(__('Avg Order Value')),
                     ]),
-
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('Status'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'pending' => 'warning',
                         'processing' => 'info',
                         'shipped' => 'primary',
@@ -101,7 +97,6 @@ final class AnalyticsResource extends Resource
                         default => 'secondary',
                     })
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Created'))
                     ->dateTime()
@@ -111,7 +106,6 @@ final class AnalyticsResource extends Resource
             ->filters([
                 Tables\Filters\DateFilter::make('created_at')
                     ->label(__('Order Date')),
-
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('Status'))
                     ->options([
@@ -122,20 +116,18 @@ final class AnalyticsResource extends Resource
                         'cancelled' => __('Cancelled'),
                         'refunded' => __('Refunded'),
                     ]),
-
                 Tables\Filters\Filter::make('high_value')
                     ->label(__('High Value Orders'))
-                    ->query(fn (Builder $query): Builder => $query->where('total', '>', 500))
+                    ->query(fn(Builder $query): Builder => $query->where('total', '>', 500))
                     ->toggle(),
-
                 Tables\Filters\Filter::make('this_month')
                     ->label(__('This Month'))
-                    ->query(fn (Builder $query): Builder => $query->whereMonth('created_at', now()->month))
+                    ->query(fn(Builder $query): Builder => $query->whereMonth('created_at', now()->month))
                     ->toggle(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->url(fn (Order $record): string => route('admin.orders.show', $record)),
+                    ->url(fn(Order $record): string => route('admin.orders.show', $record)),
             ])
             ->bulkActions([
                 Tables\Actions\ExportBulkAction::make()

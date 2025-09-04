@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 final class DocumentTemplate extends Model
@@ -32,13 +32,13 @@ final class DocumentTemplate extends Model
     protected static function boot(): void
     {
         parent::boot();
-        
+
         static::creating(function (DocumentTemplate $template): void {
             if (empty($template->slug)) {
                 $template->slug = Str::slug($template->name);
             }
         });
-        
+
         static::updating(function (DocumentTemplate $template): void {
             if ($template->isDirty('name') && empty($template->slug)) {
                 $template->slug = Str::slug($template->name);
@@ -54,6 +54,42 @@ final class DocumentTemplate extends Model
     public function getAvailableVariables(): array
     {
         return $this->variables ?? [];
+    }
+
+    public function hasVariable(string $variable): bool
+    {
+        return in_array($variable, $this->getAvailableVariables());
+    }
+
+    public function getSettings(): array
+    {
+        return $this->settings ?? [];
+    }
+
+    public function getSetting(string $key, $default = null)
+    {
+        return $this->getSettings()[$key] ?? $default;
+    }
+
+    public function render(array $variables = []): string
+    {
+        $content = $this->content;
+
+        foreach ($variables as $key => $value) {
+            $content = str_replace('{{' . $key . '}}', (string) $value, $content);
+        }
+
+        return $content;
+    }
+
+    public function scopeOfType($query, string $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    public function scopeOfCategory($query, string $category)
+    {
+        return $query->where('category', $category);
     }
 
     public function getPrintSettings(): array

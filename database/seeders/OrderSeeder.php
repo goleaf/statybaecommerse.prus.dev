@@ -16,14 +16,12 @@ class OrderSeeder extends Seeder
                 $user = \App\Models\User::factory()->create();
             }
 
-            $currency = \Shop\Core\Models\Currency::query()->where('code', current_currency())->first()
-                ?: \Shop\Core\Models\Currency::query()->where('id', (int) (string) shopper_setting('default_currency_id'))->first();
+            $currency = \App\Models\Currency::query()->where('code', current_currency())->first()
+                ?: \App\Models\Currency::query()->where('is_default', true)->first();
 
-            $zone = \Shop\Core\Models\Zone::query()->first();
-            $carrier = \Shop\Core\Models\Carrier::query()->first();
-            $payment = \Shop\Core\Models\PaymentMethod::query()->first();
+            $zone = \App\Models\Zone::query()->first();
 
-            if (!$currency || !$zone || !$carrier || !$payment) {
+            if (!$currency || !$zone) {
                 return;
             }
 
@@ -32,65 +30,46 @@ class OrderSeeder extends Seeder
                 return;
             }
 
-            /** @var \Shop\Core\Models\Order $order */
-            $order = \Shop\Core\Models\Order::query()->create([
+            /** @var \App\Models\Order $order */
+            $order = \App\Models\Order::query()->create([
                 'number' => 'WEB-' . Str::upper(Str::random(8)),
-                'currency_code' => $currency->code,
-                'channel_id' => \Shop\Core\Models\Channel::query()->value('id'),
+                'currency' => $currency->code,
+                'channel_id' => \App\Models\Channel::query()->value('id'),
                 'zone_id' => $zone->id,
-                'payment_method_id' => $payment->id,
-                'customer_id' => $user->id,
+                'user_id' => $user->id,
+                'payment_method' => 'cash_on_delivery',
+                'payment_status' => 'pending',
+                'status' => 'confirmed',
             ]);
 
             foreach ($products as $p) {
-                $amountCents = (int) round((optional($p->prices()->where('currency_id', $currency->id)->first())->amount ?? random_int(1000, 5000) / 100) * 100);
+                $amount = (float) (optional($p->prices()->whereHas('currency', fn($q) => $q->where('code', $currency->code))->first())->amount ?? (random_int(1000, 5000) / 100));
                 $order->items()->create([
                     'product_id' => $p->id,
-                    'product_type' => \App\Models\Product::class,
-                    'unit_price_amount' => $amountCents,
-                    'quantity' => random_int(1, 2),
                     'name' => $p->name,
                     'sku' => $p->sku ?? 'SKU-' . Str::upper(Str::random(6)),
+                    'unit_price' => $amount,
+                    'quantity' => random_int(1, 2),
+                    'total' => $amount,
                 ]);
             }
 
-            $order->shippingAddress()->create([
-                'customer_id' => $user->id,
-                'last_name' => 'Jonaitis',
-                'first_name' => 'Jonas',
-                'street_address' => 'Didžioji g. 1',
-                'postal_code' => '01128',
-                'city' => 'Vilnius',
-                'phone' => '+37060000000',
-                'country_name' => 'Lithuania',
-            ]);
-            $order->billingAddress()->create([
-                'customer_id' => $user->id,
-                'last_name' => 'Jonaitis',
-                'first_name' => 'Jonas',
-                'street_address' => 'Didžioji g. 1',
-                'postal_code' => '01128',
-                'city' => 'Vilnius',
-                'phone' => '+37060000000',
-                'country_name' => 'Lithuania',
+            $order->shipping()->create([
+                'carrier' => 'standard',
+                'service' => 'ground',
+                'price' => 9.99,
+                'weight' => 1.0,
+                'tracking_number' => null,
+                'estimated_delivery_date' => now()->addDays(5),
             ]);
 
             // totals
-            $subtotalCents = (int) $order->items()->get()->sum(fn($i) => (int) $i->unit_price_amount * (int) $i->quantity);
             $order->update([
-                'price_amount' => $subtotalCents,
-                'subtotal_amount' => round($subtotalCents / 100, 2),
-                'shipping_total_amount' => 9.99,
-                'grand_total_amount' => round($subtotalCents / 100, 2) + 9.99,
-            ]);
-
-            DB::table('sh_order_shippings')->insert([
-                'order_id' => $order->id,
-                'carrier_name' => $carrier->name ?? 'Carrier',
-                'tracking_number' => null,
-                'tracking_url' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'subtotal' => $order->items()->sum('total'),
+                'shipping_amount' => 9.99,
+                'tax_amount' => 0,
+                'discount_amount' => 0,
+                'total' => $order->items()->sum('total') + 9.99,
             ]);
         });
     }

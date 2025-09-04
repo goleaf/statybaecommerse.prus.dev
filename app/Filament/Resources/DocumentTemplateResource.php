@@ -6,16 +6,16 @@ use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Models\DocumentTemplate;
 use App\Services\DocumentService;
 use App\Services\MultiLanguageTabService;
-use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-use BackedEnum;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use BackedEnum;
+use UnitEnum;
 
 final class DocumentTemplateResource extends Resource
 {
@@ -38,22 +38,18 @@ final class DocumentTemplateResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $context, $state, Forms\Set $set) => 
-                                $context === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null
-                            ),
-
+                            ->afterStateUpdated(fn(string $context, $state, Forms\Set $set) =>
+                                $context === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
                         Forms\Components\TextInput::make('slug')
                             ->label(__('documents.slug'))
                             ->required()
                             ->maxLength(255)
                             ->unique(DocumentTemplate::class, 'slug', ignoreRecord: true)
                             ->rules(['alpha_dash']),
-
                         Forms\Components\Textarea::make('description')
                             ->label(__('documents.description'))
                             ->maxLength(1000)
                             ->columnSpanFull(),
-
                         Forms\Components\Select::make('type')
                             ->label(__('documents.type'))
                             ->required()
@@ -68,7 +64,6 @@ final class DocumentTemplateResource extends Resource
                                 'document' => __('documents.types.document'),
                             ])
                             ->default('document'),
-
                         Forms\Components\Select::make('category')
                             ->label(__('documents.category'))
                             ->options([
@@ -79,13 +74,11 @@ final class DocumentTemplateResource extends Resource
                                 'operations' => __('documents.categories.operations'),
                                 'customer_service' => __('documents.categories.customer_service'),
                             ]),
-
                         Forms\Components\Toggle::make('is_active')
                             ->label(__('documents.is_active'))
                             ->default(true),
                     ])
                     ->columns(2),
-
                 // Multilanguage Tabs for Template Content
                 Tabs::make('template_translations')
                     ->tabs(
@@ -117,7 +110,6 @@ final class DocumentTemplateResource extends Resource
                     ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
                     ->persistTabInQueryString('template_tab')
                     ->contained(false),
-
                 Forms\Components\Section::make(__('documents.template_variables'))
                     ->components([
                         Forms\Components\TagsInput::make('variables')
@@ -127,7 +119,6 @@ final class DocumentTemplateResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->collapsed(),
-
                 Forms\Components\Section::make(__('documents.print_settings'))
                     ->components([
                         Forms\Components\KeyValue::make('settings')
@@ -149,7 +140,6 @@ final class DocumentTemplateResource extends Resource
                     ->label(__('documents.name'))
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('documents.type'))
                     ->badge()
@@ -160,21 +150,17 @@ final class DocumentTemplateResource extends Resource
                         'info' => 'document',
                     ])
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('category')
                     ->label(__('documents.category'))
                     ->badge()
                     ->sortable(),
-
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('documents.is_active'))
                     ->boolean(),
-
                 Tables\Columns\TextColumn::make('documents_count')
                     ->label(__('documents.documents_count'))
                     ->counts('documents')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('documents.created_at'))
                     ->dateTime()
@@ -194,7 +180,6 @@ final class DocumentTemplateResource extends Resource
                         'certificate' => __('documents.types.certificate'),
                         'document' => __('documents.types.document'),
                     ]),
-
                 Tables\Filters\SelectFilter::make('category')
                     ->label(__('documents.category'))
                     ->options([
@@ -205,7 +190,6 @@ final class DocumentTemplateResource extends Resource
                         'operations' => __('documents.categories.operations'),
                         'customer_service' => __('documents.categories.customer_service'),
                     ]),
-
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label(__('documents.is_active')),
             ])
@@ -217,7 +201,7 @@ final class DocumentTemplateResource extends Resource
                     ->action(function (DocumentTemplate $record) {
                         $service = app(DocumentService::class);
                         $preview = $service->previewTemplate($record);
-                        
+
                         return response($preview)
                             ->header('Content-Type', 'text/html')
                             ->header('X-Frame-Options', 'SAMEORIGIN');
@@ -246,7 +230,7 @@ final class DocumentTemplateResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::getModel()::count();
     }
 
     public static function getGlobalSearchEloquentQuery(): Builder

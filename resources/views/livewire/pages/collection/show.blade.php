@@ -1,8 +1,8 @@
 @section('meta')
-    @php($ogImage = $collection->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'large') ?: $collection->getFirstMediaUrl(config('shopper.media.storage.collection_name')))
+    @php($ogImage = $collection->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?: $collection->getFirstMediaUrl(config('media.storage.collection_name')))
     @php
         $firstProduct = $products->first();
-        $cname = config('shopper.media.storage.collection_name');
+        $cname = config('media.storage.collection_name');
         $preSmall = $firstProduct?->getFirstMediaUrl($cname, 'small');
         $preMedium = $firstProduct?->getFirstMediaUrl($cname, 'medium');
         $preLarge = $firstProduct?->getFirstMediaUrl($cname, 'large');

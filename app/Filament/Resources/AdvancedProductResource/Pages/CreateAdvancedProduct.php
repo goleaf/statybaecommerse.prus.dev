@@ -43,3 +43,4 @@ final class CreateAdvancedProduct extends CreateRecord
             ->log('Product created via admin panel');
     }
 }
+

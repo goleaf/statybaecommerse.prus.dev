@@ -27,7 +27,7 @@
     </div>
 
     @php
-        $categoryFeature = config('shopper.features.category') ?? null;
+        $categoryFeature = config('app-features.features.category') ?? null;
         $featureEnabled =
             $categoryFeature instanceof \App\Support\FeatureState
                 ? $categoryFeature === \App\Support\FeatureState::Enabled

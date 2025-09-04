@@ -4,19 +4,19 @@ namespace App\Filament\Widgets;
 
 use App\Models\Order;
 use Filament\Actions\Action;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 
 final class AdvancedOrdersWidget extends BaseWidget
 {
     protected static ?int $sort = 5;
-    
+
     protected static ?string $heading = 'Recent Orders';
-    
-    protected int | string | array $columnSpan = 'full';
-    
+
+    protected int|string|array $columnSpan = 'full';
+
     protected static bool $isLazy = false;
 
     public function table(Table $table): Table
@@ -39,12 +39,12 @@ final class AdvancedOrdersWidget extends BaseWidget
                     ->label(__('Customer'))
                     ->searchable()
                     ->sortable()
-                    ->url(fn (Order $record): string => route('filament.admin.resources.users.view', $record->user))
+                    ->url(fn(Order $record): string => route('filament.admin.resources.users.view', $record->user))
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('Status'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'pending' => 'gray',
                         'confirmed' => 'warning',
                         'processing' => 'primary',
@@ -70,17 +70,17 @@ final class AdvancedOrdersWidget extends BaseWidget
                     ->since(),
             ])
             ->actions([
-                Tables\Actions\Action::make('view')
+                Action::make('view')
                     ->label(__('View'))
                     ->icon('heroicon-m-eye')
-                    ->url(fn (Order $record): string => route('filament.admin.resources.orders.view', $record))
+                    ->url(fn(Order $record): string => route('filament.admin.resources.orders.view', $record))
                     ->openUrlInNewTab(),
-                Tables\Actions\Action::make('edit')
+                Action::make('edit')
                     ->label(__('Edit'))
                     ->icon('heroicon-m-pencil-square')
-                    ->url(fn (Order $record): string => route('filament.admin.resources.orders.edit', $record))
+                    ->url(fn(Order $record): string => route('filament.admin.resources.orders.edit', $record))
                     ->openUrlInNewTab(),
-                Tables\Actions\Action::make('invoice')
+                Action::make('invoice')
                     ->label(__('Invoice'))
                     ->icon('heroicon-m-document-text')
                     ->action(function (Order $record) {
@@ -89,14 +89,14 @@ final class AdvancedOrdersWidget extends BaseWidget
                             storage_path("app/invoices/invoice-{$record->number}.pdf")
                         );
                     })
-                    ->visible(fn (Order $record): bool => in_array($record->status, ['confirmed', 'processing', 'shipped', 'delivered'])),
+                    ->visible(fn(Order $record): bool => in_array($record->status, ['confirmed', 'processing', 'shipped', 'delivered'])),
             ])
             ->emptyStateHeading(__('No Recent Orders'))
             ->emptyStateDescription(__('Orders will appear here once customers start placing them.'))
             ->emptyStateIcon('heroicon-o-shopping-bag')
             ->poll('30s');
     }
-    
+
     public static function canView(): bool
     {
         return auth()->user()->can('view_order');

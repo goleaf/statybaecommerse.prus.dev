@@ -1,5 +1,5 @@
 @section('meta')
-    @php($ogImage = $product->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'large') ?: $product->getFirstMediaUrl(config('shopper.media.storage.collection_name')))
+    @php($ogImage = $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?: $product->getFirstMediaUrl(config('media.storage.collection_name')))
     <x-meta
             :title="$product->name"
             :description="Str::limit(strip_tags($product->description), 150)"
@@ -124,7 +124,7 @@
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 lg:gap-8">
                         <div class="lg:col-span-2 lg:row-span-2">
-                            @php($thumb = $product->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: ($product->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'small') ?: ($product->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'medium') ?: $product->getFirstMediaUrl(config('shopper.media.storage.collection_name')))))
+                            @php($thumb = $product->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: ($product->getFirstMediaUrl(config('media.storage.collection_name'), 'small') ?: ($product->getFirstMediaUrl(config('media.storage.collection_name'), 'medium') ?: $product->getFirstMediaUrl(config('media.storage.collection_name')))))
                             @if ($thumb)
                                 <img
                                      src="{{ $thumb }}"
@@ -133,9 +133,7 @@
                             @endif
                         </div>
                         <x-product.gallery
-                                           :images="$product->getMedia(
-                                               config('shopper.media.storage.collection_name'),
-                                           )"
+                                           :images="$product->getMedia(config('media.storage.collection_name'))"
                                            :product="$product" />
                     </div>
                 </div>
@@ -166,8 +164,8 @@
             'slug' => $product->trans('slug') ?? $product->slug,
         ]);
         $image =
-            $product->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'large') ?:
-            $product->getFirstMediaUrl(config('shopper.media.storage.collection_name'));
+            $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?:
+            $product->getFirstMediaUrl(config('media.storage.collection_name'));
         $offers = null;
         if (method_exists($product, 'getPrice')) {
             $price = $product->getPrice();

@@ -14,7 +14,7 @@
                                     <div class="flex items-center gap-4">
                                         @php($model = $item->associatedModel)
                                         @if (method_exists($model, 'getFirstMediaUrl'))
-                                            @php($thumb = $model->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: ($model->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'small') ?: ($model->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'medium') ?: $model->getFirstMediaUrl(config('shopper.media.storage.collection_name')))))
+                                            @php($thumb = $model->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: ($model->getFirstMediaUrl(config('media.storage.collection_name'), 'small') ?: ($model->getFirstMediaUrl(config('media.storage.collection_name'), 'medium') ?: $model->getFirstMediaUrl(config('media.storage.collection_name')))))
                                             @if ($thumb)
                                                 <img src="{{ $thumb }}" alt="{{ $item->name }}"
                                                      class="h-16 w-16 object-cover rounded" />
@@ -40,7 +40,7 @@
 
                 <div class="space-y-6">
                     <div class="border border-gray-100 rounded-md p-4 bg-white">
-                        @if ((string) config('shopper.features.discount') === \App\Support\FeatureState::Enabled->value)
+                        @if ((bool) (config('app-features.features.discount') ?? true))
                             <livewire:components.coupon-form />
                         @endif
                         <div class="mt-6">
@@ -81,7 +81,7 @@
                     <aside class="lg:col-span-1">
                         <div class="space-y-4 border border-gray-200 p-4 rounded-md">
                             <h2 class="text-lg font-medium text-gray-900">{{ __('Summary') }}</h2>
-                            @if ((string) config('shopper.features.discount') === \App\Support\FeatureState::Enabled->value)
+                            @if ((bool) (config('app-features.features.discount') ?? true))
                                 <livewire:components.coupon-form />
                             @endif
                             <livewire:components.cart-total />

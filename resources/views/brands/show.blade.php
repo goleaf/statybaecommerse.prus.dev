@@ -44,7 +44,7 @@
 
         <div class="flex items-center gap-4 mb-6">
             @if ($brand->getLogoUrl('md'))
-                <img src="{{ $brand->getLogoUrl('md') }}" 
+                <img src="{{ $brand->getLogoUrl('md') }}"
                      srcset="{{ $brand->getLogoUrl('sm') }} 128w, {{ $brand->getLogoUrl('md') }} 200w, {{ $brand->getLogoUrl('lg') }} 400w"
                      sizes="200px"
                      alt="{{ $brand->trans('name') ?? $brand->name }} logo"
@@ -73,14 +73,14 @@
 @endsection
 
 @section('meta')
-    @php($ogImage = $brand->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'large') ?: $brand->getFirstMediaUrl(config('shopper.media.storage.collection_name')))
+    @php($ogImage = $brand->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?: $brand->getFirstMediaUrl(config('media.storage.collection_name')))
     <x-meta
             :title="$brand->trans('seo_title') ?? ($brand->trans('name') ?? $brand->name)"
             :description="Str::limit(strip_tags($brand->trans('seo_description') ?? ($brand->description ?? '')), 150)"
             :og-image="$ogImage"
             :preload-image="(string) ($products
                 ->first()
-                ?->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'medium') ?? '')"
+                ?->getFirstMediaUrl(config('media.storage.collection_name'), 'medium') ?? '')"
             :prev="$products instanceof \Illuminate\Contracts\Pagination\Paginator ||
             $products instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator
                 ? $products->previousPageUrl()
@@ -99,7 +99,7 @@
             ['label' => $brand->trans('name') ?? $brand->name],
         ]" />
         <h1 class="text-2xl font-semibold mb-6">{{ $brand->trans('name') ?? $brand->name }}</h1>
-        @php($brandThumb = $brand->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: ($brand->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'small') ?: $brand->getFirstMediaUrl(config('shopper.media.storage.collection_name'))))
+        @php($brandThumb = $brand->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: ($brand->getFirstMediaUrl(config('media.storage.collection_name'), 'small') ?: $brand->getFirstMediaUrl(config('media.storage.collection_name'))))
         @if ($brandThumb)
             <div class="mb-6">
                 <img loading="lazy" src="{{ $brandThumb }}" alt="{{ $brand->trans('name') ?? $brand->name }}"
@@ -132,7 +132,7 @@
       "@context": "https://schema.org",
       "@type": "Brand",
       "name": "{{ addslashes($brand->trans('name') ?? $brand->name) }}",
-      @php($logo = $brand->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: $brand->getFirstMediaUrl(config('shopper.media.storage.collection_name')))
+      @php($logo = $brand->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: $brand->getFirstMediaUrl(config('media.storage.collection_name')))
       @if ($logo)
       "logo": "{{ $logo }}",
       @endif

@@ -1,0 +1,64 @@
+<?php declare(strict_types=1);
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+final class WishlistItem extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'wishlist_id',
+        'product_id',
+        'variant_id',
+        'quantity',
+        'notes',
+    ];
+
+    protected $casts = [
+        'quantity' => 'integer',
+    ];
+
+    public function wishlist(): BelongsTo
+    {
+        return $this->belongsTo(UserWishlist::class, 'wishlist_id');
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'variant_id');
+    }
+
+    public function getDisplayNameAttribute(): string
+    {
+        $name = $this->product->name;
+        
+        if ($this->variant) {
+            $name .= ' - ' . $this->variant->name;
+        }
+        
+        return $name;
+    }
+
+    public function getCurrentPriceAttribute(): ?float
+    {
+        if ($this->variant) {
+            return $this->variant->price;
+        }
+        
+        return $this->product->price;
+    }
+
+    public function getFormattedCurrentPriceAttribute(): string
+    {
+        return app_money_format($this->current_price ?? 0);
+    }
+}

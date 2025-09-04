@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 class ReviewsSeeder extends Seeder
 {
@@ -51,16 +51,13 @@ class ReviewsSeeder extends Seeder
                     for ($i = 0; $i < (int) ceil($reviewsPerProduct / max(count($locales), 1)); $i++) {
                         $userId = Arr::random($userIds);
 
-                        \Shop\Core\Models\Review::factory()->create([
-                            'reviewrateable_type' => \App\Models\Product::class,
-                            'reviewrateable_id' => $productId,
-                            'author_type' => \App\Models\User::class,
-                            'author_id' => $userId,
+                        \App\Models\Review::query()->create([
+                            'product_id' => $productId,
+                            'user_id' => $userId,
                             'title' => $faker->realTextBetween(20, 45),
                             'content' => $faker->realTextBetween(120, 320),
                             'rating' => $faker->numberBetween(1, 5),
-                            'is_recommended' => $faker->boolean(70),
-                            'approved' => $faker->boolean(80),
+                            'is_approved' => $faker->boolean(80),
                             'locale' => $locale,
                         ]);
                     }
@@ -69,7 +66,3 @@ class ReviewsSeeder extends Seeder
         });
     }
 }
-
-
-
-

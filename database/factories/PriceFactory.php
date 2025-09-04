@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PriceFactory extends Factory
 {
-    protected $model = \Shop\Core\Models\Price::class;
+    protected $model = \App\Models\Price::class;
 
     public function definition(): array
     {
@@ -18,7 +18,7 @@ class PriceFactory extends Factory
         return [
             'priceable_type' => 'Product',
             'priceable_id' => fn () => \App\Models\Product::factory(),
-            'currency_id' => fn () => (int) (string) shopper_setting('default_currency_id'),
+            'currency_id' => fn () => 1, // Default currency
             'amount' => round($amount, 2),
             'compare_amount' => $compare ? round($compare, 2) : null,
             'cost_amount' => $cost ? round($cost, 2) : null,

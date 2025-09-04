@@ -3,19 +3,19 @@
 namespace App\Filament\Widgets;
 
 use Filament\Actions\Action;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Filament\Tables;
 use Spatie\Activitylog\Models\Activity;
 
 final class RecentActivityWidget extends BaseWidget
 {
     protected static ?int $sort = 3;
-    
+
     protected static ?string $heading = 'Recent Activity';
-    
-    protected int | string | array $columnSpan = 'full';
-    
+
+    protected int|string|array $columnSpan = 'full';
+
     protected static bool $isLazy = false;
 
     public function table(Table $table): Table
@@ -31,7 +31,7 @@ final class RecentActivityWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('log_name')
                     ->label(__('Type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'product' => 'success',
                         'order' => 'warning',
                         'user' => 'info',
@@ -48,7 +48,7 @@ final class RecentActivityWidget extends BaseWidget
                     }),
                 Tables\Columns\TextColumn::make('subject_type')
                     ->label(__('Subject'))
-                    ->formatStateUsing(fn (string $state): string => class_basename($state))
+                    ->formatStateUsing(fn(string $state): string => class_basename($state))
                     ->badge()
                     ->color('gray'),
                 Tables\Columns\TextColumn::make('causer.name')
@@ -58,7 +58,7 @@ final class RecentActivityWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Time'))
                     ->since()
-                    ->tooltip(fn ($state) => $state->format('Y-m-d H:i:s')),
+                    ->tooltip(fn($state) => $state->format('Y-m-d H:i:s')),
             ])
             ->actions([
                 Action::make('view_details')
@@ -75,7 +75,7 @@ final class RecentActivityWidget extends BaseWidget
             ->poll('30s')
             ->paginated(false);
     }
-    
+
     public static function getHeading(): string
     {
         return __('Recent Activity');

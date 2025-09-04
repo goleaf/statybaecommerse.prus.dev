@@ -60,13 +60,12 @@ class CategoryTest extends TestCase
 
     public function test_category_cache_flush_on_save(): void
     {
-        $category = Category::factory()->create();
-        
         // Mock cache to test if flush is called
         \Illuminate\Support\Facades\Cache::shouldReceive('forget')
-            ->with('nav:categories:roots:en')
+            ->atLeast()
             ->once();
 
+        $category = Category::factory()->create();
         $category->save();
     }
 

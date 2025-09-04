@@ -14,7 +14,7 @@ final class OrderShipping extends Model
 
     protected $fillable = [
         'order_id',
-        'carrier',
+        'carrier_name',
         'service',
         'tracking_number',
         'tracking_url',
@@ -57,7 +57,7 @@ final class OrderShipping extends Model
 
     public function scopeByCarrier($query, string $carrier)
     {
-        return $query->where('carrier', $carrier);
+        return $query->where('carrier_name', $carrier);
     }
 
     public function isShipped(): bool

@@ -61,11 +61,11 @@ new #[Lazy(isolate: false)] class extends Component {
         if ($variantId) {
             $variant = ProductVariant::with('media', 'product.media')->select('product_id', 'id')->find($variantId);
 
-            $this->thumbnail = $variant->getMedia(config('shopper.media.storage.thumbnail_collection'))->isNotEmpty() ? ($variant->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: $variant->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'large')) : ($variant->product->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: $variant->product->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'large'));
+            $this->thumbnail = $variant->getMedia(config('media.storage.thumbnail_collection'))->isNotEmpty() ? ($variant->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: $variant->getFirstMediaUrl(config('media.storage.collection_name'), 'large')) : ($variant->product->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: $variant->product->getFirstMediaUrl(config('media.storage.collection_name'), 'large'));
 
-            $this->images = $variant->getMedia(config('shopper.media.storage.collection_name'))->isNotEmpty()
+            $this->images = $variant->getMedia(config('media.storage.collection_name'))->isNotEmpty()
                 ? $variant
-                    ->getMedia(config('shopper.media.storage.collection_name'))
+                    ->getMedia(config('media.storage.collection_name'))
                     ->map(function ($media) use ($variant) {
                         return [
                             'src' => $media->getUrl('large') ?: $media->getUrl(),
@@ -75,7 +75,7 @@ new #[Lazy(isolate: false)] class extends Component {
                     })
                     ->toArray()
                 : $variant->product
-                    ->getMedia(config('shopper.media.storage.collection_name'))
+                    ->getMedia(config('media.storage.collection_name'))
                     ->map(function ($media) use ($variant) {
                         return [
                             'src' => $media->getUrl('large') ?: $media->getUrl(),

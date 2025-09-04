@@ -15,9 +15,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements HasLocalePreferenceContract, FilamentUser
 {
@@ -117,15 +117,16 @@ class User extends Authenticatable implements HasLocalePreferenceContract, Filam
         return $this->hasMany(Order::class);
     }
 
+    public function wishlist(): BelongsToMany
+    {
+        return $this
+            ->belongsToMany(Product::class, 'user_wishlists', 'user_id', 'product_id')
+            ->withTimestamps();
+    }
+
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
-    }
-
-    public function wishlist(): BelongsToMany
-    {
-        return $this->belongsToMany(Product::class, 'user_wishlists')
-            ->withTimestamps();
     }
 
     public function cartItems(): HasMany
@@ -198,7 +199,7 @@ class User extends Authenticatable implements HasLocalePreferenceContract, Filam
 
     public function canAccessPanel(Panel $panel): bool
     {
-        // Allow access if user is active and has admin role
-        return $this->is_active && $this->hasRole('admin');
+        // Allow access if user is active and has admin or administrator role
+        return $this->is_active && ($this->hasRole('admin') || $this->hasRole('administrator'));
     }
 }

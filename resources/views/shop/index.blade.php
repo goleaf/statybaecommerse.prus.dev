@@ -5,7 +5,7 @@
             @auth
                 @can('view system')
                     <a class="text-sm text-primary-700 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 underline"
-                       href="{{ url('/' . config('shopper.admin.prefix')) }}">{{ __('Admin') }}</a>
+                       href="{{ route('filament.admin.pages.dashboard') }}">{{ __('Admin') }}</a>
                 @endcan
             @endauth
             <x-language-switcher />
@@ -21,7 +21,7 @@
                 @foreach ($products as $product)
                     <div
                          class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-white/10 dark:bg-gray-900">
-                        @php($media = $product->getFirstMedia(config('shopper.media.storage.collection_name')))
+                        @php($media = $product->getFirstMedia(config('media.storage.collection_name')))
                         @if ($media)
                             <img src="{{ $media->getFullUrl() }}" alt="{{ $product->trans('name') ?? $product->name }}"
                                  class="w-full h-40 object-cover rounded-lg">

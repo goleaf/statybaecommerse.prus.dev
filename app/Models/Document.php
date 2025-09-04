@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Model;
 
 final class Document extends Model
 {
@@ -50,6 +50,20 @@ final class Document extends Model
         return $this->variables ?? [];
     }
 
+    public function isGenerated(): bool
+    {
+        return $this->status === 'generated';
+    }
+
+    public function getFileUrl(): ?string
+    {
+        if (!$this->file_path) {
+            return null;
+        }
+
+        return asset('storage/' . $this->file_path);
+    }
+
     public function isPdf(): bool
     {
         return $this->format === 'pdf';
@@ -82,7 +96,8 @@ final class Document extends Model
 
     public function scopeForModel($query, Model $model)
     {
-        return $query->where('documentable_type', get_class($model))
-                    ->where('documentable_id', $model->id);
+        return $query
+            ->where('documentable_type', get_class($model))
+            ->where('documentable_id', $model->id);
     }
 }

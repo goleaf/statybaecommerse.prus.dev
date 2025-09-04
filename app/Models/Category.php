@@ -274,17 +274,25 @@ final class Category extends Model implements HasMedia
             ->sharpen(5)
             ->optimize();
 
-        // Legacy conversions for backward compatibility
+        // Legacy conversions for backward compatibility - now in WebP
         $this
             ->addMediaConversion('thumb')
+            ->performOnCollections('images')
             ->width(200)
             ->height(200)
-            ->sharpen(10);
+            ->format('webp')
+            ->quality(85)
+            ->sharpen(10)
+            ->optimize();
 
         $this
             ->addMediaConversion('small')
+            ->performOnCollections('images')
             ->width(400)
             ->height(400)
-            ->sharpen(10);
+            ->format('webp')
+            ->quality(85)
+            ->sharpen(10)
+            ->optimize();
     }
 }

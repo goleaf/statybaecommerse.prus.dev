@@ -48,7 +48,6 @@ return [
     // Brand Information
     'brand_information' => 'Brand Information',
     'brand_images' => 'Brand Images',
-    
     // Product Images
     'product_images' => 'Product Images',
     'product_image' => 'Product Image',
@@ -361,7 +360,6 @@ return [
     'approve_selected' => 'Approve Selected',
     'reject_selected' => 'Reject Selected',
     'default_only' => 'Default Only',
-
     // Review UI translations
     'customer_reviews' => 'Customer Reviews',
     'write_review' => 'Write Review',
@@ -377,7 +375,6 @@ return [
     'reviews_count' => '{1} :count review|[2,*] :count reviews',
     'no_reviews_yet' => 'No reviews yet',
     'be_first_to_review' => 'Be the first to share your thoughts about this product.',
-
     // Address translations
     'addresses' => 'Addresses',
     'address_information' => 'Address Information',
@@ -417,7 +414,6 @@ return [
     // Discount Codes
     'discount_code_information' => 'Discount Code Information',
     'discount_code_description_help' => 'Describe the discount code benefits and conditions',
-    
     // Enhanced Frontend & Admin
     'home_title' => 'Home - E-Commerce Store',
     'home_description' => 'Professional tools and building materials for contractors and DIY enthusiasts',
@@ -443,7 +439,6 @@ return [
     'email_placeholder' => 'Enter your email address',
     'subscribe' => 'Subscribe',
     'newsletter_subscribed' => 'Successfully subscribed to newsletter!',
-    
     // Admin Dashboard
     'total_revenue' => 'Total Revenue',
     'total_orders' => 'Total Orders',
@@ -469,7 +464,6 @@ return [
     'all_products_well_stocked' => 'All products are well stocked',
     'add_stock' => 'Add Stock',
     'stock_updated' => 'Stock updated successfully!',
-    
     // Location frontend translations
     'locations' => 'Locations',
     'no_locations_found' => 'No locations found',
@@ -478,4 +472,24 @@ return [
     'contact_information' => 'Contact Information',
     'location_type' => 'Location Type',
     'back_to_locations' => 'Back to Locations',
+    // Dashboard Widget Translations
+    'todays_revenue' => "Today's Revenue",
+    'todays_orders' => "Today's Orders",
+    'new_customers_today' => 'New Customers Today',
+    'inventory_alerts' => 'Inventory Alerts',
+    'inventory_healthy' => 'Inventory Healthy',
+    'pending_orders' => 'Pending Orders',
+    'orders_awaiting_processing' => 'Orders awaiting processing',
+    'total_products' => 'Total Products',
+    'visible_products_count' => 'Visible products count',
+    'revenue_growth_positive' => '+:percent% growth',
+    'revenue_growth_negative' => '-:percent% decrease',
+    'order_growth_positive' => '+:percent% growth',
+    'order_growth_negative' => '-:percent% decrease',
+    'customer_retention_rate' => ':rate% customer retention rate',
+    'out_of_stock_products' => ':count products out of stock',
+    // Time periods
+    'today' => 'Today',
+    'this_week' => 'This Week',
+    'this_month' => 'This Month',
 ];

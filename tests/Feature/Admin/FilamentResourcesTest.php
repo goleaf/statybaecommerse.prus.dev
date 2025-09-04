@@ -8,7 +8,7 @@ use App\Models\EnhancedSetting;
 
 it('can access admin dashboard', function () {
     $user = User::factory()->create();
-    $user->assignRole('super-admin');
+    $user->assignRole('Admin');
     
     $this->actingAs($user)
         ->get('/admin')
@@ -17,7 +17,7 @@ it('can access admin dashboard', function () {
 
 it('can access product resource', function () {
     $user = User::factory()->create();
-    $user->assignRole('super-admin');
+    $user->assignRole('Admin');
     
     $this->actingAs($user)
         ->get('/admin/products')
@@ -26,7 +26,7 @@ it('can access product resource', function () {
 
 it('can create product through admin', function () {
     $user = User::factory()->create();
-    $user->assignRole('super-admin');
+    $user->assignRole('Admin');
     $brand = Brand::factory()->create();
     $category = Category::factory()->create();
     
@@ -49,7 +49,7 @@ it('can create product through admin', function () {
 
 it('can access enhanced settings resource', function () {
     $user = User::factory()->create();
-    $user->assignRole('super-admin');
+    $user->assignRole('Admin');
     
     $this->actingAs($user)
         ->get('/admin/enhanced-settings')
@@ -58,7 +58,7 @@ it('can access enhanced settings resource', function () {
 
 it('can create enhanced setting', function () {
     $user = User::factory()->create();
-    $user->assignRole('super-admin');
+    $user->assignRole('Admin');
     
     $this->actingAs($user);
     

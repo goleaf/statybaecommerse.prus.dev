@@ -34,14 +34,14 @@ class ImportPricesChunk implements ShouldQueue
                 continue;
             }
 
-            $productId = DB::table('sh_products')->where('slug', $productSlug)->value('id');
-            $currencyId = DB::table('sh_currencies')->where('code', $currencyCode)->value('id');
+            $productId = DB::table('products')->where('slug', $productSlug)->value('id');
+            $currencyId = DB::table('currencies')->where('code', $currencyCode)->value('id');
             if (!$productId || !$currencyId) {
                 continue;
             }
 
             $data = [
-                'priceable_type' => config('shopper.models.product'),
+                'priceable_type' => \App\Models\Product::class,
                 'priceable_id' => (int) $productId,
                 'currency_id' => (int) $currencyId,
                 'amount' => round($amount, 2),
@@ -51,7 +51,7 @@ class ImportPricesChunk implements ShouldQueue
             }
 
             try {
-                DB::table('sh_prices')->upsert(
+                DB::table('prices')->upsert(
                     [$data],
                     ['priceable_type', 'priceable_id', 'currency_id'],
                     ['amount', 'compare_amount']

@@ -4,10 +4,10 @@ use App\Livewire\Pages;
 use Illuminate\Support\Facades\Route;
 
 /*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
+ * |--------------------------------------------------------------------------
+ * | Web Routes
+ * |--------------------------------------------------------------------------
+ */
 
 Route::get('/health', fn() => response()->json(['ok' => true]))->name('health');
 
@@ -15,7 +15,7 @@ Route::get('/health', fn() => response()->json(['ok' => true]))->name('health');
 Route::get('/', fn() => redirect('/home'))->name('root.redirect');
 
 // Enhanced frontend routes
-Route::get('/home', Pages\EnhancedHome::class)->name('home');
+Route::get('/home', Pages\TestHome::class)->name('home');
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
 Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.show');
 Route::get('/categories', Pages\Category\Index::class)->name('categories.index');

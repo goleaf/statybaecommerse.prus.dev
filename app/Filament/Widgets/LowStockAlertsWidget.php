@@ -3,18 +3,17 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Product;
-use Filament\Tables;
+use Filament\Actions\Action;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Illuminate\Support\Facades\DB;
+use Filament\Tables;
+use Illuminate\Support\Facades\DB as Database;
 
 final class LowStockAlertsWidget extends BaseWidget
 {
     protected static ?int $sort = 4;
-    
-    protected static ?string $heading = 'Low Stock Alerts';
-    
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -23,8 +22,8 @@ final class LowStockAlertsWidget extends BaseWidget
                 Product::query()
                     ->where('is_visible', true)
                     ->where('manage_stock', true)
-                    ->where('stock_quantity', '<=', DB::raw('low_stock_threshold'))
-                    ->with(['brand', 'category'])
+                    ->where('stock_quantity', '<=', Database::raw('low_stock_threshold'))
+                    ->with(['brand', 'categories'])
                     ->orderBy('stock_quantity', 'asc')
             )
             ->columns([
@@ -43,12 +42,12 @@ final class LowStockAlertsWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('stock_quantity')
                     ->label(__('Stock'))
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
+                    ->color(fn(int $state): string => match (true) {
                         $state <= 0 => 'danger',
                         $state <= 5 => 'warning',
                         default => 'success',
                     })
-                    ->icon(fn (int $state): string => match (true) {
+                    ->icon(fn(int $state): string => match (true) {
                         $state <= 0 => 'heroicon-m-x-circle',
                         $state <= 5 => 'heroicon-m-exclamation-triangle',
                         default => 'heroicon-m-check-circle',
@@ -60,12 +59,14 @@ final class LowStockAlertsWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('brand.name')
                     ->label(__('Brand'))
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('category.name')
-                    ->label(__('Category'))
+                Tables\Columns\TextColumn::make('categories.name')
+                    ->label(__('Categories'))
+                    ->badge()
+                    ->separator(',')
                     ->toggleable(),
             ])
             ->actions([
-                Tables\Actions\Action::make('restock')
+                Action::make('restock')
                     ->label(__('Restock'))
                     ->icon('heroicon-m-plus')
                     ->color('success')
@@ -78,7 +79,7 @@ final class LowStockAlertsWidget extends BaseWidget
                     ])
                     ->action(function (Product $record, array $data): void {
                         $record->increment('stock_quantity', $data['quantity']);
-                        
+
                         activity()
                             ->performedOn($record)
                             ->withProperties([
@@ -88,10 +89,10 @@ final class LowStockAlertsWidget extends BaseWidget
                             ->log("Stock restocked with {$data['quantity']} units");
                     })
                     ->successNotificationTitle(__('Stock updated successfully')),
-                Tables\Actions\Action::make('edit')
+                Action::make('edit')
                     ->label(__('Edit Product'))
                     ->icon('heroicon-m-pencil-square')
-                    ->url(fn (Product $record): string => route('filament.admin.resources.products.edit', $record))
+                    ->url(fn(Product $record): string => route('filament.admin.resources.products.edit', $record))
                     ->openUrlInNewTab(),
             ])
             ->emptyStateHeading(__('No Low Stock Items'))
@@ -99,12 +100,12 @@ final class LowStockAlertsWidget extends BaseWidget
             ->emptyStateIcon('heroicon-o-check-circle')
             ->poll('60s');
     }
-    
+
     public static function getHeading(): string
     {
         return __('Low Stock Alerts');
     }
-    
+
     public static function canView(): bool
     {
         return auth()->user()->can('view_product');

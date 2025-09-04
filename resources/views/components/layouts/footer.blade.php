@@ -20,12 +20,12 @@
                         </h3>
                         <ul role="list" class="mt-10 space-y-5">
                             <li>
-                                <x-footer-link :spa="false" href="https://laravelshopper.dev">
+                                <x-footer-link :spa="false" href="https://filamentphp.com/docs">
                                     {{ __('Documentation') }}
                                 </x-footer-link>
                             </li>
                             <li>
-                                <x-footer-link :spa="false" href="https://github.com/shopperlabs/shopper">
+                                <x-footer-link :spa="false" href="https://github.com/filamentphp/filament">
                                     {{ __('Github') }}
                                 </x-footer-link>
                             </li>
@@ -45,20 +45,20 @@
                             {{ __('Shop') }}
                         </h3>
                         <ul role="list" class="mt-10 space-y-5">
-                            @php($features = config('shopper.features'))
-                            @if (($features['category'] ?? null) === \App\Support\FeatureState::Enabled)
+                            @php($features = config('app-features.features'))
+                            @if ((bool) ($features['category'] ?? false))
                                 <li>
                                     <x-footer-link
                                                    href="{{ route('categories.index', ['locale' => app()->getLocale()]) }}">{{ __('Categories') }}</x-footer-link>
                                 </li>
                             @endif
-                            @if (($features['collection'] ?? null) === \App\Support\FeatureState::Enabled)
+                            @if ((bool) ($features['collection'] ?? false))
                                 <li>
                                     <x-footer-link
                                                    href="{{ route('collections.index', ['locale' => app()->getLocale()]) }}">{{ __('Collections') }}</x-footer-link>
                                 </li>
                             @endif
-                            @if (($features['brand'] ?? null) === \App\Support\FeatureState::Enabled)
+                            @if ((bool) ($features['brand'] ?? false))
                                 <li>
                                     <x-footer-link
                                                    href="{{ route('brands.index', ['locale' => app()->getLocale()]) }}">{{ __('Brands') }}</x-footer-link>
@@ -85,23 +85,24 @@
                             {{-- Enhanced Newsletter Form --}}
                             <form class="mt-5" target="_blank" novalidate>
                                 <div class="space-y-2">
-                                    <label for="newsletter-email" class="block text-sm font-medium text-gray-700">{{ __('Email') }}</label>
+                                    <label for="newsletter-email"
+                                           class="block text-sm font-medium text-gray-700">{{ __('Email') }}</label>
                                     <div class="flex gap-3">
                                         <input
-                                            type="email"
-                                            id="newsletter-email"
-                                            name="EMAIL"
-                                            placeholder="{{ __('Enter your email') }}"
-                                            class="flex-1 rounded-lg border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
-                                            required
-                                        />
+                                               type="email"
+                                               id="newsletter-email"
+                                               name="EMAIL"
+                                               placeholder="{{ __('Enter your email') }}"
+                                               class="flex-1 rounded-lg border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                                               required />
                                         <button
-                                            type="submit"
-                                            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
-                                        >
+                                                type="submit"
+                                                class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
                                             {{ __('Subscribe') }}
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                                                 viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                             </svg>
                                         </button>
                                     </div>
@@ -142,25 +143,29 @@
                         {{ __('Contact') }}
                     </dl>
                     <ul class="mt-4 flex flex-col space-y-1 text-sm text-gray-900">
-                        @php($hasSettings = \Illuminate\Support\Facades\Schema::hasTable('sh_settings'))
-                        @if ($hasSettings && shopper_setting('phone_number'))
+                        @php($hasSettings = \Illuminate\Support\Facades\Schema::hasTable('settings'))
+                        @if ($hasSettings && app_setting('phone_number'))
                             <li class="flex items-center gap-3">
-                                <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2 5a2 2 0 012-2h2l2 5-2 1a14 14 0 006 6l1-2 5 2v2a2 2 0 01-2 2h-1C9.163 19 5 14.837 5 9V8a2 2 0 00-2-2z" />
+                                <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M2 5a2 2 0 012-2h2l2 5-2 1a14 14 0 006 6l1-2 5 2v2a2 2 0 01-2 2h-1C9.163 19 5 14.837 5 9V8a2 2 0 00-2-2z" />
                                 </svg>
-                                <a href="tel:{{ shopper_setting('phone_number') }}" class="hover:underline">
-                                    {{ shopper_setting('phone_number') }}
+                                <a href="tel:{{ app_setting('phone_number') }}" class="hover:underline">
+                                    {{ app_setting('phone_number') }}
                                 </a>
                             </li>
                         @endif
 
-                        @if ($hasSettings && shopper_setting('email'))
+                        @if ($hasSettings && app_setting('email'))
                             <li class="flex items-center gap-3">
-                                <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l9 6 9-6M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+                                <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M3 8l9 6 9-6M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
                                 </svg>
-                                <a href="mailto:{{ shopper_setting('email') }}" class="hover:underline">
-                                    {{ shopper_setting('email') }}
+                                <a href="mailto:{{ app_setting('email') }}" class="hover:underline">
+                                    {{ app_setting('email') }}
                                 </a>
                             </li>
                         @endif
@@ -184,8 +189,8 @@
         <div class="flex flex-col items-center border-t border-gray-200 py-8 sm:flex-row sm:justify-between lg:py-10">
             <p class="text-sm text-gray-700">
                 © {{ date('Y') }} {{ config('app.name') }}, Inc. {{ __('All rights reserved.') }}
-                <a href="https://laravelshopper.dev" target="_blank" class="pl-1 underline hover:text-gray-900">
-                    {{ __('Powered by Shopper') }}
+                <a href="https://filamentphp.com" target="_blank" class="pl-1 underline hover:text-gray-900">
+                    {{ __('Powered by Filament') }}
                 </a>
             </p>
             <div class="mt-5 flex items-center gap-6 divide-x divide-gray-200 sm:mt-0">
@@ -196,7 +201,7 @@
                         {{ __('Exports') }}
                     </x-link>
                 @endif
-                @php($hasLegals = \Illuminate\Support\Facades\Schema::hasTable('sh_legals'))
+                @php($hasLegals = \Illuminate\Support\Facades\Schema::hasTable('legals'))
                 @if ($hasLegals)
                     @php($legalModel = app(\App\Models\Legal::class))
                     @php($privacy = $legalModel->newQuery()->where('slug', 'privacy')->where('is_enabled', true)->first())

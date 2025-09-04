@@ -1,0 +1,462 @@
+<?php declare(strict_types=1);
+
+namespace App\Filament\Pages;
+
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
+use Filament\Actions\Action;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+use Filament\Forms;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use BackedEnum;
+use UnitEnum;
+
+final class DataImportExport extends Page
+{
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrows-up-down';
+    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static ?int $navigationSort = 3;
+
+    public ?string $selectedModel = 'products';
+    public ?string $importFormat = 'csv';
+    public ?string $exportFormat = 'csv';
+    public array $importOptions = [];
+    public array $exportOptions = [];
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.data_import_export');
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('Admin');
+    }
+
+    public function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Tabs::make('import_export_tabs')
+                    ->tabs([
+                        Forms\Components\Tabs\Tab::make('import')
+                            ->label(__('admin.tabs.import_data'))
+                            ->icon('heroicon-m-arrow-down-tray')
+                            ->schema([
+                                Forms\Components\Select::make('selectedModel')
+                                    ->label(__('admin.fields.data_type'))
+                                    ->options([
+                                        'products' => __('admin.models.products'),
+                                        'categories' => __('admin.models.categories'),
+                                        'brands' => __('admin.models.brands'),
+                                        'users' => __('admin.models.users'),
+                                        'orders' => __('admin.models.orders'),
+                                    ])
+                                    ->default('products')
+                                    ->live(),
+                                Forms\Components\Select::make('importFormat')
+                                    ->label(__('admin.fields.format'))
+                                    ->options([
+                                        'csv' => 'CSV',
+                                        'xlsx' => 'Excel (XLSX)',
+                                        'json' => 'JSON',
+                                    ])
+                                    ->default('csv'),
+                                Forms\Components\FileUpload::make('import_file')
+                                    ->label(__('admin.fields.import_file'))
+                                    ->disk('local')
+                                    ->directory('imports')
+                                    ->acceptedFileTypes(['text/csv', 'application/vnd.ms-excel', 'application/json'])
+                                    ->maxSize(10240)  // 10MB
+                                    ->required(),
+                                Forms\Components\Fieldset::make(__('admin.fieldsets.import_options'))
+                                    ->schema([
+                                        Forms\Components\Toggle::make('importOptions.update_existing')
+                                            ->label(__('admin.fields.update_existing'))
+                                            ->default(true)
+                                            ->helperText(__('admin.help.update_existing_records')),
+                                        Forms\Components\Toggle::make('importOptions.validate_data')
+                                            ->label(__('admin.fields.validate_data'))
+                                            ->default(true)
+                                            ->helperText(__('admin.help.validate_before_import')),
+                                        Forms\Components\Toggle::make('importOptions.skip_errors')
+                                            ->label(__('admin.fields.skip_errors'))
+                                            ->default(false)
+                                            ->helperText(__('admin.help.continue_on_errors')),
+                                        Forms\Components\TextInput::make('importOptions.batch_size')
+                                            ->label(__('admin.fields.batch_size'))
+                                            ->numeric()
+                                            ->default(100)
+                                            ->minValue(10)
+                                            ->maxValue(1000)
+                                            ->helperText(__('admin.help.import_batch_size')),
+                                    ])
+                                    ->columns(2),
+                            ]),
+                        Forms\Components\Tabs\Tab::make('export')
+                            ->label(__('admin.tabs.export_data'))
+                            ->icon('heroicon-m-arrow-up-tray')
+                            ->schema([
+                                Forms\Components\Select::make('selectedModel')
+                                    ->label(__('admin.fields.data_type'))
+                                    ->options([
+                                        'products' => __('admin.models.products'),
+                                        'categories' => __('admin.models.categories'),
+                                        'brands' => __('admin.models.brands'),
+                                        'users' => __('admin.models.users'),
+                                        'orders' => __('admin.models.orders'),
+                                    ])
+                                    ->default('products')
+                                    ->live(),
+                                Forms\Components\Select::make('exportFormat')
+                                    ->label(__('admin.fields.format'))
+                                    ->options([
+                                        'csv' => 'CSV',
+                                        'xlsx' => 'Excel (XLSX)',
+                                        'json' => 'JSON',
+                                        'pdf' => 'PDF Report',
+                                    ])
+                                    ->default('csv'),
+                                Forms\Components\Fieldset::make(__('admin.fieldsets.export_options'))
+                                    ->schema([
+                                        Forms\Components\Toggle::make('exportOptions.include_relations')
+                                            ->label(__('admin.fields.include_relations'))
+                                            ->default(true)
+                                            ->helperText(__('admin.help.export_with_relations')),
+                                        Forms\Components\Toggle::make('exportOptions.include_media')
+                                            ->label(__('admin.fields.include_media'))
+                                            ->default(false)
+                                            ->helperText(__('admin.help.export_media_urls')),
+                                        Forms\Components\DatePicker::make('exportOptions.date_from')
+                                            ->label(__('admin.fields.date_from'))
+                                            ->helperText(__('admin.help.export_date_range')),
+                                        Forms\Components\DatePicker::make('exportOptions.date_to')
+                                            ->label(__('admin.fields.date_to'))
+                                            ->default(now()),
+                                        Forms\Components\TextInput::make('exportOptions.limit')
+                                            ->label(__('admin.fields.export_limit'))
+                                            ->numeric()
+                                            ->default(1000)
+                                            ->minValue(1)
+                                            ->maxValue(10000)
+                                            ->helperText(__('admin.help.export_limit')),
+                                    ])
+                                    ->columns(2),
+                            ]),
+                    ]),
+            ]);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('import_data')
+                ->label(__('admin.actions.import_data'))
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('success')
+                ->form([
+                    Forms\Components\FileUpload::make('file')
+                        ->label(__('admin.fields.import_file'))
+                        ->required()
+                        ->acceptedFileTypes(['text/csv', 'application/json']),
+                ])
+                ->action(function (array $data): void {
+                    $this->processImport($data['file']);
+                }),
+            Action::make('export_data')
+                ->label(__('admin.actions.export_data'))
+                ->icon('heroicon-o-arrow-up-tray')
+                ->color('primary')
+                ->action(function (): void {
+                    $this->processExport();
+                }),
+            Action::make('download_template')
+                ->label(__('admin.actions.download_template'))
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('info')
+                ->action(function (): void {
+                    $this->downloadTemplate();
+                }),
+        ];
+    }
+
+    public function processImport(UploadedFile $file): void
+    {
+        try {
+            $content = file_get_contents($file->getPathname());
+            $data = $this->parseImportData($content, $this->importFormat);
+
+            $imported = 0;
+            $errors = [];
+            $batchSize = $this->importOptions['batch_size'] ?? 100;
+
+            foreach (array_chunk($data, $batchSize) as $batch) {
+                foreach ($batch as $row) {
+                    try {
+                        $this->importRow($row);
+                        $imported++;
+                    } catch (\Exception $e) {
+                        $errors[] = $e->getMessage();
+
+                        if (!($this->importOptions['skip_errors'] ?? false)) {
+                            throw $e;
+                        }
+                    }
+                }
+            }
+
+            Notification::make()
+                ->title(__('admin.notifications.import_completed'))
+                ->body(__('admin.notifications.imported_records', ['count' => $imported]))
+                ->success()
+                ->send();
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title(__('admin.notifications.import_failed'))
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
+
+    public function processExport(): void
+    {
+        try {
+            $data = $this->getExportData();
+            $filename = $this->generateExportFilename();
+            $content = $this->formatExportData($data, $this->exportFormat);
+
+            Storage::disk('public')->put('exports/' . $filename, $content);
+
+            Notification::make()
+                ->title(__('admin.notifications.export_completed'))
+                ->body(__('admin.notifications.file_ready_download'))
+                ->success()
+                ->actions([
+                    \Filament\Notifications\Actions\Action::make('download')
+                        ->label(__('admin.actions.download'))
+                        ->url(asset('storage/exports/' . $filename))
+                        ->openUrlInNewTab(),
+                ])
+                ->send();
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title(__('admin.notifications.export_failed'))
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
+
+    public function downloadTemplate(): void
+    {
+        $headers = $this->getTemplateHeaders();
+        $filename = $this->selectedModel . '_template.csv';
+
+        $csv = implode(',', $headers) . "\n";
+        $csv .= implode(',', array_fill(0, count($headers), '""')) . "\n";
+
+        Storage::disk('public')->put('templates/' . $filename, $csv);
+
+        Notification::make()
+            ->title(__('admin.notifications.template_ready'))
+            ->success()
+            ->actions([
+                \Filament\Notifications\Actions\Action::make('download')
+                    ->label(__('admin.actions.download'))
+                    ->url(asset('storage/templates/' . $filename))
+                    ->openUrlInNewTab(),
+            ])
+            ->send();
+    }
+
+    private function parseImportData(string $content, string $format): array
+    {
+        return match ($format) {
+            'csv' => $this->parseCsv($content),
+            'json' => json_decode($content, true) ?? [],
+            default => [],
+        };
+    }
+
+    private function parseCsv(string $content): array
+    {
+        $lines = explode("\n", $content);
+        $headers = str_getcsv(array_shift($lines));
+        $data = [];
+
+        foreach ($lines as $line) {
+            if (trim($line)) {
+                $values = str_getcsv($line);
+                $data[] = array_combine($headers, $values);
+            }
+        }
+
+        return $data;
+    }
+
+    private function importRow(array $row): void
+    {
+        match ($this->selectedModel) {
+            'products' => $this->importProduct($row),
+            'categories' => $this->importCategory($row),
+            'brands' => $this->importBrand($row),
+            'users' => $this->importUser($row),
+            default => throw new \InvalidArgumentException('Unsupported model type'),
+        };
+    }
+
+    private function importProduct(array $row): void
+    {
+        $product = Product::updateOrCreate(
+            ['sku' => $row['sku']],
+            [
+                'name' => $row['name'],
+                'description' => $row['description'] ?? '',
+                'price' => (float) ($row['price'] ?? 0),
+                'stock_quantity' => (int) ($row['stock_quantity'] ?? 0),
+                'is_visible' => filter_var($row['is_visible'] ?? true, FILTER_VALIDATE_BOOLEAN),
+                'brand_id' => $this->findBrandId($row['brand_name'] ?? null),
+            ]
+        );
+
+        // Attach categories if provided
+        if (!empty($row['categories'])) {
+            $categoryNames = explode('|', $row['categories']);
+            $categoryIds = Category::whereIn('name', $categoryNames)->pluck('id');
+            $product->categories()->sync($categoryIds);
+        }
+    }
+
+    private function importCategory(array $row): void
+    {
+        Category::updateOrCreate(
+            ['slug' => \Str::slug($row['name'])],
+            [
+                'name' => $row['name'],
+                'description' => $row['description'] ?? '',
+                'is_visible' => filter_var($row['is_visible'] ?? true, FILTER_VALIDATE_BOOLEAN),
+                'parent_id' => $this->findCategoryId($row['parent_name'] ?? null),
+            ]
+        );
+    }
+
+    private function importBrand(array $row): void
+    {
+        Brand::updateOrCreate(
+            ['slug' => \Str::slug($row['name'])],
+            [
+                'name' => $row['name'],
+                'description' => $row['description'] ?? '',
+                'website' => $row['website'] ?? '',
+                'is_enabled' => filter_var($row['is_enabled'] ?? true, FILTER_VALIDATE_BOOLEAN),
+            ]
+        );
+    }
+
+    private function importUser(array $row): void
+    {
+        User::updateOrCreate(
+            ['email' => $row['email']],
+            [
+                'name' => $row['name'],
+                'first_name' => $row['first_name'] ?? '',
+                'last_name' => $row['last_name'] ?? '',
+                'phone' => $row['phone'] ?? '',
+                'is_active' => filter_var($row['is_active'] ?? true, FILTER_VALIDATE_BOOLEAN),
+            ]
+        );
+    }
+
+    private function getExportData(): array
+    {
+        $query = match ($this->selectedModel) {
+            'products' => Product::with(['brand', 'categories']),
+            'categories' => Category::with('parent'),
+            'brands' => Brand::query(),
+            'users' => User::where('is_admin', false),
+            'orders' => Order::with(['user', 'items']),
+            default => collect(),
+        };
+
+        if (isset($this->exportOptions['date_from'])) {
+            $query->where('created_at', '>=', $this->exportOptions['date_from']);
+        }
+
+        if (isset($this->exportOptions['date_to'])) {
+            $query->where('created_at', '<=', $this->exportOptions['date_to']);
+        }
+
+        $limit = $this->exportOptions['limit'] ?? 1000;
+        return $query->limit($limit)->get()->toArray();
+    }
+
+    private function formatExportData(array $data, string $format): string
+    {
+        return match ($format) {
+            'csv' => $this->formatAsCsv($data),
+            'json' => json_encode($data, JSON_PRETTY_PRINT),
+            'xlsx' => $this->formatAsExcel($data),
+            default => json_encode($data),
+        };
+    }
+
+    private function formatAsCsv(array $data): string
+    {
+        if (empty($data))
+            return '';
+
+        $headers = array_keys($data[0]);
+        $csv = implode(',', $headers) . "\n";
+
+        foreach ($data as $row) {
+            $values = array_map(fn($value) => '"' . str_replace('"', '""', $value) . '"', array_values($row));
+            $csv .= implode(',', $values) . "\n";
+        }
+
+        return $csv;
+    }
+
+    private function formatAsExcel(array $data): string
+    {
+        // For now, return CSV format - could implement PhpSpreadsheet here
+        return $this->formatAsCsv($data);
+    }
+
+    private function generateExportFilename(): string
+    {
+        return $this->selectedModel . '_export_' . now()->format('Y-m-d_H-i-s') . '.' . $this->exportFormat;
+    }
+
+    private function getTemplateHeaders(): array
+    {
+        return match ($this->selectedModel) {
+            'products' => ['name', 'sku', 'description', 'price', 'stock_quantity', 'brand_name', 'categories', 'is_visible'],
+            'categories' => ['name', 'description', 'parent_name', 'is_visible'],
+            'brands' => ['name', 'description', 'website', 'is_enabled'],
+            'users' => ['name', 'email', 'first_name', 'last_name', 'phone', 'is_active'],
+            'orders' => ['number', 'user_email', 'status', 'total', 'currency'],
+            default => ['id', 'name', 'created_at'],
+        };
+    }
+
+    private function findBrandId(?string $brandName): ?int
+    {
+        if (!$brandName)
+            return null;
+        return Brand::where('name', $brandName)->first()?->id;
+    }
+
+    private function findCategoryId(?string $categoryName): ?int
+    {
+        if (!$categoryName)
+            return null;
+        return Category::where('name', $categoryName)->first()?->id;
+    }
+}

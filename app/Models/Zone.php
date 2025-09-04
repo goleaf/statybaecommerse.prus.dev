@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,9 +11,13 @@ use Illuminate\Database\Eloquent\Model;
 
 final class Zone extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     protected $table = 'zones';
+
+    public array $translatable = ['name', 'description'];
+
+    protected string $translationModel = \App\Models\Translations\ZoneTranslation::class;
 
     protected $fillable = [
         'name',
@@ -24,6 +29,8 @@ final class Zone extends Model
         'tax_rate',
         'shipping_rate',
         'is_default',
+        'sort_order',
+        'description',
     ];
 
     protected function casts(): array
@@ -32,8 +39,10 @@ final class Zone extends Model
             'is_enabled' => 'boolean',
             'is_default' => 'boolean',
             'tax_rate' => 'decimal:4',
-            'shipping_rate' => 'decimal:4',
+            'shipping_rate' => 'decimal:2',
             'metadata' => 'array',
+            'name' => 'array',
+            'description' => 'array',
         ];
     }
 

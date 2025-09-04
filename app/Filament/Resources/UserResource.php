@@ -6,17 +6,18 @@ use App\Filament\Actions\DocumentAction;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
-use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use UnitEnum;
-use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
+use BackedEnum;
+use UnitEnum;
 
 final class UserResource extends Resource
 {
@@ -176,13 +177,14 @@ final class UserResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-                Tables\Actions\Action::make('impersonate')
+                Action::make('impersonate')
                     ->icon('heroicon-o-user-circle')
                     ->color('warning')
                     ->action(function (User $record) {
                         if (auth()->user()->can('impersonate users') && $record->id !== auth()->id()) {
                             session(['impersonating' => $record->id]);
-                            return redirect()->to('/')
+                            return redirect()
+                                ->to('/')
                                 ->with('success', __('Now impersonating :name', ['name' => $record->name]));
                         }
                     })

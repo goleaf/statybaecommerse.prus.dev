@@ -67,10 +67,10 @@ return new class extends Migration {
         try {
             // Rename all tables
             foreach ($this->tablesToRename as $oldName => $newName) {
-                if (Schema::hasTable($oldName) && !Schema::hasTable($newName)) {
-                    Schema::rename($oldName, $newName);
-                    echo "Renamed table: {$oldName} -> {$newName}\n";
-                }
+                            if (Schema::hasTable($oldName) && !Schema::hasTable($newName)) {
+                Schema::rename($oldName, $newName);
+                // Renamed table: {$oldName} -> {$newName}
+            }
             }
         } finally {
             // Re-enable foreign key checks

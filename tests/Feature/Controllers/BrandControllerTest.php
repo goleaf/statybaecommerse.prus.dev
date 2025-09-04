@@ -5,8 +5,8 @@ use Illuminate\Support\Facades\Schema;
 
 beforeEach(function (): void {
     $this->artisan('migrate', ['--force' => true]);
-    if (!Schema::hasTable('sh_brands')) {
-        Schema::create('sh_brands', function ($table) {
+    if (!Schema::hasTable('brands')) {
+        Schema::create('brands', function ($table) {
             $table->id();
             $table->string('name')->nullable();
             $table->string('slug')->nullable();
@@ -14,8 +14,8 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_brand_translations')) {
-        Schema::create('sh_brand_translations', function ($table) {
+    if (!Schema::hasTable('brand_translations')) {
+        Schema::create('brand_translations', function ($table) {
             $table->id();
             $table->unsignedBigInteger('brand_id');
             $table->string('locale');
@@ -23,8 +23,8 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_products')) {
-        Schema::create('sh_products', function ($table) {
+    if (!Schema::hasTable('products')) {
+        Schema::create('products', function ($table) {
             $table->id();
             $table->unsignedBigInteger('brand_id')->nullable();
             $table->string('slug')->nullable();
@@ -36,22 +36,22 @@ beforeEach(function (): void {
 });
 
 it('lists brands when feature enabled', function (): void {
-    config()->set('shopper.features.brand', true);
+    config()->set('app-features.features.brand', true);
     config()->set('app.supported_locales', 'en');
 
-    DB::table('sh_brands')->insert(['name' => 'Z', 'slug' => 'z', 'is_enabled' => true]);
-    DB::table('sh_brands')->insert(['name' => 'A', 'slug' => 'a', 'is_enabled' => true]);
+    DB::table('brands')->insert(['name' => 'Z', 'slug' => 'z', 'is_enabled' => true]);
+    DB::table('brands')->insert(['name' => 'A', 'slug' => 'a', 'is_enabled' => true]);
 
     $this->get('/en/brands')->assertOk();
 });
 
 it('brand show redirects to canonical slug', function (): void {
-    config()->set('shopper.features.brand', true);
+    config()->set('app-features.features.brand', true);
     config()->set('app.supported_locales', 'en');
 
-    $id = DB::table('sh_brands')->insertGetId(['name' => 'Acme', 'slug' => 'acme', 'is_enabled' => true]);
-    DB::table('sh_brand_translations')->insert(['brand_id' => $id, 'locale' => 'en', 'name' => 'Acme Inc', 'slug' => 'acme-inc', 'created_at' => now(), 'updated_at' => now()]);
+    $id = DB::table('brands')->insertGetId(['name' => 'Acme', 'slug' => 'acme', 'is_enabled' => true]);
+    DB::table('brand_translations')->insert(['brand_id' => $id, 'locale' => 'en', 'name' => 'Acme Inc', 'slug' => 'acme-inc', 'created_at' => now(), 'updated_at' => now()]);
 
-    config()->set('shopper.features.brand', true);
+    config()->set('app-features.features.brand', true);
     $this->get('/en/brands/acme')->assertRedirect('/en/brands/acme-inc');
 });

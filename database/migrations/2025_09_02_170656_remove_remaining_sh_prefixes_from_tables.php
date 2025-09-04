@@ -38,7 +38,7 @@ return new class extends Migration {
         foreach ($tablesToRename as $oldName => $newName) {
             if (Schema::hasTable($oldName) && !Schema::hasTable($newName)) {
                 Schema::rename($oldName, $newName);
-                echo "Renamed table: {$oldName} -> {$newName}\n";
+                // Renamed table: {$oldName} -> {$newName}
             }
         }
     }

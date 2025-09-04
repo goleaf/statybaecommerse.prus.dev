@@ -1,9 +1,17 @@
 ---
-description:
-globs:
 alwaysApply: true
 ---
 always use documentation from https://filamentphp.com/docs
 always use documentation from https://laravelshopper.dev/docs/2.x
 always use documentation from https://laravel.com/docs/12.x/
 always use mcp
+---
+do not use mysql, always use sqlite: 
+do not change to mysql or to another sql server
+DB_CONNECTION=sqlite
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=laravel
+# DB_USERNAME=root
+# DB_PASSWORD=
+---

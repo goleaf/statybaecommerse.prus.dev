@@ -12,7 +12,7 @@ final class ProductPlaceholdersSeeder extends Seeder
 {
     public function run(): void
     {
-        $collection = config('shopper.media.storage.collection_name');
+        $collection = config('media.storage.collection_name');
 
         /** @var GradientImageService $generator */
         $generator = app(GradientImageService::class);

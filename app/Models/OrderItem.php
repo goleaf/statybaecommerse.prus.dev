@@ -10,15 +10,16 @@ final class OrderItem extends Model
 {
     use HasFactory;
 
+    protected $table = 'order_items';
+
     protected $fillable = [
         'order_id',
         'product_id',
-        'variant_id',
-        'product_name',
-        'product_sku',
-        'variant_name',
+        'product_variant_id',
+        'name',
+        'sku',
         'quantity',
-        'price',
+        'unit_price',
         'total',
     ];
 
@@ -26,8 +27,8 @@ final class OrderItem extends Model
     {
         return [
             'quantity' => 'integer',
-            'price' => 'decimal:2',
-            'total' => 'decimal:2',
+            'unit_price' => 'float',
+            'total' => 'float',
         ];
     }
 
@@ -41,18 +42,25 @@ final class OrderItem extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function variant(): BelongsTo
+    public function productVariant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class);
     }
 
-    public function getDisplayNameAttribute(): string
+    protected static function boot(): void
     {
-        return $this->variant_name ?: $this->product_name;
-    }
+        parent::boot();
 
-    public function getUnitPriceAttribute(): float
-    {
-        return $this->quantity > 0 ? $this->total / $this->quantity : 0;
+        static::creating(function (OrderItem $orderItem) {
+            if (!$orderItem->total) {
+                $orderItem->total = $orderItem->unit_price * $orderItem->quantity;
+            }
+        });
+
+        static::updating(function (OrderItem $orderItem) {
+            if ($orderItem->isDirty(['unit_price', 'quantity'])) {
+                $orderItem->total = $orderItem->unit_price * $orderItem->quantity;
+            }
+        });
     }
 }

@@ -48,7 +48,6 @@ return [
     // Brand Information
     'brand_information' => 'Prekės ženklo informacija',
     'brand_images' => 'Prekės ženklo paveikslėliai',
-    
     // Product Images
     'product_images' => 'Produkto paveikslėliai',
     'product_image' => 'Produkto paveikslėlis',
@@ -361,7 +360,6 @@ return [
     'approve_selected' => 'Patvirtinti pažymėtus',
     'reject_selected' => 'Atmesti pažymėtus',
     'default_only' => 'Tik numatytuosius',
-
     // Review UI translations
     'customer_reviews' => 'Klientų atsiliepimai',
     'write_review' => 'Rašyti atsiliepimą',
@@ -377,7 +375,6 @@ return [
     'reviews_count' => '{1} :count atsiliepimas|{2,3,4} :count atsiliepimai|[5,*] :count atsiliepimų',
     'no_reviews_yet' => 'Atsiliepimų dar nėra',
     'be_first_to_review' => 'Būkite pirmi pasidalinti mintimis apie šį produktą.',
-
     // Address translations
     'addresses' => 'Adresai',
     'address_information' => 'Adreso informacija',
@@ -417,7 +414,6 @@ return [
     // Discount Codes
     'discount_code_information' => 'Nuolaidos kodo informacija',
     'discount_code_description_help' => 'Aprašykite nuolaidos kodo privalumus ir sąlygas',
-    
     // Patobulintas frontend ir admin
     'home_title' => 'Pagrindinis - E-komercijos parduotuvė',
     'home_description' => 'Profesionalūs įrankiai ir statybinės medžiagos rangovams ir namų meistrams',
@@ -443,7 +439,6 @@ return [
     'email_placeholder' => 'Įveskite savo el. pašto adresą',
     'subscribe' => 'Prenumeruoti',
     'newsletter_subscribed' => 'Sėkmingai prenumeruotas naujienlaiškis!',
-    
     // Admin skydelis
     'total_revenue' => 'Bendros pajamos',
     'total_orders' => 'Visi užsakymai',
@@ -469,7 +464,6 @@ return [
     'all_products_well_stocked' => 'Visi produktai turi pakankamai atsargų',
     'add_stock' => 'Pridėti atsargų',
     'stock_updated' => 'Atsargos sėkmingai atnaujintos!',
-    
     // Vietų frontend vertimai
     'locations' => 'Vietos',
     'no_locations_found' => 'Vietų nerasta',
@@ -478,4 +472,24 @@ return [
     'contact_information' => 'Kontaktinė informacija',
     'location_type' => 'Vietos tipas',
     'back_to_locations' => 'Grįžti į vietas',
+    // Dashboard Widget Translations
+    'todays_revenue' => 'Šiandienos pajamos',
+    'todays_orders' => 'Šiandienos užsakymai',
+    'new_customers_today' => 'Nauji klientai šiandien',
+    'inventory_alerts' => 'Atsargų įspėjimai',
+    'inventory_healthy' => 'Atsargos normalios',
+    'pending_orders' => 'Laukiantys užsakymai',
+    'orders_awaiting_processing' => 'Užsakymai laukia apdorojimo',
+    'total_products' => 'Viso produktų',
+    'visible_products_count' => 'Matomų produktų skaičius',
+    'revenue_growth_positive' => '+:percent% augimas',
+    'revenue_growth_negative' => '-:percent% sumažėjimas',
+    'order_growth_positive' => '+:percent% augimas',
+    'order_growth_negative' => '-:percent% sumažėjimas',
+    'customer_retention_rate' => ':rate% klientų išlaikymo rodiklis',
+    'out_of_stock_products' => ':count produktų nėra atsargų',
+    // Time periods
+    'today' => 'Šiandien',
+    'this_week' => 'Šią savaitę',
+    'this_month' => 'Šį mėnesį',
 ];

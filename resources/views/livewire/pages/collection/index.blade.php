@@ -31,7 +31,7 @@
                 <a href="{{ route('collection.show', ['locale' => app()->getLocale(), 'slug' => $collection->trans('slug') ?? $collection->slug]) }}"
                    class="block border rounded-lg p-4 hover:shadow-sm">
                     <div class="aspect-square bg-gray-50 flex items-center justify-center mb-3">
-                        @php($thumb = $collection->getFirstMediaUrl(config('shopper.media.storage.thumbnail_collection')) ?: ($collection->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'small') ?: $collection->getFirstMediaUrl(config('shopper.media.storage.collection_name'))))
+                        @php($thumb = $collection->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: ($collection->getFirstMediaUrl(config('media.storage.collection_name'), 'small') ?: $collection->getFirstMediaUrl(config('media.storage.collection_name'))))
                         @if ($thumb)
                             <img loading="lazy" src="{{ $thumb }}"
                                  alt="{{ $collection->trans('name') ?? $collection->name }}"

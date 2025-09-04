@@ -3,8 +3,8 @@
 namespace App\Services\Images;
 
 use App\Models\Product;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Support\Facades\Cache;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class ImageStatsService
 {
@@ -49,10 +49,12 @@ final class ImageStatsService
 
     public function getTopProductsByImages(int $limit = 10): array
     {
-        return Product::withCount(['media' => function ($q) {
+        return Product::whereHas('media', function ($q) {
+            $q->where('collection_name', 'images');
+        })
+            ->withCount(['media' => function ($q) {
                 $q->where('collection_name', 'images');
             }])
-            ->having('media_count', '>', 0)
             ->orderBy('media_count', 'desc')
             ->limit($limit)
             ->get(['id', 'name', 'slug'])
@@ -92,11 +94,11 @@ final class ImageStatsService
     private function formatBytes(float $bytes, int $precision = 2): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
+
         return round($bytes, $precision) . ' ' . $units[$i];
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Livewire\Pages;
 
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
-use App\Models\Review;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Review;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 
@@ -23,7 +23,7 @@ final class EnhancedHome extends Component
             ->where('is_featured', true)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
-            ->orderBy('sort_order')
+            ->orderBy('created_at', 'desc')
             ->limit(8)
             ->get();
     }
@@ -47,8 +47,8 @@ final class EnhancedHome extends Component
             ->where('is_visible', true)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
+            ->whereHas('reviews')
             ->withCount('reviews')
-            ->having('reviews_count', '>', 0)
             ->orderBy('reviews_count', 'desc')
             ->limit(8)
             ->get();
@@ -60,11 +60,13 @@ final class EnhancedHome extends Component
             ->with(['media'])
             ->where('is_visible', true)
             ->where('is_featured', true)
+            ->whereHas('products', function ($query) {
+                $query->where('is_visible', true);
+            })
             ->withCount(['products' => function ($query) {
                 $query->where('is_visible', true);
             }])
-            ->having('products_count', '>', 0)
-            ->orderBy('sort_order')
+            ->orderBy('id')
             ->limit(6)
             ->get();
     }
@@ -73,12 +75,14 @@ final class EnhancedHome extends Component
     {
         return Brand::query()
             ->with(['media'])
-            ->where('is_visible', true)
+            ->where('is_enabled', true)
             ->where('is_featured', true)
+            ->whereHas('products', function ($query) {
+                $query->where('is_visible', true);
+            })
             ->withCount(['products' => function ($query) {
                 $query->where('is_visible', true);
             }])
-            ->having('products_count', '>', 0)
             ->orderBy('sort_order')
             ->limit(8)
             ->get();
@@ -102,7 +106,7 @@ final class EnhancedHome extends Component
         return [
             'products_count' => Product::where('is_visible', true)->count(),
             'categories_count' => Category::where('is_visible', true)->count(),
-            'brands_count' => Brand::where('is_visible', true)->count(),
+            'brands_count' => Brand::where('is_enabled', true)->count(),
             'reviews_count' => Review::where('is_approved', true)->count(),
             'avg_rating' => Review::where('is_approved', true)->avg('rating') ?? 0,
         ];
@@ -111,7 +115,7 @@ final class EnhancedHome extends Component
     public function addToCart(int $productId): void
     {
         $product = Product::find($productId);
-        
+
         if (!$product || !$product->is_visible) {
             $this->notifyError(__('Product not found or not available'));
             return;
@@ -123,7 +127,7 @@ final class EnhancedHome extends Component
         }
 
         $cartItems = session()->get('cart', []);
-        
+
         if (isset($cartItems[$productId])) {
             $cartItems[$productId]['quantity']++;
         } else {
@@ -135,9 +139,9 @@ final class EnhancedHome extends Component
                 'sku' => $product->sku,
             ];
         }
-        
+
         session()->put('cart', $cartItems);
-        
+
         $this->dispatch('cart-updated');
         $this->notifySuccess(__('Product added to cart'));
     }

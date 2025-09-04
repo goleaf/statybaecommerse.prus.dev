@@ -6,14 +6,14 @@ use App\Filament\Resources\DocumentResource\Pages;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Services\DocumentService;
-use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 final class DocumentResource extends Resource
 {
@@ -46,12 +46,10 @@ final class DocumentResource extends Resource
                                     }
                                 }
                             }),
-
                         Forms\Components\TextInput::make('title')
                             ->label(__('documents.title'))
                             ->required()
                             ->maxLength(255),
-
                         Forms\Components\Select::make('status')
                             ->label(__('documents.status'))
                             ->required()
@@ -61,7 +59,6 @@ final class DocumentResource extends Resource
                                 'archived' => __('documents.statuses.archived'),
                             ])
                             ->default('draft'),
-
                         Forms\Components\Select::make('format')
                             ->label(__('documents.format'))
                             ->required()
@@ -72,7 +69,6 @@ final class DocumentResource extends Resource
                             ->default('html'),
                     ])
                     ->columns(2),
-
                 Forms\Components\Section::make(__('documents.content'))
                     ->components([
                         Forms\Components\RichEditor::make('content')
@@ -95,7 +91,6 @@ final class DocumentResource extends Resource
                                 'undo',
                             ]),
                     ]),
-
                 Forms\Components\Section::make(__('documents.variables'))
                     ->components([
                         Forms\Components\KeyValue::make('variables')
@@ -106,21 +101,17 @@ final class DocumentResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->collapsed(),
-
                 Forms\Components\Section::make(__('documents.metadata'))
                     ->components([
                         Forms\Components\TextInput::make('documentable_type')
                             ->label(__('documents.related_model_type'))
                             ->disabled(),
-
                         Forms\Components\TextInput::make('documentable_id')
                             ->label(__('documents.related_model_id'))
                             ->disabled(),
-
                         Forms\Components\TextInput::make('file_path')
                             ->label(__('documents.file_path'))
                             ->disabled(),
-
                         Forms\Components\DateTimePicker::make('generated_at')
                             ->label(__('documents.generated_at'))
                             ->disabled(),
@@ -138,12 +129,10 @@ final class DocumentResource extends Resource
                     ->label(__('documents.title'))
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('template.name')
                     ->label(__('documents.template'))
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('template.type')
                     ->label(__('documents.type'))
                     ->badge()
@@ -154,7 +143,6 @@ final class DocumentResource extends Resource
                         'info' => 'document',
                     ])
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('documents.status'))
                     ->badge()
@@ -164,7 +152,6 @@ final class DocumentResource extends Resource
                         'danger' => 'archived',
                     ])
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('format')
                     ->label(__('documents.format'))
                     ->badge()
@@ -173,18 +160,15 @@ final class DocumentResource extends Resource
                         'success' => 'pdf',
                     ])
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('documentable_type')
                     ->label(__('documents.related_model'))
-                    ->formatStateUsing(fn (string $state): string => class_basename($state))
+                    ->formatStateUsing(fn(string $state): string => class_basename($state))
                     ->toggleable(),
-
                 Tables\Columns\TextColumn::make('creator.name')
                     ->label(__('documents.created_by'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('documents.created_at'))
                     ->dateTime()
@@ -196,7 +180,6 @@ final class DocumentResource extends Resource
                     ->relationship('template', 'name')
                     ->searchable()
                     ->preload(),
-
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('documents.status'))
                     ->options([
@@ -204,14 +187,12 @@ final class DocumentResource extends Resource
                         'published' => __('documents.statuses.published'),
                         'archived' => __('documents.statuses.archived'),
                     ]),
-
                 Tables\Filters\SelectFilter::make('format')
                     ->label(__('documents.format'))
                     ->options([
                         'html' => 'HTML',
                         'pdf' => 'PDF',
                     ]),
-
                 Tables\Filters\Filter::make('created_at')
                     ->label(__('documents.created_at'))
                     ->form([
@@ -224,11 +205,11 @@ final class DocumentResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -237,22 +218,20 @@ final class DocumentResource extends Resource
                     ->label(__('documents.generate_pdf'))
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('success')
-                    ->visible(fn (Document $record): bool => $record->format === 'html')
+                    ->visible(fn(Document $record): bool => $record->format === 'html')
                     ->action(function (Document $record) {
                         $service = app(DocumentService::class);
                         $url = $service->generatePdf($record);
-                        
+
                         return redirect($url);
                     }),
-
                 Tables\Actions\Action::make('download')
                     ->label(__('documents.download'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('primary')
-                    ->visible(fn (Document $record): bool => $record->isPdf() && $record->file_path)
-                    ->url(fn (Document $record): string => asset('storage/' . $record->file_path))
+                    ->visible(fn(Document $record): bool => $record->isPdf() && $record->file_path)
+                    ->url(fn(Document $record): string => asset('storage/' . $record->file_path))
                     ->openUrlInNewTab(),
-
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -276,7 +255,7 @@ final class DocumentResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::getModel()::count();
     }
 
     public static function getGlobalSearchEloquentQuery(): Builder

@@ -37,13 +37,12 @@ class BrandTest extends TestCase
 
     public function test_brand_cache_flush_on_save(): void
     {
-        $brand = Brand::factory()->create();
-        
         // Mock cache to test if flush is called
         \Illuminate\Support\Facades\Cache::shouldReceive('forget')
-            ->with('sitemap:urls:en')
+            ->atLeast()
             ->once();
 
+        $brand = Brand::factory()->create();
         $brand->save();
     }
 

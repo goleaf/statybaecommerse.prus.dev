@@ -22,13 +22,7 @@ if (!function_exists('app_setting')) {
     }
 }
 
-// Legacy alias for backward compatibility
-if (!function_exists('shopper_setting')) {
-    function shopper_setting(string $key, mixed $default = null): mixed
-    {
-        return app_setting($key, $default);
-    }
-}
+// Removed legacy shopper_setting - use app_setting instead
 
 use App\Actions\ZoneSessionManager;
 use Illuminate\Support\Facades\Schema;
@@ -114,13 +108,7 @@ if (!function_exists('format_date')) {
     }
 }
 
-// Legacy alias for backward compatibility - use app_money_format instead
-if (!function_exists('shopper_money_format')) {
-    function shopper_money_format(float|int|string $amount, ?string $currency = null): string
-    {
-        return app_money_format($amount, $currency);
-    }
-}
+// Removed legacy shopper_money_format - use app_money_format instead
 
 if (!function_exists('format_datetime')) {
     function format_datetime(\DateTimeInterface|string|null $dateTime): string

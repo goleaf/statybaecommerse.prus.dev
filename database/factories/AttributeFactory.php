@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AttributeFactory extends Factory
 {
-    protected $model = \Shop\Core\Models\Attribute::class;
+    protected $model = \App\Models\Attribute::class;
 
     public function definition(): array
     {

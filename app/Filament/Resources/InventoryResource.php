@@ -155,13 +155,8 @@ final class InventoryResource extends Resource
                     ->label(__('Stock'))
                     ->numeric()
                     ->sortable()
-                    ->color(fn (int $state, Product $record): string => {
-                        if (!$record->manage_stock) return 'gray';
-                        if ($state <= 0) return 'danger';
-                        if ($state <= $record->low_stock_threshold) return 'warning';
-                        return 'success';
-                    })
-                    ->weight('bold'),
+                    ->badge()
+                    ->color('primary'),
 
                 Tables\Columns\TextColumn::make('low_stock_threshold')
                     ->label(__('Threshold'))
@@ -177,20 +172,8 @@ final class InventoryResource extends Resource
 
                 Tables\Columns\TextColumn::make('stock_status')
                     ->label(__('Status'))
-                    ->getStateUsing(fn (Product $record): string => {
-                        if (!$record->manage_stock) return __('Not Tracked');
-                        if ($record->stock_quantity <= 0) return __('Out of Stock');
-                        if ($record->stock_quantity <= $record->low_stock_threshold) return __('Low Stock');
-                        return __('In Stock');
-                    })
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'Out of Stock' => 'danger',
-                        'Low Stock' => 'warning',
-                        'In Stock' => 'success',
-                        'Not Tracked' => 'gray',
-                        default => 'secondary',
-                    }),
+                    ->color('primary'),
 
                 Tables\Columns\TextColumn::make('price')
                     ->label(__('Price'))

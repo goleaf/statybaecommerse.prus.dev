@@ -22,7 +22,8 @@
         "solution-forest/tab-layout-plugin": "^3.2",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-medialibrary": "^11",
-        "spatie/laravel-permission": "^6.21"
+        "spatie/laravel-permission": "^6.21",
+        "spatie/laravel-translatable": "^6.11"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",

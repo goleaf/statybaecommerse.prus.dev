@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\BulkProductOperationsAction;
 use App\Filament\Actions\DocumentAction;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
@@ -401,7 +402,7 @@ final class ProductResource extends Resource
                         '$PRODUCT_PRICE' => number_format($record->price, 2) . ' EUR',
                         '$PRODUCT_DESCRIPTION' => $record->description,
                         '$PRODUCT_BRAND' => $record->brand?->name ?? '',
-                        '$PRODUCT_CATEGORY' => $record->category?->name ?? '',
+                        '$PRODUCT_CATEGORY' => $record->categories->pluck('name')->join(', '),
                         '$PRODUCT_WEIGHT' => $record->weight ? $record->weight . ' kg' : '',
                     ]),
                 Tables\Actions\ViewAction::make(),
@@ -502,6 +503,6 @@ final class ProductResource extends Resource
     public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()
-            ->with(['brand', 'category']);
+            ->with(['brand', 'categories']);
     }
 }

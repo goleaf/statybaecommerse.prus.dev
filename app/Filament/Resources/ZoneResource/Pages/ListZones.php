@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ZoneResource\Pages;
 
 use App\Filament\Resources\ZoneResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
 
 final class ListZones extends ListRecords
 {
@@ -13,7 +13,13 @@ final class ListZones extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label(__('admin.actions.create_zone')),
         ];
+    }
+
+    public function getTitle(): string
+    {
+        return __('admin.titles.zones');
     }
 }

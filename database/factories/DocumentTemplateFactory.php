@@ -6,36 +6,46 @@ use App\Models\DocumentTemplate;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\DocumentTemplate>
+ */
 final class DocumentTemplateFactory extends Factory
 {
     protected $model = DocumentTemplate::class;
 
     public function definition(): array
     {
-        $name = fake()->words(3, true);
-        
+        $name = $this->faker->words(3, true) . ' Template';
+
         return [
             'name' => $name,
             'slug' => Str::slug($name),
-            'description' => fake()->sentence(),
-            'content' => $this->generateSampleContent(),
-            'variables' => $this->generateSampleVariables(),
-            'type' => fake()->randomElement(['invoice', 'receipt', 'contract', 'agreement', 'catalog', 'report', 'certificate', 'document']),
-            'category' => fake()->randomElement(['sales', 'marketing', 'legal', 'finance', 'operations', 'customer_service']),
+            'description' => $this->faker->sentence(),
+            'content' => $this->generateTemplateContent(),
+            'variables' => $this->generateVariables(),
+            'type' => $this->faker->randomElement(['invoice', 'receipt', 'contract', 'agreement', 'catalog', 'report', 'certificate']),
+            'category' => $this->faker->randomElement(['sales', 'marketing', 'legal', 'finance', 'operations', 'customer_service']),
             'settings' => [
-                'page_size' => 'A4',
-                'orientation' => 'portrait',
-                'margins' => ['top' => 20, 'right' => 20, 'bottom' => 20, 'left' => 20],
+                'page_size' => $this->faker->randomElement(['A4', 'Letter', 'Legal']),
+                'orientation' => $this->faker->randomElement(['portrait', 'landscape']),
+                'margins' => $this->faker->randomElement(['10mm', '15mm', '20mm']),
+                'font_family' => $this->faker->randomElement(['Arial', 'Helvetica', 'Times New Roman']),
+                'font_size' => $this->faker->randomElement(['10pt', '11pt', '12pt']),
             ],
-            'is_active' => true,
+            'is_active' => $this->faker->boolean(80),  // 80% chance of being active
         ];
     }
 
-    private function generateSampleContent(): string
+    /**
+     * Generate template content with placeholders.
+     */
+    private function generateTemplateContent(): string
     {
-        return '<html>
+        return '
+<!DOCTYPE html>
+<html>
 <head>
-    <title>$DOCUMENT_TITLE</title>
+    <title>{{DOCUMENT_TITLE}}</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         .header { text-align: center; margin-bottom: 30px; }
@@ -45,142 +55,321 @@ final class DocumentTemplateFactory extends Factory
 </head>
 <body>
     <div class="header">
-        <h1>$COMPANY_NAME</h1>
-        <p>$COMPANY_ADDRESS</p>
+        <h1>{{COMPANY_NAME}}</h1>
+        <p>{{COMPANY_ADDRESS}}</p>
     </div>
     
     <div class="content">
-        <h2>$DOCUMENT_TYPE</h2>
-        <p><strong>Date:</strong> $CURRENT_DATE</p>
-        <p><strong>Customer:</strong> $CUSTOMER_NAME</p>
-        <p><strong>Email:</strong> $CUSTOMER_EMAIL</p>
+        <h2>{{DOCUMENT_TITLE}}</h2>
+        <p><strong>Date:</strong> {{DOCUMENT_DATE}}</p>
+        <p><strong>Customer:</strong> {{CUSTOMER_NAME}}</p>
         
-        <h3>Details</h3>
-        <p>$CONTENT_DETAILS</p>
+        <div class="details">
+            {{DOCUMENT_CONTENT}}
+        </div>
         
-        <p><strong>Total Amount:</strong> $TOTAL_AMOUNT</p>
+        <div class="totals">
+            <p><strong>Total:</strong> {{TOTAL_AMOUNT}}</p>
+        </div>
     </div>
     
     <div class="footer">
-        <p>Generated on $GENERATION_DATE</p>
-        <p>$COMPANY_NAME - $COMPANY_WEBSITE</p>
+        <p>Generated on {{GENERATION_DATE}}</p>
+        <p>{{COMPANY_NAME}} - All rights reserved</p>
     </div>
 </body>
 </html>';
     }
 
-    private function generateSampleVariables(): array
+    /**
+     * Generate common template variables.
+     */
+    private function generateVariables(): array
     {
         return [
-            '$DOCUMENT_TITLE',
-            '$COMPANY_NAME',
-            '$COMPANY_ADDRESS',
-            '$COMPANY_WEBSITE',
-            '$DOCUMENT_TYPE',
-            '$CURRENT_DATE',
-            '$GENERATION_DATE',
-            '$CUSTOMER_NAME',
-            '$CUSTOMER_EMAIL',
-            '$CONTENT_DETAILS',
-            '$TOTAL_AMOUNT',
+            'COMPANY_NAME',
+            'COMPANY_ADDRESS',
+            'DOCUMENT_TITLE',
+            'DOCUMENT_DATE',
+            'CUSTOMER_NAME',
+            'CUSTOMER_EMAIL',
+            'DOCUMENT_CONTENT',
+            'TOTAL_AMOUNT',
+            'GENERATION_DATE',
         ];
     }
 
+    /**
+     * Indicate that the template is active.
+     */
+    public function active(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_active' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the template is inactive.
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_active' => false,
+        ]);
+    }
+
+    /**
+     * Indicate that the template is for invoices.
+     */
     public function invoice(): static
     {
-        return $this->state([
+        return $this->state(fn(array $attributes) => [
+            'name' => 'Invoice Template',
+            'slug' => 'invoice-template',
             'type' => 'invoice',
             'category' => 'sales',
-            'content' => $this->generateInvoiceContent(),
+            'variables' => [
+                'INVOICE_NUMBER',
+                'INVOICE_DATE',
+                'DUE_DATE',
+                'CUSTOMER_NAME',
+                'CUSTOMER_ADDRESS',
+                'CUSTOMER_EMAIL',
+                'ITEMS_TABLE',
+                'SUBTOTAL',
+                'TAX_AMOUNT',
+                'TOTAL_AMOUNT',
+                'PAYMENT_TERMS',
+                'COMPANY_NAME',
+                'COMPANY_ADDRESS',
+                'COMPANY_TAX_ID',
+            ],
+            'content' => $this->generateInvoiceTemplate(),
         ]);
     }
 
+    /**
+     * Indicate that the template is for receipts.
+     */
     public function receipt(): static
     {
-        return $this->state([
+        return $this->state(fn(array $attributes) => [
+            'name' => 'Receipt Template',
+            'slug' => 'receipt-template',
             'type' => 'receipt',
             'category' => 'sales',
-            'content' => $this->generateReceiptContent(),
+            'variables' => [
+                'RECEIPT_NUMBER',
+                'PURCHASE_DATE',
+                'CUSTOMER_NAME',
+                'ITEMS_TABLE',
+                'PAYMENT_METHOD',
+                'AMOUNT_PAID',
+                'CHANGE_GIVEN',
+                'COMPANY_NAME',
+                'COMPANY_ADDRESS',
+            ],
+            'content' => $this->generateReceiptTemplate(),
         ]);
     }
 
-    private function generateInvoiceContent(): string
+    /**
+     * Indicate that the template is for contracts.
+     */
+    public function contract(): static
     {
-        return '<html>
+        return $this->state(fn(array $attributes) => [
+            'name' => 'Contract Template',
+            'slug' => 'contract-template',
+            'type' => 'contract',
+            'category' => 'legal',
+            'variables' => [
+                'CONTRACT_NUMBER',
+                'CONTRACT_DATE',
+                'EFFECTIVE_DATE',
+                'EXPIRY_DATE',
+                'PARTY_A',
+                'PARTY_B',
+                'CONTRACT_TERMS',
+                'CONTRACT_VALUE',
+                'SIGNATURES',
+            ],
+            'content' => $this->generateContractTemplate(),
+        ]);
+    }
+
+    /**
+     * Generate invoice template content.
+     */
+    private function generateInvoiceTemplate(): string
+    {
+        return '
+<!DOCTYPE html>
+<html>
 <head>
-    <title>Invoice - $INVOICE_NUMBER</title>
+    <title>Invoice {{INVOICE_NUMBER}}</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        .invoice-header { text-align: center; margin-bottom: 30px; }
+        .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
         .invoice-details { margin: 20px 0; }
-        .invoice-items { margin: 20px 0; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .total { font-weight: bold; }
+        .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .items-table th, .items-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .totals { text-align: right; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div class="invoice-header">
-        <h1>INVOICE</h1>
-        <p>Invoice Number: $INVOICE_NUMBER</p>
-        <p>Date: $INVOICE_DATE</p>
+    <div class="header">
+        <div>
+            <h1>{{COMPANY_NAME}}</h1>
+            <p>{{COMPANY_ADDRESS}}</p>
+            <p>Tax ID: {{COMPANY_TAX_ID}}</p>
+        </div>
+        <div>
+            <h2>INVOICE</h2>
+            <p><strong>Invoice #:</strong> {{INVOICE_NUMBER}}</p>
+            <p><strong>Date:</strong> {{INVOICE_DATE}}</p>
+            <p><strong>Due Date:</strong> {{DUE_DATE}}</p>
+        </div>
     </div>
     
     <div class="invoice-details">
         <h3>Bill To:</h3>
-        <p>$CUSTOMER_NAME</p>
-        <p>$CUSTOMER_ADDRESS</p>
-        <p>$CUSTOMER_EMAIL</p>
+        <p>{{CUSTOMER_NAME}}</p>
+        <p>{{CUSTOMER_ADDRESS}}</p>
+        <p>{{CUSTOMER_EMAIL}}</p>
     </div>
     
-    <div class="invoice-items">
-        <h3>Items:</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                $INVOICE_ITEMS
-            </tbody>
-        </table>
-        
-        <p class="total">Total: $INVOICE_TOTAL</p>
+    {{ITEMS_TABLE}}
+    
+    <div class="totals">
+        <p><strong>Subtotal:</strong> {{SUBTOTAL}}</p>
+        <p><strong>Tax:</strong> {{TAX_AMOUNT}}</p>
+        <p><strong>Total:</strong> {{TOTAL_AMOUNT}}</p>
+    </div>
+    
+    <div class="payment-terms">
+        <h3>Payment Terms:</h3>
+        <p>{{PAYMENT_TERMS}}</p>
     </div>
 </body>
 </html>';
     }
 
-    private function generateReceiptContent(): string
+    /**
+     * Generate receipt template content.
+     */
+    private function generateReceiptTemplate(): string
     {
-        return '<html>
+        return '
+<!DOCTYPE html>
+<html>
 <head>
-    <title>Receipt - $RECEIPT_NUMBER</title>
+    <title>Receipt {{RECEIPT_NUMBER}}</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
         .receipt { max-width: 300px; margin: 0 auto; }
-        .items { text-align: left; margin: 20px 0; }
+        .items { margin: 20px 0; }
+        .total { font-weight: bold; font-size: 18px; margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="receipt">
-        <h2>$COMPANY_NAME</h2>
-        <p>Receipt #$RECEIPT_NUMBER</p>
-        <p>$RECEIPT_DATE</p>
+        <h2>{{COMPANY_NAME}}</h2>
+        <p>{{COMPANY_ADDRESS}}</p>
+        
+        <hr>
+        
+        <p><strong>Receipt #:</strong> {{RECEIPT_NUMBER}}</p>
+        <p><strong>Date:</strong> {{PURCHASE_DATE}}</p>
+        <p><strong>Customer:</strong> {{CUSTOMER_NAME}}</p>
+        
+        <hr>
         
         <div class="items">
-            $RECEIPT_ITEMS
+            {{ITEMS_TABLE}}
         </div>
         
-        <p><strong>Total: $RECEIPT_TOTAL</strong></p>
-        <p>Thank you for your purchase!</p>
+        <hr>
+        
+        <div class="total">
+            <p>Total: {{AMOUNT_PAID}}</p>
+            <p>Payment Method: {{PAYMENT_METHOD}}</p>
+            <p>Change: {{CHANGE_GIVEN}}</p>
+        </div>
+        
+        <hr>
+        
+        <p>Thank you for your business!</p>
     </div>
 </body>
 </html>';
+    }
+
+    /**
+     * Generate contract template content.
+     */
+    private function generateContractTemplate(): string
+    {
+        return '
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contract {{CONTRACT_NUMBER}}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .parties { margin: 30px 0; }
+        .terms { margin: 30px 0; }
+        .signatures { margin-top: 50px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CONTRACT AGREEMENT</h1>
+        <p>Contract Number: {{CONTRACT_NUMBER}}</p>
+        <p>Date: {{CONTRACT_DATE}}</p>
+    </div>
+    
+    <div class="parties">
+        <p>This agreement is entered into between:</p>
+        <p><strong>Party A:</strong> {{PARTY_A}}</p>
+        <p><strong>Party B:</strong> {{PARTY_B}}</p>
+    </div>
+    
+    <div class="terms">
+        <h3>Terms and Conditions:</h3>
+        {{CONTRACT_TERMS}}
+        
+        <p><strong>Contract Value:</strong> {{CONTRACT_VALUE}}</p>
+        <p><strong>Effective Date:</strong> {{EFFECTIVE_DATE}}</p>
+        <p><strong>Expiry Date:</strong> {{EXPIRY_DATE}}</p>
+    </div>
+    
+    <div class="signatures">
+        {{SIGNATURES}}
+    </div>
+</body>
+</html>';
+    }
+
+    /**
+     * Set custom variables for the template.
+     */
+    public function withVariables(array $variables): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'variables' => $variables,
+        ]);
+    }
+
+    /**
+     * Set custom settings for the template.
+     */
+    public function withSettings(array $settings): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'settings' => array_merge($attributes['settings'] ?? [], $settings),
+        ]);
     }
 }

@@ -101,7 +101,7 @@
 @section('meta')
     @php
         $first = $products->first();
-        $cname = config('shopper.media.storage.collection_name');
+        $cname = config('media.storage.collection_name');
         $ogImage = $first?->getFirstMediaUrl($cname, 'large');
         $preSmall = $first?->getFirstMediaUrl($cname, 'small');
         $preMedium = $first?->getFirstMediaUrl($cname, 'medium');

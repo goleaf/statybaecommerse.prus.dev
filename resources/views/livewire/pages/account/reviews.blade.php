@@ -10,8 +10,8 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
         $user = auth()->user();
         $this->reviews = collect();
 
-        if ($user && class_exists(\Shop\Core\Models\Review::class)) {
-            $this->reviews = \Shop\Core\Models\Review::query()->where('user_id', $user->id)->latest()->limit(200)->get();
+        if ($user) {
+            $this->reviews = \App\Models\Review::query()->where('user_id', $user->id)->latest()->limit(200)->get();
         }
     }
 }; ?>

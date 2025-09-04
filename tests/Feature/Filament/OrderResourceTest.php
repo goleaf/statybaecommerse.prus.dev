@@ -1,248 +1,215 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Feature\Filament;
-
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Filament\Actions\DeleteAction;
 use Livewire\Livewire;
-use Tests\TestCase;
 
-final class OrderResourceTest extends TestCase
-{
-    use RefreshDatabase;
+beforeEach(function () {
+    $this->admin = User::factory()->create();
+    $this->admin->assignRole('admin');
+    $this->actingAs($this->admin);
+});
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        
-        $this->actingAs(User::factory()->create([
-            'email' => 'admin@admin.com',
-            'is_active' => true,
-        ]));
-    }
+it('can render order resource index page', function () {
+    $this->get(OrderResource::getUrl('index'))
+        ->assertSuccessful();
+});
 
-    public function test_can_render_order_list_page(): void
-    {
-        Order::factory()->count(5)->create();
+it('can list orders', function () {
+    $orders = Order::factory()->count(10)->create();
 
-        $response = $this->get(OrderResource::getUrl('index'));
+    Livewire::test(OrderResource\Pages\ListOrders::class)
+        ->assertCanSeeTableRecords($orders);
+});
 
-        $response->assertOk();
-    }
+it('can render order resource create page', function () {
+    $this->get(OrderResource::getUrl('create'))
+        ->assertSuccessful();
+});
 
-    public function test_can_list_orders(): void
-    {
-        $orders = Order::factory()->count(10)->create();
+it('can create order', function () {
+    $customer = User::factory()->create();
+    
+    $newData = [
+        'number' => 'ORD-' . now()->format('YmdHis'),
+        'user_id' => $customer->id,
+        'status' => 'pending',
+        'currency' => 'EUR',
+        'subtotal' => 100.00,
+        'tax_amount' => 21.00,
+        'shipping_amount' => 5.00,
+        'discount_amount' => 0.00,
+        'total' => 126.00,
+    ];
 
-        Livewire::test(OrderResource\Pages\ListOrders::class)
-            ->assertCanSeeTableRecords($orders);
-    }
+    Livewire::test(OrderResource\Pages\CreateOrder::class)
+        ->fillForm($newData)
+        ->call('create')
+        ->assertHasNoFormErrors();
 
-    public function test_can_search_orders_by_number(): void
-    {
-        $orders = Order::factory()->count(5)->create();
-        $firstOrder = $orders->first();
+    $this->assertDatabaseHas(Order::class, [
+        'number' => $newData['number'],
+        'user_id' => $customer->id,
+        'total' => 126.00,
+    ]);
+});
 
-        Livewire::test(OrderResource\Pages\ListOrders::class)
-            ->searchTable($firstOrder->number)
-            ->assertCanSeeTableRecords([$firstOrder])
-            ->assertCanNotSeeTableRecords($orders->skip(1));
-    }
+it('can validate order creation', function () {
+    Livewire::test(OrderResource\Pages\CreateOrder::class)
+        ->fillForm([
+            'number' => null,
+            'status' => null,
+            'total' => null,
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['number', 'status', 'total']);
+});
 
-    public function test_can_filter_orders_by_status(): void
-    {
-        $pendingOrders = Order::factory()->count(3)->create(['status' => 'pending']);
-        $shippedOrders = Order::factory()->count(2)->create(['status' => 'shipped']);
+it('can render order resource view page', function () {
+    $order = Order::factory()->create();
 
-        Livewire::test(OrderResource\Pages\ListOrders::class)
-            ->filterTable('status', 'pending')
-            ->assertCanSeeTableRecords($pendingOrders)
-            ->assertCanNotSeeTableRecords($shippedOrders);
-    }
+    $this->get(OrderResource::getUrl('view', ['record' => $order]))
+        ->assertSuccessful();
+});
 
-    public function test_can_filter_orders_by_date_range(): void
-    {
-        $recentOrders = Order::factory()->count(2)->create([
-            'created_at' => now()->subDays(5),
+it('can retrieve order data', function () {
+    $order = Order::factory()->create();
+
+    Livewire::test(OrderResource\Pages\ViewOrder::class, [
+        'record' => $order->getRouteKey(),
+    ])
+        ->assertFormSet([
+            'number' => $order->number,
+            'status' => $order->status,
+            'total' => $order->total,
         ]);
-        $oldOrders = Order::factory()->count(3)->create([
-            'created_at' => now()->subDays(30),
-        ]);
+});
 
-        Livewire::test(OrderResource\Pages\ListOrders::class)
-            ->filterTable('created_at', [
-                'created_from' => now()->subDays(10)->format('Y-m-d'),
-                'created_until' => now()->format('Y-m-d'),
-            ])
-            ->assertCanSeeTableRecords($recentOrders)
-            ->assertCanNotSeeTableRecords($oldOrders);
+it('can render order resource edit page', function () {
+    $order = Order::factory()->create();
+
+    $this->get(OrderResource::getUrl('edit', ['record' => $order]))
+        ->assertSuccessful();
+});
+
+it('can update order', function () {
+    $order = Order::factory()->create(['status' => 'pending']);
+
+    Livewire::test(OrderResource\Pages\EditOrder::class, [
+        'record' => $order->getRouteKey(),
+    ])
+        ->fillForm([
+            'status' => 'processing',
+            'notes' => 'Order is being processed',
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($order->refresh())
+        ->status->toBe('processing')
+        ->notes->toBe('Order is being processed');
+});
+
+it('can delete order', function () {
+    $order = Order::factory()->create();
+
+    Livewire::test(OrderResource\Pages\EditOrder::class, [
+        'record' => $order->getRouteKey(),
+    ])
+        ->callAction(DeleteAction::class);
+
+    $this->assertModelMissing($order);
+});
+
+it('can search orders', function () {
+    $orders = Order::factory()->count(10)->create();
+    $searchOrder = $orders->first();
+
+    Livewire::test(OrderResource\Pages\ListOrders::class)
+        ->searchTable($searchOrder->number)
+        ->assertCanSeeTableRecords([$searchOrder])
+        ->assertCanNotSeeTableRecords($orders->skip(1));
+});
+
+it('can filter orders by status', function () {
+    $pendingOrders = Order::factory()->count(3)->create(['status' => 'pending']);
+    $shippedOrders = Order::factory()->count(2)->create(['status' => 'shipped']);
+
+    Livewire::test(OrderResource\Pages\ListOrders::class)
+        ->filterTable('status', 'pending')
+        ->assertCanSeeTableRecords($pendingOrders)
+        ->assertCanNotSeeTableRecords($shippedOrders);
+});
+
+it('can filter orders by date range', function () {
+    $todayOrders = Order::factory()->count(3)->create(['created_at' => today()]);
+    $oldOrders = Order::factory()->count(2)->create(['created_at' => now()->subDays(10)]);
+
+    Livewire::test(OrderResource\Pages\ListOrders::class)
+        ->filterTable('created_at', [
+            'created_from' => today()->format('Y-m-d'),
+            'created_until' => today()->format('Y-m-d'),
+        ])
+        ->assertCanSeeTableRecords($todayOrders)
+        ->assertCanNotSeeTableRecords($oldOrders);
+});
+
+it('can sort orders', function () {
+    $orders = Order::factory()->count(3)->create();
+
+    Livewire::test(OrderResource\Pages\ListOrders::class)
+        ->sortTable('created_at')
+        ->assertCanSeeTableRecords($orders->sortBy('created_at'), inOrder: true)
+        ->sortTable('created_at', 'desc')
+        ->assertCanSeeTableRecords($orders->sortByDesc('created_at'), inOrder: true);
+});
+
+it('can bulk delete orders', function () {
+    $orders = Order::factory()->count(5)->create();
+
+    Livewire::test(OrderResource\Pages\ListOrders::class)
+        ->callTableBulkAction('delete', $orders);
+
+    foreach ($orders as $order) {
+        $this->assertModelMissing($order);
     }
+});
 
-    public function test_can_create_order(): void
-    {
-        $customer = User::factory()->create();
-        
-        $newData = [
-            'number' => 'ORD-' . time(),
-            'user_id' => $customer->id,
-            'status' => 'pending',
-            'subtotal' => 100.00,
-            'tax_amount' => 21.00,
-            'shipping_amount' => 10.00,
-            'discount_amount' => 0.00,
-            'total' => 131.00,
-            'currency' => 'EUR',
-        ];
+it('displays order totals correctly', function () {
+    $order = Order::factory()->create([
+        'subtotal' => 100.00,
+        'tax_amount' => 21.00,
+        'shipping_amount' => 5.00,
+        'discount_amount' => 10.00,
+        'total' => 116.00,
+    ]);
 
-        Livewire::test(OrderResource\Pages\CreateOrder::class)
-            ->fillForm($newData)
-            ->call('create')
-            ->assertHasNoFormErrors();
+    Livewire::test(OrderResource\Pages\ViewOrder::class, [
+        'record' => $order->getRouteKey(),
+    ])
+        ->assertSee('€100.00') // subtotal
+        ->assertSee('€21.00')  // tax
+        ->assertSee('€5.00')   // shipping
+        ->assertSee('€10.00')  // discount
+        ->assertSee('€116.00'); // total
+});
 
-        $this->assertDatabaseHas('orders', [
-            'number' => $newData['number'],
-            'user_id' => $customer->id,
-            'total' => 131.00,
-        ]);
-    }
+it('can update order status with timestamps', function () {
+    $order = Order::factory()->create(['status' => 'pending']);
 
-    public function test_can_validate_order_creation(): void
-    {
-        Livewire::test(OrderResource\Pages\CreateOrder::class)
-            ->fillForm([
-                'number' => '',
-                'subtotal' => -10,
-                'total' => '',
-            ])
-            ->call('create')
-            ->assertHasFormErrors([
-                'number' => 'required',
-                'subtotal' => 'min',
-                'total' => 'required',
-            ]);
-    }
-
-    public function test_can_edit_order(): void
-    {
-        $order = Order::factory()->create();
-
-        $newData = [
+    Livewire::test(OrderResource\Pages\EditOrder::class, [
+        'record' => $order->getRouteKey(),
+    ])
+        ->fillForm([
             'status' => 'shipped',
             'shipped_at' => now(),
-            'notes' => 'Order shipped successfully',
-        ];
-
-        Livewire::test(OrderResource\Pages\EditOrder::class, [
-            'record' => $order->getRouteKey(),
         ])
-            ->fillForm($newData)
-            ->call('save')
-            ->assertHasNoFormErrors();
+        ->call('save')
+        ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('orders', [
-            'id' => $order->id,
-            'status' => 'shipped',
-            'notes' => 'Order shipped successfully',
-        ]);
-    }
-
-    public function test_can_view_order(): void
-    {
-        $order = Order::factory()->create();
-
-        Livewire::test(OrderResource\Pages\ViewOrder::class, [
-            'record' => $order->getRouteKey(),
-        ])
-            ->assertFormSet([
-                'number' => $order->number,
-                'status' => $order->status,
-                'total' => $order->total,
-            ]);
-    }
-
-    public function test_can_delete_order(): void
-    {
-        $order = Order::factory()->create();
-
-        Livewire::test(OrderResource\Pages\ListOrders::class)
-            ->callTableAction('delete', $order);
-
-        $this->assertSoftDeleted('orders', [
-            'id' => $order->id,
-        ]);
-    }
-
-    public function test_can_bulk_delete_orders(): void
-    {
-        $orders = Order::factory()->count(3)->create();
-
-        Livewire::test(OrderResource\Pages\ListOrders::class)
-            ->callTableBulkAction('delete', $orders);
-
-        foreach ($orders as $order) {
-            $this->assertSoftDeleted('orders', [
-                'id' => $order->id,
-            ]);
-        }
-    }
-
-    public function test_order_status_badge_colors(): void
-    {
-        $pendingOrder = Order::factory()->create(['status' => 'pending']);
-        $shippedOrder = Order::factory()->create(['status' => 'shipped']);
-        $deliveredOrder = Order::factory()->create(['status' => 'delivered']);
-        $cancelledOrder = Order::factory()->create(['status' => 'cancelled']);
-
-        $component = Livewire::test(OrderResource\Pages\ListOrders::class);
-
-        // Test that orders are displayed with correct status
-        $component->assertCanSeeTableRecords([
-            $pendingOrder,
-            $shippedOrder,
-            $deliveredOrder,
-            $cancelledOrder,
-        ]);
-    }
-
-    public function test_can_update_order_addresses(): void
-    {
-        $order = Order::factory()->create();
-
-        $billingAddress = [
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john@example.com',
-            'phone' => '+1234567890',
-            'address' => '123 Main St',
-            'city' => 'Anytown',
-            'postal_code' => '12345',
-            'country' => 'US',
-        ];
-
-        $shippingAddress = [
-            'first_name' => 'Jane',
-            'last_name' => 'Smith',
-            'address' => '456 Oak Ave',
-            'city' => 'Other City',
-            'postal_code' => '67890',
-            'country' => 'US',
-        ];
-
-        Livewire::test(OrderResource\Pages\EditOrder::class, [
-            'record' => $order->getRouteKey(),
-        ])
-            ->fillForm([
-                'billing_address' => $billingAddress,
-                'shipping_address' => $shippingAddress,
-            ])
-            ->call('save')
-            ->assertHasNoFormErrors();
-
-        $order->refresh();
-        
-        $this->assertEquals($billingAddress, $order->billing_address);
-        $this->assertEquals($shippingAddress, $order->shipping_address);
-    }
-}
+    expect($order->refresh())
+        ->status->toBe('shipped')
+        ->shipped_at->not->toBeNull();
+});

@@ -2,11 +2,11 @@
 
 namespace App\Livewire\Components;
 
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Validate;
@@ -29,7 +29,7 @@ final class EnhancedSearch extends Component
     public string $sortDirection = 'desc';
     public bool $inStock = false;
     public bool $onSale = false;
-    public string $viewMode = 'grid'; // grid, list
+    public string $viewMode = 'grid';  // grid, list
     public int $perPage = 12;
 
     protected $queryString = [
@@ -84,7 +84,7 @@ final class EnhancedSearch extends Component
     {
         $this->reset([
             'selectedCategories',
-            'selectedBrands', 
+            'selectedBrands',
             'selectedAttributes',
             'minPrice',
             'maxPrice',
@@ -133,15 +133,16 @@ final class EnhancedSearch extends Component
         // Text search
         if ($this->query) {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->query . '%')
-                  ->orWhere('description', 'like', '%' . $this->query . '%')
-                  ->orWhere('sku', 'like', '%' . $this->query . '%')
-                  ->orWhereHas('brand', function ($brandQuery) {
-                      $brandQuery->where('name', 'like', '%' . $this->query . '%');
-                  })
-                  ->orWhereHas('categories', function ($catQuery) {
-                      $catQuery->where('name', 'like', '%' . $this->query . '%');
-                  });
+                $q
+                    ->where('name', 'like', '%' . $this->query . '%')
+                    ->orWhere('description', 'like', '%' . $this->query . '%')
+                    ->orWhere('sku', 'like', '%' . $this->query . '%')
+                    ->orWhereHas('brand', function ($brandQuery) {
+                        $brandQuery->where('name', 'like', '%' . $this->query . '%');
+                    })
+                    ->orWhereHas('categories', function ($catQuery) {
+                        $catQuery->where('name', 'like', '%' . $this->query . '%');
+                    });
             });
         }
 
@@ -187,20 +188,23 @@ final class EnhancedSearch extends Component
         // Sale filter
         if ($this->onSale) {
             $query->whereHas('variants', function ($q) {
-                $q->whereNotNull('compare_price')
-                  ->whereColumn('compare_price', '>', 'price');
+                $q
+                    ->whereNotNull('compare_price')
+                    ->whereColumn('compare_price', '>', 'price');
             });
         }
 
         // Sorting
         switch ($this->sortBy) {
             case 'price_asc':
-                $query->join('product_variants', 'products.id', '=', 'product_variants.product_id')
-                      ->orderBy('product_variants.price', 'asc');
+                $query
+                    ->join('product_variants', 'products.id', '=', 'product_variants.product_id')
+                    ->orderBy('product_variants.price', 'asc');
                 break;
             case 'price_desc':
-                $query->join('product_variants', 'products.id', '=', 'product_variants.product_id')
-                      ->orderBy('product_variants.price', 'desc');
+                $query
+                    ->join('product_variants', 'products.id', '=', 'product_variants.product_id')
+                    ->orderBy('product_variants.price', 'desc');
                 break;
             case 'name':
                 $query->orderBy('name', $this->sortDirection);
@@ -209,18 +213,19 @@ final class EnhancedSearch extends Component
                 $query->orderBy('created_at', $this->sortDirection);
                 break;
             case 'rating':
-                $query->withAvg('reviews', 'rating')
-                      ->orderBy('reviews_avg_rating', 'desc');
+                $query
+                    ->withAvg('reviews', 'rating')
+                    ->orderBy('reviews_avg_rating', 'desc');
                 break;
-            default: // relevance
+            default:  // relevance
                 if ($this->query) {
                     // Boost exact matches
-                    $query->orderByRaw("CASE 
+                    $query->orderByRaw('CASE 
                         WHEN name LIKE ? THEN 1
                         WHEN name LIKE ? THEN 2
                         WHEN description LIKE ? THEN 3
                         ELSE 4
-                    END", [
+                    END', [
                         $this->query,
                         '%' . $this->query . '%',
                         '%' . $this->query . '%'
@@ -237,8 +242,8 @@ final class EnhancedSearch extends Component
     public function getCategoriesProperty(): Collection
     {
         return Category::where('is_visible', true)
+            ->whereHas('products')
             ->withCount('products')
-            ->having('products_count', '>', 0)
             ->orderBy('name')
             ->get();
     }
@@ -246,8 +251,8 @@ final class EnhancedSearch extends Component
     public function getBrandsProperty(): Collection
     {
         return Brand::where('is_visible', true)
+            ->whereHas('products')
             ->withCount('products')
-            ->having('products_count', '>', 0)
             ->orderBy('name')
             ->get();
     }
@@ -259,11 +264,11 @@ final class EnhancedSearch extends Component
                 $q->where('is_visible', true);
             });
         }])
-        ->whereHas('values.productVariants.product', function ($q) {
-            $q->where('is_visible', true);
-        })
-        ->orderBy('name')
-        ->get();
+            ->whereHas('values.productVariants.product', function ($q) {
+                $q->where('is_visible', true);
+            })
+            ->orderBy('name')
+            ->get();
     }
 
     public function getPriceRangeProperty(): array
@@ -280,19 +285,21 @@ final class EnhancedSearch extends Component
 
     public function getActiveFiltersCountProperty(): int
     {
-        return count($this->selectedCategories) + 
-               count($this->selectedBrands) + 
-               count($this->selectedAttributes) +
-               ($this->minPrice ? 1 : 0) +
-               ($this->maxPrice ? 1 : 0) +
-               ($this->inStock ? 1 : 0) +
-               ($this->onSale ? 1 : 0);
+        return count($this->selectedCategories)
+            + count($this->selectedBrands)
+            + count($this->selectedAttributes)
+            + ($this->minPrice ? 1 : 0)
+            + ($this->maxPrice ? 1 : 0)
+            + ($this->inStock ? 1 : 0)
+            + ($this->onSale ? 1 : 0);
     }
 
     private function checkWishlistStatus(): void
     {
         if (auth()->check()) {
-            $this->isWishlisted = auth()->user()->wishlist()
+            $this->isWishlisted = auth()
+                ->user()
+                ->wishlist()
                 ->where('product_id', $this->product->id)
                 ->exists();
         }

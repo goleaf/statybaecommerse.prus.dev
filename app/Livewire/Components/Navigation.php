@@ -11,7 +11,7 @@ class Navigation extends Component
 {
     public function render()
     {
-        $features = config('shopper.features', []);
+        $features = config('app-features.features', []);
 
         $categoryFeature = $features['category'] ?? null;
         $enableCategory = $categoryFeature instanceof FeatureState

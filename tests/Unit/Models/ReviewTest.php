@@ -129,18 +129,22 @@ it('validates rating is between 1 and 5', function () {
     expect(fn() => Review::create([
         'product_id' => $this->product->id,
         'user_id' => $this->user->id,
+        'reviewer_name' => 'Test User',
+        'reviewer_email' => 'test@example.com',
         'title' => 'Test Review',
         'content' => 'Test content',
         'rating' => 6, // Invalid
-    ]))->toThrow();
+    ]))->toThrow(\InvalidArgumentException::class);
 
     expect(fn() => Review::create([
         'product_id' => $this->product->id,
         'user_id' => $this->user->id,
+        'reviewer_name' => 'Test User',
+        'reviewer_email' => 'test@example.com',
         'title' => 'Test Review',
         'content' => 'Test content',
         'rating' => 0, // Invalid
-    ]))->toThrow();
+    ]))->toThrow(\InvalidArgumentException::class);
 });
 
 it('calculates average rating for a product', function () {

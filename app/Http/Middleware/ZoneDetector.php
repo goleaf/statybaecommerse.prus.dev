@@ -14,14 +14,25 @@ class ZoneDetector
     public function handle(Request $request, Closure $next): Response
     {
         if (!ZoneSessionManager::checkSession()) {
-            $countries = (new CountriesWithZone)->handle();
+            try {
+                $countries = (new CountriesWithZone)->handle();
 
-            $currencyZone = $countries->firstWhere('currencyCode', app_currency());
+                if ($countries->isEmpty()) {
+                    // No zones available, skip zone detection
+                    return $next($request);
+                }
 
-            if ($currencyZone) {
-                ZoneSessionManager::setSession($currencyZone);
-            } else {
-                $this->setDefaultZone($countries);
+                $currencyZone = $countries->firstWhere('currencyCode', app_currency());
+
+                if ($currencyZone) {
+                    ZoneSessionManager::setSession($currencyZone);
+                } else {
+                    $this->setDefaultZone($countries);
+                }
+            } catch (\Exception $e) {
+                // Log the error but don't break the request
+                \Log::warning('Zone detection failed: ' . $e->getMessage());
+                // Continue without zone detection
             }
         }
 

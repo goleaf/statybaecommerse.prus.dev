@@ -3,13 +3,19 @@
 namespace Database\Seeders;
 
 use App\Models\Collection;
+use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CollectionSeeder extends Seeder
 {
+    private LocalImageGeneratorService $imageGenerator;
+
+    public function __construct()
+    {
+        $this->imageGenerator = new LocalImageGeneratorService();
+    }
+
     /**
      * Run the database seeder.
      */
@@ -96,39 +102,31 @@ class CollectionSeeder extends Seeder
     private function downloadAndAttachImage(Collection $collection, string $imageUrl, string $collectionName, string $name): void
     {
         try {
-            $response = Http::timeout(30)->get($imageUrl);
+            // Generate local WebP image
+            $imagePath = $this->imageGenerator->generateCollectionImage($collection->name);
 
-            if ($response->successful()) {
-                $extension = 'jpg';
-                $filename = Str::slug($name) . '.' . $extension;
-
-                // Ensure temp directory exists
-                $tempDir = storage_path('app/temp');
-                if (!is_dir($tempDir)) {
-                    mkdir($tempDir, 0755, true);
-                }
-
-                $tempPath = $tempDir . '/' . $filename;
-
-                // Save temporary file
-                file_put_contents($tempPath, $response->body());
+            if (file_exists($imagePath)) {
+                $filename = Str::slug($name) . '.webp';
 
                 // Add media to collection
                 $collection
-                    ->addMedia($tempPath)
+                    ->addMedia($imagePath)
+                    ->withCustomProperties(['source' => 'local_generated'])
                     ->usingName($name)
                     ->usingFileName($filename)
                     ->toMediaCollection($collectionName);
 
                 // Clean up temporary file
-                if (file_exists($tempPath)) {
-                    unlink($tempPath);
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
                 }
 
-                $this->command->info("✓ Added {$collectionName} image for {$collection->name}");
+                $this->command->info("✓ Generated {$collectionName} WebP image for {$collection->name}");
+            } else {
+                $this->command->warn("✗ Failed to generate {$collectionName} image for {$collection->name}");
             }
         } catch (\Exception $e) {
-            $this->command->warn("✗ Failed to download {$collectionName} image for {$collection->name}: " . $e->getMessage());
+            $this->command->warn("✗ Failed to generate {$collectionName} image for {$collection->name}: " . $e->getMessage());
         }
     }
 }

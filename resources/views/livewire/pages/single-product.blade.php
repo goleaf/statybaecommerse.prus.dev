@@ -1,5 +1,5 @@
 @section('meta')
-    @php($ogImage = $product->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'large') ?: $product->getFirstMediaUrl(config('shopper.media.storage.collection_name')))
+    @php($ogImage = $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?: $product->getFirstMediaUrl(config('media.storage.collection_name')))
     <x-meta
             :title="$product->trans('seo_title') ?? $product->name"
             :description="$product->trans('seo_description') ?? Str::limit(strip_tags($product->description), 150)"
@@ -54,17 +54,16 @@
                     <div wire:loading role="status" aria-live="polite" class="mb-4 text-sm text-gray-600">
                         {{ __('Loading…') }}
                     </div>
-                    
+
                     {{-- Enhanced Image Gallery Component --}}
-                    <livewire:components.product-image-gallery 
-                        :product="$product" 
-                        image-size="xl" 
-                    />
-                    
+                    <livewire:components.product-image-gallery
+                                                               :product="$product"
+                                                               image-size="xl" />
+
                     {{-- Alternative: Static Component --}}
                     {{-- <x-product.detail-images :product="$product" /> --}}
 
-                    @if ((string) config('shopper.features.review') === \App\Support\FeatureState::Enabled->value)
+                    @if ((bool) (config('app-features.features.review') ?? true))
                         <livewire:components.product.reviews :productId="$product->id" />
                         <livewire:components.product.review-form :productId="$product->id" />
                     @endif
@@ -114,8 +113,8 @@
     @php
         $price = $product->getPrice();
         $image =
-            $product->getFirstMediaUrl(config('shopper.media.storage.collection_name'), 'large') ?:
-            $product->getFirstMediaUrl(config('shopper.media.storage.collection_name'));
+            $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?:
+            $product->getFirstMediaUrl(config('media.storage.collection_name'));
         $brandName = $product->brand?->trans('name') ?? $product->brand?->name;
         $productSchema = [
             '@context' => 'https://schema.org',
@@ -139,10 +138,9 @@
                 'url' => url()->current(),
             ];
         }
-        $recentReviews = \Shop\Core\Models\Review::query()
-            ->where('reviewrateable_type', config('shopper.models.product'))
-            ->where('reviewrateable_id', $product->id)
-            ->where('approved', true)
+        $recentReviews = \App\Models\Review::query()
+            ->where('product_id', $product->id)
+            ->where('is_approved', true)
             ->latest('id')
             ->limit(5)
             ->get(['title', 'content', 'rating', 'created_at']);

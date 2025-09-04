@@ -7,7 +7,7 @@
         <x-container class="py-4">
             <div class="relative flex items-center gap-10">
                 <x-link :href="route('home', ['locale' => app()->getLocale()])">
-                    <span class="sr-only">{{ shopper_setting('legal_name') }}</span>
+                    <span class="sr-only">{{ app_setting('legal_name') }}</span>
                     <x-brand class="h-10 w-auto" aria-hidden="true" />
                 </x-link>
                 <x-link :href="route('home', ['locale' => app()->getLocale()])"
@@ -35,7 +35,7 @@
                     @endforeach
                 </ul>
 
-                @if ((string) config('shopper.features.discount') === \App\Support\FeatureState::Enabled->value)
+                @if ((bool) (config('app-features.features.discount') ?? true))
                     <livewire:components.coupon-form />
                 @endif
                 @if (session()->has('checkout.coupon.code'))
