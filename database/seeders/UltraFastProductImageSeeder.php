@@ -273,6 +273,7 @@ final class UltraFastProductImageSeeder extends Seeder
             'disk' => 'public',
             'conversions_disk' => 'public',
             'size' => filesize($destinationPath),
+            'manipulations' => json_encode([]),
             'custom_properties' => json_encode(['placeholder' => false]),
             'generated_conversions' => json_encode([]),
             'responsive_images' => json_encode([]),
