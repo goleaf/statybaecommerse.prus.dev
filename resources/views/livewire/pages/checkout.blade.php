@@ -49,7 +49,7 @@
                     <div class="flex items-center justify-between">
                         <dt class="text-gray-300">{{ __('Sub total') }}</dt>
                         <dd>
-                            {{ shopper_money_format(amount: $subtotal, currency: current_currency()) }}
+                            {{ \Illuminate\Support\Number::currency($subtotal, current_currency(), app()->getLocale()) }}
                         </dd>
                     </div>
 
@@ -128,7 +128,7 @@
                                     <div class="flex items-center justify-between">
                                         <dt class="text-gray-400">{{ __('Sub total') }}</dt>
                                         <dd>
-                                            {{ shopper_money_format(amount: $subtotal, currency: current_currency()) }}
+                                            {{ \Illuminate\Support\Number::currency($subtotal, current_currency(), app()->getLocale()) }}
                                         </dd>
                                     </div>
 

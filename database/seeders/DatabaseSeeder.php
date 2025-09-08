@@ -13,14 +13,19 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
+            RolePermissionSeeder::class,
             AdminUserSeeder::class,
+            ComprehensiveMultilanguageSeeder::class,  // Comprehensive multilanguage seeding
             LithuanianBuilderShopSeeder::class,
             BrandSeeder::class,
             CategorySeeder::class,
             CollectionSeeder::class,
+            TranslationSeeder::class,  // Add multilanguage support
             UltraFastProductImageSeeder::class,
             DocumentTemplateSeeder::class,
             ComprehensiveOrderSeeder::class,
+            AnalyticsEventSeeder::class,
+            EnsureBrandProductsSeeder::class,
         ]);
     }
 }

@@ -31,7 +31,7 @@
         {{ __('loading') }}
     </div>
 
-    <form method="GET" action="{{ route('search.index', ['locale' => app()->getLocale()]) }}" class="mb-6">
+    <form method="GET" action="{{ route('search', ['locale' => app()->getLocale()]) }}" class="mb-6">
         <input type="text" name="q" value="{{ $term }}" placeholder="{{ __('search_products') }}"
                aria-label="{{ __('search_products') }}"
                class="w-full md:w-1/2 rounded-md border-gray-300" />
@@ -76,7 +76,7 @@
                 'name' => $p->trans('name') ?? $p->name,
             ];
         }
-        $searchUrl = route('search.index', ['locale' => app()->getLocale()]);
+        $searchUrl = route('search', ['locale' => app()->getLocale()]);
         $websiteSchema = [
             '@context' => 'https://schema.org',
             '@type' => 'WebSite',

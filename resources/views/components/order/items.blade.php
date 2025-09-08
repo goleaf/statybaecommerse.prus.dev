@@ -12,7 +12,7 @@
                     {{ $item->name }}
                 </h4>
                 <p class="text-sm text-gray-700">
-                    <span class="text-gray-500">{{ __('Unit price') }}</span> : {{ shopper_money_format($item->unit_price_amount, $currency_code) }}
+                    <span class="text-gray-500">{{ __('Unit price') }}</span> : {{ \Illuminate\Support\Number::currency($item->unit_price_amount, $currency_code, app()->getLocale()) }}
                 </p>
                 <p class="text-sm text-gray-700">
                     <span class="text-gray-500">{{ __('Quantity') }}</span> : {{ $item->quantity }}

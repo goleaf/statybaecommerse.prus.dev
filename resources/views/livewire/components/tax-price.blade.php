@@ -2,5 +2,5 @@
 ?>
 
 <span>
-    {{ shopper_money_format(amount: $amount, currency: current_currency()) }}
+    {{ \Illuminate\Support\Number::currency($amount, current_currency(), app()->getLocale()) }}
 </span>

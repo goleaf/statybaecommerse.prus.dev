@@ -7,7 +7,7 @@
             <div class="ml-4">
                 <h4 class="font-heading font-medium text-gray-900">{{ __('Free shipping') }}</h4>
                 <p class="text-sm leading-5 text-gray-500">
-                    {{ __('From :amount', ['amount' => shopper_money_format(amount: 5000, currency: current_currency())]) }}
+                    {{ __('From :amount', ['amount' => \Illuminate\Support\Number::currency(5000, current_currency(), app()->getLocale())]) }}
                 </p>
             </div>
         </div>

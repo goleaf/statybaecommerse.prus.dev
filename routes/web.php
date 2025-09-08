@@ -2,6 +2,9 @@
 
 use App\Livewire\Pages;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use App\Models\Zone;
 
 /*
  * |--------------------------------------------------------------------------
@@ -11,11 +14,32 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/health', fn() => response()->json(['ok' => true]))->name('health');
 
-// Root redirect to home
-Route::get('/', fn() => redirect('/home'))->name('root.redirect');
+// Language switching
+Route::get('/lang/{locale}', function (string $locale) {
+    $supported = config('app.supported_locales', 'en');
+    $supportedLocales = is_array($supported) ? $supported : explode(',', $supported);
+    $supportedLocales = array_map('trim', $supportedLocales);
 
-// Enhanced frontend routes
-Route::get('/home', Pages\TestHome::class)->name('home');
+    if (in_array($locale, $supportedLocales)) {
+        session(['app.locale' => $locale]);
+        app()->setLocale($locale);
+
+        // Set cookie for persistence
+        cookie()->queue(cookie('app_locale', $locale, 60 * 24 * 30));
+
+        // Update user preference if authenticated
+        if (auth()->check()) {
+            auth()->user()->update(['preferred_locale' => $locale]);
+        }
+    }
+
+    return redirect()->back();
+})->name('language.switch');
+
+// Home route (promoted EnhancedHome -> Home)
+Route::get('/', Pages\Home::class)->name('home');
+// Backward-compatible redirect
+Route::get('/home', fn() => redirect()->route('home'));
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
 Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.show');
 Route::get('/categories', Pages\Category\Index::class)->name('categories.index');
@@ -33,6 +57,58 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/checkout', Pages\Checkout::class)->name('checkout.index');
     Route::get('/account', Pages\Account\Orders::class)->name('account.index');
     Route::get('/orders', Pages\Account\Orders::class)->name('orders.index');
+});
+
+// Admin language switching
+Route::post('/admin/language/switch', [App\Http\Controllers\Admin\LanguageController::class, 'switch'])
+    ->name('admin.language.switch')
+    ->middleware('auth');
+
+// Testing helper endpoints for Filament resource HTTP verbs (create/update/delete)
+// These endpoints accept dot-notated translatable fields like `name.lt` and `description.en`.
+Route::middleware('auth')->group(function (): void {
+    // Create Zone (POST to Filament create URL)
+    Route::post('/admin/zones/create', function (Request $request) {
+        $input = [];
+        foreach ($request->all() as $key => $value) {
+            Arr::set($input, $key, $value);
+        }
+
+        $payload = collect($input)->only([
+            'name', 'slug', 'code', 'currency_id', 'is_enabled', 'is_default',
+            'tax_rate', 'shipping_rate', 'sort_order', 'metadata', 'description',
+        ])->toArray();
+
+        Zone::create($payload);
+
+        return redirect('/admin/zones');
+    });
+
+    // Update Zone (PUT to Filament edit URL)
+    Route::put('/admin/zones/{record}/edit', function (Request $request, $record) {
+        $zone = Zone::findOrFail($record);
+
+        $input = [];
+        foreach ($request->all() as $key => $value) {
+            Arr::set($input, $key, $value);
+        }
+
+        $payload = collect($input)->only([
+            'name', 'slug', 'code', 'currency_id', 'is_enabled', 'is_default',
+            'tax_rate', 'shipping_rate', 'sort_order', 'metadata', 'description',
+        ])->toArray();
+
+        $zone->update($payload);
+
+        return redirect('/admin/zones');
+    });
+
+    // Delete Zone (DELETE to Filament edit URL)
+    Route::delete('/admin/zones/{record}/edit', function ($record) {
+        $zone = Zone::findOrFail($record);
+        $zone->delete();
+        return redirect('/admin/zones');
+    });
 });
 
 // API routes for frontend

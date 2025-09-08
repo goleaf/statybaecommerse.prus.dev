@@ -12,5 +12,5 @@ if (function_exists('\\Livewire\\Volt\\state') && function_exists('\\Livewire\\V
 ?>
 
 <span>
-    {{ shopper_money_format(amount: $price ?? 0, currency: function_exists('current_currency') ? current_currency() : 'USD') }}
+    {{ \Illuminate\Support\Number::currency($price ?? 0, function_exists('current_currency') ? current_currency() : 'USD', app()->getLocale()) }}
 </span>

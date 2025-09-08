@@ -27,7 +27,7 @@
                                     </div>
                                     <div class="text-right">
                                         <p class="font-medium">
-                                            {{ shopper_money_format(amount: (float) $item->price * (int) $item->quantity, currency: current_currency()) }}
+                                            {{ \Illuminate\Support\Number::currency((float) $item->price * (int) $item->quantity, current_currency(), app()->getLocale()) }}
                                         </p>
                                         <button wire:click="removeItem({{ (int) $item->id }})"
                                                 class="text-sm text-red-600 hover:underline">{{ __('cart_remove') }}</button>

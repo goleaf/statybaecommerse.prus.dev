@@ -66,7 +66,7 @@
                                     </span>
                                 </span>
                                 <span class="text-sm font-medium text-primary-950">
-                                    {{ shopper_money_format($option->price, current_currency()) }}
+                                    {{ \Illuminate\Support\Number::currency($option->price, current_currency(), app()->getLocale()) }}
                                 </span>
                             </label>
                         @endforeach

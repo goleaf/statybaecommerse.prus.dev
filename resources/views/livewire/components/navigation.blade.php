@@ -8,7 +8,7 @@
         <x-link :href="route('locations.index', ['locale' => app()->getLocale()])"
                 class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('nav_locations') }}</x-link>
 
-        <x-link :href="route('search.index', ['locale' => app()->getLocale()])"
+        <x-link :href="route('search', ['locale' => app()->getLocale()])"
                 class="text-sm font-medium text-gray-700 hover:text-gray-800">{{ __('nav_search') }}</x-link>
 
         <x-link :href="route('cart.index', ['locale' => app()->getLocale()])"

@@ -28,7 +28,7 @@
                     {{ __('Total') }}
                 </dt>
                 <dd class="mt-1 text-gray-500">
-                    {{ shopper_money_format($order->total() + $order->shippingOption?->price, $order->currency_code) }}
+                    {{ \Illuminate\Support\Number::currency($order->total() + $order->shippingOption?->price, $order->currency_code, app()->getLocale()) }}
                 </dd>
             </div>
             <div class="text-sm">

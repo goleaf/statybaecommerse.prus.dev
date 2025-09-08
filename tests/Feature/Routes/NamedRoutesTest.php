@@ -16,7 +16,6 @@ it('has expected named routes registered', function (string $routeName): void {
 })->with([
     // Currently implemented routes only
     'health',
-    'root',
     'home',
     'products.index',
     'products.gallery',
@@ -27,7 +26,7 @@ it('has expected named routes registered', function (string $routeName): void {
     'collections.index',
     'collections.show',
     'products.show',
-    'search.index',
+    'search',
     'cart.index',
     'locations.index',
     'locations.show',

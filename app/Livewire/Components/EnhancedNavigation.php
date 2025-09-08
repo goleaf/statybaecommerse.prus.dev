@@ -96,7 +96,7 @@ final class EnhancedNavigation extends Component
             return;
         }
 
-        $this->redirect(route('search.index', [
+        $this->redirect(route('search', [
             'q' => $this->searchQuery,
             'locale' => app()->getLocale(),
         ]));

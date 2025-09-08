@@ -2,82 +2,162 @@
 
 namespace App\Livewire\Pages;
 
+use App\Livewire\Concerns\WithCart;
+use App\Livewire\Concerns\WithNotifications;
 use App\Models\Brand;
-use App\Models\Collection;
+use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Contracts\View\View;
-use Livewire\Attributes\Layout;
+use App\Models\Review;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 
-#[Layout('layouts.templates.app')]
-class Home extends Component
+final class Home extends Component
 {
-    public function render(): View
+    use WithCart, WithNotifications;
+
+    public function getFeaturedProductsProperty(): Collection
     {
-        $collections = \Cache::remember(
-            'home:collections:' . app()->getLocale(),
-            now()->addMinutes(10),
-            function () {
-                return Collection::query()
-                    ->with(['translations' => function ($q) {
-                        $q->where('locale', app()->getLocale());
-                    }])
-                    ->where('is_enabled', true)
-                    ->latest('id')
-                    ->limit(3)
-                    ->get(['id', 'slug', 'name']);
-            }
-        );
+        return Product::query()
+            ->with(['brand', 'categories', 'media'])
+            ->where('is_visible', true)
+            ->where('is_featured', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->orderBy('created_at', 'desc')
+            ->limit(8)
+            ->get();
+    }
 
-        $currencyCode = current_currency();
-        $locale = app()->getLocale();
-        $products = \Cache::remember(
-            "home:products:{$locale}:{$currencyCode}",
-            now()->addMinutes(10),
-            function () use ($currencyCode, $locale) {
-                return Product::query()
-                    ->select(['id', 'slug', 'name', 'summary', 'brand_id', 'published_at'])
-                    ->with([
-                        'translations' => function ($q) use ($locale) {
-                            $q->where('locale', $locale);
-                        },
-                        'brand:id,slug,name',
-                        'brand.translations' => function ($q) use ($locale) {
-                            $q->where('locale', $locale);
-                        },
-                        'media',
-                        'prices' => function ($pq) use ($currencyCode) {
-                            $pq->whereRelation('currency', 'code', $currencyCode);
-                        },
-                        'prices.currency:id,code',
-                    ])
-                    ->withCount('variants')
-                    ->where('is_visible', true)
-                    ->whereNotNull('published_at')
-                    ->where('published_at', '<=', now())
-                    ->orderByDesc('featured')
-                    ->orderByDesc('published_at')
-                    ->limit(8)
-                    ->get();
-            }
-        );
+    public function getLatestProductsProperty(): Collection
+    {
+        return Product::query()
+            ->with(['brand', 'categories', 'media'])
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->orderBy('created_at', 'desc')
+            ->limit(8)
+            ->get();
+    }
 
-        $brands = \Cache::remember(
-            'home:brands:' . $locale,
-            now()->addMinutes(10),
-            function () use ($locale) {
-                return Brand::query()
-                    ->with(['translations' => function ($q) use ($locale) {
-                        $q->where('locale', $locale);
-                    }, 'media'])
-                    ->where('is_enabled', true)
-                    ->orderBy('name')
-                    ->limit(8)
-                    ->get(['id', 'slug', 'name']);
-            }
-        );
+    public function getPopularProductsProperty(): Collection
+    {
+        return Product::query()
+            ->with(['brand', 'categories', 'media'])
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->whereHas('reviews')
+            ->withCount('reviews')
+            ->orderBy('reviews_count', 'desc')
+            ->limit(8)
+            ->get();
+    }
 
-        return view('livewire.pages.home', compact('collections', 'products', 'brands'))
-            ->title(__('Home'));
+    public function getFeaturedCategoriesProperty(): Collection
+    {
+        return Category::query()
+            ->with(['media'])
+            ->where('is_visible', true)
+            ->where('is_featured', true)
+            ->whereHas('products', function ($query) {
+                $query->where('is_visible', true);
+            })
+            ->withCount(['products' => function ($query) {
+                $query->where('is_visible', true);
+            }])
+            ->orderBy('id')
+            ->limit(6)
+            ->get();
+    }
+
+    public function getFeaturedBrandsProperty(): Collection
+    {
+        return Brand::query()
+            ->with(['media'])
+            ->where('is_enabled', true)
+            ->where('is_featured', true)
+            ->whereHas('products', function ($query) {
+                $query->where('is_visible', true);
+            })
+            ->withCount(['products' => function ($query) {
+                $query->where('is_visible', true);
+            }])
+            ->orderBy('sort_order')
+            ->limit(8)
+            ->get();
+    }
+
+    public function getLatestReviewsProperty(): Collection
+    {
+        return Review::query()
+            ->with(['product', 'user'])
+            ->where('is_approved', true)
+            ->whereHas('product', function ($query) {
+                $query->where('is_visible', true);
+            })
+            ->orderBy('created_at', 'desc')
+            ->limit(6)
+            ->get();
+    }
+
+    public function getStatsProperty(): array
+    {
+        return [
+            'products_count' => Product::where('is_visible', true)->count(),
+            'categories_count' => Category::where('is_visible', true)->count(),
+            'brands_count' => Brand::where('is_enabled', true)->count(),
+            'reviews_count' => Review::where('is_approved', true)->count(),
+            'avg_rating' => Review::where('is_approved', true)->avg('rating') ?? 0,
+        ];
+    }
+
+    public function addToCart(int $productId): void
+    {
+        $product = Product::find($productId);
+
+        if (!$product || !$product->is_visible) {
+            $this->notifyError(__('Product not found or not available'));
+            return;
+        }
+
+        if ($product->stock_quantity <= 0) {
+            $this->notifyError(__('Product is out of stock'));
+            return;
+        }
+
+        $cartItems = session()->get('cart', []);
+
+        if (isset($cartItems[$productId])) {
+            $cartItems[$productId]['quantity']++;
+        } else {
+            $cartItems[$productId] = [
+                'name' => $product->name,
+                'price' => $product->price,
+                'quantity' => 1,
+                'image' => $product->getFirstMediaUrl('images'),
+                'sku' => $product->sku,
+            ];
+        }
+
+        session()->put('cart', $cartItems);
+
+        $this->dispatch('cart-updated');
+        $this->notifySuccess(__('Product added to cart'));
+    }
+
+    public function render()
+    {
+        return view('livewire.pages.home', [
+            'featuredProducts' => $this->featuredProducts,
+            'latestProducts' => $this->latestProducts,
+            'popularProducts' => $this->popularProducts,
+            'featuredCategories' => $this->featuredCategories,
+            'featuredBrands' => $this->featuredBrands,
+            'latestReviews' => $this->latestReviews,
+            'stats' => $this->stats,
+        ])->layout('components.layouts.base', [
+            'title' => __('Home') . ' - ' . config('app.name')
+        ]);
     }
 }

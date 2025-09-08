@@ -12,29 +12,29 @@
         <div class="mt-8 space-y-4">
             <div class="flex items-center justify-between">
                 <span class="text-gray-500">{{ __('Subtotal') }}</span>
-                <span>{{ shopper_money_format(amount: $order->subtotal_amount, currency: $order->currency_code) }}</span>
+                <span>{{ \Illuminate\Support\Number::currency($order->subtotal_amount, $order->currency_code, app()->getLocale()) }}</span>
             </div>
             @if (($order->discount_total_amount ?? 0) > 0)
                 <div class="flex items-center justify-between">
                     <span class="text-gray-500">{{ __('Discounts') }}</span>
-                    <span>-{{ shopper_money_format(amount: $order->discount_total_amount, currency: $order->currency_code) }}</span>
+                    <span>-{{ \Illuminate\Support\Number::currency($order->discount_total_amount, $order->currency_code, app()->getLocale()) }}</span>
                 </div>
                 @if (isset($redemptions) && $redemptions->isNotEmpty())
                     <ul class="text-sm text-gray-500">
                         @foreach ($redemptions as $r)
                             <li>{{ strtoupper($r->code) }} — {{ ucfirst($r->type) }}:
-                                -{{ shopper_money_format(amount: $r->amount_saved, currency: $order->currency_code) }}</li>
+                                -{{ \Illuminate\Support\Number::currency($r->amount_saved, $order->currency_code, app()->getLocale()) }}</li>
                         @endforeach
                     </ul>
                 @endif
             @endif
             <div class="flex items-center justify-between">
                 <span class="text-gray-500">{{ __('Shipping') }}</span>
-                <span>{{ shopper_money_format(amount: $order->shipping_total_amount, currency: $order->currency_code) }}</span>
+                <span>{{ \Illuminate\Support\Number::currency($order->shipping_total_amount, $order->currency_code, app()->getLocale()) }}</span>
             </div>
             <div class="flex items-center justify-between font-semibold border-t border-gray-200 pt-4">
                 <span>{{ __('Total') }}</span>
-                <span>{{ shopper_money_format(amount: $order->grand_total_amount, currency: $order->currency_code) }}</span>
+                <span>{{ \Illuminate\Support\Number::currency($order->grand_total_amount, $order->currency_code, app()->getLocale()) }}</span>
             </div>
         </div>
     </x-container>
@@ -105,7 +105,7 @@ mount(function (string $number): void {
                     <div class="flex justify-between pt-4 font-medium text-gray-900 lg:block md:pt-0">
                         <dt class="font-semibold">{{ __('Total') }}</dt>
                         <dd class="md:mt-1">
-                            {{ shopper_money_format($order->total() + $order->shippingOption->price, $order->currency_code) }}
+                            {{ \Illuminate\Support\Number::currency($order->total() + $order->shippingOption->price, $order->currency_code, app()->getLocale()) }}
                         </dd>
                     </div>
                 </dl>

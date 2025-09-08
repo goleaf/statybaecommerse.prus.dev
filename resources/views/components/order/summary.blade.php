@@ -7,25 +7,25 @@
         <div class="flex items-center justify-between">
             <dt class="text-sm">{{ __('Sub total') }}</dt>
             <dd class="text-sm font-medium text-gray-900">
-                {{ shopper_money_format($order->total(), $order->currency_code) }}
+                {{ \Illuminate\Support\Number::currency($order->total(), $order->currency_code, app()->getLocale()) }}
             </dd>
         </div>
         <div class="flex items-center justify-between">
             <dt class="text-sm">{{ __('Shipping') }}</dt>
             <dd class="text-sm font-medium text-gray-900">
-                {{ shopper_money_format($order->shippingOption->price, $order->currency_code) }}
+                {{ \Illuminate\Support\Number::currency($order->shippingOption->price, $order->currency_code, app()->getLocale()) }}
             </dd>
         </div>
         <div class="flex items-center justify-between">
             <dt class="text-sm">{{ __('Tax') }}</dt>
             <dd class="text-sm font-medium text-gray-900">
-                {{ shopper_money_format(0, $order->currency_code) }}
+                {{ \Illuminate\Support\Number::currency(0, $order->currency_code, app()->getLocale()) }}
             </dd>
         </div>
         <div class="flex items-center justify-between border-t border-gray-200 pt-4">
             <dt class="font-heading font-medium text-primary-950">{{ __('Total') }}</dt>
             <dd class="text-base font-bold text-gray-900">
-                {{ shopper_money_format($order->total() + $order->shippingOption->price, $order->currency_code) }}
+                {{ \Illuminate\Support\Number::currency($order->total() + $order->shippingOption->price, $order->currency_code, app()->getLocale()) }}
             </dd>
         </div>
     </dl>

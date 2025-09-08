@@ -1,7 +1,7 @@
 @props(['item'])
 
 @php
-    $price = shopper_money_format(amount: $item->price * $item->quantity, currency: current_currency());
+    $price = \Illuminate\Support\Number::currency($item->price * $item->quantity, current_currency(), app()->getLocale());
 
     $model =
         $item->associatedModel instanceof \App\Models\ProductVariant

@@ -57,7 +57,7 @@
             <div class="flex items-center justify-between pb-1 mb-3 border-b border-gray-200">
                 <p>{{ __('Tax') }}</p>
                 <p class="text-base text-right text-gray-950">
-                    {{ shopper_money_format(0, currency: current_currency()) }}
+                    {{ \Illuminate\Support\Number::currency(0, current_currency(), app()->getLocale()) }}
                 </p>
             </div>
             <div class="flex items-center justify-between pt-1 pb-1 mb-3 border-b border-gray-200">
@@ -67,7 +67,7 @@
             <div class="flex items-center justify-between pt-1 pb-1 mb-3 border-b border-gray-200">
                 <p>{{ __('Subtotal') }}</p>
                 <p class="text-base text-right text-gray-950">
-                    {{ shopper_money_format($subtotal, currency: current_currency()) }}
+                    {{ \Illuminate\Support\Number::currency($subtotal, current_currency(), app()->getLocale()) }}
                 </p>
             </div>
         </div>

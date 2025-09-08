@@ -1,7 +1,7 @@
 @props(['item'])
 
 @php
-    $price = shopper_money_format(amount: $item->price * $item->quantity, currency: current_currency());
+    $price = \Illuminate\Support\Number::currency($item->price * $item->quantity, current_currency(), app()->getLocale());
 
     $model =
         $item->associatedModel instanceof \App\Models\ProductVariant
@@ -22,7 +22,7 @@
         </h3>
 
         <p class="mt-1 text-gray-300">
-            {{ __(':qty x :price', ['qty' => $item->quantity, 'price' => shopper_money_format($item->price, current_currency())]) }}
+            {{ __(':qty x :price', ['qty' => $item->quantity, 'price' => \Illuminate\Support\Number::currency($item->price, current_currency(), app()->getLocale())]) }}
         </p>
 
         @if ($item->attributes->isNotEmpty())

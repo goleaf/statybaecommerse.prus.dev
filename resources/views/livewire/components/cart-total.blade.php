@@ -2,12 +2,12 @@
 	<div class="space-y-2">
 		<div class="flex items-center justify-between">
 			<span class="text-gray-300">{{ __('Subtotal') }}</span>
-			<span>{{ shopper_money_format(amount: $subtotal, currency: current_currency()) }}</span>
+			<span>{{ \Illuminate\Support\Number::currency($subtotal, current_currency(), app()->getLocale()) }}</span>
 		</div>
 		@if($discount > 0)
 			<div class="flex items-center justify-between">
 				<span class="text-gray-300">{{ __('Discount') }}</span>
-				<span>-{{ shopper_money_format(amount: $discount, currency: current_currency()) }}</span>
+				<span>-{{ \Illuminate\Support\Number::currency($discount, current_currency(), app()->getLocale()) }}</span>
 			</div>
 		@endif
 		@if(session()->has('checkout.coupon.code'))
@@ -18,7 +18,7 @@
 		@endif
 		<div class="flex items-center justify-between text-base font-semibold border-t border-white/10 pt-3">
 			<span>{{ __('Total') }}</span>
-			<span>{{ shopper_money_format(amount: $total, currency: current_currency()) }}</span>
+			<span>{{ \Illuminate\Support\Number::currency($total, current_currency(), app()->getLocale()) }}</span>
 		</div>
 	</div>
 </div>
