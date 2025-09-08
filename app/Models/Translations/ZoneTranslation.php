@@ -10,3 +10,5 @@ class ZoneTranslation extends Model
     protected $guarded = [];
     public $timestamps = true;
 }
+
+

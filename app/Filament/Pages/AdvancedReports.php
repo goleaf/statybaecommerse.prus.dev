@@ -20,7 +20,7 @@ final class AdvancedReports extends Page
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Analytics';
+    protected static string|UnitEnum|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 1;
 

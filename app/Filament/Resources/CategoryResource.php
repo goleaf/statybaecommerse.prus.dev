@@ -5,17 +5,19 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use App\Services\MultiLanguageTabService;
-use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use BackedEnum;
+use UnitEnum;
 
 final class CategoryResource extends Resource
 {
@@ -52,7 +54,6 @@ final class CategoryResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-
                 // Category Images Section
                 Forms\Components\Section::make(__('translations.category_images'))
                     ->components([
@@ -78,7 +79,6 @@ final class CategoryResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(1),
-
                 // Multilanguage Tabs for Translatable Content
                 Tabs::make('category_translations')
                     ->tabs(
@@ -182,16 +182,16 @@ final class CategoryResource extends Resource
                     ->searchable()
                     ->preload(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                    Actions\ForceDeleteBulkAction::make(),
+                    Actions\RestoreBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order', 'asc');

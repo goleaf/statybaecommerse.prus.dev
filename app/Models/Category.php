@@ -66,6 +66,11 @@ final class Category extends Model implements HasMedia
             ->useLogName('category');
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public static function flushCaches(): void
     {
         $locales = collect(config('app.supported_locales', 'en'))

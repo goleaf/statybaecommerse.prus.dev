@@ -20,6 +20,7 @@ final class OrderItem extends Model
         'sku',
         'quantity',
         'unit_price',
+        'price',
         'total',
     ];
 
@@ -28,6 +29,7 @@ final class OrderItem extends Model
         return [
             'quantity' => 'integer',
             'unit_price' => 'float',
+            'price' => 'float',
             'total' => 'float',
         ];
     }
@@ -52,6 +54,9 @@ final class OrderItem extends Model
         parent::boot();
 
         static::creating(function (OrderItem $orderItem) {
+            if (isset($orderItem->price) && empty($orderItem->unit_price)) {
+                $orderItem->unit_price = $orderItem->price;
+            }
             if (!$orderItem->total) {
                 $orderItem->total = $orderItem->unit_price * $orderItem->quantity;
             }
@@ -60,6 +65,9 @@ final class OrderItem extends Model
         static::updating(function (OrderItem $orderItem) {
             if ($orderItem->isDirty(['unit_price', 'quantity'])) {
                 $orderItem->total = $orderItem->unit_price * $orderItem->quantity;
+            }
+            if ($orderItem->isDirty('price') && !$orderItem->isDirty('unit_price')) {
+                $orderItem->unit_price = $orderItem->price;
             }
         });
     }

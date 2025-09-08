@@ -3,12 +3,15 @@
     "name": "laravel-app",
     "private": true,
     "type": "module",
-    "scripts": {
-        "build": "vite build",
-        "dev": "vite",
-        "mcp:filament": "node mcp/filament-docs-server.js",
-        "test": "php artisan test"
-    },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "mcp:filament": "node mcp/filament-docs-server.js",
+    "test": "php artisan test",
+    "e2e:smoke": "node scripts/e2e-smoke.mjs",
+    "e2e:routes": "node scripts/check-routes.mjs",
+    "e2e:console": "node scripts/check-console.mjs"
+  },
     "devDependencies": {
         "@modelcontextprotocol/sdk": "^1.0.0",
         "@tailwindcss/aspect-ratio": "^0.4.2",

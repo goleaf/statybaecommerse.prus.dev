@@ -2,11 +2,15 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Actions\AttachAction;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\DetachAction;
+use Filament\Actions\DetachBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 
 final class CategoriesRelationManager extends RelationManager
@@ -53,15 +57,15 @@ final class CategoriesRelationManager extends RelationManager
                     ->query(fn(Builder $query): Builder => $query->where('is_visible', true)),
             ])
             ->headerActions([
-                Tables\Actions\AttachAction::make()
+                AttachAction::make()
                     ->preloadRecordSelect(),
             ])
-            ->actions([
-                Tables\Actions\DetachAction::make(),
+            ->recordActions([
+                DetachAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DetachBulkAction::make(),
                 ]),
             ]);
     }

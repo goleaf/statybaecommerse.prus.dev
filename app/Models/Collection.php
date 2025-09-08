@@ -56,6 +56,11 @@ final class Collection extends Model implements HasMedia
         });
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public static function flushCaches(): void
     {
         $locales = collect(config('app.supported_locales', 'en'))

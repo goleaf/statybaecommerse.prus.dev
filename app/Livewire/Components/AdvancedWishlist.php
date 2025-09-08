@@ -103,3 +103,5 @@ final class AdvancedWishlist extends Component
         return view('livewire.components.advanced-wishlist');
     }
 }
+
+

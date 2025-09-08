@@ -120,3 +120,5 @@ it('can handle product catalog with filters', function () {
         ->set('brandId', $brand->id)
         ->assertSee($product->name);
 });
+
+

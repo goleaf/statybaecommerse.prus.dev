@@ -4,14 +4,17 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EnhancedSettingResource\Pages;
 use App\Models\EnhancedSetting;
-use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Actions as Actions;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 final class EnhancedSettingResource extends Resource
 {
@@ -25,62 +28,62 @@ final class EnhancedSettingResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Enhanced Settings');
+        return __('enhanced_settings.enhanced_settings');
     }
 
     public static function getModelLabel(): string
     {
-        return __('Enhanced Setting');
+        return __('enhanced_settings.enhanced_setting');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Enhanced Settings');
+        return __('enhanced_settings.enhanced_settings');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('Setting Information'))
+                Forms\Components\Section::make(__('enhanced_settings.setting_information'))
                     ->components([
                         Forms\Components\Select::make('group')
-                            ->label(__('Group'))
+                            ->label(__('enhanced_settings.group'))
                             ->options([
-                                'general' => __('General'),
-                                'ecommerce' => __('E-commerce'),
-                                'email' => __('Email'),
-                                'payment' => __('Payment'),
-                                'shipping' => __('Shipping'),
-                                'seo' => __('SEO'),
-                                'security' => __('Security'),
-                                'api' => __('API'),
-                                'appearance' => __('Appearance'),
-                                'notifications' => __('Notifications'),
+                                'general' => __('enhanced_settings.groups.general'),
+                                'ecommerce' => __('enhanced_settings.groups.ecommerce'),
+                                'email' => __('enhanced_settings.groups.email'),
+                                'payment' => __('enhanced_settings.groups.payment'),
+                                'shipping' => __('enhanced_settings.groups.shipping'),
+                                'seo' => __('enhanced_settings.groups.seo'),
+                                'security' => __('enhanced_settings.groups.security'),
+                                'api' => __('enhanced_settings.groups.api'),
+                                'appearance' => __('enhanced_settings.groups.appearance'),
+                                'notifications' => __('enhanced_settings.groups.notifications'),
                             ])
                             ->required()
                             ->default('general'),
                         Forms\Components\TextInput::make('key')
-                            ->label(__('Key'))
+                            ->label(__('enhanced_settings.key'))
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
                             ->regex('/^[a-z0-9_\.]+$/')
-                            ->helperText(__('Use lowercase letters, numbers, underscores and dots only')),
+                            ->helperText(__('enhanced_settings.help.key')),
                         Forms\Components\Select::make('type')
-                            ->label(__('Type'))
+                            ->label(__('enhanced_settings.type'))
                             ->options([
-                                'text' => __('Text'),
-                                'textarea' => __('Textarea'),
-                                'number' => __('Number'),
-                                'boolean' => __('Boolean'),
-                                'json' => __('JSON'),
-                                'array' => __('Array'),
-                                'select' => __('Select'),
-                                'file' => __('File'),
-                                'color' => __('Color'),
-                                'date' => __('Date'),
-                                'datetime' => __('DateTime'),
+                                'text' => __('enhanced_settings.types.text'),
+                                'textarea' => __('enhanced_settings.types.textarea'),
+                                'number' => __('enhanced_settings.types.number'),
+                                'boolean' => __('enhanced_settings.types.boolean'),
+                                'json' => __('enhanced_settings.types.json'),
+                                'array' => __('enhanced_settings.types.array'),
+                                'select' => __('enhanced_settings.types.select'),
+                                'file' => __('enhanced_settings.types.file'),
+                                'color' => __('enhanced_settings.types.color'),
+                                'date' => __('enhanced_settings.types.date'),
+                                'datetime' => __('enhanced_settings.types.datetime'),
                             ])
                             ->required()
                             ->default('text')
@@ -89,44 +92,43 @@ final class EnhancedSettingResource extends Resource
                             ->label(__('Sort Order'))
                             ->numeric()
                             ->default(0),
-                    ])->columns(2),
-
+                    ])
+                    ->columns(2),
                 Forms\Components\Section::make(__('Value Configuration'))
                     ->components([
                         Forms\Components\TextInput::make('value')
                             ->label(__('Value'))
-                            ->visible(fn (Forms\Get $get) => in_array($get('type'), ['text', 'number']))
+                            ->visible(fn(Forms\Get $get) => in_array($get('type'), ['text', 'number']))
                             ->required()
                             ->maxLength(1000),
                         Forms\Components\Textarea::make('value')
                             ->label(__('Value'))
-                            ->visible(fn (Forms\Get $get) => $get('type') === 'textarea')
+                            ->visible(fn(Forms\Get $get) => $get('type') === 'textarea')
                             ->required()
                             ->rows(4),
                         Forms\Components\Toggle::make('value')
                             ->label(__('Value'))
-                            ->visible(fn (Forms\Get $get) => $get('type') === 'boolean'),
+                            ->visible(fn(Forms\Get $get) => $get('type') === 'boolean'),
                         Forms\Components\Textarea::make('value')
                             ->label(__('JSON Value'))
-                            ->visible(fn (Forms\Get $get) => in_array($get('type'), ['json', 'array']))
+                            ->visible(fn(Forms\Get $get) => in_array($get('type'), ['json', 'array']))
                             ->required()
                             ->rows(6)
                             ->helperText(__('Enter valid JSON format')),
                         Forms\Components\ColorPicker::make('value')
                             ->label(__('Color Value'))
-                            ->visible(fn (Forms\Get $get) => $get('type') === 'color'),
+                            ->visible(fn(Forms\Get $get) => $get('type') === 'color'),
                         Forms\Components\DatePicker::make('value')
                             ->label(__('Date Value'))
-                            ->visible(fn (Forms\Get $get) => $get('type') === 'date'),
+                            ->visible(fn(Forms\Get $get) => $get('type') === 'date'),
                         Forms\Components\DateTimePicker::make('value')
                             ->label(__('DateTime Value'))
-                            ->visible(fn (Forms\Get $get) => $get('type') === 'datetime'),
+                            ->visible(fn(Forms\Get $get) => $get('type') === 'datetime'),
                         Forms\Components\Textarea::make('description')
                             ->label(__('Description'))
                             ->rows(3)
                             ->columnSpanFull(),
                     ]),
-
                 Forms\Components\Section::make(__('Advanced Options'))
                     ->components([
                         Forms\Components\Toggle::make('is_public')
@@ -138,7 +140,8 @@ final class EnhancedSettingResource extends Resource
                         Forms\Components\KeyValue::make('validation_rules')
                             ->label(__('Validation Rules'))
                             ->helperText(__('Laravel validation rules in key-value format')),
-                    ])->columns(2),
+                    ])
+                    ->columns(2),
             ]);
     }
 
@@ -159,7 +162,7 @@ final class EnhancedSettingResource extends Resource
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('Type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'boolean' => 'success',
                         'number' => 'info',
                         'json', 'array' => 'warning',
@@ -168,7 +171,7 @@ final class EnhancedSettingResource extends Resource
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('Value'))
                     ->limit(50)
-                    ->tooltip(fn ($record) => $record->description),
+                    ->tooltip(fn($record) => $record->description),
                 Tables\Columns\IconColumn::make('is_public')
                     ->label(__('Public'))
                     ->boolean(),
@@ -183,7 +186,7 @@ final class EnhancedSettingResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('group')
                     ->label(__('Group'))
-                    ->options(fn () => EnhancedSetting::distinct()->pluck('group', 'group')),
+                    ->options(fn() => EnhancedSetting::distinct()->pluck('group', 'group')),
                 Tables\Filters\SelectFilter::make('type')
                     ->label(__('Type'))
                     ->options([
@@ -196,14 +199,14 @@ final class EnhancedSettingResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_public')
                     ->label(__('Is Public')),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('group', 'asc')

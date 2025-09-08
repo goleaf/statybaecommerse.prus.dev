@@ -9,6 +9,8 @@ use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
@@ -160,14 +162,14 @@ final class CountryResource extends Resource
                     ->query(fn(Builder $query): Builder => $query->has('translations'))
                     ->label('Has Translations'),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('cca2');

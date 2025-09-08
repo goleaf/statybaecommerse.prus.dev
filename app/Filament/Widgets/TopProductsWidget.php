@@ -4,16 +4,19 @@ namespace App\Filament\Widgets;
 
 use App\Models\AnalyticsEvent;
 use App\Models\Product;
-use Filament\Actions\Action;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Tables;
+use Filament\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB as Database;
 
-class TopProductsWidget extends BaseWidget
+final class TopProductsWidget extends BaseWidget
 {
-    protected static ?string $heading = 'Top Products';
+    public function getHeading(): string
+    {
+        return __('admin.widgets.top_products');
+    }
 
     protected static ?int $sort = 3;
 
@@ -39,8 +42,14 @@ class TopProductsWidget extends BaseWidget
                             ->where('created_at', '>=', now()->subDays(7)),
                         'cart_adds_count'
                     )
-                    ->where('status', 'active')
-                    ->orderByDesc('views_count')
+                    ->withSum(['orderItems as total_sold' => function ($query) {
+                        $query->whereHas('order', function ($q) {
+                            $q->where('status', 'completed');
+                        });
+                    }], 'quantity')
+                    ->addSelect(Database::raw('COALESCE(total_sold, 0) as total_sold'))
+                    ->where('products.is_visible', true)
+                    ->orderByRaw('COALESCE(views_count, 0) + COALESCE(total_sold, 0) DESC')
             )
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('images')
@@ -52,20 +61,26 @@ class TopProductsWidget extends BaseWidget
                     ->searchable()
                     ->limit(30),
                 Tables\Columns\TextColumn::make('views_count')
-                    ->label('Views')
+                    ->label(__('admin.widgets.views'))
                     ->badge()
                     ->color('info')
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('cart_adds_count')
-                    ->label('Cart Adds')
+                    ->label(__('admin.widgets.cart_adds'))
                     ->badge()
                     ->color('success')
                     ->alignCenter(),
+                Tables\Columns\TextColumn::make('total_sold')
+                    ->label(__('admin.widgets.total_sold'))
+                    ->badge()
+                    ->color('warning')
+                    ->alignCenter()
+                    ->default(0),
                 Tables\Columns\TextColumn::make('price')
                     ->money('EUR')
                     ->alignRight(),
                 Tables\Columns\TextColumn::make('stock_quantity')
-                    ->label('Stock')
+                    ->label(__('admin.widgets.stock'))
                     ->badge()
                     ->color(fn($state) => $state > 10 ? 'success' : ($state > 0 ? 'warning' : 'danger'))
                     ->alignCenter(),

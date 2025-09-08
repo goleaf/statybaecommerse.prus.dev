@@ -100,10 +100,12 @@ return new class extends Migration {
     private function createMissingTables(): void
     {
         // Create locations table
-        if (!Schema::hasTable('sh_locations')) {
-            Schema::create('sh_locations', function (Blueprint $table) {
+        if (!Schema::hasTable('locations')) {
+            Schema::create('locations', function (Blueprint $table) {
                 $table->id();
-                $table->string('name');
+                $table->json('name')->nullable(); // Translatable field
+                $table->json('slug')->nullable(); // Translatable field  
+                $table->json('description')->nullable(); // Translatable field
                 $table->string('code')->unique();
                 $table->string('address_line_1');
                 $table->string('address_line_2')->nullable();

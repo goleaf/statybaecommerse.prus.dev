@@ -78,7 +78,7 @@ final class CustomerSegmentation extends Page implements HasTable
                     ->getStateUsing(fn(User $record): string => $this->calculateCustomerSegment($record)),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('create_segment')
+                Actions\Action::make('create_segment')
                     ->label(__('admin.actions.create_segment'))
                     ->icon('heroicon-o-plus-circle')
                     ->form([
@@ -128,8 +128,8 @@ final class CustomerSegmentation extends Page implements HasTable
                             ->send();
                     }),
             ])
-            ->actions([
-                Tables\Actions\Action::make('assign_to_group')
+            ->recordActions([
+                Actions\Action::make('assign_to_group')
                     ->label(__('admin.actions.assign_to_group'))
                     ->icon('heroicon-o-user-plus')
                     ->form([
@@ -146,7 +146,7 @@ final class CustomerSegmentation extends Page implements HasTable
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\Action::make('send_marketing_email')
+                Actions\Action::make('send_marketing_email')
                     ->label(__('admin.actions.send_email'))
                     ->icon('heroicon-o-envelope')
                     ->color('info')
@@ -183,8 +183,8 @@ final class CustomerSegmentation extends Page implements HasTable
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('bulk_assign_group')
+                Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('bulk_assign_group')
                         ->label(__('admin.actions.assign_to_group'))
                         ->icon('heroicon-m-user-group')
                         ->form([
@@ -203,7 +203,7 @@ final class CustomerSegmentation extends Page implements HasTable
                                 ->success()
                                 ->send();
                         }),
-                    Tables\Actions\BulkAction::make('bulk_marketing_email')
+                    Actions\BulkAction::make('bulk_marketing_email')
                         ->label(__('admin.actions.send_bulk_email'))
                         ->icon('heroicon-m-envelope')
                         ->color('info')
@@ -321,3 +321,5 @@ final class CustomerSegmentation extends Page implements HasTable
         ];
     }
 }
+
+

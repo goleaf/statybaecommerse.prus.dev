@@ -3,7 +3,7 @@
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\User;
-use Filament\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteAction;
 use Livewire\Livewire;
 
 beforeEach(function () {

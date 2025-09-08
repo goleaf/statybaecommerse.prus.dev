@@ -5,16 +5,22 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LocationResource\Pages;
 use App\Models\Location;
 use App\Services\MultiLanguageTabService;
-use Filament\Schemas\Schema;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-use BackedEnum;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use BackedEnum;
+use UnitEnum;
 
 final class LocationResource extends Resource
 {
@@ -33,7 +39,7 @@ final class LocationResource extends Resource
                 // Location Address Information (Non-translatable)
                 Forms\Components\Section::make(__('translations.location_address'))
                     ->components([
-                        Forms\Components\TextInput::make('address')
+                        Forms\Components\TextInput::make('address_line_1')
                             ->label(__('translations.address'))
                             ->maxLength(255),
                         Forms\Components\TextInput::make('city')
@@ -45,7 +51,7 @@ final class LocationResource extends Resource
                         Forms\Components\TextInput::make('postal_code')
                             ->label(__('translations.postal_code'))
                             ->maxLength(20),
-                        Forms\Components\Select::make('country_id')
+                        Forms\Components\Select::make('country_code')
                             ->label(__('translations.country'))
                             ->relationship('country', 'name')
                             ->searchable()
@@ -62,12 +68,11 @@ final class LocationResource extends Resource
                         Forms\Components\Toggle::make('is_default')
                             ->label(__('translations.is_default'))
                             ->default(false),
-                        Forms\Components\Toggle::make('is_active')
+                        Forms\Components\Toggle::make('is_enabled')
                             ->label(__('translations.active'))
                             ->default(true),
                     ])
                     ->columns(2),
-
                 // Multilanguage Tabs for Location Content
                 Tabs::make('location_translations')
                     ->tabs(
@@ -127,7 +132,7 @@ final class LocationResource extends Resource
                 Tables\Columns\IconColumn::make('is_default')
                     ->label(__('translations.is_default'))
                     ->boolean(),
-                Tables\Columns\IconColumn::make('is_active')
+                Tables\Columns\IconColumn::make('is_enabled')
                     ->label(__('translations.active'))
                     ->boolean()
                     ->sortable(),
@@ -140,7 +145,7 @@ final class LocationResource extends Resource
             ->filters([
                 Tables\Filters\Filter::make('active')
                     ->label(__('translations.active_only'))
-                    ->query(fn(Builder $query): Builder => $query->where('is_active', true)),
+                    ->query(fn(Builder $query): Builder => $query->where('is_enabled', true)),
                 Tables\Filters\Filter::make('default')
                     ->label(__('translations.default_only'))
                     ->query(fn(Builder $query): Builder => $query->where('is_default', true)),
@@ -150,14 +155,14 @@ final class LocationResource extends Resource
                     ->searchable()
                     ->preload(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('name', 'asc');

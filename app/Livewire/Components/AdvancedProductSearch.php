@@ -241,3 +241,5 @@ final class AdvancedProductSearch extends Component
         return view('livewire.components.advanced-product-search');
     }
 }
+
+

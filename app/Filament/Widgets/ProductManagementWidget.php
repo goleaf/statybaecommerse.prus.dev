@@ -14,7 +14,10 @@ final class ProductManagementWidget extends BaseWidget
 {
     protected static ?int $sort = 6;
 
-    protected static ?string $heading = 'Product Management';
+    public function getHeading(): string
+    {
+        return __('admin.widgets.product_management');
+    }
 
     protected int|string|array $columnSpan = 'full';
 
@@ -135,7 +138,7 @@ final class ProductManagementWidget extends BaseWidget
                     ->onColor('warning')
                     ->offColor('gray'),
             ])
-            ->actions([
+            ->recordActions([
                 Action::make('view')
                     ->label(__('View'))
                     ->icon('heroicon-o-eye')

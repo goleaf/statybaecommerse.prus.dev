@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class EnhancedSetting extends Model
 {
@@ -15,6 +16,7 @@ final class EnhancedSetting extends Model
     protected $fillable = [
         'group',
         'key',
+        'locale',
         'value',
         'type',
         'description',
@@ -25,7 +27,6 @@ final class EnhancedSetting extends Model
     ];
 
     protected $casts = [
-        'value' => 'json',
         'validation_rules' => 'json',
         'is_public' => 'boolean',
         'is_encrypted' => 'boolean',
@@ -36,15 +37,46 @@ final class EnhancedSetting extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if ($this->is_encrypted && $value) {
-                    return decrypt($value);
+                // Handle encryption first
+                if ($this->attributes['is_encrypted'] ?? false) {
+                    if ($value && $value !== 'null') {
+                        try {
+                            $decrypted = decrypt($value);
+                            // Try to decode JSON if it's a JSON string
+                            if (in_array($this->attributes['type'] ?? '', ['json', 'array']) && is_string($decrypted)) {
+                                $decoded = json_decode($decrypted, true);
+                                return $decoded !== null ? $decoded : $decrypted;
+                            }
+                            return $decrypted;
+                        } catch (\Exception $e) {
+                            // If decryption fails, treat as unencrypted
+                        }
+                    }
                 }
+
+                // Handle JSON types for unencrypted values
+                if (in_array($this->attributes['type'] ?? '', ['json', 'array']) && is_string($value)) {
+                    $decoded = json_decode($value, true);
+                    return $decoded !== null ? $decoded : $value;
+                }
+
                 return $value;
             },
             set: function ($value) {
-                if ($this->is_encrypted && $value) {
-                    return encrypt($value);
+                // Convert arrays/objects to JSON string for json/array types
+                if (in_array($this->attributes['type'] ?? '', ['json', 'array']) && (is_array($value) || is_object($value))) {
+                    $value = json_encode($value);
                 }
+
+                // Handle encryption
+                if (($this->attributes['is_encrypted'] ?? false) && $value !== null) {
+                    try {
+                        return encrypt($value);
+                    } catch (\Exception $e) {
+                        return $value;
+                    }
+                }
+
                 return $value;
             }
         );
@@ -71,11 +103,52 @@ final class EnhancedSetting extends Model
         return $setting ? $setting->value : $default;
     }
 
-    public static function setValue(string $key, $value, string $group = 'general'): void
+    public static function setValue(string $key, $value, string $group = 'general', string $locale = null): void
     {
+        $locale = $locale ?? app()->getLocale();
+        
         static::updateOrCreate(
-            ['key' => $key],
-            ['value' => $value, 'group' => $group]
+            ['key' => $key, 'locale' => $locale],
+            [
+                'value' => $value,
+                'group' => $group,
+                'type' => is_array($value) || is_object($value) ? 'json' : 'text',
+            ]
         );
+    }
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(EnhancedSettingTranslation::class);
+    }
+
+    public function translation(string $locale = null)
+    {
+        $locale = $locale ?? app()->getLocale();
+        return $this->translations()->where('locale', $locale)->first();
+    }
+
+    public function getTranslatedDescription(string $locale = null): ?string
+    {
+        $translation = $this->translation($locale);
+        return $translation?->description ?? $this->description;
+    }
+
+    public function getDisplayName(string $locale = null): ?string
+    {
+        $translation = $this->translation($locale);
+        return $translation?->display_name ?? $this->key;
+    }
+
+    public function getHelpText(string $locale = null): ?string
+    {
+        $translation = $this->translation($locale);
+        return $translation?->help_text;
+    }
+
+    public function scopeForLocale($query, string $locale = null)
+    {
+        $locale = $locale ?? app()->getLocale();
+        return $query->where('locale', $locale);
     }
 }

@@ -17,7 +17,6 @@ final class ProductGallery extends Component
     protected $queryString = [
         'search' => ['except' => ''],
         'filter' => ['except' => 'all'],
-        'page' => ['except' => 1],
     ];
 
     public function updatingSearch(): void

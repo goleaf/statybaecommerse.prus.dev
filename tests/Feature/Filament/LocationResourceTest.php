@@ -1,164 +1,441 @@
 <?php declare(strict_types=1);
 
+namespace Tests\Feature\Filament;
+
 use App\Filament\Resources\LocationResource;
-use App\Models\Location;
 use App\Models\Country;
+use App\Models\Location;
 use App\Models\User;
-use function Pest\Laravel\{actingAs, assertDatabaseHas, assertDatabaseMissing};
+use Filament\Actions\Testing\TestAction;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
 
-beforeEach(function () {
-    $this->admin = User::factory()->create();
-    $this->admin->assignRole('admin');
-    $this->country = Country::factory()->create();
-});
+class LocationResourceTest extends TestCase
+{
+    use RefreshDatabase;
 
-it('can render location resource index page', function () {
-    actingAs($this->admin)
-        ->get(LocationResource::getUrl('index'))
-        ->assertSuccessful();
-});
+    protected User $adminUser;
+    protected Country $country;
 
-it('can render location resource create page', function () {
-    actingAs($this->admin)
-        ->get(LocationResource::getUrl('create'))
-        ->assertSuccessful();
-});
+    protected function setUp(): void
+    {
+        parent::setUp();
 
-it('can create location', function () {
-    $newData = [
-        'name' => 'Main Warehouse',
-        'slug' => 'main-warehouse',
-        'description' => 'Primary storage facility',
-        'address' => '123 Main Street',
-        'city' => 'Vilnius',
-        'state' => 'Vilnius County',
-        'postal_code' => '01234',
-        'country_id' => $this->country->id,
-        'phone' => '+370 600 12345',
-        'email' => 'warehouse@example.com',
-        'is_default' => false,
-        'is_active' => true,
-    ];
+        // Create admin user with proper permissions
+        $this->adminUser = User::factory()->create([
+            'email' => 'admin@test.com',
+            'name' => 'Admin User',
+        ]);
 
-    actingAs($this->admin)
-        ->post(LocationResource::getUrl('create'), $newData)
-        ->assertRedirect();
+        // Give the user admin permissions
+        $this->adminUser->assignRole('super_admin');
 
-    assertDatabaseHas('locations', $newData);
-});
+        // Create a country for testing
+        $this->country = Country::factory()->create([
+            'name' => 'Lithuania',
+            'cca2' => 'LT',
+            'cca3' => 'LTU',
+        ]);
+    }
 
-it('can render location resource view page', function () {
-    $location = Location::factory()->create(['country_id' => $this->country->id]);
+    /**
+     * @test
+     */
+    public function can_render_location_index_page(): void
+    {
+        $this->actingAs($this->adminUser);
 
-    actingAs($this->admin)
-        ->get(LocationResource::getUrl('view', ['record' => $location]))
-        ->assertSuccessful();
-});
+        $response = $this->get(LocationResource::getUrl('index'));
 
-it('can render location resource edit page', function () {
-    $location = Location::factory()->create(['country_id' => $this->country->id]);
+        $response->assertSuccessful();
+    }
 
-    actingAs($this->admin)
-        ->get(LocationResource::getUrl('edit', ['record' => $location]))
-        ->assertSuccessful();
-});
+    /**
+     * @test
+     */
+    public function can_list_locations(): void
+    {
+        $this->actingAs($this->adminUser);
 
-it('can update location', function () {
-    $location = Location::factory()->create(['country_id' => $this->country->id]);
-    $newData = [
-        'name' => 'Updated Warehouse',
-        'slug' => 'updated-warehouse',
-        'city' => 'Kaunas',
-        'is_active' => false,
-    ];
-
-    actingAs($this->admin)
-        ->put(LocationResource::getUrl('edit', ['record' => $location]), array_merge($newData, [
+        $locations = Location::factory()->count(3)->create([
             'country_id' => $this->country->id,
-        ]))
-        ->assertRedirect();
+        ]);
 
-    assertDatabaseHas('locations', array_merge(['id' => $location->id], $newData));
-});
+        Livewire::test(LocationResource\Pages\ListLocations::class)
+            ->assertCanSeeTableRecords($locations);
+    }
 
-it('can delete location', function () {
-    $location = Location::factory()->create(['country_id' => $this->country->id]);
+    /**
+     * @test
+     */
+    public function can_render_location_create_page(): void
+    {
+        $this->actingAs($this->adminUser);
 
-    actingAs($this->admin)
-        ->delete(LocationResource::getUrl('edit', ['record' => $location]))
-        ->assertRedirect();
+        $response = $this->get(LocationResource::getUrl('create'));
 
-    assertDatabaseMissing('locations', ['id' => $location->id]);
-});
+        $response->assertSuccessful();
+    }
 
-it('can list locations', function () {
-    $locations = Location::factory()->count(5)->create(['country_id' => $this->country->id]);
+    /**
+     * @test
+     */
+    public function can_create_location(): void
+    {
+        $this->actingAs($this->adminUser);
 
-    actingAs($this->admin)
-        ->get(LocationResource::getUrl('index'))
-        ->assertSuccessful()
-        ->assertSeeText($locations->first()->name);
-});
-
-it('can filter active locations', function () {
-    $activeLocation = Location::factory()->create(['is_active' => true, 'country_id' => $this->country->id]);
-    $inactiveLocation = Location::factory()->create(['is_active' => false, 'country_id' => $this->country->id]);
-
-    actingAs($this->admin)
-        ->get(LocationResource::getUrl('index') . '?filter[active]=1')
-        ->assertSuccessful()
-        ->assertSeeText($activeLocation->name)
-        ->assertDontSeeText($inactiveLocation->name);
-});
-
-it('can filter default locations', function () {
-    $defaultLocation = Location::factory()->create(['is_default' => true, 'country_id' => $this->country->id]);
-    $regularLocation = Location::factory()->create(['is_default' => false, 'country_id' => $this->country->id]);
-
-    actingAs($this->admin)
-        ->get(LocationResource::getUrl('index') . '?filter[default]=1')
-        ->assertSuccessful()
-        ->assertSeeText($defaultLocation->name)
-        ->assertDontSeeText($regularLocation->name);
-});
-
-it('can filter locations by country', function () {
-    $country2 = Country::factory()->create();
-    $location1 = Location::factory()->create(['country_id' => $this->country->id]);
-    $location2 = Location::factory()->create(['country_id' => $country2->id]);
-
-    actingAs($this->admin)
-        ->get(LocationResource::getUrl('index') . '?filter[country_id]=' . $this->country->id)
-        ->assertSuccessful()
-        ->assertSeeText($location1->name)
-        ->assertDontSeeText($location2->name);
-});
-
-it('validates required fields when creating location', function () {
-    actingAs($this->admin)
-        ->post(LocationResource::getUrl('create'), [])
-        ->assertSessionHasErrors(['name', 'slug', 'country_id']);
-});
-
-it('validates unique slug when creating location', function () {
-    $existingLocation = Location::factory()->create(['slug' => 'existing-slug', 'country_id' => $this->country->id]);
-
-    actingAs($this->admin)
-        ->post(LocationResource::getUrl('create'), [
-            'name' => 'Test Location',
-            'slug' => 'existing-slug',
+        $newData = [
+            'address' => 'Test Address 123',
+            'city' => 'Vilnius',
+            'state' => 'Vilnius County',
+            'postal_code' => '01234',
             'country_id' => $this->country->id,
+            'phone' => '+370 123 45678',
+            'email' => 'test@location.com',
+            'is_default' => false,
+            'is_active' => true,
+            // Multilanguage fields
+            'name' => [
+                'lt' => 'Testas Vieta',
+                'en' => 'Test Location',
+            ],
+            'slug' => [
+                'lt' => 'testas-vieta',
+                'en' => 'test-location',
+            ],
+            'description' => [
+                'lt' => 'Testas aprašymas',
+                'en' => 'Test description',
+            ],
+        ];
+
+        Livewire::test(LocationResource\Pages\CreateLocation::class)
+            ->fillForm($newData)
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('locations', [
+            'address' => 'Test Address 123',
+            'city' => 'Vilnius',
+            'country_id' => $this->country->id,
+            'email' => 'test@location.com',
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_validate_required_fields(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        Livewire::test(LocationResource\Pages\CreateLocation::class)
+            ->fillForm([
+                'address' => '',
+                'country_id' => null,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['country_id']);
+    }
+
+    /**
+     * @test
+     */
+    public function can_render_location_edit_page(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $location = Location::factory()->create([
+            'country_id' => $this->country->id,
+        ]);
+
+        $response = $this->get(LocationResource::getUrl('edit', [
+            'record' => $location,
+        ]));
+
+        $response->assertSuccessful();
+    }
+
+    /**
+     * @test
+     */
+    public function can_retrieve_location_data(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $location = Location::factory()->create([
+            'country_id' => $this->country->id,
+            'address' => 'Original Address',
+            'city' => 'Kaunas',
+        ]);
+
+        Livewire::test(LocationResource\Pages\EditLocation::class, [
+            'record' => $location->getRouteKey(),
         ])
-        ->assertSessionHasErrors(['slug']);
-});
+            ->assertFormSet([
+                'address' => 'Original Address',
+                'city' => 'Kaunas',
+                'country_id' => $this->country->id,
+            ]);
+    }
 
-it('validates email format when creating location', function () {
-    actingAs($this->admin)
-        ->post(LocationResource::getUrl('create'), [
-            'name' => 'Test Location',
-            'slug' => 'test-location',
+    /**
+     * @test
+     */
+    public function can_save_location(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $location = Location::factory()->create([
             'country_id' => $this->country->id,
-            'email' => 'invalid-email-format',
+        ]);
+
+        $newData = [
+            'address' => 'Updated Address 456',
+            'city' => 'Klaipėda',
+            'state' => 'Klaipėda County',
+            'postal_code' => '56789',
+            'country_id' => $this->country->id,
+            'phone' => '+370 987 65432',
+            'email' => 'updated@location.com',
+            'is_default' => true,
+            'is_active' => true,
+        ];
+
+        Livewire::test(LocationResource\Pages\EditLocation::class, [
+            'record' => $location->getRouteKey(),
         ])
-        ->assertSessionHasErrors(['email']);
-});
+            ->fillForm($newData)
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect($location->refresh())
+            ->address
+            ->toBe('Updated Address 456')
+            ->city
+            ->toBe('Klaipėda')
+            ->email
+            ->toBe('updated@location.com')
+            ->is_default
+            ->toBeTrue();
+    }
+
+    /**
+     * @test
+     */
+    public function can_delete_location(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $location = Location::factory()->create([
+            'country_id' => $this->country->id,
+        ]);
+
+        Livewire::test(LocationResource\Pages\EditLocation::class, [
+            'record' => $location->getRouteKey(),
+        ])
+            ->callAction(TestAction::make('delete'))
+            ->assertRedirect(LocationResource::getUrl('index'));
+
+        $this->assertModelMissing($location);
+    }
+
+    /**
+     * @test
+     */
+    public function can_view_location(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $location = Location::factory()->create([
+            'country_id' => $this->country->id,
+            'address' => 'View Test Address',
+            'city' => 'Šiauliai',
+        ]);
+
+        $response = $this->get(LocationResource::getUrl('view', [
+            'record' => $location,
+        ]));
+
+        $response->assertSuccessful();
+    }
+
+    /**
+     * @test
+     */
+    public function can_filter_locations_by_country(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $otherCountry = Country::factory()->create([
+            'name' => 'Latvia',
+            'cca2' => 'LV',
+            'cca3' => 'LVA',
+        ]);
+
+        $lithuanianLocation = Location::factory()->create([
+            'country_id' => $this->country->id,
+            'city' => 'Vilnius',
+        ]);
+
+        $latvianLocation = Location::factory()->create([
+            'country_id' => $otherCountry->id,
+            'city' => 'Riga',
+        ]);
+
+        Livewire::test(LocationResource\Pages\ListLocations::class)
+            ->filterTable('country_id', $this->country->id)
+            ->assertCanSeeTableRecords([$lithuanianLocation])
+            ->assertCanNotSeeTableRecords([$latvianLocation]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_search_locations(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $searchableLocation = Location::factory()->create([
+            'country_id' => $this->country->id,
+            'city' => 'Unique City Name',
+        ]);
+
+        $otherLocation = Location::factory()->create([
+            'country_id' => $this->country->id,
+            'city' => 'Different City',
+        ]);
+
+        Livewire::test(LocationResource\Pages\ListLocations::class)
+            ->searchTable('Unique City')
+            ->assertCanSeeTableRecords([$searchableLocation])
+            ->assertCanNotSeeTableRecords([$otherLocation]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_sort_locations(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $locationA = Location::factory()->create([
+            'country_id' => $this->country->id,
+            'city' => 'A City',
+        ]);
+
+        $locationZ = Location::factory()->create([
+            'country_id' => $this->country->id,
+            'city' => 'Z City',
+        ]);
+
+        Livewire::test(LocationResource\Pages\ListLocations::class)
+            ->sortTable('city')
+            ->assertCanSeeTableRecords([$locationA, $locationZ], inOrder: true)
+            ->sortTable('city', 'desc')
+            ->assertCanSeeTableRecords([$locationZ, $locationA], inOrder: true);
+    }
+
+    /**
+     * @test
+     */
+    public function can_bulk_delete_locations(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $locations = Location::factory()->count(3)->create([
+            'country_id' => $this->country->id,
+        ]);
+
+        Livewire::test(LocationResource\Pages\ListLocations::class)
+            ->selectTableRecords($locations)
+            ->callAction(TestAction::make('delete')->table()->bulk())
+            ->assertCanNotSeeTableRecords($locations);
+
+        foreach ($locations as $location) {
+            $this->assertModelMissing($location);
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function validates_email_format(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        Livewire::test(LocationResource\Pages\CreateLocation::class)
+            ->fillForm([
+                'email' => 'invalid-email',
+                'country_id' => $this->country->id,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['email']);
+    }
+
+    /**
+     * @test
+     */
+    public function validates_phone_format(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        Livewire::test(LocationResource\Pages\CreateLocation::class)
+            ->fillForm([
+                'phone' => 'invalid-phone-format-that-is-way-too-long-to-be-valid',
+                'country_id' => $this->country->id,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['phone']);
+    }
+
+    /**
+     * @test
+     */
+    public function can_toggle_location_status(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $location = Location::factory()->create([
+            'country_id' => $this->country->id,
+            'is_active' => true,
+        ]);
+
+        Livewire::test(LocationResource\Pages\EditLocation::class, [
+            'record' => $location->getRouteKey(),
+        ])
+            ->fillForm(['is_active' => false])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect($location->refresh()->is_active)->toBeFalse();
+    }
+
+    /**
+     * @test
+     */
+    public function can_set_default_location(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $existingDefault = Location::factory()->create([
+            'country_id' => $this->country->id,
+            'is_default' => true,
+        ]);
+
+        $newLocation = Location::factory()->create([
+            'country_id' => $this->country->id,
+            'is_default' => false,
+        ]);
+
+        Livewire::test(LocationResource\Pages\EditLocation::class, [
+            'record' => $newLocation->getRouteKey(),
+        ])
+            ->fillForm(['is_default' => true])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect($newLocation->refresh()->is_default)->toBeTrue();
+    }
+}

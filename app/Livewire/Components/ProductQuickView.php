@@ -116,3 +116,5 @@ final class ProductQuickView extends Component
         return view('livewire.components.product-quick-view');
     }
 }
+
+

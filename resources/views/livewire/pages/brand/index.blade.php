@@ -81,7 +81,7 @@
                         </div>
                         
                         <h3 class="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
-                            <a href="{{ route('brands.show', ['slug' => $brand->slug]) }}" class="stretched-link">
+                            <a href="{{ route('brands.show', $brand) }}" class="stretched-link">
                                 {{ $brand->name }}
                             </a>
                         </h3>

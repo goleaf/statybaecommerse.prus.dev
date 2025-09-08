@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -28,6 +29,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Set default currency for Number helper (EUR by default)
+        try {
+            Number::useCurrency(config('shared.localization.default_currency', 'EUR'));
+        } catch (\Throwable $e) {
+            // Safe fallback if Number is unavailable
+        }
+
         // Legacy Shopper components removed - using native Filament resources
 
         Model::saved(function ($model): void {

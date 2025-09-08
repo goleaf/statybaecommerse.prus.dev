@@ -7,15 +7,21 @@ use App\Models\Brand;
 use App\Services\MultiLanguageTabService;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions as Actions;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use BackedEnum;
 use UnitEnum;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
-use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 
 final class BrandResource extends Resource
 {
@@ -23,7 +29,10 @@ final class BrandResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Catalog';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.catalog');
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -64,7 +73,6 @@ final class BrandResource extends Resource
                             ->helperText(__('admin.help.brand_enabled')),
                     ])
                     ->columns(2),
-
                 // Brand Images Section
                 Forms\Components\Section::make(__('admin.sections.brand_images'))
                     ->components([
@@ -90,7 +98,6 @@ final class BrandResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(1),
-
                 // Multilanguage Tabs for Translatable Content
                 Tabs::make('brand_translations')
                     ->tabs(
@@ -154,7 +161,7 @@ final class BrandResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('medium')
-                    ->description(fn ($record): string => $record->slug ?? ''),
+                    ->description(fn($record): string => $record->slug ?? ''),
                 Tables\Columns\TextColumn::make('website')
                     ->label(__('admin.fields.website'))
                     ->url()
@@ -206,36 +213,36 @@ final class BrandResource extends Resource
                     ->query(fn($query) => $query->has('translations'))
                     ->toggle(),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\Action::make('toggle_status')
+            ->recordActions([
+                Actions\ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    Action::make('toggle_status')
                         ->label(fn($record) => $record->is_enabled ? __('admin.actions.disable') : __('admin.actions.enable'))
                         ->icon(fn($record) => $record->is_enabled ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                         ->color(fn($record) => $record->is_enabled ? 'warning' : 'success')
                         ->action(fn($record) => $record->update(['is_enabled' => !$record->is_enabled]))
                         ->requiresConfirmation(),
-                    Tables\Actions\DeleteAction::make(),
+                    DeleteAction::make(),
                 ])->label(__('admin.actions.actions')),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('enable')
+                Actions\BulkActionGroup::make([
+                    BulkAction::make('enable')
                         ->label(__('admin.actions.enable_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(fn($records) => $records->each->update(['is_enabled' => true]))
                         ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('disable')
+                    BulkAction::make('disable')
                         ->label(__('admin.actions.disable_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(fn($records) => $records->each->update(['is_enabled' => false]))
                         ->requiresConfirmation(),
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Actions\DeleteBulkAction::make(),
+                    Actions\ForceDeleteBulkAction::make(),
+                    Actions\RestoreBulkAction::make(),
                 ])->label(__('admin.actions.bulk_actions')),
             ])
             ->defaultSort('name', 'asc')

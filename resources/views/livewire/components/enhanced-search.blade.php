@@ -219,7 +219,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <h3 class="font-semibold text-gray-900 mb-1">
-                                        <a href="{{ route('products.show', $product->slug) }}" class="hover:text-blue-600">
+                                        <a href="{{ route('products.show', $product->slug ?? $product) }}" class="hover:text-blue-600">
                                             {{ $product->name }}
                                         </a>
                                     </h3>

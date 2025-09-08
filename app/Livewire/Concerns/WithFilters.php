@@ -140,6 +140,27 @@ trait WithFilters
 
     protected function applySorting(Builder $query): Builder
     {
-        return $query->orderBy($this->sortBy, $this->sortDirection);
+        // Map UI sort keys to safe columns/aggregates
+        $sortKey = $this->sortBy;
+        $direction = strtolower($this->sortDirection) === 'desc' ? 'desc' : 'asc';
+
+        $whitelist = [
+            'name' => 'name',
+            'price' => 'price',
+            'created_at' => 'created_at', // Newest
+        ];
+
+        if ($sortKey === 'popularity') {
+            // Requires withCount('orderItems') in query
+            return $query->orderBy('order_items_count', $direction);
+        }
+
+        if ($sortKey === 'rating') {
+            // Requires withAvg('reviews as average_rating', 'rating') in query
+            return $query->orderBy('average_rating', $direction);
+        }
+
+        $column = $whitelist[$sortKey] ?? 'created_at';
+        return $query->orderBy($column, $direction);
     }
 }

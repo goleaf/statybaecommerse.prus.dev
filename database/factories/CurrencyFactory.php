@@ -12,10 +12,10 @@ final class CurrencyFactory extends Factory
     public function definition(): array
     {
         $currencies = [
-            ['name' => 'Euro', 'code' => 'EUR', 'symbol' => '€'],
-            ['name' => 'US Dollar', 'code' => 'USD', 'symbol' => '$'],
-            ['name' => 'British Pound', 'code' => 'GBP', 'symbol' => '£'],
-            ['name' => 'Japanese Yen', 'code' => 'JPY', 'symbol' => '¥'],
+            ['name' => ['en' => 'Euro', 'lt' => 'Euras'], 'code' => 'EUR', 'symbol' => '€'],
+            ['name' => ['en' => 'US Dollar', 'lt' => 'JAV doleris'], 'code' => 'USD', 'symbol' => '$'],
+            ['name' => ['en' => 'British Pound', 'lt' => 'Svaras sterlingų'], 'code' => 'GBP', 'symbol' => '£'],
+            ['name' => ['en' => 'Japanese Yen', 'lt' => 'Japonijos jena'], 'code' => 'JPY', 'symbol' => '¥'],
         ];
 
         $currency = $this->faker->randomElement($currencies);
@@ -24,28 +24,59 @@ final class CurrencyFactory extends Factory
             'name' => $currency['name'],
             'code' => $currency['code'],
             'symbol' => $currency['symbol'],
-            'exchange_rate' => $this->faker->randomFloat(4, 0.5, 2.0),
-            'is_enabled' => true,
+            'exchange_rate' => $this->faker->randomFloat(6, 0.5, 2.0),
+            'is_default' => false,
+            'is_enabled' => $this->faker->boolean(80),  // 80% chance of being enabled
+            'decimal_places' => $this->faker->numberBetween(0, 4),
         ];
     }
 
     public function euro(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'name' => 'Euro',
+        return $this->state(fn(array $attributes) => [
+            'name' => ['en' => 'Euro', 'lt' => 'Euras'],
             'code' => 'EUR',
             'symbol' => '€',
-            'exchange_rate' => 1.0000,
+            'exchange_rate' => 1.0,
+            'is_default' => true,
+            'is_enabled' => true,
+            'decimal_places' => 2,
         ]);
     }
 
     public function usd(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'name' => 'US Dollar',
+        return $this->state(fn(array $attributes) => [
+            'name' => ['en' => 'US Dollar', 'lt' => 'JAV doleris'],
             'code' => 'USD',
             'symbol' => '$',
-            'exchange_rate' => 1.1000,
+            'exchange_rate' => 1.1,
+            'is_default' => false,
+            'is_enabled' => true,
+            'decimal_places' => 2,
+        ]);
+    }
+
+    public function enabled(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_enabled' => true,
+        ]);
+    }
+
+    public function disabled(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_enabled' => false,
+        ]);
+    }
+
+    public function default(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_default' => true,
         ]);
     }
 }
+
+

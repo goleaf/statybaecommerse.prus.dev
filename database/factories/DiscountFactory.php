@@ -61,3 +61,5 @@ final class DiscountFactory extends Factory
         ]);
     }
 }
+
+

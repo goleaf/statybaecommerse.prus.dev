@@ -83,6 +83,19 @@ if (!function_exists('format_money')) {
         }
         $currency = $currency ?: current_currency();
         $locale = $locale ?: app()->getLocale();
+
+        // Prefer Laravel's Number helper for currency formatting
+        try {
+            /** @var class-string|null $numberClass */
+            $numberClass = \Illuminate\Support\Number::class;
+            if (class_exists($numberClass)) {
+                return \Illuminate\Support\Number::currency((float) $amount, $currency, $locale);
+            }
+        } catch (\Throwable $e) {
+            // Fall back to intl formatter below
+        }
+
+        // Fallback: use intl NumberFormatter
         $formatter = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
         return $formatter->formatCurrency((float) $amount, $currency) ?: (string) $amount;
     }

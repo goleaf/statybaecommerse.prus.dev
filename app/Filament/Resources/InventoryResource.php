@@ -6,6 +6,7 @@ use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Filament\Forms;
+use Filament\Tables\Actions\Action;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -221,11 +222,11 @@ final class InventoryResource extends Resource
                     ->trueLabel(__('Tracked'))
                     ->falseLabel(__('Not Tracked')),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make()
+            ->recordActions([
+                EditAction::make()
                     ->label(__('Adjust Stock')),
                 
-                Tables\Actions\Action::make('quick_restock')
+                Action::make('quick_restock')
                     ->label(__('Quick Restock'))
                     ->icon('heroicon-o-plus-circle')
                     ->color('success')
@@ -257,8 +258,8 @@ final class InventoryResource extends Resource
                     ->successNotificationTitle(__('Stock updated successfully')),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('bulk_restock')
+                Actions\BulkActionGroup::make([
+                    BulkAction::make('bulk_restock')
                         ->label(__('Bulk Restock'))
                         ->icon('heroicon-o-plus-circle')
                         ->color('success')

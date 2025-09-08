@@ -6,29 +6,33 @@ use App\Filament\Resources\DocumentResource\Pages;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Services\DocumentService;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
-use UnitEnum;
 
 final class DocumentResource extends Resource
 {
     protected static ?string $model = Document::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Documents';
+    protected static string|\UnitEnum|null $navigationGroup = 'Documents';
 
     protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 Forms\Components\Section::make(__('documents.document_information'))
                     ->components([
                         Forms\Components\Select::make('document_template_id')
@@ -213,8 +217,8 @@ final class DocumentResource extends Resource
                             );
                     }),
             ])
-            ->actions([
-                Tables\Actions\Action::make('generate_pdf')
+            ->recordActions([
+                Action::make('generate_pdf')
                     ->label(__('documents.generate_pdf'))
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('success')
@@ -225,20 +229,20 @@ final class DocumentResource extends Resource
 
                         return redirect($url);
                     }),
-                Tables\Actions\Action::make('download')
+                Action::make('download')
                     ->label(__('documents.download'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('primary')
                     ->visible(fn(Document $record): bool => $record->isPdf() && $record->file_path)
                     ->url(fn(Document $record): string => asset('storage/' . $record->file_path))
                     ->openUrlInNewTab(),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

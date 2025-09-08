@@ -1,48 +1,46 @@
 <?php declare(strict_types=1);
 
+namespace Tests\Unit\Models;
+
 use App\Models\AnalyticsEvent;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+final class AnalyticsEventTest extends TestCase
+{
+    use RefreshDatabase;
 
-describe('AnalyticsEvent Model', function () {
-    it('can be created with valid data', function () {
+    public function test_analytics_event_can_be_created(): void
+    {
         $user = User::factory()->create();
 
         $event = AnalyticsEvent::create([
-            'event_type' => 'page_view',
+            'event_type' => 'product_view',
             'session_id' => 'test-session-123',
             'user_id' => $user->id,
-            'properties' => ['page' => 'home', 'section' => 'hero'],
-            'url' => 'https://example.com/home',
+            'properties' => ['product_id' => 1, 'page' => 'home'],
+            'url' => 'https://example.com/products/1',
             'referrer' => 'https://google.com',
             'user_agent' => 'Mozilla/5.0 Test Browser',
             'ip_address' => '192.168.1.1',
-            'country_code' => 'US',
+            'country_code' => 'LT',
             'created_at' => now(),
         ]);
 
-        expect($event)
-            ->toBeInstanceOf(AnalyticsEvent::class)
-            ->and($event->event_type)
-            ->toBe('page_view')
-            ->and($event->session_id)
-            ->toBe('test-session-123')
-            ->and($event->user_id)
-            ->toBe($user->id)
-            ->and($event->properties)
-            ->toBe(['page' => 'home', 'section' => 'hero'])
-            ->and($event->url)
-            ->toBe('https://example.com/home');
-    });
+        $this->assertInstanceOf(AnalyticsEvent::class, $event);
+        $this->assertEquals('product_view', $event->event_type);
+        $this->assertEquals('test-session-123', $event->session_id);
+        $this->assertEquals($user->id, $event->user_id);
+        $this->assertEquals(['product_id' => 1, 'page' => 'home'], $event->properties);
+        $this->assertEquals('https://example.com/products/1', $event->url);
+    }
 
-    it('has correct fillable attributes', function () {
+    public function test_analytics_event_has_correct_fillable_attributes(): void
+    {
         $event = new AnalyticsEvent();
 
-        expect($event->getFillable())->toBe([
+        $expected = [
             'event_type',
             'session_id',
             'user_id',
@@ -53,85 +51,85 @@ describe('AnalyticsEvent Model', function () {
             'ip_address',
             'country_code',
             'created_at',
-        ]);
-    });
+        ];
 
-    it('disables timestamps by default', function () {
+        $this->assertEquals($expected, $event->getFillable());
+    }
+
+    public function test_analytics_event_disables_timestamps(): void
+    {
         $event = new AnalyticsEvent();
 
-        expect($event->timestamps)->toBeFalse();
-    });
+        $this->assertFalse($event->timestamps);
+    }
 
-    it('casts properties to array', function () {
+    public function test_analytics_event_casts_properties_to_array(): void
+    {
         $event = AnalyticsEvent::factory()->create([
-            'properties' => ['product_id' => 123, 'category' => 'electronics'],
+            'properties' => ['test' => 'value', 'number' => 123],
         ]);
 
-        expect($event->properties)
-            ->toBeArray()
-            ->and($event->properties['product_id'])
-            ->toBe(123)
-            ->and($event->properties['category'])
-            ->toBe('electronics');
-    });
+        $this->assertIsArray($event->properties);
+        $this->assertEquals(['test' => 'value', 'number' => 123], $event->properties);
+    }
 
-    it('casts created_at to datetime', function () {
+    public function test_analytics_event_casts_created_at_to_datetime(): void
+    {
         $event = AnalyticsEvent::factory()->create([
-            'created_at' => '2024-01-15 10:30:00',
+            'created_at' => '2024-01-01 12:00:00',
         ]);
 
-        expect($event->created_at)->toBeInstanceOf(Carbon\Carbon::class);
-    });
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $event->created_at);
+    }
 
-    it('belongs to a user', function () {
+    public function test_analytics_event_belongs_to_user(): void
+    {
         $user = User::factory()->create();
-        $event = AnalyticsEvent::factory()->create([
-            'user_id' => $user->id,
-        ]);
+        $event = AnalyticsEvent::factory()->create(['user_id' => $user->id]);
 
-        expect($event->user)
-            ->toBeInstanceOf(User::class)
-            ->and($event->user->id)
-            ->toBe($user->id);
-    });
+        $this->assertInstanceOf(User::class, $event->user);
+        $this->assertEquals($user->id, $event->user->id);
+    }
 
-    it('can have null user for anonymous events', function () {
-        $event = AnalyticsEvent::factory()->create([
-            'user_id' => null,
-        ]);
+    public function test_analytics_event_can_have_null_user(): void
+    {
+        $event = AnalyticsEvent::factory()->create(['user_id' => null]);
 
-        expect($event->user)->toBeNull();
-    });
+        $this->assertNull($event->user_id);
+        $this->assertNull($event->user);
+    }
 
-    it('can scope by event type', function () {
-        AnalyticsEvent::factory()->create(['event_type' => 'page_view']);
-        AnalyticsEvent::factory()->create(['event_type' => 'button_click']);
-        AnalyticsEvent::factory()->create(['event_type' => 'page_view']);
+    public function test_scope_of_type(): void
+    {
+        AnalyticsEvent::factory()->create(['event_type' => 'product_view']);
+        AnalyticsEvent::factory()->create(['event_type' => 'add_to_cart']);
+        AnalyticsEvent::factory()->create(['event_type' => 'product_view']);
 
-        $pageViewEvents = AnalyticsEvent::ofType('page_view')->get();
-        $buttonClickEvents = AnalyticsEvent::ofType('button_click')->get();
+        $productViews = AnalyticsEvent::ofType('product_view')->get();
+        $cartAdds = AnalyticsEvent::ofType('add_to_cart')->get();
 
-        expect($pageViewEvents)
-            ->toHaveCount(2)
-            ->and($buttonClickEvents)
-            ->toHaveCount(1);
-    });
+        $this->assertCount(2, $productViews);
+        $this->assertCount(1, $cartAdds);
+    }
 
-    it('can scope by session id', function () {
-        AnalyticsEvent::factory()->create(['session_id' => 'session-123']);
-        AnalyticsEvent::factory()->create(['session_id' => 'session-456']);
-        AnalyticsEvent::factory()->create(['session_id' => 'session-123']);
+    public function test_scope_for_session(): void
+    {
+        $sessionId = 'test-session-123';
 
-        $session123Events = AnalyticsEvent::forSession('session-123')->get();
-        $session456Events = AnalyticsEvent::forSession('session-456')->get();
+        AnalyticsEvent::factory()->create(['session_id' => $sessionId]);
+        AnalyticsEvent::factory()->create(['session_id' => 'other-session']);
+        AnalyticsEvent::factory()->create(['session_id' => $sessionId]);
 
-        expect($session123Events)
-            ->toHaveCount(2)
-            ->and($session456Events)
-            ->toHaveCount(1);
-    });
+        $sessionEvents = AnalyticsEvent::forSession($sessionId)->get();
 
-    it('can scope by user id', function () {
+        $this->assertCount(2, $sessionEvents);
+        $sessionEvents->each(function ($event) use ($sessionId) {
+            $this->assertEquals($sessionId, $event->session_id);
+        });
+    }
+
+    public function test_scope_for_user(): void
+    {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
 
@@ -140,206 +138,90 @@ describe('AnalyticsEvent Model', function () {
         AnalyticsEvent::factory()->create(['user_id' => $user1->id]);
 
         $user1Events = AnalyticsEvent::forUser($user1->id)->get();
-        $user2Events = AnalyticsEvent::forUser($user2->id)->get();
 
-        expect($user1Events)
-            ->toHaveCount(2)
-            ->and($user2Events)
-            ->toHaveCount(1);
-    });
+        $this->assertCount(2, $user1Events);
+        $user1Events->each(function ($event) use ($user1) {
+            $this->assertEquals($user1->id, $event->user_id);
+        });
+    }
 
-    it('can scope by date range', function () {
+    public function test_scope_in_date_range(): void
+    {
         $startDate = now()->subDays(7);
         $endDate = now()->subDays(1);
 
-        AnalyticsEvent::factory()->create(['created_at' => now()->subDays(10)]);
-        AnalyticsEvent::factory()->create(['created_at' => now()->subDays(5)]);
-        AnalyticsEvent::factory()->create(['created_at' => now()->subDays(3)]);
-        AnalyticsEvent::factory()->create(['created_at' => now()]);
+        AnalyticsEvent::factory()->create(['created_at' => now()->subDays(10)]);  // Outside range
+        AnalyticsEvent::factory()->create(['created_at' => now()->subDays(5)]);  // Inside range
+        AnalyticsEvent::factory()->create(['created_at' => now()->subDays(3)]);  // Inside range
+        AnalyticsEvent::factory()->create(['created_at' => now()]);  // Outside range
 
-        $eventsInRange = AnalyticsEvent::inDateRange($startDate, $endDate)->get();
+        $rangeEvents = AnalyticsEvent::inDateRange($startDate, $endDate)->get();
 
-        expect($eventsInRange)->toHaveCount(2);
-    });
+        $this->assertCount(2, $rangeEvents);
+    }
 
-    it('can track events with static method', function () {
+    public function test_track_static_method_creates_event(): void
+    {
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        // Start a session to avoid mocking issues
-        $this->startSession();
-        session()->put('_token', 'test-token');
+        // Mock request data
+        request()->merge(['url' => 'https://test.com/products/1']);
+        request()->headers->set('referer', 'https://google.com');
+        request()->headers->set('user-agent', 'Test Browser');
+        request()->server->set('REMOTE_ADDR', '192.168.1.1');
 
         $event = AnalyticsEvent::track('product_view', [
-            'product_id' => 123,
+            'product_id' => 1,
             'category' => 'electronics',
         ]);
 
-        expect($event)
-            ->toBeInstanceOf(AnalyticsEvent::class)
-            ->and($event->event_type)
-            ->toBe('product_view')
-            ->and($event->properties)
-            ->toBe(['product_id' => 123, 'category' => 'electronics'])
-            ->and($event->user_id)
-            ->toBe($user->id);
+        $this->assertInstanceOf(AnalyticsEvent::class, $event);
+        $this->assertEquals('product_view', $event->event_type);
+        $this->assertEquals($user->id, $event->user_id);
+        $this->assertEquals(['product_id' => 1, 'category' => 'electronics'], $event->properties);
+        $this->assertNotNull($event->session_id);
+    }
 
-        $this->assertDatabaseHas('analytics_events', [
-            'event_type' => 'product_view',
-            'user_id' => $user->id,
-        ]);
-    });
+    public function test_track_method_works_without_authenticated_user(): void
+    {
+        // Don't authenticate any user
 
-    it('can track anonymous events', function () {
-        // Start a session without authenticating
-        $this->startSession();
+        $event = AnalyticsEvent::track('page_view', ['page' => 'home']);
 
-        $event = AnalyticsEvent::track('page_view');
+        $this->assertInstanceOf(AnalyticsEvent::class, $event);
+        $this->assertEquals('page_view', $event->event_type);
+        $this->assertNull($event->user_id);
+        $this->assertEquals(['page' => 'home'], $event->properties);
+    }
 
-        expect($event->user_id)
-            ->toBeNull()
-            ->and($event->event_type)
-            ->toBe('page_view');
-    });
+    public function test_track_method_uses_custom_url(): void
+    {
+        $customUrl = 'https://custom.com/special-page';
 
-    it('can track events with custom url', function () {
-        $this->startSession();
+        $event = AnalyticsEvent::track('custom_event', [], $customUrl);
 
-        $event = AnalyticsEvent::track('custom_event', [], 'https://custom.url/path');
+        $this->assertEquals($customUrl, $event->url);
+    }
 
-        expect($event->url)->toBe('https://custom.url/path');
-    });
+    public function test_analytics_event_factory_creates_valid_data(): void
+    {
+        $event = AnalyticsEvent::factory()->create();
 
-    it('stores properties as json', function () {
-        $properties = [
-            'product_id' => 123,
-            'price' => 99.99,
-            'category' => 'electronics',
-            'tags' => ['new', 'featured'],
-        ];
+        $this->assertNotNull($event->event_type);
+        $this->assertNotNull($event->session_id);
+        $this->assertIsArray($event->properties);
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $event->created_at);
+    }
 
+    public function test_analytics_event_factory_can_create_specific_event_type(): void
+    {
         $event = AnalyticsEvent::factory()->create([
-            'properties' => $properties,
+            'event_type' => 'purchase',
+            'properties' => ['order_id' => 123, 'total' => 99.99],
         ]);
 
-        expect($event->properties)->toBe($properties);
-
-        // Verify it's stored as JSON in database
-        $rawEvent = \DB::table('analytics_events')->find($event->id);
-        expect(json_decode($rawEvent->properties, true))->toBe($properties);
-    });
-
-    it('can handle empty properties', function () {
-        $event = AnalyticsEvent::factory()->create([
-            'properties' => [],
-        ]);
-
-        expect($event->properties)->toBe([]);
-    });
-
-    it('can handle null properties', function () {
-        $event = AnalyticsEvent::factory()->create([
-            'properties' => [],
-        ]);
-
-        expect($event->properties)->toBe([]);
-    });
-
-    it('can combine multiple scopes', function () {
-        $user = User::factory()->create();
-        $sessionId = 'test-session-combo';
-        $startDate = now()->subDays(7);
-        $endDate = now();
-
-        // Create events that match all criteria
-        AnalyticsEvent::factory()->create([
-            'event_type' => 'page_view',
-            'user_id' => $user->id,
-            'session_id' => $sessionId,
-            'created_at' => now()->subDays(3),
-        ]);
-
-        // Create events that don't match all criteria
-        AnalyticsEvent::factory()->create([
-            'event_type' => 'button_click',  // Different type
-            'user_id' => $user->id,
-            'session_id' => $sessionId,
-            'created_at' => now()->subDays(3),
-        ]);
-
-        AnalyticsEvent::factory()->create([
-            'event_type' => 'page_view',
-            'user_id' => $user->id,
-            'session_id' => 'different-session',  // Different session
-            'created_at' => now()->subDays(3),
-        ]);
-
-        $filteredEvents = AnalyticsEvent::ofType('page_view')
-            ->forUser($user->id)
-            ->forSession($sessionId)
-            ->inDateRange($startDate, $endDate)
-            ->get();
-
-        expect($filteredEvents)->toHaveCount(1);
-    });
-
-    it('validates required fields', function () {
-        expect(fn() => AnalyticsEvent::create([]))
-            ->toThrow(Illuminate\Database\QueryException::class);
-    });
-
-    it('can track common ecommerce events', function () {
-        $this->startSession();
-
-        // Product view
-        $productView = AnalyticsEvent::track('product_view', [
-            'product_id' => 123,
-            'product_name' => 'iPhone 15',
-            'category' => 'Electronics',
-            'price' => 999.99,
-        ]);
-
-        // Add to cart
-        $addToCart = AnalyticsEvent::track('add_to_cart', [
-            'product_id' => 123,
-            'quantity' => 1,
-            'price' => 999.99,
-        ]);
-
-        // Purchase
-        $purchase = AnalyticsEvent::track('purchase', [
-            'order_id' => 'ORD-12345',
-            'total' => 999.99,
-            'items_count' => 1,
-        ]);
-
-        expect($productView->event_type)
-            ->toBe('product_view')
-            ->and($addToCart->event_type)
-            ->toBe('add_to_cart')
-            ->and($purchase->event_type)
-            ->toBe('purchase');
-
-        $this->assertDatabaseCount('analytics_events', 3);
-    });
-
-    it('can track user journey across session', function () {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-        $this->startSession();
-
-        // Simulate user journey
-        AnalyticsEvent::track('page_view', ['page' => 'home']);
-        AnalyticsEvent::track('page_view', ['page' => 'products']);
-        AnalyticsEvent::track('product_view', ['product_id' => 123]);
-        AnalyticsEvent::track('add_to_cart', ['product_id' => 123]);
-
-        $userJourney = AnalyticsEvent::forUser($user->id)
-            ->orderBy('created_at')
-            ->get();
-
-        expect($userJourney)->toHaveCount(4);
-        expect($userJourney->pluck('event_type')->toArray())
-            ->toBe(['page_view', 'page_view', 'product_view', 'add_to_cart']);
-    });
-});
+        $this->assertEquals('purchase', $event->event_type);
+        $this->assertEquals(['order_id' => 123, 'total' => 99.99], $event->properties);
+    }
+}

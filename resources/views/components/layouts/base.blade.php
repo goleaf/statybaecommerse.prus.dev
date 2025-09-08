@@ -62,12 +62,18 @@
                     <div class="flex items-center space-x-4">
                         <!-- Language Switcher -->
                         <div class="relative">
+                            @php
+                                $supported = config('app.supported_locales', ['en']);
+                                $supportedLocales = is_array($supported)
+                                    ? $supported
+                                    : preg_split('/[\s,|]+/', (string) $supported, -1, PREG_SPLIT_NO_EMPTY);
+                            @endphp
                             <select
-                                    onchange="window.location.href = this.value"
-                                    class="appearance-none bg-white border border-gray-300 rounded-md py-1 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                @foreach (config('app.supported_locales', ['en']) as $locale)
-                                    <option value="{{ route(Route::currentRouteName(), array_merge(request()->route()->parameters(), ['locale' => $locale])) }}"
-                                            {{ app()->getLocale() === $locale ? 'selected' : '' }}>
+                                onchange="window.location.href = this.value"
+                                class="appearance-none bg-white border border-gray-300 rounded-md py-1 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                @foreach ($supportedLocales as $locale)
+                                    <option value="{{ route('language.switch', ['locale' => $locale]) }}"
+                                        {{ app()->getLocale() === $locale ? 'selected' : '' }}>
                                         {{ strtoupper($locale) }}
                                     </option>
                                 @endforeach

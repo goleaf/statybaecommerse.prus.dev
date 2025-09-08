@@ -102,7 +102,7 @@ final class InventoryManagement extends Page implements HasTable
                     ->sortable(),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('stock_filter')
+                Actions\Action::make('stock_filter')
                     ->label(__('admin.actions.filter_stock'))
                     ->icon('heroicon-o-funnel')
                     ->form([
@@ -120,8 +120,8 @@ final class InventoryManagement extends Page implements HasTable
                         $this->stockFilter = $data['stock_filter'];
                     }),
             ])
-            ->actions([
-                Tables\Actions\Action::make('update_stock')
+            ->recordActions([
+                Actions\Action::make('update_stock')
                     ->label(__('admin.actions.update_stock'))
                     ->icon('heroicon-o-pencil')
                     ->form([
@@ -157,7 +157,7 @@ final class InventoryManagement extends Page implements HasTable
                             ->send();
                     }),
 
-                Tables\Actions\Action::make('view_variants')
+                Actions\Action::make('view_variants')
                     ->label(__('admin.actions.view_variants'))
                     ->icon('heroicon-o-squares-2x2')
                     ->color('info')
@@ -168,8 +168,8 @@ final class InventoryManagement extends Page implements HasTable
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('bulk_stock_update')
+                Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('bulk_stock_update')
                         ->label(__('admin.actions.bulk_stock_update'))
                         ->icon('heroicon-m-pencil-square')
                         ->form([
@@ -206,13 +206,13 @@ final class InventoryManagement extends Page implements HasTable
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('enable_tracking')
+                    Actions\BulkAction::make('enable_tracking')
                         ->label(__('admin.actions.enable_tracking'))
                         ->icon('heroicon-m-eye')
                         ->color('success')
                         ->action(fn ($records) => $records->each(fn($record) => $record->update(['track_inventory' => true]))),
 
-                    Tables\Actions\BulkAction::make('disable_tracking')
+                    Actions\BulkAction::make('disable_tracking')
                         ->label(__('admin.actions.disable_tracking'))
                         ->icon('heroicon-m-eye-slash')
                         ->color('danger')
@@ -253,7 +253,7 @@ final class InventoryManagement extends Page implements HasTable
                         ->title(__('admin.notifications.inventory_exported'))
                         ->body(__('admin.notifications.file_saved', ['filename' => $filename]))
                         ->success()
-                        ->actions([
+                        ->recordActions([
                             \Filament\Notifications\Actions\Action::make('download')
                                 ->label(__('admin.actions.download'))
                                 ->url(asset('storage/exports/' . $filename))

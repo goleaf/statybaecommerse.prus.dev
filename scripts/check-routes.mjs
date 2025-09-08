@@ -72,3 +72,5 @@ function buildTargets() {
   console.log(`\n[result] total=${results.length} failed=${failed.length}`);
   if (failed.length > 0) process.exitCode = 1;
 })();
+
+

@@ -6,6 +6,7 @@ use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Tables\Actions\Action;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -122,15 +123,15 @@ final class VariantsRelationManager extends RelationManager
                     ->query(fn(Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Actions\CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('is_default', 'desc');

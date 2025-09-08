@@ -51,6 +51,11 @@ final class Brand extends Model implements HasMedia
         });
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

@@ -13,13 +13,19 @@ final class Setting extends Model
         'key',
         'value',
         'type',
+        'group',
         'description',
+        'display_name',
         'is_public',
+        'is_required',
+        'is_encrypted',
     ];
 
     protected $casts = [
         'value' => 'array',
         'is_public' => 'boolean',
+        'is_required' => 'boolean',
+        'is_encrypted' => 'boolean',
     ];
 
     public function getValueAttribute($value)

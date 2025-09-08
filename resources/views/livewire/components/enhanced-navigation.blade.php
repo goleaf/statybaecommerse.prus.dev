@@ -37,7 +37,7 @@
                             <div class="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                 <div class="relative grid gap-6 bg-white px-5 py-6 dark:bg-gray-800 sm:gap-8 sm:p-8">
                                     @foreach($this->mainCategories as $category)
-                                        <a href="{{ route('categories.show', ['slug' => $category->slug, 'locale' => app()->getLocale()]) }}" 
+                                        <a href="{{ route('categories.show', $category) }}" 
                                            class="-m-3 flex items-start rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                                             @if($category->getFirstMediaUrl('images'))
                                                 <img src="{{ $category->getFirstMediaUrl('images') }}" 
@@ -59,7 +59,7 @@
                                         <ul role="list" class="mt-4 space-y-4">
                                             @foreach($this->mainCategories->take(3) as $category)
                                                 <li class="truncate text-base">
-                                                    <a href="{{ route('categories.show', ['slug' => $category->slug, 'locale' => app()->getLocale()]) }}" 
+                                                    <a href="{{ route('categories.show', $category) }}" 
                                                        class="font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-gray-300 transition-colors duration-200">
                                                         {{ $category->name }}
                                                     </a>

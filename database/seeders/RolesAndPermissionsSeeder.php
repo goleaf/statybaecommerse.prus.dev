@@ -15,6 +15,8 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Roles
         $admin = Role::findOrCreate('administrator', $guard);
+        // Backwards-compatible alias used by tests and some seeders
+        $superAdmin = Role::findOrCreate('super_admin', $guard);
         $manager = Role::findOrCreate('manager', $guard);
         $user = Role::findOrCreate('user', $guard);
 
@@ -60,8 +62,9 @@ class RolesAndPermissionsSeeder extends Seeder
             $permissions[] = Permission::findOrCreate($name, $guard);
         }
 
-        // Assign all to admin
+        // Assign all to admin and super_admin
         $admin->syncPermissions($permissions);
+        $superAdmin->syncPermissions($permissions);
 
         // Assign a subset to manager
         $manager->syncPermissions(collect($permissions)->filter(function ($perm) {

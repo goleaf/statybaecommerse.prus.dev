@@ -7,6 +7,7 @@ use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Tables\Actions\Action;
 use Filament\Tables;
 
 final class ReviewsRelationManager extends RelationManager
@@ -95,35 +96,35 @@ final class ReviewsRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Actions\CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\Action::make('approve')
+            ->recordActions([
+                Action::make('approve')
                     ->icon('heroicon-o-check')
                     ->color('success')
                     ->action(fn(Review $record) => $record->update(['is_approved' => true]))
                     ->visible(fn(Review $record) => !$record->is_approved),
-                Tables\Actions\Action::make('reject')
+                Action::make('reject')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
                     ->action(fn(Review $record) => $record->update(['is_approved' => false]))
                     ->visible(fn(Review $record) => $record->is_approved),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('approve')
+                Actions\BulkActionGroup::make([
+                    BulkAction::make('approve')
                         ->label('Approve Selected')
                         ->icon('heroicon-o-check')
                         ->color('success')
                         ->action(fn($records) => $records->each->update(['is_approved' => true])),
-                    Tables\Actions\BulkAction::make('reject')
+                    BulkAction::make('reject')
                         ->label('Reject Selected')
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
                         ->action(fn($records) => $records->each->update(['is_approved' => false])),
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

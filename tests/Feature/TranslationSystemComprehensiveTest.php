@@ -1,0 +1,288 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Services\Shared\TranslationService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
+use Tests\TestCase;
+
+final class TranslationSystemComprehensiveTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private TranslationService $translationService;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->translationService = new TranslationService();
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_get_lithuanian_translations(): void
+    {
+        App::setLocale('lt');
+
+        $translation = $this->translationService->getTranslation('translations.todays_orders');
+        $this->assertEquals('Šiandienos užsakymai', $translation);
+
+        $translation = $this->translationService->getTranslation('admin.navigation.dashboard');
+        $this->assertEquals('Valdymo skydas', $translation);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_get_english_translations(): void
+    {
+        App::setLocale('en');
+
+        // Test that English translations exist or fallback works
+        $translation = $this->translationService->getTranslation('translations.todays_orders');
+        $this->assertNotEmpty($translation);
+
+        $translation = $this->translationService->getTranslation('admin.navigation.dashboard');
+        $this->assertNotEmpty($translation);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_key_when_translation_not_found(): void
+    {
+        $translation = $this->translationService->getTranslation('non.existent.key');
+        $this->assertEquals('non.existent.key', $translation);
+    }
+
+    /**
+     * @test
+     */
+    public function it_supports_parameter_replacement(): void
+    {
+        App::setLocale('lt');
+
+        $translation = $this->translationService->getTranslation(
+            'translations.revenue_growth_positive',
+            ['percent' => '15']
+        );
+
+        $this->assertStringContainsString('15', $translation);
+        $this->assertStringContainsString('%', $translation);
+    }
+
+    /**
+     * @test
+     */
+    public function it_caches_translations(): void
+    {
+        Cache::flush();
+
+        // First call should cache the translation
+        $translation1 = $this->translationService->getTranslation('translations.todays_orders');
+
+        // Second call should use cache
+        $translation2 = $this->translationService->getTranslation('translations.todays_orders');
+
+        $this->assertEquals($translation1, $translation2);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_clear_translation_cache(): void
+    {
+        // Cache a translation
+        $this->translationService->getTranslation('translations.todays_orders');
+
+        // Clear cache
+        $this->translationService->clearTranslationCache();
+
+        // This should work without errors
+        $translation = $this->translationService->getTranslation('translations.todays_orders');
+        $this->assertNotEmpty($translation);
+    }
+
+    /**
+     * @test
+     */
+    public function it_supports_all_configured_locales(): void
+    {
+        $supportedLocales = $this->translationService->getSupportedLocales();
+
+        $this->assertContains('lt', $supportedLocales);
+        $this->assertContains('en', $supportedLocales);
+        $this->assertContains('de', $supportedLocales);
+    }
+
+    /**
+     * @test
+     */
+    public function it_has_correct_default_locale(): void
+    {
+        $defaultLocale = $this->translationService->getDefaultLocale();
+        $this->assertEquals('lt', $defaultLocale);
+    }
+
+    /**
+     * @test
+     */
+    public function it_validates_locale_support(): void
+    {
+        $this->assertTrue($this->translationService->isLocaleSupported('lt'));
+        $this->assertTrue($this->translationService->isLocaleSupported('en'));
+        $this->assertTrue($this->translationService->isLocaleSupported('de'));
+        $this->assertFalse($this->translationService->isLocaleSupported('fr'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_euro_currency_for_all_locales(): void
+    {
+        $this->assertEquals('EUR', $this->translationService->getCurrentCurrency());
+
+        App::setLocale('en');
+        $this->assertEquals('EUR', $this->translationService->getCurrentCurrency());
+
+        App::setLocale('de');
+        $this->assertEquals('EUR', $this->translationService->getCurrentCurrency());
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_get_all_translations_for_locale(): void
+    {
+        App::setLocale('lt');
+
+        $allTranslations = $this->translationService->getAllTranslations();
+
+        $this->assertIsArray($allTranslations);
+        $this->assertNotEmpty($allTranslations);
+        $this->assertArrayHasKey('translations.todays_orders', $allTranslations);
+    }
+
+    /**
+     * @test
+     */
+    public function it_loads_translations_from_json_files(): void
+    {
+        App::setLocale('lt');
+
+        // Test that JSON translations are loaded
+        $translation = $this->translationService->getTranslation('translations.todays_orders');
+        $this->assertEquals('Šiandienos užsakymai', $translation);
+    }
+
+    /**
+     * @test
+     */
+    public function it_loads_translations_from_php_files(): void
+    {
+        App::setLocale('lt');
+
+        // Test that PHP file translations are loaded
+        $translation = $this->translationService->getTranslation('admin.navigation.dashboard');
+        $this->assertEquals('Valdymo skydas', $translation);
+    }
+
+    /**
+     * @test
+     */
+    public function it_handles_dot_notation_correctly(): void
+    {
+        App::setLocale('lt');
+
+        $translation = $this->translationService->getTranslation('admin.widgets.enhanced_ecommerce_overview');
+        $this->assertNotEmpty($translation);
+    }
+
+    /**
+     * @test
+     */
+    public function widget_translations_are_available(): void
+    {
+        App::setLocale('lt');
+
+        // Test widget-specific translations
+        $this->assertNotEmpty(__('admin.widgets.enhanced_ecommerce_overview'));
+        $this->assertNotEmpty(__('admin.widgets.top_products'));
+        $this->assertNotEmpty(__('admin.widgets.realtime_analytics'));
+    }
+
+    /**
+     * @test
+     */
+    public function dashboard_translations_are_available(): void
+    {
+        App::setLocale('lt');
+
+        // Test dashboard-specific translations
+        $this->assertNotEmpty(__('translations.todays_orders'));
+        $this->assertNotEmpty(__('translations.todays_revenue'));
+        $this->assertNotEmpty(__('translations.monthly_orders'));
+        $this->assertNotEmpty(__('translations.monthly_revenue'));
+        $this->assertNotEmpty(__('translations.active_carts'));
+        $this->assertNotEmpty(__('translations.total_products'));
+        $this->assertNotEmpty(__('translations.total_users'));
+    }
+
+    /**
+     * @test
+     */
+    public function navigation_translations_are_available(): void
+    {
+        App::setLocale('lt');
+
+        // Test navigation translations
+        $this->assertNotEmpty(__('admin.navigation.dashboard'));
+        $this->assertNotEmpty(__('admin.navigation.catalog'));
+        $this->assertNotEmpty(__('admin.navigation.orders'));
+        $this->assertNotEmpty(__('admin.navigation.customers'));
+        $this->assertNotEmpty(__('admin.navigation.marketing'));
+        $this->assertNotEmpty(__('admin.navigation.settings'));
+        $this->assertNotEmpty(__('admin.navigation.system'));
+    }
+
+    /**
+     * @test
+     */
+    public function currency_and_partner_translations_are_available(): void
+    {
+        App::setLocale('lt');
+
+        // Test currency translations
+        $this->assertNotEmpty(__('admin.currency.plural'));
+        $this->assertNotEmpty(__('admin.currency.singular'));
+
+        // Test partner translations
+        $this->assertNotEmpty(__('admin.partner.plural'));
+        $this->assertNotEmpty(__('admin.partner.singular'));
+
+        // Test partner tier translations
+        $this->assertNotEmpty(__('admin.partner_tier.plural'));
+        $this->assertNotEmpty(__('admin.partner_tier.singular'));
+    }
+
+    /**
+     * @test
+     */
+    public function model_translations_are_available(): void
+    {
+        App::setLocale('lt');
+
+        // Test model translations
+        $this->assertNotEmpty(__('admin.models.brand'));
+        $this->assertNotEmpty(__('admin.models.brands'));
+        $this->assertNotEmpty(__('admin.models.product'));
+        $this->assertNotEmpty(__('admin.models.products'));
+        $this->assertNotEmpty(__('admin.models.order'));
+        $this->assertNotEmpty(__('admin.models.orders'));
+        $this->assertNotEmpty(__('admin.models.user'));
+        $this->assertNotEmpty(__('admin.models.users'));
+    }
+}

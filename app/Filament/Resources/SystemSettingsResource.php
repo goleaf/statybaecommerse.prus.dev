@@ -4,14 +4,21 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SystemSettingsResource\Pages;
 use App\Models\Setting;
-use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 final class SystemSettingsResource extends Resource
 {
@@ -42,23 +49,21 @@ final class SystemSettingsResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('Setting Information'))
+                Section::make(__('Setting Information'))
                     ->schema([
-                        Forms\Components\TextInput::make('key')
+                        TextInput::make('key')
                             ->label(__('Key'))
                             ->required()
                             ->maxLength(255)
                             ->unique(Setting::class, 'key', ignoreRecord: true)
                             ->helperText(__('Unique identifier for this setting'))
                             ->columnSpanFull(),
-                        
-                        Forms\Components\TextInput::make('display_name')
+                        TextInput::make('display_name')
                             ->label(__('Display Name'))
                             ->required()
                             ->maxLength(255)
                             ->helperText(__('Human-readable name for this setting')),
-                        
-                        Forms\Components\Select::make('type')
+                        Select::make('type')
                             ->label(__('Type'))
                             ->options([
                                 'string' => __('Text'),
@@ -78,35 +83,30 @@ final class SystemSettingsResource extends Resource
                             ->helperText(__('Data type for this setting')),
                     ])
                     ->columns(2),
-                
-                Forms\Components\Section::make(__('Setting Value'))
+                Section::make(__('Setting Value'))
                     ->schema([
-                        Forms\Components\Textarea::make('value')
+                        Textarea::make('value')
                             ->label(__('Value'))
                             ->required()
                             ->rows(3)
                             ->helperText(__('The actual value for this setting'))
                             ->columnSpanFull(),
-                        
-                        Forms\Components\Textarea::make('description')
+                        Textarea::make('description')
                             ->label(__('Description'))
                             ->rows(2)
                             ->helperText(__('Optional description of what this setting controls'))
                             ->columnSpanFull(),
                     ]),
-                
-                Forms\Components\Section::make(__('Organization'))
+                Section::make(__('Organization'))
                     ->schema([
-                        Forms\Components\TextInput::make('group')
+                        TextInput::make('group')
                             ->label(__('Group'))
                             ->helperText(__('Group this setting belongs to (e.g., "general", "email", "payment")')),
-                        
-                        Forms\Components\Toggle::make('is_public')
+                        Toggle::make('is_public')
                             ->label(__('Public'))
                             ->helperText(__('Can this setting be accessed from frontend?'))
                             ->default(false),
-                        
-                        Forms\Components\Toggle::make('is_required')
+                        Toggle::make('is_required')
                             ->label(__('Required'))
                             ->helperText(__('Is this setting required for system operation?'))
                             ->default(false),
@@ -125,17 +125,15 @@ final class SystemSettingsResource extends Resource
                     ->sortable()
                     ->copyable()
                     ->weight('medium'),
-                
                 Tables\Columns\TextColumn::make('display_name')
                     ->label(__('Display Name'))
                     ->searchable()
                     ->sortable()
                     ->wrap(),
-                
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('Type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'string', 'text' => 'gray',
                         'number' => 'info',
                         'boolean' => 'success',
@@ -144,7 +142,6 @@ final class SystemSettingsResource extends Resource
                         'url' => 'secondary',
                         default => 'gray',
                     }),
-                
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('Value'))
                     ->limit(50)
@@ -153,23 +150,19 @@ final class SystemSettingsResource extends Resource
                         return strlen($state) > 50 ? $state : null;
                     })
                     ->copyable(),
-                
                 Tables\Columns\TextColumn::make('group')
                     ->label(__('Group'))
                     ->badge()
                     ->color('primary')
                     ->sortable(),
-                
                 Tables\Columns\IconColumn::make('is_public')
                     ->label(__('Public'))
                     ->boolean()
                     ->sortable(),
-                
                 Tables\Columns\IconColumn::make('is_required')
                     ->label(__('Required'))
                     ->boolean()
                     ->sortable(),
-                
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('Last Updated'))
                     ->dateTime()
@@ -191,36 +184,32 @@ final class SystemSettingsResource extends Resource
                         'date' => __('Date'),
                         'datetime' => __('Date & Time'),
                     ]),
-                
                 Tables\Filters\SelectFilter::make('group')
                     ->label(__('Group'))
-                    ->options(fn (): array => Setting::query()
+                    ->options(fn(): array => Setting::query()
                         ->whereNotNull('group')
                         ->distinct()
                         ->pluck('group', 'group')
-                        ->toArray()
-                    ),
-                
+                        ->toArray()),
                 Tables\Filters\TernaryFilter::make('is_public')
                     ->label(__('Public'))
                     ->placeholder(__('All'))
                     ->trueLabel(__('Public'))
                     ->falseLabel(__('Private')),
-                
                 Tables\Filters\TernaryFilter::make('is_required')
                     ->label(__('Required'))
                     ->placeholder(__('All'))
                     ->trueLabel(__('Required'))
                     ->falseLabel(__('Optional')),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('group')

@@ -238,7 +238,7 @@ final class DataImportExport extends Page
                 ->title(__('admin.notifications.export_completed'))
                 ->body(__('admin.notifications.file_ready_download'))
                 ->success()
-                ->actions([
+                ->recordActions([
                     \Filament\Notifications\Actions\Action::make('download')
                         ->label(__('admin.actions.download'))
                         ->url(asset('storage/exports/' . $filename))
@@ -267,7 +267,7 @@ final class DataImportExport extends Page
         Notification::make()
             ->title(__('admin.notifications.template_ready'))
             ->success()
-            ->actions([
+            ->recordActions([
                 \Filament\Notifications\Actions\Action::make('download')
                     ->label(__('admin.actions.download'))
                     ->url(asset('storage/templates/' . $filename))
@@ -460,3 +460,5 @@ final class DataImportExport extends Page
         return Category::where('name', $categoryName)->first()?->id;
     }
 }
+
+

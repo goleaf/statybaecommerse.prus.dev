@@ -19,15 +19,24 @@ final class Country extends Model
     protected $table = 'countries';
 
     protected $fillable = [
-        'region',
-        'subregion',
+        'name',
         'cca2',
         'cca3',
+        'ccn3',
+        'currency_code',
+        'phone_code',
+        'phone_calling_code',
         'flag',
+        'svg_flag',
+        'region',
+        'subregion',
         'latitude',
         'longitude',
-        'phone_calling_code',
         'currencies',
+        'languages',
+        'timezones',
+        'is_enabled',
+        'sort_order',
     ];
 
     protected function casts(): array
@@ -36,6 +45,10 @@ final class Country extends Model
             'latitude' => 'decimal:8',
             'longitude' => 'decimal:8',
             'currencies' => 'array',
+            'languages' => 'array',
+            'timezones' => 'array',
+            'is_enabled' => 'boolean',
+            'sort_order' => 'integer',
         ];
     }
 

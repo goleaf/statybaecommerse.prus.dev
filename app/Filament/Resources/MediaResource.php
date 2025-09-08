@@ -4,15 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MediaResource\Pages;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Tables;
-use Filament\Forms;
 use Filament\Schemas\Schema;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 final class MediaResource extends Resource
 {
@@ -58,7 +58,7 @@ final class MediaResource extends Resource
                         Forms\Components\TextInput::make('size')
                             ->label(__('File Size'))
                             ->disabled()
-                            ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : ''),
+                            ->formatStateUsing(fn($state) => $state ? number_format($state / 1024, 2) . ' KB' : ''),
                         Forms\Components\Select::make('collection_name')
                             ->label(__('Collection'))
                             ->options([
@@ -101,7 +101,7 @@ final class MediaResource extends Resource
                 Tables\Columns\TextColumn::make('collection_name')
                     ->label(__('Collection'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'product-images' => 'success',
                         'product-gallery' => 'info',
                         'brand-logos' => 'warning',
@@ -116,12 +116,12 @@ final class MediaResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('size')
                     ->label(__('Size'))
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : '')
+                    ->formatStateUsing(fn($state) => $state ? number_format($state / 1024, 2) . ' KB' : '')
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('model_type')
                     ->label(__('Used By'))
-                    ->formatStateUsing(fn (string $state): string => class_basename($state))
+                    ->formatStateUsing(fn(string $state): string => class_basename($state))
                     ->badge()
                     ->color('primary')
                     ->toggleable(),
@@ -150,19 +150,19 @@ final class MediaResource extends Resource
                         'image/gif' => 'GIF',
                     ]),
             ])
-            ->actions([
-                Tables\Actions\Action::make('download')
+            ->recordActions([
+                \Filament\Actions\Action::make('download')
                     ->label(__('Download'))
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (Media $record): string => $record->getUrl())
+                    ->url(fn(Media $record): string => $record->getUrl())
                     ->openUrlInNewTab(),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                \Filament\Actions\ViewAction::make(),
+                \Filament\Actions\EditAction::make(),
+                \Filament\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
@@ -194,6 +194,6 @@ final class MediaResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false; // Media is uploaded through other resources
+        return false;  // Media is uploaded through other resources
     }
 }

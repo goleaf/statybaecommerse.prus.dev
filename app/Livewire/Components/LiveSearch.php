@@ -115,3 +115,5 @@ final class LiveSearch extends Component
         return view('livewire.components.live-search');
     }
 }
+
+

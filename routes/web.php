@@ -21,8 +21,9 @@ Route::get('/lang/{locale}', function (string $locale) {
     $supportedLocales = array_map('trim', $supportedLocales);
 
     if (in_array($locale, $supportedLocales)) {
-        session(['app.locale' => $locale]);
+        // Set runtime and persist
         app()->setLocale($locale);
+        session(['locale' => $locale, 'app.locale' => $locale]);
 
         // Set cookie for persistence
         cookie()->queue(cookie('app_locale', $locale, 60 * 24 * 30));
@@ -30,6 +31,12 @@ Route::get('/lang/{locale}', function (string $locale) {
         // Update user preference if authenticated
         if (auth()->check()) {
             auth()->user()->update(['preferred_locale' => $locale]);
+        }
+
+        // Optional currency mapping
+        $mapping = (array) config('app.locale_mapping', []);
+        if (isset($mapping[$locale]['currency']) && is_string($mapping[$locale]['currency'])) {
+            session(['forced_currency' => $mapping[$locale]['currency']]);
         }
     }
 

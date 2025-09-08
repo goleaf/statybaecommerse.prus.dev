@@ -14,7 +14,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         // Allow administrators to bypass all authorization checks
         Gate::before(function ($user, string $ability = null) {
-            if (method_exists($user, 'hasRole') && $user->hasRole('administrator')) {
+            if (method_exists($user, 'hasRole') && ($user->hasRole('administrator') || $user->hasRole('super_admin'))) {
                 return true;
             }
 

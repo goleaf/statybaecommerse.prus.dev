@@ -28,13 +28,10 @@ class UserFactory extends Factory
         
         return [
             'name' => $firstName . ' ' . $lastName,
-            'first_name' => $firstName,
-            'last_name' => $lastName,
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'preferred_locale' => fake()->randomElement(['en', 'lt', 'de']),
-            'phone' => fake()->phoneNumber(),
+            'preferred_locale' => fake()->randomElement(['en', 'lt']),
             'remember_token' => Str::random(10),
         ];
     }

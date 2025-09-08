@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         // Enhanced Settings System for Filament
@@ -13,14 +12,16 @@ return new class extends Migration
             Schema::create('settings', function (Blueprint $table) {
                 $table->id();
                 $table->string('key')->unique();
+                $table->string('display_name');
                 $table->text('value')->nullable();
-                $table->string('type')->default('string'); // string, boolean, integer, float, array, json
+                $table->string('type')->default('string');  // string, boolean, integer, float, array, json
                 $table->string('group')->default('general');
                 $table->text('description')->nullable();
                 $table->boolean('is_public')->default(false);
+                $table->boolean('is_required')->default(false);
                 $table->boolean('is_encrypted')->default(false);
                 $table->timestamps();
-                
+
                 $table->index(['group', 'key']);
                 $table->index('is_public');
             });
@@ -34,11 +35,11 @@ return new class extends Migration
                 $table->string('key')->unique();
                 $table->boolean('is_enabled')->default(false);
                 $table->text('description')->nullable();
-                $table->json('conditions')->nullable(); // User groups, roles, etc.
+                $table->json('conditions')->nullable();  // User groups, roles, etc.
                 $table->timestamp('enabled_at')->nullable();
                 $table->timestamp('disabled_at')->nullable();
                 $table->timestamps();
-                
+
                 $table->index('is_enabled');
                 $table->index('key');
             });
@@ -50,15 +51,15 @@ return new class extends Migration
                 $table->id();
                 $table->string('name');
                 $table->string('key')->unique();
-                $table->string('type'); // email, sms, push, database
-                $table->string('event'); // order_created, user_registered, etc.
-                $table->json('subject'); // Multilingual
-                $table->json('content'); // Multilingual
-                $table->json('variables')->nullable(); // Available variables
+                $table->string('type');  // email, sms, push, database
+                $table->string('event');  // order_created, user_registered, etc.
+                $table->json('subject');  // Multilingual
+                $table->json('content');  // Multilingual
+                $table->json('variables')->nullable();  // Available variables
                 $table->boolean('is_active')->default(true);
                 $table->string('locale')->default('lt');
                 $table->timestamps();
-                
+
                 $table->index(['type', 'event']);
                 $table->index(['is_active', 'locale']);
             });
@@ -74,7 +75,7 @@ return new class extends Migration
                 $table->boolean('is_public')->default(false);
                 $table->boolean('is_default')->default(false);
                 $table->timestamps();
-                
+
                 $table->index(['user_id', 'is_default']);
                 $table->index('is_public');
             });
@@ -89,7 +90,7 @@ return new class extends Migration
                 $table->integer('quantity')->default(1);
                 $table->text('notes')->nullable();
                 $table->timestamps();
-                
+
                 $table->unique(['wishlist_id', 'product_id', 'variant_id']);
                 $table->index('product_id');
             });
@@ -106,9 +107,9 @@ return new class extends Migration
                 $table->integer('quantity');
                 $table->decimal('unit_price', 10, 2);
                 $table->decimal('total_price', 10, 2);
-                $table->json('product_snapshot')->nullable(); // Store product data at time of adding
+                $table->json('product_snapshot')->nullable();  // Store product data at time of adding
                 $table->timestamps();
-                
+
                 $table->index(['session_id', 'user_id']);
                 $table->index('product_id');
                 $table->index('created_at');
@@ -123,7 +124,7 @@ return new class extends Migration
                 $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
                 $table->foreignId('product_id')->constrained()->cascadeOnDelete();
                 $table->timestamps();
-                
+
                 $table->unique(['session_id', 'product_id']);
                 $table->unique(['user_id', 'product_id']);
                 $table->index('product_id');
@@ -134,17 +135,17 @@ return new class extends Migration
         if (!Schema::hasTable('analytics_events')) {
             Schema::create('analytics_events', function (Blueprint $table) {
                 $table->id();
-                $table->string('event_type'); // page_view, product_view, add_to_cart, etc.
+                $table->string('event_type');  // page_view, product_view, add_to_cart, etc.
                 $table->string('session_id');
                 $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-                $table->json('properties'); // Event-specific data
+                $table->json('properties');  // Event-specific data
                 $table->string('url')->nullable();
                 $table->string('referrer')->nullable();
                 $table->string('user_agent')->nullable();
                 $table->ipAddress('ip_address')->nullable();
                 $table->string('country_code', 2)->nullable();
                 $table->timestamp('created_at');
-                
+
                 $table->index(['event_type', 'created_at']);
                 $table->index(['session_id', 'created_at']);
                 $table->index(['user_id', 'created_at']);
@@ -155,18 +156,18 @@ return new class extends Migration
         if (!Schema::hasTable('seo_data')) {
             Schema::create('seo_data', function (Blueprint $table) {
                 $table->id();
-                $table->morphs('seoable'); // Can be attached to any model
+                $table->morphs('seoable');  // Can be attached to any model
                 $table->string('locale', 5);
                 $table->string('title')->nullable();
                 $table->text('description')->nullable();
                 $table->text('keywords')->nullable();
                 $table->string('canonical_url')->nullable();
-                $table->json('meta_tags')->nullable(); // Additional meta tags
-                $table->json('structured_data')->nullable(); // JSON-LD data
+                $table->json('meta_tags')->nullable();  // Additional meta tags
+                $table->json('structured_data')->nullable();  // JSON-LD data
                 $table->boolean('no_index')->default(false);
                 $table->boolean('no_follow')->default(false);
                 $table->timestamps();
-                
+
                 $table->unique(['seoable_type', 'seoable_id', 'locale']);
                 $table->index(['locale', 'no_index']);
             });
@@ -294,7 +295,7 @@ return new class extends Migration
         if (Schema::hasTable('users')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->dropColumn([
-                    'login_count', 'last_login_ip', 'last_login_at', 
+                    'login_count', 'last_login_ip', 'last_login_at',
                     'tax_number', 'company', 'avatar'
                 ]);
             });

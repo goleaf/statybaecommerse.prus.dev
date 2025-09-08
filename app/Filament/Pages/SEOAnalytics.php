@@ -95,14 +95,14 @@ final class SEOAnalytics extends Page implements HasTable
                     }),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('seo_audit')
+                Actions\Action::make('seo_audit')
                     ->label(__('admin.actions.seo_audit'))
                     ->icon('heroicon-o-magnifying-glass-circle')
                     ->action(function (): void {
                         $this->performSEOAudit();
                     }),
 
-                Tables\Actions\Action::make('generate_sitemaps')
+                Actions\Action::make('generate_sitemaps')
                     ->label(__('admin.actions.generate_sitemaps'))
                     ->icon('heroicon-o-map')
                     ->color('success')
@@ -110,8 +110,8 @@ final class SEOAnalytics extends Page implements HasTable
                         $this->generateSitemaps();
                     }),
             ])
-            ->actions([
-                Tables\Actions\Action::make('optimize_seo')
+            ->recordActions([
+                Actions\Action::make('optimize_seo')
                     ->label(__('admin.actions.optimize_seo'))
                     ->icon('heroicon-o-wrench-screwdriver')
                     ->color('warning')
@@ -119,7 +119,7 @@ final class SEOAnalytics extends Page implements HasTable
                         $this->optimizeSEO($record);
                     }),
 
-                Tables\Actions\Action::make('preview_seo')
+                Actions\Action::make('preview_seo')
                     ->label(__('admin.actions.preview_seo'))
                     ->icon('heroicon-o-eye')
                     ->color('info')
@@ -440,3 +440,5 @@ final class SEOAnalytics extends Page implements HasTable
             ->send();
     }
 }
+
+

@@ -37,6 +37,8 @@ final class ProductCatalog extends Component
     {
         $query = Product::query()
             ->with(['brand', 'categories', 'media', 'prices'])
+            ->withCount('orderItems')
+            ->withAvg('reviews as average_rating', 'rating')
             ->where('is_visible', true)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());

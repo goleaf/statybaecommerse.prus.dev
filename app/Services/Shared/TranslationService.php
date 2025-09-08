@@ -10,9 +10,15 @@ final class TranslationService
     private const CACHE_TTL = 3600; // 1 hour
     private const SUPPORTED_LOCALES = ['lt', 'en', 'de'];
 
-    public function getTranslation(string $key, string $locale = null, array $replace = []): string
+    public function getTranslation(string $key, mixed $localeOrReplace = null, array $replace = []): string
     {
-        $locale = $locale ?? app()->getLocale();
+        // Support both signatures: (key, replaceArray) or (key, locale, replaceArray)
+        if (is_array($localeOrReplace)) {
+            $replace = $localeOrReplace;
+            $locale = app()->getLocale();
+        } else {
+            $locale = $localeOrReplace ?? app()->getLocale();
+        }
         
         $cacheKey = "translation.{$locale}.{$key}";
         
@@ -20,13 +26,13 @@ final class TranslationService
             return $this->loadTranslationFromFiles($key, $locale);
         });
 
-        if (!empty($replace)) {
+        if (!empty($replace) && is_string($translation)) {
             foreach ($replace as $search => $replacement) {
                 $translation = str_replace(":{$search}", $replacement, $translation);
             }
         }
 
-        return $translation ?: $key;
+        return is_string($translation) && $translation !== '' ? $translation : $key;
     }
 
     public function getAllTranslations(string $locale = null): array
@@ -101,7 +107,7 @@ final class TranslationService
         };
     }
 
-    private function loadTranslationFromFiles(string $key, string $locale): ?string
+    private function loadTranslationFromFiles(string $key, string $locale): string|array|null
     {
         // Try JSON file first
         $jsonFile = lang_path("{$locale}.json");

@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
-use Filament\Actions\Action;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Tables;
@@ -11,7 +10,12 @@ use Filament\Tables;
 final class RecentOrdersWidget extends BaseWidget
 {
     protected static ?int $sort = 4;
-    protected static ?string $heading = 'Recent Orders';
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.recent_orders');
+    }
+
     protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
@@ -68,12 +72,12 @@ final class RecentOrdersWidget extends BaseWidget
                     ->since(),
             ])
             ->actions([
-                Action::make('view')
+                Actions\Action::make('view')
                     ->label(__('admin.actions.view'))
                     ->icon('heroicon-m-eye')
                     ->url(fn(Order $record): string => route('filament.admin.resources.orders.view', $record))
                     ->openUrlInNewTab(),
-                Action::make('process')
+                Actions\Action::make('process')
                     ->label(__('admin.actions.process'))
                     ->icon('heroicon-m-cog-6-tooth')
                     ->color('info')
@@ -87,3 +91,5 @@ final class RecentOrdersWidget extends BaseWidget
             ->paginated(false);
     }
 }
+
+

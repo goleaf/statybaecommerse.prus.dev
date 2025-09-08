@@ -9,8 +9,8 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 final class ActivityLogResource extends Resource
 {
@@ -44,7 +44,7 @@ final class ActivityLogResource extends Resource
                 Tables\Columns\TextColumn::make('log_name')
                     ->label(__('Log Name'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'product' => 'success',
                         'order' => 'warning',
                         'user' => 'info',
@@ -57,7 +57,7 @@ final class ActivityLogResource extends Resource
                     ->limit(50),
                 Tables\Columns\TextColumn::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->formatStateUsing(fn (string $state): string => class_basename($state))
+                    ->formatStateUsing(fn(string $state): string => class_basename($state))
                     ->badge()
                     ->color('primary'),
                 Tables\Columns\TextColumn::make('subject_id')
@@ -95,23 +95,25 @@ final class ActivityLogResource extends Resource
                     ]),
                 Tables\Filters\Filter::make('created_at')
                     ->form([
-                        Tables\Filters\Indicators\DatePicker::make('created_from'),
-                        Tables\Filters\Indicators\DatePicker::make('created_until'),
+                        \Filament\Forms\Components\DatePicker::make('created_from')
+                            ->label(__('From Date')),
+                        \Filament\Forms\Components\DatePicker::make('created_until')
+                            ->label(__('Until Date')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()
+            ->recordActions([
+                Actions\ViewAction::make()
                     ->modalContent(function (Activity $record) {
                         return view('filament.activity-log.view-modal', [
                             'activity' => $record,

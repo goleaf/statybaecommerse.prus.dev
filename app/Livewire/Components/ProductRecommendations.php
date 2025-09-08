@@ -230,3 +230,5 @@ final class ProductRecommendations extends Component
         return view('livewire.components.product-recommendations');
     }
 }
+
+

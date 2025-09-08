@@ -15,7 +15,10 @@ final class ModernSalesWidget extends BaseWidget
 {
     protected static ?int $sort = 4;
 
-    protected static ?string $heading = 'Recent Sales';
+    public function getHeading(): string
+    {
+        return __('analytics.recent_sales');
+    }
 
     protected int|string|array $columnSpan = 'full';
 
@@ -86,7 +89,7 @@ final class ModernSalesWidget extends BaseWidget
                     ->icon('heroicon-o-calendar'),
             ])
             ->actions([
-                Action::make('view')
+                Actions\Action::make('view')
                     ->label(__('View'))
                     ->icon('heroicon-o-eye')
                     ->color('primary')

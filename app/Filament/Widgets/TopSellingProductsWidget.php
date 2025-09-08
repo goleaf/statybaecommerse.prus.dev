@@ -12,7 +12,12 @@ use Illuminate\Database\Eloquent\Builder;
 final class TopSellingProductsWidget extends BaseWidget
 {
     protected static ?int $sort = 3;
-    protected static ?string $heading = 'Top Selling Products';
+
+    public function getHeading(): string
+    {
+        return __('analytics.top_selling_products');
+    }
+
     protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
@@ -81,7 +86,7 @@ final class TopSellingProductsWidget extends BaseWidget
             ])
             ->actions([
                 Action::make('view')
-                    ->label(__('admin.actions.view'))
+                    ->label(__('analytics.view'))
                     ->icon('heroicon-m-eye')
                     ->url(fn(Product $record): string => route('filament.admin.resources.products.view', $record))
                     ->openUrlInNewTab(),
@@ -89,3 +94,5 @@ final class TopSellingProductsWidget extends BaseWidget
             ->paginated(false);
     }
 }
+
+

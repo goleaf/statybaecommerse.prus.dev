@@ -7,6 +7,15 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
+use Filament\Tables\Actions\Action as TableAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -25,7 +34,10 @@ final class UserResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Users';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.customers');
+    }
 
     protected static ?int $navigationSort = 1;
 
@@ -163,7 +175,7 @@ final class UserResource extends Resource
                     ->multiple()
                     ->label('Customer Groups'),
             ])
-            ->actions([
+            ->recordActions([
                 DocumentAction::make()
                     ->variables(fn(User $record) => [
                         '$CUSTOMER_NAME' => $record->name,
@@ -174,10 +186,10 @@ final class UserResource extends Resource
                         '$CUSTOMER_COMPANY' => $record->company ?? '',
                         '$CUSTOMER_GROUP' => $record->customerGroups->pluck('name')->implode(', '),
                     ]),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Action::make('impersonate')
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+                TableAction::make('impersonate')
                     ->icon('heroicon-o-user-circle')
                     ->color('warning')
                     ->action(function (User $record) {
@@ -194,16 +206,16 @@ final class UserResource extends Resource
                     ->visible(fn(User $record) => auth()->user()->can('impersonate users') && $record->id !== auth()->id()),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\BulkAction::make('activate')
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-check')
                         ->color('success')
                         ->action(fn($records) => $records->each->update(['is_active' => true])),
-                    Tables\Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')

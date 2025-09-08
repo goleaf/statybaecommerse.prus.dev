@@ -5,16 +5,22 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
 use App\Services\MultiLanguageTabService;
-use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-use BackedEnum;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use BackedEnum;
+use UnitEnum;
 
 final class AttributeResource extends Resource
 {
@@ -64,7 +70,6 @@ final class AttributeResource extends Resource
                             ->default(true),
                     ])
                     ->columns(3),
-
                 // Multilanguage Tabs for Translatable Content
                 Tabs::make('attribute_translations')
                     ->tabs(
@@ -166,14 +171,14 @@ final class AttributeResource extends Resource
                     ->label(__('translations.filterable_only'))
                     ->query(fn(Builder $query): Builder => $query->where('is_filterable', true)),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order', 'asc');

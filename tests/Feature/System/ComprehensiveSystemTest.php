@@ -106,7 +106,7 @@ final class ComprehensiveSystemTest extends TestCase
             'value' => 'test_value',
         ]);
 
-        $this->assertEquals('test_value', shopper_setting('test_setting'));
+        $this->assertEquals('test_value', app_setting('test_setting'));
     }
 
     public function test_cart_session_functionality(): void

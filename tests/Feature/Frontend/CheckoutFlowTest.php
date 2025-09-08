@@ -120,3 +120,5 @@ it('can add products to cart from dashboard', function () {
 
     expect(session('cart'))->toHaveCount(1);
 });
+
+

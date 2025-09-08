@@ -5,14 +5,22 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ZoneResource\Pages;
 use App\Models\Currency;
 use App\Models\Zone;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Schemas\Components as Schemas;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
+use Illuminate\Database\Eloquent\Model;
 use BackedEnum;
+use UnitEnum;
 
 final class ZoneResource extends Resource
 {
@@ -43,13 +51,13 @@ final class ZoneResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Tabs::make('zone_tabs')
+                Schemas\Tabs::make('zone_tabs')
                     ->tabs([
-                        Forms\Components\Tabs\Tab::make('general')
+                        Schemas\Tabs\Tab::make('general')
                             ->label(__('admin.tabs.general'))
                             ->icon('heroicon-m-cog-6-tooth')
                             ->schema([
-                                Forms\Components\Grid::make(2)
+                                Schemas\Grid::make(2)
                                     ->schema([
                                         Forms\Components\TextInput::make('name.lt')
                                             ->label(__('admin.fields.name_lt'))
@@ -101,7 +109,7 @@ final class ZoneResource extends Resource
                                             ->default(0)
                                             ->minValue(0),
                                     ]),
-                                Forms\Components\Grid::make(2)
+                                Schemas\Grid::make(2)
                                     ->schema([
                                         Forms\Components\Textarea::make('description.lt')
                                             ->label(__('admin.fields.description_lt'))
@@ -113,11 +121,11 @@ final class ZoneResource extends Resource
                                             ->maxLength(500),
                                     ]),
                             ]),
-                        Forms\Components\Tabs\Tab::make('settings')
+                        Schemas\Tabs\Tab::make('settings')
                             ->label(__('admin.tabs.settings'))
                             ->icon('heroicon-m-adjustments-horizontal')
                             ->schema([
-                                Forms\Components\Grid::make(2)
+                                Schemas\Grid::make(2)
                                     ->schema([
                                         Forms\Components\TextInput::make('tax_rate')
                                             ->label(__('admin.fields.tax_rate'))
@@ -137,7 +145,7 @@ final class ZoneResource extends Resource
                                             ->prefix('€')
                                             ->helperText(__('admin.help.shipping_rate')),
                                     ]),
-                                Forms\Components\Grid::make(2)
+                                Schemas\Grid::make(2)
                                     ->schema([
                                         Forms\Components\Toggle::make('is_enabled')
                                             ->label(__('admin.fields.is_enabled'))
@@ -155,7 +163,7 @@ final class ZoneResource extends Resource
                                     ->addActionLabel(__('admin.actions.add_metadata'))
                                     ->helperText(__('admin.help.zone_metadata')),
                             ]),
-                        Forms\Components\Tabs\Tab::make('countries')
+                        Schemas\Tabs\Tab::make('countries')
                             ->label(__('admin.tabs.countries'))
                             ->icon('heroicon-m-flag')
                             ->schema([
@@ -170,6 +178,31 @@ final class ZoneResource extends Resource
                     ])
                     ->columnSpanFull(),
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        return true;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return true;
+    }
+
+    public static function canCreate(): bool
+    {
+        return true;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return true;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return true;
     }
 
     public static function table(Table $table): Table
@@ -234,19 +267,19 @@ final class ZoneResource extends Resource
                     ->preload(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('enable')
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    BulkAction::make('enable')
                         ->label(__('admin.actions.enable'))
                         ->icon('heroicon-m-check-circle')
                         ->color('success')
                         ->action(fn($records) => $records->each(fn($record) => $record->update(['is_enabled' => true])))
                         ->deselectRecordsAfterCompletion(),
-                    Tables\Actions\BulkAction::make('disable')
+                    BulkAction::make('disable')
                         ->label(__('admin.actions.disable'))
                         ->icon('heroicon-m-x-circle')
                         ->color('danger')

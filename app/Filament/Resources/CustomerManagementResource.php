@@ -3,17 +3,20 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerManagementResource\Pages;
-use App\Models\User;
+use App\Filament\Resources\OrderResource;
 use App\Models\Order;
-use Filament\Forms;
-use Filament\Schemas\Schema;
+use App\Models\User;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 final class CustomerManagementResource extends Resource
 {
@@ -58,17 +61,14 @@ final class CustomerManagementResource extends Resource
                             ->label(__('Full Name'))
                             ->required()
                             ->maxLength(255),
-
                         Forms\Components\TextInput::make('email')
                             ->label(__('Email Address'))
                             ->email()
                             ->required()
                             ->unique(User::class, 'email', ignoreRecord: true),
-
                         Forms\Components\DateTimePicker::make('email_verified_at')
                             ->label(__('Email Verified At'))
                             ->nullable(),
-
                         Forms\Components\Select::make('preferred_locale')
                             ->label(__('Preferred Language'))
                             ->options([
@@ -79,14 +79,12 @@ final class CustomerManagementResource extends Resource
                             ->default('lt'),
                     ])
                     ->columns(2),
-
                 Forms\Components\Section::make(__('Account Status'))
                     ->schema([
                         Forms\Components\Toggle::make('is_active')
                             ->label(__('Active Account'))
                             ->helperText(__('Inactive accounts cannot place orders'))
                             ->default(true),
-
                         Forms\Components\Select::make('timezone')
                             ->label(__('Timezone'))
                             ->options([
@@ -97,19 +95,16 @@ final class CustomerManagementResource extends Resource
                             ])
                             ->default('Europe/Vilnius')
                             ->searchable(),
-
                         Forms\Components\DateTimePicker::make('last_login_at')
                             ->label(__('Last Login'))
                             ->disabled()
                             ->dehydrated(false),
-
                         Forms\Components\TextInput::make('last_login_ip')
                             ->label(__('Last Login IP'))
                             ->disabled()
                             ->dehydrated(false),
                     ])
                     ->columns(2),
-
                 Forms\Components\Section::make(__('Customer Preferences'))
                     ->schema([
                         Forms\Components\KeyValue::make('preferences')
@@ -118,16 +113,14 @@ final class CustomerManagementResource extends Resource
                             ->valueLabel(__('Value'))
                             ->helperText(__('Customer preferences and settings')),
                     ]),
-
                 Forms\Components\Section::make(__('Password Management'))
                     ->schema([
                         Forms\Components\TextInput::make('password')
                             ->label(__('New Password'))
                             ->password()
-                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                            ->dehydrated(fn ($state) => filled($state))
+                            ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                            ->dehydrated(fn($state) => filled($state))
                             ->helperText(__('Leave blank to keep current password')),
-
                         Forms\Components\TextInput::make('password_confirmation')
                             ->label(__('Confirm Password'))
                             ->password()
@@ -146,34 +139,29 @@ final class CustomerManagementResource extends Resource
                 Tables\Columns\ImageColumn::make('avatar_url')
                     ->label(__('Avatar'))
                     ->circular()
-                    ->defaultImageUrl(fn (User $record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->name) . '&background=6366f1&color=fff')
+                    ->defaultImageUrl(fn(User $record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->name) . '&background=6366f1&color=fff')
                     ->size(50),
-
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Name'))
                     ->searchable()
                     ->sortable()
                     ->weight('medium'),
-
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('Email'))
                     ->searchable()
                     ->copyable()
                     ->sortable(),
-
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(__('Verified'))
                     ->boolean()
-                    ->getStateUsing(fn (User $record): bool => !is_null($record->email_verified_at))
+                    ->getStateUsing(fn(User $record): bool => !is_null($record->email_verified_at))
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('orders_count')
                     ->label(__('Orders'))
                     ->numeric()
                     ->sortable()
                     ->badge()
                     ->color('primary'),
-
                 Tables\Columns\TextColumn::make('orders_sum_total')
                     ->label(__('Total Spent'))
                     ->money('EUR')
@@ -183,27 +171,23 @@ final class CustomerManagementResource extends Resource
                             ->money('EUR')
                             ->label(__('Total Customer Value')),
                     ]),
-
                 Tables\Columns\TextColumn::make('last_order_date')
                     ->label(__('Last Order'))
-                    ->getStateUsing(fn (User $record): ?string => $record->orders()->latest()->first()?->created_at?->diffForHumans())
+                    ->getStateUsing(fn(User $record): ?string => $record->orders()->latest()->first()?->created_at?->diffForHumans())
                     ->placeholder(__('No orders'))
                     ->sortable(query: function (Builder $query, string $direction): Builder {
                         return $query->withMax('orders', 'created_at')->orderBy('orders_max_created_at', $direction);
                     }),
-
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('Active'))
                     ->boolean()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('preferred_locale')
                     ->label(__('Language'))
                     ->badge()
                     ->color('secondary')
-                    ->formatStateUsing(fn (string $state): string => strtoupper($state))
+                    ->formatStateUsing(fn(string $state): string => strtoupper($state))
                     ->toggleable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Registered'))
                     ->dateTime()
@@ -217,16 +201,14 @@ final class CustomerManagementResource extends Resource
                     ->trueLabel(__('Verified'))
                     ->falseLabel(__('Unverified'))
                     ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('email_verified_at'),
-                        false: fn (Builder $query) => $query->whereNull('email_verified_at'),
+                        true: fn(Builder $query) => $query->whereNotNull('email_verified_at'),
+                        false: fn(Builder $query) => $query->whereNull('email_verified_at'),
                     ),
-
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label(__('Account Status'))
                     ->placeholder(__('All'))
                     ->trueLabel(__('Active'))
                     ->falseLabel(__('Inactive')),
-
                 Tables\Filters\SelectFilter::make('preferred_locale')
                     ->label(__('Language'))
                     ->options([
@@ -234,29 +216,25 @@ final class CustomerManagementResource extends Resource
                         'lt' => __('Lithuanian'),
                         'de' => __('German'),
                     ]),
-
                 Tables\Filters\Filter::make('has_orders')
                     ->label(__('Has Orders'))
-                    ->query(fn (Builder $query): Builder => $query->has('orders'))
+                    ->query(fn(Builder $query): Builder => $query->has('orders'))
                     ->toggle(),
-
                 Tables\Filters\Filter::make('high_value_customers')
                     ->label(__('High Value Customers'))
-                    ->query(fn (Builder $query): Builder => $query->whereHas('orders', function (Builder $subQuery) {
+                    ->query(fn(Builder $query): Builder => $query->whereHas('orders', function (Builder $subQuery) {
                         $subQuery->havingRaw('SUM(total) > 1000');
                     }))
                     ->toggle(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                
-                Tables\Actions\Action::make('view_orders')
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('view_orders')
                     ->label(__('View Orders'))
                     ->icon('heroicon-o-shopping-bag')
-                    ->url(fn (User $record): string => OrderResource::getUrl('index', ['tableFilters' => ['user' => ['value' => $record->id]]])),
-
-                Tables\Actions\Action::make('send_email')
+                    ->url(fn(User $record): string => OrderResource::getUrl('index', ['tableFilters' => ['user' => ['value' => $record->id]]])),
+                Action::make('send_email')
                     ->label(__('Send Email'))
                     ->icon('heroicon-o-envelope')
                     ->color('primary')
@@ -276,21 +254,19 @@ final class CustomerManagementResource extends Resource
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    
-                    Tables\Actions\BulkAction::make('activate_accounts')
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                    BulkAction::make('activate_accounts')
                         ->label(__('Activate Accounts'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(fn ($records) => $records->each(fn (User $record) => $record->update(['is_active' => true])))
+                        ->action(fn($records) => $records->each(fn(User $record) => $record->update(['is_active' => true])))
                         ->requiresConfirmation(),
-
-                    Tables\Actions\BulkAction::make('deactivate_accounts')
+                    BulkAction::make('deactivate_accounts')
                         ->label(__('Deactivate Accounts'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(fn ($records) => $records->each(fn (User $record) => $record->update(['is_active' => false])))
+                        ->action(fn($records) => $records->each(fn(User $record) => $record->update(['is_active' => false])))
                         ->requiresConfirmation(),
                 ]),
             ])
@@ -301,7 +277,7 @@ final class CustomerManagementResource extends Resource
                     ->collapsible(),
                 Tables\Grouping\Group::make('is_active')
                     ->label(__('Status'))
-                    ->getDescriptionFromRecordUsing(fn (User $record): string => $record->is_active ? __('Active') : __('Inactive'))
+                    ->getDescriptionFromRecordUsing(fn(User $record): string => $record->is_active ? __('Active') : __('Inactive'))
                     ->collapsible(),
             ])
             ->poll('120s');
@@ -334,7 +310,7 @@ final class CustomerManagementResource extends Resource
         $newCustomers = User::where('is_admin', false)
             ->where('created_at', '>=', now()->subWeek())
             ->count();
-        
+
         return $newCustomers > 0 ? (string) $newCustomers : null;
     }
 

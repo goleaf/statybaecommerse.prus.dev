@@ -9,6 +9,8 @@ use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
@@ -151,10 +153,10 @@ final class ReviewResource extends Resource
                     ->searchable()
                     ->preload(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('approve')
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('approve')
                     ->label(__('translations.approve'))
                     ->icon('heroicon-o-check')
                     ->color('success')
@@ -163,7 +165,7 @@ final class ReviewResource extends Resource
                         'is_approved' => true,
                         'approved_at' => now(),
                     ])),
-                Tables\Actions\Action::make('reject')
+                Action::make('reject')
                     ->label(__('translations.reject'))
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
@@ -172,11 +174,11 @@ final class ReviewResource extends Resource
                         'is_approved' => false,
                         'approved_at' => null,
                     ])),
-                Tables\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('approve_selected')
+                Actions\BulkActionGroup::make([
+                    BulkAction::make('approve_selected')
                         ->label(__('translations.approve_selected'))
                         ->icon('heroicon-o-check')
                         ->color('success')
@@ -184,7 +186,7 @@ final class ReviewResource extends Resource
                             'is_approved' => true,
                             'approved_at' => now(),
                         ]))),
-                    Tables\Actions\BulkAction::make('reject_selected')
+                    BulkAction::make('reject_selected')
                         ->label(__('translations.reject_selected'))
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
@@ -192,7 +194,7 @@ final class ReviewResource extends Resource
                             'is_approved' => false,
                             'approved_at' => null,
                         ]))),
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

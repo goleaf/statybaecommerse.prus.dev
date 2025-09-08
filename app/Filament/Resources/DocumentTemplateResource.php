@@ -9,6 +9,7 @@ use App\Services\MultiLanguageTabService;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -193,8 +194,8 @@ final class DocumentTemplateResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label(__('documents.is_active')),
             ])
-            ->actions([
-                Tables\Actions\Action::make('preview')
+            ->recordActions([
+                Actions\Action::make('preview')
                     ->label(__('documents.preview'))
                     ->icon('heroicon-o-eye')
                     ->color('info')
@@ -207,13 +208,13 @@ final class DocumentTemplateResource extends Resource
                             ->header('X-Frame-Options', 'SAMEORIGIN');
                     })
                     ->openUrlInNewTab(),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

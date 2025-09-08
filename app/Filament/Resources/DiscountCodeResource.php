@@ -9,6 +9,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
@@ -44,7 +46,7 @@ final class DiscountCodeResource extends Resource
                             ->maxLength(255)
                             ->unique(DiscountCode::class, 'code', ignoreRecord: true)
                             ->suffixAction(
-                                Forms\Components\Actions\Action::make('generate')
+                                Forms\Components\Action::make('generate')
                                     ->icon('heroicon-o-arrow-path')
                                     ->action(function (Forms\Set $set) {
                                         $set('code', strtoupper(\Illuminate\Support\Str::random(8)));
@@ -253,10 +255,10 @@ final class DiscountCodeResource extends Resource
                         $query->whereBetween('valid_until', [now(), now()->addDays(7)])
                     ),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('duplicate')
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('duplicate')
                     ->label(__('Duplicate'))
                     ->icon('heroicon-o-document-duplicate')
                     ->action(function (DiscountCode $record) {
@@ -267,17 +269,17 @@ final class DiscountCodeResource extends Resource
                         
                         return redirect()->to(static::getUrl('edit', ['record' => $newCode]));
                     }),
-                Tables\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('activate')
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                    BulkAction::make('activate')
                         ->label(__('Activate'))
                         ->icon('heroicon-o-check')
                         ->action(fn($records) => $records->each(fn($record) => $record->update(['status' => 'active'])))
                         ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label(__('Deactivate'))
                         ->icon('heroicon-o-x-mark')
                         ->action(fn($records) => $records->each(fn($record) => $record->update(['status' => 'inactive'])))

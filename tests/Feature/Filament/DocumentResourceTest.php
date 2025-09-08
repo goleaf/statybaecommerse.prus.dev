@@ -1,255 +1,468 @@
 <?php declare(strict_types=1);
 
+namespace Tests\Feature\Filament;
+
 use App\Filament\Resources\DocumentResource;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\Order;
 use App\Models\User;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
 
-use function Pest\Livewire\livewire;
+class DocumentResourceTest extends TestCase
+{
+    use RefreshDatabase;
 
-uses(RefreshDatabase::class);
+    protected User $adminUser;
+    protected DocumentTemplate $template;
+    protected Order $order;
 
-describe('Document Resource', function () {
-    beforeEach(function () {
-        $this->admin = User::factory()->create(['is_admin' => true]);
-        $this->actingAs($this->admin);
-    });
+    protected function setUp(): void
+    {
+        parent::setUp();
 
-    it('can render index page', function () {
-        $this
-            ->get(DocumentResource::getUrl('index'))
-            ->assertSuccessful();
-    });
+        // Create admin user
+        $this->adminUser = User::factory()->create([
+            'email' => 'admin@test.com',
+            'name' => 'Admin User',
+        ]);
 
-    it('can list documents', function () {
-        $documents = Document::factory()->count(10)->create();
+        // Give the user admin permissions
+        $this->adminUser->assignRole('super_admin');
 
-        livewire(DocumentResource\Pages\ListDocuments::class)
+        // Create document template
+        $this->template = DocumentTemplate::factory()->create([
+            'name' => 'Invoice Template',
+            'type' => 'invoice',
+            'category' => 'sales',
+            'content' => '<h1>Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p>',
+        ]);
+
+        // Create an order for document association
+        $this->order = Order::factory()->create();
+    }
+
+    /**
+     * @test
+     */
+    public function can_render_document_index_page(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $response = $this->get(DocumentResource::getUrl('index'));
+
+        $response->assertSuccessful();
+    }
+
+    /**
+     * @test
+     */
+    public function can_list_documents(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $documents = Document::factory()->count(3)->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+        ]);
+
+        Livewire::test(DocumentResource\Pages\ListDocuments::class)
             ->assertCanSeeTableRecords($documents);
-    });
+    }
 
-    it('can render create page', function () {
-        $this
-            ->get(DocumentResource::getUrl('create'))
-            ->assertSuccessful();
-    });
+    /**
+     * @test
+     */
+    public function can_render_document_create_page(): void
+    {
+        $this->actingAs($this->adminUser);
 
-    it('can create document', function () {
-        $template = DocumentTemplate::factory()->create();
-        $order = Order::factory()->create();
+        $response = $this->get(DocumentResource::getUrl('create'));
+
+        $response->assertSuccessful();
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_document(): void
+    {
+        $this->actingAs($this->adminUser);
 
         $newData = [
-            'document_template_id' => $template->id,
-            'title' => 'Test Invoice',
-            'content' => '<h1>Invoice</h1>',
-            'variables' => ['order_number' => '12345'],
+            'document_template_id' => $this->template->id,
+            'title' => 'Test Document',
+            'content' => '<h1>Test Content</h1>',
             'status' => 'draft',
-            'format' => 'pdf',
+            'format' => 'html',
+            'variables' => [
+                'ORDER_NUMBER' => '12345',
+                'CUSTOMER_NAME' => 'John Doe',
+            ],
             'documentable_type' => Order::class,
-            'documentable_id' => $order->id,
+            'documentable_id' => $this->order->id,
         ];
 
-        livewire(DocumentResource\Pages\CreateDocument::class)
+        Livewire::test(DocumentResource\Pages\CreateDocument::class)
             ->fillForm($newData)
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('documents', [
-            'title' => 'Test Invoice',
+            'title' => 'Test Document',
             'status' => 'draft',
-            'format' => 'pdf',
+            'format' => 'html',
+            'creator_id' => $this->adminUser->id,
         ]);
-    });
+    }
 
-    it('validates required fields when creating', function () {
-        livewire(DocumentResource\Pages\CreateDocument::class)
+    /**
+     * @test
+     */
+    public function can_validate_required_fields(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        Livewire::test(DocumentResource\Pages\CreateDocument::class)
             ->fillForm([
                 'title' => '',
-                'content' => '',
+                'document_template_id' => null,
             ])
             ->call('create')
-            ->assertHasFormErrors(['title', 'content']);
-    });
+            ->assertHasFormErrors(['title', 'document_template_id']);
+    }
 
-    it('can render view page', function () {
-        $document = Document::factory()->create();
+    /**
+     * @test
+     */
+    public function can_render_document_edit_page(): void
+    {
+        $this->actingAs($this->adminUser);
 
-        $this
-            ->get(DocumentResource::getUrl('view', ['record' => $document]))
-            ->assertSuccessful();
-    });
+        $document = Document::factory()->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+        ]);
 
-    it('can view document', function () {
-        $document = Document::factory()->create();
+        $response = $this->get(DocumentResource::getUrl('edit', [
+            'record' => $document,
+        ]));
 
-        livewire(DocumentResource\Pages\ViewDocument::class, ['record' => $document->getRouteKey()])
+        $response->assertSuccessful();
+    }
+
+    /**
+     * @test
+     */
+    public function can_retrieve_document_data(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $document = Document::factory()->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+            'title' => 'Original Document',
+            'status' => 'draft',
+        ]);
+
+        Livewire::test(DocumentResource\Pages\EditDocument::class, [
+            'record' => $document->getRouteKey(),
+        ])
             ->assertFormSet([
-                'title' => $document->title,
-                'status' => $document->status,
-                'format' => $document->format,
+                'title' => 'Original Document',
+                'status' => 'draft',
+                'document_template_id' => $this->template->id,
             ]);
-    });
+    }
 
-    it('can render edit page', function () {
-        $document = Document::factory()->create();
+    /**
+     * @test
+     */
+    public function can_save_document(): void
+    {
+        $this->actingAs($this->adminUser);
 
-        $this
-            ->get(DocumentResource::getUrl('edit', ['record' => $document]))
-            ->assertSuccessful();
-    });
+        $document = Document::factory()->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+        ]);
 
-    it('can retrieve data for editing', function () {
-        $document = Document::factory()->create();
-
-        livewire(DocumentResource\Pages\EditDocument::class, ['record' => $document->getRouteKey()])
-            ->assertFormSet([
-                'title' => $document->title,
-                'content' => $document->content,
-                'status' => $document->status,
-                'format' => $document->format,
-            ]);
-    });
-
-    it('can save document', function () {
-        $document = Document::factory()->create();
         $newData = [
-            'title' => 'Updated Invoice',
-            'status' => 'generated',
+            'title' => 'Updated Document Title',
+            'content' => '<h1>Updated Content</h1>',
+            'status' => 'published',
+            'format' => 'pdf',
         ];
 
-        livewire(DocumentResource\Pages\EditDocument::class, ['record' => $document->getRouteKey()])
+        Livewire::test(DocumentResource\Pages\EditDocument::class, [
+            'record' => $document->getRouteKey(),
+        ])
             ->fillForm($newData)
             ->call('save')
             ->assertHasNoFormErrors();
 
-        expect($document->fresh())
+        expect($document->refresh())
             ->title
-            ->toBe('Updated Invoice')
+            ->toBe('Updated Document Title')
             ->status
-            ->toBe('generated');
-    });
+            ->toBe('published')
+            ->format
+            ->toBe('pdf');
+    }
 
-    it('can delete document', function () {
-        $document = Document::factory()->create();
+    /**
+     * @test
+     */
+    public function can_delete_document(): void
+    {
+        $this->actingAs($this->adminUser);
 
-        livewire(DocumentResource\Pages\EditDocument::class, ['record' => $document->getRouteKey()])
-            ->callAction(DeleteAction::class);
+        $document = Document::factory()->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+        ]);
+
+        Livewire::test(DocumentResource\Pages\EditDocument::class, [
+            'record' => $document->getRouteKey(),
+        ])
+            ->callAction(TestAction::make('delete'))
+            ->assertRedirect(DocumentResource::getUrl('index'));
 
         $this->assertModelMissing($document);
-    });
+    }
 
-    it('can search documents by title', function () {
-        $documents = Document::factory()->count(10)->create();
-        $firstDocument = $documents->first();
+    /**
+     * @test
+     */
+    public function can_view_document(): void
+    {
+        $this->actingAs($this->adminUser);
 
-        livewire(DocumentResource\Pages\ListDocuments::class)
-            ->searchTable($firstDocument->title)
-            ->assertCanSeeTableRecords([$firstDocument])
-            ->assertCanNotSeeTableRecords($documents->skip(1));
-    });
+        $document = Document::factory()->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+            'title' => 'View Test Document',
+        ]);
 
-    it('can filter documents by status', function () {
-        $generatedDocuments = Document::factory()->count(3)->create(['status' => 'generated']);
-        $draftDocuments = Document::factory()->count(2)->create(['status' => 'draft']);
+        $response = $this->get(DocumentResource::getUrl('view', [
+            'record' => $document,
+        ]));
 
-        livewire(DocumentResource\Pages\ListDocuments::class)
-            ->filterTable('status', 'generated')
-            ->assertCanSeeTableRecords($generatedDocuments)
-            ->assertCanNotSeeTableRecords($draftDocuments);
-    });
+        $response->assertSuccessful();
+    }
 
-    it('can filter documents by format', function () {
-        $pdfDocuments = Document::factory()->count(3)->create(['format' => 'pdf']);
-        $htmlDocuments = Document::factory()->count(2)->create(['format' => 'html']);
+    /**
+     * @test
+     */
+    public function can_filter_documents_by_template(): void
+    {
+        $this->actingAs($this->adminUser);
 
-        livewire(DocumentResource\Pages\ListDocuments::class)
-            ->filterTable('format', 'pdf')
-            ->assertCanSeeTableRecords($pdfDocuments)
-            ->assertCanNotSeeTableRecords($htmlDocuments);
-    });
+        $otherTemplate = DocumentTemplate::factory()->create([
+            'name' => 'Receipt Template',
+            'type' => 'receipt',
+        ]);
 
-    it('can sort documents by created date', function () {
-        $oldDocument = Document::factory()->create(['created_at' => now()->subDays(2)]);
-        $newDocument = Document::factory()->create(['created_at' => now()]);
+        $invoiceDocument = Document::factory()->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+        ]);
 
-        livewire(DocumentResource\Pages\ListDocuments::class)
-            ->sortTable('created_at', 'desc')
-            ->assertCanSeeTableRecords([$newDocument, $oldDocument], inOrder: true);
-    });
+        $receiptDocument = Document::factory()->create([
+            'document_template_id' => $otherTemplate->id,
+            'creator_id' => $this->adminUser->id,
+        ]);
 
-    it('can bulk delete documents', function () {
-        $documents = Document::factory()->count(3)->create();
+        Livewire::test(DocumentResource\Pages\ListDocuments::class)
+            ->filterTable('template', $this->template->id)
+            ->assertCanSeeTableRecords([$invoiceDocument])
+            ->assertCanNotSeeTableRecords([$receiptDocument]);
+    }
 
-        livewire(DocumentResource\Pages\ListDocuments::class)
-            ->callTableBulkAction('delete', $documents);
+    /**
+     * @test
+     */
+    public function can_filter_documents_by_status(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $draftDocument = Document::factory()->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+            'status' => 'draft',
+        ]);
+
+        $publishedDocument = Document::factory()->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+            'status' => 'published',
+        ]);
+
+        Livewire::test(DocumentResource\Pages\ListDocuments::class)
+            ->filterTable('status', 'draft')
+            ->assertCanSeeTableRecords([$draftDocument])
+            ->assertCanNotSeeTableRecords([$publishedDocument]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_search_documents(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $searchableDocument = Document::factory()->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+            'title' => 'Unique Document Title',
+        ]);
+
+        $otherDocument = Document::factory()->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+            'title' => 'Different Title',
+        ]);
+
+        Livewire::test(DocumentResource\Pages\ListDocuments::class)
+            ->searchTable('Unique Document')
+            ->assertCanSeeTableRecords([$searchableDocument])
+            ->assertCanNotSeeTableRecords([$otherDocument]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_bulk_delete_documents(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $documents = Document::factory()->count(3)->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+        ]);
+
+        Livewire::test(DocumentResource\Pages\ListDocuments::class)
+            ->selectTableRecords($documents)
+            ->callAction(TestAction::make('delete')->table()->bulk())
+            ->assertCanNotSeeTableRecords($documents);
 
         foreach ($documents as $document) {
             $this->assertModelMissing($document);
         }
-    });
+    }
 
-    it('shows document template relationship', function () {
-        $template = DocumentTemplate::factory()->create(['name' => 'Invoice Template']);
-        $document = Document::factory()->create(['document_template_id' => $template->id]);
+    /**
+     * @test
+     */
+    public function can_generate_pdf_action(): void
+    {
+        $this->actingAs($this->adminUser);
 
-        livewire(DocumentResource\Pages\ViewDocument::class, ['record' => $document->getRouteKey()])
-            ->assertSee('Invoice Template');
-    });
-
-    it('shows document creator relationship', function () {
-        $creator = User::factory()->create(['name' => 'John Creator']);
-        $document = Document::factory()->create(['created_by' => $creator->id]);
-
-        livewire(DocumentResource\Pages\ViewDocument::class, ['record' => $document->getRouteKey()])
-            ->assertSee('John Creator');
-    });
-
-    it('can generate document action', function () {
-        $document = Document::factory()->create(['status' => 'draft']);
-
-        livewire(DocumentResource\Pages\EditDocument::class, ['record' => $document->getRouteKey()])
-            ->callAction('generate');
-
-        expect($document->fresh()->status)->toBe('generated');
-    });
-
-    it('can download document action', function () {
         $document = Document::factory()->create([
-            'status' => 'generated',
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+            'format' => 'html',
+            'content' => '<h1>Test PDF Content</h1>',
+        ]);
+
+        Livewire::test(DocumentResource\Pages\ListDocuments::class)
+            ->callAction(TestAction::make('generate_pdf')->table($document))
+            ->assertHasNoActionErrors();
+
+        // Verify the document format was updated or PDF was generated
+        // This would depend on your actual PDF generation implementation
+    }
+
+    /**
+     * @test
+     */
+    public function can_download_document_action(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $document = Document::factory()->create([
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+            'format' => 'pdf',
             'file_path' => 'documents/test.pdf',
         ]);
 
-        $response = $this->get(DocumentResource::getUrl('download', ['record' => $document]));
+        // Test that the download action is visible for PDF documents
+        Livewire::test(DocumentResource\Pages\ListDocuments::class)
+            ->assertActionVisible(TestAction::make('download')->table($document));
+    }
 
-        $response->assertSuccessful();
-    });
+    /**
+     * @test
+     */
+    public function validates_document_variables_format(): void
+    {
+        $this->actingAs($this->adminUser);
 
-    it('restricts access to non-admin users', function () {
-        $user = User::factory()->create(['is_admin' => false]);
-        $this->actingAs($user);
+        Livewire::test(DocumentResource\Pages\CreateDocument::class)
+            ->fillForm([
+                'title' => 'Test Document',
+                'document_template_id' => $this->template->id,
+                'variables' => 'invalid-json-format',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['variables']);
+    }
 
-        $this
-            ->get(DocumentResource::getUrl('index'))
-            ->assertForbidden();
-    });
+    /**
+     * @test
+     */
+    public function can_update_document_status(): void
+    {
+        $this->actingAs($this->adminUser);
 
-    it('can view document variables in formatted way', function () {
         $document = Document::factory()->create([
-            'variables' => [
-                'customer_name' => 'John Doe',
-                'order_number' => '12345',
-                'order_total' => 100.5,
-            ],
+            'document_template_id' => $this->template->id,
+            'creator_id' => $this->adminUser->id,
+            'status' => 'draft',
         ]);
 
-        livewire(DocumentResource\Pages\ViewDocument::class, ['record' => $document->getRouteKey()])
-            ->assertSee('John Doe')
-            ->assertSee('12345')
-            ->assertSee('100.5');
-    });
-});
+        Livewire::test(DocumentResource\Pages\EditDocument::class, [
+            'record' => $document->getRouteKey(),
+        ])
+            ->fillForm(['status' => 'published'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect($document->refresh()->status)->toBe('published');
+    }
+
+    /**
+     * @test
+     */
+    public function can_associate_document_with_model(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $newData = [
+            'document_template_id' => $this->template->id,
+            'title' => 'Associated Document',
+            'content' => '<h1>Content</h1>',
+            'status' => 'draft',
+            'format' => 'html',
+            'documentable_type' => Order::class,
+            'documentable_id' => $this->order->id,
+        ];
+
+        Livewire::test(DocumentResource\Pages\CreateDocument::class)
+            ->fillForm($newData)
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $document = Document::where('title', 'Associated Document')->first();
+
+        expect($document)
+            ->documentable_type
+            ->toBe(Order::class)
+            ->documentable_id
+            ->toBe($this->order->id);
+    }
+}

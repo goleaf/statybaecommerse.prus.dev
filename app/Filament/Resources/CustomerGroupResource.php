@@ -5,16 +5,18 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Models\CustomerGroup;
 use App\Services\MultiLanguageTabService;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-use BackedEnum;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use BackedEnum;
+use UnitEnum;
 
 final class CustomerGroupResource extends Resource
 {
@@ -45,7 +47,6 @@ final class CustomerGroupResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-
                 // Multilanguage Tabs for Customer Group Content
                 Tabs::make('customer_group_translations')
                     ->tabs(
@@ -107,14 +108,14 @@ final class CustomerGroupResource extends Resource
                     ->label(__('translations.active_only'))
                     ->query(fn(Builder $query): Builder => $query->where('is_active', true)),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('name', 'asc');

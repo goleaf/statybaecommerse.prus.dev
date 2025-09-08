@@ -14,7 +14,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <x-filament::card>
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-primary-600">{{ app_money_format($this->getSalesData()['totalRevenue']) }}</div>
+                            <div class="text-2xl font-bold text-primary-600">{{ \Illuminate\Support\Number::currency($this->getSalesData()['totalRevenue'], current_currency(), app()->getLocale()) }}</div>
                             <div class="text-sm text-gray-500">{{ __('admin.reports.total_revenue') }}</div>
                         </div>
                     </x-filament::card>
@@ -28,7 +28,7 @@
                     
                     <x-filament::card>
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-info-600">{{ app_money_format($this->getSalesData()['avgOrderValue']) }}</div>
+                            <div class="text-2xl font-bold text-info-600">{{ \Illuminate\Support\Number::currency($this->getSalesData()['avgOrderValue'], current_currency(), app()->getLocale()) }}</div>
                             <div class="text-sm text-gray-500">{{ __('admin.reports.avg_order_value') }}</div>
                         </div>
                     </x-filament::card>
@@ -59,7 +59,7 @@
                                     </div>
                                     <div class="text-right">
                                         <div class="font-semibold">{{ $product->order_items_count }} {{ __('admin.table.orders') }}</div>
-                                        <div class="text-sm text-gray-500">{{ app_money_format($product->order_items_sum_total) }}</div>
+                                        <div class="text-sm text-gray-500">{{ \Illuminate\Support\Number::currency($product->order_items_sum_total, current_currency(), app()->getLocale()) }}</div>
                                     </div>
                                 </div>
                             @endforeach
@@ -106,7 +106,7 @@
                                     </div>
                                     <div class="text-right">
                                         <div class="font-semibold">{{ $customer->orders_count }} {{ __('admin.table.orders') }}</div>
-                                        <div class="text-sm text-gray-500">{{ app_money_format($customer->orders_sum_total) }}</div>
+                                        <div class="text-sm text-gray-500">{{ \Illuminate\Support\Number::currency($customer->orders_sum_total, current_currency(), app()->getLocale()) }}</div>
                                     </div>
                                 </div>
                             @endforeach
@@ -150,3 +150,4 @@
         </div>
     </div>
 </x-filament-panels::page>
+

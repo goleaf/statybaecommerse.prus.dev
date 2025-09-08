@@ -6,6 +6,8 @@ use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
 use App\Services\MultiLanguageTabService;
 use Filament\Forms;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -177,14 +179,14 @@ final class PartnerTierResource extends Resource
                     ->label(__('admin.partner_tier.filters.has_partners'))
                     ->query(fn (Builder $query): Builder => $query->has('partners')),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');

@@ -86,7 +86,7 @@
         {{-- Enhanced Quick View Overlay --}}
         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             <x-filament::button 
-                href="{{ route('products.show', ['slug' => $product->slug, 'locale' => app()->getLocale()]) }}"
+                href="{{ route('products.show', $product->slug ?? $product) }}"
                 color="white"
                 icon="heroicon-o-eye"
                 class="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
@@ -103,7 +103,7 @@
         @endif
         
         <h3 class="mt-1 text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
-            <a href="{{ route('products.show', ['slug' => $product->slug, 'locale' => app()->getLocale()]) }}" 
+            <a href="{{ route('products.show', $product->slug ?? $product) }}" 
                class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
                 {{ $product->name }}
             </a>

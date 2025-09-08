@@ -82,6 +82,11 @@ final class Product extends Model implements HasMedia
             ->useLogName('product');
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function isPublished(): bool
     {
         return $this->is_visible && $this->published_at && $this->published_at <= now();

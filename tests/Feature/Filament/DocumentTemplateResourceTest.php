@@ -4,7 +4,7 @@ use App\Filament\Resources\DocumentTemplateResource;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\User;
-use Filament\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Livewire\livewire;

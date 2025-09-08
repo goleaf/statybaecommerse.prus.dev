@@ -1,63 +1,50 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
 use Closure;
 
-class SetLocale
+final class SetLocale
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
-        $supportedConfig = config('app.supported_locales', 'en');
-        $supported = collect(is_array($supportedConfig) ? $supportedConfig : explode(',', (string) $supportedConfig))
-            ->map(fn($v) => trim($v))
-            ->filter()
-            ->values()
-            ->all();
+        // Allow explicit override via query (?locale=xx)
+        $queryLocale = $request->query('locale');
 
-        // Detection order: URL param > session > user preferred > cookie > Accept-Language > app default
-        $param = $request->route('locale');
-        $sessionLocale = session('app.locale');
-        $userLocale = optional($request->user())->preferred_locale ?? null;
-        $cookieLocale = $request->cookie('app_locale');
-        $acceptLocale = $request->getPreferredLanguage($supported ?: null);
+        // Get locale from query, session (both keys), cookie, or user preference
+        $locale = $queryLocale
+            ?? Session::get('locale')
+            ?? Session::get('app.locale')
+            ?? $request->cookie('app_locale')
+            ?? (auth()->check() ? auth()->user()->preferred_locale ?? null : null)
+            ?? config('app.locale', 'lt');
 
-        $candidates = array_filter([
-            is_string($param) ? $param : null,
-            is_string($sessionLocale) ? $sessionLocale : null,
-            is_string($userLocale) ? $userLocale : null,
-            is_string($cookieLocale) ? $cookieLocale : null,
-            is_string($acceptLocale) ? $acceptLocale : null,
-            (string) config('app.locale'),
-        ], fn($v) => (string) $v !== '');
+        // Validate locale against configured supported locales
+        $supported = config('app.supported_locales', ['lt', 'en']);
+        $supportedLocales = is_array($supported)
+            ? $supported
+            : preg_split('/[\s,|]+/', (string) $supported, -1, PREG_SPLIT_NO_EMPTY);
+        $supportedLocales = array_map('trim', $supportedLocales);
 
-        $locale = collect($candidates)
-            ->first(fn($loc) => in_array($loc, $supported, true))
-                ?: (is_array($supported) && !empty($supported) ? (string) $supported[0] : (string) config('app.locale'));
+        if (!in_array($locale, $supportedLocales, true)) {
+            $locale = (string) (config('app.locale', 'lt'));
+        }
 
-        if ($locale && (empty($supported) || in_array($locale, $supported, true))) {
-            app()->setLocale($locale);
-            session(['app.locale' => $locale]);
-            // Persist cookie for a month
-            cookie()->queue(cookie('app_locale', $locale, 60 * 24 * 30));
+        // Set application locale
+        App::setLocale($locale);
 
-            // Persist on user profile when authenticated
-            if ($request->user() && $request->user()->preferred_locale !== $locale) {
-                $request->user()->forceFill(['preferred_locale' => $locale])->save();
-            }
+        // Store in session and cookie for persistence
+        Session::put('locale', $locale);
+        Session::put('app.locale', $locale);
+        cookie()->queue(cookie('app_locale', $locale, 60 * 24 * 30));
 
-            // Optional mapping: locale -> currency/zone
-            $mapping = (array) config('app.locale_mapping', []);
-            if (isset($mapping[$locale])) {
-                $map = $mapping[$locale];
-                if (!empty($map['currency'])) {
-                    session(['forced_currency' => (string) $map['currency']]);
-                }
-                if (!empty($map['zone'])) {
-                    session(['forced_zone' => (string) $map['zone']]);
-                }
-            }
+        // Optionally map locale to currency/zone
+        $mapping = (array) config('app.locale_mapping', []);
+        if (isset($mapping[$locale]['currency']) && is_string($mapping[$locale]['currency'])) {
+            Session::put('forced_currency', $mapping[$locale]['currency']);
         }
 
         return $next($request);

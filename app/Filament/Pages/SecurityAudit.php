@@ -127,15 +127,15 @@ final class SecurityAudit extends Page implements HasTable
                               ->orWhere('description', 'like', '%blocked%')
                     ),
             ])
-            ->actions([
-                Tables\Actions\Action::make('view_details')
+            ->recordActions([
+                Actions\Action::make('view_details')
                     ->label(__('admin.actions.view_details'))
                     ->icon('heroicon-o-eye')
                     ->modalContent(fn ($record) => view('filament.modals.activity-details', compact('record')))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel(__('admin.actions.close')),
 
-                Tables\Actions\Action::make('flag_suspicious')
+                Actions\Action::make('flag_suspicious')
                     ->label(__('admin.actions.flag_suspicious'))
                     ->icon('heroicon-o-flag')
                     ->color('danger')
@@ -284,7 +284,7 @@ final class SecurityAudit extends Page implements HasTable
         \Filament\Notifications\Notification::make()
             ->title(__('admin.notifications.audit_log_exported'))
             ->success()
-            ->actions([
+            ->recordActions([
                 \Filament\Notifications\Actions\Action::make('download')
                     ->label(__('admin.actions.download'))
                     ->url(asset('storage/exports/' . $filename))
@@ -293,3 +293,5 @@ final class SecurityAudit extends Page implements HasTable
             ->send();
     }
 }
+
+

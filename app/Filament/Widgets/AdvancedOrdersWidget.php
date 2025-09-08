@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
-use Filament\Actions\Action;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Tables;
@@ -13,11 +12,14 @@ final class AdvancedOrdersWidget extends BaseWidget
 {
     protected static ?int $sort = 5;
 
-    protected static ?string $heading = 'Recent Orders';
-
     protected int|string|array $columnSpan = 'full';
 
     protected static bool $isLazy = false;
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.recent_orders');
+    }
 
     public function table(Table $table): Table
     {
@@ -69,18 +71,18 @@ final class AdvancedOrdersWidget extends BaseWidget
                     ->sortable()
                     ->since(),
             ])
-            ->actions([
-                Action::make('view')
+            ->recordActions([
+                Actions\Action::make('view')
                     ->label(__('View'))
                     ->icon('heroicon-m-eye')
                     ->url(fn(Order $record): string => route('filament.admin.resources.orders.view', $record))
                     ->openUrlInNewTab(),
-                Action::make('edit')
+                Actions\Action::make('edit')
                     ->label(__('Edit'))
                     ->icon('heroicon-m-pencil-square')
                     ->url(fn(Order $record): string => route('filament.admin.resources.orders.edit', $record))
                     ->openUrlInNewTab(),
-                Action::make('invoice')
+                Actions\Action::make('invoice')
                     ->label(__('Invoice'))
                     ->icon('heroicon-m-document-text')
                     ->action(function (Order $record) {

@@ -11,7 +11,8 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\MultiLanguageTabService;
-use Filament\Actions\Action;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -19,6 +20,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Table;
+use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,7 +37,10 @@ final class ProductResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cube';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Catalog';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.catalog');
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -182,7 +187,7 @@ final class ProductResource extends Resource
                 Forms\Components\Section::make(__('translations.media'))
                     ->components([
                         Forms\Components\Actions::make([
-                            Forms\Components\Actions\Action::make('generate_images')
+                            Forms\Components\Action::make('generate_images')
                                 ->label(__('translations.generate_images'))
                                 ->icon('heroicon-o-photo')
                                 ->color('success')
@@ -394,7 +399,7 @@ final class ProductResource extends Resource
                     ->query(fn(Builder $query): Builder => $query->where('is_featured', true))
                     ->label('Featured Only'),
             ])
-            ->actions([
+            ->recordActions([
                 DocumentAction::make()
                     ->variables(fn(Product $record) => [
                         '$PRODUCT_NAME' => $record->name,
@@ -405,13 +410,13 @@ final class ProductResource extends Resource
                         '$PRODUCT_CATEGORY' => $record->categories->pluck('name')->join(', '),
                         '$PRODUCT_WEIGHT' => $record->weight ? $record->weight . ' kg' : '',
                     ]),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('generate_images')
+                Actions\BulkActionGroup::make([
+                    BulkAction::make('generate_images')
                         ->label(__('translations.generate_images'))
                         ->icon('heroicon-o-photo')
                         ->color('success')
@@ -465,9 +470,9 @@ final class ProductResource extends Resource
                         ->modalHeading(__('translations.generate_images'))
                         ->modalDescription('Ar tikrai norite sugeneruoti atsitiktinius paveikslėlius pažymėtiems produktams?')
                         ->modalSubmitActionLabel(__('translations.generate_images')),
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Actions\DeleteBulkAction::make(),
+                    Actions\ForceDeleteBulkAction::make(),
+                    Actions\RestoreBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

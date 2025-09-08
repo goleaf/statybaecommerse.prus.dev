@@ -2,20 +2,24 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Translatable\HasTranslations as SpatieHasTranslations;
 
 final class Location extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, SpatieHasTranslations;
 
     protected $table = 'locations';
 
     protected $fillable = [
         'name',
+        'slug',
+        'description',
         'code',
         'address_line_1',
         'address_line_2',
@@ -29,6 +33,8 @@ final class Location extends Model
         'is_default',
         'type',
     ];
+
+    public array $translatable = ['name', 'slug', 'description'];
 
     protected function casts(): array
     {

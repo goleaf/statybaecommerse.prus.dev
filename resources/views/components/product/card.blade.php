@@ -6,10 +6,7 @@
     <div class="mt-4 flex justify-between">
         <div>
             <h3 class="text-sm font-medium text-gray-700">
-                <x-link :href="route('products.show', [
-                    'locale' => app()->getLocale(),
-                    'slug' => $product->trans('slug') ?? $product->slug,
-                ])">
+                <x-link :href="route('products.show', $product->trans('slug') ?? $product->slug ?? $product)">
                     <span aria-hidden="true" class="absolute inset-0"></span>
                     {{ $product->trans('name') ?? $product->name }}
                 </x-link>
@@ -18,10 +15,7 @@
             @if ($product->brand_id)
                 <p class="mt-1 text-sm text-gray-500">
                     @if ($product->brand)
-                        <x-link :href="route('brands.show', [
-                            'locale' => app()->getLocale(),
-                            'slug' => $product->brand->trans('slug') ?? $product->brand->slug,
-                        ])">
+                        <x-link :href="route('brands.show', $product->brand)">
                             {{ $product->brand?->trans('name') ?? $product->brand?->name }}
                         </x-link>
                     @else

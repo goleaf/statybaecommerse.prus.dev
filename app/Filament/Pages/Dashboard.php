@@ -2,18 +2,13 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\AdvancedStatsWidget;
-use App\Filament\Widgets\ComprehensiveStatsWidget;
 use App\Filament\Widgets\EnhancedEcommerceOverview;
 use App\Filament\Widgets\RealtimeAnalyticsWidget;
-use App\Filament\Widgets\RecentOrdersWidget;
-use App\Filament\Widgets\SalesChart;
 use App\Filament\Widgets\TopProductsWidget;
-use App\Filament\Widgets\TopSellingProductsWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
 use BackedEnum;
 
-final class AdvancedDashboard extends BaseDashboard
+final class Dashboard extends BaseDashboard
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
@@ -23,7 +18,7 @@ final class AdvancedDashboard extends BaseDashboard
 
     public function getTitle(): string
     {
-        return __('Advanced Dashboard');
+        return __('Dashboard');
     }
 
     public static function getNavigationLabel(): string
@@ -34,13 +29,8 @@ final class AdvancedDashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            ComprehensiveStatsWidget::class,
             EnhancedEcommerceOverview::class,
-            AdvancedStatsWidget::class,
             RealtimeAnalyticsWidget::class,
-            SalesChart::class,
-            RecentOrdersWidget::class,
-            TopSellingProductsWidget::class,
             TopProductsWidget::class,
         ];
     }
@@ -52,22 +42,6 @@ final class AdvancedDashboard extends BaseDashboard
             'md' => 2,
             'lg' => 3,
             'xl' => 4,
-            '2xl' => 6,
-        ];
-    }
-
-    public function getHeaderWidgets(): array
-    {
-        return [
-            ComprehensiveStatsWidget::class,
-            EnhancedEcommerceOverview::class,
-        ];
-    }
-
-    public function getFooterWidgets(): array
-    {
-        return [
-            RealtimeAnalyticsWidget::class,
         ];
     }
 

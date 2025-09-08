@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Product;
-use Filament\Actions\Action;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Tables;
@@ -14,6 +13,11 @@ final class LowStockAlertsWidget extends BaseWidget
     protected static ?int $sort = 4;
 
     protected int|string|array $columnSpan = 'full';
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.low_stock_alerts');
+    }
 
     public function table(Table $table): Table
     {
@@ -65,13 +69,13 @@ final class LowStockAlertsWidget extends BaseWidget
                     ->separator(',')
                     ->toggleable(),
             ])
-            ->actions([
-                Action::make('restock')
+            ->recordActions([
+                Actions\Action::make('restock')
                     ->label(__('Restock'))
                     ->icon('heroicon-m-plus')
                     ->color('success')
                     ->form([
-                        Tables\Actions\Modal\Components\TextInput::make('quantity')
+                        \Filament\Forms\Components\TextInput::make('quantity')
                             ->label(__('Add Quantity'))
                             ->numeric()
                             ->required()
@@ -89,7 +93,7 @@ final class LowStockAlertsWidget extends BaseWidget
                             ->log("Stock restocked with {$data['quantity']} units");
                     })
                     ->successNotificationTitle(__('Stock updated successfully')),
-                Action::make('edit')
+                Actions\Action::make('edit')
                     ->label(__('Edit Product'))
                     ->icon('heroicon-m-pencil-square')
                     ->url(fn(Product $record): string => route('filament.admin.resources.products.edit', $record))
@@ -99,11 +103,6 @@ final class LowStockAlertsWidget extends BaseWidget
             ->emptyStateDescription(__('All products are well stocked!'))
             ->emptyStateIcon('heroicon-o-check-circle')
             ->poll('60s');
-    }
-
-    public static function getHeading(): string
-    {
-        return __('Low Stock Alerts');
     }
 
     public static function canView(): bool

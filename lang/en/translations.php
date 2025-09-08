@@ -7,6 +7,32 @@ return [
     'address_type_home' => 'Home Address',
     'address_type_work' => 'Work Address',
     'address_type_other' => 'Other Address',
+    // Country Translations
+    'country_name' => 'Country Name',
+    'country_official_name' => 'Official Country Name',
+    'official_name_help' => 'Enter the official name of the country',
+    'country_code' => 'Country Code',
+    'phone_code' => 'Phone Code',
+    'region' => 'Region',
+    'subregion' => 'Subregion',
+    'currencies' => 'Currencies',
+    'flag' => 'Flag',
+    // Currency Translations
+    'currency_settings' => 'Currency Settings',
+    'currency_information' => 'Currency Information',
+    'currency_name_help' => 'Enter the currency name in the selected language',
+    // Widget Translations
+    'recent_orders_description' => 'Latest orders from customers',
+    // Admin Fields
+    'order_reference' => 'Order Reference',
+    'customer' => 'Customer',
+    'total' => 'Total',
+    'status' => 'Status',
+    'created_at' => 'Created At',
+    // Admin Actions
+    'view' => 'View',
+    'edit' => 'Edit',
+    'delete' => 'Delete',
     // General UI
     'name' => 'Name',
     'slug' => 'Slug',

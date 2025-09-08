@@ -26,7 +26,6 @@ final class Index extends Component
         'priceMax' => ['except' => null],
         'hasProducts' => ['except' => false],
         'sort' => ['except' => 'name_asc'],
-        'page' => ['except' => 1],
     ];
 
     public function updating($field): void

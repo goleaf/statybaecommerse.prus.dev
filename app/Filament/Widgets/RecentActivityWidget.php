@@ -2,7 +2,6 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Actions\Action;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Tables;
@@ -12,7 +11,10 @@ final class RecentActivityWidget extends BaseWidget
 {
     protected static ?int $sort = 3;
 
-    protected static ?string $heading = 'Recent Activity';
+    public function getHeading(): string
+    {
+        return __('Recent Activity');
+    }
 
     protected int|string|array $columnSpan = 'full';
 
@@ -60,7 +62,7 @@ final class RecentActivityWidget extends BaseWidget
                     ->since()
                     ->tooltip(fn($state) => $state->format('Y-m-d H:i:s')),
             ])
-            ->actions([
+            ->recordActions([
                 Action::make('view_details')
                     ->label(__('Details'))
                     ->icon('heroicon-m-eye')
@@ -74,10 +76,5 @@ final class RecentActivityWidget extends BaseWidget
             ])
             ->poll('30s')
             ->paginated(false);
-    }
-
-    public static function getHeading(): string
-    {
-        return __('Recent Activity');
     }
 }

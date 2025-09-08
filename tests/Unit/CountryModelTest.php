@@ -1,0 +1,265 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit;
+
+use App\Models\Translations\CountryTranslation;
+use App\Models\Country;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class CountryModelTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_country_fillable_attributes(): void
+    {
+        $fillable = [
+            'name',
+            'cca2',
+            'cca3',
+            'ccn3',
+            'currency_code',
+            'phone_code',
+            'phone_calling_code',
+            'flag',
+            'svg_flag',
+            'region',
+            'subregion',
+            'latitude',
+            'longitude',
+            'currencies',
+            'languages',
+            'timezones',
+            'is_enabled',
+            'sort_order',
+        ];
+
+        $country = new Country();
+        $this->assertEquals($fillable, $country->getFillable());
+    }
+
+    public function test_country_casts(): void
+    {
+        $country = new Country();
+        $casts = $country->getCasts();
+
+        $this->assertEquals('decimal:8', $casts['latitude']);
+        $this->assertEquals('decimal:8', $casts['longitude']);
+        $this->assertEquals('array', $casts['currencies']);
+        $this->assertEquals('array', $casts['languages']);
+        $this->assertEquals('array', $casts['timezones']);
+        $this->assertEquals('boolean', $casts['is_enabled']);
+        $this->assertEquals('integer', $casts['sort_order']);
+    }
+
+    public function test_country_uses_soft_deletes(): void
+    {
+        $country = new Country();
+        $this->assertContains('Illuminate\Database\Eloquent\SoftDeletes', class_uses($country));
+    }
+
+    public function test_country_has_translations_trait(): void
+    {
+        $country = new Country();
+        $this->assertContains('App\Traits\HasTranslations', class_uses($country));
+    }
+
+    public function test_country_translation_model_property(): void
+    {
+        $country = new Country();
+        $reflection = new \ReflectionClass($country);
+        $property = $reflection->getProperty('translationModel');
+        $property->setAccessible(true);
+
+        $this->assertEquals(CountryTranslation::class, $property->getValue($country));
+    }
+
+    public function test_country_code_attribute(): void
+    {
+        $country = new Country(['cca2' => 'LT']);
+        $this->assertEquals('LT', $country->code);
+    }
+
+    public function test_country_iso_code_attribute(): void
+    {
+        $country = new Country(['cca3' => 'LTU']);
+        $this->assertEquals('LTU', $country->iso_code);
+    }
+
+    public function test_country_phone_code_attribute(): void
+    {
+        $country = new Country(['phone_calling_code' => '370']);
+        $this->assertEquals('370', $country->phone_code);
+    }
+
+    public function test_country_translated_name_attribute_with_translation(): void
+    {
+        $country = Country::create([
+            'cca2' => 'LT',
+            'cca3' => 'LTU',
+            'phone_calling_code' => '370',
+            'flag' => '🇱🇹',
+            'region' => 'Europe',
+            'subregion' => 'Northern Europe',
+            'latitude' => 55.169438,
+            'longitude' => 23.881275,
+            'currencies' => ['EUR'],
+            'is_enabled' => true,
+            'sort_order' => 1,
+        ]);
+
+        CountryTranslation::create([
+            'country_id' => $country->id,
+            'locale' => 'en',
+            'name' => 'Lithuania',
+            'name_official' => 'Republic of Lithuania',
+        ]);
+
+        $country->load('translations');
+        app()->setLocale('en');
+
+        $this->assertEquals('Lithuania', $country->translated_name);
+    }
+
+    public function test_country_translated_name_attribute_without_translation(): void
+    {
+        $country = new Country([
+            'cca2' => 'LT',
+            'name' => 'Lithuania Fallback'
+        ]);
+
+        $this->assertEquals('Lithuania Fallback', $country->translated_name);
+    }
+
+    public function test_country_translated_name_attribute_fallback_to_unknown(): void
+    {
+        $country = new Country(['cca2' => 'LT']);
+        $this->assertEquals('Unknown', $country->translated_name);
+    }
+
+    public function test_country_translated_official_name_attribute(): void
+    {
+        $country = Country::create([
+            'cca2' => 'LT',
+            'cca3' => 'LTU',
+            'phone_calling_code' => '370',
+            'flag' => '🇱🇹',
+            'region' => 'Europe',
+            'subregion' => 'Northern Europe',
+            'latitude' => 55.169438,
+            'longitude' => 23.881275,
+            'currencies' => ['EUR'],
+            'is_enabled' => true,
+            'sort_order' => 1,
+        ]);
+
+        CountryTranslation::create([
+            'country_id' => $country->id,
+            'locale' => 'en',
+            'name' => 'Lithuania',
+            'name_official' => 'Republic of Lithuania',
+        ]);
+
+        $country->load('translations');
+        app()->setLocale('en');
+
+        $this->assertEquals('Republic of Lithuania', $country->translated_official_name);
+    }
+
+    public function test_country_display_name_with_phone_code(): void
+    {
+        $country = Country::create([
+            'cca2' => 'LT',
+            'cca3' => 'LTU',
+            'phone_calling_code' => '370',
+            'flag' => '🇱🇹',
+            'region' => 'Europe',
+            'subregion' => 'Northern Europe',
+            'latitude' => 55.169438,
+            'longitude' => 23.881275,
+            'currencies' => ['EUR'],
+            'is_enabled' => true,
+            'sort_order' => 1,
+        ]);
+
+        CountryTranslation::create([
+            'country_id' => $country->id,
+            'locale' => 'en',
+            'name' => 'Lithuania',
+            'name_official' => 'Republic of Lithuania',
+        ]);
+
+        $country->load('translations');
+        app()->setLocale('en');
+
+        $this->assertEquals('Lithuania (+370)', $country->display_name);
+    }
+
+    public function test_country_display_name_without_phone_code(): void
+    {
+        $country = Country::create([
+            'cca2' => 'LT',
+            'cca3' => 'LTU',
+            'flag' => '🇱🇹',
+            'region' => 'Europe',
+            'subregion' => 'Northern Europe',
+            'latitude' => 55.169438,
+            'longitude' => 23.881275,
+            'currencies' => ['EUR'],
+            'is_enabled' => true,
+            'sort_order' => 1,
+        ]);
+
+        CountryTranslation::create([
+            'country_id' => $country->id,
+            'locale' => 'en',
+            'name' => 'Lithuania',
+            'name_official' => 'Republic of Lithuania',
+        ]);
+
+        $country->load('translations');
+        app()->setLocale('en');
+
+        $this->assertEquals('Lithuania', $country->display_name);
+    }
+
+    public function test_country_currencies_cast_to_array(): void
+    {
+        $country = Country::create([
+            'cca2' => 'LT',
+            'cca3' => 'LTU',
+            'phone_calling_code' => '370',
+            'flag' => '🇱🇹',
+            'region' => 'Europe',
+            'subregion' => 'Northern Europe',
+            'latitude' => 55.169438,
+            'longitude' => 23.881275,
+            'currencies' => ['EUR', 'USD'],
+            'is_enabled' => true,
+            'sort_order' => 1,
+        ]);
+
+        $this->assertIsArray($country->currencies);
+        $this->assertEquals(['EUR', 'USD'], $country->currencies);
+    }
+
+    public function test_country_coordinates_cast_to_decimal(): void
+    {
+        $country = Country::create([
+            'cca2' => 'LT',
+            'cca3' => 'LTU',
+            'phone_calling_code' => '370',
+            'flag' => '🇱🇹',
+            'region' => 'Europe',
+            'subregion' => 'Northern Europe',
+            'latitude' => 55.169438,
+            'longitude' => 23.881275,
+            'currencies' => ['EUR'],
+            'is_enabled' => true,
+            'sort_order' => 1,
+        ]);
+
+        $this->assertEquals(55.169438, (float) $country->latitude);
+        $this->assertEquals(23.881275, (float) $country->longitude);
+    }
+}

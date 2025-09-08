@@ -112,7 +112,7 @@
                         {{-- Product Info --}}
                         <div class="p-4">
                             <h3 class="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                                <a href="{{ route('products.show', ['slug' => $product->slug]) }}" 
+                                <a href="{{ route('products.show', $product) }}" 
                                    class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                                     {{ $product->name }}
                                 </a>

@@ -1,0 +1,196 @@
+<?php declare(strict_types=1);
+
+use App\Filament\Resources\AnalyticsResource\Pages\AnalyticsDashboard;
+use App\Filament\Resources\AnalyticsResource;
+use App\Models\Order;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->adminUser = User::factory()->create([
+        'email' => 'admin@admin.com',
+        'name' => 'Admin User',
+    ]);
+
+    // Assign admin role if using Spatie permissions
+    if (class_exists(\Spatie\Permission\Models\Role::class)) {
+        $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
+        $this->adminUser->assignRole($adminRole);
+    }
+
+    $this->actingAs($this->adminUser);
+});
+
+it('can access analytics dashboard', function () {
+    $response = $this->get(AnalyticsResource::getUrl('index'));
+
+    $response->assertSuccessful();
+});
+
+it('can view analytics dashboard page', function () {
+    livewire(AnalyticsDashboard::class)
+        ->assertSuccessful();
+});
+
+it('displays correct analytics data', function () {
+    // Create test orders
+    $orders = Order::factory()->count(5)->create([
+        'status' => 'completed',
+        'total' => 100.0,
+        'created_at' => now()->subDays(5),
+    ]);
+
+    $pendingOrders = Order::factory()->count(2)->create([
+        'status' => 'pending',
+        'total' => 50.0,
+        'created_at' => now()->subDays(2),
+    ]);
+
+    livewire(AnalyticsDashboard::class)
+        ->assertSuccessful()
+        ->assertCanSeeTableRecords($orders->concat($pendingOrders));
+});
+
+it('can filter orders by status', function () {
+    $completedOrders = Order::factory()->count(3)->create(['status' => 'completed']);
+    $pendingOrders = Order::factory()->count(2)->create(['status' => 'pending']);
+
+    livewire(AnalyticsDashboard::class)
+        ->assertCanSeeTableRecords($completedOrders->concat($pendingOrders))
+        ->filterTable('status', 'completed')
+        ->assertCanSeeTableRecords($completedOrders)
+        ->assertCanNotSeeTableRecords($pendingOrders);
+});
+
+it('can filter orders by date range', function () {
+    $oldOrders = Order::factory()->count(2)->create([
+        'created_at' => now()->subMonths(2),
+    ]);
+
+    $recentOrders = Order::factory()->count(3)->create([
+        'created_at' => now()->subDays(5),
+    ]);
+
+    livewire(AnalyticsDashboard::class)
+        ->assertCanSeeTableRecords($oldOrders->concat($recentOrders))
+        ->filterTable('created_at', [
+            'created_from' => now()->subDays(10)->format('Y-m-d'),
+            'created_until' => now()->format('Y-m-d'),
+        ])
+        ->assertCanSeeTableRecords($recentOrders)
+        ->assertCanNotSeeTableRecords($oldOrders);
+});
+
+it('can filter high value orders', function () {
+    $lowValueOrders = Order::factory()->count(2)->create(['total' => 100.0]);
+    $highValueOrders = Order::factory()->count(3)->create(['total' => 600.0]);
+
+    livewire(AnalyticsDashboard::class)
+        ->assertCanSeeTableRecords($lowValueOrders->concat($highValueOrders))
+        ->filterTable('high_value')
+        ->assertCanSeeTableRecords($highValueOrders)
+        ->assertCanNotSeeTableRecords($lowValueOrders);
+});
+
+it('can filter orders from this month', function () {
+    $oldOrders = Order::factory()->count(2)->create([
+        'created_at' => now()->subMonths(2),
+    ]);
+
+    $thisMonthOrders = Order::factory()->count(3)->create([
+        'created_at' => now()->startOfMonth()->addDays(5),
+    ]);
+
+    livewire(AnalyticsDashboard::class)
+        ->assertCanSeeTableRecords($oldOrders->concat($thisMonthOrders))
+        ->filterTable('this_month')
+        ->assertCanSeeTableRecords($thisMonthOrders)
+        ->assertCanNotSeeTableRecords($oldOrders);
+});
+
+it('can export analytics data', function () {
+    Order::factory()->count(5)->create();
+
+    livewire(AnalyticsDashboard::class)
+        ->callAction('export_report')
+        ->assertNotified();
+});
+
+it('can refresh analytics data', function () {
+    livewire(AnalyticsDashboard::class)
+        ->callAction('refresh_data')
+        ->assertNotified();
+});
+
+it('displays correct table columns', function () {
+    $order = Order::factory()->create([
+        'reference' => 'ORD-12345',
+        'total' => 150.5,
+        'status' => 'completed',
+    ]);
+
+    livewire(AnalyticsDashboard::class)
+        ->assertCanSeeTableRecords([$order])
+        ->assertTableColumnExists('order_date')
+        ->assertTableColumnExists('reference')
+        ->assertTableColumnExists('user.name')
+        ->assertTableColumnExists('items_count')
+        ->assertTableColumnExists('total')
+        ->assertTableColumnExists('status')
+        ->assertTableColumnExists('created_at');
+});
+
+it('can sort by different columns', function () {
+    $orders = Order::factory()->count(3)->create();
+
+    livewire(AnalyticsDashboard::class)
+        ->assertCanSeeTableRecords($orders)
+        ->sortTable('total')
+        ->assertSuccessful()
+        ->sortTable('created_at', 'desc')
+        ->assertSuccessful();
+});
+
+it('can group orders by month', function () {
+    Order::factory()->count(3)->create([
+        'created_at' => now()->startOfMonth(),
+    ]);
+
+    livewire(AnalyticsDashboard::class)
+        ->groupTable('order_month')
+        ->assertSuccessful();
+});
+
+it('can group orders by status', function () {
+    Order::factory()->count(2)->create(['status' => 'completed']);
+    Order::factory()->count(2)->create(['status' => 'pending']);
+
+    livewire(AnalyticsDashboard::class)
+        ->groupTable('status')
+        ->assertSuccessful();
+});
+
+it('displays navigation badge for pending orders', function () {
+    Order::factory()->count(3)->create(['status' => 'pending']);
+
+    expect(AnalyticsResource::getNavigationBadge())->toBe('3');
+    expect(AnalyticsResource::getNavigationBadgeColor())->toBe('warning');
+});
+
+it('hides navigation badge when no pending orders', function () {
+    Order::factory()->count(2)->create(['status' => 'completed']);
+
+    expect(AnalyticsResource::getNavigationBadge())->toBeNull();
+});
+
+it('can access analytics with proper permissions', function () {
+    expect(AnalyticsResource::canAccess())->toBeTrue();
+});
+
+it('displays correct labels and translations', function () {
+    expect(AnalyticsResource::getNavigationLabel())->toBe(__('analytics.analytics_dashboard'));
+    expect(AnalyticsResource::getModelLabel())->toBe(__('analytics.analytics'));
+    expect(AnalyticsResource::getPluralModelLabel())->toBe(__('analytics.analytics'));
+});

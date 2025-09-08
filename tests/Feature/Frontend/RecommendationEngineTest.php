@@ -242,3 +242,5 @@ it('can track security activities and detect suspicious patterns', function () {
     expect($securityPage->securityStats['total_activities'])->toBeGreaterThan(0);
     expect($securityPage->suspiciousActivities)->not()->toBeEmpty();
 });
+
+

@@ -19,12 +19,14 @@ return new class extends Migration {
                 $table->text('description')->nullable();
                 $table->string('website')->nullable();
                 $table->boolean('is_enabled')->default(true);
+                $table->integer('sort_order')->default(0);
                 $table->string('seo_title')->nullable();
                 $table->text('seo_description')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
 
                 $table->index(['is_enabled', 'name']);
+                $table->index(['sort_order']);
             });
         }
 
@@ -58,8 +60,11 @@ return new class extends Migration {
                 $table->text('description')->nullable();
                 $table->text('short_description')->nullable();
                 $table->string('sku')->unique();
+                $table->text('summary')->nullable();
                 $table->decimal('price', 10, 2)->nullable();
                 $table->decimal('sale_price', 10, 2)->nullable();
+                $table->decimal('compare_price', 10, 2)->nullable();
+                $table->decimal('cost_price', 10, 2)->nullable();
                 $table->boolean('manage_stock')->default(false);
                 $table->integer('stock_quantity')->default(0);
                 $table->integer('low_stock_threshold')->default(0);
@@ -68,6 +73,7 @@ return new class extends Migration {
                 $table->decimal('width', 8, 2)->nullable();
                 $table->decimal('height', 8, 2)->nullable();
                 $table->boolean('is_visible')->default(true);
+                $table->boolean('is_enabled')->default(true);
                 $table->boolean('is_featured')->default(false);
                 $table->timestamp('published_at')->nullable();
                 $table->string('seo_title')->nullable();
@@ -108,6 +114,7 @@ return new class extends Migration {
                 $table->string('slug')->unique();
                 $table->text('description')->nullable();
                 $table->boolean('is_visible')->default(true);
+                $table->boolean('is_enabled')->default(true);
                 $table->integer('sort_order')->default(0);
                 $table->string('seo_title')->nullable();
                 $table->text('seo_description')->nullable();
@@ -115,6 +122,7 @@ return new class extends Migration {
                 $table->softDeletes();
 
                 $table->index(['is_visible', 'sort_order']);
+                $table->index(['is_enabled']);
             });
         }
 

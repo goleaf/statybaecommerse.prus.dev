@@ -4,14 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
-use Filament\Forms;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 final class CartItemResource extends Resource
 {
@@ -125,15 +127,15 @@ final class CartItemResource extends Resource
                     ->query(fn(Builder $query): Builder => $query->whereDate('created_at', today()))
                     ->label('Added Today'),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('clear_old_carts')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    BulkAction::make('clear_old_carts')
                         ->label('Clear Old Cart Items')
                         ->icon('heroicon-o-trash')
                         ->color('danger')

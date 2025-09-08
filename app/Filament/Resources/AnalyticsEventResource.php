@@ -4,14 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Models\AnalyticsEvent;
-use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 final class AnalyticsEventResource extends Resource
 {
@@ -136,14 +136,14 @@ final class AnalyticsEventResource extends Resource
                     ->query(fn(Builder $query): Builder => $query->whereMonth('created_at', now()->month))
                     ->label('This Month'),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                Actions\ViewAction::make(),
+                Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('cleanup_old_events')
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                    Actions\BulkAction::make('cleanup_old_events')
                         ->label('Cleanup Old Events')
                         ->icon('heroicon-o-trash')
                         ->color('danger')
@@ -174,11 +174,11 @@ final class AnalyticsEventResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false; // Analytics events are created programmatically
+        return false;  // Analytics events are created programmatically
     }
 
     public static function canEdit($record): bool
     {
-        return false; // Analytics events should not be edited
+        return false;  // Analytics events should not be edited
     }
 }

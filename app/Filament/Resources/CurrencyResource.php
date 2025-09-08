@@ -5,17 +5,20 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CurrencyResource\Pages;
 use App\Models\Currency;
 use App\Services\MultiLanguageTabService;
-use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Section;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use BackedEnum;
+use UnitEnum;
 
 final class CurrencyResource extends Resource
 {
@@ -42,41 +45,39 @@ final class CurrencyResource extends Resource
         return $schema
             ->components([
                 // Currency Settings (Non-translatable)
-                Forms\Components\Section::make(__('translations.currency_settings'))
+                Section::make(__('translations.currency_settings'))
                     ->components([
-                        
                         Forms\Components\TextInput::make('code')
                             ->label(__('admin.currency.form.code'))
                             ->required()
                             ->maxLength(3)
                             ->unique(Currency::class, 'code', ignoreRecord: true)
                             ->helperText(__('admin.currency.form.code_help')),
-                        
                         Forms\Components\TextInput::make('symbol')
                             ->label(__('admin.currency.form.symbol'))
                             ->required()
                             ->maxLength(10),
-                        
                         Forms\Components\TextInput::make('exchange_rate')
                             ->label(__('admin.currency.form.exchange_rate'))
                             ->numeric()
                             ->step(0.0001)
-                            ->default(1.0000)
+                            ->default(1.0)
                             ->helperText(__('admin.currency.form.exchange_rate_help')),
-                        
-                        Forms\Components\TextInput::make('precision')
-                            ->label(__('admin.currency.form.precision'))
+                        Forms\Components\TextInput::make('decimal_places')
+                            ->label(__('admin.currency.form.decimal_places'))
                             ->numeric()
                             ->default(2)
                             ->minValue(0)
                             ->maxValue(4),
-                        
-                        Forms\Components\Toggle::make('enabled')
+                        Forms\Components\Toggle::make('is_enabled')
                             ->label(__('admin.currency.form.enabled'))
                             ->default(true),
+                        Forms\Components\Toggle::make('is_default')
+                            ->label(__('admin.currency.form.is_default'))
+                            ->default(false)
+                            ->helperText(__('admin.currency.form.is_default_help')),
                     ])
                     ->columns(2),
-
                 // Multilanguage Tabs for Currency Content
                 Tabs::make('currency_translations')
                     ->tabs(
@@ -95,19 +96,16 @@ final class CurrencyResource extends Resource
                     ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
                     ->persistTabInQueryString('currency_tab')
                     ->contained(false),
-                
-                Forms\Components\Section::make(__('admin.currency.form.formatting'))
+                Section::make(__('admin.currency.form.formatting'))
                     ->components([
                         Forms\Components\TextInput::make('thousands_separator')
                             ->label(__('admin.currency.form.thousands_separator'))
                             ->default(',')
                             ->maxLength(1),
-                        
                         Forms\Components\TextInput::make('decimal_separator')
                             ->label(__('admin.currency.form.decimal_separator'))
                             ->default('.')
                             ->maxLength(1),
-                        
                         Forms\Components\Select::make('symbol_position')
                             ->label(__('admin.currency.form.symbol_position'))
                             ->options([
@@ -128,34 +126,32 @@ final class CurrencyResource extends Resource
                     ->label(__('admin.currency.table.name'))
                     ->searchable()
                     ->sortable(),
-                
                 Tables\Columns\TextColumn::make('code')
                     ->label(__('admin.currency.table.code'))
                     ->searchable()
                     ->sortable()
                     ->badge(),
-                
                 Tables\Columns\TextColumn::make('symbol')
                     ->label(__('admin.currency.table.symbol'))
                     ->badge()
                     ->color('success'),
-                
                 Tables\Columns\TextColumn::make('exchange_rate')
                     ->label(__('admin.currency.table.exchange_rate'))
                     ->numeric(decimalPlaces: 4)
                     ->sortable(),
-                
-                Tables\Columns\IconColumn::make('enabled')
+                Tables\Columns\IconColumn::make('is_enabled')
                     ->label(__('admin.currency.table.enabled'))
                     ->boolean()
                     ->sortable(),
-                
+                Tables\Columns\IconColumn::make('is_default')
+                    ->label(__('admin.currency.table.is_default'))
+                    ->boolean()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.currency.table.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('admin.currency.table.updated_at'))
                     ->dateTime()
@@ -163,17 +159,19 @@ final class CurrencyResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('enabled')
+                Tables\Filters\TernaryFilter::make('is_enabled')
                     ->label(__('admin.currency.filters.enabled')),
+                Tables\Filters\TernaryFilter::make('is_default')
+                    ->label(__('admin.currency.filters.is_default')),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('name');
