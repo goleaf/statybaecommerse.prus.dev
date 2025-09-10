@@ -16,4 +16,5 @@ return [
         'system' => 'Sistema',
         'reports' => 'Ataskaitos',
     ],
+    'menus' => 'Meniu',
 ];

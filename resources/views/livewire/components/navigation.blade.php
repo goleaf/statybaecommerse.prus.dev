@@ -80,43 +80,7 @@
         {{-- Secondary: links and categories --}}
         <div class="hidden lg:flex items-center justify-between py-2">
             <nav class="flex items-center gap-6">
-                @if (Route::has('brands.index'))
-                    <x-link :href="route('brands.index', ['locale' => app()->getLocale()])"
-                            class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('nav_brands') }}</x-link>
-                @endif
-                @if (Route::has('locations.index'))
-                    <x-link :href="route('locations.index', ['locale' => app()->getLocale()])"
-                            class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('nav_locations') }}</x-link>
-                @endif
-                @if (Route::has('search'))
-                    <x-link :href="route('search', ['locale' => app()->getLocale()])"
-                            class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('nav_search') }}</x-link>
-                @endif
-                @if (Route::has('cart.index'))
-                    <x-link :href="route('cart.index', ['locale' => app()->getLocale()])"
-                            class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('nav_cart') }}</x-link>
-                @endif
-
-                @auth
-                    @can('view system')
-                        @if (Route::has('admin.discounts.presets'))
-                            <x-link :href="route('admin.discounts.presets')"
-                                    class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('nav_admin') }}</x-link>
-                        @elseif (Route::has('filament.admin.pages.dashboard'))
-                            <x-link :href="route('filament.admin.pages.dashboard')"
-                                    class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('nav_admin') }}</x-link>
-                        @else
-                            <x-link href="/admin"
-                                    class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('nav_admin') }}</x-link>
-                        @endif
-                    @endcan
-                    @can('view orders')
-                        @if (Route::has('exports.index'))
-                            <x-link :href="route('exports.index')"
-                                    class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('nav_exports') }}</x-link>
-                        @endif
-                    @endcan
-                @endauth
+                <x-navigation.menu-items :items="$this->headerMenu" />
             </nav>
 
             @php

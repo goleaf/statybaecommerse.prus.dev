@@ -54,52 +54,59 @@
         </div>
     </section>
 
-    <!-- Featured Categories -->
-    @if ($featuredCategories->count() > 0)
-        <section class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        {{ __('translations.featured_categories') }}</h2>
-                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ __('translations.categories_description') }}
-                    </p>
+    <!-- Sidebar + Featured Categories Grid -->
+    <section class="py-10 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-3">
+                    <livewire:components.home-sidebar />
                 </div>
+                <div class="lg:col-span-9">
+                    @if ($featuredCategories->count() > 0)
+                        <div class="text-center mb-8">
+                            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                                {{ __('translations.featured_categories') }}</h2>
+                            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                                {{ __('translations.categories_description') }}</p>
+                        </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                    @foreach ($featuredCategories as $category)
-                        <a href="{{ route('category.show', ['category' => $category->slug ?? $category]) }}"
-                           class="group">
-                            <div
-                                 class="bg-gray-100 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105">
-                                @if ($category->icon)
-                                    <div class="w-12 h-12 mx-auto mb-4 text-indigo-600">
-                                        <x-app-icon :name="$category->icon" class="w-12 h-12" />
-                                    </div>
-                                @elseif($category->getFirstMediaUrl('images'))
-                                    <img src="{{ $category->getFirstMediaUrl('images', 'thumb') }}"
-                                         alt="{{ $category->name }}"
-                                         class="w-12 h-12 mx-auto mb-4 rounded-lg object-cover">
-                                @else
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                            @foreach ($featuredCategories as $category)
+                                <a href="{{ route('category.show', ['category' => $category->slug ?? $category]) }}"
+                                   class="group">
                                     <div
-                                         class="w-12 h-12 mx-auto mb-4 bg-indigo-100 rounded-lg flex items-center justify-center">
-                                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor"
-                                             viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 11h10" />
-                                        </svg>
+                                         class="bg-gray-100 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                        @if ($category->icon)
+                                            <div class="w-12 h-12 mx-auto mb-4 text-indigo-600">
+                                                <x-app-icon :name="$category->icon" class="w-12 h-12" />
+                                            </div>
+                                        @elseif($category->getFirstMediaUrl('images'))
+                                            <img src="{{ $category->getFirstMediaUrl('images', 'thumb') }}"
+                                                 alt="{{ $category->name }}"
+                                                 class="w-12 h-12 mx-auto mb-4 rounded-lg object-cover">
+                                        @else
+                                            <div
+                                                 class="w-12 h-12 mx-auto mb-4 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                                <svg class="w-6 h-6 text-indigo-600" fill="none"
+                                                     stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          stroke-width="2"
+                                                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 11h10" />
+                                                </svg>
+                                            </div>
+                                        @endif
+                                        <h3 class="font-semibold text-gray-900">{{ $category->name }}</h3>
+                                        <p class="text-sm text-gray-500">{{ $category->products_count }}
+                                            {{ __('translations.products') }}</p>
                                     </div>
-                                @endif
-
-                                <h3 class="font-semibold text-gray-900">{{ $category->name }}</h3>
-                                <p class="text-sm text-gray-500">{{ $category->products_count }}
-                                    {{ __('translations.products') }}</p>
-                            </div>
-                        </a>
-                    @endforeach
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
-        </section>
-    @endif
+        </div>
+    </section>
 
     <!-- Latest Products -->
     @if ($latestProducts->count() > 0)

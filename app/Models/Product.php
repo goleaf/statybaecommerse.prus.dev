@@ -18,14 +18,17 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[ObservedBy([ProductObserver::class])]
-final class Product extends Model
+final class Product extends Model implements HasMedia
 {
     use HasFactory, SoftDeletes;
     use HasProductPricing;
     use HasTranslations;
     use LogsActivity;
+    use InteractsWithMedia;
 
     protected $fillable = [
         'name',

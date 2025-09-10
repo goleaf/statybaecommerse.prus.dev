@@ -4,7 +4,7 @@
     <ul class="space-y-2">
         @foreach ($nodes as $node)
             <li>
-                <a href="{{ route('category.show', ['locale' => app()->getLocale(), 'slug' => $node['slug']]) }}"
+                <a href="{{ route('category.show', ['category' => $node['slug']]) }}"
                    class="text-sm text-gray-700 hover:underline">
                     {{ $node['name'] }}
                 </a>

@@ -17,7 +17,6 @@ return [
     'featured' => 'Featured',
     'out_of_stock' => 'Out of Stock',
     'in_stock' => 'In Stock',
-    
     // Buttons
     'view' => 'View',
     'edit' => 'Edit',
@@ -37,7 +36,6 @@ return [
     'search' => 'Search',
     'filter' => 'Filter',
     'sort' => 'Sort',
-    
     // Forms
     'required_field' => 'Required field',
     'optional_field' => 'Optional field',
@@ -46,7 +44,6 @@ return [
     'choose_file' => 'Choose file',
     'upload_image' => 'Upload image',
     'drag_drop_files' => 'Drag and drop files here',
-    
     // Notifications
     'success' => 'Success',
     'error' => 'Error',
@@ -55,7 +52,6 @@ return [
     'notification_sent' => 'Notification sent',
     'operation_completed' => 'Operation completed',
     'operation_failed' => 'Operation failed',
-    
     // Pagination
     'showing' => 'Showing',
     'to' => 'to',
@@ -64,7 +60,6 @@ return [
     'no_results' => 'No results found',
     'page' => 'Page',
     'per_page' => 'Per page',
-    
     // Empty States
     'no_items_found' => 'No items found',
     'empty_cart' => 'Cart is empty',
@@ -74,14 +69,12 @@ return [
     'start_shopping' => 'Start Shopping',
     'browse_products' => 'Browse Products',
     'try_different_search' => 'Try a different search',
-    
     // Loading States
     'loading' => 'Loading...',
     'processing' => 'Processing...',
     'saving' => 'Saving...',
     'submitting' => 'Submitting...',
     'please_wait' => 'Please wait...',
-    
     // Status
     'active' => 'Active',
     'inactive' => 'Inactive',
@@ -92,7 +85,6 @@ return [
     'pending' => 'Pending',
     'approved' => 'Approved',
     'rejected' => 'Rejected',
-    
     // Common Actions
     'create_new' => 'Create New',
     'edit_item' => 'Edit Item',
@@ -102,7 +94,6 @@ return [
     'show_less' => 'Show Less',
     'expand' => 'Expand',
     'collapse' => 'Collapse',
-    
     // Comparison
     'compare_limit_reached' => 'Comparison limit reached (:max products)',
     'product_already_in_comparison' => 'Product already in comparison',
@@ -110,13 +101,12 @@ return [
     'product_removed_from_comparison' => 'Product removed from comparison',
     'clear_comparison' => 'Clear Comparison',
     'compare_products' => 'Compare Products',
-    
     // Navigation
     'home' => 'Home',
     'brands' => 'Brands',
     'categories' => 'Categories',
     'products' => 'Products',
-    
+    'all' => 'All',
     // Empty states
     'no_results_found' => 'No results found',
     'clear_filters' => 'Clear Filters',

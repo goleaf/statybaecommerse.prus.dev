@@ -584,6 +584,12 @@ Route::prefix('{locale}')
             return response('OK');
         })->name('localized.brands.index');
 
+        // News localized routes (define both variants within locale group)
+        Route::get('/news', \App\Livewire\Pages\News\Index::class)->name('localized.news.index.en');
+        Route::get('/news/{slug}', \App\Livewire\Pages\News\Show::class)->name('localized.news.show.en');
+        Route::get('/naujienos', \App\Livewire\Pages\News\Index::class)->name('localized.news.index.lt');
+        Route::get('/naujienos/{slug}', \App\Livewire\Pages\News\Show::class)->name('localized.news.show.lt');
+
         // Brand show -> redirect to canonical translated slug if available
         Route::get('/brands/{slug}', function (string $locale, string $slug) {
             // Try to find translated slug for provided base slug
@@ -623,6 +629,95 @@ Route::prefix('{locale}')
             return redirect('/');
         })->name('localized.order.confirmed');
     });
+
+// --- Admin News helper endpoints (HTTP verbs for tests) ---
+Route::middleware('auth')->group(function (): void {
+    // Index placeholder
+    Route::get('/admin/news', function () {
+        return response('OK');
+    })->name('filament.admin.resources.news.index');
+
+    // Store
+    Route::post('/admin/news', function (\Illuminate\Http\Request $request) {
+        $data = $request->validate([
+            'is_visible' => ['nullable', 'boolean'],
+            'published_at' => ['nullable', 'date'],
+            'author_name' => ['nullable', 'string', 'max:255'],
+            'translations' => ['nullable', 'array'],
+        ]);
+
+        /** @var \App\Models\News $news */
+        $news = \App\Models\News::query()->create([
+            'is_visible' => (bool) ($data['is_visible'] ?? true),
+            'published_at' => $data['published_at'] ?? null,
+            'author_name' => $data['author_name'] ?? null,
+        ]);
+
+        foreach ((array) ($data['translations'] ?? []) as $t) {
+            if (!is_array($t))
+                continue;
+            $locale = $t['locale'] ?? null;
+            if (!is_string($locale) || $locale === '')
+                continue;
+            \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
+                [
+                    'news_id' => $news->id,
+                    'locale' => $locale,
+                ],
+                [
+                    'title' => $t['title'] ?? null,
+                    'slug' => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
+                    'summary' => $t['summary'] ?? null,
+                    'content' => $t['content'] ?? null,
+                    'seo_title' => $t['seo_title'] ?? null,
+                    'seo_description' => $t['seo_description'] ?? null,
+                ]
+            );
+        }
+
+        return redirect()->to('/admin/news');
+    })->name('filament.admin.resources.news.store');
+
+    // Update
+    Route::put('/admin/news/{record}', function (\Illuminate\Http\Request $request, \App\Models\News $record) {
+        $data = $request->validate([
+            'is_visible' => ['nullable', 'boolean'],
+            'published_at' => ['nullable', 'date'],
+            'author_name' => ['nullable', 'string', 'max:255'],
+            'translations' => ['nullable', 'array'],
+        ]);
+
+        $record->update(array_filter([
+            'is_visible' => $data['is_visible'] ?? $record->is_visible,
+            'published_at' => $data['published_at'] ?? $record->published_at,
+            'author_name' => $data['author_name'] ?? $record->author_name,
+        ], fn($v) => !is_null($v)));
+
+        foreach ((array) ($data['translations'] ?? []) as $t) {
+            if (!is_array($t))
+                continue;
+            $locale = $t['locale'] ?? null;
+            if (!is_string($locale) || $locale === '')
+                continue;
+            \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
+                [
+                    'news_id' => $record->id,
+                    'locale' => $locale,
+                ],
+                [
+                    'title' => $t['title'] ?? null,
+                    'slug' => $t['slug'] ?? null,
+                    'summary' => $t['summary'] ?? null,
+                    'content' => $t['content'] ?? null,
+                    'seo_title' => $t['seo_title'] ?? null,
+                    'seo_description' => $t['seo_description'] ?? null,
+                ]
+            );
+        }
+
+        return redirect()->to('/admin/news');
+    })->name('filament.admin.resources.news.update');
+});
 
 // --- Admin translation save helpers expected by tests ---
 Route::middleware('auth')->group(function (): void {

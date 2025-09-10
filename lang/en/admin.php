@@ -50,6 +50,7 @@ return [
         'document_templates' => 'Document Templates',
         'enhanced_settings' => 'Enhanced Settings',
         'system_settings' => 'System Settings',
+        'news' => 'News',
     ],
     // Dashboard
     'dashboard' => [
@@ -84,6 +85,12 @@ return [
         'total' => 'Total',
         'status' => 'Status',
         'created_at' => 'Created At',
+        // News specific
+        'title' => 'Title',
+        'summary' => 'Summary',
+        'content' => 'Content',
+        'published_at' => 'Published At',
+        'author_name' => 'Author',
     ],
     // Actions
     'actions' => [

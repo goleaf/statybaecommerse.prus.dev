@@ -17,9 +17,13 @@ final class MultiLanguageTabService
      */
     public static function getAvailableLanguages(): array
     {
-        $supported = config('app-features.supported_locales', ['en', 'lt']);
+        $supported = config('app.supported_locales', ['lt', 'en']);
+        $locales = is_array($supported)
+            ? $supported
+            : preg_split('/[\s,|]+/', (string) $supported, -1, PREG_SPLIT_NO_EMPTY);
+        $locales = array_values(array_filter(array_map('trim', $locales)));
 
-        return collect($supported)->map(function (string $locale) {
+        return collect($locales)->map(function (string $locale) {
             return [
                 'code' => $locale,
                 'name' => self::getLanguageName($locale),

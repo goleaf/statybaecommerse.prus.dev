@@ -2,9 +2,10 @@
 
 namespace App\Livewire\Components;
 
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Collection;
+use App\Models\Menu;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -14,6 +15,26 @@ final class NavigationMenu extends Component
     public bool $mobileMenuOpen = false;
     public bool $searchOpen = false;
     public string $searchQuery = '';
+
+    #[Computed]
+    public function headerMenu()
+    {
+        return \Cache::remember(
+            'nav:header_menu:' . app()->getLocale(),
+            now()->addMinutes(30),
+            function () {
+                /** @var Menu|null $menu */
+                $menu = Menu::query()
+                    ->where('key', 'main_header')
+                    ->where('is_active', true)
+                    ->first();
+                if (!$menu) {
+                    return collect();
+                }
+                return $menu->items()->with('children')->where('is_visible', true)->get();
+            }
+        );
+    }
 
     #[Computed]
     public function mainCategories()
@@ -107,4 +128,3 @@ final class NavigationMenu extends Component
         return view('livewire.components.navigation');
     }
 }
-

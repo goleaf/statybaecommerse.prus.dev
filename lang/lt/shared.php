@@ -17,7 +17,6 @@ return [
     'featured' => 'Rekomenduojamas',
     'out_of_stock' => 'Nėra atsargose',
     'in_stock' => 'Yra atsargose',
-    
     // Buttons
     'view' => 'Peržiūrėti',
     'edit' => 'Redaguoti',
@@ -37,7 +36,6 @@ return [
     'search' => 'Ieškoti',
     'filter' => 'Filtruoti',
     'sort' => 'Rūšiuoti',
-    
     // Forms
     'required_field' => 'Privalomas laukas',
     'optional_field' => 'Neprivalomas laukas',
@@ -46,7 +44,6 @@ return [
     'choose_file' => 'Pasirinkite failą',
     'upload_image' => 'Įkelti paveikslėlį',
     'drag_drop_files' => 'Vilkite ir meskite failus čia',
-    
     // Notifications
     'success' => 'Sėkmė',
     'error' => 'Klaida',
@@ -55,7 +52,6 @@ return [
     'notification_sent' => 'Pranešimas išsiųstas',
     'operation_completed' => 'Operacija baigta',
     'operation_failed' => 'Operacija nepavyko',
-    
     // Pagination
     'showing' => 'Rodoma',
     'to' => 'iki',
@@ -64,7 +60,6 @@ return [
     'no_results' => 'Rezultatų nerasta',
     'page' => 'Puslapis',
     'per_page' => 'Viename puslapyje',
-    
     // Empty States
     'no_items_found' => 'Elementų nerasta',
     'empty_cart' => 'Krepšelis tuščias',
@@ -74,14 +69,12 @@ return [
     'start_shopping' => 'Pradėti apsipirkimą',
     'browse_products' => 'Naršyti produktus',
     'try_different_search' => 'Pabandykite kitą paiešką',
-    
     // Loading States
     'loading' => 'Kraunama...',
     'processing' => 'Apdorojama...',
     'saving' => 'Išsaugoma...',
     'submitting' => 'Pateikiama...',
     'please_wait' => 'Palaukite...',
-    
     // Status
     'active' => 'Aktyvus',
     'inactive' => 'Neaktyvus',
@@ -92,7 +85,6 @@ return [
     'pending' => 'Laukiama',
     'approved' => 'Patvirtintas',
     'rejected' => 'Atmestas',
-    
     // Common Actions
     'create_new' => 'Sukurti naują',
     'edit_item' => 'Redaguoti elementą',
@@ -102,7 +94,6 @@ return [
     'show_less' => 'Rodyti mažiau',
     'expand' => 'Išplėsti',
     'collapse' => 'Suskleisti',
-    
     // Comparison
     'compare_limit_reached' => 'Pasiektas palyginimo limitas (:max produktai)',
     'product_already_in_comparison' => 'Produktas jau yra palyginime',
@@ -110,13 +101,12 @@ return [
     'product_removed_from_comparison' => 'Produktas pašalintas iš palyginimo',
     'clear_comparison' => 'Išvalyti palyginimą',
     'compare_products' => 'Palyginti produktus',
-    
     // Navigation
     'home' => 'Pagrindinis',
     'brands' => 'Prekės ženklai',
     'categories' => 'Kategorijos',
     'products' => 'Produktai',
-    
+    'all' => 'Visi',
     // Empty states
     'no_results_found' => 'Rezultatų nerasta',
     'clear_filters' => 'Išvalyti filtrus',

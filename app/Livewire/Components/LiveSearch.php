@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Components;
 
-use App\Models\Product;
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -35,9 +35,10 @@ final class LiveSearch extends Component
             ->with(['media', 'brand'])
             ->where('is_visible', true)
             ->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->query . '%')
-                  ->orWhere('description', 'like', '%' . $this->query . '%')
-                  ->orWhere('sku', 'like', '%' . $this->query . '%');
+                $q
+                    ->where('name', 'like', '%' . $this->query . '%')
+                    ->orWhere('description', 'like', '%' . $this->query . '%')
+                    ->orWhere('sku', 'like', '%' . $this->query . '%');
             })
             ->limit($this->maxResults)
             ->get()
@@ -66,7 +67,7 @@ final class LiveSearch extends Component
                     'title' => $category->name,
                     'subtitle' => __('ecommerce.category'),
                     'description' => $category->products_count . ' ' . __('ecommerce.products'),
-                    'url' => route('category.show', $category->slug),
+                    'url' => route('category.show', ['category' => $category->slug]),
                 ];
             });
 
@@ -115,4 +116,3 @@ final class LiveSearch extends Component
         return view('livewire.components.live-search');
     }
 }
-

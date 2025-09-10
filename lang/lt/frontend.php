@@ -7,6 +7,7 @@ return [
         'categories' => 'Kategorijos',
         'brands' => 'Prekės ženklai',
         'collections' => 'Kolekcijos',
+        'news' => 'Naujienos',
         'about' => 'Apie mus',
         'contact' => 'Kontaktai',
         'cart' => 'Krepšelis',

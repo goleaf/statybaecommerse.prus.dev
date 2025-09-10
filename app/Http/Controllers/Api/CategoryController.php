@@ -13,9 +13,10 @@ final class CategoryController extends Controller
         $categories = Category::query()
             ->where('is_visible', true)
             ->with(['children' => function ($query) {
-                $query->where('is_visible', true)
-                      ->orderBy('sort_order')
-                      ->orderBy('name');
+                $query
+                    ->where('is_visible', true)
+                    ->orderBy('sort_order')
+                    ->orderBy('name');
             }])
             ->whereNull('parent_id')
             ->orderBy('sort_order')
@@ -27,14 +28,14 @@ final class CategoryController extends Controller
                     'name' => $category->name,
                     'slug' => $category->slug,
                     'description' => $category->description,
-                    'url' => route('category.show', $category->slug),
+                    'url' => route('category.show', ['category' => $category->slug]),
                     'children' => $category->children->map(function (Category $child) {
                         return [
                             'id' => $child->id,
                             'name' => $child->name,
                             'slug' => $child->slug,
                             'description' => $child->description,
-                            'url' => route('category.show', $child->slug),
+                            'url' => route('category.show', ['category' => $child->slug]),
                         ];
                     }),
                 ];

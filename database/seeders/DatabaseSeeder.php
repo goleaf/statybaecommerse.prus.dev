@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             ChannelSeeder::class,
             // Core catalog structure with local images only
             BrandSeeder::class,
-            CategorySeeder::class,
+            LithuanianCatalogSeeder::class,
             AttributeSeeder::class,
             AttributeValueSeeder::class,
             // High‑performance product seeding with attributes, relations, translations, and local images
@@ -58,6 +58,10 @@ class DatabaseSeeder extends Seeder
             // Analytics & SEO
             AnalyticsEventSeeder::class,
             SeoDataSeeder::class,
+            // News demo content
+            NewsSeeder::class,
+            // Build header menu from categories
+            MenuSeeder::class,
         ]);
     }
 }

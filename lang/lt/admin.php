@@ -57,6 +57,7 @@ return [
         'document_templates' => 'Dokumentų šablonai',
         'enhanced_settings' => 'Patobulinti nustatymai',
         'system_settings' => 'Sistemos nustatymai',
+        'news' => 'Naujienos',
     ],
     // Reports
     'reports' => [
@@ -164,6 +165,12 @@ return [
         'total' => 'Suma',
         'status' => 'Būsena',
         'created_at' => 'Sukurta',
+        // News specific
+        'title' => 'Pavadinimas',
+        'summary' => 'Santrauka',
+        'content' => 'Turinys',
+        'published_at' => 'Publikavimo data',
+        'author_name' => 'Autorius',
     ],
     // Actions
     'actions' => [

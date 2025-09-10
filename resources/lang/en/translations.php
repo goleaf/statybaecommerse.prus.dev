@@ -12,7 +12,6 @@ return [
     'threshold' => 'Threshold',
     'updated_at' => 'Updated At',
     'variant' => 'Variant',
-    
     // Address Types
     'address_type_shipping' => 'Shipping Address',
     'address_type_billing' => 'Billing Address',
@@ -537,4 +536,15 @@ return [
     'today' => 'Today',
     'this_week' => 'This Week',
     'this_month' => 'This Month',
+    // Navigation/Menu
+    'menu_information' => 'Menu information',
+    'location' => 'Location',
+    'active' => 'Active',
+    'label' => 'Label',
+    'url' => 'URL',
+    'route_name' => 'Route name',
+    'route_params' => 'Route params',
+    'icon' => 'Icon',
+    'parent_item' => 'Parent item',
+    'view_all' => 'View all',
 ];

@@ -1,7 +1,8 @@
 @section('meta')
     @php
-        $ogImage = $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large')
-            ?: $product->getFirstMediaUrl(config('media.storage.collection_name'));
+        $ogImage =
+            $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?:
+            $product->getFirstMediaUrl(config('media.storage.collection_name'));
     @endphp
     <x-meta
             :title="$product->name"
@@ -202,8 +203,7 @@
                     'position' => $position++,
                     'name' => $cat->trans('name') ?? $cat->name,
                     'item' => route('category.show', [
-                        'locale' => app()->getLocale(),
-                        'slug' => $cat->trans('slug') ?? $cat->slug,
+                        'category' => $cat->trans('slug') ?? $cat->slug,
                     ]),
                 ];
             }

@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Product;
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Support\Str;
 
 final class SEOService
@@ -14,7 +14,7 @@ final class SEOService
         $title = $product->meta_title ?? $product->name . ' - ' . config('app.name');
         $description = $product->meta_description ?? Str::limit(strip_tags($product->description), 160);
         $keywords = $product->meta_keywords ?? self::generateProductKeywords($product);
-        
+
         return [
             'title' => $title,
             'description' => $description,
@@ -29,28 +29,28 @@ final class SEOService
             'product_availability' => $product->stock_quantity > 0 ? 'in stock' : 'out of stock',
         ];
     }
-    
+
     public static function getCategorySEO(Category $category): array
     {
         $title = $category->meta_title ?? $category->name . ' - ' . config('app.name');
         $description = $category->meta_description ?? Str::limit(strip_tags($category->description), 160);
-        
+
         return [
             'title' => $title,
             'description' => $description,
-            'canonical' => route('category.show', $category->slug),
+            'canonical' => route('category.show', ['category' => $category->slug]),
             'og_title' => $title,
             'og_description' => $description,
             'og_image' => $category->getFirstMediaUrl('images', 'image-lg') ?: $category->getFirstMediaUrl('images'),
             'og_type' => 'website',
         ];
     }
-    
+
     public static function getBrandSEO(Brand $brand): array
     {
         $title = $brand->meta_title ?? $brand->name . ' Products - ' . config('app.name');
         $description = $brand->meta_description ?? Str::limit(strip_tags($brand->description), 160);
-        
+
         return [
             'title' => $title,
             'description' => $description,
@@ -61,7 +61,7 @@ final class SEOService
             'og_type' => 'website',
         ];
     }
-    
+
     private static function generateProductKeywords(Product $product): string
     {
         $keywords = collect([
@@ -70,13 +70,13 @@ final class SEOService
             $product->categories->first()?->name,
             $product->sku,
         ])
-        ->filter()
-        ->map(fn($keyword) => Str::slug($keyword, ' '))
-        ->implode(', ');
-        
+            ->filter()
+            ->map(fn($keyword) => Str::slug($keyword, ' '))
+            ->implode(', ');
+
         return $keywords;
     }
-    
+
     public static function getStructuredData(Product $product): array
     {
         return [
@@ -94,8 +94,8 @@ final class SEOService
                 '@type' => 'Offer',
                 'price' => number_format($product->price, 2),
                 'priceCurrency' => 'EUR',
-                'availability' => $product->stock_quantity > 0 
-                    ? 'https://schema.org/InStock' 
+                'availability' => $product->stock_quantity > 0
+                    ? 'https://schema.org/InStock'
                     : 'https://schema.org/OutOfStock',
                 'seller' => [
                     '@type' => 'Organization',

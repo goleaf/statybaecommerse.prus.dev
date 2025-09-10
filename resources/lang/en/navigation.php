@@ -16,4 +16,5 @@ return [
         'system' => 'System',
         'reports' => 'Reports',
     ],
+    'menus' => 'Menus',
 ];

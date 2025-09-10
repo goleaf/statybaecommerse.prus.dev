@@ -12,7 +12,6 @@ return [
     'threshold' => 'Riba',
     'updated_at' => 'Atnaujinta',
     'variant' => 'Variantas',
-    
     // Address Types
     'address_type_shipping' => 'Pristatymo adresas',
     'address_type_billing' => 'Atsiskaitymo adresas',
@@ -554,4 +553,15 @@ return [
     'today' => 'Šiandien',
     'this_week' => 'Šią savaitę',
     'this_month' => 'Šį mėnesį',
+    // Navigation/Menu
+    'menu_information' => 'Meniu informacija',
+    'location' => 'Vieta',
+    'active' => 'Aktyvus',
+    'label' => 'Žyma',
+    'url' => 'Nuoroda',
+    'route_name' => 'Maršruto pavadinimas',
+    'route_params' => 'Maršruto parametrai',
+    'icon' => 'Ikona',
+    'parent_item' => 'Tėvinis punktas',
+    'view_all' => 'Peržiūrėti viską',
 ];

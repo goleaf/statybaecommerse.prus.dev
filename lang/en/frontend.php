@@ -7,6 +7,7 @@ return [
         'categories' => 'Categories',
         'brands' => 'Brands',
         'collections' => 'Collections',
+        'news' => 'News',
         'about' => 'About',
         'contact' => 'Contact',
         'cart' => 'Cart',
