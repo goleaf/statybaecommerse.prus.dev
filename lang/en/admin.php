@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
 
 return [
+    'brand_name' => 'Statyba E-Commerce',
     // Navigation
     'navigation' => [
         'dashboard' => 'Dashboard',
+        'commerce' => 'Commerce',
         'catalog' => 'Catalog',
         'orders' => 'Orders',
         'customers' => 'Customers',
@@ -40,6 +42,11 @@ return [
         'currencies' => 'Currencies',
         'partner_tiers' => 'Partner Tiers',
         'discount_codes' => 'Discount Codes',
+        'user_impersonation' => 'User Impersonation',
+        'system_monitoring' => 'System Monitoring',
+        'security_audit' => 'Security Audit',
+        'inventory_management' => 'Inventory Management',
+        'data_import_export' => 'Data Import/Export',
         'document_templates' => 'Document Templates',
         'enhanced_settings' => 'Enhanced Settings',
         'system_settings' => 'System Settings',
@@ -50,6 +57,7 @@ return [
         'overview' => 'Overview',
         'quick_stats' => 'Quick Statistics',
         'recent_activity' => 'Recent Activity',
+        'description' => 'Manage store content, orders, customers, and settings in one place.',
     ],
     // Widgets
     'widgets' => [
@@ -83,10 +91,150 @@ return [
         'edit' => 'Edit',
         'delete' => 'Delete',
         'process' => 'Process',
+        'impersonate' => 'Impersonate',
+        'start_impersonation' => 'Start Impersonation',
+        'stop_impersonation' => 'Stop Impersonation',
+        'view_orders' => 'View Orders',
+        'send_notification' => 'Send Notification',
+        'activate' => 'Activate',
+        'deactivate' => 'Deactivate',
+        'view_details' => 'View Details',
+        'close' => 'Close',
+        'flag_suspicious' => 'Flag Suspicious',
+        'security_scan' => 'Security Scan',
+        'export_audit_log' => 'Export Audit Log',
+        'clear_old_logs' => 'Clear Old Logs',
+        'download' => 'Download',
+        'filter_stock' => 'Filter Stock',
+        'update_stock' => 'Update Stock',
+        'view_variants' => 'View Variants',
+        'bulk_stock_update' => 'Bulk Stock Update',
+        'enable_tracking' => 'Enable Tracking',
+        'disable_tracking' => 'Disable Tracking',
+        'export_inventory' => 'Export Inventory',
+        'low_stock_alert' => 'Low Stock Alert',
+    ],
+    // Modals
+    'modals' => [
+        'impersonate_user' => 'Impersonate User',
+        'impersonate_description' => 'Are you sure you want to start impersonating this user? You will be able to view the system from their perspective.',
+        'clear_logs_description' => 'Are you sure you want to delete logs older than 6 months? This action cannot be undone.',
+    ],
+    // Notifications
+    'notifications' => [
+        'cannot_impersonate_admin' => 'Cannot impersonate admin users',
+        'impersonation_started' => 'Impersonation started',
+        'impersonating_user' => 'Now impersonating user: :name',
+        'impersonation_stopped' => 'Impersonation stopped',
+        'notification_sent' => 'Notification sent',
+        'activity_flagged' => 'Activity flagged as suspicious',
+        'logs_cleared' => 'Logs cleared successfully',
+        'deleted_records' => 'Deleted records: :count',
+        'security_scan_completed' => 'Security scan completed',
+        'security_issues_found' => 'Security issues found: :count',
+        'audit_log_exported' => 'Audit log exported',
+    ],
+    // Impersonation
+    'impersonation' => [
+        'active_session' => 'Active Impersonation Session',
+        'currently_viewing_as' => 'Currently viewing as: :name',
+        'user_management' => 'User Management',
+        'description' => 'View and manage users, start impersonation sessions for security purposes.',
+        'guidelines' => 'Impersonation Guidelines',
+        'guideline_1' => 'Use impersonation only for security purposes and troubleshooting',
+        'guideline_2' => 'Never modify user data during impersonation',
+        'guideline_3' => 'Impersonation sessions are logged and monitored',
+        'guideline_4' => 'Always stop impersonation when finished',
+    ],
+    // Filters
+    'filters' => [
+        'active_users' => 'Active Users',
+        'has_orders' => 'Has Orders',
+        'recent_activity' => 'Recent Activity',
+        'log_type' => 'Log Type',
+        'event_type' => 'Event Type',
+        'suspicious_only' => 'Suspicious Only',
+    ],
+    // Tabs
+    'tabs' => [
+        'import_data' => 'Import Data',
+        'export_data' => 'Export Data',
+    ],
+    // Fieldsets
+    'fieldsets' => [
+        'import_options' => 'Import Options',
+        'export_options' => 'Export Options',
+    ],
+    // Data Import/Export Fields
+    'fields' => [
+        'data_type' => 'Data Type',
+        'format' => 'Format',
+        'import_file' => 'Import File',
+        'update_existing' => 'Update Existing Records',
+        'validate_data' => 'Validate Data Before Import',
+        'skip_errors' => 'Skip Errors and Continue',
+        'batch_size' => 'Batch Size',
+        'include_relations' => 'Include Relations',
+        'include_media' => 'Include Media URLs',
+        'date_from' => 'Date From',
+        'date_to' => 'Date To',
+        'export_limit' => 'Export Limit',
+    ],
+    // Help texts
+    'help' => [
+        'update_existing_records' => 'If enabled, existing records will be updated by identifier.',
+        'validate_before_import' => 'Validate CSV/JSON format before importing.',
+        'continue_on_errors' => 'Continue import even if errors are found.',
+        'import_batch_size' => 'Number of records per import batch.',
+        'export_with_relations' => 'Include related records in the export file.',
+        'export_media_urls' => 'Include media URLs (if applicable).',
+        'export_date_range' => 'Limit export by date range.',
+        'export_limit' => 'Max number of records to include in export.',
+    ],
+    // Data Import/Export Actions
+    'actions' => [
+        'import_data' => 'Import Data',
+        'export_data' => 'Export Data',
+        'download_template' => 'Download Template',
+    ],
+    // Data Import/Export Notifications
+    'notifications' => [
+        'import_completed' => 'Import completed successfully',
+        'import_failed' => 'Import failed',
+        'export_completed' => 'Export completed successfully',
+        'export_failed' => 'Export failed',
+        'file_ready_download' => 'File is ready for download',
+        'template_ready' => 'Template is ready',
+    ],
+    // Inventory filters & ops
+    'stock_filters' => [
+        'all' => 'All',
+        'good_stock' => 'Good Stock',
+        'low_stock' => 'Low Stock',
+        'out_of_stock' => 'Out of Stock',
+    ],
+    'stock_operations' => [
+        'set_to' => 'Set to',
+        'increase_by' => 'Increase by',
+        'decrease_by' => 'Decrease by',
+    ],
+    // Fields
+    'fields' => [
+        'title' => 'Title',
+        'message' => 'Message',
+        'notification_type' => 'Notification Type',
+    ],
+    // Notification Types
+    'notification_types' => [
+        'info' => 'Info',
+        'success' => 'Success',
+        'warning' => 'Warning',
+        'danger' => 'Danger',
     ],
     // Products
     'products' => [
         'title' => 'Products',
+        'description' => 'Create, edit and manage products, pricing, stock and content.',
         'create' => 'Create Product',
         'edit' => 'Edit Product',
         'view' => 'View Product',
@@ -125,6 +273,7 @@ return [
     // Orders
     'orders' => [
         'title' => 'Orders',
+        'description' => 'Review and manage orders, statuses, payments and shipments.',
         'create' => 'Create Order',
         'edit' => 'Edit Order',
         'view' => 'View Order',
@@ -494,6 +643,7 @@ return [
         'deactivate' => 'Deactivate',
         'enable' => 'Enable',
         'disable' => 'Disable',
+        'restore' => 'Restore',
     ],
     // Messages
     'messages' => [
@@ -577,10 +727,40 @@ return [
         'start_date' => 'Start Date',
         'end_date' => 'End Date',
     ],
+    // Common
+    'customer' => 'Customer',
+    'items' => 'Items',
+    'order_date' => 'Order Date',
+    'billing_address' => 'Billing Address',
+    'shipping_address' => 'Shipping Address',
+    'order_information' => 'Order Information',
+    'pricing' => 'Pricing',
+    'addresses_information' => 'Addresses Information',
+    'dates_information' => 'Dates Information',
+    'notes_information' => 'Notes Information',
+    'order_created_from' => 'Order Created From',
+    'order_created_until' => 'Order Created Until',
+    'shipped_at' => 'Shipped At',
+    'delivered_at' => 'Delivered At',
     // Table
     'table' => [
         'orders' => 'orders',
         'in_stock' => 'in stock',
+        'name' => 'Name',
+        'sku' => 'SKU',
+        'brand' => 'Brand',
+        'current_stock' => 'Current Stock',
+        'threshold' => 'Threshold',
+        'variants' => 'Variants',
+        'tracked' => 'Tracked',
+        'last_updated' => 'Last Updated',
+        'log_type' => 'Log Type',
+        'activity' => 'Activity',
+        'user' => 'User',
+        'email' => 'Email',
+        'subject' => 'Subject',
+        'event' => 'Event',
+        'timestamp' => 'Timestamp',
     ],
     // Analytics
     'analytics' => [

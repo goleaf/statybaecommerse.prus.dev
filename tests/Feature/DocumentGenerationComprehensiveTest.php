@@ -22,9 +22,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->documentService = app(DocumentService::class);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_create_document_template(): void
     {
         $template = DocumentTemplate::factory()->create([
@@ -46,9 +44,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertEquals(['ORDER_NUMBER', 'CUSTOMER_NAME'], $template->variables);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_generate_document_from_template(): void
     {
         $user = User::factory()->create(['name' => 'John Doe']);
@@ -77,9 +73,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertStringContainsString('John Doe', $document->content);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_extract_variables_from_order(): void
     {
         $user = User::factory()->create(['name' => 'Jane Smith', 'email' => 'jane@example.com']);
@@ -103,9 +97,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertEquals('jane@example.com', $variables['CUSTOMER_EMAIL']);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_render_template_with_variables(): void
     {
         $template = DocumentTemplate::factory()->create([
@@ -125,9 +117,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertStringContainsString('Customer: Bob Johnson', $renderedContent);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_generate_pdf_document(): void
     {
         $template = DocumentTemplate::factory()->create([
@@ -145,9 +135,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertStringContainsString('.pdf', $document->file_path);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_generate_html_document(): void
     {
         $template = DocumentTemplate::factory()->create([
@@ -164,9 +152,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertStringContainsString('<h1>HTML Test Document</h1>', $document->content);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_scope_templates_by_type(): void
     {
         DocumentTemplate::factory()->create(['type' => 'invoice']);
@@ -180,9 +166,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertCount(1, $receiptTemplates);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_scope_templates_by_category(): void
     {
         DocumentTemplate::factory()->create(['category' => 'sales']);
@@ -196,9 +180,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertCount(1, $marketingTemplates);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_scope_active_templates(): void
     {
         DocumentTemplate::factory()->create(['is_active' => true]);
@@ -214,9 +196,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_get_available_variables_from_template(): void
     {
         $template = DocumentTemplate::factory()->create([
@@ -232,9 +212,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertContains('ORDER_TOTAL', $availableVariables);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_check_if_template_has_variable(): void
     {
         $template = DocumentTemplate::factory()->create([
@@ -246,9 +224,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertFalse($template->hasVariable('ORDER_TOTAL'));
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_get_template_settings(): void
     {
         $template = DocumentTemplate::factory()->create([
@@ -267,9 +243,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertEquals('10mm', $settings['margins']);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_get_specific_setting_with_default(): void
     {
         $template = DocumentTemplate::factory()->create([
@@ -283,9 +257,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertEquals('portrait', $orientation);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_scope_documents_by_status(): void
     {
         Document::factory()->create(['status' => 'draft']);
@@ -299,9 +271,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertCount(1, $publishedDocuments);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_scope_documents_by_format(): void
     {
         Document::factory()->create(['format' => 'html']);
@@ -315,9 +285,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertCount(1, $pdfDocuments);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_check_if_document_is_generated(): void
     {
         $generatedDocument = Document::factory()->create([
@@ -334,9 +302,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertFalse($notGeneratedDocument->isGenerated());
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_get_file_url_when_file_exists(): void
     {
         $document = Document::factory()->create([
@@ -349,9 +315,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertStringContainsString('documents/test.pdf', $fileUrl);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_null_for_file_url_when_no_file(): void
     {
         $document = Document::factory()->create([
@@ -363,9 +327,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $this->assertNull($fileUrl);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_handles_multilanguage_templates(): void
     {
         $template = DocumentTemplate::factory()->create([

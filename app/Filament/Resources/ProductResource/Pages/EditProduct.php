@@ -10,11 +10,21 @@ final class EditProduct extends EditRecord
 {
     protected static string $resource = ProductResource::class;
 
+    public function getTitle(): string
+    {
+        return __('admin.products.edit');
+    }
+
+    public function getSubheading(): ?string
+    {
+        return __('admin.products.description');
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
+            Actions\ViewAction::make()->label(__('admin.actions.view')),
+            Actions\DeleteAction::make()->label(__('admin.actions.delete')),
         ];
     }
 }

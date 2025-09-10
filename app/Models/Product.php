@@ -14,19 +14,17 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[ObservedBy([ProductObserver::class])]
-final class Product extends Model implements HasMedia
+final class Product extends Model
 {
     use HasFactory, SoftDeletes;
     use HasProductPricing;
     use HasTranslations;
-    use InteractsWithMedia;
     use LogsActivity;
 
     protected $fillable = [
@@ -112,6 +110,16 @@ final class Product extends Model implements HasMedia
         return $this->availableQuantity() < 1;
     }
 
+    public function isVariant(): bool
+    {
+        return $this->type === 'variable' || $this->variants()->exists();
+    }
+
+    public function getStockAttribute(): int
+    {
+        return (int) ($this->stock_quantity ?? 0);
+    }
+
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class, 'product_id');
@@ -142,6 +150,11 @@ final class Product extends Model implements HasMedia
         return $this->hasMany(Review::class);
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+    }
+
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
@@ -152,9 +165,9 @@ final class Product extends Model implements HasMedia
         return $this->hasMany(CartItem::class);
     }
 
-    public function inventories(): MorphMany
+    public function inventories(): HasMany
     {
-        return $this->morphMany(Inventory::class, 'inventoriable');
+        return $this->hasMany(Inventory::class);
     }
 
     public function documents(): MorphMany
@@ -237,36 +250,36 @@ final class Product extends Model implements HasMedia
 
     public function getMainImageAttribute(): ?string
     {
-        return $this->getFirstMediaUrl('images', 'preview') ?: null;
+        $img = $this->images()->orderBy('sort_order')->first();
+        return $img ? $this->resolvePublicUrl($img->path) : null;
     }
 
     public function getThumbnailAttribute(): ?string
     {
-        return $this->getFirstMediaUrl('images', 'thumb') ?: null;
+        $img = $this->images()->orderBy('sort_order')->first();
+        return $img ? $this->resolvePublicUrl($img->path) : null;
     }
 
     public function getImageUrl(?string $size = null): ?string
     {
-        if (!$size) {
-            return $this->getFirstMediaUrl('images') ?: null;
-        }
-
-        return $this->getFirstMediaUrl('images', "image-{$size}") ?: $this->getFirstMediaUrl('images');
+        $img = $this->images()->orderBy('sort_order')->first();
+        return $img ? $this->resolvePublicUrl($img->path) : null;
     }
 
     public function getGalleryImages(): array
     {
-        return $this->getMedia('images')->map(function ($media) {
+        return $this->images()->orderBy('sort_order')->get()->map(function (ProductImage $img) {
+            $url = $this->resolvePublicUrl($img->path);
             return [
-                'original' => $media->getFullUrl(),
-                'xl' => $media->getFullUrl('image-xl'),
-                'lg' => $media->getFullUrl('image-lg'),
-                'md' => $media->getFullUrl('image-md'),
-                'sm' => $media->getFullUrl('image-sm'),
-                'xs' => $media->getFullUrl('image-xs'),
-                'alt' => $media->getCustomProperty('alt_text') ?: $media->name,
-                'title' => $media->name,
-                'generated' => $media->getCustomProperty('generated', false),
+                'original' => $url,
+                'xl' => $url,
+                'lg' => $url,
+                'md' => $url,
+                'sm' => $url,
+                'xs' => $url,
+                'alt' => $img->alt_text ?: $this->name,
+                'title' => $this->name,
+                'generated' => true,
             ];
         })->toArray();
     }
@@ -278,26 +291,25 @@ final class Product extends Model implements HasMedia
 
     public function getAllImageSizes(): array
     {
-        $mainMedia = $this->getFirstMedia('images');
-        
-        if (!$mainMedia) {
+        $img = $this->images()->orderBy('sort_order')->first();
+        if (!$img) {
             return [];
         }
-
+        $url = $this->resolvePublicUrl($img->path);
         return [
-            'original' => $mainMedia->getFullUrl(),
-            'xl' => $mainMedia->getFullUrl('image-xl'),
-            'lg' => $mainMedia->getFullUrl('image-lg'),
-            'md' => $mainMedia->getFullUrl('image-md'),
-            'sm' => $mainMedia->getFullUrl('image-sm'),
-            'xs' => $mainMedia->getFullUrl('image-xs'),
+            'original' => $url,
+            'xl' => $url,
+            'lg' => $url,
+            'md' => $url,
+            'sm' => $url,
+            'xs' => $url,
         ];
     }
 
     public function getResponsiveImageAttributes(?string $defaultSize = 'md'): array
     {
         $images = $this->getAllImageSizes();
-        
+
         if (empty($images)) {
             return [
                 'src' => null,
@@ -308,11 +320,11 @@ final class Product extends Model implements HasMedia
         }
 
         $srcset = [
-            $images['xs'] . ' 150w',
-            $images['sm'] . ' 300w',
-            $images['md'] . ' 500w',
-            $images['lg'] . ' 800w',
-            $images['xl'] . ' 1200w',
+            ($images['xs'] ?? null) ? ($images['xs'] . ' 150w') : null,
+            ($images['sm'] ?? null) ? ($images['sm'] . ' 300w') : null,
+            ($images['md'] ?? null) ? ($images['md'] . ' 500w') : null,
+            ($images['lg'] ?? null) ? ($images['lg'] . ' 800w') : null,
+            ($images['xl'] ?? null) ? ($images['xl'] . ' 1200w') : null,
         ];
 
         return [
@@ -325,94 +337,24 @@ final class Product extends Model implements HasMedia
 
     public function hasImages(): bool
     {
-        return $this->getMedia('images')->isNotEmpty();
+        return $this->images()->exists();
     }
 
     public function getImagesCount(): int
     {
-        return $this->getMedia('images')->count();
+        return (int) $this->images()->count();
     }
 
-    public function registerMediaCollections(): void
+    // Media library removed for product images in favor of product_images table
+
+    // Media conversions removed
+
+    private function resolvePublicUrl(string $path): string
     {
-        $this
-            ->addMediaCollection('images')
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'])
-            ->singleFile(false);
-    }
-
-    public function registerMediaConversions(Media $media = null): void
-    {
-        // Product image conversions with multiple resolutions
-        $this
-            ->addMediaConversion('image-xs')
-            ->performOnCollections('images')
-            ->width(150)
-            ->height(150)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(10)
-            ->optimize();
-
-        $this
-            ->addMediaConversion('image-sm')
-            ->performOnCollections('images')
-            ->width(300)
-            ->height(300)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(10)
-            ->optimize();
-
-        $this
-            ->addMediaConversion('image-md')
-            ->performOnCollections('images')
-            ->width(500)
-            ->height(500)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(10)
-            ->optimize();
-
-        $this
-            ->addMediaConversion('image-lg')
-            ->performOnCollections('images')
-            ->width(800)
-            ->height(800)
-            ->format('webp')
-            ->quality(90)
-            ->sharpen(5)
-            ->optimize();
-
-        $this
-            ->addMediaConversion('image-xl')
-            ->performOnCollections('images')
-            ->width(1200)
-            ->height(1200)
-            ->format('webp')
-            ->quality(90)
-            ->sharpen(5)
-            ->optimize();
-
-        // Legacy conversions for backward compatibility - now in WebP
-        $this
-            ->addMediaConversion('thumb')
-            ->performOnCollections('images')
-            ->width(300)
-            ->height(300)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(10)
-            ->optimize();
-
-        $this
-            ->addMediaConversion('preview')
-            ->performOnCollections('images')
-            ->width(500)
-            ->height(500)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(10)
-            ->optimize();
+        // Assume stored under public disk or public path
+        if (str_starts_with($path, ['http://', 'https://', '/'])) {
+            return $path;
+        }
+        return asset(trim($path, '/'));
     }
 }

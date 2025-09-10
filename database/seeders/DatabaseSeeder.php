@@ -12,20 +12,52 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            // Minimal, usable foundation
+            CurrencySeeder::class,
             RolesAndPermissionsSeeder::class,
-            RolePermissionSeeder::class,
             AdminUserSeeder::class,
-            ComprehensiveMultilanguageSeeder::class,  // Comprehensive multilanguage seeding
-            LithuanianBuilderShopSeeder::class,
+            // Countries and zones for shipping/tax logic
+            CountrySeeder::class,
+            ZoneSeeder::class,
+            ChannelSeeder::class,
+            // Core catalog structure with local images only
             BrandSeeder::class,
             CategorySeeder::class,
-            CollectionSeeder::class,
-            TranslationSeeder::class,  // Add multilanguage support
-            UltraFastProductImageSeeder::class,
-            DocumentTemplateSeeder::class,
-            ComprehensiveOrderSeeder::class,
-            AnalyticsEventSeeder::class,
+            AttributeSeeder::class,
+            AttributeValueSeeder::class,
+            // High‑performance product seeding with attributes, relations, translations, and local images
+            TurboEcommerceSeeder::class,
+            // Enforce max 100 products per brand/category
             EnsureBrandProductsSeeder::class,
+            LocationSeeder::class,
+            InventorySeeder::class,
+            VariantInventorySeeder::class,
+            // Marketing: sample coupons for admin CRUD
+            CouponSeeder::class,
+            // Discounts for admin/discounts CRUD
+            DiscountSeeder::class,
+            // Partners & tiers
+            PartnerTierSeeder::class,
+            PartnerSeeder::class,
+            // Customer segmentation: groups and realistic customers/orders distribution
+            CustomerSegmentationSeeder::class,
+            // High-volume customers for reviews authorship and load testing
+            BulkCustomerSeeder::class,
+            // Normal settings for /admin/normal-settings CRUD
+            NormalSettingSeeder::class,
+            // Comprehensive orders for analytics (current and previous month, with paid statuses)
+            ComprehensiveOrderSeeder::class,
+            // Collections for admin/collections CRUD
+            CollectionSeeder::class,
+            // Product reviews for admin/reviews CRUD
+            ReviewsSeeder::class,
+            // Reports CRUD samples
+            ReportSeeder::class,
+            // Cart items for admin/cart-items CRUD
+            CartItemSeeder::class,
+            // Analytics & SEO
+            AnalyticsEventSeeder::class,
+            SeoDataSeeder::class,
         ]);
     }
 }

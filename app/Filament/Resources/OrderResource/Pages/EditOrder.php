@@ -10,11 +10,21 @@ class EditOrder extends EditRecord
 {
     protected static string $resource = OrderResource::class;
 
+    public function getTitle(): string
+    {
+        return __('admin.orders.edit');
+    }
+
+    public function getSubheading(): ?string
+    {
+        return __('admin.orders.description');
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
+            Actions\ViewAction::make()->label(__('admin.actions.view')),
+            Actions\DeleteAction::make()->label(__('admin.actions.delete')),
         ];
     }
 }

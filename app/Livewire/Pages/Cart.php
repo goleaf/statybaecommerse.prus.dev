@@ -47,6 +47,86 @@ class Cart extends Component
         }
     }
 
+    // Alias to keep shared cart item component working in different contexts
+    public function removeToCart(int $id): void
+    {
+        $this->removeItem($id);
+    }
+
+    public function updateItemQuantity(int $id, int $quantity): void
+    {
+        $quantity = max(0, $quantity);
+        $cart = $this->getCartSession();
+        if (!$cart) {
+            return;
+        }
+
+        if ($quantity === 0) {
+            $cart->remove($id);
+        } else {
+            // Darryldecode\Cart supports absolute updates via ['quantity' => ['relative' => false, 'value' => X]]
+            try {
+                $cart->update($id, [
+                    'quantity' => [
+                        'relative' => false,
+                        'value' => $quantity,
+                    ],
+                ]);
+            } catch (\Throwable $e) {
+                // ignore update failures
+            }
+        }
+
+        $this->dispatch('cartUpdated');
+        $this->refreshTotals();
+    }
+
+    public function incrementItem(int $id): void
+    {
+        $cart = $this->getCartSession();
+        if (!$cart) {
+            return;
+        }
+        try {
+            $cart->update($id, [
+                'quantity' => 1, // relative +1
+            ]);
+        } catch (\Throwable $e) {
+            // ignore
+        }
+        $this->dispatch('cartUpdated');
+        $this->refreshTotals();
+    }
+
+    public function decrementItem(int $id): void
+    {
+        $cart = $this->getCartSession();
+        if (!$cart) {
+            return;
+        }
+        try {
+            // Fetch current quantity to prevent negative
+            $current = 0;
+            foreach ($cart->getContent() as $item) {
+                if ((int) $item->id === (int) $id) {
+                    $current = (int) $item->quantity;
+                    break;
+                }
+            }
+            if ($current <= 1) {
+                $cart->remove($id);
+            } else {
+                $cart->update($id, [
+                    'quantity' => -1, // relative -1
+                ]);
+            }
+        } catch (\Throwable $e) {
+            // ignore
+        }
+        $this->dispatch('cartUpdated');
+        $this->refreshTotals();
+    }
+
     public function render(): View
     {
         $sessionItems = collect();
@@ -61,5 +141,4 @@ class Cart extends Component
         ])->title(__('Your cart'));
     }
 }
-
 

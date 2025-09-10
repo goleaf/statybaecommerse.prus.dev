@@ -67,9 +67,8 @@ final class RecentOrdersWidget extends BaseWidget
                     ->weight('medium'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.table.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->since(),
+                    ->date('Y-m-d')
+                    ->sortable(),
             ])
             ->actions([
                 Actions\Action::make('view')
@@ -91,5 +90,4 @@ final class RecentOrdersWidget extends BaseWidget
             ->paginated(false);
     }
 }
-
 

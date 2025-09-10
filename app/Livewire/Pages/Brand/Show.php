@@ -18,15 +18,17 @@ final class Show extends Component
     public string $sortBy = 'latest';
     public string $priceRange = 'all';
 
-    public function mount(string $slug): void
+    public function mount(Brand $brand): void
     {
-        $this->brand = Brand::query()
-            ->with(['translations' => function ($q) {
-                $q->where('locale', app()->getLocale());
-            }, 'media'])
-            ->where('slug', $slug)
-            ->where('is_enabled', true)
-            ->firstOrFail();
+        // Ensure brand is enabled and load relationships
+        if (!$brand->is_enabled) {
+            abort(404);
+        }
+        
+        $brand->load(['translations' => function ($q) {
+            $q->where('locale', app()->getLocale());
+        }, 'media']);
+        $this->brand = $brand;
     }
 
     public function getProductsProperty()

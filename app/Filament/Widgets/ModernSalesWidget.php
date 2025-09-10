@@ -83,7 +83,7 @@ final class ModernSalesWidget extends BaseWidget
                     ->icon('heroicon-o-cube'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Date'))
-                    ->dateTime('M j, Y H:i')
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable()
                     ->icon('heroicon-o-calendar'),

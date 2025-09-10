@@ -11,11 +11,14 @@ final class SetLocale
 {
     public function handle(Request $request, Closure $next): mixed
     {
+        // Prefer locale from route parameter if present (e.g., /{locale}/...)
+        $routeLocale = $request->route('locale');
         // Allow explicit override via query (?locale=xx)
         $queryLocale = $request->query('locale');
 
         // Get locale from query, session (both keys), cookie, or user preference
-        $locale = $queryLocale
+        $locale = $routeLocale
+            ?? $queryLocale
             ?? Session::get('locale')
             ?? Session::get('app.locale')
             ?? $request->cookie('app_locale')

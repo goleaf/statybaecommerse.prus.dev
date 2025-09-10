@@ -4,7 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,20 +26,30 @@ final class CartItemResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Orders';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Orders;
 
-    protected static ?string $navigationLabel = 'Cart Items';
+    protected static ?string $navigationLabel = null;
 
     protected static ?int $navigationSort = 5;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.orders');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.cart_items');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Cart Item Information')
+                \Filament\Schemas\Components\Section::make(__('admin.cart.items'))
                     ->components([
                         Forms\Components\TextInput::make('session_id')
-                            ->label('Session ID')
+                            ->label(__('admin.cart.fields.session_id'))
                             ->maxLength(255),
                         Forms\Components\Select::make('user_id')
                             ->relationship('user', 'name')
@@ -66,11 +81,11 @@ final class CartItemResource extends Resource
                             ->step(0.01),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Product Snapshot')
+                \Filament\Schemas\Components\Section::make(__('admin.products.view'))
                     ->components([
                         Forms\Components\KeyValue::make('product_snapshot')
-                            ->label('Product Data at Time of Adding')
-                            ->keyLabel('Property')
+                            ->label(__('admin.products.fields.description'))
+                            ->keyLabel('Key')
                             ->valueLabel('Value'),
                     ])
                     ->collapsible(),
@@ -85,21 +100,21 @@ final class CartItemResource extends Resource
                     ->label('ID')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('User')
+                    ->label(__('admin.cart.fields.user'))
                     ->sortable()
                     ->searchable()
                     ->placeholder('Guest'),
                 Tables\Columns\TextColumn::make('session_id')
-                    ->label('Session')
+                    ->label(__('admin.cart.fields.session_id'))
                     ->limit(10)
                     ->tooltip(fn($record) => $record->session_id),
                 Tables\Columns\TextColumn::make('product.name')
-                    ->label('Product')
+                    ->label(__('admin.cart.fields.product'))
                     ->sortable()
                     ->searchable()
                     ->limit(30),
                 Tables\Columns\TextColumn::make('variant.name')
-                    ->label('Variant')
+                    ->label(__('admin.cart.fields.variant'))
                     ->placeholder('No variant')
                     ->limit(20),
                 Tables\Columns\TextColumn::make('quantity')
@@ -112,8 +127,8 @@ final class CartItemResource extends Resource
                     ->money('EUR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Added At')
-                    ->dateTime()
+                    ->label(__('admin.cart.fields.added_at'))
+                    ->date('Y-m-d')
                     ->sortable(),
             ])
             ->filters([
@@ -132,20 +147,29 @@ final class CartItemResource extends Resource
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     BulkAction::make('clear_old_carts')
-                        ->label('Clear Old Cart Items')
+                        ->label(__('admin.cart.clear_old'))
                         ->icon('heroicon-o-trash')
                         ->color('danger')
-                        ->action(function () {
-                            CartItem::where('created_at', '<', now()->subDays(7))->delete();
+                        ->action(function ($records) {
+                            // Respect selected records if provided; otherwise, run global cleanup
+                            if ($records && count($records)) {
+                                foreach ($records as $record) {
+                                    if ($record->created_at < now()->subDays(7)) {
+                                        $record->forceDelete();
+                                    }
+                                }
+                            } else {
+                                CartItem::where('created_at', '<', now()->subDays(7))->forceDelete();
+                            }
                         })
                         ->requiresConfirmation()
-                        ->modalHeading('Clear Old Cart Items')
-                        ->modalDescription('This will delete all cart items older than 7 days. This action cannot be undone.')
-                        ->modalSubmitActionLabel('Clear Old Items'),
+                        ->modalHeading(__('admin.cart.clear_old'))
+                        ->modalDescription(__('admin.messages.confirm_delete'))
+                        ->modalSubmitActionLabel(__('admin.actions.confirm')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

@@ -10,6 +10,7 @@ use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class DocumentResourceTest extends TestCase
@@ -30,7 +31,8 @@ class DocumentResourceTest extends TestCase
             'name' => 'Admin User',
         ]);
 
-        // Give the user admin permissions
+        // Ensure role exists and assign it
+        Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
         $this->adminUser->assignRole('super_admin');
 
         // Create document template
@@ -45,9 +47,7 @@ class DocumentResourceTest extends TestCase
         $this->order = Order::factory()->create();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_render_document_index_page(): void
     {
         $this->actingAs($this->adminUser);
@@ -57,9 +57,7 @@ class DocumentResourceTest extends TestCase
         $response->assertSuccessful();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_list_documents(): void
     {
         $this->actingAs($this->adminUser);
@@ -73,9 +71,7 @@ class DocumentResourceTest extends TestCase
             ->assertCanSeeTableRecords($documents);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_render_document_create_page(): void
     {
         $this->actingAs($this->adminUser);
@@ -85,9 +81,7 @@ class DocumentResourceTest extends TestCase
         $response->assertSuccessful();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_create_document(): void
     {
         $this->actingAs($this->adminUser);
@@ -119,9 +113,7 @@ class DocumentResourceTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_validate_required_fields(): void
     {
         $this->actingAs($this->adminUser);
@@ -135,9 +127,7 @@ class DocumentResourceTest extends TestCase
             ->assertHasFormErrors(['title', 'document_template_id']);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_render_document_edit_page(): void
     {
         $this->actingAs($this->adminUser);
@@ -154,9 +144,7 @@ class DocumentResourceTest extends TestCase
         $response->assertSuccessful();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_retrieve_document_data(): void
     {
         $this->actingAs($this->adminUser);
@@ -178,9 +166,7 @@ class DocumentResourceTest extends TestCase
             ]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_save_document(): void
     {
         $this->actingAs($this->adminUser);
@@ -213,9 +199,7 @@ class DocumentResourceTest extends TestCase
             ->toBe('pdf');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_delete_document(): void
     {
         $this->actingAs($this->adminUser);
@@ -234,9 +218,7 @@ class DocumentResourceTest extends TestCase
         $this->assertModelMissing($document);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_view_document(): void
     {
         $this->actingAs($this->adminUser);
@@ -254,9 +236,7 @@ class DocumentResourceTest extends TestCase
         $response->assertSuccessful();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_filter_documents_by_template(): void
     {
         $this->actingAs($this->adminUser);
@@ -282,9 +262,7 @@ class DocumentResourceTest extends TestCase
             ->assertCanNotSeeTableRecords([$receiptDocument]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_filter_documents_by_status(): void
     {
         $this->actingAs($this->adminUser);
@@ -307,9 +285,7 @@ class DocumentResourceTest extends TestCase
             ->assertCanNotSeeTableRecords([$publishedDocument]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_search_documents(): void
     {
         $this->actingAs($this->adminUser);
@@ -332,9 +308,7 @@ class DocumentResourceTest extends TestCase
             ->assertCanNotSeeTableRecords([$otherDocument]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_bulk_delete_documents(): void
     {
         $this->actingAs($this->adminUser);
@@ -354,9 +328,7 @@ class DocumentResourceTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_generate_pdf_action(): void
     {
         $this->actingAs($this->adminUser);
@@ -376,9 +348,7 @@ class DocumentResourceTest extends TestCase
         // This would depend on your actual PDF generation implementation
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_download_document_action(): void
     {
         $this->actingAs($this->adminUser);
@@ -395,9 +365,7 @@ class DocumentResourceTest extends TestCase
             ->assertActionVisible(TestAction::make('download')->table($document));
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function validates_document_variables_format(): void
     {
         $this->actingAs($this->adminUser);
@@ -412,9 +380,7 @@ class DocumentResourceTest extends TestCase
             ->assertHasFormErrors(['variables']);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_update_document_status(): void
     {
         $this->actingAs($this->adminUser);
@@ -435,9 +401,7 @@ class DocumentResourceTest extends TestCase
         expect($document->refresh()->status)->toBe('published');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_associate_document_with_model(): void
     {
         $this->actingAs($this->adminUser);

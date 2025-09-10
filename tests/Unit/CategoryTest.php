@@ -90,6 +90,7 @@ class CategoryTest extends TestCase
             'description',
             'parent_id',
             'sort_order',
+            'is_enabled',
             'is_visible',
             'seo_title',
             'seo_description',

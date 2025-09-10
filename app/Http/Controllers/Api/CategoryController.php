@@ -27,14 +27,14 @@ final class CategoryController extends Controller
                     'name' => $category->name,
                     'slug' => $category->slug,
                     'description' => $category->description,
-                    'url' => route('categories.show', $category->slug),
+                    'url' => route('category.show', $category->slug),
                     'children' => $category->children->map(function (Category $child) {
                         return [
                             'id' => $child->id,
                             'name' => $child->name,
                             'slug' => $child->slug,
                             'description' => $child->description,
-                            'url' => route('categories.show', $child->slug),
+                            'url' => route('category.show', $child->slug),
                         ];
                     }),
                 ];
@@ -46,4 +46,3 @@ final class CategoryController extends Controller
         ]);
     }
 }
-

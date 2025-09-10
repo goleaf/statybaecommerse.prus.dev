@@ -4,20 +4,19 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
-use App\Services\MultiLanguageTabService;
-use Filament\Forms;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use UnitEnum;
+use Filament\Actions as Actions;
+use Filament\Forms;
+use Filament\Tables;
 use BackedEnum;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
-use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use UnitEnum;
 
 final class PartnerTierResource extends Resource
 {
@@ -25,7 +24,7 @@ final class PartnerTierResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Marketing;
 
     protected static ?int $navigationSort = 2;
 
@@ -43,85 +42,51 @@ final class PartnerTierResource extends Resource
     {
         return $schema
             ->components([
-                // Partner Tier Settings (Non-translatable)
-                Forms\Components\Section::make(__('translations.partner_tier_settings'))
+                Section::make(__('admin.partner_tier.form.basic_info'))
                     ->components([
-                        
-                        Forms\Components\TextInput::make('discount_percentage')
-                            ->label(__('admin.partner_tier.form.discount_percentage'))
+                        Forms\Components\TextInput::make('name')
+                            ->label(__('admin.partner_tier.form.name'))
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('code')
+                            ->label(__('admin.partner_tier.form.code'))
+                            ->required()
+                            ->unique(PartnerTier::class, 'code', ignoreRecord: true)
+                            ->maxLength(100),
+                        Forms\Components\TextInput::make('discount_rate')
+                            ->label(__('admin.partner_tier.form.discount_rate'))
                             ->numeric()
-                            ->suffix('%')
+                            ->step(0.0001)
                             ->minValue(0)
-                            ->maxValue(100)
-                            ->step(0.01)
-                            ->helperText(__('admin.partner_tier.form.discount_help')),
-                        
-                        Forms\Components\TextInput::make('sort_order')
-                            ->label(__('admin.partner_tier.form.sort_order'))
+                            ->maxValue(1)
+                            ->helperText(__('admin.partner_tier.form.discount_rate_help')),
+                        Forms\Components\TextInput::make('commission_rate')
+                            ->label(__('admin.partner_tier.form.commission_rate'))
                             ->numeric()
-                            ->default(0)
-                            ->helperText(__('admin.partner_tier.form.sort_order_help')),
-                        
-                        Forms\Components\Toggle::make('active')
-                            ->label(__('admin.partner_tier.form.active'))
-                            ->default(true),
-                    ])
-                    ->columns(2),
-
-                // Multilanguage Tabs for Partner Tier Content
-                Tabs::make('partner_tier_translations')
-                    ->tabs(
-                        MultiLanguageTabService::createSectionedTabs([
-                            'tier_information' => [
-                                'name' => [
-                                    'type' => 'text',
-                                    'label' => __('translations.name'),
-                                    'required' => true,
-                                    'maxLength' => 255,
-                                ],
-                                'description' => [
-                                    'type' => 'textarea',
-                                    'label' => __('translations.description'),
-                                    'maxLength' => 1000,
-                                    'rows' => 3,
-                                    'placeholder' => __('translations.tier_description_help'),
-                                ],
-                                'benefits' => [
-                                    'type' => 'rich_editor',
-                                    'label' => __('translations.benefits'),
-                                    'toolbar' => ['bold', 'italic', 'link', 'bulletList', 'orderedList'],
-                                    'placeholder' => __('translations.tier_benefits_help'),
-                                ],
-                            ],
-                        ])
-                    )
-                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
-                    ->persistTabInQueryString('partner_tier_tab')
-                    ->contained(false),
-                
-                Forms\Components\Section::make(__('admin.partner_tier.form.requirements'))
-                    ->components([
+                            ->step(0.0001)
+                            ->minValue(0)
+                            ->maxValue(1)
+                            ->helperText(__('admin.partner_tier.form.commission_rate_help')),
                         Forms\Components\TextInput::make('minimum_order_value')
                             ->label(__('admin.partner_tier.form.minimum_order_value'))
                             ->numeric()
                             ->step(0.01)
-                            ->prefix('€')
-                            ->helperText(__('admin.partner_tier.form.minimum_order_help')),
-                        
-                        Forms\Components\TextInput::make('minimum_annual_volume')
-                            ->label(__('admin.partner_tier.form.minimum_annual_volume'))
-                            ->numeric()
-                            ->step(0.01)
-                            ->prefix('€')
-                            ->helperText(__('admin.partner_tier.form.annual_volume_help')),
-                        
-                        Forms\Components\Textarea::make('benefits')
-                            ->label(__('admin.partner_tier.form.benefits'))
-                            ->maxLength(2000)
-                            ->rows(4)
-                            ->helperText(__('admin.partner_tier.form.benefits_help')),
+                            ->prefix('€'),
+                        Forms\Components\Toggle::make('is_enabled')
+                            ->label(__('admin.partner_tier.form.active'))
+                            ->default(true),
                     ])
                     ->columns(2),
+                Section::make(__('admin.partner_tier.form.benefits'))
+                    ->components([
+                        Forms\Components\KeyValue::make('benefits')
+                            ->label(__('admin.partner_tier.form.benefits'))
+                            ->keyLabel(__('admin.partner_tier.form.benefit_key'))
+                            ->valueLabel(__('admin.partner_tier.form.benefit_value'))
+                            ->addButtonLabel(__('admin.partner_tier.form.add_benefit'))
+                            ->reorderable(),
+                    ])
+                    ->columns(1),
             ]);
     }
 
@@ -133,51 +98,40 @@ final class PartnerTierResource extends Resource
                     ->label(__('admin.partner_tier.table.name'))
                     ->searchable()
                     ->sortable(),
-                
-                Tables\Columns\TextColumn::make('discount_percentage')
-                    ->label(__('admin.partner_tier.table.discount_percentage'))
-                    ->numeric(decimalPlaces: 2)
-                    ->suffix('%')
+                Tables\Columns\TextColumn::make('code')
+                    ->label(__('admin.partner_tier.table.code'))
+                    ->searchable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('discount_rate')
+                    ->label(__('admin.partner_tier.table.discount_rate'))
+                    ->formatStateUsing(fn($state) => $state === null ? null : number_format((float) $state * 100, 2) . '%')
                     ->sortable(),
-                
+                Tables\Columns\TextColumn::make('commission_rate')
+                    ->label(__('admin.partner_tier.table.commission_rate'))
+                    ->formatStateUsing(fn($state) => $state === null ? null : number_format((float) $state * 100, 2) . '%')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('minimum_order_value')
-                    ->label(__('admin.partner_tier.table.minimum_order'))
+                    ->label(__('admin.partner_tier.table.minimum_order_value'))
                     ->money('EUR')
                     ->sortable(),
-                
-                Tables\Columns\TextColumn::make('minimum_annual_volume')
-                    ->label(__('admin.partner_tier.table.annual_volume'))
-                    ->money('EUR')
-                    ->sortable(),
-                
                 Tables\Columns\TextColumn::make('partners_count')
                     ->label(__('admin.partner_tier.table.partners_count'))
                     ->counts('partners')
                     ->badge()
                     ->color('info'),
-                
-                Tables\Columns\TextColumn::make('sort_order')
-                    ->label(__('admin.partner_tier.table.sort_order'))
-                    ->sortable(),
-                
-                Tables\Columns\IconColumn::make('active')
+                Tables\Columns\IconColumn::make('is_enabled')
                     ->label(__('admin.partner_tier.table.active'))
                     ->boolean()
                     ->sortable(),
-                
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.partner_tier.table.created_at'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('active')
+                Tables\Filters\TernaryFilter::make('is_enabled')
                     ->label(__('admin.partner_tier.filters.active')),
-                
-                Tables\Filters\Filter::make('has_partners')
-                    ->label(__('admin.partner_tier.filters.has_partners'))
-                    ->query(fn (Builder $query): Builder => $query->has('partners')),
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -189,7 +143,7 @@ final class PartnerTierResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('sort_order');
+            ->defaultSort('name');
     }
 
     public static function getRelations(): array

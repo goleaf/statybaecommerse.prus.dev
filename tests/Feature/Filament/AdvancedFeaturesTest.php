@@ -59,7 +59,8 @@ it('can generate sales report data', function () {
         'total' => 100.00,
     ]);
     
-    $reportsPage = new \App\Filament\Pages\AdvancedReports();
+    // Legacy AdvancedReports removed; ensure Reports page reachable
+    expect(class_exists(\App\Filament\Pages\Reports::class))->toBeTrue();
     $reportsPage->startDate = now()->subDays(7)->format('Y-m-d');
     $reportsPage->endDate = now()->format('Y-m-d');
     

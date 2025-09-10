@@ -8,25 +8,33 @@
                 <div class="hidden mt-10 space-y-8 lg:block">
                     <nav role="navigation" class="flex flex-col space-y-4 lg:pr-12">
                         <x-nav.account-link
-                            :href="route('account')"
-                            :title="__('Overview')"
-                            :active="request()->routeIs('account')"
-                        />
+                                            :href="route('account')"
+                                            :title="__('Overview')"
+                                            :active="request()->routeIs('account')" />
                         <x-nav.account-link
-                            :href="route('account.profile')"
-                            :title="__('Profile')"
-                            :active="request()->routeIs('account.profile')"
-                        />
+                                            :href="route('account.profile')"
+                                            :title="__('Profile')"
+                                            :active="request()->routeIs('account.profile')" />
                         <x-nav.account-link
-                            :href="route('account.addresses')"
-                            :title="__('Addresses')"
-                            :active="request()->routeIs('account.addresses')"
-                        />
+                                            :href="route('account.addresses')"
+                                            :title="__('Addresses')"
+                                            :active="request()->routeIs('account.addresses')" />
                         <x-nav.account-link
-                            :href="route('account.orders')"
-                            :title="__('Orders')"
-                            :active="request()->routeIs('account.orders*')"
-                        />
+                                            :href="route('account.orders')"
+                                            :title="__('Orders')"
+                                            :active="request()->routeIs('account.orders*')" />
+                        <x-nav.account-link
+                                            :href="route('account.wishlist')"
+                                            :title="__('Wishlist')"
+                                            :active="request()->routeIs('account.wishlist')" />
+                        <x-nav.account-link
+                                            :href="route('account.documents')"
+                                            :title="__('Documents')"
+                                            :active="request()->routeIs('account.documents')" />
+                        <x-nav.account-link
+                                            :href="route('account.notifications')"
+                                            :title="__('Notifications')"
+                                            :active="request()->routeIs('account.notifications')" />
                     </nav>
                 </div>
             </div>

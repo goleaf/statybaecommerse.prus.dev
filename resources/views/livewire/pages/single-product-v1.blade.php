@@ -1,11 +1,14 @@
 @section('meta')
-    @php($ogImage = $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?: $product->getFirstMediaUrl(config('media.storage.collection_name')))
+    @php
+        $ogImage = $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large')
+            ?: $product->getFirstMediaUrl(config('media.storage.collection_name'));
+    @endphp
     <x-meta
             :title="$product->name"
             :description="Str::limit(strip_tags($product->description), 150)"
             :og-image="$ogImage"
             ogType="product"
-            canonical="{{ url()->current() }}"
+            :canonical="url()->current()"
             :preload-image="(string) ($ogImage ?: '')" />
 @endsection
 
@@ -45,7 +48,7 @@
                         <h1 class="font-heading text-xl font-semibold text-gray-900 lg:text-2xl">
                             {{ $product->name }}
                         </h1>
-                        <x-product.price :$product class="text-xl font-medium text-gray-900" />
+                        <x-product.price :product="$product" class="text-xl font-medium text-gray-900" />
                     </div>
                     <!-- Reviews -->
                     <div class="mt-4">

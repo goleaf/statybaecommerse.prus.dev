@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Brand;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class BrandSeeder extends Seeder
@@ -157,6 +158,30 @@ class BrandSeeder extends Seeder
                 ]
             );
 
+            // Upsert translations for all supported locales
+            $locales = $this->supportedLocales();
+            $now = now();
+            $trRows = [];
+            foreach ($locales as $loc) {
+                $name = $this->translateLike($brandData['name'], $loc);
+                $trRows[] = [
+                    'brand_id' => $brand->id,
+                    'locale' => $loc,
+                    'name' => $name,
+                    'slug' => Str::slug($name),
+                    'description' => $this->translateLike($brandData['description'], $loc),
+                    'seo_title' => $name,
+                    'seo_description' => $this->translateLike('Originali statybos prekių gamintojo informacija.', $loc),
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+            DB::table('brand_translations')->upsert(
+                $trRows,
+                ['brand_id','locale'],
+                ['name','slug','description','seo_title','seo_description','updated_at']
+            );
+
             // Add logo if brand was created and doesn't have one
             if ($brand->wasRecentlyCreated || !$brand->hasMedia('logo')) {
                 $this->downloadAndAttachImage($brand, $brandData['logo_url'], 'logo', $brandData['name'] . ' Logo');
@@ -205,5 +230,23 @@ class BrandSeeder extends Seeder
         } catch (\Exception $e) {
             $this->command->warn("✗ Failed to generate {$collection} image for {$brand->name}: " . $e->getMessage());
         }
+    }
+
+    private function supportedLocales(): array
+    {
+        return collect(explode(',', (string) config('app.supported_locales', 'lt')))
+            ->map(fn($v) => trim((string) $v))
+            ->filter()->unique()->values()->all();
+    }
+
+    private function translateLike(string $text, string $locale): string
+    {
+        return match ($locale) {
+            'lt' => $text,
+            'en' => $text . ' (EN)',
+            'ru' => $text . ' (RU)',
+            'de' => $text . ' (DE)',
+            default => $text . ' (' . strtoupper($locale) . ')',
+        };
     }
 }

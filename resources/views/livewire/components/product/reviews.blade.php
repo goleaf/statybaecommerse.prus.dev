@@ -17,5 +17,11 @@
                 </li>
             @endforeach
         </ul>
+
+        @if ($reviews->hasPages())
+            <div class="mt-6">
+                {{ $reviews->links('components.pagination') }}
+            </div>
+        @endif
     @endif
 </div>

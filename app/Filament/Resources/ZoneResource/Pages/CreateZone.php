@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ZoneResource\Pages;
 
 use App\Filament\Resources\ZoneResource;
+use App\Models\Zone;
 use Filament\Resources\Pages\CreateRecord;
 
 final class CreateZone extends CreateRecord

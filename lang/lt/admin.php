@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
 
 return [
+    'brand_name' => 'Statyba E-komercija',
     // Navigation
     'navigation' => [
         'dashboard' => 'Valdymo skydas',
+        'commerce' => 'Prekyba',
         'catalog' => 'Katalogas',
         'orders' => 'Užsakymai',
         'customers' => 'Klientai',
@@ -48,6 +50,10 @@ return [
         'currencies' => 'Valiutos',
         'partner_tiers' => 'Partnerių lygiai',
         'discount_codes' => 'Nuolaidų kodai',
+        'user_impersonation' => 'Naudotojų imitavimas',
+        'system_monitoring' => 'Sistemos stebėjimas',
+        'security_audit' => 'Saugumo auditas',
+        'data_import_export' => 'Duomenų importas/eksportas',
         'document_templates' => 'Dokumentų šablonai',
         'enhanced_settings' => 'Patobulinti nustatymai',
         'system_settings' => 'Sistemos nustatymai',
@@ -94,13 +100,44 @@ return [
     'table' => [
         'orders' => 'užsakymai',
         'in_stock' => 'sandėlyje',
+        'name' => 'Pavadinimas',
+        'sku' => 'SKU',
+        'brand' => 'Prekės ženklas',
+        'current_stock' => 'Dabartinės atsargos',
+        'threshold' => 'Slenkstis',
+        'variants' => 'Variantai',
+        'tracked' => 'Sekama',
+        'last_updated' => 'Paskutinį kartą atnaujinta',
+        'log_type' => 'Žurnalo tipas',
+        'activity' => 'Veikla',
+        'user' => 'Naudotojas',
+        'email' => 'El. paštas',
+        'subject' => 'Objektas',
+        'event' => 'Įvykis',
+        'timestamp' => 'Laiko žyma',
     ],
+    // Common
+    'customer' => 'Klientas',
+    'items' => 'Prekės',
+    'order_date' => 'Užsakymo data',
+    'billing_address' => 'Sąskaitos adresas',
+    'shipping_address' => 'Pristatymo adresas',
+    'order_information' => 'Užsakymo informacija',
+    'pricing' => 'Kainodara',
+    'addresses_information' => 'Adresų informacija',
+    'dates_information' => 'Datų informacija',
+    'notes_information' => 'Pastabų informacija',
+    'order_created_from' => 'Užsakymas sukurtas nuo',
+    'order_created_until' => 'Užsakymas sukurtas iki',
+    'shipped_at' => 'Išsiųsta',
+    'delivered_at' => 'Pristatyta',
     // Dashboard
     'dashboard' => [
         'welcome' => 'Sveiki atvykę į administravimo panelę',
         'overview' => 'Apžvalga',
         'quick_stats' => 'Greita statistika',
         'recent_activity' => 'Paskutinė veikla',
+        'description' => 'Tvarkykite parduotuvės turinį, užsakymus, klientus ir nustatymus vienoje vietoje.',
     ],
     // Widgets
     'widgets' => [
@@ -134,10 +171,153 @@ return [
         'edit' => 'Redaguoti',
         'delete' => 'Ištrinti',
         'process' => 'Apdoroti',
+        'impersonate' => 'Imitavimas',
+        'start_impersonation' => 'Pradėti imitavimą',
+        'stop_impersonation' => 'Sustabdyti imitavimą',
+        'view_orders' => 'Peržiūrėti užsakymus',
+        'send_notification' => 'Siųsti pranešimą',
+        'activate' => 'Aktyvuoti',
+        'deactivate' => 'Išjungti',
+    ],
+    // Modals
+    'modals' => [
+        'impersonate_user' => 'Imitavimas naudotoją',
+        'impersonate_description' => 'Ar tikrai norite pradėti imitavimą šio naudotojo? Galėsite peržiūrėti sistemą jo akimis.',
+        'clear_logs_description' => 'Ar tikrai norite ištrinti senesnius nei 6 mėn. žurnalus? Šio veiksmo anuliuoti nepavyks.',
+    ],
+    // Notifications
+    'notifications' => [
+        'cannot_impersonate_admin' => 'Negalite imitavimo administratoriaus',
+        'impersonation_started' => 'Imitavimas pradėtas',
+        'impersonating_user' => 'Dabar imitavimas naudotoją: :name',
+        'impersonation_stopped' => 'Imitavimas sustabdytas',
+        'notification_sent' => 'Pranešimas išsiųstas',
+        'activity_flagged' => 'Veikla pažymėta kaip įtartina',
+        'logs_cleared' => 'Žurnalai sėkmingai išvalyti',
+        'deleted_records' => 'Ištrinta įrašų: :count',
+        'security_scan_completed' => 'Saugumo patikra baigta',
+        'security_issues_found' => 'Rasta saugumo problemų: :count',
+        'audit_log_exported' => 'Audito žurnalas eksportuotas',
+    ],
+    // Security audit helpers
+    'log_types' => [
+        'user' => 'naudotojas',
+        'order' => 'užsakymas',
+        'product' => 'produktas',
+        'security' => 'saugumas',
+    ],
+    'events' => [
+        'created' => 'sukurta',
+        'updated' => 'atnaujinta',
+        'deleted' => 'ištrinta',
+        'login' => 'prisijungimas',
+    ],
+    'security_issues' => [
+        'admin_without_2fa' => 'Administratoriai be 2FA: :count',
+        'inactive_admins' => 'Neaktyvūs administratoriai (nesijungė > 3 mėn.): :count',
+        'suspicious_logins' => 'Įtartinų prisijungimų per 24 val.: :count',
+    ],
+    // Impersonation
+    'impersonation' => [
+        'active_session' => 'Aktyvus imitavimo seansas',
+        'currently_viewing_as' => 'Šiuo metu peržiūrite kaip: :name',
+        'user_management' => 'Naudotojų valdymas',
+        'description' => 'Peržiūrėkite ir valdykite naudotojus, pradėkite imitavimo seansus saugumo tikslais.',
+        'guidelines' => 'Imitavimo gairės',
+        'guideline_1' => 'Naudokite imitavimą tik saugumo tikslais ir problemų sprendimui',
+        'guideline_2' => 'Niekada nekeiskite naudotojo duomenų imitavimo metu',
+        'guideline_3' => 'Imitavimo seansai yra registruojami ir stebimi',
+        'guideline_4' => 'Visada sustabdykite imitavimą baigę darbą',
+    ],
+    // Filters
+    'filters' => [
+        'active_users' => 'Aktyvūs naudotojai',
+        'has_orders' => 'Turi užsakymų',
+        'recent_activity' => 'Neseniai aktyvūs',
+        'log_type' => 'Žurnalo tipas',
+        'event_type' => 'Įvykio tipas',
+        'suspicious_only' => 'Tik įtartini',
+    ],
+    // Tabs
+    'tabs' => [
+        'import_data' => 'Importuoti duomenis',
+        'export_data' => 'Eksportuoti duomenis',
+    ],
+    // Fieldsets
+    'fieldsets' => [
+        'import_options' => 'Importo parinktys',
+        'export_options' => 'Eksporto parinktys',
+    ],
+    // Data Import/Export Fields
+    'fields' => [
+        'data_type' => 'Duomenų tipas',
+        'format' => 'Formatas',
+        'import_file' => 'Importo failas',
+        'update_existing' => 'Atnaujinti esamus įrašus',
+        'validate_data' => 'Validuoti duomenis prieš importą',
+        'skip_errors' => 'Praleisti klaidas ir tęsti',
+        'batch_size' => 'Partijos dydis',
+        'include_relations' => 'Įtraukti ryšius',
+        'include_media' => 'Įtraukti medijos URL',
+        'date_from' => 'Data nuo',
+        'date_to' => 'Data iki',
+        'export_limit' => 'Eksporto limitas',
+    ],
+    // Help texts
+    'help' => [
+        'update_existing_records' => 'Jei įjungta, esami įrašai bus atnaujinti pagal identifikatorių.',
+        'validate_before_import' => 'Prieš importuojant patikrinkite CSV/JSON formatą.',
+        'continue_on_errors' => 'Tęsti importą net ir radus klaidų.',
+        'import_batch_size' => 'Įrašų skaičius vienoje partijoje importo metu.',
+        'export_with_relations' => 'Į eksporto failą įtraukti susijusius įrašus.',
+        'export_media_urls' => 'Įtraukti medijos URL (jei taikoma).',
+        'export_date_range' => 'Apriboti eksportą pagal datų intervalą.',
+        'export_limit' => 'Maksimalus į eksportą įtraukiamų įrašų skaičius.',
+    ],
+    // Data Import/Export Actions
+    'actions' => [
+        'import_data' => 'Importuoti duomenis',
+        'export_data' => 'Eksportuoti duomenis',
+        'download_template' => 'Atsisiųsti šabloną',
+    ],
+    // Data Import/Export Notifications
+    'notifications' => [
+        'import_completed' => 'Importas sėkmingai baigtas',
+        'import_failed' => 'Importas nepavyko',
+        'export_completed' => 'Eksportas sėkmingai baigtas',
+        'export_failed' => 'Eksportas nepavyko',
+        'file_ready_download' => 'Failas paruoštas atsisiųsti',
+        'template_ready' => 'Šablonas paruoštas',
+    ],
+    // Inventory filters & ops
+    'stock_filters' => [
+        'all' => 'Visi',
+        'good_stock' => 'Pakankamos atsargos',
+        'low_stock' => 'Mažos atsargos',
+        'out_of_stock' => 'Nėra atsargų',
+    ],
+    'stock_operations' => [
+        'set_to' => 'Nustatyti į',
+        'increase_by' => 'Padidinti per',
+        'decrease_by' => 'Sumažinti per',
+    ],
+    // Fields
+    'fields' => [
+        'title' => 'Pavadinimas',
+        'message' => 'Žinutė',
+        'notification_type' => 'Pranešimo tipas',
+    ],
+    // Notification Types
+    'notification_types' => [
+        'info' => 'Informacija',
+        'success' => 'Sėkmė',
+        'warning' => 'Įspėjimas',
+        'danger' => 'Pavojus',
     ],
     // Products
     'products' => [
         'title' => 'Produktai',
+        'description' => 'Kurti, redaguoti ir valdyti produktus, jų kainas, atsargas ir aprašymus.',
         'create' => 'Sukurti produktą',
         'edit' => 'Redaguoti produktą',
         'view' => 'Peržiūrėti produktą',
@@ -172,10 +352,18 @@ return [
             'categories' => 'Kategorijos',
             'images' => 'Paveikslėliai',
         ],
+        'variant' => [
+            'sections' => [
+                'information' => 'Varianto informacija',
+                'inventory' => 'Atsargos',
+                'physical_properties' => 'Fizinės savybės',
+            ],
+        ],
     ],
     // Orders
     'orders' => [
         'title' => 'Užsakymai',
+        'description' => 'Peržiūrėkite ir valdykite užsakymus, būsenas, mokėjimus ir pristatymą.',
         'create' => 'Sukurti užsakymą',
         'edit' => 'Redaguoti užsakymą',
         'view' => 'Peržiūrėti užsakymą',
@@ -307,7 +495,21 @@ return [
         'view' => 'Peržiūrėti naudotoją',
         'delete' => 'Ištrinti naudotoją',
         'impersonate' => 'Prisijungti kaip naudotojas',
+        'singular' => 'Naudotojas',
+        'sections' => [
+            'user_information' => 'Naudotojo informacija',
+            'profile_information' => 'Profilio informacija',
+            'roles_permissions' => 'Vaidmenys ir leidimai',
+            'settings' => 'Nustatymai',
+        ],
+        'gender' => [
+            'male' => 'Vyras',
+            'female' => 'Moteris',
+            'other' => 'Kita',
+        ],
         'fields' => [
+            'first_name' => 'Vardas',
+            'last_name' => 'Pavardė',
             'name' => 'Vardas',
             'email' => 'El. paštas',
             'phone' => 'Telefonas',
@@ -321,6 +523,7 @@ return [
             'orders_count' => 'Užsakymų skaičius',
             'total_spent' => 'Iš viso išleista',
         ],
+        'joined' => 'Prisijungė',
     ],
     // Analytics
     'analytics' => [
@@ -331,6 +534,11 @@ return [
         'conversion_rate' => 'Konversijos rodiklis',
         'page_views' => 'Puslapių peržiūros',
         'product_views' => 'Produktų peržiūros',
+        'anonymous' => 'Anoniminis',
+        'session' => 'Sesija',
+        'unknown' => 'Nežinoma',
+        'this_week' => 'Šią savaitę',
+        'this_month' => 'Šį mėnesį',
         'event_types' => [
             'page_view' => 'Puslapio peržiūra',
             'product_view' => 'Produkto peržiūra',
@@ -340,6 +548,15 @@ return [
             'search' => 'Paieška',
             'user_register' => 'Naudotojo registracija',
             'user_login' => 'Naudotojo prisijungimas',
+        ],
+        'sections' => [
+            'event_information' => 'Įvykio informacija',
+            'event_properties' => 'Įvykio savybės',
+            'user_agent' => 'Naršyklės agentas',
+        ],
+        'filters' => [
+            'registered_only' => 'Tik registruoti naudotojai',
+            'anonymous_only' => 'Tik anoniminiai naudotojai',
         ],
     ],
     // Widgets
@@ -398,6 +615,21 @@ return [
         'edit' => 'Redaguoti',
         'delete' => 'Ištrinti',
         'process' => 'Apdoroti',
+        'view_details' => 'Peržiūrėti detales',
+        'close' => 'Uždaryti',
+        'flag_suspicious' => 'Pažymėti įtartina',
+        'security_scan' => 'Saugumo patikra',
+        'export_audit_log' => 'Eksportuoti audito žurnalą',
+        'clear_old_logs' => 'Išvalyti senus žurnalus',
+        'download' => 'Atsisiųsti',
+        'filter_stock' => 'Filtruoti atsargas',
+        'update_stock' => 'Atnaujinti atsargas',
+        'view_variants' => 'Peržiūrėti variantus',
+        'bulk_stock_update' => 'Masinis atsargų atnaujinimas',
+        'enable_tracking' => 'Įjungti sekimą',
+        'disable_tracking' => 'Išjungti sekimą',
+        'export_inventory' => 'Eksportuoti atsargas',
+        'low_stock_alert' => 'Mažų atsargų įspėjimas',
     ],
     // Charts
     'charts' => [
@@ -634,6 +866,9 @@ return [
         'deactivate' => 'Deaktyvuoti',
         'enable' => 'Įjungti',
         'disable' => 'Išjungti',
+        'restore' => 'Atkurti',
+        'activate_selected' => 'Aktyvuoti pasirinktus',
+        'deactivate_selected' => 'Išjungti pasirinktus',
     ],
     // Messages
     'messages' => [
@@ -654,6 +889,7 @@ return [
         'roles_created' => 'Vaidmenys sukurti',
         'seeder_success' => 'Duomenų įkėlimas sėkmingas',
         'language_changed' => 'Kalba sėkmingai pakeista',
+        'not_provided' => 'Nepateikta',
     ],
     // Time periods
     'periods' => [

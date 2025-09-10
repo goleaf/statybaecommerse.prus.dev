@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Enums\NavigationGroup as NavEnum;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -28,7 +29,7 @@ final class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('E-Commerce Admin')
+            ->brandName(__('admin.brand_name'))
             ->brandLogo(asset('images/logo-admin.svg'))
             ->brandLogoHeight('2rem')
             ->favicon(asset('images/favicon.ico'))
@@ -54,11 +55,12 @@ final class AdminPanelProvider extends PanelProvider
                 StartSession::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
+                // Set locale as early as possible so Filament builds UI in correct language
+                \App\Http\Middleware\SetFilamentLocale::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                \App\Http\Middleware\SetFilamentLocale::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -71,7 +73,6 @@ final class AdminPanelProvider extends PanelProvider
             ->maxContentWidth('full')
             ->font('Inter')
             ->darkMode()
-            ->brandName('Statyba E-Commerce')
             ->globalSearch()
             ->globalSearchDebounce('500ms')
             ->breadcrumbs()
@@ -79,36 +80,12 @@ final class AdminPanelProvider extends PanelProvider
             ->databaseTransactions()
             ->readOnlyRelationManagersOnResourceViewPagesByDefault()
             ->navigationGroups([
-                NavigationGroup::make()
-                    ->label(__('admin.navigation.dashboard'))
-                    ->icon('heroicon-o-home'),
-                NavigationGroup::make()
-                    ->label(__('admin.navigation.catalog'))
-                    ->icon('heroicon-o-cube'),
-                NavigationGroup::make()
-                    ->label(__('admin.navigation.orders'))
-                    ->icon('heroicon-o-shopping-bag'),
-                NavigationGroup::make()
-                    ->label(__('admin.navigation.customers'))
-                    ->icon('heroicon-o-users'),
-                NavigationGroup::make()
-                    ->label(__('admin.navigation.marketing'))
-                    ->icon('heroicon-o-megaphone'),
-                NavigationGroup::make()
-                    ->label(__('admin.navigation.partners'))
-                    ->icon('heroicon-o-building-office'),
-                NavigationGroup::make()
-                    ->label(__('admin.navigation.content'))
-                    ->icon('heroicon-o-document-text'),
-                NavigationGroup::make()
-                    ->label(__('admin.navigation.documents'))
-                    ->icon('heroicon-o-document-duplicate'),
-                NavigationGroup::make()
-                    ->label(__('admin.navigation.settings'))
-                    ->icon('heroicon-o-cog-6-tooth'),
-                NavigationGroup::make()
-                    ->label(__('admin.navigation.system'))
-                    ->icon('heroicon-o-server'),
+                NavigationGroup::make()->label(__('admin.navigation.dashboard'))->icon('heroicon-o-home'),
+                NavigationGroup::make()->label(__('admin.navigation.commerce'))->icon('heroicon-o-shopping-bag'),
+                NavigationGroup::make()->label(__('admin.navigation.marketing'))->icon('heroicon-o-megaphone'),
+                NavigationGroup::make()->label(__('admin.navigation.content'))->icon('heroicon-o-document-text'),
+                NavigationGroup::make()->label(__('admin.navigation.analytics'))->icon('heroicon-o-chart-bar'),
+                NavigationGroup::make()->label(__('admin.navigation.system'))->icon('heroicon-o-cog-6-tooth'),
             ])
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()

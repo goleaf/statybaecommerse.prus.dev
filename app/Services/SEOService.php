@@ -19,10 +19,10 @@ final class SEOService
             'title' => $title,
             'description' => $description,
             'keywords' => $keywords,
-            'canonical' => route('products.show', $product->slug),
+            'canonical' => route('product.show', $product->slug),
             'og_title' => $title,
             'og_description' => $description,
-            'og_image' => $product->getFirstMediaUrl('product-images', 'medium'),
+            'og_image' => $product->getFirstMediaUrl('images', 'image-lg') ?: $product->getFirstMediaUrl('images'),
             'og_type' => 'product',
             'product_price' => number_format($product->price, 2),
             'product_currency' => 'EUR',
@@ -38,10 +38,10 @@ final class SEOService
         return [
             'title' => $title,
             'description' => $description,
-            'canonical' => route('categories.show', $category->slug),
+            'canonical' => route('category.show', $category->slug),
             'og_title' => $title,
             'og_description' => $description,
-            'og_image' => $category->getFirstMediaUrl('images', 'medium'),
+            'og_image' => $category->getFirstMediaUrl('images', 'image-lg') ?: $category->getFirstMediaUrl('images'),
             'og_type' => 'website',
         ];
     }
@@ -57,7 +57,7 @@ final class SEOService
             'canonical' => route('brands.show', $brand->slug),
             'og_title' => $title,
             'og_description' => $description,
-            'og_image' => $brand->getFirstMediaUrl('logos', 'medium'),
+            'og_image' => $brand->getFirstMediaUrl('logo', 'logo-md') ?: $brand->getFirstMediaUrl('logo'),
             'og_type' => 'website',
         ];
     }
@@ -85,7 +85,7 @@ final class SEOService
             'name' => $product->name,
             'description' => strip_tags($product->description),
             'sku' => $product->sku,
-            'image' => $product->getFirstMediaUrl('product-images', 'large'),
+            'image' => $product->getFirstMediaUrl('images', 'image-lg') ?: $product->getFirstMediaUrl('images'),
             'brand' => [
                 '@type' => 'Brand',
                 'name' => $product->brand?->name ?? config('app.name'),

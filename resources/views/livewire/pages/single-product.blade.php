@@ -1,11 +1,15 @@
 @section('meta')
-    @php($ogImage = $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?: $product->getFirstMediaUrl(config('media.storage.collection_name')))
+    @php
+        $ogImage =
+            $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?:
+            $product->getFirstMediaUrl(config('media.storage.collection_name'));
+    @endphp
     <x-meta
             :title="$product->trans('seo_title') ?? $product->name"
             :description="$product->trans('seo_description') ?? Str::limit(strip_tags($product->description), 150)"
             :og-image="$ogImage"
             ogType="product"
-            canonical="{{ url()->current() }}"
+            :canonical="url()->current()"
             :preload-image="(string) ($ogImage ?: '')" />
 @endsection
 
@@ -19,24 +23,28 @@
     <div class="pb-16 pt-10 sm:pb-24">
         <x-container class="mt-8 max-w-2xl">
             <x-breadcrumbs :items="[
-                ['label' => __('Products'), 'url' => route('home', ['locale' => app()->getLocale()])],
+                [
+                    'label' => __('frontend.navigation.products'),
+                    'url' => route('products.index', ['locale' => app()->getLocale()]),
+                ],
                 [
                     'label' => $product->brand?->trans('name') ?? $product->brand?->name,
-                    'url' => $product->brand
-                        ? route('brand.show', [
-                            'locale' => app()->getLocale(),
-                            'slug' => $product->brand->trans('slug') ?? $product->brand->slug,
-                        ])
-                        : null,
+                    'url' =>
+                        $product->brand && function_exists('route') && Route::has('brands.show')
+                            ? route('brands.show', [
+                                'locale' => app()->getLocale(),
+                                'brand' => $product->brand->trans('slug') ?? $product->brand->slug,
+                            ])
+                            : null,
                 ],
                 ['label' => $product->trans('name') ?? $product->name],
-            ]" />
+            ]" aria-label="{{ __('frontend.navigation.breadcrumbs') }}" />
             <div class="lg:grid lg:grid-cols-12 lg:gap-x-8">
                 <div class="lg:col-span-3">
                     <aside class="space-y-10 lg:sticky lg:top-40" aria-labelledby="product-description">
                         <!-- Product details -->
                         <div>
-                            <h2 class="text-sm font-medium text-gray-900">{{ __('Description') }}</h2>
+                            <h2 class="text-sm font-medium text-gray-900">{{ __('frontend.products.description') }}</h2>
 
                             <div class="prose prose-sm mt-4 text-gray-500">
                                 {!! $product->trans('description') ?? $product->description !!}
@@ -52,7 +60,7 @@
                 <!-- Product gallery -->
                 <div class="lg:col-span-6 lg:px-8">
                     <div wire:loading role="status" aria-live="polite" class="mb-4 text-sm text-gray-600">
-                        {{ __('Loading…') }}
+                        {{ __('frontend.buttons.loading') }}
                     </div>
 
                     {{-- Enhanced Image Gallery Component --}}
@@ -71,11 +79,11 @@
 
                 <div class="lg:col-span-3">
                     <aside class="space-y-10 lg:sticky lg:top-40" aria-labelledby="product-variant">
-                        <livewire:components.variants-selector :$product />
+                        <livewire:components.variants-selector :product="$product" />
 
                         <!-- Policies -->
                         <section aria-labelledby="policies-heading">
-                            <h2 id="policies-heading" class="sr-only">{{ __('Our privacy') }}</h2>
+                            <h2 id="policies-heading" class="sr-only">{{ __('frontend.products.policies_title') }}</h2>
 
                             <dl class="space-y-4">
                                 <div class="border border-gray-200 bg-gray-50 p-6">
@@ -83,10 +91,10 @@
                                         <x-untitledui-globe-05 class="size-6 text-gray-400" stroke-width="1.5"
                                                                aria-hidden="true" />
                                         <span
-                                              class="text-sm font-medium text-gray-900">{{ __('International delivery') }}</span>
+                                              class="text-sm font-medium text-gray-900">{{ __('frontend.products.international_delivery') }}</span>
                                     </dt>
                                     <dd class="mt-1 text-sm text-gray-500">
-                                        {{ __('Get your order in 2 weeks') }}
+                                        {{ __('frontend.products.delivery_eta_2_weeks') }}
                                     </dd>
                                 </div>
                                 <div class="border border-gray-200 bg-gray-50 p-6">
@@ -94,10 +102,10 @@
                                         <x-untitledui-gift-02 class="size-6 text-gray-400" stroke-width="1.5"
                                                               aria-hidden="true" />
                                         <span
-                                              class="text-sm font-medium text-gray-900">{{ __('Loyalty rewards') }}</span>
+                                              class="text-sm font-medium text-gray-900">{{ __('frontend.products.loyalty_rewards') }}</span>
                                     </dt>
                                     <dd class="mt-1 text-sm text-gray-500">
-                                        {{ __('Don\'t look at other tees') }}
+                                        {{ __('frontend.products.loyalty_rewards_desc') }}
                                     </dd>
                                 </div>
                             </dl>

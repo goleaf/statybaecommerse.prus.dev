@@ -22,7 +22,6 @@ final class Setting extends Model
     ];
 
     protected $casts = [
-        'value' => 'array',
         'is_public' => 'boolean',
         'is_required' => 'boolean',
         'is_encrypted' => 'boolean',

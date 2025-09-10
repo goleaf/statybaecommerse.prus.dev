@@ -9,26 +9,29 @@ final class SingleProduct extends Component
 {
     public Product $product;
 
-    public function mount(string $slug): void
+    public function mount(Product $product): void
     {
-        $this->product = Product::where('slug', $slug)
-            ->where('is_visible', true)
-            ->with(['brand', 'categories', 'media', 'variants', 'reviews'])
-            ->firstOrFail();
+        // Ensure product is visible and load relationships
+        if (!$product->is_visible) {
+            abort(404);
+        }
+
+        $product->load(['brand', 'categories', 'media', 'variants', 'reviews']);
+        $this->product = $product;
     }
 
     public function getRelatedProductsProperty()
     {
         // Get related products from the same categories
         $categoryIds = $this->product->categories->pluck('id')->toArray();
-        
+
         if (empty($categoryIds)) {
             return collect();
         }
-        
+
         return Product::whereHas('categories', function ($query) use ($categoryIds) {
-                $query->whereIn('category_id', $categoryIds);
-            })
+            $query->whereIn('category_id', $categoryIds);
+        })
             ->where('id', '!=', $this->product->id)
             ->where('is_visible', true)
             ->with(['media', 'brand'])
@@ -40,8 +43,8 @@ final class SingleProduct extends Component
     {
         return view('livewire.pages.single-product', [
             'relatedProducts' => $this->relatedProducts,
-        ])->layout('components.layouts.base', [
-            'title' => $this->product->name
+        ])->layout('components.layouts.templates.app', [
+            'title' => $this->product->name,
         ]);
     }
 }

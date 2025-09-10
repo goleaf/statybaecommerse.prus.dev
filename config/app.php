@@ -84,7 +84,7 @@ return [
      * | and sitemap generation. Example: "en,lt,de".
      * |
      */
-    'supported_locales' => env('APP_SUPPORTED_LOCALES', 'lt,en,de'),
+    'supported_locales' => env('APP_SUPPORTED_LOCALES', 'lt,en,ru,de'),
 
     /*
      * |--------------------------------------------------------------------------

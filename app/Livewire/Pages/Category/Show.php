@@ -14,12 +14,15 @@ final class Show extends Component
     public string $sortBy = 'created_at';
     public string $sortDirection = 'desc';
 
-    public function mount(string $slug): void
+    public function mount(Category $category): void
     {
-        $this->category = Category::where('slug', $slug)
-            ->where('is_visible', true)
-            ->with(['media'])
-            ->firstOrFail();
+        // Ensure category is visible and load media
+        if (!$category->is_visible) {
+            abort(404);
+        }
+        
+        $category->load(['media']);
+        $this->category = $category;
     }
 
     public function getProductsProperty()

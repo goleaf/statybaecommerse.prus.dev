@@ -20,9 +20,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->translationService = new TranslationService();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_get_lithuanian_translations(): void
     {
         App::setLocale('lt');
@@ -34,9 +32,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertEquals('Valdymo skydas', $translation);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_get_english_translations(): void
     {
         App::setLocale('en');
@@ -49,18 +45,14 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertNotEmpty($translation);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_key_when_translation_not_found(): void
     {
         $translation = $this->translationService->getTranslation('non.existent.key');
         $this->assertEquals('non.existent.key', $translation);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_supports_parameter_replacement(): void
     {
         App::setLocale('lt');
@@ -74,9 +66,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertStringContainsString('%', $translation);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_caches_translations(): void
     {
         Cache::flush();
@@ -90,9 +80,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertEquals($translation1, $translation2);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_clear_translation_cache(): void
     {
         // Cache a translation
@@ -106,9 +94,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertNotEmpty($translation);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_supports_all_configured_locales(): void
     {
         $supportedLocales = $this->translationService->getSupportedLocales();
@@ -118,18 +104,14 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertContains('de', $supportedLocales);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_has_correct_default_locale(): void
     {
         $defaultLocale = $this->translationService->getDefaultLocale();
         $this->assertEquals('lt', $defaultLocale);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_validates_locale_support(): void
     {
         $this->assertTrue($this->translationService->isLocaleSupported('lt'));
@@ -138,9 +120,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertFalse($this->translationService->isLocaleSupported('fr'));
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_euro_currency_for_all_locales(): void
     {
         $this->assertEquals('EUR', $this->translationService->getCurrentCurrency());
@@ -152,9 +132,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertEquals('EUR', $this->translationService->getCurrentCurrency());
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_get_all_translations_for_locale(): void
     {
         App::setLocale('lt');
@@ -166,9 +144,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertArrayHasKey('translations.todays_orders', $allTranslations);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_loads_translations_from_json_files(): void
     {
         App::setLocale('lt');
@@ -178,9 +154,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertEquals('Šiandienos užsakymai', $translation);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_loads_translations_from_php_files(): void
     {
         App::setLocale('lt');
@@ -190,9 +164,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertEquals('Valdymo skydas', $translation);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_handles_dot_notation_correctly(): void
     {
         App::setLocale('lt');
@@ -201,9 +173,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertNotEmpty($translation);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function widget_translations_are_available(): void
     {
         App::setLocale('lt');
@@ -214,9 +184,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertNotEmpty(__('admin.widgets.realtime_analytics'));
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function dashboard_translations_are_available(): void
     {
         App::setLocale('lt');
@@ -231,9 +199,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertNotEmpty(__('translations.total_users'));
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function navigation_translations_are_available(): void
     {
         App::setLocale('lt');
@@ -248,9 +214,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertNotEmpty(__('admin.navigation.system'));
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function currency_and_partner_translations_are_available(): void
     {
         App::setLocale('lt');
@@ -268,9 +232,7 @@ final class TranslationSystemComprehensiveTest extends TestCase
         $this->assertNotEmpty(__('admin.partner_tier.singular'));
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function model_translations_are_available(): void
     {
         App::setLocale('lt');

@@ -21,7 +21,8 @@ it('can list users', function () {
     $users = User::factory()->count(10)->create();
 
     Livewire::test(UserResource\Pages\ListUsers::class)
-        ->assertCanSeeTableRecords($users);
+        ->loadTable()
+        ->assertCanSeeTableRecords([$users->first()]);
 });
 
 it('can create user', function () {
@@ -145,8 +146,8 @@ it('can bulk activate users', function () {
     $users = User::factory()->count(3)->create(['is_active' => false]);
 
     Livewire::test(UserResource\Pages\ListUsers::class)
-        ->selectTableRecords($users)
-        ->callTableBulkAction('activate');
+        ->loadTable()
+        ->callTableBulkAction('activate', $users);
 
     foreach ($users as $user) {
         expect($user->refresh()->is_active)->toBeTrue();

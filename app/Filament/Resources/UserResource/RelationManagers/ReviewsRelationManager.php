@@ -4,7 +4,7 @@ namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use App\Models\Review;
 use Filament\Forms;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -79,7 +79,7 @@ final class ReviewsRelationManager extends RelationManager
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable(),
             ])
             ->filters([

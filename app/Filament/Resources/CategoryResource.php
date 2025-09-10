@@ -4,18 +4,22 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
-use App\Services\MultiLanguageTabService;
-use Filament\Tables\Actions\Action;
+// use App\Services\MultiLanguageTabService;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
+// use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+// use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use BackedEnum;
 use UnitEnum;
 
@@ -25,17 +29,37 @@ final class CategoryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-folder';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Catalog';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
 
     protected static ?int $navigationSort = 3;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.catalog');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.categories');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                // Main Category Information (Non-translatable)
-                Forms\Components\Section::make(__('translations.category_information'))
+                Section::make(__('translations.category_information'))
                     ->components([
+                        Forms\Components\TextInput::make('name')
+                            ->label(__('translations.name'))
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('slug')
+                            ->label(__('translations.slug'))
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('description')
+                            ->label(__('translations.description'))
+                            ->rows(3),
                         Forms\Components\Select::make('parent_id')
                             ->label(__('translations.parent_category'))
                             ->relationship('parent', 'name')
@@ -54,8 +78,18 @@ final class CategoryResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-                // Category Images Section
-                Forms\Components\Section::make(__('translations.category_images'))
+                Section::make(__('translations.seo_information'))
+                    ->components([
+                        Forms\Components\TextInput::make('seo_title')
+                            ->label(__('translations.seo_title'))
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('seo_description')
+                            ->label(__('translations.seo_description'))
+                            ->rows(3)
+                            ->maxLength(300),
+                    ])
+                    ->columns(2),
+                Section::make(__('translations.category_images'))
                     ->components([
                         Forms\Components\SpatieMediaLibraryFileUpload::make('images')
                             ->label(__('translations.category_image'))
@@ -64,7 +98,7 @@ final class CategoryResource extends Resource
                             ->imageEditor()
                             ->imageEditorAspectRatios(['1:1'])
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'])
-                            ->maxSize(5120)  // 5MB
+                            ->maxSize(5120)
                             ->helperText(__('translations.category_image_help'))
                             ->columnSpanFull(),
                         Forms\Components\SpatieMediaLibraryFileUpload::make('banner')
@@ -74,55 +108,11 @@ final class CategoryResource extends Resource
                             ->imageEditor()
                             ->imageEditorAspectRatios(['2:1', '16:9'])
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
-                            ->maxSize(10240)  // 10MB
+                            ->maxSize(10240)
                             ->helperText(__('translations.category_banner_help'))
                             ->columnSpanFull(),
                     ])
                     ->columns(1),
-                // Multilanguage Tabs for Translatable Content
-                Tabs::make('category_translations')
-                    ->tabs(
-                        MultiLanguageTabService::createSectionedTabs([
-                            'basic_information' => [
-                                'name' => [
-                                    'type' => 'text',
-                                    'label' => __('translations.name'),
-                                    'required' => true,
-                                    'maxLength' => 255,
-                                ],
-                                'slug' => [
-                                    'type' => 'text',
-                                    'label' => __('translations.slug'),
-                                    'required' => true,
-                                    'maxLength' => 255,
-                                    'placeholder' => __('translations.slug_auto_generated'),
-                                ],
-                                'description' => [
-                                    'type' => 'rich_editor',
-                                    'label' => __('translations.description'),
-                                    'toolbar' => ['bold', 'italic', 'link', 'bulletList', 'orderedList', 'h2', 'h3'],
-                                ],
-                            ],
-                            'seo_information' => [
-                                'seo_title' => [
-                                    'type' => 'text',
-                                    'label' => __('translations.seo_title'),
-                                    'maxLength' => 255,
-                                    'placeholder' => __('translations.seo_title_help'),
-                                ],
-                                'seo_description' => [
-                                    'type' => 'textarea',
-                                    'label' => __('translations.seo_description'),
-                                    'maxLength' => 300,
-                                    'rows' => 3,
-                                    'placeholder' => __('translations.seo_description_help'),
-                                ],
-                            ],
-                        ])
-                    )
-                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
-                    ->persistTabInQueryString('category_tab')
-                    ->contained(false),
             ]);
     }
 
@@ -131,7 +121,7 @@ final class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('images')
-                    ->label('Image')
+                    ->label(__('translations.image'))
                     ->collection('images')
                     ->conversion('image-sm')
                     ->circular()
@@ -143,31 +133,29 @@ final class CategoryResource extends Resource
                     ->searchable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('parent.name')
-                    ->label('Parent Category')
+                    ->label(__('translations.parent_category'))
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('sort_order')
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
-                Tables\Columns\IconColumn::make('is_enabled')
-                    ->boolean()
-                    ->label('Enabled')
+                Tables\Columns\ToggleColumn::make('is_enabled')
+                    ->label(__('translations.enabled'))
                     ->sortable(),
-                Tables\Columns\IconColumn::make('is_visible')
-                    ->boolean()
-                    ->label('Visible')
+                Tables\Columns\ToggleColumn::make('is_visible')
+                    ->label(__('translations.visible'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('products_count')
                     ->counts('products')
-                    ->label('Products')
+                    ->label(__('admin.models.products'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -177,12 +165,19 @@ final class CategoryResource extends Resource
                     ->query(fn($query) => $query->where('is_enabled', true)),
                 Tables\Filters\Filter::make('visible')
                     ->query(fn($query) => $query->where('is_visible', true)),
+                Tables\Filters\Filter::make('root_categories')
+                    ->query(fn($query) => $query->whereNull('parent_id')),
                 Tables\Filters\SelectFilter::make('parent_id')
                     ->relationship('parent', 'name')
                     ->searchable()
                     ->preload(),
             ])
             ->recordActions([
+                Action::make('create_subcategory')
+                    ->label(__('translations.create_subcategory'))
+                    ->icon('heroicon-o-plus')
+                    ->color('primary')
+                    ->url(fn($record) => self::getUrl('create', ['parent_id' => $record->getKey()])),
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
@@ -194,13 +189,19 @@ final class CategoryResource extends Resource
                     Actions\RestoreBulkAction::make(),
                 ]),
             ])
+            ->groups([
+                Tables\Grouping\Group::make('parent.name')
+                    ->label(__('translations.parent_category'))
+                    ->collapsible(),
+            ])
+            ->reorderable('sort_order')
             ->defaultSort('sort_order', 'asc');
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            CategoryResource\RelationManagers\ChildrenRelationManager::class,
         ];
     }
 

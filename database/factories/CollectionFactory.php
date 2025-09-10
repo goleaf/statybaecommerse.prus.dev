@@ -21,23 +21,28 @@ class CollectionFactory extends Factory
             'name' => Str::title($name),
             'slug' => Str::slug($name . '-' . $this->faker->unique()->randomNumber()),
             'description' => $this->faker->boolean(60) ? '<p>' . $this->faker->paragraphs(2, true) . '</p>' : null,
-            'type' => $this->faker->randomElement(['manual', 'auto']),
-            'is_enabled' => true,
+            'is_visible' => true,
+            'sort_order' => $this->faker->numberBetween(0, 10),
             'seo_title' => $this->faker->boolean(40) ? $this->faker->sentence(6) : null,
             'seo_description' => $this->faker->boolean(40) ? $this->faker->sentence(12) : null,
-            'metadata' => null,
+            'is_automatic' => $this->faker->boolean(30),
+            'rules' => null,
+            'max_products' => $this->faker->boolean(30) ? $this->faker->numberBetween(5, 50) : null,
         ];
     }
 
     public function configure(): static
     {
         return $this->afterCreating(function (Collection $collection): void {
+            if (app()->environment('testing')) {
+                return;  // skip media in tests to avoid GD errors
+            }
             $paths = ['demo/collection.jpg', 'demo/collection.png', 'demo/tshirt.jpg'];
             foreach ($paths as $path) {
                 if (Storage::disk('public')->exists($path)) {
                     $collection
                         ->addMedia(Storage::disk('public')->path($path))
-                        ->toMediaCollection('collections');
+                        ->toMediaCollection('images');
                     break;
                 }
             }

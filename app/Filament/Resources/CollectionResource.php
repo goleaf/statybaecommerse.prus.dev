@@ -5,19 +5,23 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use App\Services\MultiLanguageTabService;
-use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
+use Filament\Actions as Actions;
+use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use BackedEnum;
+use UnitEnum;
 
 final class CollectionResource extends Resource
 {
@@ -25,16 +29,26 @@ final class CollectionResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Catalog';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
 
     protected static ?int $navigationSort = 3;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.catalog');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.collections');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 // Main Collection Information (Non-translatable)
-                Forms\Components\Section::make(__('translations.collection_information'))
+                Section::make(__('translations.collection_information'))
                     ->components([
                         Forms\Components\TextInput::make('sort_order')
                             ->label(__('translations.sort_order'))
@@ -54,9 +68,8 @@ final class CollectionResource extends Resource
                             ->live(),
                     ])
                     ->columns(2),
-
                 // Collection Rules Section
-                Forms\Components\Section::make(__('translations.collection_rules'))
+                Section::make(__('translations.collection_rules'))
                     ->components([
                         Forms\Components\Textarea::make('rules')
                             ->label(__('translations.collection_rules'))
@@ -66,7 +79,6 @@ final class CollectionResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->visible(fn(Forms\Get $get): bool => $get('is_automatic') === true),
-
                 // Multilanguage Tabs for Translatable Content
                 Tabs::make('collection_translations')
                     ->tabs(
@@ -125,38 +137,33 @@ final class CollectionResource extends Resource
                     ->searchable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('type')
+                    ->label(__('translations.type'))
+                    ->formatStateUsing(fn($record): string => $record->is_automatic ? 'automatic' : 'manual')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'manual' => 'primary',
-                        'automatic' => 'success',
-                        default => 'gray',
-                    }),
+                    ->color(fn($record): string => $record->is_automatic ? 'success' : 'primary'),
                 Tables\Columns\TextColumn::make('products_count')
                     ->counts('products')
                     ->label('Products')
                     ->sortable(),
-                Tables\Columns\IconColumn::make('is_enabled')
-                    ->boolean()
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('is_featured')
+                Tables\Columns\IconColumn::make('is_visible')
+                    ->label(__('translations.visible'))
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('type')
+                Tables\Filters\SelectFilter::make('is_automatic')
+                    ->label(__('translations.type'))
                     ->options([
-                        'manual' => 'Manual',
-                        'automatic' => 'Automatic',
+                        0 => 'Manual',
+                        1 => 'Automatic',
                     ]),
-                Tables\Filters\Filter::make('enabled')
-                    ->query(fn($query) => $query->where('is_enabled', true)),
-                Tables\Filters\Filter::make('featured')
-                    ->query(fn($query) => $query->where('is_featured', true)),
+                Tables\Filters\Filter::make('visible')
+                    ->query(fn($query) => $query->where('is_visible', true)),
             ])
             ->recordActions([
                 ViewAction::make(),

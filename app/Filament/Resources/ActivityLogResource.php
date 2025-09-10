@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityLogResource\Pages;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
@@ -18,13 +19,13 @@ final class ActivityLogResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Settings';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::System;
 
     protected static ?int $navigationSort = 10;
 
     public static function getNavigationLabel(): string
     {
-        return __('Activity Log');
+        return __('admin.navigation.activity_logs');
     }
 
     public static function getModelLabel(): string
@@ -70,7 +71,7 @@ final class ActivityLogResource extends Resource
                     ->default(__('System')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Date'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(),
             ])
@@ -113,7 +114,7 @@ final class ActivityLogResource extends Resource
                     }),
             ])
             ->recordActions([
-                Actions\ViewAction::make()
+                ViewAction::make()
                     ->modalContent(function (Activity $record) {
                         return view('filament.activity-log.view-modal', [
                             'activity' => $record,

@@ -1,46 +1,61 @@
 <?php
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\Layout;
-use Livewire\Volt\Component;
+use function Livewire\Volt\{layout, title};
 
-new #[Layout('components.layouts.templates.account')] class extends Component {
-    #[Computed(persist: true)]
-    public function links(): array
-    {
-        return [
-            [
-                'title' => __('My orders'),
-                'description' => __('Track your orders, return them or buy them again'),
-                'href' => route('account.orders'),
-                'icon' => 'untitledui-shopping-bag-03',
-            ],
-            [
-                'title' => __('My reviews'),
-                'description' => __('View and manage product reviews you posted'),
-                'href' => route('account.reviews'),
-                'icon' => 'untitledui-star-07',
-            ],
-            [
-                'title' => __('Personal information'),
-                'description' => __('Change of e-mail address, name and telephone number'),
-                'href' => route('account.profile'),
-                'icon' => 'untitledui-shield-tick',
-            ],
-            [
-                'title' => __('My addresses'),
-                'description' => __('Billing and delivery preferences for orders'),
-                'href' => route('account.addresses'),
-                'icon' => 'untitledui-globe-05',
-            ],
-            [
-                'title' => __('Contact us'),
-                'description' => __('Contact our customer service department by telephone or e-mail'),
-                'href' => route('account'),
-                'icon' => 'untitledui-phone',
-            ],
-        ];
-    }
-}; ?>
+layout('components.layouts.templates.account');
+title(__('Overview'));
+
+// Build links without Volt computed to avoid test-time Volt closure issues
+$links = [
+    [
+        'title' => __('My orders'),
+        'description' => __('Track your orders, return them or buy them again'),
+        'href' => route('account.orders'),
+        'icon' => 'untitledui-shopping-bag',
+    ],
+    [
+        'title' => __('My reviews'),
+        'description' => __('View and manage product reviews you posted'),
+        'href' => route('account.reviews'),
+        'icon' => 'untitledui-star-07',
+    ],
+    [
+        'title' => __('Personal information'),
+        'description' => __('Change of e-mail address, name and telephone number'),
+        'href' => route('account.profile'),
+        'icon' => 'untitledui-shield-tick',
+    ],
+    [
+        'title' => __('My addresses'),
+        'description' => __('Billing and delivery preferences for orders'),
+        'href' => route('account.addresses'),
+        'icon' => 'untitledui-globe-05',
+    ],
+    [
+        'title' => __('Wishlist'),
+        'description' => __('Products you saved for later'),
+        'href' => route('account.wishlist'),
+        'icon' => 'untitledui-heart',
+    ],
+    [
+        'title' => __('Documents'),
+        'description' => __('Invoices and generated documents'),
+        'href' => route('account.documents'),
+        'icon' => 'untitledui-file-02',
+    ],
+    [
+        'title' => __('Notifications'),
+        'description' => __('Messages and alerts'),
+        'href' => route('account.notifications'),
+        'icon' => 'untitledui-bell-01',
+    ],
+    [
+        'title' => __('Contact us'),
+        'description' => __('Contact our customer service department by telephone or e-mail'),
+        'href' => route('account'),
+        'icon' => 'untitledui-phone',
+    ],
+];
+?>
 
 <div class="space-y-10">
     <x-breadcrumbs :items="[['label' => __('My account')]]" />
@@ -51,7 +66,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                     )" />
 
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:max-w-5xl lg:grid-cols-3">
-        @foreach ($this->links as $link)
+        @foreach ($links as $link)
             <x-account-card-link
                                  :href="$link['href']"
                                  :title="$link['title']"

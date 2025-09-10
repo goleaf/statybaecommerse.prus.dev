@@ -2,7 +2,7 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\EnhancedEcommerceOverview;
+use App\Filament\Widgets\EcommerceOverview;
 use App\Filament\Widgets\RealtimeAnalyticsWidget;
 use App\Filament\Widgets\TopProductsWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -18,18 +18,23 @@ final class Dashboard extends BaseDashboard
 
     public function getTitle(): string
     {
-        return __('Dashboard');
+        return __('admin.navigation.dashboard');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Dashboard');
+        return __('admin.navigation.dashboard');
+    }
+
+    public function getSubheading(): ?string
+    {
+        return __('admin.dashboard.description');
     }
 
     public function getWidgets(): array
     {
         return [
-            EnhancedEcommerceOverview::class,
+            EcommerceOverview::class,
             RealtimeAnalyticsWidget::class,
             TopProductsWidget::class,
         ];

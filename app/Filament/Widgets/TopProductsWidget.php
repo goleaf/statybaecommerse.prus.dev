@@ -4,10 +4,10 @@ namespace App\Filament\Widgets;
 
 use App\Models\AnalyticsEvent;
 use App\Models\Product;
+use Filament\Actions\Action;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Tables;
-use Filament\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB as Database;
 
@@ -20,7 +20,7 @@ final class TopProductsWidget extends BaseWidget
 
     protected static ?int $sort = 3;
 
-    protected int|string|array $columnSpan = 2;
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -42,12 +42,20 @@ final class TopProductsWidget extends BaseWidget
                             ->where('created_at', '>=', now()->subDays(7)),
                         'cart_adds_count'
                     )
-                    ->withSum(['orderItems as total_sold' => function ($query) {
-                        $query->whereHas('order', function ($q) {
-                            $q->where('status', 'completed');
-                        });
-                    }], 'quantity')
-                    ->addSelect(Database::raw('COALESCE(total_sold, 0) as total_sold'))
+                    ->selectSub(
+                        Database::table('order_items')
+                            ->selectRaw('COALESCE(SUM(order_items.quantity), 0)')
+                            ->whereColumn('order_items.product_id', 'products.id')
+                            ->whereExists(function ($query) {
+                                $query
+                                    ->select(Database::raw(1))
+                                    ->from('orders')
+                                    ->whereColumn('orders.id', 'order_items.order_id')
+                                    ->where('orders.status', 'completed')
+                                    ->whereNull('orders.deleted_at');
+                            }),
+                        'total_sold'
+                    )
                     ->where('products.is_visible', true)
                     ->orderByRaw('COALESCE(views_count, 0) + COALESCE(total_sold, 0) DESC')
             )
@@ -87,9 +95,13 @@ final class TopProductsWidget extends BaseWidget
             ])
             ->actions([
                 Action::make('view')
-                    ->url(fn(Product $record): string => route('products.show', $record))
+                    ->url(fn(Product $record): string => route('product.show', $record))
                     ->openUrlInNewTab()
                     ->icon('heroicon-m-eye'),
+                Action::make('edit')
+                    ->label(__('admin.actions.edit'))
+                    ->icon('heroicon-o-pencil')
+                    ->url(fn(Product $record): string => route('filament.admin.resources.products.edit', $record)),
             ])
             ->paginated([5, 10, 25])
             ->defaultPaginationPageOption(10);

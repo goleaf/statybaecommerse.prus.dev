@@ -27,18 +27,14 @@ class MultilanguageTest extends TestCase
         $this->adminUser->assignRole('super_admin');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function application_uses_lithuanian_as_default_locale(): void
     {
         expect(config('app.locale'))->toBe('lt');
         expect(config('app.fallback_locale'))->toBe('lt');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function translation_files_exist_for_both_languages(): void
     {
         $translationFiles = [
@@ -63,9 +59,7 @@ class MultilanguageTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function lithuanian_translations_are_loaded(): void
     {
         app()->setLocale('lt');
@@ -75,9 +69,7 @@ class MultilanguageTest extends TestCase
         expect($translation)->toBeString();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function english_translations_are_loaded(): void
     {
         app()->setLocale('en');
@@ -87,9 +79,7 @@ class MultilanguageTest extends TestCase
         expect($translation)->toBeString();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_switch_between_locales(): void
     {
         // Test Lithuanian
@@ -101,9 +91,7 @@ class MultilanguageTest extends TestCase
         expect(app()->getLocale())->toBe('en');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function models_support_multilanguage_fields(): void
     {
         $country = Country::factory()->create();
@@ -113,9 +101,7 @@ class MultilanguageTest extends TestCase
         expect($country->translatable)->toContain('name');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function location_model_supports_multilanguage_fields(): void
     {
         $location = Location::factory()->create();
@@ -127,9 +113,7 @@ class MultilanguageTest extends TestCase
         expect($location->translatable)->toContain('description');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_save_multilanguage_data(): void
     {
         $country = Country::factory()->create();
@@ -162,9 +146,7 @@ class MultilanguageTest extends TestCase
         expect($location->description)->toBe('English description');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function fallback_locale_works_when_translation_missing(): void
     {
         $country = Country::factory()->create();
@@ -185,9 +167,7 @@ class MultilanguageTest extends TestCase
         expect($location->name)->toBe('Tik lietuviškai');  // Should fallback to Lithuanian
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_translations_work(): void
     {
         app()->setLocale('lt');
@@ -208,9 +188,7 @@ class MultilanguageTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function ecommerce_translations_work(): void
     {
         app()->setLocale('lt');
@@ -230,9 +208,7 @@ class MultilanguageTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function document_translations_work(): void
     {
         app()->setLocale('lt');
@@ -252,9 +228,7 @@ class MultilanguageTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function analytics_translations_work(): void
     {
         app()->setLocale('lt');
@@ -270,9 +244,7 @@ class MultilanguageTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function currency_formatting_respects_locale(): void
     {
         // Test Euro formatting for Lithuanian locale
@@ -287,9 +259,7 @@ class MultilanguageTest extends TestCase
         expect($formatted)->toBe('€1,234.56');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function date_formatting_respects_locale(): void
     {
         $date = now()->setDate(2024, 12, 25);
@@ -305,9 +275,7 @@ class MultilanguageTest extends TestCase
         expect($enDate)->toBe('12/25/2024');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function validation_messages_are_translated(): void
     {
         app()->setLocale('lt');
@@ -326,9 +294,7 @@ class MultilanguageTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function pagination_is_translated(): void
     {
         app()->setLocale('lt');
@@ -345,9 +311,7 @@ class MultilanguageTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function shared_translations_work(): void
     {
         app()->setLocale('lt');
@@ -368,9 +332,7 @@ class MultilanguageTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function frontend_translations_work(): void
     {
         app()->setLocale('lt');
@@ -389,9 +351,7 @@ class MultilanguageTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function store_translations_work(): void
     {
         app()->setLocale('lt');
@@ -410,9 +370,7 @@ class MultilanguageTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_have_preferred_locale(): void
     {
         $user = User::factory()->create([
@@ -422,9 +380,7 @@ class MultilanguageTest extends TestCase
         expect($user->preferred_locale)->toBe('en');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function multilanguage_slug_generation_works(): void
     {
         $country = Country::factory()->create();

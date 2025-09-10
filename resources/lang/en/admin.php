@@ -13,6 +13,7 @@ return [
         'documents' => 'Documents',
         'settings' => 'Settings',
         'system' => 'System',
+        'reports' => 'Reports',
         'profile' => 'Profile',
         'language' => 'Language',
         'analytics' => 'Analytics',
@@ -41,7 +42,7 @@ return [
         'partner_tiers' => 'Partner Tiers',
         'discount_codes' => 'Discount Codes',
         'document_templates' => 'Document Templates',
-        'enhanced_settings' => 'Enhanced Settings',
+        'enhanced_settings' => 'Settings',
         'system_settings' => 'System Settings',
     ],
     // Dashboard
@@ -559,6 +560,13 @@ return [
         'in_stock' => 'In Stock',
         'low_stock' => 'Low Stock',
         'out_of_stock' => 'Out of Stock',
+    ],
+    // Models
+    'models' => [
+        'report' => 'Report',
+        'reports' => 'Reports',
+        'seo_data' => 'SEO Data',
+        'seo_entries' => 'SEO Entries',
     ],
     // Date Ranges
     'date_ranges' => [

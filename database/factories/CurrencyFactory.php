@@ -11,19 +11,10 @@ final class CurrencyFactory extends Factory
 
     public function definition(): array
     {
-        $currencies = [
-            ['name' => ['en' => 'Euro', 'lt' => 'Euras'], 'code' => 'EUR', 'symbol' => '€'],
-            ['name' => ['en' => 'US Dollar', 'lt' => 'JAV doleris'], 'code' => 'USD', 'symbol' => '$'],
-            ['name' => ['en' => 'British Pound', 'lt' => 'Svaras sterlingų'], 'code' => 'GBP', 'symbol' => '£'],
-            ['name' => ['en' => 'Japanese Yen', 'lt' => 'Japonijos jena'], 'code' => 'JPY', 'symbol' => '¥'],
-        ];
-
-        $currency = $this->faker->randomElement($currencies);
-
         return [
-            'name' => $currency['name'],
-            'code' => $currency['code'],
-            'symbol' => $currency['symbol'],
+            'name' => ['en' => 'Currency ' . $this->faker->unique()->lexify('???'), 'lt' => 'Valiuta ' . $this->faker->unique()->lexify('???')],
+            'code' => strtoupper($this->faker->unique()->lexify('???')),
+            'symbol' => '¤',
             'exchange_rate' => $this->faker->randomFloat(6, 0.5, 2.0),
             'is_default' => false,
             'is_enabled' => $this->faker->boolean(80),  // 80% chance of being enabled

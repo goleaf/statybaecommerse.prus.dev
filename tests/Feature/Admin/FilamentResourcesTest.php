@@ -4,7 +4,7 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
-use App\Models\EnhancedSetting;
+use App\Models\NormalSetting as EnhancedSetting;
 
 it('can access admin dashboard', function () {
     $user = User::factory()->create();

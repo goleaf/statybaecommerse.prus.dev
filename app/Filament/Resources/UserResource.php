@@ -7,16 +7,16 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
-use Filament\Tables\Actions\Action as TableAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -45,10 +45,14 @@ final class UserResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('User Information')
+                Section::make(__('admin.users.sections.user_information'))
                     ->components([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
+                        Forms\Components\TextInput::make('first_name')
+                            ->label(__('admin.users.fields.first_name'))
+                            ->required(fn(string $context): bool => $context === 'create')
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('last_name')
+                            ->label(__('admin.users.fields.last_name'))
                             ->maxLength(255),
                         Forms\Components\TextInput::make('email')
                             ->email()
@@ -56,7 +60,7 @@ final class UserResource extends Resource
                             ->unique(User::class, 'email', ignoreRecord: true)
                             ->maxLength(255),
                         Forms\Components\DateTimePicker::make('email_verified_at')
-                            ->label('Email Verified At'),
+                            ->label(__('admin.users.fields.email_verified_at')),
                         Forms\Components\TextInput::make('password')
                             ->password()
                             ->dehydrateStateUsing(fn($state) => Hash::make($state))
@@ -65,7 +69,7 @@ final class UserResource extends Resource
                             ->maxLength(255),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Profile Information')
+                Section::make(__('admin.users.sections.profile_information'))
                     ->components([
                         Forms\Components\TextInput::make('phone')
                             ->tel()
@@ -73,19 +77,19 @@ final class UserResource extends Resource
                         Forms\Components\DatePicker::make('date_of_birth'),
                         Forms\Components\Select::make('gender')
                             ->options([
-                                'male' => 'Male',
-                                'female' => 'Female',
-                                'other' => 'Other',
+                                'male' => __('admin.users.gender.male'),
+                                'female' => __('admin.users.gender.female'),
+                                'other' => __('admin.users.gender.other'),
                             ]),
                         Forms\Components\Select::make('preferred_locale')
                             ->options([
-                                'en' => 'English',
-                                'lt' => 'Lithuanian',
+                                'en' => __('admin.language_switcher.english'),
+                                'lt' => __('admin.language_switcher.lithuanian'),
                             ])
                             ->default('lt'),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Roles & Permissions')
+                Section::make(__('admin.users.sections.roles_permissions'))
                     ->components([
                         Forms\Components\Select::make('roles')
                             ->relationship('roles', 'name')
@@ -99,16 +103,16 @@ final class UserResource extends Resource
                             ->searchable(),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Settings')
+                Section::make(__('admin.users.sections.settings'))
                     ->components([
                         Forms\Components\Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('admin.users.fields.is_active'))
                             ->default(true),
                         Forms\Components\Toggle::make('accepts_marketing')
-                            ->label('Accepts Marketing')
+                            ->label(__('admin.users.fields.accepts_marketing'))
                             ->default(false),
                         Forms\Components\Toggle::make('two_factor_enabled')
-                            ->label('Two Factor Authentication')
+                            ->label(__('admin.users.fields.two_factor_enabled'))
                             ->default(false),
                     ])
                     ->columns(3),
@@ -130,7 +134,7 @@ final class UserResource extends Resource
                     ->toggleable(),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->boolean()
-                    ->label('Verified')
+                    ->label(__('admin.users.fields.email_verified_at'))
                     ->getStateUsing(fn($record) => !is_null($record->email_verified_at)),
                 Tables\Columns\TextColumn::make('roles.name')
                     ->badge()
@@ -139,11 +143,11 @@ final class UserResource extends Resource
                 Tables\Columns\TextColumn::make('customerGroups.name')
                     ->badge()
                     ->separator(',')
-                    ->label('Groups')
+                    ->label(__('admin.users.fields.customer_groups'))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('orders_count')
                     ->counts('orders')
-                    ->label('Orders')
+                    ->label(__('admin.users.fields.orders_count'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_spent')
                     ->getStateUsing(fn($record) => $record->orders()->where('status', '!=', 'cancelled')->sum('total'))
@@ -153,16 +157,16 @@ final class UserResource extends Resource
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->deferLoading(false)
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\Filter::make('verified')
                     ->query(fn(Builder $query): Builder => $query->whereNotNull('email_verified_at')),
                 Tables\Filters\Filter::make('active')
@@ -173,7 +177,7 @@ final class UserResource extends Resource
                 Tables\Filters\SelectFilter::make('customerGroups')
                     ->relationship('customerGroups', 'name')
                     ->multiple()
-                    ->label('Customer Groups'),
+                    ->label(__('admin.users.fields.customer_groups')),
             ])
             ->recordActions([
                 DocumentAction::make()
@@ -189,7 +193,7 @@ final class UserResource extends Resource
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
-                TableAction::make('impersonate')
+                Action::make('impersonate')
                     ->icon('heroicon-o-user-circle')
                     ->color('warning')
                     ->action(function (User $record) {
@@ -197,12 +201,12 @@ final class UserResource extends Resource
                             session(['impersonating' => $record->id]);
                             return redirect()
                                 ->to('/')
-                                ->with('success', __('Now impersonating :name', ['name' => $record->name]));
+                                ->with('success', __('admin.notifications.impersonating_user', ['name' => $record->name]));
                         }
                     })
                     ->requiresConfirmation()
-                    ->modalHeading(__('Impersonate User'))
-                    ->modalDescription(__('You will be logged in as this user. You can return to your account anytime.'))
+                    ->modalHeading(__('admin.modals.impersonate_user'))
+                    ->modalDescription(__('admin.modals.impersonate_description'))
                     ->visible(fn(User $record) => auth()->user()->can('impersonate users') && $record->id !== auth()->id()),
             ])
             ->bulkActions([
@@ -211,12 +215,19 @@ final class UserResource extends Resource
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                     BulkAction::make('activate')
-                        ->label('Activate Selected')
+                        ->label(__('admin.actions.activate_selected'))
                         ->icon('heroicon-o-check')
                         ->color('success')
-                        ->action(fn($records) => $records->each->update(['is_active' => true])),
+                        ->action(function ($records): void {
+                            $ids = collect($records)
+                                ->map(fn($record) => is_object($record) ? $record->getKey() : $record)
+                                ->all();
+                            if (!empty($ids)) {
+                                \App\Models\User::whereIn('id', $ids)->update(['is_active' => true]);
+                            }
+                        }),
                     BulkAction::make('deactivate')
-                        ->label('Deactivate Selected')
+                        ->label(__('admin.actions.deactivate_selected'))
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
                         ->action(fn($records) => $records->each->update(['is_active' => false])),
@@ -260,10 +271,10 @@ final class UserResource extends Resource
     public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
     {
         return [
-            'Email' => $record->email,
-            'Phone' => $record->phone ?? __('Not provided'),
-            'Status' => $record->is_active ? __('Active') : __('Inactive'),
-            'Joined' => $record->created_at->format('Y-m-d'),
+            __('admin.users.fields.email') => $record->email,
+            __('admin.users.fields.phone') => $record->phone ?? __('admin.messages.not_provided'),
+            __('admin.fields.status') => $record->is_active ? __('admin.products.status.active') : __('admin.products.status.inactive'),
+            __('admin.users.joined') => $record->created_at->format('Y-m-d'),
         ];
     }
 }

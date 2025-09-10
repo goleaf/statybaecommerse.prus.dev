@@ -20,6 +20,7 @@ class DiscountCode extends Model
         'expires_at',
         'max_uses',
         'usage_count',
+        'status',
         'metadata',
     ];
 

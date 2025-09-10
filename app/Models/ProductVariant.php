@@ -89,6 +89,11 @@ final class ProductVariant extends Model implements HasMedia
         return $this->availableQuantity() < 1;
     }
 
+    public function getStockAttribute(): int
+    {
+        return (int) ($this->quantity ?? 0);
+    }
+
     public function prices(): MorphMany
     {
         return $this->morphMany(Price::class, 'priceable');

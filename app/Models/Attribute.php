@@ -39,7 +39,7 @@ final class Attribute extends Model
 
     public function values(): HasMany
     {
-        return $this->hasMany(AttributeValue::class)->orderBy('position');
+        return $this->hasMany(AttributeValue::class)->orderBy('sort_order');
     }
 
     public function products(): BelongsToMany

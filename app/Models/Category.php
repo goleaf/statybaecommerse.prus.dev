@@ -31,6 +31,7 @@ final class Category extends Model implements HasMedia
         'description',
         'parent_id',
         'sort_order',
+        'is_enabled',
         'is_visible',
         'seo_title',
         'seo_description',
@@ -39,6 +40,7 @@ final class Category extends Model implements HasMedia
     protected function casts(): array
     {
         return [
+            'is_enabled' => 'boolean',
             'is_visible' => 'boolean',
             'sort_order' => 'integer',
         ];

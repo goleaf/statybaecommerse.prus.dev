@@ -6,5 +6,4 @@
         </div>
         {{ $slot }}
     </main>
-    @include('components.layouts.partials.footer-legal')
 </x-layouts.base>

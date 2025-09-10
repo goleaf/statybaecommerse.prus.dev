@@ -24,15 +24,25 @@ final class DocumentTemplateResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Documents';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Content;
 
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('navigation.groups.content');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.document_templates');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('documents.template_information'))
+                \Filament\Schemas\Components\Section::make(__('documents.template_information'))
                     ->components([
                         Forms\Components\TextInput::make('name')
                             ->label(__('documents.name'))
@@ -111,7 +121,7 @@ final class DocumentTemplateResource extends Resource
                     ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
                     ->persistTabInQueryString('template_tab')
                     ->contained(false),
-                Forms\Components\Section::make(__('documents.template_variables'))
+                \Filament\Schemas\Components\Section::make(__('documents.template_variables'))
                     ->components([
                         Forms\Components\TagsInput::make('variables')
                             ->label(__('documents.variables'))
@@ -120,7 +130,7 @@ final class DocumentTemplateResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->collapsed(),
-                Forms\Components\Section::make(__('documents.print_settings'))
+                \Filament\Schemas\Components\Section::make(__('documents.print_settings'))
                     ->components([
                         Forms\Components\KeyValue::make('settings')
                             ->label(__('documents.settings'))
@@ -164,7 +174,7 @@ final class DocumentTemplateResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('documents.created_at'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

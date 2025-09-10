@@ -1,6 +1,18 @@
 <?php declare(strict_types=1);
 
 return [
+    // Inventory CRUD translations
+    'inventories' => 'Inventories',
+    'inventory_entry' => 'Inventory Entry',
+    'variant_inventories' => 'Variant Inventories',
+    'variant_inventory_entry' => 'Variant Inventory Entry',
+    'tracked' => 'Tracked',
+    'reserved' => 'Reserved',
+    'incoming' => 'Incoming',
+    'threshold' => 'Threshold',
+    'updated_at' => 'Updated At',
+    'variant' => 'Variant',
+    
     // Address Types
     'address_type_shipping' => 'Shipping Address',
     'address_type_billing' => 'Billing Address',

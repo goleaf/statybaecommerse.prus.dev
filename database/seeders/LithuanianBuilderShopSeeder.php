@@ -13,31 +13,38 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Activitylog\ActivityLogStatus;
 
 class LithuanianBuilderShopSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create roles and permissions
-        $this->createRolesAndPermissions();
-        
-        // Create admin users
-        $this->createAdminUsers();
-        
-        // Create main categories
-        $categories = $this->createMainCategories();
-        
-        // Create subcategories
-        $this->createSubcategories($categories);
-        
-        // Create brands
-        $brands = $this->createBrands();
-        
-        // Create products
-        $this->createProducts($brands, $categories);
-        
-        // Create sample orders
-        $this->createSampleOrders();
+        $activityStatus = app(\Spatie\Activitylog\ActivityLogStatus::class);
+        $activityStatus->disable();
+        try {
+            // Create roles and permissions
+            $this->createRolesAndPermissions();
+
+            // Create admin users
+            $this->createAdminUsers();
+
+            // Create main categories
+            $categories = $this->createMainCategories();
+
+            // Create subcategories
+            $this->createSubcategories($categories);
+
+            // Create brands
+            $brands = $this->createBrands();
+
+            // Create products
+            $this->createProducts($brands, $categories);
+
+            // Create sample orders
+            $this->createSampleOrders();
+        } finally {
+            $activityStatus->enable();
+        }
     }
 
     private function createRolesAndPermissions(): void
@@ -294,10 +301,10 @@ class LithuanianBuilderShopSeeder extends Seeder
                     OrderItem::create([
                         'order_id' => $order->id,
                         'product_id' => $product->id,
-                        'product_name' => $product->name,
-                        'product_sku' => $product->sku,
+                        'name' => $product->name,
+                        'sku' => $product->sku,
                         'quantity' => $quantity,
-                        'price' => $price,
+                        'unit_price' => $price,
                         'total' => $price * $quantity,
                     ]);
                 }

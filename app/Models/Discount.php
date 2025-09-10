@@ -259,4 +259,55 @@ final class Discount extends Model
     {
         return !$this->isExclusive() && !$other->isExclusive();
     }
+
+    /**
+     * Check if the discount is currently active based on is_active and date window.
+     */
+    public function isCurrentlyActive(): bool
+    {
+        if (! (bool) ($this->is_active ?? false)) {
+            return false;
+        }
+
+        $now = now();
+        if ($this->starts_at && $this->starts_at->gt($now)) {
+            return false;
+        }
+        if ($this->ends_at && $this->ends_at->lt($now)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Calculate discount amount for a given subtotal/order total.
+     */
+    public function calculateDiscountAmount(float $amount): float
+    {
+        return match ($this->type) {
+            'percentage' => round(($amount * ((float) $this->value)) / 100, 2),
+            'fixed' => (float) min((float) $this->value, $amount),
+            default => 0.0,
+        };
+    }
+
+    /**
+     * Increase usage_count by 1 and persist.
+     */
+    public function incrementUsage(): void
+    {
+        $this->increment('usage_count');
+    }
+
+    /**
+     * Whether usage limit has been reached.
+     */
+    public function isUsageLimitReached(): bool
+    {
+        if ($this->usage_limit === null) {
+            return false;
+        }
+        return (int) $this->usage_count >= (int) $this->usage_limit;
+    }
 }

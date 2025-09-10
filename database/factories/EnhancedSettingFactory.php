@@ -2,15 +2,15 @@
 
 namespace Database\Factories;
 
-use App\Models\EnhancedSetting;
+use App\Models\NormalSetting;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\EnhancedSetting>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\NormalSetting>
  */
 final class EnhancedSettingFactory extends Factory
 {
-    protected $model = EnhancedSetting::class;
+    protected $model = NormalSetting::class;
 
     public function definition(): array
     {

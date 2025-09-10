@@ -5,18 +5,22 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CountryResource\Pages;
 use App\Models\Country;
 use App\Services\MultiLanguageTabService;
-use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
+use Filament\Actions as Actions;
+use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-use BackedEnum;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use BackedEnum;
+use UnitEnum;
 
 final class CountryResource extends Resource
 {
@@ -24,44 +28,49 @@ final class CountryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-globe-europe-africa';
 
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.countries');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Country Information')
+                Section::make(__('admin.countries.sections.country_information'))
                     ->components([
                         Forms\Components\TextInput::make('cca2')
-                            ->label('Country Code (2-letter)')
+                            ->label(__('admin.countries.fields.cca2'))
                             ->required()
                             ->maxLength(2)
                             ->unique(Country::class, 'cca2', ignoreRecord: true),
                         Forms\Components\TextInput::make('cca3')
-                            ->label('Country Code (3-letter)')
+                            ->label(__('admin.countries.fields.cca3'))
                             ->required()
                             ->maxLength(3)
                             ->unique(Country::class, 'cca3', ignoreRecord: true),
                         Forms\Components\TextInput::make('phone_calling_code')
-                            ->label('Phone Code')
+                            ->label(__('admin.countries.fields.phone_calling_code'))
                             ->required()
                             ->maxLength(10),
                         Forms\Components\TextInput::make('flag')
-                            ->label('Flag Emoji')
+                            ->label(__('admin.countries.fields.flag'))
                             ->maxLength(10),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Geographic Information')
+                Section::make(__('admin.countries.sections.geographic_information'))
                     ->components([
                         Forms\Components\Select::make('region')
                             ->options([
-                                'Europe' => 'Europe',
-                                'Asia' => 'Asia',
-                                'Africa' => 'Africa',
-                                'Americas' => 'Americas',
-                                'Oceania' => 'Oceania',
+                                'Europe' => __('admin.countries.regions.europe'),
+                                'Asia' => __('admin.countries.regions.asia'),
+                                'Africa' => __('admin.countries.regions.africa'),
+                                'Americas' => __('admin.countries.regions.americas'),
+                                'Oceania' => __('admin.countries.regions.oceania'),
                             ])
                             ->required(),
                         Forms\Components\TextInput::make('subregion')
@@ -73,7 +82,7 @@ final class CountryResource extends Resource
                             ->numeric()
                             ->step(0.000001),
                         Forms\Components\TagsInput::make('currencies')
-                            ->placeholder('Add currency codes (e.g., EUR, USD)'),
+                            ->placeholder(__('admin.countries.placeholders.add_currency_codes')),
                     ])
                     ->columns(2),
                 // Multilanguage Tabs for Country Names
@@ -107,16 +116,16 @@ final class CountryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('flag')
-                    ->label('Flag')
+                    ->label(__('admin.countries.fields.flag'))
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('cca2')
-                    ->label('Code')
+                    ->label(__('admin.countries.fields.code'))
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->color('primary'),
                 Tables\Columns\TextColumn::make('translated_name')
-                    ->label('Name')
+                    ->label(__('admin.countries.fields.name'))
                     ->searchable(['name'])
                     ->sortable()
                     ->getStateUsing(fn(Country $record): string => $record->trans('name') ?? $record->cca2),
@@ -133,7 +142,7 @@ final class CountryResource extends Resource
                 Tables\Columns\TextColumn::make('subregion')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('phone_calling_code')
-                    ->label('Phone Code')
+                    ->label(__('admin.countries.fields.phone_calling_code'))
                     ->prefix('+')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('currencies')
@@ -142,25 +151,25 @@ final class CountryResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('translations_count')
                     ->counts('translations')
-                    ->label('Translations')
+                    ->label(__('admin.countries.fields.translations'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('region')
                     ->options([
-                        'Europe' => 'Europe',
-                        'Asia' => 'Asia',
-                        'Africa' => 'Africa',
-                        'Americas' => 'Americas',
-                        'Oceania' => 'Oceania',
+                        'Europe' => __('admin.countries.regions.europe'),
+                        'Asia' => __('admin.countries.regions.asia'),
+                        'Africa' => __('admin.countries.regions.africa'),
+                        'Americas' => __('admin.countries.regions.americas'),
+                        'Oceania' => __('admin.countries.regions.oceania'),
                     ]),
                 Tables\Filters\Filter::make('has_translations')
                     ->query(fn(Builder $query): Builder => $query->has('translations'))
-                    ->label('Has Translations'),
+                    ->label(__('admin.countries.filters.has_translations')),
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -190,5 +199,10 @@ final class CountryResource extends Resource
             'view' => Pages\ViewCountry::route('/{record}'),
             'edit' => Pages\EditCountry::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.system');
     }
 }

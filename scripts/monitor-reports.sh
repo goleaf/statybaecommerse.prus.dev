@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Advanced Reports System Monitoring Script
+# Reports System Monitoring Script
 # Usage: ./scripts/monitor-reports.sh
 
-echo "🔍 Advanced Reports System Health Check"
+echo "🔍 Reports System Health Check"
 echo "======================================="
 
 # Check if the route is accessible
-echo "📊 Testing Advanced Reports Route..."
-ROUTE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://statybaecommerse.prus.dev/admin/advanced-reports)
+echo "📊 Testing Reports Route..."
+ROUTE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://statybaecommerse.prus.dev/admin/reports)
 if [ "$ROUTE_STATUS" -eq 200 ] || [ "$ROUTE_STATUS" -eq 302 ]; then
     echo "✅ Route accessible (HTTP $ROUTE_STATUS)"
 else
@@ -49,4 +49,4 @@ echo "Active Widgets: $WIDGET_COUNT"
 
 echo ""
 echo "🎉 Health Check Complete!"
-echo "📊 Access your reports: https://statybaecommerse.prus.dev/admin/advanced-reports"
+echo "📊 Access your reports: https://statybaecommerse.prus.dev/admin/reports"

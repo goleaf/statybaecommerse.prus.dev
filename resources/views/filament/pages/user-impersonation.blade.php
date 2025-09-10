@@ -12,9 +12,15 @@
                             </div>
                         </div>
                     </div>
-                    <div>
-                        {{ $this->stopImpersonationAction }}
-                    </div>
+                    @if(session()->has('impersonate'))
+                        <x-filament::button
+                            color="danger"
+                            icon="heroicon-o-arrow-left"
+                            wire:click="stopImpersonation"
+                        >
+                            {{ __('admin.actions.stop_impersonation') }}
+                        </x-filament::button>
+                    @endif
                 </div>
             </x-filament::card>
         @endif

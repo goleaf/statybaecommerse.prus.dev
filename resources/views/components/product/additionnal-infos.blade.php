@@ -18,28 +18,30 @@
                 <li class="grid grid-cols-2 gap-2 py-2">
                     <span>{{ __('Height') }} :</span>
                     <span class="text-gray-700 font-medium">
-                        {{ \Illuminate\Support\Number::format($product->height_value ?? 0) }} {{ $product->height_unit->value }}
+                        {{ \Illuminate\Support\Number::format($product->height ?? 0) }} {{ $product->height_unit?->value ?? '' }}
                     </span>
                 </li>
                 <li class="grid grid-cols-2 gap-2 py-2">
                     <span>{{ __('Width') }} :</span>
                     <span class="text-gray-700 font-medium">
-                        {{ \Illuminate\Support\Number::format($product->width_value ?? 0) }} {{ $product->width_unit->value }}
+                        {{ \Illuminate\Support\Number::format($product->width ?? 0) }} {{ $product->width_unit?->value ?? '' }}
                     </span>
                 </li>
                 <li class="grid grid-cols-2 gap-2 py-2">
                     <span>{{ __('Depth') }} :</span>
                     <span class="text-gray-700 font-medium">
-                        {{ \Illuminate\Support\Number::format($product->depth_value ?? 0) }} {{ $product->depth_unit->value }}
+                        {{ \Illuminate\Support\Number::format($product->length ?? 0) }} {{ $product->depth_unit?->value ?? '' }}
                     </span>
                 </li>
                 <li class="grid grid-cols-2 gap-2 py-2">
                     <span>{{ __('Weight') }} :</span>
                     <span class="text-gray-700 font-medium">
-                        {{ \Illuminate\Support\Number::format($product->weight_value ?? 0) }} {{ $product->weight_unit->value }}
+                        {{ \Illuminate\Support\Number::format($product->weight ?? 0) }} {{ $product->weight_unit?->value ?? '' }}
                     </span>
                 </li>
             </ul>
         </div>
     </div>
+    
 </div>
+

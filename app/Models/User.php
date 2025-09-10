@@ -15,13 +15,26 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements HasLocalePreferenceContract, FilamentUser
 {
-    use HasFactory, HasRoles, Notifiable, LogsActivity;
+    protected static function booted(): void
+    {
+        static::saving(function (self $user): void {
+            $computedName = trim(((string) ($user->first_name ?? '')) . ' ' . ((string) ($user->last_name ?? '')));
+            if (empty($user->name) && $computedName !== '') {
+                $user->name = $computedName;
+            }
+            if (empty($user->name) && !empty($user->email)) {
+                $user->name = (string) $user->email;
+            }
+        });
+    }
+    use HasFactory, HasRoles, Notifiable, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -58,6 +71,7 @@ class User extends Authenticatable implements HasLocalePreferenceContract, Filam
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -139,9 +153,15 @@ class User extends Authenticatable implements HasLocalePreferenceContract, Filam
         return $this->hasMany(Review::class);
     }
 
+    // Explicit alias for clarity in code: reviews authored by this customer
+    public function authoredReviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'user_id');
+    }
+
     public function customerGroups(): BelongsToMany
     {
-        return $this->belongsToMany(CustomerGroup::class, 'customer_group_user', 'user_id', 'group_id');
+        return $this->belongsToMany(CustomerGroup::class, 'customer_group_user', 'user_id', 'customer_group_id');
     }
 
     public function discountRedemptions(): HasMany

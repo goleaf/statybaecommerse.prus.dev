@@ -8,20 +8,29 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Filament\Actions\Action;
-use Filament\Forms\Form;
+use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Tabs;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use BackedEnum;
 use UnitEnum;
 
 final class DataImportExport extends Page
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrows-up-down';
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::System;
     protected static ?int $navigationSort = 3;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.system');
+    }
 
     public ?string $selectedModel = 'products';
     public ?string $importFormat = 'csv';
@@ -39,13 +48,13 @@ final class DataImportExport extends Page
         return auth()->user()?->hasRole('Admin');
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
-                Forms\Components\Tabs::make('import_export_tabs')
+                Tabs::make('import_export_tabs')
                     ->tabs([
-                        Forms\Components\Tabs\Tab::make('import')
+                        Tab::make('import')
                             ->label(__('admin.tabs.import_data'))
                             ->icon('heroicon-m-arrow-down-tray')
                             ->schema([
@@ -75,7 +84,7 @@ final class DataImportExport extends Page
                                     ->acceptedFileTypes(['text/csv', 'application/vnd.ms-excel', 'application/json'])
                                     ->maxSize(10240)  // 10MB
                                     ->required(),
-                                Forms\Components\Fieldset::make(__('admin.fieldsets.import_options'))
+                                Fieldset::make(__('admin.fieldsets.import_options'))
                                     ->schema([
                                         Forms\Components\Toggle::make('importOptions.update_existing')
                                             ->label(__('admin.fields.update_existing'))
@@ -99,7 +108,7 @@ final class DataImportExport extends Page
                                     ])
                                     ->columns(2),
                             ]),
-                        Forms\Components\Tabs\Tab::make('export')
+                        Tab::make('export')
                             ->label(__('admin.tabs.export_data'))
                             ->icon('heroicon-m-arrow-up-tray')
                             ->schema([
@@ -123,7 +132,7 @@ final class DataImportExport extends Page
                                         'pdf' => 'PDF Report',
                                     ])
                                     ->default('csv'),
-                                Forms\Components\Fieldset::make(__('admin.fieldsets.export_options'))
+                                Fieldset::make(__('admin.fieldsets.export_options'))
                                     ->schema([
                                         Forms\Components\Toggle::make('exportOptions.include_relations')
                                             ->label(__('admin.fields.include_relations'))
@@ -314,10 +323,23 @@ final class DataImportExport extends Page
 
     private function importProduct(array $row): void
     {
-        $product = Product::updateOrCreate(
-            ['sku' => $row['sku']],
+        $name = (string) ($row['name'] ?? 'Unnamed Product');
+        $sku = (string) ($row['sku'] ?? Str::upper(Str::random(8)));
+
+        // Generate unique slug if none provided
+        $baseSlug = Str::slug($row['slug'] ?? $name);
+        $slug = $baseSlug ?: Str::slug($sku);
+        $i = 1;
+        while (Product::where('slug', $slug)->where('sku', '!=', $sku)->exists()) {
+            $slug = $baseSlug . '-' . $i;
+            $i++;
+        }
+
+        Product::updateOrCreate(
+            ['sku' => $sku],
             [
-                'name' => $row['name'],
+                'name' => $name,
+                'slug' => $slug,
                 'description' => $row['description'] ?? '',
                 'price' => (float) ($row['price'] ?? 0),
                 'stock_quantity' => (int) ($row['stock_quantity'] ?? 0),
@@ -460,5 +482,3 @@ final class DataImportExport extends Page
         return Category::where('name', $categoryName)->first()?->id;
     }
 }
-
-

@@ -110,4 +110,15 @@ return [
     'product_removed_from_comparison' => 'Produktas pašalintas iš palyginimo',
     'clear_comparison' => 'Išvalyti palyginimą',
     'compare_products' => 'Palyginti produktus',
+    
+    // Navigation
+    'home' => 'Pagrindinis',
+    'brands' => 'Prekės ženklai',
+    'categories' => 'Kategorijos',
+    'products' => 'Produktai',
+    
+    // Empty states
+    'no_results_found' => 'Rezultatų nerasta',
+    'clear_filters' => 'Išvalyti filtrus',
+    'cart_empty_description' => 'Jūsų krepšelis tuščias. Pradėkite apsipirkimą, kad pridėtumėte prekių.',
 ];

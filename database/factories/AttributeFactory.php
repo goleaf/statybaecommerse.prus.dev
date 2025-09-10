@@ -12,16 +12,17 @@ class AttributeFactory extends Factory
 
     public function definition(): array
     {
-        $label = $this->faker->unique()->randomElement(['Color','Size','Material','Fit','Length','Style']);
-        $types = ['checkbox','color','date','richtext','select','text','number'];
+        $label = $this->faker->randomElement(['Color','Size','Material','Fit','Length','Style']) . ' ' . $this->faker->unique()->numerify('###');
+        $types = ['boolean','color','date','select','multiselect','text','number'];
         return [
             'name' => $label,
-            'code' => strtolower(str_replace(' ', '_', $label)),
+            'slug' => strtolower(str_replace(' ', '_', $label)),
             'type' => $this->faker->randomElement($types),
             'is_filterable' => true,
             'is_searchable' => true,
             'is_enabled' => true,
-            'metadata' => null,
+            'sort_order' => 0,
+            'options' => null,
         ];
     }
 }

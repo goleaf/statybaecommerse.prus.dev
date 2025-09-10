@@ -5,17 +5,18 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ZoneResource\Pages;
 use App\Models\Currency;
 use App\Models\Zone;
-use Filament\Tables\Actions\Action;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components as Schemas;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
-use Filament\Schemas\Components as Schemas;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -28,9 +29,14 @@ final class ZoneResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-globe-europe-africa';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Settings';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Settings;
 
     protected static ?int $navigationSort = 5;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.settings');
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -170,6 +176,7 @@ final class ZoneResource extends Resource
                                 Forms\Components\CheckboxList::make('countries')
                                     ->label(__('admin.fields.countries'))
                                     ->relationship('countries', 'name')
+                                    ->getOptionLabelFromRecordUsing(fn($record): string => (string) ($record->name ?? $record->cca2 ?? $record->cca3 ?? $record->code ?? $record->id))
                                     ->searchable()
                                     ->bulkToggleable()
                                     ->columns(3)
@@ -251,7 +258,7 @@ final class ZoneResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.table.created_at'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -267,6 +274,7 @@ final class ZoneResource extends Resource
                     ->preload(),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -297,6 +305,7 @@ final class ZoneResource extends Resource
             'index' => Pages\ListZones::route('/'),
             'create' => Pages\CreateZone::route('/create'),
             'edit' => Pages\EditZone::route('/{record}/edit'),
+            'view' => Pages\ViewZone::route('/{record}'),
         ];
     }
 

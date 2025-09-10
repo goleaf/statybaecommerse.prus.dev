@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use Filament\Schemas\Schema;
+use Filament\Actions\Action;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
-use Filament\Tables\Actions\Action;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -19,8 +19,8 @@ final class VariantsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
-                Forms\Components\Section::make('Variant Information')
+            ->schema([
+                Forms\Components\Section::make(__('admin.products.variant.sections.information'))
                     ->components([
                         Forms\Components\TextInput::make('sku')
                             ->required()
@@ -43,7 +43,7 @@ final class VariantsRelationManager extends RelationManager
                             ->step(0.01),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Inventory')
+                Forms\Components\Section::make(__('admin.products.variant.sections.inventory'))
                     ->components([
                         Forms\Components\TextInput::make('stock_quantity')
                             ->numeric()
@@ -59,7 +59,7 @@ final class VariantsRelationManager extends RelationManager
                             ->default(false),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Physical Properties')
+                Forms\Components\Section::make(__('admin.products.variant.sections.physical_properties'))
                     ->components([
                         Forms\Components\TextInput::make('weight')
                             ->numeric()
@@ -99,7 +99,7 @@ final class VariantsRelationManager extends RelationManager
                     ->money('EUR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('stock_quantity')
-                    ->label('Stock')
+                    ->label(__('admin.products.fields.stock_quantity'))
                     ->numeric()
                     ->sortable()
                     ->color(fn($state): string => match (true) {

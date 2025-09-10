@@ -5,10 +5,10 @@ namespace App\Filament\Pages;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Pages\Page;
-use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\Models\Activity;
@@ -20,7 +20,7 @@ final class SecurityAudit extends Page implements HasTable
     use InteractsWithTable;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shield-check';
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::System;
     protected static ?int $navigationSort = 2;
 
     public array $securityStats = [];
@@ -54,51 +54,43 @@ final class SecurityAudit extends Page implements HasTable
                 Tables\Columns\TextColumn::make('log_name')
                     ->label(__('admin.table.log_type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'user' => 'info',
                         'order' => 'success',
                         'product' => 'warning',
                         'security' => 'danger',
                         default => 'gray',
                     }),
-
                 Tables\Columns\TextColumn::make('description')
                     ->label(__('admin.table.activity'))
                     ->limit(50)
-                    ->tooltip(fn ($record): string => $record->description),
-
+                    ->tooltip(fn($record): string => $record->description),
                 Tables\Columns\TextColumn::make('causer.name')
                     ->label(__('admin.table.user'))
                     ->default('System')
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('causer.email')
                     ->label(__('admin.table.email'))
                     ->default('N/A')
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('subject_type')
                     ->label(__('admin.table.subject'))
-                    ->getStateUsing(fn ($record): string => 
-                        $record->subject_type ? class_basename($record->subject_type) : 'N/A'
-                    ),
-
+                    ->getStateUsing(fn($record): string =>
+                        $record->subject_type ? class_basename($record->subject_type) : 'N/A'),
                 Tables\Columns\TextColumn::make('event')
                     ->label(__('admin.table.event'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'created' => 'success',
                         'updated' => 'info',
                         'deleted' => 'danger',
                         'login' => 'warning',
                         default => 'gray',
                     }),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.table.timestamp'))
-                    ->dateTime()
-                    ->sortable()
-                    ->since(),
+                    ->date('Y-m-d')
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('log_name')
@@ -109,7 +101,6 @@ final class SecurityAudit extends Page implements HasTable
                         'product' => __('admin.log_types.product'),
                         'security' => __('admin.log_types.security'),
                     ]),
-
                 Tables\Filters\SelectFilter::make('event')
                     ->label(__('admin.filters.event_type'))
                     ->options([
@@ -118,28 +109,26 @@ final class SecurityAudit extends Page implements HasTable
                         'deleted' => __('admin.events.deleted'),
                         'login' => __('admin.events.login'),
                     ]),
-
                 Tables\Filters\Filter::make('suspicious')
                     ->label(__('admin.filters.suspicious_only'))
-                    ->query(fn (Builder $query): Builder => 
-                        $query->where('description', 'like', '%failed%')
-                              ->orWhere('description', 'like', '%suspicious%')
-                              ->orWhere('description', 'like', '%blocked%')
-                    ),
+                    ->query(fn(Builder $query): Builder =>
+                        $query
+                            ->where('description', 'like', '%failed%')
+                            ->orWhere('description', 'like', '%suspicious%')
+                            ->orWhere('description', 'like', '%blocked%')),
             ])
             ->recordActions([
                 Actions\Action::make('view_details')
                     ->label(__('admin.actions.view_details'))
                     ->icon('heroicon-o-eye')
-                    ->modalContent(fn ($record) => view('filament.modals.activity-details', compact('record')))
+                    ->modalContent(fn($record) => view('filament.modals.activity-details', compact('record')))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel(__('admin.actions.close')),
-
                 Actions\Action::make('flag_suspicious')
                     ->label(__('admin.actions.flag_suspicious'))
                     ->icon('heroicon-o-flag')
                     ->color('danger')
-                    ->visible(fn ($record): bool => !str_contains($record->description, 'FLAGGED'))
+                    ->visible(fn($record): bool => !str_contains($record->description, 'FLAGGED'))
                     ->action(function ($record): void {
                         $record->update([
                             'description' => $record->description . ' [FLAGGED AS SUSPICIOUS]'
@@ -174,9 +163,10 @@ final class SecurityAudit extends Page implements HasTable
         // Load suspicious activities
         $this->suspiciousActivities = Activity::where('created_at', '>=', now()->subDays(7))
             ->where(function ($query) {
-                $query->where('description', 'like', '%failed%')
-                      ->orWhere('description', 'like', '%suspicious%')
-                      ->orWhere('description', 'like', '%blocked%');
+                $query
+                    ->where('description', 'like', '%failed%')
+                    ->orWhere('description', 'like', '%suspicious%')
+                    ->orWhere('description', 'like', '%blocked%');
             })
             ->with('causer')
             ->limit(10)
@@ -194,7 +184,6 @@ final class SecurityAudit extends Page implements HasTable
                 ->action(function (): void {
                     $this->performSecurityScan();
                 }),
-
             Action::make('export_audit_log')
                 ->label(__('admin.actions.export_audit_log'))
                 ->icon('heroicon-o-arrow-down-tray')
@@ -202,7 +191,6 @@ final class SecurityAudit extends Page implements HasTable
                 ->action(function (): void {
                     $this->exportAuditLog();
                 }),
-
             Action::make('clear_old_logs')
                 ->label(__('admin.actions.clear_old_logs'))
                 ->icon('heroicon-o-trash')
@@ -263,7 +251,7 @@ final class SecurityAudit extends Page implements HasTable
             ->get();
 
         $csv = "Timestamp,Log Type,Event,User,Email,Subject,Description,IP Address\n";
-        
+
         foreach ($activities as $activity) {
             $csv .= sprintf(
                 '"%s","%s","%s","%s","%s","%s","%s","%s"' . "\n",
@@ -293,5 +281,3 @@ final class SecurityAudit extends Page implements HasTable
             ->send();
     }
 }
-
-

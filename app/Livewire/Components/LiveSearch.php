@@ -82,7 +82,7 @@ final class LiveSearch extends Component
                     'title' => $brand->name,
                     'subtitle' => __('ecommerce.brand'),
                     'description' => $brand->products_count . ' ' . __('ecommerce.products'),
-                    'url' => route('brand.show', $brand->slug),
+                    'url' => route('brands.show', $brand->slug),
                 ];
             });
 
@@ -115,5 +115,4 @@ final class LiveSearch extends Component
         return view('livewire.components.live-search');
     }
 }
-
 

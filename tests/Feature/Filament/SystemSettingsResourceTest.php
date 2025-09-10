@@ -166,8 +166,7 @@ final class SystemSettingsResourceTest extends TestCase
         $settings = Setting::factory()->count(3)->create();
 
         Livewire::test(SystemSettingsResource\Pages\ListSystemSettings::class)
-            ->selectTableRecords($settings)
-            ->callTableBulkAction('delete');
+            ->callTableBulkAction('delete', $settings);
 
         foreach ($settings as $setting) {
             $this->assertModelMissing($setting);

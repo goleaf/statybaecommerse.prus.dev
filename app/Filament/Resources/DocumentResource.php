@@ -6,15 +6,11 @@ use App\Filament\Resources\DocumentResource\Pages;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Services\DocumentService;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,15 +21,25 @@ final class DocumentResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Documents';
+    protected static string|\UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Content;
 
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('navigation.groups.content');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.documents.title');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('documents.document_information'))
+                Section::make(__('documents.document_information'))
                     ->components([
                         Forms\Components\Select::make('document_template_id')
                             ->label(__('documents.template'))
@@ -73,7 +79,7 @@ final class DocumentResource extends Resource
                             ->default('html'),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('documents.content'))
+                Section::make(__('documents.content'))
                     ->components([
                         Forms\Components\RichEditor::make('content')
                             ->label(__('documents.content'))
@@ -95,7 +101,7 @@ final class DocumentResource extends Resource
                                 'undo',
                             ]),
                     ]),
-                Forms\Components\Section::make(__('documents.variables'))
+                Section::make(__('documents.variables'))
                     ->components([
                         Forms\Components\KeyValue::make('variables')
                             ->label(__('documents.variables'))
@@ -105,7 +111,7 @@ final class DocumentResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->collapsed(),
-                Forms\Components\Section::make(__('documents.metadata'))
+                Section::make(__('documents.metadata'))
                     ->components([
                         Forms\Components\TextInput::make('documentable_type')
                             ->label(__('documents.related_model_type'))
@@ -175,7 +181,7 @@ final class DocumentResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('documents.created_at'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable(),
             ])
             ->filters([
@@ -218,7 +224,7 @@ final class DocumentResource extends Resource
                     }),
             ])
             ->recordActions([
-                Action::make('generate_pdf')
+                Actions\Action::make('generate_pdf')
                     ->label(__('documents.generate_pdf'))
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('success')
@@ -229,20 +235,20 @@ final class DocumentResource extends Resource
 
                         return redirect($url);
                     }),
-                Action::make('download')
+                Actions\Action::make('download')
                     ->label(__('documents.download'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('primary')
                     ->visible(fn(Document $record): bool => $record->isPdf() && $record->file_path)
                     ->url(fn(Document $record): string => asset('storage/' . $record->file_path))
                     ->openUrlInNewTab(),
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+            ->bulkActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

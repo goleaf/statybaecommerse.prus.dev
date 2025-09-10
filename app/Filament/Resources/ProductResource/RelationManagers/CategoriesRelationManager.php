@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use Filament\Actions\AttachAction;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;

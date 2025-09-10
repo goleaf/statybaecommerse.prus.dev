@@ -18,15 +18,16 @@ final class AttributeValue extends Model
     protected $fillable = [
         'attribute_id',
         'value',
-        'key',
-        'position',
+        'slug',
+        'color_code',
+        'sort_order',
         'is_enabled',
     ];
 
     protected function casts(): array
     {
         return [
-            'position' => 'integer',
+            'sort_order' => 'integer',
             'is_enabled' => 'boolean',
         ];
     }

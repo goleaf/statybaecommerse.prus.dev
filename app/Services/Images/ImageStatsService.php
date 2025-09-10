@@ -64,7 +64,7 @@ final class ImageStatsService
                     'name' => $product->name,
                     'slug' => $product->slug,
                     'image_count' => $product->media_count,
-                    'url' => route('products.show', ['slug' => $product->slug]),
+                    'url' => route('product.show', ['slug' => $product->slug]),
                 ];
             })
             ->toArray();

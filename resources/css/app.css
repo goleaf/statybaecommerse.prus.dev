@@ -16,12 +16,47 @@
   display: none !important;
 }
 
+:root {
+  /* Enforce light color scheme across browsers */
+  color-scheme: light;
+}
+
 body {
-  @apply antialiased bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+  @apply antialiased bg-gray-50 text-gray-900;
 }
 
 /* Selection colors (Tailwind v4 does not support variant utilities in @apply) */
 ::selection {
   background-color: #0d9488; /* teal-600 */
   color: #ffffff;
+}
+
+/* Neutralize any dark:... utilities if user prefers dark scheme */
+@media (prefers-color-scheme: dark) {
+  /* Background overrides */
+  .dark\:bg-gray-900 { background-color: #ffffff !important; }
+  .dark\:bg-gray-800 { background-color: #ffffff !important; }
+  .dark\:bg-gray-700 { background-color: #f7fafc !important; }
+  .dark\:bg-gray-600 { background-color: #f7fafc !important; }
+  .dark\:bg-green-900\/20 { background-color: #ecfdf5 !important; }
+  .dark\:bg-red-900\/20 { background-color: #fef2f2 !important; }
+  .dark\:bg-blue-900\/20 { background-color: #eff6ff !important; }
+
+  /* Text overrides */
+  .dark\:text-white { color: #111827 !important; }
+  .dark\:text-gray-100 { color: #111827 !important; }
+  .dark\:text-gray-200 { color: #1f2937 !important; }
+  .dark\:text-gray-300 { color: #374151 !important; }
+  .dark\:text-gray-400 { color: #4b5563 !important; }
+  .dark\:text-blue-400 { color: #2563eb !important; }
+  .dark\:text-green-400 { color: #16a34a !important; }
+  .dark\:text-red-400 { color: #dc2626 !important; }
+
+  /* Border overrides */
+  .dark\:border-gray-600 { border-color: #e5e7eb !important; }
+  .dark\:border-gray-700 { border-color: #e5e7eb !important; }
+
+  /* Hover state overrides */
+  .dark\:hover\:bg-gray-700:hover { background-color: #f3f4f6 !important; }
+  .dark\:hover\:text-white:hover { color: #111827 !important; }
 }

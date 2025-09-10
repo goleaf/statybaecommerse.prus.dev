@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Currency;
+use App\Models\Country;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
 
@@ -104,20 +105,44 @@ class ZoneSeeder extends Seeder
         ];
 
         foreach ($zones as $zoneData) {
-            $zone = Zone::create([
-                'name' => $zoneData['name'],
-                'slug' => $zoneData['slug'],
-                'code' => $zoneData['code'],
-                'is_enabled' => $zoneData['is_enabled'],
-                'is_default' => $zoneData['is_default'],
-                'currency_id' => $zoneData['currency_id'],
-                'tax_rate' => $zoneData['tax_rate'],
-                'shipping_rate' => $zoneData['shipping_rate'],
-                'sort_order' => $zoneData['sort_order'],
-                'metadata' => $zoneData['metadata']
-            ]);
+            $zone = Zone::updateOrCreate(
+                ['code' => $zoneData['code']],
+                [
+                    'name' => $zoneData['name'],
+                    'slug' => $zoneData['slug'],
+                    'is_enabled' => $zoneData['is_enabled'],
+                    'is_default' => $zoneData['is_default'],
+                    'currency_id' => $zoneData['currency_id'],
+                    'tax_rate' => $zoneData['tax_rate'],
+                    'shipping_rate' => $zoneData['shipping_rate'],
+                    'sort_order' => $zoneData['sort_order'],
+                    'metadata' => $zoneData['metadata']
+                ]
+            );
 
-            $this->command->info("Created zone: {$zoneData['code']} - {$zoneData['name']['en']}");
+            // Attach countries to zones by region/codes
+            $countryCodes = match ($zoneData['code']) {
+                'EU' => [
+                    'LT','LV','EE','PL','DE','FR','NL','BE','ES','IT','AT','CH','CZ','SK','HU','RO','BG','HR','SI','SE','NO','DK','FI','GB'
+                ],
+                'NA' => ['US','CA','MX'],
+                'UK' => ['GB'],
+                'LT' => ['LT'],
+                default => [],
+            };
+
+            if (! empty($countryCodes)) {
+                $countryIds = Country::query()
+                    ->whereIn('cca2', $countryCodes)
+                    ->pluck('id')
+                    ->all();
+
+                if (! empty($countryIds)) {
+                    $zone->countries()->syncWithoutDetaching($countryIds);
+                }
+            }
+
+            $this->command->info("Upserted zone: {$zoneData['code']} - {$zoneData['name']['en']} (countries: " . implode(',', $countryCodes) . ")");
         }
 
         $this->command->info('Zone seeding completed successfully!');

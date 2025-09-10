@@ -4,14 +4,12 @@ return [
     // Analytics Dashboard
     'analytics_dashboard' => 'Analytics Dashboard',
     'analytics' => 'Analytics',
-    
     // Date and Time Filters
     'from_date' => 'From Date',
     'until_date' => 'Until Date',
     'order_date_range' => 'Order Date Range',
     'this_month' => 'This Month',
     'month' => 'Month',
-    
     // Order Status
     'status' => 'Status',
     'pending' => 'Pending',
@@ -20,11 +18,9 @@ return [
     'delivered' => 'Delivered',
     'cancelled' => 'Cancelled',
     'refunded' => 'Refunded',
-    
     // Filters and Actions
     'high_value_orders' => 'High Value Orders',
     'export_selected' => 'Export Selected',
-    
     // Column Headers
     'date' => 'Date',
     'order_number' => 'Order Number',
@@ -32,7 +28,6 @@ return [
     'items' => 'Items',
     'total' => 'Total',
     'created' => 'Created',
-    
     // Summary Labels
     'total_revenue' => 'Total Revenue',
     'avg_order_value' => 'Avg Order Value',
@@ -40,7 +35,6 @@ return [
     'customers' => 'Customers',
     'products' => 'Products',
     'reviews' => 'Reviews',
-    
     // Analytics Metrics
     'orders_count' => 'Total Orders Count',
     'revenue' => 'Revenue',
@@ -50,7 +44,6 @@ return [
     'sales_by_category' => 'Sales by Category',
     'monthly_revenue' => 'Monthly Revenue',
     'daily_orders' => 'Daily Orders',
-    
     // Time Periods
     'today' => 'Today',
     'yesterday' => 'Yesterday',
@@ -58,14 +51,12 @@ return [
     'last_30_days' => 'Last 30 Days',
     'this_year' => 'This Year',
     'last_year' => 'Last Year',
-    
     // Performance Metrics
     'growth_rate' => 'Growth Rate',
     'repeat_customers' => 'Repeat Customers',
     'new_customers' => 'New Customers',
     'customer_lifetime_value' => 'Customer Lifetime Value',
     'cart_abandonment_rate' => 'Cart Abandonment Rate',
-    
     // Export Options
     'export_csv' => 'Export CSV',
     'export_excel' => 'Export Excel',
@@ -74,13 +65,11 @@ return [
     'export_report' => 'Export Report',
     'refresh_data' => 'Refresh Data',
     'view' => 'View',
-    
     // Chart Types
     'line_chart' => 'Line Chart',
     'bar_chart' => 'Bar Chart',
     'pie_chart' => 'Pie Chart',
     'area_chart' => 'Area Chart',
-    
     // Comparison
     'compare_to_previous' => 'Compare to Previous Period',
     'percentage_change' => 'Percentage Change',
@@ -88,7 +77,6 @@ return [
     'increase' => 'Increase',
     'decrease' => 'Decrease',
     'no_change' => 'No Change',
-    
     // Additional Analytics Terms
     'active_customers' => 'Active Customers',
     'featured' => 'featured',

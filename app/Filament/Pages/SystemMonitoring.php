@@ -6,9 +6,9 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Filament\Actions\Action;
-use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
+use Filament\Forms;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -20,11 +20,14 @@ final class SystemMonitoring extends Page
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cpu-chip';
 
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::System;
+
     protected static ?int $navigationSort = 1;
 
     public array $systemStats = [];
+
     public array $databaseStats = [];
+
     public array $queueStats = [];
 
     public static function getNavigationLabel(): string
@@ -84,7 +87,6 @@ final class SystemMonitoring extends Page
                 ->label(__('admin.actions.refresh'))
                 ->icon('heroicon-o-arrow-path')
                 ->action(fn() => $this->loadSystemStats()),
-
             Action::make('clear_cache')
                 ->label(__('admin.actions.clear_cache'))
                 ->icon('heroicon-o-trash')
@@ -93,13 +95,12 @@ final class SystemMonitoring extends Page
                 ->action(function (): void {
                     Artisan::call('optimize:clear');
                     $this->loadSystemStats();
-                    
+
                     \Filament\Notifications\Notification::make()
                         ->title(__('admin.notifications.cache_cleared'))
                         ->success()
                         ->send();
                 }),
-
             Action::make('optimize')
                 ->label(__('admin.actions.optimize'))
                 ->icon('heroicon-o-rocket-launch')
@@ -108,7 +109,7 @@ final class SystemMonitoring extends Page
                 ->action(function (): void {
                     Artisan::call('optimize');
                     $this->loadSystemStats();
-                    
+
                     \Filament\Notifications\Notification::make()
                         ->title(__('admin.notifications.system_optimized'))
                         ->success()

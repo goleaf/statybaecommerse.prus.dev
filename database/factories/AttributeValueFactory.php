@@ -14,9 +14,10 @@ class AttributeValueFactory extends Factory
         return [
             'attribute_id' => fn() => \App\Models\Attribute::factory(),
             'value' => $value,
-            'key' => $this->faker->boolean(50) ? $this->faker->hexColor() : null,
-            'position' => $this->faker->numberBetween(0, 50),
-            'metadata' => null,
+            'slug' => str($value)->slug()->toString(),
+            'color_code' => $this->faker->boolean(40) ? $this->faker->hexColor() : null,
+            'sort_order' => $this->faker->numberBetween(0, 50),
+            'is_enabled' => true,
         ];
     }
 }

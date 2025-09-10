@@ -11,11 +11,13 @@ final class HandleImpersonation
 {
     public function handle(Request $request, Closure $next)
     {
-        if (session()->has('impersonating') && Auth::check()) {
-            $impersonatedUserId = session('impersonating');
-            $impersonatedUser = User::find($impersonatedUserId);
+        if (session()->has('impersonate') && Auth::check()) {
+            $impersonateData = session('impersonate');
+            $impersonatedUserId = $impersonateData['user_id'] ?? null;
+            if ($impersonatedUserId) {
+                $impersonatedUser = User::find($impersonatedUserId);
             
-            if ($impersonatedUser) {
+                if ($impersonatedUser) {
                 // Store original user ID for returning
                 if (!session()->has('original_user')) {
                     session(['original_user' => Auth::id()]);
@@ -28,6 +30,7 @@ final class HandleImpersonation
                     'user' => $impersonatedUser,
                     'original_user' => User::find(session('original_user')),
                 ]);
+                }
             }
         }
 

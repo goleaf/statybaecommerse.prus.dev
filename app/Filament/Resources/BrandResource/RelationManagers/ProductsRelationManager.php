@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions as Actions;
+use Filament\Actions as Actions;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;

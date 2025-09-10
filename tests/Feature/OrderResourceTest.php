@@ -147,8 +147,7 @@ final class OrderResourceTest extends TestCase
         $orders = Order::factory()->count(3)->create();
 
         Livewire::test(OrderResource\Pages\ListOrders::class)
-            ->selectTableRecords($orders)
-            ->callTableBulkAction('delete');
+            ->callTableBulkAction('delete', $orders);
 
         foreach ($orders as $order) {
             $this->assertSoftDeleted($order);
@@ -197,7 +196,7 @@ final class OrderResourceTest extends TestCase
         // This would test the DocumentAction, but we need to mock the DocumentTemplate
         // For now, we'll just test that the action exists
         Livewire::test(OrderResource\Pages\ListOrders::class)
-            ->assertTableActionExists('generate_document', $order);
+            ->assertTableActionExists('generate_document', record: $order);
     }
 
     public function test_order_displays_correct_columns(): void

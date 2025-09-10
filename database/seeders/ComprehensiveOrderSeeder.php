@@ -23,7 +23,7 @@ final class ComprehensiveOrderSeeder extends Seeder
     private array $orderStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
     private array $paymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
     private array $paymentMethods = ['credit_card', 'paypal', 'bank_transfer', 'cash_on_delivery', 'stripe', 'mollie'];
-    private array $currencies = ['EUR', 'USD', 'GBP'];
+    private array $currencies = ['EUR'];
     private array $shippingCarriers = ['DPD', 'Omniva', 'LP Express', 'UPS', 'FedEx', 'DHL'];
     private array $shippingServices = ['Standard', 'Express', 'Next Day', 'Economy', 'Premium'];
 
@@ -187,7 +187,10 @@ final class ComprehensiveOrderSeeder extends Seeder
     {
         $status = fake()->randomElement($this->orderStatuses);
         $paymentStatus = $this->getPaymentStatusForOrderStatus($status);
-        $currency = fake()->randomElement($this->currencies);
+        $currency = 'EUR';
+
+        $zoneId = optional($zones->firstWhere('is_default', true))->id
+            ?? optional($zones->first())->id;
 
         // Calculate amounts
         $subtotal = fake()->randomFloat(2, 10, 500);
@@ -212,7 +215,8 @@ final class ComprehensiveOrderSeeder extends Seeder
             'notes' => fake()->optional(0.3)->sentence(),
             'shipped_at' => $this->getShippedDate($status, $orderDate),
             'delivered_at' => $this->getDeliveredDate($status, $orderDate),
-            'zone_id' => null,  // Skip zone_id for now as it references sh_zones table
+            // Temporarily avoid FK issues after sh_* table renames
+            'zone_id' => null,
             'payment_status' => $paymentStatus,
             'payment_method' => fake()->randomElement($this->paymentMethods),
             'payment_reference' => fake()->optional(0.8)->uuid(),
@@ -250,11 +254,11 @@ final class ComprehensiveOrderSeeder extends Seeder
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $product->id,
-                'variant_id' => null,  // Assuming no variants for now
-                'product_name' => $product->name,
-                'product_sku' => $product->sku ?? fake()->unique()->bothify('SKU-####-????'),
+                'product_variant_id' => null,  // Assuming no variants for now
+                'name' => $product->name,
+                'sku' => $product->sku ?? fake()->unique()->bothify('SKU-####-????'),
                 'quantity' => $quantity,
-                'price' => $unitPrice,
+                'unit_price' => $unitPrice,
                 'total' => $total,
             ]);
         }

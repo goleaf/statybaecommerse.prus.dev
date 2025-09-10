@@ -17,4 +17,14 @@ class CreateOrder extends CreateRecord
 
         return $data;
     }
+
+    public function getTitle(): string
+    {
+        return __('admin.orders.create');
+    }
+
+    public function getSubheading(): ?string
+    {
+        return __('admin.orders.description');
+    }
 }

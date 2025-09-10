@@ -15,7 +15,7 @@ return [
         'system' => 'Sistema',
         'analytics' => 'Analitika',
         'users' => 'Naudotojai',
-        'advanced_reports' => 'Išsamūs ataskaitos',
+        'reports' => 'Ataskaitos',
         'brands' => 'Prekės ženklai',
         'zones' => 'Zonos',
         'customer_segmentation' => 'Klientų segmentavimas',
@@ -49,7 +49,7 @@ return [
         'partner_tiers' => 'Partnerių lygiai',
         'discount_codes' => 'Nuolaidų kodai',
         'document_templates' => 'Dokumentų šablonai',
-        'enhanced_settings' => 'Patobulinti nustatymai',
+        'enhanced_settings' => 'Nustatymai',
         'system_settings' => 'Sistemos nustatymai',
     ],
     // Reports
@@ -101,6 +101,7 @@ return [
         'overview' => 'Apžvalga',
         'quick_stats' => 'Greita statistika',
         'recent_activity' => 'Paskutinė veikla',
+        'description' => 'Tvarkykite parduotuvės turinį, užsakymus, klientus ir nustatymus vienoje vietoje.',
     ],
     // Widgets
     'widgets' => [
@@ -712,6 +713,8 @@ return [
     'models' => [
         'brand' => 'Prekės ženklas',
         'brands' => 'Prekės ženklai',
+        'report' => 'Ataskaita',
+        'reports' => 'Ataskaitos',
         'currency' => 'Valiuta',
         'currencies' => 'Valiutos',
         'partner' => 'Partneris',
@@ -754,6 +757,8 @@ return [
         'media_files' => 'Medijos failai',
         'analytics_event' => 'Analitikos įvykis',
         'analytics_events' => 'Analitikos įvykiai',
+        'seo_data' => 'SEO duomenys',
+        'seo_entries' => 'SEO įrašai',
         'cart_item' => 'Krepšelio prekė',
         'cart_items' => 'Krepšelio prekės',
         'customer_group' => 'Klientų grupė',

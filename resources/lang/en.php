@@ -12,6 +12,7 @@ return [
     'nav_exports' => 'Exports',
     'nav_account' => 'Account',
     'nav_locations' => 'Locations',
+    'nav_toggle' => 'Toggle navigation',
     // Authentication
     'auth_login' => 'Login',
     'auth_register' => 'Register',

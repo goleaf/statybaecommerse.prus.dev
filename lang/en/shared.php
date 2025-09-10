@@ -110,4 +110,15 @@ return [
     'product_removed_from_comparison' => 'Product removed from comparison',
     'clear_comparison' => 'Clear Comparison',
     'compare_products' => 'Compare Products',
+    
+    // Navigation
+    'home' => 'Home',
+    'brands' => 'Brands',
+    'categories' => 'Categories',
+    'products' => 'Products',
+    
+    // Empty states
+    'no_results_found' => 'No results found',
+    'clear_filters' => 'Clear Filters',
+    'cart_empty_description' => 'Your cart is empty. Start shopping to add items.',
 ];

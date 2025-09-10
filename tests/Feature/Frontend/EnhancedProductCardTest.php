@@ -147,7 +147,7 @@ it('tracks analytics when opening quick view', function () {
 it('can navigate to product page', function () {
     Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
         ->call('viewProduct')
-        ->assertRedirect(route('products.show', $this->product));
+        ->assertRedirect(route('product.show', $this->product));
 });
 
 it('tracks analytics when viewing product page', function () {

@@ -6,11 +6,14 @@ use App\Filament\Resources\CustomerManagementResource\Pages;
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\User;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,13 +27,13 @@ final class CustomerManagementResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Customers';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Customers;
 
     protected static ?int $navigationSort = 1;
 
     public static function getNavigationLabel(): string
     {
-        return __('Customer Management');
+        return __('admin.navigation.customers');
     }
 
     public static function getModelLabel(): string
@@ -55,7 +58,7 @@ final class CustomerManagementResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('Customer Information'))
+                Section::make(__('Customer Information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label(__('Full Name'))
@@ -79,7 +82,7 @@ final class CustomerManagementResource extends Resource
                             ->default('lt'),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('Account Status'))
+                Section::make(__('Account Status'))
                     ->schema([
                         Forms\Components\Toggle::make('is_active')
                             ->label(__('Active Account'))
@@ -105,7 +108,7 @@ final class CustomerManagementResource extends Resource
                             ->dehydrated(false),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('Customer Preferences'))
+                Section::make(__('Customer Preferences'))
                     ->schema([
                         Forms\Components\KeyValue::make('preferences')
                             ->label(__('Preferences'))
@@ -113,7 +116,7 @@ final class CustomerManagementResource extends Resource
                             ->valueLabel(__('Value'))
                             ->helperText(__('Customer preferences and settings')),
                     ]),
-                Forms\Components\Section::make(__('Password Management'))
+                Section::make(__('Password Management'))
                     ->schema([
                         Forms\Components\TextInput::make('password')
                             ->label(__('New Password'))
@@ -190,7 +193,7 @@ final class CustomerManagementResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Registered'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -230,11 +233,11 @@ final class CustomerManagementResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                Action::make('view_orders')
+                Actions\Action::make('view_orders')
                     ->label(__('View Orders'))
                     ->icon('heroicon-o-shopping-bag')
                     ->url(fn(User $record): string => OrderResource::getUrl('index', ['tableFilters' => ['user' => ['value' => $record->id]]])),
-                Action::make('send_email')
+                Actions\Action::make('send_email')
                     ->label(__('Send Email'))
                     ->icon('heroicon-o-envelope')
                     ->color('primary')
@@ -302,7 +305,7 @@ final class CustomerManagementResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('view_customers') ?? false;
+        return (bool) (auth()->user()?->is_admin ?? false);
     }
 
     public static function getNavigationBadge(): ?string

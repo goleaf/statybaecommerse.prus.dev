@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
-use Filament\Tables\Actions\Action;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -22,7 +22,7 @@ final class CollectionsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 Forms\Components\Select::make('collection_id')
                     ->relationship('collections', 'name')
                     ->searchable()
@@ -43,12 +43,10 @@ final class CollectionsRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
+                    ->label(__('translations.type'))
+                    ->formatStateUsing(fn($record): string => $record->is_automatic ? 'automatic' : 'manual')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'manual' => 'primary',
-                        'automatic' => 'success',
-                        default => 'gray',
-                    }),
+                    ->color(fn($record): string => $record->is_automatic ? 'success' : 'primary'),
                 Tables\Columns\TextColumn::make('products_count')
                     ->counts('products')
                     ->label('Products'),
@@ -57,10 +55,11 @@ final class CollectionsRelationManager extends RelationManager
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
+                Tables\Filters\SelectFilter::make('is_automatic')
+                    ->label(__('translations.type'))
                     ->options([
-                        'manual' => 'Manual',
-                        'automatic' => 'Automatic',
+                        0 => 'Manual',
+                        1 => 'Automatic',
                     ]),
                 Tables\Filters\Filter::make('visible')
                     ->query(fn(Builder $query): Builder => $query->where('is_visible', true)),
@@ -73,7 +72,7 @@ final class CollectionsRelationManager extends RelationManager
                 DetachAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
+                Tables\Actions\BulkActionGroup::make([
                     DetachBulkAction::make(),
                 ]),
             ]);

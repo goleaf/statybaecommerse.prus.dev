@@ -28,7 +28,7 @@
     @else
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($collections as $collection)
-                <a href="{{ route('collection.show', ['locale' => app()->getLocale(), 'slug' => $collection->trans('slug') ?? $collection->slug]) }}"
+                <a href="{{ route('collections.show', ['locale' => app()->getLocale(), 'slug' => $collection->trans('slug') ?? $collection->slug]) }}"
                    class="block border rounded-lg p-4 hover:shadow-sm">
                     <div class="aspect-square bg-gray-50 flex items-center justify-center mb-3">
                         @php($thumb = $collection->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: ($collection->getFirstMediaUrl(config('media.storage.collection_name'), 'small') ?: $collection->getFirstMediaUrl(config('media.storage.collection_name'))))

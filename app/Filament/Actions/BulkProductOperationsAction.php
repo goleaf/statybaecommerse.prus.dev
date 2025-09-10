@@ -8,6 +8,7 @@ use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Support\Colors\Color;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Schemas\Components\Group;
 
 final class BulkProductOperationsAction
 {
@@ -32,7 +33,7 @@ final class BulkProductOperationsAction
                     ->required()
                     ->live(),
 
-                Forms\Components\Group::make([
+                Group::make([
                     Forms\Components\TextInput::make('price_multiplier')
                         ->label(__('admin.fields.price_multiplier'))
                         ->numeric()
@@ -50,7 +51,7 @@ final class BulkProductOperationsAction
                 ->visible(fn (Forms\Get $get): bool => $get('operation') === 'update_prices')
                 ->columns(2),
 
-                Forms\Components\Group::make([
+                Group::make([
                     Forms\Components\TextInput::make('stock_quantity')
                         ->label(__('admin.fields.stock_quantity'))
                         ->numeric()

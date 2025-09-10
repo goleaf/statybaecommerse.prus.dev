@@ -1,6 +1,18 @@
 <?php declare(strict_types=1);
 
 return [
+    // Category page sidebar & controls
+    'advanced_filters' => 'Advanced filters',
+    'filters' => 'Filters',
+    'categories' => 'Categories',
+    'products' => 'Products',
+    'newest' => 'Newest',
+    'ascending' => 'Ascending',
+    'descending' => 'Descending',
+    'rating' => 'Rating',
+    'price' => 'Price',
+    'name' => 'Name',
+    'showing' => 'Showing',
     // Address Types
     'address_type_shipping' => 'Shipping Address',
     'address_type_billing' => 'Billing Address',
@@ -87,8 +99,10 @@ return [
     'image_gallery' => 'Image Gallery',
     'no_image' => 'No Image',
     'generate_images' => 'Generate Images',
+    'generate_images_confirm_bulk' => 'Are you sure you want to generate random images for the selected products?',
     'random_image' => 'Random Image',
     'image_generated' => 'Image Generated',
+    'image_generation_summary' => 'Successfully generated: :success, Errors: :errors',
     'image_conversion' => 'Image Conversion',
     'webp_format' => 'WebP Format',
     'image_optimization' => 'Image Optimization',
@@ -127,6 +141,9 @@ return [
     'parent_category' => 'Parent Category',
     'enabled' => 'Enabled',
     'visible' => 'Visible',
+    'attach_existing_category' => 'Attach existing category',
+    'detach_child' => 'Detach',
+    'bulk_detach' => 'Bulk Detach',
     // Collection Information
     'collection_information' => 'Collection Information',
     'collection_rules' => 'Collection Rules',
@@ -518,4 +535,6 @@ return [
     'today' => 'Today',
     'this_week' => 'This Week',
     'this_month' => 'This Month',
+    // Brands
+    'brands' => 'Brands',
 ];

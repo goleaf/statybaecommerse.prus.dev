@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\HasTranslations;
 
 final class Campaign extends Model
 {
     use HasFactory, SoftDeletes;
+    use HasTranslations;
 
     protected $table = 'discount_campaigns';
 
@@ -23,6 +25,11 @@ final class Campaign extends Model
         'zone_id',
         'status',
         'metadata',
+        'is_featured',
+        'send_notifications',
+        'track_conversions',
+        'max_uses',
+        'budget_limit',
     ];
 
     protected function casts(): array
@@ -31,8 +38,15 @@ final class Campaign extends Model
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
             'metadata' => 'array',
+            'is_featured' => 'boolean',
+            'send_notifications' => 'boolean',
+            'track_conversions' => 'boolean',
+            'max_uses' => 'integer',
+            'budget_limit' => 'decimal:2',
         ];
     }
+
+    protected string $translationModel = \App\Models\Translations\CampaignTranslation::class;
 
     public function discounts(): BelongsToMany
     {

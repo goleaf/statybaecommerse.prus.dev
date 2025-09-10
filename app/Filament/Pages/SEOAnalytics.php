@@ -2,17 +2,18 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\Product;
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use Filament\Actions\Action;
-use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Http;
 use BackedEnum;
@@ -23,7 +24,7 @@ final class SEOAnalytics extends Page implements HasTable
     use InteractsWithTable;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass';
-    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Marketing;
     protected static ?int $navigationSort = 2;
 
     public ?string $seoEntityType = 'products';
@@ -32,6 +33,11 @@ final class SEOAnalytics extends Page implements HasTable
     public static function getNavigationLabel(): string
     {
         return __('admin.navigation.seo_analytics');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.marketing');
     }
 
     public function table(Table $table): Table
@@ -44,50 +50,44 @@ final class SEOAnalytics extends Page implements HasTable
                     ->searchable()
                     ->sortable()
                     ->weight('medium'),
-
                 Tables\Columns\TextColumn::make('slug')
                     ->label(__('admin.table.slug'))
                     ->copyable()
                     ->badge()
                     ->color('gray'),
-
                 Tables\Columns\TextColumn::make('seo_title')
                     ->label(__('admin.table.seo_title'))
                     ->limit(50)
-                    ->tooltip(fn ($record): ?string => $record->seo_title),
-
+                    ->tooltip(fn($record): ?string => $record->seo_title),
                 Tables\Columns\TextColumn::make('seo_title_length')
                     ->label(__('admin.table.title_length'))
-                    ->getStateUsing(fn ($record): int => strlen($record->seo_title ?? ''))
+                    ->getStateUsing(fn($record): int => strlen($record->seo_title ?? ''))
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
+                    ->color(fn(int $state): string => match (true) {
                         $state === 0 => 'danger',
                         $state < 30 => 'warning',
                         $state > 60 => 'warning',
                         default => 'success',
                     }),
-
                 Tables\Columns\TextColumn::make('seo_description_length')
                     ->label(__('admin.table.desc_length'))
-                    ->getStateUsing(fn ($record): int => strlen($record->seo_description ?? ''))
+                    ->getStateUsing(fn($record): int => strlen($record->seo_description ?? ''))
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
+                    ->color(fn(int $state): string => match (true) {
                         $state === 0 => 'danger',
                         $state < 120 => 'warning',
                         $state > 160 => 'warning',
                         default => 'success',
                     }),
-
                 Tables\Columns\IconColumn::make('has_meta_keywords')
                     ->label(__('admin.table.keywords'))
-                    ->getStateUsing(fn ($record): bool => !empty($record->meta_keywords))
+                    ->getStateUsing(fn($record): bool => !empty($record->meta_keywords))
                     ->boolean(),
-
                 Tables\Columns\TextColumn::make('seo_score')
                     ->label(__('admin.table.seo_score'))
-                    ->getStateUsing(fn ($record): int => $this->calculateSEOScore($record))
+                    ->getStateUsing(fn($record): int => $this->calculateSEOScore($record))
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
+                    ->color(fn(int $state): string => match (true) {
                         $state >= 90 => 'success',
                         $state >= 70 => 'info',
                         $state >= 50 => 'warning',
@@ -95,14 +95,13 @@ final class SEOAnalytics extends Page implements HasTable
                     }),
             ])
             ->headerActions([
-                Actions\Action::make('seo_audit')
+                Action::make('seo_audit')
                     ->label(__('admin.actions.seo_audit'))
                     ->icon('heroicon-o-magnifying-glass-circle')
                     ->action(function (): void {
                         $this->performSEOAudit();
                     }),
-
-                Actions\Action::make('generate_sitemaps')
+                Action::make('generate_sitemaps')
                     ->label(__('admin.actions.generate_sitemaps'))
                     ->icon('heroicon-o-map')
                     ->color('success')
@@ -111,19 +110,18 @@ final class SEOAnalytics extends Page implements HasTable
                     }),
             ])
             ->recordActions([
-                Actions\Action::make('optimize_seo')
+                Action::make('optimize_seo')
                     ->label(__('admin.actions.optimize_seo'))
                     ->icon('heroicon-o-wrench-screwdriver')
                     ->color('warning')
                     ->action(function ($record): void {
                         $this->optimizeSEO($record);
                     }),
-
-                Actions\Action::make('preview_seo')
+                Action::make('preview_seo')
                     ->label(__('admin.actions.preview_seo'))
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->modalContent(fn ($record) => view('filament.modals.seo-preview', compact('record')))
+                    ->modalContent(fn($record) => view('filament.modals.seo-preview', compact('record')))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel(__('admin.actions.close')),
             ])
@@ -137,11 +135,13 @@ final class SEOAnalytics extends Page implements HasTable
                         'poor' => __('admin.seo_scores.poor') . ' (0-49)',
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        if (!$data['value']) return $query;
-                        
+                        if (!$data['value'])
+                            return $query;
+
                         return match ($data['value']) {
-                            'excellent' => $query->whereRaw('LENGTH(COALESCE(seo_title, "")) BETWEEN 30 AND 60')
-                                               ->whereRaw('LENGTH(COALESCE(seo_description, "")) BETWEEN 120 AND 160'),
+                            'excellent' => $query
+                                ->whereRaw('LENGTH(COALESCE(seo_title, "")) BETWEEN 30 AND 60')
+                                ->whereRaw('LENGTH(COALESCE(seo_description, "")) BETWEEN 120 AND 160'),
                             'good' => $query->whereNotNull('seo_title')->whereNotNull('seo_description'),
                             'fair' => $query->where(function ($q) {
                                 $q->whereNull('seo_title')->orWhereNull('seo_description');
@@ -150,19 +150,17 @@ final class SEOAnalytics extends Page implements HasTable
                             default => $query,
                         };
                     }),
-
                 Tables\Filters\TernaryFilter::make('missing_seo_title')
                     ->label(__('admin.filters.missing_seo_title'))
                     ->queries(
-                        true: fn (Builder $query) => $query->whereNull('seo_title'),
-                        false: fn (Builder $query) => $query->whereNotNull('seo_title'),
+                        true: fn(Builder $query) => $query->whereNull('seo_title'),
+                        false: fn(Builder $query) => $query->whereNotNull('seo_title'),
                     ),
-
                 Tables\Filters\TernaryFilter::make('missing_seo_description')
                     ->label(__('admin.filters.missing_seo_description'))
                     ->queries(
-                        true: fn (Builder $query) => $query->whereNull('seo_description'),
-                        false: fn (Builder $query) => $query->whereNotNull('seo_description'),
+                        true: fn(Builder $query) => $query->whereNull('seo_description'),
+                        false: fn(Builder $query) => $query->whereNotNull('seo_description'),
                     ),
             ]);
     }
@@ -222,7 +220,7 @@ final class SEOAnalytics extends Page implements HasTable
     private function performSEOAudit(): void
     {
         $issues = [];
-        
+
         // Check for missing SEO titles
         $missingTitles = $this->getSEOQuery()->whereNull('seo_title')->count();
         if ($missingTitles > 0) {
@@ -236,7 +234,8 @@ final class SEOAnalytics extends Page implements HasTable
         }
 
         // Check for duplicate titles
-        $duplicateTitles = $this->getSEOQuery()
+        $duplicateTitles = $this
+            ->getSEOQuery()
             ->whereNotNull('seo_title')
             ->groupBy('seo_title')
             ->havingRaw('COUNT(*) > 1')
@@ -277,7 +276,7 @@ final class SEOAnalytics extends Page implements HasTable
     private function buildSitemapForLocale(string $locale): string
     {
         $urls = [];
-        
+
         // Add products
         Product::where('is_visible', true)->chunk(100, function ($products) use (&$urls, $locale) {
             foreach ($products as $product) {
@@ -305,7 +304,7 @@ final class SEOAnalytics extends Page implements HasTable
         // Build XML
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-        
+
         foreach ($urls as $url) {
             $xml .= "  <url>\n";
             $xml .= "    <loc>{$url['loc']}</loc>\n";
@@ -314,9 +313,9 @@ final class SEOAnalytics extends Page implements HasTable
             $xml .= "    <priority>{$url['priority']}</priority>\n";
             $xml .= "  </url>\n";
         }
-        
+
         $xml .= '</urlset>';
-        
+
         return $xml;
     }
 
@@ -402,7 +401,6 @@ final class SEOAnalytics extends Page implements HasTable
                         ->success()
                         ->send();
                 }),
-
             Action::make('check_broken_links')
                 ->label(__('admin.actions.check_broken_links'))
                 ->icon('heroicon-o-link')
@@ -440,5 +438,3 @@ final class SEOAnalytics extends Page implements HasTable
             ->send();
     }
 }
-
-

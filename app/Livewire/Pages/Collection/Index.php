@@ -14,7 +14,7 @@ class Index extends Component
     {
         abort_if(!app_feature_enabled('collection'), 404);
         $collections = CollectionModel::query()
-            ->where('is_enabled', true)
+            ->where('is_visible', true)
             ->orderBy('name')
             ->get();
 

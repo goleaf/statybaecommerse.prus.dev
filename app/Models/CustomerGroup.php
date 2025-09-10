@@ -3,9 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 final class CustomerGroup extends Model
 {
     use HasFactory;
@@ -14,26 +13,27 @@ final class CustomerGroup extends Model
 
     protected $fillable = [
         'name',
-        'code',
+        'slug',
         'description',
-        'discount_rate',
+        'discount_percentage',
         'is_enabled',
-        'metadata',
+        'is_active',
+        'conditions',
     ];
 
     protected function casts(): array
     {
         return [
-            'discount_rate' => 'decimal:4',
+            'discount_percentage' => 'decimal:2',
             'is_enabled' => 'boolean',
-            'metadata' => 'array',
+            'conditions' => 'array',
         ];
     }
 
     public function users(): BelongsToMany
     {
         return $this
-            ->belongsToMany(User::class, 'customer_group_user', 'group_id', 'user_id')
+            ->belongsToMany(User::class, 'customer_group_user', 'customer_group_id', 'user_id')
             ->withTimestamps();
     }
 
@@ -54,7 +54,7 @@ final class CustomerGroup extends Model
 
     public function scopeWithDiscount($query)
     {
-        return $query->where('discount_rate', '>', 0);
+        return $query->where('discount_percentage', '>', 0);
     }
 
     public function getUsersCountAttribute(): int
@@ -64,6 +64,16 @@ final class CustomerGroup extends Model
 
     public function hasDiscountRate(): bool
     {
-        return $this->discount_rate > 0;
+        return (float) $this->discount_percentage > 0;
+    }
+
+    public function getIsActiveAttribute(): bool
+    {
+        return (bool) $this->is_enabled;
+    }
+
+    public function setIsActiveAttribute(bool $value): void
+    {
+        $this->attributes['is_enabled'] = $value;
     }
 }

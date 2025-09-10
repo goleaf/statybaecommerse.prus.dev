@@ -239,9 +239,9 @@ final class CartItemResourceTest extends TestCase
         $this->actingAs($this->user);
 
         Livewire::test(CartItemResource\Pages\ListCartItems::class)
-            ->assertTableActionExists('view', $this->cartItem)
-            ->assertTableActionExists('edit', $this->cartItem)
-            ->assertTableActionExists('delete', $this->cartItem);
+            ->assertTableActionExists('view', checkActionUsing: null, record: $this->cartItem)
+            ->assertTableActionExists('edit', checkActionUsing: null, record: $this->cartItem)
+            ->assertTableActionExists('delete', checkActionUsing: null, record: $this->cartItem);
     }
 
     public function test_cart_item_resource_can_perform_view_action(): void
@@ -290,8 +290,7 @@ final class CartItemResourceTest extends TestCase
         ]);
 
         Livewire::test(CartItemResource\Pages\ListCartItems::class)
-            ->selectTableRecords([$this->cartItem, $cartItem2])
-            ->callTableBulkAction('delete');
+            ->callTableBulkAction('delete', records: [$this->cartItem, $cartItem2]);
 
         $this->assertSoftDeleted($this->cartItem);
         $this->assertSoftDeleted($cartItem2);
@@ -315,8 +314,7 @@ final class CartItemResourceTest extends TestCase
         ]);
 
         Livewire::test(CartItemResource\Pages\ListCartItems::class)
-            ->selectTableRecords([$oldCartItem1, $oldCartItem2])
-            ->callTableBulkAction('clear_old_carts');
+            ->callTableBulkAction('clear_old_carts', records: [$oldCartItem1, $oldCartItem2]);
 
         $this->assertDatabaseMissing('cart_items', ['id' => $oldCartItem1->id]);
         $this->assertDatabaseMissing('cart_items', ['id' => $oldCartItem2->id]);

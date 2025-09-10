@@ -4,11 +4,11 @@ namespace App\Filament\Actions;
 
 use App\Models\DocumentTemplate;
 use App\Services\DocumentService;
-use Closure;
 use Filament\Actions\Action;
-use Filament\Forms;
 use Filament\Notifications\Notification;
+use Filament\Forms;
 use Illuminate\Database\Eloquent\Model;
+use Closure;
 
 final class DocumentAction extends Action
 {
@@ -24,7 +24,8 @@ final class DocumentAction extends Action
     {
         parent::setUp();
 
-        $this->label(__('documents.generate_document'))
+        $this
+            ->label(__('documents.generate_document'))
             ->icon('heroicon-o-document-text')
             ->color('primary')
             ->modalHeading(__('documents.generate_document'))
@@ -40,12 +41,10 @@ final class DocumentAction extends Action
                     ->required()
                     ->searchable()
                     ->preload(),
-
                 Forms\Components\TextInput::make('title')
                     ->label(__('documents.title'))
                     ->required()
                     ->maxLength(255),
-
                 Forms\Components\Textarea::make('notes')
                     ->label(__('documents.notes'))
                     ->maxLength(1000),
@@ -55,7 +54,7 @@ final class DocumentAction extends Action
                 $service = app(DocumentService::class);
 
                 // Get variables from callback or default
-                $variables = $this->variablesCallback 
+                $variables = $this->variablesCallback
                     ? call_user_func($this->variablesCallback, $record)
                     : $this->extractVariablesFromRecord($record);
 
@@ -92,10 +91,10 @@ final class DocumentAction extends Action
     {
         $service = app(DocumentService::class);
         $variables = $service->getAvailableVariables();
-        
+
         // Extract model-specific variables
         $modelVariables = $service->extractVariablesFromModel($record, class_basename($record) . '_');
-        
+
         // Merge with global variables
         return array_merge($variables, $modelVariables, $this->variables);
     }

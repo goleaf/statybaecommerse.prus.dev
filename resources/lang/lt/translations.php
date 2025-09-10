@@ -1,6 +1,18 @@
 <?php declare(strict_types=1);
 
 return [
+    // Inventory CRUD translations
+    'inventories' => 'Atsargos',
+    'inventory_entry' => 'Atsargų įrašas',
+    'variant_inventories' => 'Variantų atsargos',
+    'variant_inventory_entry' => 'Varianto atsargų įrašas',
+    'tracked' => 'Sekama',
+    'reserved' => 'Rezervuota',
+    'incoming' => 'Atvyksta',
+    'threshold' => 'Riba',
+    'updated_at' => 'Atnaujinta',
+    'variant' => 'Variantas',
+    
     // Address Types
     'address_type_shipping' => 'Pristatymo adresas',
     'address_type_billing' => 'Atsiskaitymo adresas',

@@ -19,6 +19,23 @@ final class Review extends Model
             if ($review->rating < 1 || $review->rating > 5) {
                 throw new \InvalidArgumentException('Rating must be between 1 and 5');
             }
+
+            // Ensure required reviewer fields are populated
+            if (empty($review->reviewer_name) && !empty($review->user_id)) {
+                $user = User::find($review->user_id);
+                if ($user) {
+                    $review->reviewer_name = $user->name ?? 'Guest';
+                    $review->reviewer_email = $user->email ?? 'guest@example.com';
+                }
+            }
+
+            if (empty($review->reviewer_name)) {
+                $review->reviewer_name = $review->reviewer_name ?? 'Guest';
+            }
+
+            if (empty($review->reviewer_email)) {
+                $review->reviewer_email = $review->reviewer_email ?? 'guest@example.com';
+            }
         });
         
         static::updating(function ($review) {
@@ -64,6 +81,12 @@ final class Review extends Model
         return $this->belongsTo(User::class);
     }
 
+    // Alias for clarity: a review's author is a customer (User)
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function scopeApproved($query)
     {
         return $query->where('is_approved', true);
@@ -100,5 +123,4 @@ final class Review extends Model
         return $this->save();
     }
 }
-
 

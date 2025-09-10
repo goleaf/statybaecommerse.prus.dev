@@ -11,7 +11,7 @@
 
     @if ($price && $price->percentage && $price->percentage > 0)
         <span>
-            <span class="sr-only">{{ __('Original :') }}</span>
+            <span class="sr-only">{{ __('price_original') }}</span>
             <span class="text-gray-400 font-normal text-[13px] line-through">
                 {{ \Illuminate\Support\Number::currency($price->compare->amount, current_currency(), app()->getLocale()) }}
             </span>

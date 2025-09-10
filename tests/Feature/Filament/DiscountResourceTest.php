@@ -7,7 +7,13 @@ use function Pest\Laravel\{actingAs, assertDatabaseHas, assertDatabaseMissing};
 
 beforeEach(function () {
     $this->admin = User::factory()->create();
-    $this->admin->assignRole('admin');
+    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    $guard = config('auth.defaults.guard', 'web');
+    \Spatie\Permission\Models\Role::query()->firstOrCreate([
+        'name' => 'admin',
+        'guard_name' => is_string($guard) ? $guard : 'web',
+    ]);
+    $this->admin->syncRoles(['admin']);
 });
 
 it('can render discount resource index page', function () {

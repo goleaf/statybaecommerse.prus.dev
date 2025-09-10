@@ -12,6 +12,7 @@ return [
     'nav_exports' => 'Eksportai',
     'nav_account' => 'Paskyra',
     'nav_locations' => 'Parduotuvės',
+    'nav_toggle' => 'Perjungti meniu',
     // Authentication
     'auth_login' => 'Prisijungti',
     'auth_register' => 'Registruotis',

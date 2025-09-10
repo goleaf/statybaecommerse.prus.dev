@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
@@ -119,6 +119,22 @@ final class Order extends Model
     public function scopeCompleted($query)
     {
         return $query->whereIn('status', ['delivered', 'completed']);
+    }
+
+    // Consider orders that have been paid (preferred) or are in a paid-like lifecycle state
+    public function scopePaid($query)
+    {
+        // Prefer explicit payment status when present and non-null
+        if (\Schema::hasColumn($this->getTable(), 'payment_status')) {
+            $query = $query->where(function ($q) {
+                $q
+                    ->whereNotNull('payment_status')
+                    ->whereIn('payment_status', ['paid', 'captured', 'settled', 'authorized']);
+            });
+        }
+
+        // Also include lifecycle statuses that imply payment captured
+        return $query->orWhereIn('status', ['processing', 'confirmed', 'shipped', 'delivered', 'completed']);
     }
 
     public function isPaid(): bool

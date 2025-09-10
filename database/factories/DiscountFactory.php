@@ -18,6 +18,7 @@ final class DiscountFactory extends Factory
             'description' => $this->faker->sentence(),
             'type' => $this->faker->randomElement(['percentage', 'fixed']),
             'value' => $this->faker->randomFloat(2, 5, 50),
+            'is_active' => true,
             'is_enabled' => true,
             'starts_at' => now()->subDays(1),
             'ends_at' => now()->addDays(30),

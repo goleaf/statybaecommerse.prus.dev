@@ -5,19 +5,23 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
 use App\Services\MultiLanguageTabService;
-use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
+use Filament\Actions as Actions;
+use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-use BackedEnum;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use BackedEnum;
+use UnitEnum;
 
 final class CouponResource extends Resource
 {
@@ -25,7 +29,7 @@ final class CouponResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-ticket';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Marketing;
 
     protected static ?int $navigationSort = 1;
 
@@ -34,7 +38,7 @@ final class CouponResource extends Resource
         return $schema
             ->components([
                 // Coupon Settings (Non-translatable)
-                Forms\Components\Section::make(__('translations.coupon_settings'))
+                Section::make(__('translations.coupon_settings'))
                     ->components([
                         Forms\Components\TextInput::make('code')
                             ->label(__('translations.coupon_code'))
@@ -48,7 +52,6 @@ final class CouponResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-
                 // Multilanguage Tabs for Coupon Content
                 Tabs::make('coupon_translations')
                     ->tabs(
@@ -73,12 +76,12 @@ final class CouponResource extends Resource
                     ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
                     ->persistTabInQueryString('coupon_tab')
                     ->contained(false),
-                Forms\Components\Section::make('Discount Settings')
+                Section::make(__('admin.coupons.sections.discount_settings'))
                     ->components([
                         Forms\Components\Select::make('type')
                             ->options([
-                                'percentage' => 'Percentage',
-                                'fixed' => 'Fixed Amount',
+                                'percentage' => __('admin.coupons.types.percentage'),
+                                'fixed' => __('admin.coupons.types.fixed'),
                             ])
                             ->required()
                             ->live(),
@@ -89,18 +92,18 @@ final class CouponResource extends Resource
                         Forms\Components\TextInput::make('minimum_amount')
                             ->numeric()
                             ->prefix('€')
-                            ->label('Minimum Order Amount'),
+                            ->label(__('admin.coupons.fields.minimum_amount')),
                         Forms\Components\TextInput::make('usage_limit')
                             ->numeric()
-                            ->label('Usage Limit'),
+                            ->label(__('admin.coupons.fields.usage_limit')),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Validity Period')
+                Section::make(__('admin.coupons.sections.validity_period'))
                     ->components([
                         Forms\Components\DateTimePicker::make('starts_at')
-                            ->label('Start Date'),
+                            ->label(__('admin.coupons.fields.starts_at')),
                         Forms\Components\DateTimePicker::make('expires_at')
-                            ->label('Expiry Date'),
+                            ->label(__('admin.coupons.fields.expires_at')),
                     ])
                     ->columns(2),
             ]);
@@ -128,24 +131,24 @@ final class CouponResource extends Resource
                         $record->type === 'percentage' ? $state . '%' : '€' . $state),
                 Tables\Columns\TextColumn::make('minimum_amount')
                     ->money('EUR')
-                    ->placeholder('No minimum'),
+                    ->placeholder(__('admin.coupons.placeholders.no_minimum')),
                 Tables\Columns\TextColumn::make('usage_limit')
-                    ->placeholder('Unlimited'),
+                    ->placeholder(__('admin.coupons.placeholders.unlimited')),
                 Tables\Columns\TextColumn::make('used_count')
-                    ->label('Times Used'),
+                    ->label(__('admin.coupons.fields.used_count')),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('starts_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
-                    ->placeholder('No start date'),
+                    ->placeholder(__('admin.coupons.placeholders.no_start_date')),
                 Tables\Columns\TextColumn::make('expires_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
-                    ->placeholder('No expiry'),
+                    ->placeholder(__('admin.coupons.placeholders.no_expiry')),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -153,8 +156,8 @@ final class CouponResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'percentage' => 'Percentage',
-                        'fixed' => 'Fixed Amount',
+                        'percentage' => __('admin.coupons.types.percentage'),
+                        'fixed' => __('admin.coupons.types.fixed'),
                     ]),
                 Tables\Filters\Filter::make('active')
                     ->query(fn(Builder $query): Builder => $query->where('is_active', true)),

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Model;
 
 final class Inventory extends Model
@@ -14,8 +13,7 @@ final class Inventory extends Model
     protected $table = 'inventories';
 
     protected $fillable = [
-        'inventoriable_id',
-        'inventoriable_type',
+        'product_id',
         'location_id',
         'quantity',
         'reserved',
@@ -35,9 +33,9 @@ final class Inventory extends Model
         ];
     }
 
-    public function inventoriable(): MorphTo
+    public function product(): BelongsTo
     {
-        return $this->morphTo();
+        return $this->belongsTo(Product::class);
     }
 
     public function location(): BelongsTo

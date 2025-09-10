@@ -3,7 +3,7 @@
 use App\Filament\Resources\AnalyticsEventResource;
 use App\Models\AnalyticsEvent;
 use App\Models\User;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Livewire\livewire;

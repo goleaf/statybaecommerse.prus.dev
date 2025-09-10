@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\AnalyticsResource\Pages;
 
 use App\Filament\Resources\AnalyticsResource;
-use App\Filament\Widgets\AdvancedStatsWidget;
+use App\Filament\Widgets\StatsWidget;
 use App\Filament\Widgets\OrdersChartWidget;
 use App\Filament\Widgets\TopSellingProductsWidget;
 use Filament\Resources\Pages\ListRecords;
@@ -43,7 +43,7 @@ final class AnalyticsDashboard extends ListRecords
     protected function getHeaderWidgets(): array
     {
         return [
-            AdvancedStatsWidget::class,
+            StatsWidget::class,
         ];
     }
 

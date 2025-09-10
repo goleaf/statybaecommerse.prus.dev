@@ -10,10 +10,20 @@ class ListOrders extends ListRecords
 {
     protected static string $resource = OrderResource::class;
 
+    public function getTitle(): string
+    {
+        return __('admin.orders.title');
+    }
+
+    public function getSubheading(): ?string
+    {
+        return __('admin.orders.description');
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->label(__('admin.actions.create')),
         ];
     }
 }

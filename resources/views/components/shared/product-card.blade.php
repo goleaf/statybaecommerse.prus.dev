@@ -85,7 +85,7 @@
             'text-lg font-medium text-gray-900 dark:text-white line-clamp-2' => $layout === 'grid',
             'text-xl font-medium text-gray-900 dark:text-white' => $layout === 'list',
         ])>
-            <a href="{{ route('products.show', $product->slug ?? $product) }}" 
+            <a href="{{ route('product.show', $product->slug ?? $product) }}" 
                class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
                 {{ $product->name }}
             </a>

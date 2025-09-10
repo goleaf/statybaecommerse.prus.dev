@@ -106,13 +106,13 @@ return new class extends Migration {
                 $table->json('name')->nullable(); // Translatable field
                 $table->json('slug')->nullable(); // Translatable field  
                 $table->json('description')->nullable(); // Translatable field
-                $table->string('code')->unique();
-                $table->string('address_line_1');
+                $table->string('code')->nullable()->unique();
+                $table->string('address_line_1')->nullable();
                 $table->string('address_line_2')->nullable();
-                $table->string('city');
-                $table->string('state');
-                $table->string('postal_code');
-                $table->string('country_code', 3);
+                $table->string('city')->nullable();
+                $table->string('state')->nullable();
+                $table->string('postal_code')->nullable();
+                $table->string('country_code', 3)->nullable();
                 $table->string('phone')->nullable();
                 $table->string('email')->nullable();
                 $table->boolean('is_enabled')->default(true);

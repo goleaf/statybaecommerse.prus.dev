@@ -146,6 +146,30 @@ class CategorySeeder extends Seeder
             ]
         );
 
+        // Upsert translations for all supported locales
+        $locales = $this->supportedLocales();
+        $now = now();
+        $trRows = [];
+        foreach ($locales as $loc) {
+            $name = $this->translateLike($categoryData['name'], $loc);
+            $trRows[] = [
+                'category_id' => $category->id,
+                'locale' => $loc,
+                'name' => $name,
+                'slug' => \Illuminate\Support\Str::slug($name),
+                'description' => $this->translateLike($categoryData['description'], $loc),
+                'seo_title' => $name,
+                'seo_description' => $this->translateLike('Statybinių prekių kategorija.', $loc),
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }
+        \Illuminate\Support\Facades\DB::table('category_translations')->upsert(
+            $trRows,
+            ['category_id','locale'],
+            ['name','slug','description','seo_title','seo_description','updated_at']
+        );
+
         // Add main image if category was created and doesn't have one
         if ($category && ($category->wasRecentlyCreated || !$category->hasMedia('images')) && isset($categoryData['image_url'])) {
             $this->downloadAndAttachImage($category, $categoryData['image_url'], 'images', $categoryData['name'] . ' Image');
@@ -196,5 +220,23 @@ class CategorySeeder extends Seeder
         } catch (\Exception $e) {
             $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}: " . $e->getMessage());
         }
+    }
+
+    private function supportedLocales(): array
+    {
+        return collect(explode(',', (string) config('app.supported_locales', 'lt')))
+            ->map(fn($v) => trim((string) $v))
+            ->filter()->unique()->values()->all();
+    }
+
+    private function translateLike(string $text, string $locale): string
+    {
+        return match ($locale) {
+            'lt' => $text,
+            'en' => $text . ' (EN)',
+            'ru' => $text . ' (RU)',
+            'de' => $text . ' (DE)',
+            default => $text . ' (' . strtoupper($locale) . ')',
+        };
     }
 }

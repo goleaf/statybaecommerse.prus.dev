@@ -7,7 +7,9 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\DatabaseDateService;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ExportBulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -23,13 +25,18 @@ final class AnalyticsResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Analytics';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Analytics;
 
     protected static ?int $navigationSort = 1;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.analytics');
+    }
+
     public static function getNavigationLabel(): string
     {
-        return __('analytics.analytics_dashboard');
+        return __('admin.navigation.analytics');
     }
 
     public static function getModelLabel(): string
@@ -58,7 +65,7 @@ final class AnalyticsResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('order_date')
                     ->label(__('analytics.date'))
-                    ->date()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('reference')
@@ -101,7 +108,7 @@ final class AnalyticsResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('analytics.created'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

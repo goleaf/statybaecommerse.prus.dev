@@ -2,15 +2,56 @@
 
 namespace App\Livewire\Pages\Brand;
 
-use App\Livewire\Shared\BasePageComponent;
-use App\Livewire\Concerns\WithFilters;
+use App\Livewire\Pages\AbstractPageComponent;
 use App\Models\Brand;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
+use Livewire\Component;
+use Livewire\WithPagination;
 
-final class Index extends BasePageComponent
+final class Index extends AbstractPageComponent implements HasSchemas
 {
-    use WithFilters;
+    use InteractsWithSchemas;
+    use WithPagination;
+
+    #[Url(except: '')]
+    public string $search = '';
+
+    #[Url(except: 'name')]
+    public string $sortBy = 'name';
+
+    public function mount(): void
+    {
+        // Initialize component
+    }
+
+    public function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                TextInput::make('search')
+                    ->label(__('Search brands'))
+                    ->placeholder(__('Search brands...'))
+                    ->live(debounce: 300)
+                    ->afterStateUpdated(fn() => $this->resetPage()),
+
+                Select::make('sortBy')
+                    ->label(__('Sort by'))
+                    ->options([
+                        'name' => __('Name'),
+                        'products_count' => __('Most Products'),
+                        'created_at' => __('Newest'),
+                    ])
+                    ->live()
+                    ->afterStateUpdated(fn() => $this->resetPage()),
+            ]);
+    }
 
     #[Computed]
     public function brands()
@@ -25,18 +66,28 @@ final class Index extends BasePageComponent
             ->where('is_enabled', true)
             ->withCount('products');
 
-        // Apply search filter using trait method
-        $query = $this->applySearchFilters($query);
+        // Apply search filter
+        if ($this->search !== '') {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('description', 'like', '%' . $this->search . '%');
+            });
+        }
 
-        // Apply sorting using trait method
-        $query = $this->applySorting($query);
+        // Apply sorting
+        match ($this->sortBy) {
+            'name' => $query->orderBy('name'),
+            'products_count' => $query->orderByDesc('products_count'),
+            'created_at' => $query->orderByDesc('created_at'),
+            default => $query->orderBy('name'),
+        };
 
         return $query->paginate(12);
     }
 
     protected function getPageTitle(): string
     {
-        return $this->trans('shared.brands');
+        return __('shared.brands');
     }
 
     protected function getPageDescription(): ?string

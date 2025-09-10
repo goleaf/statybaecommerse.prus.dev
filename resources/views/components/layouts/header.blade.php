@@ -1,11 +1,8 @@
 {{-- Enhanced Header with Modern Navigation --}}
-<header class="sticky top-0 z-20 border-b border-gray-200 bg-white bg-opacity-80 backdrop-blur-xl backdrop-filter">
+<header class="sticky top-0 z-20 border-b border-gray-200 bg-white/90 backdrop-blur-xl" role="banner"
+        aria-label="{{ __('nav_toggle') }}">
     <x-banner />
-    
-    {{-- Use Enhanced Navigation Component --}}
-    <livewire:components.enhanced-navigation />
-    
-    <x-container class="px-4 py-2">
-        @includeIf('components.store-badge')
-    </x-container>
+
+    {{-- Primary navigation (logo, search, actions) + secondary links --}}
+    <livewire:components.navigation-menu />
 </header>

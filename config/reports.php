@@ -3,16 +3,16 @@
 return [
     /*
      * |--------------------------------------------------------------------------
-     * | Advanced Reports Configuration
+     * | Reports Configuration
      * |--------------------------------------------------------------------------
      * |
-     * | Configuration settings for the Advanced Reports system
+     * | Configuration settings for the Reports system
      * |
      */
     'cache' => [
         'enabled' => env('REPORTS_CACHE_ENABLED', true),
         'ttl' => env('REPORTS_CACHE_TTL', 3600),  // 1 hour
-        'prefix' => 'advanced_reports',
+        'prefix' => 'reports',
     ],
     'performance' => [
         'max_records_per_query' => env('REPORTS_MAX_RECORDS', 10000),

@@ -142,6 +142,7 @@ return new class extends Migration
             $table->integer('sort_order')->default(0);
             $table->boolean('is_enabled')->default(true);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
             $table->unique(['attribute_id', 'slug']);
@@ -224,6 +225,7 @@ return new class extends Migration
         });
 
         // Create settings table for application settings
+        if (!Schema::hasTable('settings')) {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('key')->unique();
@@ -236,6 +238,7 @@ return new class extends Migration
             $table->index(['key']);
             $table->index(['is_public']);
         });
+        }
     }
 
     public function down(): void

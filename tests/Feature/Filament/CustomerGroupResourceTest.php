@@ -3,9 +3,11 @@
 use App\Filament\Resources\CustomerGroupResource;
 use App\Models\CustomerGroup;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 use function Pest\Laravel\{actingAs, assertDatabaseHas, assertDatabaseMissing};
 
 beforeEach(function () {
+    Role::findOrCreate('admin', 'web');
     $this->admin = User::factory()->create();
     $this->admin->assignRole('admin');
 });
@@ -31,10 +33,15 @@ it('can create customer group', function () {
     ];
 
     actingAs($this->admin)
-        ->post(CustomerGroupResource::getUrl('create'), $newData)
+        ->from(CustomerGroupResource::getUrl('create'))
+        ->post(CustomerGroupResource::getUrl('create'), array_merge($newData, ['slug' => 'vip-customers']))
         ->assertRedirect();
 
-    assertDatabaseHas('customer_groups', $newData);
+    assertDatabaseHas('customer_groups', array_merge(
+        ['is_enabled' => $newData['is_active']],
+        collect($newData)->except('is_active')->all(),
+        ['slug' => 'vip-customers']
+    ));
 });
 
 it('can render customer group resource view page', function () {
@@ -63,16 +70,22 @@ it('can update customer group', function () {
     ];
 
     actingAs($this->admin)
+        ->from(CustomerGroupResource::getUrl('edit', ['record' => $customerGroup]))
         ->put(CustomerGroupResource::getUrl('edit', ['record' => $customerGroup]), $newData)
         ->assertRedirect();
 
-    assertDatabaseHas('customer_groups', array_merge(['id' => $customerGroup->id], $newData));
+    assertDatabaseHas('customer_groups', array_merge(
+        ['id' => $customerGroup->id],
+        ['is_enabled' => $newData['is_active']],
+        collect($newData)->except('is_active')->all()
+    ));
 });
 
 it('can delete customer group', function () {
     $customerGroup = CustomerGroup::factory()->create();
 
     actingAs($this->admin)
+        ->from(CustomerGroupResource::getUrl('edit', ['record' => $customerGroup]))
         ->delete(CustomerGroupResource::getUrl('edit', ['record' => $customerGroup]))
         ->assertRedirect();
 
@@ -101,22 +114,25 @@ it('can filter active customer groups', function () {
 
 it('validates required fields when creating customer group', function () {
     actingAs($this->admin)
+        ->from(CustomerGroupResource::getUrl('create'))
         ->post(CustomerGroupResource::getUrl('create'), [])
         ->assertSessionHasErrors(['name']);
 });
 
 it('validates discount percentage is within valid range', function () {
     actingAs($this->admin)
+        ->from(CustomerGroupResource::getUrl('create'))
         ->post(CustomerGroupResource::getUrl('create'), [
             'name' => 'Test Group',
-            'discount_percentage' => 150, // Invalid - over 100%
+            'discount_percentage' => 150,
         ])
         ->assertSessionHasErrors(['discount_percentage']);
 
     actingAs($this->admin)
+        ->from(CustomerGroupResource::getUrl('create'))
         ->post(CustomerGroupResource::getUrl('create'), [
             'name' => 'Test Group',
-            'discount_percentage' => -5, // Invalid - negative
+            'discount_percentage' => -5,
         ])
         ->assertSessionHasErrors(['discount_percentage']);
 });

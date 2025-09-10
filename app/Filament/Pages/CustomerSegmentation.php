@@ -5,12 +5,12 @@ namespace App\Filament\Pages;
 use App\Models\CustomerGroup;
 use App\Models\Order;
 use App\Models\User;
-use Filament\Actions\Action;
-use Filament\Forms\Form;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,11 +21,18 @@ final class CustomerSegmentation extends Page implements HasTable
 {
     use InteractsWithTable;
 
+    protected string $view = 'filament.pages.customer-segmentation';
+
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
-    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Marketing;
     protected static ?int $navigationSort = 1;
 
-    public ?string $segmentType = 'value';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.marketing');
+    }
+
+    public ?string $segmentType = null;
     public array $segmentCriteria = [];
 
     public static function getNavigationLabel(): string
@@ -37,6 +44,7 @@ final class CustomerSegmentation extends Page implements HasTable
     {
         return $table
             ->query($this->getCustomerQuery())
+            ->deferLoading(false)
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('admin.table.name'))
@@ -77,57 +85,7 @@ final class CustomerSegmentation extends Page implements HasTable
                     })
                     ->getStateUsing(fn(User $record): string => $this->calculateCustomerSegment($record)),
             ])
-            ->headerActions([
-                Actions\Action::make('create_segment')
-                    ->label(__('admin.actions.create_segment'))
-                    ->icon('heroicon-o-plus-circle')
-                    ->form([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('admin.fields.segment_name'))
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('admin.fields.description'))
-                            ->rows(3),
-                        Forms\Components\Select::make('criteria_type')
-                            ->label(__('admin.fields.criteria_type'))
-                            ->options([
-                                'total_spent' => __('admin.segment_criteria.total_spent'),
-                                'order_count' => __('admin.segment_criteria.order_count'),
-                                'last_order_days' => __('admin.segment_criteria.last_order_days'),
-                                'avg_order_value' => __('admin.segment_criteria.avg_order_value'),
-                            ])
-                            ->required()
-                            ->live(),
-                        Forms\Components\TextInput::make('criteria_value')
-                            ->label(__('admin.fields.criteria_value'))
-                            ->numeric()
-                            ->required(),
-                        Forms\Components\Select::make('criteria_operator')
-                            ->label(__('admin.fields.operator'))
-                            ->options([
-                                'gt' => __('admin.operators.greater_than'),
-                                'gte' => __('admin.operators.greater_than_equal'),
-                                'lt' => __('admin.operators.less_than'),
-                                'lte' => __('admin.operators.less_than_equal'),
-                                'eq' => __('admin.operators.equal'),
-                            ])
-                            ->default('gte')
-                            ->required(),
-                    ])
-                    ->action(function (array $data): void {
-                        CustomerGroup::create([
-                            'name' => $data['name'],
-                            'description' => $data['description'] ?? '',
-                            'is_enabled' => true,
-                        ]);
-
-                        \Filament\Notifications\Notification::make()
-                            ->title(__('admin.notifications.segment_created'))
-                            ->success()
-                            ->send();
-                    }),
-            ])
+            ->headerActions([])
             ->recordActions([
                 Actions\Action::make('assign_to_group')
                     ->label(__('admin.actions.assign_to_group'))
@@ -285,7 +243,70 @@ final class CustomerSegmentation extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('segment_analysis')
+            Actions\Action::make('create_segment')
+                ->label(__('admin.actions.create_segment'))
+                ->icon('heroicon-o-plus-circle')
+                ->form([
+                    Forms\Components\TextInput::make('name')
+                        ->label(__('admin.fields.segment_name'))
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\Textarea::make('description')
+                        ->label(__('admin.fields.description'))
+                        ->rows(3),
+                    Forms\Components\Select::make('criteria_type')
+                        ->label(__('admin.fields.criteria_type'))
+                        ->options([
+                            'total_spent' => __('admin.segment_criteria.total_spent'),
+                            'order_count' => __('admin.segment_criteria.order_count'),
+                            'last_order_days' => __('admin.segment_criteria.last_order_days'),
+                            'avg_order_value' => __('admin.segment_criteria.avg_order_value'),
+                        ])
+                        ->required()
+                        ->live(),
+                    Forms\Components\TextInput::make('criteria_value')
+                        ->label(__('admin.fields.criteria_value'))
+                        ->numeric()
+                        ->required(),
+                    Forms\Components\Select::make('criteria_operator')
+                        ->label(__('admin.fields.operator'))
+                        ->options([
+                            'gt' => __('admin.operators.greater_than'),
+                            'gte' => __('admin.operators.greater_than_equal'),
+                            'lt' => __('admin.operators.less_than'),
+                            'lte' => __('admin.operators.less_than_equal'),
+                            'eq' => __('admin.operators.equal'),
+                        ])
+                        ->default('gte')
+                        ->required(),
+                ])
+                ->action(function (array $data): void {
+                    $baseSlug = \Illuminate\Support\Str::slug((string) $data['name']);
+                    $slug = $baseSlug;
+                    $i = 1;
+                    while (CustomerGroup::where('slug', $slug)->exists()) {
+                        $slug = $baseSlug . '-' . $i;
+                        $i++;
+                    }
+
+                    CustomerGroup::create([
+                        'name' => $data['name'],
+                        'slug' => $slug,
+                        'description' => $data['description'] ?? '',
+                        'is_enabled' => true,
+                        'conditions' => [
+                            'type' => $data['criteria_type'] ?? null,
+                            'operator' => $data['criteria_operator'] ?? null,
+                            'value' => $data['criteria_value'] ?? null,
+                        ],
+                    ]);
+
+                    \Filament\Notifications\Notification::make()
+                        ->title(__('admin.notifications.segment_created'))
+                        ->success()
+                        ->send();
+                }),
+            Actions\Action::make('segment_analysis')
                 ->label(__('admin.actions.segment_analysis'))
                 ->icon('heroicon-o-chart-pie')
                 ->action(function (): void {
@@ -321,5 +342,3 @@ final class CustomerSegmentation extends Page implements HasTable
         ];
     }
 }
-
-

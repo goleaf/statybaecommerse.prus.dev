@@ -5,12 +5,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LocationResource\Pages;
 use App\Models\Location;
 use App\Services\MultiLanguageTabService;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
-use Filament\Tables\Actions\Action;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -28,7 +28,7 @@ final class LocationResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-map-pin';
 
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::System;
 
     protected static ?int $navigationSort = 3;
 
@@ -37,7 +37,7 @@ final class LocationResource extends Resource
         return $schema
             ->components([
                 // Location Address Information (Non-translatable)
-                Forms\Components\Section::make(__('translations.location_address'))
+                \Filament\Schemas\Components\Section::make(__('translations.location_address'))
                     ->components([
                         Forms\Components\TextInput::make('address_line_1')
                             ->label(__('translations.address'))
@@ -138,7 +138,7 @@ final class LocationResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('translations.created_at'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

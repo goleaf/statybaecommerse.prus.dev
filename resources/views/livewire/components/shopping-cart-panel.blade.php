@@ -217,7 +217,7 @@
                         
                         <div class="flex space-x-2">
                             <a 
-                                href="{{ route('cart', app()->getLocale()) }}"
+                                href="{{ route('cart.index', app()->getLocale()) }}"
                                 class="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200 text-center text-sm"
                             >
                                 {{ __('translations.view_cart') }}

@@ -16,7 +16,6 @@ return [
         'logout' => 'Logout',
         'search' => 'Search',
     ],
-
     'products' => [
         'name' => 'Name',
         'price' => 'Price',
@@ -46,8 +45,16 @@ return [
         'image_gallery' => 'Image Gallery',
         'zoom' => 'Zoom',
         'video' => 'Video',
+        'policies_title' => 'Policies',
+        'international_delivery' => 'International delivery',
+        'delivery_eta_2_weeks' => 'Get your order in 2 weeks',
+        'loyalty_rewards' => 'Loyalty rewards',
+        'loyalty_rewards_desc' => 'Earn points and get discounts',
     ],
-
+    'breadcrumbs' => [
+        'department' => 'Department',
+        'category' => 'Category',
+    ],
     'cart' => [
         'title' => 'Shopping Cart',
         'empty' => 'Your cart is empty',
@@ -72,7 +79,6 @@ return [
         'shipping_calculator' => 'Shipping Calculator',
         'items_count' => 'Items Count',
     ],
-
     'checkout' => [
         'title' => 'Checkout',
         'billing_address' => 'Billing Address',
@@ -101,7 +107,6 @@ return [
         'create_account' => 'Create Account',
         'guest_checkout' => 'Guest Checkout',
     ],
-
     'account' => [
         'title' => 'My Account',
         'dashboard' => 'Dashboard',
@@ -128,7 +133,6 @@ return [
         'billing_address' => 'Billing Address',
         'shipping_address' => 'Shipping Address',
     ],
-
     'orders' => [
         'number' => 'Order Number',
         'date' => 'Date',
@@ -148,7 +152,6 @@ return [
         'cancelled' => 'Cancelled',
         'refunded' => 'Refunded',
     ],
-
     'reviews' => [
         'title' => 'Reviews',
         'write_review' => 'Write Review',
@@ -168,7 +171,6 @@ return [
         'lowest_rated' => 'Lowest Rated',
         'most_helpful' => 'Most Helpful',
     ],
-
     'search' => [
         'placeholder' => 'Search products...',
         'results' => 'Search Results',
@@ -195,7 +197,6 @@ return [
         'new_arrivals' => 'New Arrivals',
         'featured' => 'Featured',
     ],
-
     'forms' => [
         'required' => 'This field is required',
         'email' => 'Please enter a valid email address',
@@ -209,7 +210,6 @@ return [
         'confirmed' => 'Confirmation does not match',
         'accepted' => 'You must accept this field',
     ],
-
     'buttons' => [
         'save' => 'Save',
         'cancel' => 'Cancel',
@@ -228,7 +228,6 @@ return [
         'ok' => 'OK',
         'loading' => 'Loading...',
     ],
-
     'messages' => [
         'success' => 'Success!',
         'error' => 'Error occurred!',
@@ -248,7 +247,6 @@ return [
         'newsletter_subscribed' => 'Successfully subscribed to newsletter',
         'contact_message_sent' => 'Message sent successfully',
     ],
-
     'footer' => [
         'about_us' => 'About Us',
         'contact_us' => 'Contact Us',
@@ -266,7 +264,6 @@ return [
         'secure_shopping' => 'Secure Shopping',
         'copyright' => 'All rights reserved',
     ],
-
     // Home page translations
     'nav_home' => 'Home',
     'meta_description_home' => 'Discover our amazing products and collections',

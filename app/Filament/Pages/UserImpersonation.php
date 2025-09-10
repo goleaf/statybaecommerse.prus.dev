@@ -4,9 +4,9 @@ namespace App\Filament\Pages;
 
 use App\Models\User;
 use Filament\Actions\Action;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
@@ -22,7 +22,7 @@ final class UserImpersonation extends Page implements HasTable
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
 
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::System;
 
     protected static ?int $navigationSort = 5;
 
@@ -43,9 +43,6 @@ final class UserImpersonation extends Page implements HasTable
                 User::query()
                     ->where('is_admin', false)
                     ->withCount(['orders'])
-                    ->withSum(['orders' => function (Builder $query) {
-                        $query->where('status', 'completed');
-                    }], 'total')
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
@@ -63,15 +60,14 @@ final class UserImpersonation extends Page implements HasTable
                     ->numeric()
                     ->badge()
                     ->color('info'),
-                Tables\Columns\TextColumn::make('orders_sum_total')
-                    ->label(__('admin.table.total_spent'))
-                    ->money('EUR')
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('admin.table.created_at'))
+                    ->date('Y-m-d')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('last_login_at')
                     ->label(__('admin.table.last_login'))
-                    ->dateTime()
-                    ->sortable()
-                    ->since(),
+                    ->date('Y-m-d')
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('admin.table.status'))
                     ->boolean(),
@@ -88,7 +84,7 @@ final class UserImpersonation extends Page implements HasTable
                         $query->where('last_login_at', '>=', now()->subDays(30))),
             ])
             ->recordActions([
-                Actions\Action::make('impersonate')
+                Action::make('impersonate')
                     ->label(__('admin.actions.impersonate'))
                     ->icon('heroicon-o-user')
                     ->color('warning')
@@ -124,7 +120,7 @@ final class UserImpersonation extends Page implements HasTable
                         $this->redirect('/');
                     })
                     ->visible(fn(User $record): bool => !$record->is_admin),
-                Actions\Action::make('view_orders')
+                Action::make('view_orders')
                     ->label(__('admin.actions.view_orders'))
                     ->icon('heroicon-o-shopping-bag')
                     ->color('info')
@@ -133,7 +129,7 @@ final class UserImpersonation extends Page implements HasTable
                             'tableFilters' => ['user' => ['value' => $record->id]]
                         ]))
                     ->openUrlInNewTab(),
-                Actions\Action::make('send_notification')
+                Action::make('send_notification')
                     ->label(__('admin.actions.send_notification'))
                     ->icon('heroicon-o-bell')
                     ->color('primary')
@@ -172,14 +168,14 @@ final class UserImpersonation extends Page implements HasTable
                     }),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\BulkAction::make('activate')
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\BulkAction::make('activate')
                         ->label(__('admin.actions.activate'))
                         ->icon('heroicon-m-check-circle')
                         ->color('success')
                         ->action(fn($records) => $records->each(fn($record) => $record->update(['is_active' => true])))
                         ->deselectRecordsAfterCompletion(),
-                    Actions\BulkAction::make('deactivate')
+                    \Filament\Actions\BulkAction::make('deactivate')
                         ->label(__('admin.actions.deactivate'))
                         ->icon('heroicon-m-x-circle')
                         ->color('danger')
@@ -219,5 +215,26 @@ final class UserImpersonation extends Page implements HasTable
                     }
                 }),
         ];
+    }
+
+    public function stopImpersonation(): void
+    {
+        $impersonateData = session('impersonate');
+        $originalUserId = $impersonateData['original_user_id'] ?? null;
+
+        if ($originalUserId) {
+            $originalUser = User::find($originalUserId);
+            if ($originalUser) {
+                auth()->login($originalUser);
+                session()->forget('impersonate');
+
+                Notification::make()
+                    ->title(__('admin.notifications.impersonation_stopped'))
+                    ->success()
+                    ->send();
+
+                $this->redirect('/admin');
+            }
+        }
     }
 }

@@ -7,6 +7,7 @@ use App\Models\AnalyticsEvent;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,9 +20,9 @@ final class AnalyticsEventResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Analytics;
 
-    protected static ?string $navigationLabel = 'Analytics Events';
+    protected static ?string $navigationLabel = null;
 
     protected static ?int $navigationSort = 1;
 
@@ -29,7 +30,7 @@ final class AnalyticsEventResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Event Information')
+                \Filament\Schemas\Components\Section::make(__('admin.analytics.sections.event_information'))
                     ->components([
                         Forms\Components\TextInput::make('event_type')
                             ->required()
@@ -56,14 +57,14 @@ final class AnalyticsEventResource extends Resource
                             ->required(),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Event Properties')
+                \Filament\Schemas\Components\Section::make(__('admin.analytics.sections.event_properties'))
                     ->components([
                         Forms\Components\KeyValue::make('properties')
                             ->keyLabel('Property')
                             ->valueLabel('Value'),
                     ])
                     ->collapsible(),
-                Forms\Components\Section::make('User Agent')
+                \Filament\Schemas\Components\Section::make(__('admin.analytics.sections.user_agent'))
                     ->components([
                         Forms\Components\Textarea::make('user_agent')
                             ->rows(3),
@@ -89,52 +90,52 @@ final class AnalyticsEventResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('User')
-                    ->placeholder('Anonymous')
+                    ->label(__('admin.users.singular'))
+                    ->placeholder(__('admin.analytics.anonymous'))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('session_id')
-                    ->label('Session')
+                    ->label(__('admin.analytics.session'))
                     ->limit(10)
                     ->tooltip(fn($record) => $record->session_id),
                 Tables\Columns\TextColumn::make('url')
                     ->limit(50)
                     ->tooltip(fn($record) => $record->url),
                 Tables\Columns\TextColumn::make('country_code')
-                    ->label('Country')
+                    ->label(__('admin.countries.singular'))
                     ->badge()
-                    ->placeholder('Unknown'),
+                    ->placeholder(__('admin.analytics.unknown')),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('event_type')
                     ->options([
-                        'page_view' => 'Page View',
-                        'product_view' => 'Product View',
-                        'add_to_cart' => 'Add to Cart',
-                        'remove_from_cart' => 'Remove from Cart',
-                        'purchase' => 'Purchase',
-                        'search' => 'Search',
-                        'user_register' => 'User Register',
-                        'user_login' => 'User Login',
+                        'page_view' => __('admin.analytics.event_types.page_view'),
+                        'product_view' => __('admin.analytics.event_types.product_view'),
+                        'add_to_cart' => __('admin.analytics.event_types.add_to_cart'),
+                        'remove_from_cart' => __('admin.analytics.event_types.remove_from_cart'),
+                        'purchase' => __('admin.analytics.event_types.purchase'),
+                        'search' => __('admin.analytics.event_types.search'),
+                        'user_register' => __('admin.analytics.event_types.user_register'),
+                        'user_login' => __('admin.analytics.event_types.user_login'),
                     ]),
                 Tables\Filters\Filter::make('has_user')
                     ->query(fn(Builder $query): Builder => $query->whereNotNull('user_id'))
-                    ->label('Registered Users Only'),
+                    ->label(__('admin.analytics.filters.registered_only')),
                 Tables\Filters\Filter::make('anonymous_only')
                     ->query(fn(Builder $query): Builder => $query->whereNull('user_id'))
-                    ->label('Anonymous Users Only'),
+                    ->label(__('admin.analytics.filters.anonymous_only')),
                 Tables\Filters\Filter::make('today')
                     ->query(fn(Builder $query): Builder => $query->whereDate('created_at', today()))
-                    ->label('Today'),
+                    ->label(__('admin.date_ranges.today')),
                 Tables\Filters\Filter::make('this_week')
                     ->query(fn(Builder $query): Builder => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]))
-                    ->label('This Week'),
+                    ->label(__('admin.analytics.this_week')),
                 Tables\Filters\Filter::make('this_month')
                     ->query(fn(Builder $query): Builder => $query->whereMonth('created_at', now()->month))
-                    ->label('This Month'),
+                    ->label(__('admin.analytics.this_month')),
             ])
             ->recordActions([
                 Actions\ViewAction::make(),
@@ -174,11 +175,21 @@ final class AnalyticsEventResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false;  // Analytics events are created programmatically
+        return false;  // created programmatically
     }
 
     public static function canEdit($record): bool
     {
-        return false;  // Analytics events should not be edited
+        return false;  // read-only
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('navigation.groups.analytics');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.analytics.events');
     }
 }

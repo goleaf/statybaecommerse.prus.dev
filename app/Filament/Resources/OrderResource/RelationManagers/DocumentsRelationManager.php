@@ -5,13 +5,12 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Document;
 use App\Services\DocumentService;
 use Filament\Forms;
-use Filament\Tables\Actions\Action;
-use Filament\Actions\ViewAction;
+use Filament\Actions as Actions;
 use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Actions;
+// duplicate import removed
 
 final class DocumentsRelationManager extends RelationManager
 {
@@ -103,7 +102,7 @@ final class DocumentsRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('documents.created_at'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable(),
             ])
             ->filters([
@@ -133,7 +132,7 @@ final class DocumentsRelationManager extends RelationManager
                     }),
             ])
             ->recordActions([
-                Action::make('generate_pdf')
+                Actions\Action::make('generate_pdf')
                     ->label(__('documents.generate_pdf'))
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('success')
@@ -145,7 +144,7 @@ final class DocumentsRelationManager extends RelationManager
                         return redirect($url);
                     }),
 
-                Action::make('download')
+                Actions\Action::make('download')
                     ->label(__('documents.download'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('primary')
@@ -153,9 +152,9 @@ final class DocumentsRelationManager extends RelationManager
                     ->url(fn (Document $record): string => asset('storage/' . $record->file_path))
                     ->openUrlInNewTab(),
 
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([

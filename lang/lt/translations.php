@@ -1,6 +1,19 @@
 <?php declare(strict_types=1);
 
 return [
+    // Category page sidebar & controls
+    'advanced_filters' => 'Išplėstiniai filtrai',
+    'filters' => 'Filtrai',
+    'categories' => 'Kategorijos',
+    'products' => 'Produktai',
+    'newest' => 'Naujausi',
+    'oldest' => 'Seniausi',
+    'ascending' => 'Didėjimo tvarka',
+    'descending' => 'Mažėjimo tvarka',
+    'rating' => 'Įvertinimas',
+    'price' => 'Kaina',
+    'name' => 'Pavadinimas',
+    'showing' => 'Rodoma',
     // Address Types
     'address_type_shipping' => 'Pristatymo adresas',
     'address_type_billing' => 'Atsiskaitymo adresas',
@@ -87,8 +100,10 @@ return [
     'image_gallery' => 'Paveikslėlių galerija',
     'no_image' => 'Nėra paveikslėlio',
     'generate_images' => 'Generuoti paveikslėlius',
+    'generate_images_confirm_bulk' => 'Ar tikrai norite sugeneruoti atsitiktinius paveikslėlius pažymėtiems produktams?',
     'random_image' => 'Atsitiktinis paveikslėlis',
     'image_generated' => 'Paveikslėlis sugeneruotas',
+    'image_generation_summary' => 'Sėkmingai sugeneruota: :success, Klaidos: :errors',
     'image_conversion' => 'Paveikslėlio konvertavimas',
     'webp_format' => 'WebP formatas',
     'image_optimization' => 'Paveikslėlio optimizavimas',
@@ -127,6 +142,9 @@ return [
     'parent_category' => 'Tėvinė kategorija',
     'enabled' => 'Įjungta',
     'visible' => 'Matoma',
+    'attach_existing_category' => 'Prijungti esamą kategoriją',
+    'detach_child' => 'Atsieti',
+    'bulk_detach' => 'Masinis atsiejimas',
     // Collection Information
     'collection_information' => 'Kolekcijos informacija',
     'collection_rules' => 'Kolekcijos taisyklės',
@@ -535,4 +553,6 @@ return [
     'today' => 'Šiandien',
     'this_week' => 'Šią savaitę',
     'this_month' => 'Šį mėnesį',
+    // Brands
+    'brands' => 'Prekės ženklai',
 ];

@@ -13,6 +13,11 @@ trait CreatesApplication
 
         $app->make(Kernel::class)->bootstrap();
 
+        // Ensure tests always use in-memory SQLite to avoid file corruption issues
+        config()->set('database.default', 'sqlite');
+        config()->set('database.connections.sqlite.database', ':memory:');
+        config()->set('debugbar.enabled', false);
+
         return $app;
     }
 }

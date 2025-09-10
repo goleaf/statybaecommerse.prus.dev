@@ -11,11 +11,10 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\MultiLanguageTabService;
-use Filament\Tables\Actions\Action;
-use Filament\Actions\ViewAction;
-use Filament\Infolists\Components;
-use Filament\Infolists\Infolist;
+use Filament\Actions\Action;
+// Actions for tables/pages
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
@@ -23,6 +22,7 @@ use Filament\Tables\Table;
 use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
+// Table actions are referenced via TableActions alias
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -54,10 +54,10 @@ final class ProductResource extends Resource
     public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
     {
         return [
-            'Brand' => $record->brand?->name,
-            'SKU' => $record->sku,
-            'Price' => '€' . number_format($record->price, 2),
-            'Stock' => $record->stock_quantity,
+            __('admin.products.fields.brand') => $record->brand?->name,
+            __('admin.products.fields.sku') => $record->sku,
+            __('admin.products.fields.price') => '€' . number_format($record->price, 2),
+            __('admin.products.fields.stock_quantity') => $record->stock_quantity,
         ];
     }
 
@@ -67,7 +67,7 @@ final class ProductResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Product Information')
+                Section::make(__('translations.product_information'))
                     ->components([
                         Forms\Components\TextInput::make('name')
                             ->required()
@@ -124,7 +124,7 @@ final class ProductResource extends Resource
                             ->maxLength(65535),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Pricing & Inventory')
+                Section::make(__('translations.pricing_inventory'))
                     ->components([
                         Forms\Components\TextInput::make('price')
                             ->numeric()
@@ -132,17 +132,17 @@ final class ProductResource extends Resource
                             ->step(0.01)
                             ->required(),
                         Forms\Components\TextInput::make('compare_price')
-                            ->label('Compare at Price')
+                            ->label(__('admin.products.fields.compare_price'))
                             ->numeric()
                             ->prefix('€')
                             ->step(0.01),
                         Forms\Components\TextInput::make('cost_price')
-                            ->label('Cost Price')
+                            ->label(__('admin.products.fields.cost_price'))
                             ->numeric()
                             ->prefix('€')
                             ->step(0.01),
                         Forms\Components\TextInput::make('sku')
-                            ->label('SKU')
+                            ->label(__('admin.products.fields.sku'))
                             ->maxLength(255)
                             ->unique(Product::class, 'sku', ignoreRecord: true),
                         Forms\Components\TextInput::make('barcode')
@@ -161,79 +161,31 @@ final class ProductResource extends Resource
                             ->step(0.01),
                     ])
                     ->columns(4),
-                Forms\Components\Section::make('Settings')
+                Section::make(__('translations.settings'))
                     ->components([
                         Forms\Components\Toggle::make('track_inventory')
-                            ->label('Track Inventory')
+                            ->label(__('admin.products.fields.track_inventory'))
                             ->default(true),
                         Forms\Components\Toggle::make('is_visible')
-                            ->label('Visible')
+                            ->label(__('admin.products.fields.is_visible'))
                             ->default(true),
                         Forms\Components\Toggle::make('is_featured')
-                            ->label('Featured')
+                            ->label(__('admin.products.fields.is_featured'))
                             ->default(false),
                         Forms\Components\Select::make('status')
                             ->options([
-                                'draft' => 'Draft',
-                                'active' => 'Active',
-                                'inactive' => 'Inactive',
-                                'archived' => 'Archived',
+                                'draft' => __('translations.draft'),
+                                'active' => __('translations.active'),
+                                'inactive' => __('translations.inactive'),
+                                'archived' => __('translations.archived'),
                             ])
                             ->default('draft')
                             ->required(),
                     ])
                     ->columns(4),
                 // Media Section
-                Forms\Components\Section::make(__('translations.media'))
+                Section::make(__('translations.media'))
                     ->components([
-                        Forms\Components\Actions::make([
-                            Forms\Components\Action::make('generate_images')
-                                ->label(__('translations.generate_images'))
-                                ->icon('heroicon-o-photo')
-                                ->color('success')
-                                ->action(function (Product $record) {
-                                    $imageService = app(\App\Services\Images\ProductImageService::class);
-
-                                    try {
-                                        // Generate 3 random images
-                                        for ($i = 0; $i < 3; $i++) {
-                                            $imagePath = $imageService->generateProductImage($record);
-
-                                            $record
-                                                ->addMedia($imagePath)
-                                                ->withCustomProperties([
-                                                    'generated' => true,
-                                                    'product_name' => $record->name,
-                                                    'image_number' => $i + 1,
-                                                    'alt_text' => __('translations.product_image_alt', ['name' => $record->name, 'number' => $i + 1]),
-                                                ])
-                                                ->usingName($record->name . ' - ' . __('translations.image') . ' ' . ($i + 1))
-                                                ->usingFileName('product_' . $record->id . '_generated_' . ($i + 1) . '.webp')
-                                                ->toMediaCollection('images');
-
-                                            if (file_exists($imagePath)) {
-                                                unlink($imagePath);
-                                            }
-                                        }
-
-                                        \Filament\Notifications\Notification::make()
-                                            ->title(__('translations.image_generated'))
-                                            ->success()
-                                            ->send();
-                                    } catch (\Throwable $e) {
-                                        \Filament\Notifications\Notification::make()
-                                            ->title('Klaida generuojant paveikslėlius')
-                                            ->body($e->getMessage())
-                                            ->danger()
-                                            ->send();
-                                    }
-                                })
-                                ->requiresConfirmation()
-                                ->modalHeading(__('translations.generate_images'))
-                                ->modalDescription('Ar tikrai norite sugeneruoti atsitiktinius paveikslėlius šiam produktui?')
-                                ->modalSubmitActionLabel(__('translations.generate_images'))
-                                ->visible(fn(?Product $record) => $record?->exists),
-                        ]),
                         Forms\Components\SpatieMediaLibraryFileUpload::make('images')
                             ->label(__('translations.product_images'))
                             ->multiple()
@@ -244,7 +196,6 @@ final class ProductResource extends Resource
                             ->imageCropAspectRatio('1:1')
                             ->imageResizeTargetWidth('800')
                             ->imageResizeTargetHeight('800')
-                            ->optimize('webp')
                             ->collection('images')
                             ->conversion('image-md')
                             ->helperText(__('translations.product_images') . '. ' . __('translations.webp_format') . ' ' . __('translations.image_optimization')),
@@ -330,27 +281,33 @@ final class ProductResource extends Resource
                             ? __('translations.images') . ': ' . $record->getImagesCount()
                             : __('translations.no_image')),
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('admin.products.fields.name'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('sku')
+                    ->label(__('admin.products.fields.sku'))
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->color('gray'),
                 Tables\Columns\TextColumn::make('brand.name')
+                    ->label(__('admin.products.fields.brand'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('categories.name')
+                    ->label(__('admin.products.fields.categories'))
                     ->badge()
                     ->separator(',')
                     ->limit(2)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('price')
+                    ->label(__('admin.products.fields.price'))
                     ->money('EUR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('stock_quantity')
+                    ->label(__('admin.products.fields.stock_quantity'))
                     ->numeric()
                     ->sortable()
                     ->color(fn($state): string => match (true) {
@@ -359,9 +316,11 @@ final class ProductResource extends Resource
                         default => 'success',
                     }),
                 Tables\Columns\IconColumn::make('is_visible')
+                    ->label(__('admin.products.fields.is_visible'))
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_featured')
+                    ->label(__('admin.products.fields.is_featured'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(),
@@ -375,7 +334,8 @@ final class ProductResource extends Resource
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label(__('admin.fields.created_at'))
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -387,20 +347,65 @@ final class ProductResource extends Resource
                     ->preload(),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draft',
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
-                        'archived' => 'Archived',
+                        'draft' => __('translations.draft'),
+                        'active' => __('translations.active'),
+                        'inactive' => __('translations.inactive'),
+                        'archived' => __('translations.archived'),
                     ]),
                 Tables\Filters\Filter::make('low_stock')
                     ->query(fn(Builder $query): Builder => $query->lowStock())
-                    ->label('Low Stock'),
+                    ->label(__('admin.products.filters.low_stock')),
                 Tables\Filters\Filter::make('featured')
                     ->query(fn(Builder $query): Builder => $query->where('is_featured', true))
-                    ->label('Featured Only'),
+                    ->label(__('admin.products.filters.featured_only')),
             ])
             ->recordActions([
+                Actions\Action::make('generate_images')
+                    ->label(__('translations.generate_images'))
+                    ->icon('heroicon-o-photo')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading(__('translations.generate_images'))
+                    ->modalDescription(__('translations.generate_images_confirm_single'))
+                    ->modalSubmitActionLabel(__('translations.generate_images'))
+                    ->action(function (Product $record) {
+                        $imageService = app(\App\Services\Images\ProductImageService::class);
+
+                        try {
+                            for ($i = 0; $i < 3; $i++) {
+                                $imagePath = $imageService->generateProductImage($record);
+
+                                $record
+                                    ->addMedia($imagePath)
+                                    ->withCustomProperties([
+                                        'generated' => true,
+                                        'product_name' => $record->name,
+                                        'image_number' => $i + 1,
+                                        'alt_text' => __('translations.product_image_alt', ['name' => $record->name, 'number' => $i + 1]),
+                                    ])
+                                    ->usingName($record->name . ' - ' . __('translations.image') . ' ' . ($i + 1))
+                                    ->usingFileName('product_' . $record->id . '_generated_' . ($i + 1) . '.webp')
+                                    ->toMediaCollection('images');
+
+                                if (file_exists($imagePath)) {
+                                    unlink($imagePath);
+                                }
+                            }
+
+                            \Filament\Notifications\Notification::make()
+                                ->title(__('translations.image_generated'))
+                                ->success()
+                                ->send();
+                        } catch (\Throwable $e) {
+                            \Filament\Notifications\Notification::make()
+                                ->title(__('translations.image_generation_failed'))
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 DocumentAction::make()
+                    ->label(__('admin.documents.generate'))
                     ->variables(fn(Product $record) => [
                         '$PRODUCT_NAME' => $record->name,
                         '$PRODUCT_SKU' => $record->sku,
@@ -410,13 +415,13 @@ final class ProductResource extends Resource
                         '$PRODUCT_CATEGORY' => $record->categories->pluck('name')->join(', '),
                         '$PRODUCT_WEIGHT' => $record->weight ? $record->weight . ' kg' : '',
                     ]),
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Actions\ViewAction::make()->label(__('admin.actions.view')),
+                Actions\EditAction::make()->label(__('admin.actions.edit')),
+                Actions\DeleteAction::make()->label(__('admin.actions.delete')),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([
-                    BulkAction::make('generate_images')
+                    Actions\BulkAction::make('generate_images')
                         ->label(__('translations.generate_images'))
                         ->icon('heroicon-o-photo')
                         ->color('success')
@@ -462,13 +467,13 @@ final class ProductResource extends Resource
 
                             \Filament\Notifications\Notification::make()
                                 ->title(__('translations.image_generated'))
-                                ->body("Sėkmingai sugeneruota: {$successCount}, Klaidos: {$errorCount}")
+                                ->body(__('translations.image_generation_summary', ['success' => $successCount, 'errors' => $errorCount]))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation()
                         ->modalHeading(__('translations.generate_images'))
-                        ->modalDescription('Ar tikrai norite sugeneruoti atsitiktinius paveikslėlius pažymėtiems produktams?')
+                        ->modalDescription(__('translations.generate_images_confirm_bulk'))
                         ->modalSubmitActionLabel(__('translations.generate_images')),
                     Actions\DeleteBulkAction::make(),
                     Actions\ForceDeleteBulkAction::make(),

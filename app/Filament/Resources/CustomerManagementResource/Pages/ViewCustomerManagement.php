@@ -55,11 +55,11 @@ final class ViewCustomerManagement extends ViewRecord
                             ->label(__('Timezone')),
                         Components\TextEntry::make('last_login_at')
                             ->label(__('Last Login'))
-                            ->dateTime()
+                            ->date('Y-m-d')
                             ->placeholder(__('Never')),
                         Components\TextEntry::make('created_at')
                             ->label(__('Registered'))
-                            ->dateTime(),
+                            ->date('Y-m-d'),
                     ])
                     ->columns(2),
 

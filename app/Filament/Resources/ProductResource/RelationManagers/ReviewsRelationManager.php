@@ -7,7 +7,7 @@ use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Tables;
 
 final class ReviewsRelationManager extends RelationManager
@@ -80,7 +80,7 @@ final class ReviewsRelationManager extends RelationManager
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable(),
             ])
             ->filters([

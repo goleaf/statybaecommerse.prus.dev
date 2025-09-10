@@ -16,7 +16,6 @@ return [
         'logout' => 'Atsijungti',
         'search' => 'Paieška',
     ],
-
     'products' => [
         'name' => 'Pavadinimas',
         'price' => 'Kaina',
@@ -46,8 +45,12 @@ return [
         'image_gallery' => 'Nuotraukų galerija',
         'zoom' => 'Padidinti',
         'video' => 'Vaizdo įrašas',
+        'policies_title' => 'Politikos ir pristatymas',
+        'international_delivery' => 'Tarptautinis pristatymas',
+        'delivery_eta_2_weeks' => 'Užsakymas bus pristatytas per 2 savaites',
+        'loyalty_rewards' => 'Lojalumo taškai',
+        'loyalty_rewards_desc' => 'Kaupkite taškus ir gaukite nuolaidas',
     ],
-
     'cart' => [
         'title' => 'Pirkimų krepšelis',
         'empty' => 'Jūsų krepšelis tuščias',
@@ -72,7 +75,6 @@ return [
         'shipping_calculator' => 'Pristatymo skaičiuotuvas',
         'items_count' => 'Prekių skaičius',
     ],
-
     'checkout' => [
         'title' => 'Atsiskaitymas',
         'billing_address' => 'Atsiskaitymo adresas',
@@ -101,7 +103,6 @@ return [
         'create_account' => 'Sukurti paskyrą',
         'guest_checkout' => 'Pirkti kaip svečias',
     ],
-
     'account' => [
         'title' => 'Mano paskyra',
         'dashboard' => 'Valdymo skydas',
@@ -128,7 +129,6 @@ return [
         'billing_address' => 'Atsiskaitymo adresas',
         'shipping_address' => 'Pristatymo adresas',
     ],
-
     'orders' => [
         'number' => 'Užsakymo numeris',
         'date' => 'Data',
@@ -148,7 +148,6 @@ return [
         'cancelled' => 'Atšaukta',
         'refunded' => 'Grąžinta',
     ],
-
     'reviews' => [
         'title' => 'Atsiliepimai',
         'write_review' => 'Rašyti atsiliepimą',
@@ -168,7 +167,6 @@ return [
         'lowest_rated' => 'Žemiausią įvertinimą',
         'most_helpful' => 'Naudingiausią',
     ],
-
     'search' => [
         'placeholder' => 'Ieškoti produktų...',
         'results' => 'Paieškos rezultatai',
@@ -195,7 +193,6 @@ return [
         'new_arrivals' => 'Naujos prekės',
         'featured' => 'Rekomenduojamos',
     ],
-
     'forms' => [
         'required' => 'Šis laukas yra privalomas',
         'email' => 'Įveskite galiojantį el. pašto adresą',
@@ -209,7 +206,6 @@ return [
         'confirmed' => 'Patvirtinimas nesutampa',
         'accepted' => 'Turite sutikti su šiuo lauku',
     ],
-
     'buttons' => [
         'save' => 'Išsaugoti',
         'cancel' => 'Atšaukti',
@@ -228,7 +224,6 @@ return [
         'ok' => 'Gerai',
         'loading' => 'Kraunama...',
     ],
-
     'messages' => [
         'success' => 'Sėkmingai atlikta!',
         'error' => 'Įvyko klaida!',
@@ -248,7 +243,6 @@ return [
         'newsletter_subscribed' => 'Sėkmingai užsiprenumeravote naujienlaiškį',
         'contact_message_sent' => 'Žinutė išsiųsta sėkmingai',
     ],
-
     'footer' => [
         'about_us' => 'Apie mus',
         'contact_us' => 'Susisiekite',
@@ -266,7 +260,6 @@ return [
         'secure_shopping' => 'Saugūs pirkimai',
         'copyright' => 'Visos teisės saugomos',
     ],
-
     // Home page translations
     'nav_home' => 'Pagrindinis',
     'meta_description_home' => 'Atraskite mūsų nuostabius produktus ir kolekcijas',

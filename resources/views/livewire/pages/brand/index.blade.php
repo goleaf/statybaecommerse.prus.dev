@@ -20,47 +20,16 @@
     {{-- Filters Section --}}
     <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                {{-- Search --}}
-                <div class="flex-1 max-w-md">
-                    <label for="search" class="sr-only">{{ __('Search brands') }}</label>
-                    <div class="relative">
-                        <input
-                            wire:model.live.debounce.300ms="search"
-                            type="search"
-                            id="search"
-                            placeholder="{{ __('Search brands...') }}"
-                            class="block w-full rounded-lg border-gray-300 bg-white px-4 py-2 pl-10 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                        />
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Sort Options --}}
-                <div class="flex items-center gap-4">
-                    <label for="sortBy" class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Sort by') }}:</label>
-                    <select
-                        wire:model.live="sortBy"
-                        id="sortBy"
-                        class="rounded-lg border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    >
-                        <option value="name">{{ __('Name') }}</option>
-                        <option value="products_count">{{ __('Most Products') }}</option>
-                        <option value="created_at">{{ __('Newest') }}</option>
-                    </select>
-                </div>
-            </div>
+            <form wire:submit.prevent class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                {{ $this->form }}
+            </form>
         </div>
     </div>
 
     {{-- Brands Grid --}}
     <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         @if($this->brands->count() > 0)
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-live="polite">
                 @foreach($this->brands as $brand)
                     <x-shared.card hover="true" class="group">
                         <div class="aspect-w-16 aspect-h-9 overflow-hidden rounded-t-lg">
@@ -68,11 +37,11 @@
                                 <img 
                                     src="{{ $brand->getFirstMediaUrl('logo') }}" 
                                     alt="{{ $brand->name }}"
-                                    class="h-48 w-full object-contain object-center transition-transform duration-300 group-hover:scale-105 p-6"
                                     loading="lazy"
+                                    class="h-48 w-full object-contain object-center transition-transform duration-300 group-hover:scale-105 p-6"
                                 />
                             @else
-                                <div class="flex h-48 items-center justify-center bg-gray-100 dark:bg-gray-700">
+                                <div class="flex h-48 items-center justify-center bg-gray-100 dark:bg-gray-700" aria-hidden="true">
                                     <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                     </svg>
@@ -98,7 +67,7 @@
                                     {{ $brand->products_count }} {{ trans_choice('products', $brand->products_count) }}
                                 </x-shared.badge>
                                 
-                                <svg class="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                 </svg>
                             </div>
@@ -123,4 +92,6 @@
             />
         @endif
     </div>
+
+    <x-filament-actions::modals />
 </div>

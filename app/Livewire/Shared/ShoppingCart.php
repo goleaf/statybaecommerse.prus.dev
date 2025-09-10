@@ -29,16 +29,27 @@ final class ShoppingCart extends Component
             ->first();
 
         if ($cartItem) {
+            $newQuantity = $cartItem->quantity + $quantity;
+            $unitPrice = (float) ($cartItem->unit_price ?? ($product->sale_price ?? $product->price));
             $cartItem->update([
-                'quantity' => $cartItem->quantity + $quantity,
+                'quantity' => $newQuantity,
+                'unit_price' => $unitPrice,
+                'total_price' => round($unitPrice * $newQuantity, 2),
             ]);
         } else {
+            $unitPrice = (float) ($product->sale_price ?? $product->price);
             CartItem::create([
                 'session_id' => $sessionId,
                 'user_id' => auth()->id(),
                 'product_id' => $productId,
                 'quantity' => $quantity,
-                'price' => $product->sale_price ?? $product->price,
+                'unit_price' => $unitPrice,
+                'total_price' => round($unitPrice * $quantity, 2),
+                'product_snapshot' => [
+                    'name' => $product->name,
+                    'price' => $unitPrice,
+                    'sku' => $product->sku ?? null,
+                ],
             ]);
         }
 
@@ -95,7 +106,7 @@ final class ShoppingCart extends Component
     public function getCartTotalProperty(): float
     {
         return $this->cartItems->sum(function (CartItem $item) {
-            return $item->price * $item->quantity;
+            return (float) $item->total_price;
         });
     }
 

@@ -1,5 +1,13 @@
+@php($hasSettings = \Illuminate\Support\Facades\Schema::hasTable('settings'))
+@php($companyName = $hasSettings ? app_setting('company_name') ?? config('app.name') : config('app.name'))
+@php($companyEmail = $hasSettings ? app_setting('email') ?? null : null)
+@php($companyPhone = $hasSettings ? app_setting('phone_number') ?? null : null)
+@php($companyAddress = $hasSettings ? app_setting('company_address') ?? null : null)
+@php($socialFacebook = $hasSettings ? app_setting('social_facebook') ?? '#' : '#')
+@php($socialInstagram = $hasSettings ? app_setting('social_instagram') ?? '#' : '#')
+
 <footer aria-labelledby="footer-heading" class="bg-white border-t border-gray-100">
-    <h2 id="footer-heading" class="sr-only">{{ __('Footer') }}</h2>
+    <h2 id="footer-heading" class="sr-only">{{ __('footer_heading') }}</h2>
     <x-container>
         <div class="grid grid-cols-1 gap-8 py-10 lg:grid-cols-3 lg:py-20">
             <div class="lg:max-w-sm">
@@ -9,96 +17,96 @@
                              aria-hidden="true" />
                 </h3>
                 <p class="mt-10 text-gray-500 text-sm/6">
-                    {{ __('Build modern, scalable online stores. It includes essential features like product management, checkout, and order handling.') }}
+                    {{ __('footer_tagline') }}
                 </p>
             </div>
             <div class="space-y-12 lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0 lg:col-span-2">
                 <div class="grid grid-cols-2 gap-8 lg:gap-12">
                     <div>
                         <h3 class="font-heading text-sm font-medium uppercase tracking-wider text-gray-500">
-                            {{ __('About') }}
+                            {{ __('footer_about') }}
                         </h3>
                         <ul role="list" class="mt-10 space-y-5">
                             <li>
                                 <x-footer-link :spa="false" href="https://filamentphp.com/docs">
-                                    {{ __('Documentation') }}
+                                    {{ __('footer_documentation') }}
                                 </x-footer-link>
                             </li>
                             <li>
                                 <x-footer-link :spa="false" href="https://github.com/filamentphp/filament">
-                                    {{ __('Github') }}
+                                    {{ __('footer_github') }}
                                 </x-footer-link>
                             </li>
                             <li>
-                                <x-footer-link href="#">{{ __('About') }}</x-footer-link>
+                                <x-footer-link href="#">{{ __('footer_about') }}</x-footer-link>
                             </li>
                             <li>
-                                <x-footer-link href="#">{{ __('Secure payment') }}</x-footer-link>
+                                <x-footer-link href="#">{{ __('footer_secure_payment') }}</x-footer-link>
                             </li>
                             <li>
-                                <x-footer-link href="/">{{ __('Contact') }}</x-footer-link>
+                                <x-footer-link href="/">{{ __('footer_contact') }}</x-footer-link>
                             </li>
                         </ul>
                     </div>
                     <div>
                         <h3 class="font-heading text-sm font-medium uppercase tracking-wider text-gray-500">
-                            {{ __('Shop') }}
+                            {{ __('footer_shop') }}
                         </h3>
                         <ul role="list" class="mt-10 space-y-5">
                             @php($features = config('app-features.features'))
                             @if ((bool) ($features['category'] ?? false))
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('categories.index', ['locale' => app()->getLocale()]) }}">{{ __('Categories') }}</x-footer-link>
+                                                   href="{{ route('categories.index', ['locale' => app()->getLocale()]) }}">{{ __('nav_categories') }}</x-footer-link>
                                 </li>
                             @endif
-                            @if ((bool) ($features['collection'] ?? false))
+                            @if ((bool) ($features['collection'] ?? false) && \Illuminate\Support\Facades\Route::has('collections.index'))
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('collections.index', ['locale' => app()->getLocale()]) }}">{{ __('Collections') }}</x-footer-link>
+                                                   href="{{ route('collections.index', ['locale' => app()->getLocale()]) }}">{{ __('nav_collections') }}</x-footer-link>
                                 </li>
                             @endif
                             @if ((bool) ($features['brand'] ?? false))
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('brands.index', ['locale' => app()->getLocale()]) }}">{{ __('Brands') }}</x-footer-link>
+                                                   href="{{ route('brands.index', ['locale' => app()->getLocale()]) }}">{{ __('nav_brands') }}</x-footer-link>
                                 </li>
                             @endif
                             <li>
-                                <x-footer-link href="#">{{ __('Shipping') }}</x-footer-link>
+                                <x-footer-link href="#">{{ __('legal_shipping') }}</x-footer-link>
                             </li>
                             <li>
-                                <x-footer-link href="#">{{ __('Returns / Refunds') }}</x-footer-link>
+                                <x-footer-link href="#">{{ __('footer_returns_refunds') }}</x-footer-link>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <div>
                     <h3 class="font-heading text-sm font-medium uppercase tracking-wider text-gray-500">
-                        {{ __('Subscribe to our newsletter') }}
+                        {{ __('footer_subscribe_title') }}
                     </h3>
                     <div class="mt-10 space-y-6">
                         <div>
                             <p class="text-sm leading-6 text-gray-500">
-                                {{ __('Subscribe to our newsletter and get VIP access to all our exclusive offers, promotions and much more!') }}
+                                {{ __('footer_subscribe_desc') }}
                             </p>
                             {{-- Enhanced Newsletter Form --}}
                             <form class="mt-5" target="_blank" novalidate>
                                 <div class="space-y-2">
                                     <label for="newsletter-email"
-                                           class="block text-sm font-medium text-gray-700">{{ __('Email') }}</label>
+                                           class="block text-sm font-medium text-gray-700">{{ __('auth_email') }}</label>
                                     <div class="flex gap-3">
                                         <input
                                                type="email"
                                                id="newsletter-email"
                                                name="EMAIL"
-                                               placeholder="{{ __('Enter your email') }}"
+                                               placeholder="{{ __('footer_enter_email') }}"
                                                class="flex-1 rounded-lg border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
                                                required />
                                         <button
                                                 type="submit"
                                                 class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
-                                            {{ __('Subscribe') }}
+                                            {{ __('footer_subscribe_button') }}
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor"
                                                  viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -112,9 +120,9 @@
                         </div>
                         <div class="flex items-center space-x-4">
                             <a
-                               href="#"
+                               href="{{ $socialFacebook }}"
                                class="text-primary-500 hover:text-primary-700">
-                                <span class="sr-only">{{ __('Facebook') }}</span>
+                                <span class="sr-only">{{ __('footer_facebook') }}</span>
                                 <svg class="size-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path
                                           fill-rule="evenodd"
@@ -122,8 +130,8 @@
                                           clip-rule="evenodd" />
                                 </svg>
                             </a>
-                            <a href="#" class="text-primary-500 hover:text-primary-700">
-                                <span class="sr-only">{{ __('Instagram') }}</span>
+                            <a href="{{ $socialInstagram }}" class="text-primary-500 hover:text-primary-700">
+                                <span class="sr-only">{{ __('footer_instagram') }}</span>
                                 <svg class="size-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path
                                           fill-rule="evenodd"
@@ -140,32 +148,31 @@
             <div class="space-y-4 lg:space-y-0 lg:flex lg:flex-1 lg:gap-10">
                 <div>
                     <dl class="font-heading text-sm/4 font-semibold uppercase tracking-wider text-gray-900 underline">
-                        {{ __('Contact') }}
+                        {{ __('footer_contact') }}
                     </dl>
                     <ul class="mt-4 flex flex-col space-y-1 text-sm text-gray-900">
-                        @php($hasSettings = \Illuminate\Support\Facades\Schema::hasTable('settings'))
-                        @if ($hasSettings && app_setting('phone_number'))
+                        @if ($companyPhone)
                             <li class="flex items-center gap-3">
                                 <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none"
                                      stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                           d="M2 5a2 2 0 012-2h2l2 5-2 1a14 14 0 006 6l1-2 5 2v2a2 2 0 01-2 2h-1C9.163 19 5 14.837 5 9V8a2 2 0 00-2-2z" />
                                 </svg>
-                                <a href="tel:{{ app_setting('phone_number') }}" class="hover:underline">
-                                    {{ app_setting('phone_number') }}
+                                <a href="tel:{{ $companyPhone }}" class="hover:underline">
+                                    {{ $companyPhone }}
                                 </a>
                             </li>
                         @endif
 
-                        @if ($hasSettings && app_setting('email'))
+                        @if ($companyEmail)
                             <li class="flex items-center gap-3">
                                 <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none"
                                      stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                           d="M3 8l9 6 9-6M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
                                 </svg>
-                                <a href="mailto:{{ app_setting('email') }}" class="hover:underline">
-                                    {{ app_setting('email') }}
+                                <a href="mailto:{{ $companyEmail }}" class="hover:underline">
+                                    {{ $companyEmail }}
                                 </a>
                             </li>
                         @endif
@@ -173,10 +180,10 @@
                 </div>
                 <div>
                     <dl class="font-heading text-sm/4 font-semibold uppercase tracking-wider text-gray-900 underline">
-                        {{ __('Hours') }}
+                        {{ __('footer_hours') }}
                     </dl>
                     <dt class="mt-4 text-sm leading-5 text-gray-900">
-                        {{ __('From monday to Friday: 9am to 5pm GMT.') }}
+                        {{ __('footer_hours_desc') }}
                     </dt>
                 </div>
             </div>
@@ -188,9 +195,9 @@
         </div>
         <div class="flex flex-col items-center border-t border-gray-200 py-8 sm:flex-row sm:justify-between lg:py-10">
             <p class="text-sm text-gray-700">
-                © {{ date('Y') }} {{ config('app.name') }}, Inc. {{ __('All rights reserved.') }}
+                © {{ date('Y') }} {{ config('app.name') }}, Inc. {{ __('footer_all_rights_reserved') }}
                 <a href="https://filamentphp.com" target="_blank" class="pl-1 underline hover:text-gray-900">
-                    {{ __('Powered by Filament') }}
+                    {{ __('footer_powered_by_filament') }}
                 </a>
             </p>
             <div class="mt-5 flex items-center gap-6 divide-x divide-gray-200 sm:mt-0">
@@ -211,29 +218,45 @@
                     @if ($privacy)
                         <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $privacy->trans('slug') ?? 'privacy']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-gray-700 hover:underline">
-                            {{ __('Privacy') }}
+                            {{ __('legal_privacy') }}
                         </x-link>
                     @endif
                     @if ($terms)
                         <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $terms->trans('slug') ?? 'terms']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-gray-700 hover:underline">
-                            {{ __('Terms of use') }}
+                            {{ __('legal_terms') }}
                         </x-link>
                     @endif
                     @if ($refund)
                         <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $refund->trans('slug') ?? 'refund']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-gray-700 hover:underline">
-                            {{ __('Refund') }}
+                            {{ __('legal_refund') }}
                         </x-link>
                     @endif
                     @if ($shipping)
                         <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $shipping->trans('slug') ?? 'shipping']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-gray-700 hover:underline">
-                            {{ __('Shipping') }}
+                            {{ __('legal_shipping') }}
                         </x-link>
                     @endif
                 @endif
             </div>
         </div>
     </x-container>
+    {{-- Organization JSON-LD for SEO --}}
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "Organization",
+        "name": "{{ $companyName }}",
+        "url": "{{ url('/') }}",
+        "email": {{ $companyEmail ? '"' . e($companyEmail) . '"' : 'null' }},
+        "telephone": {{ $companyPhone ? '"' . e($companyPhone) . '"' : 'null' }},
+        "address": {{ $companyAddress ? '"' . e($companyAddress) . '"' : 'null' }},
+        "sameAs": [
+            {{ $socialFacebook ? '"' . e($socialFacebook) . '"' : '' }}{{ ($socialFacebook && $socialInstagram) ? ',' : '' }}
+            {{ $socialInstagram ? '"' . e($socialInstagram) . '"' : '' }}
+        ]
+    }
+    </script>
 </footer>

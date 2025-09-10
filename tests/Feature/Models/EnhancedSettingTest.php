@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use App\Models\EnhancedSetting;
+use App\Models\NormalSetting as EnhancedSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

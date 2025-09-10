@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use App\Filament\Widgets\AdvancedStatsWidget;
+use App\Filament\Widgets\StatsWidget as AdvancedStatsWidget; // legacy alias removed
 use App\Filament\Widgets\OrdersChartWidget;
 use App\Filament\Widgets\TopSellingProductsWidget;
 use App\Models\Brand;

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MediaResource\Pages;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -20,30 +21,35 @@ final class MediaResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Content';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Content;
 
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.content');
+    }
+
     public static function getNavigationLabel(): string
     {
-        return __('Media Library');
+        return __('admin.navigation.media');
     }
 
     public static function getModelLabel(): string
     {
-        return __('Media File');
+        return __('admin.models.media');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Media Files');
+        return __('admin.models.media_files');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('Media Information'))
+                Section::make(__('Media Information'))
                     ->components([
                         Forms\Components\TextInput::make('name')
                             ->label(__('Name'))
@@ -127,7 +133,7 @@ final class MediaResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Uploaded'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

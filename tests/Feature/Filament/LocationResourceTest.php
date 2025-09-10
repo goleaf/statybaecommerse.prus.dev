@@ -39,9 +39,7 @@ class LocationResourceTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_render_location_index_page(): void
     {
         $this->actingAs($this->adminUser);
@@ -51,9 +49,7 @@ class LocationResourceTest extends TestCase
         $response->assertSuccessful();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_list_locations(): void
     {
         $this->actingAs($this->adminUser);
@@ -66,9 +62,7 @@ class LocationResourceTest extends TestCase
             ->assertCanSeeTableRecords($locations);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_render_location_create_page(): void
     {
         $this->actingAs($this->adminUser);
@@ -78,9 +72,7 @@ class LocationResourceTest extends TestCase
         $response->assertSuccessful();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_create_location(): void
     {
         $this->actingAs($this->adminUser);
@@ -123,9 +115,7 @@ class LocationResourceTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_validate_required_fields(): void
     {
         $this->actingAs($this->adminUser);
@@ -139,9 +129,7 @@ class LocationResourceTest extends TestCase
             ->assertHasFormErrors(['country_id']);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_render_location_edit_page(): void
     {
         $this->actingAs($this->adminUser);
@@ -157,9 +145,7 @@ class LocationResourceTest extends TestCase
         $response->assertSuccessful();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_retrieve_location_data(): void
     {
         $this->actingAs($this->adminUser);
@@ -180,9 +166,7 @@ class LocationResourceTest extends TestCase
             ]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_save_location(): void
     {
         $this->actingAs($this->adminUser);
@@ -221,9 +205,7 @@ class LocationResourceTest extends TestCase
             ->toBeTrue();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_delete_location(): void
     {
         $this->actingAs($this->adminUser);
@@ -241,9 +223,7 @@ class LocationResourceTest extends TestCase
         $this->assertModelMissing($location);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_view_location(): void
     {
         $this->actingAs($this->adminUser);
@@ -261,9 +241,7 @@ class LocationResourceTest extends TestCase
         $response->assertSuccessful();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_filter_locations_by_country(): void
     {
         $this->actingAs($this->adminUser);
@@ -290,9 +268,7 @@ class LocationResourceTest extends TestCase
             ->assertCanNotSeeTableRecords([$latvianLocation]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_search_locations(): void
     {
         $this->actingAs($this->adminUser);
@@ -313,9 +289,7 @@ class LocationResourceTest extends TestCase
             ->assertCanNotSeeTableRecords([$otherLocation]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_sort_locations(): void
     {
         $this->actingAs($this->adminUser);
@@ -337,9 +311,7 @@ class LocationResourceTest extends TestCase
             ->assertCanSeeTableRecords([$locationZ, $locationA], inOrder: true);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_bulk_delete_locations(): void
     {
         $this->actingAs($this->adminUser);
@@ -358,9 +330,7 @@ class LocationResourceTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function validates_email_format(): void
     {
         $this->actingAs($this->adminUser);
@@ -374,9 +344,7 @@ class LocationResourceTest extends TestCase
             ->assertHasFormErrors(['email']);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function validates_phone_format(): void
     {
         $this->actingAs($this->adminUser);
@@ -390,9 +358,7 @@ class LocationResourceTest extends TestCase
             ->assertHasFormErrors(['phone']);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_toggle_location_status(): void
     {
         $this->actingAs($this->adminUser);
@@ -412,9 +378,7 @@ class LocationResourceTest extends TestCase
         expect($location->refresh()->is_active)->toBeFalse();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_set_default_location(): void
     {
         $this->actingAs($this->adminUser);

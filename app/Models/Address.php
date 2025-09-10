@@ -43,7 +43,7 @@ final class Address extends Model
 
     public function country(): BelongsTo
     {
-        return $this->belongsTo(Country::class, 'country_code', 'code');
+        return $this->belongsTo(Country::class, 'country_code', 'cca2');
     }
 
     public function scopeDefault($query)

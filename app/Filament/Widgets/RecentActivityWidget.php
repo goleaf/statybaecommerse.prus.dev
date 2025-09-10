@@ -59,7 +59,7 @@ final class RecentActivityWidget extends BaseWidget
                     ->icon('heroicon-m-user'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Time'))
-                    ->since()
+                    ->date('Y-m-d')
                     ->tooltip(fn($state) => $state->format('Y-m-d H:i:s')),
             ])
             ->recordActions([

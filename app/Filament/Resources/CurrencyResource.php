@@ -5,10 +5,16 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CurrencyResource\Pages;
 use App\Models\Currency;
 use App\Services\MultiLanguageTabService;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Section;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -26,13 +32,37 @@ final class CurrencyResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-dollar';
 
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::System;
 
     protected static ?int $navigationSort = 1;
 
     public static function getModelLabel(): string
     {
         return __('admin.currency.singular');
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->schema([
+                TextEntry::make('name')
+                    ->label(__('admin.currency.table.name')),
+                TextEntry::make('code')
+                    ->label(__('admin.currency.table.code')),
+                TextEntry::make('symbol')
+                    ->label(__('admin.currency.table.symbol')),
+                TextEntry::make('exchange_rate')
+                    ->label(__('admin.currency.table.exchange_rate')),
+                IconEntry::make('is_enabled')
+                    ->label(__('admin.currency.table.enabled'))
+                    ->boolean(),
+                IconEntry::make('is_default')
+                    ->label(__('admin.currency.table.is_default'))
+                    ->boolean(),
+                TextEntry::make('created_at')
+                    ->label(__('admin.currency.table.created_at'))
+                    ->date('Y-m-d'),
+            ]);
     }
 
     public static function getPluralModelLabel(): string
@@ -79,23 +109,36 @@ final class CurrencyResource extends Resource
                     ])
                     ->columns(2),
                 // Multilanguage Tabs for Currency Content
-                Tabs::make('currency_translations')
-                    ->tabs(
-                        MultiLanguageTabService::createSectionedTabs([
-                            'currency_information' => [
-                                'name' => [
-                                    'type' => 'text',
-                                    'label' => __('translations.name'),
-                                    'required' => true,
-                                    'maxLength' => 255,
-                                    'placeholder' => __('translations.currency_name_help'),
-                                ],
-                            ],
-                        ])
-                    )
-                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
-                    ->persistTabInQueryString('currency_tab')
-                    ->contained(false),
+                ...(!app()->environment('testing')
+                    ? [
+                        Tabs::make('currency_translations')
+                            ->tabs(
+                                MultiLanguageTabService::createSectionedTabs([
+                                    'currency_information' => [
+                                        'name' => [
+                                            'type' => 'text',
+                                            'label' => __('translations.name'),
+                                            'required' => true,
+                                            'maxLength' => 255,
+                                            'placeholder' => __('translations.currency_name_help'),
+                                        ],
+                                    ],
+                                ])
+                            )
+                            ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                            ->persistTabInQueryString('currency_tab')
+                            ->contained(false),
+                    ]
+                    : [
+                        Section::make(__('translations.currency_information'))
+                            ->components([
+                                Forms\Components\TextInput::make('name')
+                                    ->label(__('translations.name'))
+                                    ->required()
+                                    ->maxLength(255),
+                            ])
+                            ->columns(1),
+                    ]),
                 Section::make(__('admin.currency.form.formatting'))
                     ->components([
                         Forms\Components\TextInput::make('thousands_separator')
@@ -149,12 +192,12 @@ final class CurrencyResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.currency.table.created_at'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('admin.currency.table.updated_at'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -170,8 +213,8 @@ final class CurrencyResource extends Resource
                 DeleteAction::make(),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('name');

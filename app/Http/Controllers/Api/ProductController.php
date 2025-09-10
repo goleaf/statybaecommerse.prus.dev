@@ -34,7 +34,7 @@ final class ProductController extends Controller
                     'sale_price' => $product->sale_price,
                     'brand' => $product->brand?->name,
                     'image' => $product->getFirstMediaUrl('images', 'thumb'),
-                    'url' => route('products.show', $product->slug),
+                    'url' => route('product.show', $product->slug),
                 ];
             });
 
@@ -45,4 +45,3 @@ final class ProductController extends Controller
         ]);
     }
 }
-

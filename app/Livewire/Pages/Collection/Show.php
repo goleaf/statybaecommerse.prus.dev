@@ -29,32 +29,23 @@ class Show extends Component
     #[Url]
     public array $selectedValues = [];
 
-    public function mount(string $slug): void
+    public function mount(CollectionModel $collection): void
     {
         abort_if(!app_feature_enabled('collection'), 404);
-        $this->slug = $slug;
+        
+        // Ensure collection is enabled
+        if (!$collection->is_enabled) {
+            abort(404);
+        }
+        
+        $this->collection = $collection;
+        $this->slug = $collection->slug;
+        
+        // Handle translation redirects if needed
         $locale = app()->getLocale();
-        $this->collection = CollectionModel::query()
-            ->where('is_enabled', true)
-            ->where(function ($q) use ($slug, $locale) {
-                $q
-                    ->where('slug', $slug)
-                    ->orWhereExists(function ($sq) use ($slug, $locale) {
-                        $sq
-                            ->selectRaw('1')
-                            ->from('sh_collection_translations as t')
-                            ->whereColumn('t.collection_id', 'sh_collections.id')
-                            ->where('t.locale', $locale)
-                            ->where('t.slug', $slug);
-                    });
-            })
-            ->first();
-
-        abort_if(is_null($this->collection), 404);
-
         $canonical = $this->collection->translations()->where('locale', $locale)->value('slug') ?: $this->collection->slug;
-        if ($canonical && $canonical !== $slug) {
-            redirect()->to(route('collection.show', ['locale' => $locale, 'slug' => $canonical]), 301)->send();
+        if ($canonical && $canonical !== $this->slug) {
+            redirect()->to(route('collections.show', ['locale' => $locale, 'slug' => $canonical]), 301)->send();
             exit;
         }
     }

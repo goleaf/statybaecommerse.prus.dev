@@ -195,7 +195,7 @@ it('has correct column span', function () {
     $property = $reflection->getProperty('columnSpan');
     $property->setAccessible(true);
 
-    expect($property->getValue($this->widget))->toBe(2);
+    expect($property->getValue($this->widget))->toBe('full');
 });
 
 it('has correct sort order', function () {
@@ -212,6 +212,10 @@ it('includes product view action', function () {
     // Check that the table has record actions configured
     $actions = $table->getRecordActions();
     expect($actions)->not()->toBeEmpty();
+
+    // Ensure the Edit action exists
+    $actionNames = array_map(fn($a) => method_exists($a, 'getName') ? $a->getName() : null, $actions);
+    expect($actionNames)->toContain('edit');
 });
 
 it('uses correct pagination options', function () {

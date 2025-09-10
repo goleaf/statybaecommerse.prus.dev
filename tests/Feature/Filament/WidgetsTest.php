@@ -32,9 +32,7 @@ class WidgetsTest extends TestCase
         $this->adminUser->assignRole('super_admin');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function enhanced_ecommerce_overview_widget_renders(): void
     {
         $this->actingAs($this->adminUser);
@@ -73,9 +71,7 @@ class WidgetsTest extends TestCase
         expect($stats[2]->getValue())->toBe('3');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function enhanced_ecommerce_overview_calculates_revenue_correctly(): void
     {
         $this->actingAs($this->adminUser);
@@ -102,9 +98,7 @@ class WidgetsTest extends TestCase
         expect($revenue)->toBe('€400.00');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function enhanced_ecommerce_overview_calculates_orders_correctly(): void
     {
         $this->actingAs($this->adminUser);
@@ -119,9 +113,7 @@ class WidgetsTest extends TestCase
         expect($orders)->toBe('6');  // All orders regardless of status
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function enhanced_ecommerce_overview_calculates_customers_correctly(): void
     {
         $this->actingAs($this->adminUser);
@@ -135,9 +127,7 @@ class WidgetsTest extends TestCase
         expect($customers)->toBe('5');  // Only customers
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function enhanced_ecommerce_overview_calculates_average_order_value(): void
     {
         $this->actingAs($this->adminUser);
@@ -158,9 +148,7 @@ class WidgetsTest extends TestCase
         expect($aov)->toBe('€150.00');  // (100 + 200) / 2
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function enhanced_ecommerce_overview_calculates_average_rating(): void
     {
         $this->actingAs($this->adminUser);
@@ -175,9 +163,7 @@ class WidgetsTest extends TestCase
         expect($rating)->toBe('4.0/5');  // (4 + 5 + 3) / 3 = 4.0
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function orders_chart_widget_renders(): void
     {
         $this->actingAs($this->adminUser);
@@ -209,9 +195,7 @@ class WidgetsTest extends TestCase
         expect($data['datasets'][0])->toHaveKey('data');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function orders_chart_widget_has_correct_heading(): void
     {
         $this->actingAs($this->adminUser);
@@ -222,9 +206,7 @@ class WidgetsTest extends TestCase
         expect($heading)->toBe(__('analytics.orders_overview'));
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function orders_chart_widget_has_description(): void
     {
         $this->actingAs($this->adminUser);
@@ -236,9 +218,7 @@ class WidgetsTest extends TestCase
         expect($description)->toContain('30 days');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function realtime_analytics_widget_renders(): void
     {
         $this->actingAs($this->adminUser);
@@ -255,9 +235,7 @@ class WidgetsTest extends TestCase
             ->toHaveKey('labels');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function realtime_analytics_widget_has_correct_heading(): void
     {
         $this->actingAs($this->adminUser);
@@ -268,9 +246,7 @@ class WidgetsTest extends TestCase
         expect($heading)->toBe(__('admin.widgets.realtime_analytics'));
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function realtime_analytics_widget_has_polling_interval(): void
     {
         $this->actingAs($this->adminUser);
@@ -281,9 +257,7 @@ class WidgetsTest extends TestCase
         expect($widget->pollingInterval)->toBe('10s');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function widgets_respect_permissions(): void
     {
         // Create a user without dashboard permissions
@@ -300,9 +274,7 @@ class WidgetsTest extends TestCase
         expect($canView)->toBeFalse();
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function enhanced_ecommerce_overview_handles_empty_data(): void
     {
         $this->actingAs($this->adminUser);
@@ -325,9 +297,7 @@ class WidgetsTest extends TestCase
         expect($rating)->toBe('0.0/5');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function enhanced_ecommerce_overview_calculates_monthly_changes(): void
     {
         $this->actingAs($this->adminUser);
@@ -357,9 +327,7 @@ class WidgetsTest extends TestCase
         expect($ordersChange)->toContain('%');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function enhanced_ecommerce_overview_shows_correct_icons_for_trends(): void
     {
         $this->actingAs($this->adminUser);
@@ -383,9 +351,7 @@ class WidgetsTest extends TestCase
         expect($ordersIcon)->toBe('heroicon-m-arrow-trending-up');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function enhanced_ecommerce_overview_shows_correct_colors_for_trends(): void
     {
         $this->actingAs($this->adminUser);
@@ -409,9 +375,7 @@ class WidgetsTest extends TestCase
         expect($ordersColor)->toBe('success');
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function widgets_have_correct_sort_order(): void
     {
         expect(EnhancedEcommerceOverview::$sort)->toBeNull();
@@ -419,9 +383,7 @@ class WidgetsTest extends TestCase
         expect(OrdersChartWidget::$sort)->toBe(4);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function orders_chart_widget_filters_data_by_date_range(): void
     {
         $this->actingAs($this->adminUser);

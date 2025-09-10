@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Models\EnhancedSetting;
+use App\Models\NormalSetting as EnhancedSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

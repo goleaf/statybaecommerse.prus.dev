@@ -147,11 +147,11 @@ return new class extends Migration {
                 $table->string('number')->unique();
                 $table->unsignedBigInteger('user_id')->nullable();
                 $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled'])->default('pending');
-                $table->decimal('subtotal', 10, 2);
+                $table->decimal('subtotal', 10, 2)->default(0);
                 $table->decimal('tax_amount', 10, 2)->default(0);
                 $table->decimal('shipping_amount', 10, 2)->default(0);
                 $table->decimal('discount_amount', 10, 2)->default(0);
-                $table->decimal('total', 10, 2);
+                $table->decimal('total', 10, 2)->default(0);
                 $table->string('currency', 3)->default('EUR');
                 $table->json('billing_address')->nullable();
                 $table->json('shipping_address')->nullable();
@@ -197,6 +197,9 @@ return new class extends Migration {
                 $table->string('title')->nullable();
                 $table->text('content');
                 $table->boolean('is_approved')->default(false);
+                $table->string('locale', 8)->default('lt');
+                $table->timestamp('approved_at')->nullable();
+                $table->timestamp('rejected_at')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
 
@@ -204,6 +207,7 @@ return new class extends Migration {
                 $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
                 $table->index(['product_id', 'is_approved']);
                 $table->index(['is_approved', 'created_at']);
+                $table->index(['locale']);
             });
         }
 

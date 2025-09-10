@@ -6,7 +6,7 @@ use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -80,7 +80,7 @@ final class OrdersRelationManager extends RelationManager
                     ->counts('items'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.order_date'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable(),
             ])
             ->filters([

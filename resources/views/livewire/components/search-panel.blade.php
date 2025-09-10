@@ -204,14 +204,14 @@
                 <div class="{{ $viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4' }}">
                     @foreach($products as $product)
                         @if($viewMode === 'grid')
-                            <livewire:components.enhanced-product-card :product="$product" :key="'product-' . $product->id" />
+                            <livewire:components.product-card :product="$product" :key="'product-' . $product->id" />
                         @else
                             <!-- List View -->
                             <div class="bg-white rounded-lg shadow-sm border p-4 flex space-x-4">
                                 <div class="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                    @if($product->getFirstMediaUrl('gallery'))
+                                    @if($product->getFirstMediaUrl('images'))
                                         <img 
-                                            src="{{ $product->getFirstMediaUrl('gallery', 'thumb') }}" 
+                                            src="{{ $product->getFirstMediaUrl('images', 'image-sm') ?: $product->getFirstMediaUrl('images') }}" 
                                             alt="{{ $product->name }}"
                                             class="w-full h-full object-cover"
                                         >
@@ -219,7 +219,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <h3 class="font-semibold text-gray-900 mb-1">
-                                        <a href="{{ route('products.show', $product->slug ?? $product) }}" class="hover:text-blue-600">
+                                        <a href="{{ route('product.show', $product->slug ?? $product) }}" class="hover:text-blue-600">
                                             {{ $product->name }}
                                         </a>
                                     </h3>

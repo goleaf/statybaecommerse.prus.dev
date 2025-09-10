@@ -27,7 +27,7 @@
         @endif
         <x-breadcrumbs>
             <x-slot name="links">
-                <x-link :href="route('brand.index', ['locale' => app()->getLocale()])">{{ __('nav_brands') }}</x-link>
+                <x-link :href="route('brands.index', ['locale' => app()->getLocale()])">{{ __('nav_brands') }}</x-link>
             </x-slot>
         </x-breadcrumbs>
 
@@ -95,7 +95,7 @@
 <x-dynamic-component :component="$layout">
     <div class="container mx-auto px-4 py-8">
         <x-breadcrumbs :items="[
-            ['label' => __('Brands'), 'url' => route('brand.index', ['locale' => app()->getLocale()])],
+            ['label' => __('Brands'), 'url' => route('brands.index', ['locale' => app()->getLocale()])],
             ['label' => $brand->trans('name') ?? $brand->name],
         ]" />
         <h1 class="text-2xl font-semibold mb-6">{{ $brand->trans('name') ?? $brand->name }}</h1>

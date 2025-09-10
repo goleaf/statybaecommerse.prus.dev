@@ -5,15 +5,17 @@ namespace App\Filament\Resources;
 use App\Filament\Actions\DocumentAction;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
-use Filament\Tables\Actions\Action;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components as Schemas;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -40,25 +42,24 @@ final class OrderResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
-                Forms\Components\Section::make(__('ecommerce.order_information'))
-                    ->components([
+            ->schema([
+                Schemas\Section::make(__('admin.order_information'))
+                    ->schema([
                         Forms\Components\TextInput::make('number')
                             ->required()
-                            ->maxLength(255)
-                            ->disabled()
-                            ->dehydrated(),
+                            ->unique(Order::class, 'number', ignoreRecord: true)
+                            ->maxLength(255),
                         Forms\Components\Select::make('user_id')
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload(),
                         Forms\Components\Select::make('status')
                             ->options([
-                                'pending' => __('ecommerce.pending'),
-                                'processing' => __('ecommerce.processing'),
-                                'shipped' => __('ecommerce.shipped'),
-                                'delivered' => __('ecommerce.delivered'),
-                                'cancelled' => __('ecommerce.cancelled'),
+                                'pending' => __('translations.pending'),
+                                'processing' => __('translations.processing'),
+                                'shipped' => __('translations.shipped'),
+                                'delivered' => __('translations.delivered'),
+                                'cancelled' => __('translations.cancelled'),
                             ])
                             ->required(),
                         Forms\Components\TextInput::make('currency')
@@ -66,8 +67,8 @@ final class OrderResource extends Resource
                             ->maxLength(3),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('ecommerce.pricing'))
-                    ->components([
+                Schemas\Section::make(__('admin.pricing'))
+                    ->schema([
                         Forms\Components\TextInput::make('subtotal')
                             ->numeric()
                             ->prefix('€')
@@ -90,24 +91,24 @@ final class OrderResource extends Resource
                             ->required(),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('ecommerce.addresses_information'))
-                    ->components([
+                Schemas\Section::make(__('admin.addresses_information'))
+                    ->schema([
                         Forms\Components\KeyValue::make('billing_address')
-                            ->label(__('ecommerce.billing_address')),
+                            ->label(__('admin.billing_address')),
                         Forms\Components\KeyValue::make('shipping_address')
-                            ->label(__('ecommerce.shipping_address')),
+                            ->label(__('admin.shipping_address')),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('ecommerce.dates_information'))
-                    ->components([
+                Schemas\Section::make(__('admin.dates_information'))
+                    ->schema([
                         Forms\Components\DateTimePicker::make('shipped_at')
-                            ->label(__('ecommerce.shipped_at')),
+                            ->label(__('admin.shipped_at')),
                         Forms\Components\DateTimePicker::make('delivered_at')
-                            ->label(__('ecommerce.delivered_at')),
+                            ->label(__('admin.delivered_at')),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('ecommerce.notes_information'))
-                    ->components([
+                Schemas\Section::make(__('admin.notes_information'))
+                    ->schema([
                         Forms\Components\Textarea::make('notes')
                             ->rows(3),
                     ]),
@@ -119,10 +120,11 @@ final class OrderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('number')
+                    ->label(__('admin.orders.fields.number'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label(__('ecommerce.customer'))
+                    ->label(__('admin.customer'))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
@@ -135,21 +137,22 @@ final class OrderResource extends Resource
                         'cancelled' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('total')
+                    ->label(__('admin.orders.fields.total'))
                     ->money('EUR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('items_count')
                     ->counts('items')
-                    ->label(__('ecommerce.items')),
+                    ->label(__('admin.items')),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('ecommerce.order_date'))
-                    ->dateTime()
+                    ->label(__('admin.order_date'))
+                    ->date('Y-m-d')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('shipped_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('delivered_at')
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable()
                     ->toggleable(),
             ])
@@ -157,18 +160,18 @@ final class OrderResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'pending' => __('ecommerce.pending'),
-                        'processing' => __('ecommerce.processing'),
-                        'shipped' => __('ecommerce.shipped'),
-                        'delivered' => __('ecommerce.delivered'),
-                        'cancelled' => __('ecommerce.cancelled'),
+                        'pending' => __('translations.pending'),
+                        'processing' => __('translations.processing'),
+                        'shipped' => __('translations.shipped'),
+                        'delivered' => __('translations.delivered'),
+                        'cancelled' => __('translations.cancelled'),
                     ]),
                 Tables\Filters\Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
-                            ->label(__('ecommerce.order_created_from')),
+                            ->label(__('admin.order_created_from')),
                         Forms\Components\DatePicker::make('created_until')
-                            ->label(__('ecommerce.order_created_until')),
+                            ->label(__('admin.order_created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -184,6 +187,7 @@ final class OrderResource extends Resource
             ])
             ->recordActions([
                 DocumentAction::make()
+                    ->label(__('admin.documents.generate'))
                     ->variables(fn(Order $record) => [
                         '$ORDER_NUMBER' => $record->number,
                         '$ORDER_DATE' => $record->created_at->format('Y-m-d'),
@@ -198,9 +202,18 @@ final class OrderResource extends Resource
                         '$BILLING_ADDRESS' => is_array($record->billing_address) ? implode(', ', $record->billing_address) : $record->billing_address,
                         '$SHIPPING_ADDRESS' => is_array($record->shipping_address) ? implode(', ', $record->shipping_address) : $record->shipping_address,
                     ]),
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                ViewAction::make()->label(__('admin.actions.view')),
+                EditAction::make()->label(__('admin.actions.edit')),
+                DeleteAction::make()->label(__('admin.actions.delete')),
+                Action::make('restore')
+                    ->label(__('admin.actions.restore'))
+                    ->icon('heroicon-o-arrow-path')
+                    ->visible(fn(?Order $record): bool => true)
+                    ->action(function (?Order $record): void {
+                        if ($record && method_exists($record, 'restore')) {
+                            $record->restore();
+                        }
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -209,7 +222,8 @@ final class OrderResource extends Resource
                     RestoreBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('created_at', 'desc')
+            ->persistFiltersInSession();
     }
 
     public static function getRelations(): array

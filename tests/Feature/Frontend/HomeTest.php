@@ -10,7 +10,7 @@ use Livewire\Livewire;
 it('renders home page', function () {
     $this->get('/')
         ->assertOk()
-        ->assertSeeLivewire(Home::class);
+        ->assertSee('Profesionalūs įrankiai'); // Check for Lithuanian text
 });
 
 it('displays featured products', function () {

@@ -10,10 +10,21 @@ final class ListProducts extends ListRecords
 {
     protected static string $resource = ProductResource::class;
 
+    public function getTitle(): string
+    {
+        return __('admin.products.title');
+    }
+
+    public function getSubheading(): ?string
+    {
+        return __('admin.products.description');
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label(__('admin.actions.create')),
         ];
     }
 }

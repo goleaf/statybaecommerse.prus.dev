@@ -5,12 +5,14 @@ namespace App\Filament\Pages;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Filament\Actions\Action;
-use Filament\Forms;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Pages\Page;
-use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use BackedEnum;
 use UnitEnum;
@@ -21,7 +23,8 @@ final class InventoryManagement extends Page implements HasTable
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cube-transparent';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Catalog';
+    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
+
     protected static ?int $navigationSort = 10;
 
     public ?string $stockFilter = 'all';
@@ -34,13 +37,16 @@ final class InventoryManagement extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
+            ->paginated([10, 25, 50])
+            ->striped()
+            ->poll(null)
             ->query(
                 Product::query()
                     ->with(['brand', 'media', 'variants'])
                     ->withCount('variants')
-                    ->when($this->stockFilter === 'low', fn (Builder $query) => $query->where('stock_quantity', '<=', 10))
-                    ->when($this->stockFilter === 'out', fn (Builder $query) => $query->where('stock_quantity', '<=', 0))
-                    ->when($this->stockFilter === 'good', fn (Builder $query) => $query->where('stock_quantity', '>', 10))
+                    ->when($this->stockFilter === 'low', fn(Builder $query) => $query->where('stock_quantity', '<=', 10))
+                    ->when($this->stockFilter === 'out', fn(Builder $query) => $query->where('stock_quantity', '<=', 0))
+                    ->when($this->stockFilter === 'good', fn(Builder $query) => $query->where('stock_quantity', '>', 10))
             )
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
@@ -49,60 +55,51 @@ final class InventoryManagement extends Page implements HasTable
                     ->conversion('thumb')
                     ->circular()
                     ->size(40),
-
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('admin.table.name'))
                     ->searchable()
                     ->sortable()
                     ->weight('medium'),
-
                 Tables\Columns\TextColumn::make('sku')
                     ->label(__('admin.table.sku'))
                     ->searchable()
                     ->copyable()
                     ->badge()
                     ->color('gray'),
-
                 Tables\Columns\TextColumn::make('brand.name')
                     ->label(__('admin.table.brand'))
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('stock_quantity')
                     ->label(__('admin.table.current_stock'))
                     ->numeric()
                     ->sortable()
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
+                    ->color(fn(int $state): string => match (true) {
                         $state <= 0 => 'danger',
                         $state <= 10 => 'warning',
                         $state <= 50 => 'info',
                         default => 'success',
                     }),
-
                 Tables\Columns\TextColumn::make('low_stock_threshold')
                     ->label(__('admin.table.threshold'))
                     ->numeric()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('variants_count')
                     ->label(__('admin.table.variants'))
                     ->numeric()
                     ->badge()
                     ->color('info'),
-
                 Tables\Columns\IconColumn::make('track_inventory')
                     ->label(__('admin.table.tracked'))
                     ->boolean(),
-
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('admin.table.last_updated'))
-                    ->dateTime()
-                    ->since()
+                    ->date('Y-m-d')
                     ->sortable(),
             ])
             ->headerActions([
-                Actions\Action::make('stock_filter')
+                Action::make('stock_filter')
                     ->label(__('admin.actions.filter_stock'))
                     ->icon('heroicon-o-funnel')
                     ->form([
@@ -121,7 +118,7 @@ final class InventoryManagement extends Page implements HasTable
                     }),
             ])
             ->recordActions([
-                Actions\Action::make('update_stock')
+                Action::make('update_stock')
                     ->label(__('admin.actions.update_stock'))
                     ->icon('heroicon-o-pencil')
                     ->form([
@@ -130,17 +127,15 @@ final class InventoryManagement extends Page implements HasTable
                             ->numeric()
                             ->required()
                             ->minValue(0),
-                            
                         Forms\Components\TextInput::make('low_stock_threshold')
                             ->label(__('admin.fields.low_stock_threshold'))
                             ->numeric()
                             ->minValue(0),
-                            
                         Forms\Components\Textarea::make('note')
                             ->label(__('admin.fields.inventory_note'))
                             ->maxLength(500),
                     ])
-                    ->fillForm(fn (Product $record): array => [
+                    ->fillForm(fn(Product $record): array => [
                         'stock_quantity' => $record->stock_quantity,
                         'low_stock_threshold' => $record->low_stock_threshold,
                     ])
@@ -156,20 +151,18 @@ final class InventoryManagement extends Page implements HasTable
                             ->success()
                             ->send();
                     }),
-
-                Actions\Action::make('view_variants')
+                Action::make('view_variants')
                     ->label(__('admin.actions.view_variants'))
                     ->icon('heroicon-o-squares-2x2')
                     ->color('info')
-                    ->visible(fn (Product $record): bool => $record->variants_count > 0)
-                    ->url(fn (Product $record): string => 
-                        route('filament.admin.resources.products.view', ['record' => $record, 'activeTab' => 'variants'])
-                    )
+                    ->visible(fn(Product $record): bool => $record->variants_count > 0)
+                    ->url(fn(Product $record): string =>
+                        route('filament.admin.resources.products.view', ['record' => $record, 'activeTab' => 'variants']))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\BulkAction::make('bulk_stock_update')
+                BulkActionGroup::make([
+                    BulkAction::make('bulk_stock_update')
                         ->label(__('admin.actions.bulk_stock_update'))
                         ->icon('heroicon-m-pencil-square')
                         ->form([
@@ -181,7 +174,6 @@ final class InventoryManagement extends Page implements HasTable
                                     'decrease' => __('admin.stock_operations.decrease_by'),
                                 ])
                                 ->required(),
-                                
                             Forms\Components\TextInput::make('quantity')
                                 ->label(__('admin.fields.quantity'))
                                 ->numeric()
@@ -189,13 +181,18 @@ final class InventoryManagement extends Page implements HasTable
                                 ->minValue(0),
                         ])
                         ->action(function (array $data, $records): void {
+                            $normalized = $records instanceof \Illuminate\Support\Collection ? $records->all() : $records;
+                            $records = collect($normalized)
+                                ->map(fn($record) => $record instanceof Product ? $record : Product::find($record))
+                                ->filter();
+
                             foreach ($records as $record) {
                                 $newStock = match ($data['operation']) {
-                                    'set' => $data['quantity'],
-                                    'increase' => $record->stock_quantity + $data['quantity'],
-                                    'decrease' => max(0, $record->stock_quantity - $data['quantity']),
+                                    'set' => (int) $data['quantity'],
+                                    'increase' => (int) $record->stock_quantity + (int) $data['quantity'],
+                                    'decrease' => max(0, (int) $record->stock_quantity - (int) $data['quantity']),
                                 };
-                                
+
                                 $record->update(['stock_quantity' => $newStock]);
                             }
 
@@ -205,21 +202,38 @@ final class InventoryManagement extends Page implements HasTable
                                 ->success()
                                 ->send();
                         }),
-
-                    Actions\BulkAction::make('enable_tracking')
+                    BulkAction::make('enable_tracking')
                         ->label(__('admin.actions.enable_tracking'))
                         ->icon('heroicon-m-eye')
                         ->color('success')
-                        ->action(fn ($records) => $records->each(fn($record) => $record->update(['track_inventory' => true]))),
+                        ->action(function ($records): void {
+                            $normalized = $records instanceof \Illuminate\Support\Collection ? $records->all() : $records;
+                            $records = collect($normalized)
+                                ->map(fn($record) => $record instanceof Product ? $record : Product::find($record))
+                                ->filter();
 
-                    Actions\BulkAction::make('disable_tracking')
+                            $records->each(fn(Product $record) => $record->update(['track_inventory' => true]));
+                        }),
+                    BulkAction::make('disable_tracking')
                         ->label(__('admin.actions.disable_tracking'))
                         ->icon('heroicon-m-eye-slash')
                         ->color('danger')
-                        ->action(fn ($records) => $records->each(fn($record) => $record->update(['track_inventory' => false]))),
+                        ->action(function ($records): void {
+                            $normalized = $records instanceof \Illuminate\Support\Collection ? $records->all() : $records;
+                            $records = collect($normalized)
+                                ->map(fn($record) => $record instanceof Product ? $record : Product::find($record))
+                                ->filter();
+
+                            $records->each(fn(Product $record) => $record->update(['track_inventory' => false]));
+                        }),
                 ]),
             ])
             ->defaultSort('stock_quantity', 'asc');
+    }
+
+    protected function shouldLoadTableOnMount(): bool
+    {
+        return true;
     }
 
     protected function getHeaderActions(): array
@@ -233,7 +247,7 @@ final class InventoryManagement extends Page implements HasTable
                     // Export inventory to CSV
                     $products = Product::with('brand')->get();
                     $csv = "Name,SKU,Brand,Stock,Threshold,Price\n";
-                    
+
                     foreach ($products as $product) {
                         $csv .= sprintf(
                             '"%s","%s","%s",%d,%d,%.2f' . "\n",
@@ -245,10 +259,10 @@ final class InventoryManagement extends Page implements HasTable
                             $product->price
                         );
                     }
-                    
+
                     $filename = 'inventory-' . now()->format('Y-m-d-H-i-s') . '.csv';
                     \Storage::disk('public')->put('exports/' . $filename, $csv);
-                    
+
                     \Filament\Notifications\Notification::make()
                         ->title(__('admin.notifications.inventory_exported'))
                         ->body(__('admin.notifications.file_saved', ['filename' => $filename]))
@@ -261,14 +275,13 @@ final class InventoryManagement extends Page implements HasTable
                         ])
                         ->send();
                 }),
-
             Action::make('low_stock_alert')
                 ->label(__('admin.actions.low_stock_alert'))
                 ->icon('heroicon-o-exclamation-triangle')
                 ->color('warning')
                 ->action(function (): void {
                     $lowStockCount = Product::where('stock_quantity', '<=', 10)->count();
-                    
+
                     \Filament\Notifications\Notification::make()
                         ->title(__('admin.notifications.low_stock_check'))
                         ->body(__('admin.notifications.low_stock_items', ['count' => $lowStockCount]))
@@ -282,7 +295,7 @@ final class InventoryManagement extends Page implements HasTable
     {
         \Artisan::call('optimize:clear');
         $this->loadSystemStats();
-        
+
         \Filament\Notifications\Notification::make()
             ->title(__('admin.notifications.cache_cleared'))
             ->success()
@@ -293,7 +306,7 @@ final class InventoryManagement extends Page implements HasTable
     {
         \Artisan::call('optimize');
         $this->loadSystemStats();
-        
+
         \Filament\Notifications\Notification::make()
             ->title(__('admin.notifications.system_optimized'))
             ->success()

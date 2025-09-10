@@ -58,7 +58,7 @@ final class RecentOrders extends BaseWidget
                     ]),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.fields.created_at'))
-                    ->dateTime()
+                    ->date('Y-m-d')
                     ->sortable(),
             ])
             ->actions([

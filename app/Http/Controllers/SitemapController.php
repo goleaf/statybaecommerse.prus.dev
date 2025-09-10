@@ -11,6 +11,8 @@ class SitemapController extends Controller
 {
     public function index(): Response
     {
+        // Resolve table names (supports sh_* prefixed fallback for tests)
+        $tables = $this->resolveTables();
         $locales = collect(explode(',', (string) config('app.supported_locales', 'en')))
             ->map(fn($v) => trim($v))
             ->filter()
@@ -31,16 +33,16 @@ class SitemapController extends Controller
             $urls[] = url('/' . $loc . '/brands');
 
             // Categories with translated slugs fallback to base slug
-            if (!Schema::hasTable('categories')) {
+            if (!Schema::hasTable($tables['categories'])) {
                 continue;  // Skip dynamic sections when tables are missing in testing
             }
-            $categoryQuery = DB::table('categories as c')
-                ->leftJoin('category_translations as t', function ($join) use ($loc) {
+            $categoryQuery = DB::table($tables['categories'] . ' as c')
+                ->leftJoin($tables['category_translations'] . ' as t', function ($join) use ($loc) {
                     $join->on('t.category_id', '=', 'c.id')->where('t.locale', '=', $loc);
                 })
                 ->limit(1000)
                 ->selectRaw('COALESCE(t.slug, c.slug) as slug');
-            if (Schema::hasColumn('categories', 'is_enabled')) {
+            if (Schema::hasColumn($tables['categories'], 'is_enabled')) {
                 $categoryQuery->where('c.is_enabled', true);
             }
             $categorySlugs = $categoryQuery->pluck('slug');
@@ -49,16 +51,16 @@ class SitemapController extends Controller
             }
 
             // Collections
-            if (!Schema::hasTable('collections')) {
+            if (!Schema::hasTable($tables['collections'])) {
                 continue;
             }
-            $collectionQuery = DB::table('collections as c')
-                ->leftJoin('collection_translations as t', function ($join) use ($loc) {
+            $collectionQuery = DB::table($tables['collections'] . ' as c')
+                ->leftJoin($tables['collection_translations'] . ' as t', function ($join) use ($loc) {
                     $join->on('t.collection_id', '=', 'c.id')->where('t.locale', '=', $loc);
                 })
                 ->limit(1000)
                 ->selectRaw('COALESCE(t.slug, c.slug) as slug');
-            if (Schema::hasColumn('collections', 'is_enabled')) {
+            if (Schema::hasColumn($tables['collections'], 'is_enabled')) {
                 $collectionQuery->where('c.is_enabled', true);
             }
             $collectionSlugs = $collectionQuery->pluck('slug');
@@ -67,16 +69,16 @@ class SitemapController extends Controller
             }
 
             // Brands
-            if (!Schema::hasTable('brands')) {
+            if (!Schema::hasTable($tables['brands'])) {
                 continue;
             }
-            $brandQuery = DB::table('brands as b')
-                ->leftJoin('brand_translations as t', function ($join) use ($loc) {
+            $brandQuery = DB::table($tables['brands'] . ' as b')
+                ->leftJoin($tables['brand_translations'] . ' as t', function ($join) use ($loc) {
                     $join->on('t.brand_id', '=', 'b.id')->where('t.locale', '=', $loc);
                 })
                 ->limit(1000)
                 ->selectRaw('COALESCE(t.slug, b.slug) as slug');
-            if (Schema::hasColumn('brands', 'is_enabled')) {
+            if (Schema::hasColumn($tables['brands'], 'is_enabled')) {
                 $brandQuery->where('b.is_enabled', true);
             }
             $brandSlugs = $brandQuery->pluck('slug');
@@ -85,19 +87,19 @@ class SitemapController extends Controller
             }
 
             // Products (visible & published)
-            if (!Schema::hasTable('products')) {
+            if (!Schema::hasTable($tables['products'])) {
                 continue;
             }
-            $productQuery = DB::table('products as p')
-                ->leftJoin('product_translations as t', function ($join) use ($loc) {
+            $productQuery = DB::table($tables['products'] . ' as p')
+                ->leftJoin($tables['product_translations'] . ' as t', function ($join) use ($loc) {
                     $join->on('t.product_id', '=', 'p.id')->where('t.locale', '=', $loc);
                 })
                 ->limit(5000)
                 ->selectRaw('COALESCE(t.slug, p.slug) as slug');
-            if (Schema::hasColumn('products', 'is_visible')) {
+            if (Schema::hasColumn($tables['products'], 'is_visible')) {
                 $productQuery->where('p.is_visible', true);
             }
-            if (Schema::hasColumn('products', 'published_at')) {
+            if (Schema::hasColumn($tables['products'], 'published_at')) {
                 $productQuery->whereNotNull('p.published_at')->where('p.published_at', '<=', now());
             }
             $productSlugs = $productQuery->pluck('slug');
@@ -106,15 +108,15 @@ class SitemapController extends Controller
             }
 
             // Legal pages (enabled) with translated slugs
-            if (!Schema::hasTable('legals')) {
+            if (!Schema::hasTable($tables['legals'])) {
                 continue;
             }
-            $legalQuery = DB::table('legals as l')
-                ->leftJoin('legal_translations as t', function ($join) use ($loc) {
+            $legalQuery = DB::table($tables['legals'] . ' as l')
+                ->leftJoin($tables['legal_translations'] . ' as t', function ($join) use ($loc) {
                     $join->on('t.legal_id', '=', 'l.id')->where('t.locale', '=', $loc);
                 })
                 ->selectRaw('COALESCE(t.slug, l.slug) as slug');
-            if (Schema::hasColumn('legals', 'is_enabled')) {
+            if (Schema::hasColumn($tables['legals'], 'is_enabled')) {
                 $legalQuery->where('l.is_enabled', true);
             }
             $legalSlugs = $legalQuery->pluck('slug');
@@ -134,6 +136,7 @@ class SitemapController extends Controller
 
     public function locale(string $locale): Response
     {
+        $tables = $this->resolveTables();
         $supported = collect(explode(',', (string) config('app.supported_locales', 'en')))
             ->map(fn($v) => trim($v))
             ->filter()
@@ -158,18 +161,18 @@ class SitemapController extends Controller
         $urls[] = url('/' . $locale . '/brands');
 
         // Categories with translated slugs fallback to base slug
-        if (!Schema::hasTable('categories')) {
+        if (!Schema::hasTable($tables['categories'])) {
             $xml = view('sitemap.xml', ['urls' => $urls])->render();
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
         }
-        $categoryQuery = DB::table('categories as c')
-            ->leftJoin('category_translations as t', function ($join) use ($locale) {
+        $categoryQuery = DB::table($tables['categories'] . ' as c')
+            ->leftJoin($tables['category_translations'] . ' as t', function ($join) use ($locale) {
                 $join->on('t.category_id', '=', 'c.id')->where('t.locale', '=', $locale);
             })
             ->limit(1000)
             ->selectRaw('COALESCE(t.slug, c.slug) as slug');
-        if (Schema::hasColumn('categories', 'is_enabled')) {
+        if (Schema::hasColumn($tables['categories'], 'is_enabled')) {
             $categoryQuery->where('c.is_enabled', true);
         }
         $categorySlugs = $categoryQuery->pluck('slug');
@@ -178,18 +181,18 @@ class SitemapController extends Controller
         }
 
         // Collections
-        if (!Schema::hasTable('collections')) {
+        if (!Schema::hasTable($tables['collections'])) {
             $xml = view('sitemap.xml', ['urls' => $urls])->render();
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
         }
-        $collectionQuery = DB::table('collections as c')
-            ->leftJoin('collection_translations as t', function ($join) use ($locale) {
+        $collectionQuery = DB::table($tables['collections'] . ' as c')
+            ->leftJoin($tables['collection_translations'] . ' as t', function ($join) use ($locale) {
                 $join->on('t.collection_id', '=', 'c.id')->where('t.locale', '=', $locale);
             })
             ->limit(1000)
             ->selectRaw('COALESCE(t.slug, c.slug) as slug');
-        if (Schema::hasColumn('collections', 'is_enabled')) {
+        if (Schema::hasColumn($tables['collections'], 'is_enabled')) {
             $collectionQuery->where('c.is_enabled', true);
         }
         $collectionSlugs = $collectionQuery->pluck('slug');
@@ -198,18 +201,18 @@ class SitemapController extends Controller
         }
 
         // Brands
-        if (!Schema::hasTable('brands')) {
+        if (!Schema::hasTable($tables['brands'])) {
             $xml = view('sitemap.xml', ['urls' => $urls])->render();
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
         }
-        $brandQuery = DB::table('brands as b')
-            ->leftJoin('brand_translations as t', function ($join) use ($locale) {
+        $brandQuery = DB::table($tables['brands'] . ' as b')
+            ->leftJoin($tables['brand_translations'] . ' as t', function ($join) use ($locale) {
                 $join->on('t.brand_id', '=', 'b.id')->where('t.locale', '=', $locale);
             })
             ->limit(1000)
             ->selectRaw('COALESCE(t.slug, b.slug) as slug');
-        if (Schema::hasColumn('brands', 'is_enabled')) {
+        if (Schema::hasColumn($tables['brands'], 'is_enabled')) {
             $brandQuery->where('b.is_enabled', true);
         }
         $brandSlugs = $brandQuery->pluck('slug');
@@ -218,21 +221,21 @@ class SitemapController extends Controller
         }
 
         // Products (visible & published)
-        if (!Schema::hasTable('products')) {
+        if (!Schema::hasTable($tables['products'])) {
             $xml = view('sitemap.xml', ['urls' => $urls])->render();
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
         }
-        $productQuery = DB::table('products as p')
-            ->leftJoin('product_translations as t', function ($join) use ($locale) {
+        $productQuery = DB::table($tables['products'] . ' as p')
+            ->leftJoin($tables['product_translations'] . ' as t', function ($join) use ($locale) {
                 $join->on('t.product_id', '=', 'p.id')->where('t.locale', '=', $locale);
             })
             ->limit(5000)
             ->selectRaw('COALESCE(t.slug, p.slug) as slug');
-        if (Schema::hasColumn('products', 'is_visible')) {
+        if (Schema::hasColumn($tables['products'], 'is_visible')) {
             $productQuery->where('p.is_visible', true);
         }
-        if (Schema::hasColumn('products', 'published_at')) {
+        if (Schema::hasColumn($tables['products'], 'published_at')) {
             $productQuery->whereNotNull('p.published_at')->where('p.published_at', '<=', now());
         }
         $productSlugs = $productQuery->pluck('slug');
@@ -241,17 +244,17 @@ class SitemapController extends Controller
         }
 
         // Legal pages (enabled) with translated slugs
-        if (!Schema::hasTable('legals')) {
+        if (!Schema::hasTable($tables['legals'])) {
             $xml = view('sitemap.xml', ['urls' => $urls])->render();
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
         }
-        $legalQuery = DB::table('legals as l')
-            ->leftJoin('legal_translations as t', function ($join) use ($locale) {
+        $legalQuery = DB::table($tables['legals'] . ' as l')
+            ->leftJoin($tables['legal_translations'] . ' as t', function ($join) use ($locale) {
                 $join->on('t.legal_id', '=', 'l.id')->where('t.locale', '=', $locale);
             })
             ->selectRaw('COALESCE(t.slug, l.slug) as slug');
-        if (Schema::hasColumn('legals', 'is_enabled')) {
+        if (Schema::hasColumn($tables['legals'], 'is_enabled')) {
             $legalQuery->where('l.is_enabled', true);
         }
         $legalSlugs = $legalQuery->pluck('slug');
@@ -263,5 +266,34 @@ class SitemapController extends Controller
         $xml = view('sitemap.xml', ['urls' => $urls])->render();
 
         return response($xml, 200)->header('Content-Type', 'application/xml');
+    }
+
+    private function resolveTables(): array
+    {
+        // Map of base table names and their sh_* fallbacks used in tests
+        $map = [
+            'categories' => 'sh_categories',
+            'category_translations' => 'sh_category_translations',
+            'collections' => 'sh_collections',
+            'collection_translations' => 'sh_collection_translations',
+            'brands' => 'sh_brands',
+            'brand_translations' => 'sh_brand_translations',
+            'products' => 'sh_products',
+            'product_translations' => 'sh_product_translations',
+            'legals' => 'sh_legals',
+            'legal_translations' => 'sh_legal_translations',
+        ];
+
+        $resolved = [];
+        foreach ($map as $base => $fallback) {
+            // Prefer sh_* tables when present (tests seed these), otherwise use base
+            if (\Illuminate\Support\Facades\Schema::hasTable($fallback)) {
+                $resolved[$base] = $fallback;
+            } else {
+                $resolved[$base] = $base;
+            }
+        }
+
+        return $resolved;
     }
 }
