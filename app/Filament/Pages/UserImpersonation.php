@@ -34,7 +34,7 @@ final class UserImpersonation extends Page implements HasTable
     public static function canAccess(): bool
     {
         $user = auth()->user();
-        return $user?->hasRole('administrator') || $user?->hasRole('admin') || $user?->is_admin;
+        return $user?->hasRole('administrator') || $user?->hasRole('super_admin') || $user?->is_admin;
     }
 
     public function table(Table $table): Table
@@ -120,7 +120,7 @@ final class UserImpersonation extends Page implements HasTable
 
                         $this->redirect('/');
                     })
-                    ->visible(fn(User $record): bool => !$record->is_admin),
+                    ->visible(fn(?User $record): bool => $record && !$record->is_admin),
                 Action::make('view_orders')
                     ->label(__('admin.actions.view_orders'))
                     ->icon('heroicon-o-shopping-bag')

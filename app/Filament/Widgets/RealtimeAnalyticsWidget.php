@@ -12,7 +12,7 @@ final class RealtimeAnalyticsWidget extends ChartWidget
 {
     public static ?int $sort = 2;
     public ?string $pollingInterval = '10s';
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function getHeading(): ?string
     {
@@ -22,7 +22,7 @@ final class RealtimeAnalyticsWidget extends ChartWidget
     public function getData(): array
     {
         $timeRange = $this->getTimeRange();
-        
+
         return [
             'datasets' => [
                 [
@@ -118,7 +118,7 @@ final class RealtimeAnalyticsWidget extends ChartWidget
     private function getPageViews(array $timeRange): array
     {
         $data = [];
-        
+
         foreach ($timeRange as $time) {
             $count = AnalyticsEvent::where('event_type', 'page_view')
                 ->whereBetween('created_at', [
@@ -126,42 +126,42 @@ final class RealtimeAnalyticsWidget extends ChartWidget
                     $time->copy()->endOfHour()
                 ])
                 ->count();
-            
+
             $data[] = $count;
         }
-        
+
         return $data;
     }
 
     private function getOrdersData(array $timeRange): array
     {
         $data = [];
-        
+
         foreach ($timeRange as $time) {
             $count = Order::whereBetween('created_at', [
                 $time->startOfHour(),
                 $time->copy()->endOfHour()
             ])->count();
-            
+
             $data[] = $count;
         }
-        
+
         return $data;
     }
 
     private function getNewUsersData(array $timeRange): array
     {
         $data = [];
-        
+
         foreach ($timeRange as $time) {
             $count = User::whereBetween('created_at', [
                 $time->startOfHour(),
                 $time->copy()->endOfHour()
             ])->count();
-            
+
             $data[] = $count;
         }
-        
+
         return $data;
     }
 

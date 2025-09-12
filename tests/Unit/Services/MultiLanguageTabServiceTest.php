@@ -4,7 +4,7 @@ use App\Services\MultiLanguageTabService;
 use Illuminate\Support\Collection;
 
 it('returns available languages with expected structure', function (): void {
-    config()->set('app-features.supported_locales', ['lt', 'en']);
+    config()->set('app.supported_locales', ['lt', 'en']);
 
     $languages = MultiLanguageTabService::getAvailableLanguages();
 
@@ -22,11 +22,11 @@ it('returns available languages with expected structure', function (): void {
 
 it('computes default active tab index with lt prioritized', function (): void {
     // lt first
-    config()->set('app-features.supported_locales', ['lt', 'en']);
+    config()->set('app.supported_locales', ['lt', 'en']);
     expect(MultiLanguageTabService::getDefaultActiveTab())->toBe(0);
 
     // en first, lt second
-    config()->set('app-features.supported_locales', ['en', 'lt']);
+    config()->set('app.supported_locales', ['en', 'lt']);
     expect(MultiLanguageTabService::getDefaultActiveTab())->toBe(1);
 });
 

@@ -45,7 +45,7 @@ final class DataImportExport extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->hasRole('Admin');
+        return auth()->user()?->hasRole('admin');
     }
 
     public function form(Schema $schema): Schema

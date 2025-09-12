@@ -140,6 +140,7 @@ return [
         'security_scan_completed' => 'Security scan completed',
         'security_issues_found' => 'Security issues found: :count',
         'audit_log_exported' => 'Audit log exported',
+        'admin_message_footer' => 'This message was sent from the administration system.',
     ],
     // Impersonation
     'impersonation' => [

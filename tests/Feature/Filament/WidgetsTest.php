@@ -44,7 +44,7 @@ class WidgetsTest extends TestCase
         // Create test data
         Order::factory()->count(5)->create([
             'status' => 'completed',
-            'total' => 100.00,  // €100.00
+            'total' => 100.0,  // €100.00
             'created_at' => now(),
         ]);
 
@@ -71,7 +71,7 @@ class WidgetsTest extends TestCase
         expect($stats)->toHaveCount(6);
         expect($stats[0]->getValue())->toContain('€');
         expect($stats[1]->getValue())->toBe('5');
-        expect($stats[2]->getValue())->toBe('17'); // All users created across tests
+        expect($stats[2]->getValue())->toBe('17');  // All users created across tests
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
@@ -82,17 +82,17 @@ class WidgetsTest extends TestCase
         // Create orders with specific amounts
         Order::factory()->create([
             'status' => 'completed',
-            'total' => 150.00,  // €150.00
+            'total' => 150.0,  // €150.00
         ]);
 
         Order::factory()->create([
             'status' => 'completed',
-            'total' => 250.00,  // €250.00
+            'total' => 250.0,  // €250.00
         ]);
 
         Order::factory()->create([
             'status' => 'pending',
-            'total' => 100.00,  // Should not be counted
+            'total' => 100.0,  // Should not be counted
         ]);
 
         $widget = new EnhancedEcommerceOverview();
@@ -137,12 +137,12 @@ class WidgetsTest extends TestCase
 
         Order::factory()->create([
             'status' => 'completed',
-            'total' => 100.00,  // €100.00
+            'total' => 100.0,  // €100.00
         ]);
 
         Order::factory()->create([
             'status' => 'completed',
-            'total' => 200.00,  // €200.00
+            'total' => 200.0,  // €200.00
         ]);
 
         $widget = new EnhancedEcommerceOverview();
@@ -294,7 +294,7 @@ class WidgetsTest extends TestCase
 
         expect($revenue)->toBe('€0.00');
         expect($orders)->toBe('0');
-        expect($customers)->toBe('1'); // Admin user created in setUp
+        expect($customers)->toBe('1');  // Admin user created in setUp
         expect($aov)->toBe('€0.00');
         expect($products)->toBe('0');
         expect($rating)->toBe('0.0/5');
@@ -308,14 +308,14 @@ class WidgetsTest extends TestCase
         // Current month orders
         Order::factory()->count(5)->create([
             'status' => 'completed',
-            'total' => 100.00,
+            'total' => 100.0,
             'created_at' => now(),
         ]);
 
         // Previous month orders
         Order::factory()->count(3)->create([
             'status' => 'completed',
-            'total' => 100.00,
+            'total' => 100.0,
             'created_at' => now()->subMonth(),
         ]);
 

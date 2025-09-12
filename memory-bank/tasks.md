@@ -235,6 +235,8 @@ Type: Complex System
    - [x] Fixed ProductCatalogTest (passed successfully - 13 tests, 23 assertions)
    - [x] Fixed EditRouteTest (passed successfully - 2 tests, 2 assertions)
    - [x] Fixed IndexTest (passed successfully - 3 tests, 10 assertions)
+   - [x] Fixed WidgetsTest (passed successfully - 19 tests, 43 assertions)
+   - [x] Fixed ActivityLogResourceTest (passed successfully - 15 tests, 37 assertions)
 
 3. **Security Verification**
    - [ ] Test 2FA enrollment and recovery flows

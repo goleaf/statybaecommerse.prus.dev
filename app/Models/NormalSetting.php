@@ -175,6 +175,14 @@ final class NormalSetting extends Model
         return $query->where('locale', $locale);
     }
 
+    protected function validationRules(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? json_decode($value, true) : [],
+            set: fn ($value) => $value ? json_encode($value) : null,
+        );
+    }
+
     protected static function booted(): void
     {
         static::creating(function (self $setting) {

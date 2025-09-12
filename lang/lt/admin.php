@@ -116,6 +116,9 @@ return [
         'subject' => 'Objektas',
         'event' => 'Įvykis',
         'timestamp' => 'Laiko žyma',
+        'created_at' => 'Sukurta',
+        'last_login' => 'Paskutinis prisijungimas',
+        'status' => 'Būsena',
     ],
     // Common
     'customer' => 'Klientas',
@@ -205,6 +208,7 @@ return [
         'security_scan_completed' => 'Saugumo patikra baigta',
         'security_issues_found' => 'Rasta saugumo problemų: :count',
         'audit_log_exported' => 'Audito žurnalas eksportuotas',
+        'admin_message_footer' => 'Šis pranešimas išsiųstas iš administracijos sistemos.',
     ],
     // Security audit helpers
     'log_types' => [
