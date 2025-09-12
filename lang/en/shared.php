@@ -25,7 +25,6 @@ return [
     'cancel' => 'Cancel',
     'create' => 'Create',
     'submit' => 'Submit',
-    
     // Additional shared keys for tests
     'shared' => [
         'save' => 'Save',

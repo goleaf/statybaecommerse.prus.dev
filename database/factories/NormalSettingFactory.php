@@ -22,7 +22,7 @@ final class NormalSettingFactory extends Factory
         return [
             'group' => $this->faker->randomElement(['general', 'admin', 'frontend', 'api', 'email']),
             'key' => $this->faker->unique()->slug(2),
-            'locale' => $this->faker->randomElement(['en', 'lt', null]),
+            'locale' => $this->faker->randomElement(['en', 'lt']),
             'value' => $this->faker->sentence(),
             'type' => $this->faker->randomElement(['text', 'number', 'boolean', 'json', 'array']),
             'description' => $this->faker->sentence(),

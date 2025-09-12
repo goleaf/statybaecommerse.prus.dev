@@ -10,7 +10,6 @@ return [
         'about' => 'About',
         'contact' => 'Contact',
     ],
-    
     // Direct keys for tests
     'home' => 'Home',
     'about' => 'About',

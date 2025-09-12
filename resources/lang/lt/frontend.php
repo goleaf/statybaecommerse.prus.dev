@@ -10,7 +10,6 @@ return [
         'about' => 'Apie mus',
         'contact' => 'Kontaktai',
     ],
-    
     // Direct keys for tests
     'home' => 'Pagrindinis',
     'about' => 'Apie mus',

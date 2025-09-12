@@ -25,7 +25,6 @@ return [
     'cancel' => 'Atšaukti',
     'create' => 'Sukurti',
     'submit' => 'Pateikti',
-    
     // Additional shared keys for tests
     'shared' => [
         'save' => 'Išsaugoti',
