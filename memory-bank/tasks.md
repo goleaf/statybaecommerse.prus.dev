@@ -270,6 +270,11 @@ Type: Complex System
   - Fixed order confirmation route test
   - **Remaining Issue:** Sitemap view compilation syntax error (marked as skipped)
   - **Status:** 4 tests passing, 1 test skipped due to view compilation issue
+- ✅ **NamedRoutesTest:** Fixed all 24 test cases
+  - Fixed duplicate route conflicts by removing redundant route definitions
+  - Removed duplicate 'product.show' route that conflicted with 'products.show'
+  - Removed duplicate 'category.show' route that conflicted with 'categories.show'
+  - All 24 NamedRoutesTest cases now passing with 24 assertions
 - 🔄 **AccountPagesTest:** Partially fixed - addresses issue resolved, but view compilation error persists
   - Fixed addresses table migration to include deleted_at column for soft deletes
   - Fixed Reviews component to properly load user reviews data

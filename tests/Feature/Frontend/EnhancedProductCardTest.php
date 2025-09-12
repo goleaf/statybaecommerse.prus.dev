@@ -26,7 +26,7 @@ it('can render enhanced product card', function () {
 });
 
 it('can add product to cart', function () {
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('addToCart')
         ->assertDispatched('add-to-cart', [
             'product_id' => $this->product->id,
@@ -36,7 +36,7 @@ it('can add product to cart', function () {
 });
 
 it('tracks analytics when adding to cart', function () {
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('addToCart');
 
     $this->assertDatabaseHas(AnalyticsEvent::class, [
@@ -49,7 +49,7 @@ it('can add product to wishlist when authenticated', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('toggleWishlist')
         ->assertDispatched('notify')
         ->assertDispatched('wishlist-updated');
@@ -65,7 +65,7 @@ it('can add product to wishlist when authenticated', function () {
 });
 
 it('shows login required message when adding to wishlist as guest', function () {
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('toggleWishlist')
         ->assertDispatched('notify', function ($event) {
             return $event['type'] === 'warning' && 
@@ -87,7 +87,7 @@ it('can remove product from wishlist', function () {
         'product_id' => $this->product->id,
     ]);
 
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('toggleWishlist')
         ->assertDispatched('notify');
 
@@ -98,7 +98,7 @@ it('can remove product from wishlist', function () {
 });
 
 it('can add product to comparison', function () {
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('toggleComparison')
         ->assertDispatched('notify')
         ->assertDispatched('comparison-updated');
@@ -115,7 +115,7 @@ it('can remove product from comparison', function () {
         'session_id' => session()->getId(),
     ]);
 
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('toggleComparison')
         ->assertDispatched('notify');
 
@@ -126,7 +126,7 @@ it('can remove product from comparison', function () {
 });
 
 it('can open quick view', function () {
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('quickView')
         ->assertDispatched('open-quick-view', [
             'product_id' => $this->product->id,
@@ -134,7 +134,7 @@ it('can open quick view', function () {
 });
 
 it('tracks analytics when opening quick view', function () {
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('quickView');
 
     $this->assertDatabaseHas(AnalyticsEvent::class, [
@@ -145,13 +145,13 @@ it('tracks analytics when opening quick view', function () {
 });
 
 it('can navigate to product page', function () {
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('viewProduct')
         ->assertRedirect(route('product.show', $this->product));
 });
 
 it('tracks analytics when viewing product page', function () {
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('viewProduct');
 
     $this->assertDatabaseHas(AnalyticsEvent::class, [
@@ -175,7 +175,7 @@ it('shows correct wishlist status', function () {
         'product_id' => $this->product->id,
     ]);
 
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->assertSet('isInWishlist', true);
 });
 
@@ -185,7 +185,7 @@ it('shows correct comparison status', function () {
         'session_id' => session()->getId(),
     ]);
 
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->assertSet('isInComparison', true);
 });
 
@@ -197,7 +197,7 @@ it('displays product badges correctly', function () {
         'compare_price' => 100.00,
     ]);
 
-    Livewire::test(EnhancedProductCard::class, ['product' => $featuredProduct])
+    Livewire::test(ProductCard::class, ['product' => $featuredProduct])
         ->assertSee('Featured')
         ->assertSee('-20%'); // Discount badge
 });
@@ -208,7 +208,7 @@ it('shows stock status correctly', function () {
         'track_inventory' => true,
     ]);
 
-    Livewire::test(EnhancedProductCard::class, ['product' => $outOfStockProduct])
+    Livewire::test(ProductCard::class, ['product' => $outOfStockProduct])
         ->assertSee(__('translations.out_of_stock'));
 
     $lowStockProduct = Product::factory()->create([
@@ -217,7 +217,7 @@ it('shows stock status correctly', function () {
         'track_inventory' => true,
     ]);
 
-    Livewire::test(EnhancedProductCard::class, ['product' => $lowStockProduct])
+    Livewire::test(ProductCard::class, ['product' => $lowStockProduct])
         ->assertSee(__('translations.in_stock'))
         ->assertSee('2 ' . __('translations.left'));
 });
@@ -226,7 +226,7 @@ it('refreshes status on events', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $component = Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    $component = Livewire::test(ProductCard::class, ['product' => $this->product])
         ->assertSet('isInWishlist', false);
 
     // Simulate adding to wishlist externally

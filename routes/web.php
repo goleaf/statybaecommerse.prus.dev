@@ -394,6 +394,7 @@ Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.sh
 Route::get('/products/{product}/gallery', function ($product) {
     return redirect('/' . app()->getLocale() . '/products/' . $product . '/gallery');
 })->name('products.gallery');
+// Alias for legacy route names - handled by route model binding
 Route::get('/categories', function () {
     return redirect('/' . app()->getLocale() . '/categories');
 })->name('categories.index');
