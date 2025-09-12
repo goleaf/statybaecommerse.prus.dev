@@ -504,7 +504,6 @@ Route::middleware('auth')->group(function (): void {
         }
         return $placeholder('System Monitoring')();
     })->name('filament.admin.pages.system-monitoring');
-    Route::get('/admin/inventory-management', \App\Filament\Pages\InventoryManagement::class)->name('filament.admin.pages.inventory-management');
 
     // Discount Presets placeholder routes (auth required)
     Route::get('/admin/discounts/presets', $placeholder('Discount Presets'))
@@ -786,4 +785,21 @@ Route::middleware('auth')->group(function (): void {
         ->name('admin.attributes.translations.save');
     Route::put('/admin/{locale}/attribute-values/{id}/translations/{lang}', fn() => back())
         ->name('admin.attribute-values.translations.save');
+});
+
+// Notification routes
+Route::middleware('auth')->group(function (): void {
+    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/{id}/unread', [App\Http\Controllers\NotificationController::class, 'markAsUnread'])->name('notifications.unread');
+    Route::post('/notifications/read-all', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::delete('/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'delete'])->name('notifications.delete');
+    Route::delete('/notifications', [App\Http\Controllers\NotificationController::class, 'clearAll'])->name('notifications.clear-all');
+    Route::get('/notifications/unread-count', [App\Http\Controllers\NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+    Route::get('/notifications/recent', [App\Http\Controllers\NotificationController::class, 'getRecent'])->name('notifications.recent');
+});
+
+// Localized notification routes
+Route::middleware(['auth', 'localize'])->group(function (): void {
+    Route::get('/{locale}/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('localized.notifications.index');
 });

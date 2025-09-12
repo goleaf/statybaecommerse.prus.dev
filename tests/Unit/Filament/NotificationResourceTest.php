@@ -2,13 +2,13 @@
 
 use App\Filament\Resources\NotificationResource;
 use App\Models\User;
-use Illuminate\Notifications\DatabaseNotification;
-use Illuminate\Support\Facades\Notification;
+use App\Models\Notification;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 describe('NotificationResource Unit Tests', function () {
     describe('Resource Configuration', function () {
         it('has correct model configuration', function () {
-            expect(NotificationResource::getModel())->toBe(DatabaseNotification::class);
+            expect(NotificationResource::getModel())->toBe(Notification::class);
         });
 
         it('has correct navigation configuration', function () {
@@ -30,7 +30,7 @@ describe('NotificationResource Unit Tests', function () {
         });
 
         it('prevents editing of notifications', function () {
-            $notification = DatabaseNotification::factory()->create();
+            $notification = Notification::factory()->create();
             expect(NotificationResource::canEdit($notification))->toBeFalse();
         });
     });

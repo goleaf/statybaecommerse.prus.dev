@@ -19,7 +19,7 @@ final class CampaignViewFactory extends Factory
             'ip_address' => $this->faker->ipv4(),
             'user_agent' => $this->faker->userAgent(),
             'referer' => $this->faker->optional(0.7)->url(),
-            'customer_id' => $this->faker->optional(0.6)->randomElement(Customer::pluck('id')->toArray()),
+            'customer_id' => $this->faker->optional(0.6)->numberBetween(1, 100),
             'viewed_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
         ];
     }

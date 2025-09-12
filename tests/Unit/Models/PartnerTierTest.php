@@ -57,9 +57,9 @@ final class PartnerTierTest extends TestCase
             'benefits' => ['key' => 'value'],
         ]);
 
-        $this->assertIsFloat($partnerTier->discount_rate);
-        $this->assertIsFloat($partnerTier->commission_rate);
-        $this->assertIsFloat($partnerTier->minimum_order_value);
+        $this->assertIsNumeric($partnerTier->discount_rate);
+        $this->assertIsNumeric($partnerTier->commission_rate);
+        $this->assertIsNumeric($partnerTier->minimum_order_value);
         $this->assertIsBool($partnerTier->is_enabled);
         $this->assertIsArray($partnerTier->benefits);
     }

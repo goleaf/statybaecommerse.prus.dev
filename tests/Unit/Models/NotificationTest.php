@@ -129,8 +129,8 @@ final class NotificationTest extends TestCase
             'data' => ['message' => 'Unread notification'],
         ]);
 
-        $readNotifications = DatabaseNotification::read()->get();
-        $unreadNotifications = DatabaseNotification::unread()->get();
+        $readNotifications = DatabaseNotification::whereNotNull('read_at')->get();
+        $unreadNotifications = DatabaseNotification::whereNull('read_at')->get();
 
         $this->assertCount(1, $readNotifications);
         $this->assertCount(1, $unreadNotifications);

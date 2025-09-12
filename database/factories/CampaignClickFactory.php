@@ -20,7 +20,7 @@ final class CampaignClickFactory extends Factory
             'user_agent' => $this->faker->userAgent(),
             'click_type' => $this->faker->randomElement(['cta', 'banner', 'link']),
             'clicked_url' => $this->faker->url(),
-            'customer_id' => $this->faker->optional(0.6)->randomElement(Customer::pluck('id')->toArray()),
+            'customer_id' => $this->faker->optional(0.6)->numberBetween(1, 100),
             'clicked_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
         ];
     }

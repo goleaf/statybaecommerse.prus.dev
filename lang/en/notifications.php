@@ -1,142 +1,56 @@
-<?php
+<?php declare(strict_types=1);
 
 return [
-    // General notifications
-    'no_notifications' => 'No notifications',
-    'check_later' => 'Check back later.',
+    'notifications' => 'Notifications',
+    'notification' => 'Notification',
+    'unread' => 'unread',
+    'read' => 'read',
     'mark_as_read' => 'Mark as read',
-    'mark_all_as_read' => 'Mark all as read',
+    'mark_as_unread' => 'Mark as unread',
+    'mark_all_read' => 'Mark all as read',
+    'clear_all' => 'Clear all',
     'delete_notification' => 'Delete notification',
-    'delete_all_notifications' => 'Delete all notifications',
+    'no_notifications' => 'No notifications',
+    'no_notifications_yet' => 'You don\'t have any notifications yet.',
+    'filter_by_type' => 'Filter by type:',
+    'all_types' => 'All types',
+    'show_unread_only' => 'Show unread only',
+    'notification_marked_as_read' => 'Notification marked as read',
+    'notification_marked_as_unread' => 'Notification marked as unread',
+    'all_notifications_marked_as_read' => 'All notifications marked as read',
     'notification_deleted' => 'Notification deleted',
-    'all_notifications_deleted' => 'All notifications deleted',
-    'all_marked_as_read' => 'All notifications marked as read',
-    
-    // Notification types
-    'types' => [
-        'info' => 'Information',
-        'success' => 'Success',
-        'warning' => 'Warning',
-        'error' => 'Error',
+    'all_notifications_cleared' => 'All notifications cleared',
+    'are_you_sure_delete' => 'Are you sure you want to delete this notification?',
+    'are_you_sure_clear_all' => 'Are you sure you want to clear all notifications? This action cannot be undone.',
+    'manage_notifications' => 'Manage notifications',
+    'stay_updated' => 'Manage your notifications and stay updated with the latest information.',
+    'refresh' => 'Refresh',
+    'quick_action_mark_all' => 'Quick action to mark all notifications as read',
+    'remove_all_permanently' => 'Remove all notifications permanently',
+    'manage_preferences' => 'Manage notification preferences',
+    'go_to_settings' => 'Go to settings',
+    'notification_received' => 'Notification received',
+    'unread_count' => 'Unread count',
+    'recent_notifications' => 'Recent notifications',
+    'notification_center' => 'Notification center',
+    'notification_settings' => 'Notification settings',
+    'email_notifications' => 'Email notifications',
+    'push_notifications' => 'Push notifications',
+    'sms_notifications' => 'SMS notifications',
+    'notification_types' => [
         'order' => 'Order',
-        'product' => 'Product',
-        'user' => 'User',
-        'system' => 'System',
         'payment' => 'Payment',
         'shipping' => 'Shipping',
-        'review' => 'Review',
         'promotion' => 'Promotion',
+        'system' => 'System',
+        'security' => 'Security',
         'newsletter' => 'Newsletter',
-        'support' => 'Support',
     ],
-    
-    // Order notifications
-    'order' => [
-        'created' => 'New order created',
-        'updated' => 'Order updated',
-        'cancelled' => 'Order cancelled',
-        'completed' => 'Order completed',
-        'shipped' => 'Order shipped',
-        'delivered' => 'Order delivered',
-        'payment_received' => 'Payment received',
-        'payment_failed' => 'Payment failed',
-        'refund_processed' => 'Refund processed',
-    ],
-    
-    // Product notifications
-    'product' => [
-        'created' => 'New product created',
-        'updated' => 'Product updated',
-        'deleted' => 'Product deleted',
-        'low_stock' => 'Low stock alert',
-        'out_of_stock' => 'Product out of stock',
-        'back_in_stock' => 'Product back in stock',
-        'price_changed' => 'Product price changed',
-        'review_added' => 'Review added',
-    ],
-    
-    // User notifications
-    'user' => [
-        'registered' => 'New user registered',
-        'profile_updated' => 'Profile updated',
-        'password_changed' => 'Password changed',
-        'email_verified' => 'Email verified',
-        'login' => 'Login',
-        'logout' => 'Logout',
-        'account_suspended' => 'Account suspended',
-        'account_activated' => 'Account activated',
-    ],
-    
-    // System notifications
-    'system' => [
-        'maintenance_started' => 'Maintenance started',
-        'maintenance_completed' => 'Maintenance completed',
-        'backup_created' => 'Backup created',
-        'update_available' => 'Update available',
-        'security_alert' => 'Security alert',
-        'performance_issue' => 'Performance issue',
-    ],
-    
-    // Payment notifications
-    'payment' => [
-        'processed' => 'Payment processed',
-        'failed' => 'Payment failed',
-        'refunded' => 'Payment refunded',
-        'disputed' => 'Payment disputed',
-        'chargeback' => 'Payment chargeback',
-    ],
-    
-    // Shipping notifications
-    'shipping' => [
-        'label_created' => 'Shipping label created',
-        'picked_up' => 'Package picked up',
-        'in_transit' => 'Package in transit',
-        'out_for_delivery' => 'Out for delivery',
-        'delivered' => 'Package delivered',
-        'delivery_failed' => 'Delivery failed',
-        'returned' => 'Package returned',
-    ],
-    
-    // Review notifications
-    'review' => [
-        'submitted' => 'Review submitted',
-        'approved' => 'Review approved',
-        'rejected' => 'Review rejected',
-        'replied' => 'Reply to review',
-    ],
-    
-    // Promotion notifications
-    'promotion' => [
-        'created' => 'New promotion created',
-        'started' => 'Promotion started',
-        'ended' => 'Promotion ended',
-        'expiring_soon' => 'Promotion expiring soon',
-    ],
-    
-    // Newsletter notifications
-    'newsletter' => [
-        'subscribed' => 'Newsletter subscribed',
-        'unsubscribed' => 'Newsletter unsubscribed',
-        'sent' => 'Newsletter sent',
-    ],
-    
-    // Support notifications
-    'support' => [
-        'ticket_created' => 'Support ticket created',
-        'ticket_updated' => 'Support ticket updated',
-        'ticket_closed' => 'Support ticket closed',
-        'message_received' => 'Message received',
-        'response_sent' => 'Response sent',
-    ],
-    
-    // Time formats
-    'time' => [
-        'just_now' => 'just now',
-        'minutes_ago' => ':count min ago',
-        'hours_ago' => ':count hr ago',
-        'days_ago' => ':count day ago',
-        'weeks_ago' => ':count wk ago',
-        'months_ago' => ':count mo ago',
-        'years_ago' => ':count yr ago',
+    'notification_actions' => [
+        'view' => 'View',
+        'dismiss' => 'Dismiss',
+        'archive' => 'Archive',
+        'reply' => 'Reply',
+        'forward' => 'Forward',
     ],
 ];

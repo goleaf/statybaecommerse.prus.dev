@@ -17,7 +17,7 @@ final class CampaignConversionFactory extends Factory
         return [
             'campaign_id' => Campaign::factory(),
             'order_id' => $this->faker->optional(0.8)->randomElement(Order::pluck('id')->toArray()),
-            'customer_id' => $this->faker->optional(0.7)->randomElement(Customer::pluck('id')->toArray()),
+            'customer_id' => $this->faker->optional(0.7)->numberBetween(1, 100),
             'conversion_type' => $this->faker->randomElement(['purchase', 'signup', 'download', 'subscription']),
             'conversion_value' => $this->faker->randomFloat(2, 10, 1000),
             'session_id' => $this->faker->uuid(),

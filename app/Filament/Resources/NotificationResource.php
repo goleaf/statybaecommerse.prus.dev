@@ -19,9 +19,9 @@ final class NotificationResource extends Resource
 {
     protected static ?string $model = DatabaseNotification::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-bell';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-bell';
 
-    protected static ?string $navigationGroup = 'System';
+    protected static \UnitEnum|string|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 3;
 

@@ -3,8 +3,8 @@
 use App\Filament\Resources\NotificationResource;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Notifications\DatabaseNotification;
-use Illuminate\Support\Facades\Notification;
+use App\Models\Notification;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 uses(RefreshDatabase::class);
 
@@ -22,7 +22,7 @@ describe('NotificationResource', function () {
         });
 
         it('can render view page', function () {
-            $notification = DatabaseNotification::factory()->create([
+            $notification = Notification::factory()->create([
                 'notifiable_type' => User::class,
                 'notifiable_id' => $this->adminUser->id,
             ]);
@@ -42,7 +42,7 @@ describe('NotificationResource', function () {
     describe('Table Functionality', function () {
         beforeEach(function () {
             $this->notifications = collect([
-                DatabaseNotification::factory()->create([
+                Notification::factory()->create([
                     'type' => 'App\Notifications\OrderNotification',
                     'notifiable_type' => User::class,
                     'notifiable_id' => $this->adminUser->id,
@@ -53,7 +53,7 @@ describe('NotificationResource', function () {
                     ],
                     'read_at' => null,
                 ]),
-                DatabaseNotification::factory()->create([
+                Notification::factory()->create([
                     'type' => 'App\Notifications\ProductNotification',
                     'notifiable_type' => User::class,
                     'notifiable_id' => $this->adminUser->id,
@@ -64,7 +64,7 @@ describe('NotificationResource', function () {
                     ],
                     'read_at' => now(),
                 ]),
-                DatabaseNotification::factory()->create([
+                Notification::factory()->create([
                     'type' => 'App\Notifications\SystemNotification',
                     'notifiable_type' => User::class,
                     'notifiable_id' => $this->adminUser->id,
@@ -139,7 +139,7 @@ describe('NotificationResource', function () {
 
     describe('Actions', function () {
         beforeEach(function () {
-            $this->notification = DatabaseNotification::factory()->create([
+            $this->notification = Notification::factory()->create([
                 'notifiable_type' => User::class,
                 'notifiable_id' => $this->adminUser->id,
                 'data' => [
@@ -168,7 +168,7 @@ describe('NotificationResource', function () {
         });
 
         it('can bulk delete notifications', function () {
-            $notifications = DatabaseNotification::factory()->count(3)->create([
+            $notifications = Notification::factory()->count(3)->create([
                 'notifiable_type' => User::class,
                 'notifiable_id' => $this->adminUser->id,
             ]);
@@ -191,7 +191,7 @@ describe('NotificationResource', function () {
         });
 
         it('prevents editing of notifications', function () {
-            $notification = DatabaseNotification::factory()->create();
+            $notification = Notification::factory()->create();
             expect(NotificationResource::canEdit($notification))->toBeFalse();
         });
 
@@ -204,7 +204,7 @@ describe('NotificationResource', function () {
 
     describe('Data Formatting', function () {
         it('formats notification type correctly', function () {
-            $notification = DatabaseNotification::factory()->create([
+            $notification = Notification::factory()->create([
                 'type' => 'App\Notifications\OrderNotification',
             ]);
 
@@ -213,7 +213,7 @@ describe('NotificationResource', function () {
         });
 
         it('formats notifiable type correctly', function () {
-            $notification = DatabaseNotification::factory()->create([
+            $notification = Notification::factory()->create([
                 'notifiable_type' => User::class,
             ]);
 
@@ -222,11 +222,11 @@ describe('NotificationResource', function () {
         });
 
         it('displays notification type badges with correct colors', function () {
-            $orderNotification = DatabaseNotification::factory()->create([
+            $orderNotification = Notification::factory()->create([
                 'data' => ['type' => 'order'],
             ]);
 
-            $productNotification = DatabaseNotification::factory()->create([
+            $productNotification = Notification::factory()->create([
                 'data' => ['type' => 'product'],
             ]);
 
@@ -236,11 +236,11 @@ describe('NotificationResource', function () {
         });
 
         it('shows read status correctly', function () {
-            $readNotification = DatabaseNotification::factory()->create([
+            $readNotification = Notification::factory()->create([
                 'read_at' => now(),
             ]);
 
-            $unreadNotification = DatabaseNotification::factory()->create([
+            $unreadNotification = Notification::factory()->create([
                 'read_at' => null,
             ]);
 
@@ -252,11 +252,11 @@ describe('NotificationResource', function () {
 
     describe('Query Optimization', function () {
         it('orders notifications by latest first', function () {
-            $oldNotification = DatabaseNotification::factory()->create([
+            $oldNotification = Notification::factory()->create([
                 'created_at' => now()->subDays(2),
             ]);
 
-            $newNotification = DatabaseNotification::factory()->create([
+            $newNotification = Notification::factory()->create([
                 'created_at' => now(),
             ]);
 
