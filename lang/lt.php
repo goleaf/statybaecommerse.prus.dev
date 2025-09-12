@@ -1267,7 +1267,6 @@ return [
         'no_recommendations' => 'Šiuo metu nėra rekomendacijų',
         'no_recommendations_desc' => 'Šiuo metu neturime produktų rekomendacijų jums.',
     ],
-
     'campaign_conversions' => [
         'navigation' => [
             'label' => 'Kampanijų konversijos',

@@ -23,7 +23,8 @@ class ZoneResource extends Resource
     protected static $navigationIcon = 'heroicon-o-globe-alt';
 
     /** @var string|\BackedEnum|null */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Content;
 
     protected static ?int $navigationSort = 1;
 

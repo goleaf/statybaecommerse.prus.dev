@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
+use UnitEnum;
 use App\Models\NewsCategory;
 use App\Models\NewsTag;
 use Filament\Resources\Resource;
@@ -25,7 +26,8 @@ final class NewsResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    protected static string|BackedEnum|null $navigationGroup = 'Content Management';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Content Management';
 
     public static function getModelLabel(): string
     {

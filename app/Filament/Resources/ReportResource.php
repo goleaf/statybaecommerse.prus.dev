@@ -47,7 +47,8 @@ final class ReportResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-chart-bar';
 
-    protected static string|BackedEnum|null $navigationGroup = 'Reports';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Reports';
 
     protected static ?int $navigationSort = 1;
 

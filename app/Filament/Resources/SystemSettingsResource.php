@@ -22,7 +22,8 @@ final class SystemSettingsResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     /** @var string|\BackedEnum|null */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 1;
 

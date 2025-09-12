@@ -47,7 +47,8 @@ final class PriceListResource extends Resource
     protected static $navigationIcon = 'heroicon-o-currency-dollar';
 
     /** @var string|\BackedEnum|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Pricing Management';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Pricing Management';
 
     protected static ?int $navigationSort = 1;
 

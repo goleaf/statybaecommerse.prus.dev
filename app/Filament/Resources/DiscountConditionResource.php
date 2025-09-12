@@ -25,7 +25,8 @@ final class DiscountConditionResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static string|BackedEnum|null $navigationGroup = 'Discounts';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Discounts';
 
     protected static ?int $navigationSort = 2;
 

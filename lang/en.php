@@ -1267,7 +1267,6 @@ return [
         'no_recommendations' => 'No Recommendations Available',
         'no_recommendations_desc' => "We don't have any product recommendations for you at the moment.",
     ],
-
     'campaign_conversions' => [
         'navigation' => [
             'label' => 'Campaign Conversions',
@@ -1503,6 +1502,28 @@ return [
             'delete' => 'Delete',
             'filter' => 'Filter',
             'create_first' => 'Create First Conversion',
+            'back_to_list' => 'Back to List',
+            'cancel' => 'Cancel',
+            'update' => 'Update',
+        ],
+        'sections' => [
+            'basic_information' => 'Basic Information',
+            'customer_information' => 'Customer Information',
+            'tracking_information' => 'Tracking Information',
+            'device_information' => 'Device Information',
+            'performance_metrics' => 'Performance Metrics',
+            'additional_information' => 'Additional Information',
+            'quick_stats' => 'Quick Stats',
+            'actions' => 'Actions',
+        ],
+        'fields' => [
+            'id' => 'ID',
+            'campaign' => 'Campaign',
+            'select_campaign' => 'Select Campaign',
+            'select_type' => 'Select Type',
+            'select_device' => 'Select Device',
+            'tags_placeholder' => 'Enter tags separated by commas',
+            'tags_help' => 'Tags are separated by commas, e.g.: tag1, tag2, tag3',
         ],
     ],
 ];

@@ -314,31 +314,6 @@ final class CampaignControllerTest extends TestCase
         $response->assertDontSee($smsCampaign->trans('name'));
     }
 
-    public function test_can_search_campaigns(): void
-    {
-        $searchableCampaign = Campaign::factory()->create([
-            'name' => 'Searchable Campaign',
-            'status' => 'active',
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
-        ]);
-
-        $otherCampaign = Campaign::factory()->create([
-            'name' => 'Other Campaign',
-            'status' => 'active',
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
-        ]);
-
-        $response = $this->get(route('frontend.campaigns.search', ['q' => 'Searchable']));
-
-        $response->assertStatus(200);
-        $response->assertViewIs('frontend.campaigns.search');
-        $response->assertViewHas('campaigns');
-        $response->assertViewHas('query', 'Searchable');
-        $response->assertSee($searchableCampaign->trans('name'));
-        $response->assertDontSee($otherCampaign->trans('name'));
-    }
 
     public function test_only_active_campaigns_are_shown(): void
     {

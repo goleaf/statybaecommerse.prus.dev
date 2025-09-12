@@ -24,7 +24,8 @@ final class ReferralRewardResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-gift';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Referral;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Referral;
 
     protected static ?string $navigationLabel = 'referrals.navigation.rewards';
 
