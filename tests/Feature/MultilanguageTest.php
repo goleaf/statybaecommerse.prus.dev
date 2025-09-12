@@ -18,6 +18,9 @@ class MultilanguageTest extends TestCase
     {
         parent::setUp();
 
+        // Create roles and permissions first
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+
         $this->adminUser = User::factory()->create([
             'email' => 'admin@test.com',
             'name' => 'Admin User',
@@ -97,8 +100,8 @@ class MultilanguageTest extends TestCase
         $country = Country::factory()->create();
 
         // Test that country has translation support
-        expect($country)->toHaveProperty('translatable');
-        expect($country->translatable)->toContain('name');
+        expect($country)->toHaveMethod('translations');
+        expect($country->translations())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class);
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
@@ -119,7 +122,7 @@ class MultilanguageTest extends TestCase
         $country = Country::factory()->create();
 
         $location = Location::factory()->create([
-            'country_id' => $country->id,
+            'country_code' => $country->cca2,
         ]);
 
         // Set multilanguage data
@@ -152,7 +155,7 @@ class MultilanguageTest extends TestCase
         $country = Country::factory()->create();
 
         $location = Location::factory()->create([
-            'country_id' => $country->id,
+            'country_code' => $country->cca2,
         ]);
 
         // Set only Lithuanian translation
@@ -164,7 +167,9 @@ class MultilanguageTest extends TestCase
 
         // Test that fallback works when English is missing
         app()->setLocale('en');
-        expect($location->name)->toBe('Tik lietuviškai');  // Should fallback to Lithuanian
+        // With Spatie translatable, we need to check the actual behavior
+        $name = $location->getTranslation('name', 'en', false);
+        expect($name)->toBe('Tik lietuviškai');  // Should fallback to Lithuanian
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
@@ -386,7 +391,7 @@ class MultilanguageTest extends TestCase
         $country = Country::factory()->create();
 
         $location = Location::factory()->create([
-            'country_id' => $country->id,
+            'country_code' => $country->cca2,
         ]);
 
         $location->setTranslations('name', [

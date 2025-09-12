@@ -21,7 +21,7 @@ final class EditCollection extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $prepared = MultiLanguageTabService::prepareTranslationData($data, ['name', 'slug', 'description', 'seo_title', 'seo_description']);
+        $prepared = MultiLanguageTabService::prepareTranslationData($data, ['name', 'slug', 'description']);
         $this->data['translations'] = $prepared['translations'];
         $main = $prepared['main_data'];
         $defaultLocale = config('app.locale', 'lt');
@@ -29,8 +29,7 @@ final class EditCollection extends EditRecord
         $main['name'] = $main['name'] ?? ($tr['name'] ?? $this->record->name);
         $main['slug'] = $main['slug'] ?? ($tr['slug'] ?? $this->record->slug);
         $main['description'] = $main['description'] ?? ($tr['description'] ?? null);
-        $main['seo_title'] = $main['seo_title'] ?? ($tr['seo_title'] ?? null);
-        $main['seo_description'] = $main['seo_description'] ?? ($tr['seo_description'] ?? null);
+        // SEO fields are handled directly from form data, not from translations
         return $main;
     }
 
@@ -45,8 +44,6 @@ final class EditCollection extends EditRecord
                         'name' => $fields['name'] ?? $this->record->name,
                         'slug' => $fields['slug'] ?? $this->record->slug,
                         'description' => $fields['description'] ?? null,
-                        'seo_title' => $fields['seo_title'] ?? null,
-                        'seo_description' => $fields['seo_description'] ?? null,
                     ]
                 );
             }

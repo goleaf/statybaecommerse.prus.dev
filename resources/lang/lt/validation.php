@@ -11,6 +11,7 @@ return [
         'string' => ':attribute negali būti ilgesnis nei :max simbolių.',
         'numeric' => ':attribute negali būti didesnis nei :max.',
     ],
+    'unique' => ':attribute jau egzistuoja.',
     'confirmed' => ':attribute patvirtinimas nesutampa.',
     'attributes' => [
         'email' => 'el. paštas',

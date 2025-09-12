@@ -19,7 +19,7 @@ final class StatsWidget extends BaseWidget
 
     protected static bool $isLazy = false;
 
-    protected function getStats(): array
+    public function getStats(): array
     {
         $currentMonth = now()->startOfMonth();
         $previousMonth = now()->subMonth()->startOfMonth();
@@ -48,7 +48,7 @@ final class StatsWidget extends BaseWidget
         $newCustomers = User::where('created_at', '>=', $currentMonth)->count();
 
         $totalCategories = Category::where('is_visible', true)->count();
-        $totalBrands = Brand::where('is_visible', true)->count();
+        $totalBrands = Brand::where('is_enabled', true)->count();
         $totalReviews = Review::where('is_approved', true)->count();
         $avgRating = Review::where('is_approved', true)->avg('rating') ?? 0;
 
@@ -110,7 +110,7 @@ final class StatsWidget extends BaseWidget
         ];
     }
 
-    private function getRevenueChart(): array
+    public function getRevenueChart(): array
     {
         return Order::select(
             Database::raw(DatabaseDateService::dateExpression('created_at') . ' as date'),
@@ -124,7 +124,7 @@ final class StatsWidget extends BaseWidget
             ->toArray();
     }
 
-    private function getOrdersChart(): array
+    public function getOrdersChart(): array
     {
         return Order::select(
             Database::raw(DatabaseDateService::dateExpression('created_at') . ' as date'),

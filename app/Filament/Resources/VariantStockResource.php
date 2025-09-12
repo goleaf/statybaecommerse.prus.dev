@@ -42,7 +42,7 @@ final class VariantStockResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('translations.variant_inventory_entry'))
+                Section::make(__('translations.variant_inventory_entry'))
                     ->schema([
                         Forms\Components\Select::make('variant_id')
                             ->label(__('translations.variant'))

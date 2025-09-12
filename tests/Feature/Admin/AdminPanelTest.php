@@ -12,6 +12,10 @@ it('loads the admin dashboard without schema container errors', function (): voi
         'is_admin' => true,
     ]);
 
+    // Assign administrator role
+    $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
+    $admin->assignRole($adminRole);
+
     actingAs($admin);
 
     $response = get('/admin');

@@ -20,7 +20,7 @@ final class ItemsRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Item Information')
+                Section::make('Item Information')
                     ->components([
                         Forms\Components\Select::make('product_id')
                             ->relationship('product', 'name')

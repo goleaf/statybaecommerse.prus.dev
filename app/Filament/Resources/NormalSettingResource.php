@@ -52,7 +52,7 @@ class NormalSettingResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('enhanced_settings.setting_information'))
+                Section::make(__('enhanced_settings.setting_information'))
                     ->components([
                         Forms\Components\Select::make('group')
                             ->label(__('enhanced_settings.group'))
@@ -101,7 +101,7 @@ class NormalSettingResource extends Resource
                             ->default(0),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('Value Configuration'))
+                Section::make(__('Value Configuration'))
                     ->components([
                         Forms\Components\TextInput::make('value')
                             ->label(__('Value'))
@@ -126,7 +126,7 @@ class NormalSettingResource extends Resource
                             ]),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('Translation'))
+                Section::make(__('Translation'))
                     ->components([
                         Forms\Components\TextInput::make('locale')
                             ->label(__('Locale'))
@@ -136,7 +136,7 @@ class NormalSettingResource extends Resource
                             ->label(__('Description'))
                             ->maxLength(1000),
                     ]),
-                Forms\Components\Section::make(__('Advanced Options'))
+                Section::make(__('Advanced Options'))
                     ->components([
                         Forms\Components\Toggle::make('is_public')
                             ->label(__('Is Public'))

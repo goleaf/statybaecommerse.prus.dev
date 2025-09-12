@@ -37,7 +37,6 @@ final class Order extends Model
         'payment_status',
         'payment_method',
         'payment_reference',
-        'timeline',
     ];
 
     protected function casts(): array
@@ -52,7 +51,6 @@ final class Order extends Model
             'shipping_address' => 'json',
             'shipped_at' => 'datetime',
             'delivered_at' => 'datetime',
-            'timeline' => 'array',
         ];
     }
 
@@ -159,6 +157,6 @@ final class Order extends Model
 
     public function getFormattedTotalAttribute(): string
     {
-        return number_format($this->total, 2) . ' ' . $this->currency;
+        return number_format((float) $this->total, 2) . ' ' . $this->currency;
     }
 }

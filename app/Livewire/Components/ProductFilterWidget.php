@@ -2,44 +2,44 @@
 
 namespace App\Livewire\Components;
 
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Contracts\View\View;
-use Livewire\Component;
 use Livewire\Attributes\Url;
+use Livewire\Component;
 
 final class ProductFilterWidget extends Component
 {
     #[Url]
     public string $search = '';
-    
+
     #[Url]
     public array $categories = [];
-    
+
     #[Url]
     public array $brands = [];
-    
+
     #[Url]
-    public array $attributes = [];
-    
+    public array $selectedAttributes = [];
+
     #[Url]
     public float $minPrice = 0;
-    
+
     #[Url]
     public float $maxPrice = 10000;
-    
+
     #[Url]
     public bool $inStock = false;
-    
+
     #[Url]
     public bool $onSale = false;
-    
+
     #[Url]
     public string $sortBy = 'created_at';
-    
+
     #[Url]
     public string $sortDirection = 'desc';
 
@@ -63,7 +63,7 @@ final class ProductFilterWidget extends Component
         $this->dispatch('filter-updated');
     }
 
-    public function updatedAttributes(): void
+    public function updatedSelectedAttributes(): void
     {
         $this->dispatch('filter-updated');
     }
@@ -101,7 +101,7 @@ final class ProductFilterWidget extends Component
     public function clearFilters(): void
     {
         $this->reset([
-            'search', 'categories', 'brands', 'attributes', 
+            'search', 'categories', 'brands', 'attributes',
             'inStock', 'onSale', 'sortBy', 'sortDirection'
         ]);
         $this->updatePriceRange();
@@ -113,7 +113,7 @@ final class ProductFilterWidget extends Component
         $priceRange = Product::where('is_visible', true)
             ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
             ->first();
-            
+
         $this->minPrice = $priceRange->min_price ?? 0;
         $this->maxPrice = $priceRange->max_price ?? 10000;
     }
@@ -121,7 +121,7 @@ final class ProductFilterWidget extends Component
     public function getAvailableCategoriesProperty()
     {
         return Category::where('is_visible', true)
-            ->withTranslation()
+            ->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])
             ->orderBy('name')
             ->get();
     }
@@ -129,7 +129,7 @@ final class ProductFilterWidget extends Component
     public function getAvailableBrandsProperty()
     {
         return Brand::where('is_visible', true)
-            ->withTranslation()
+            ->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])
             ->orderBy('name')
             ->get();
     }
@@ -137,12 +137,12 @@ final class ProductFilterWidget extends Component
     public function getAvailableAttributesProperty()
     {
         return Attribute::with(['values' => function ($query) {
-            $query->withTranslation()->orderBy('sort_order');
+            $query->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])->orderBy('sort_order');
         }])
-        ->withTranslation()
-        ->where('is_filterable', true)
-        ->orderBy('sort_order')
-        ->get();
+            ->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])
+            ->where('is_filterable', true)
+            ->orderBy('sort_order')
+            ->get();
     }
 
     public function getFilteredProductsQuery()
@@ -154,12 +154,13 @@ final class ProductFilterWidget extends Component
         // Search filter
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%')
-                  ->orWhere('sku', 'like', '%' . $this->search . '%')
-                  ->orWhereHas('brand', function ($brandQuery) {
-                      $brandQuery->where('name', 'like', '%' . $this->search . '%');
-                  });
+                $q
+                    ->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('description', 'like', '%' . $this->search . '%')
+                    ->orWhere('sku', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('brand', function ($brandQuery) {
+                        $brandQuery->where('name', 'like', '%' . $this->search . '%');
+                    });
             });
         }
 
@@ -191,14 +192,15 @@ final class ProductFilterWidget extends Component
         }
 
         // Attribute filters
-        if (!empty($this->attributes)) {
-            foreach ($this->attributes as $attributeId => $valueIds) {
+        if (!empty($this->selectedAttributes)) {
+            foreach ($this->selectedAttributes as $attributeId => $valueIds) {
                 if (!empty($valueIds)) {
                     $query->whereHas('attributes', function ($q) use ($attributeId, $valueIds) {
-                        $q->where('attributes.id', $attributeId)
-                          ->whereHas('values', function ($valueQuery) use ($valueIds) {
-                              $valueQuery->whereIn('attribute_values.id', $valueIds);
-                          });
+                        $q
+                            ->where('attributes.id', $attributeId)
+                            ->whereHas('values', function ($valueQuery) use ($valueIds) {
+                                $valueQuery->whereIn('attribute_values.id', $valueIds);
+                            });
                     });
                 }
             }

@@ -60,6 +60,8 @@ class DatabaseSeeder extends Seeder
             SeoDataSeeder::class,
             // News demo content
             NewsSeeder::class,
+            // Legal pages
+            LegalSeeder::class,
             // Build header menu from categories
             MenuSeeder::class,
         ]);

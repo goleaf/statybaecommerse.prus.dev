@@ -23,7 +23,18 @@ return [
     'delete' => 'Ištrinti',
     'save' => 'Išsaugoti',
     'cancel' => 'Atšaukti',
+    'create' => 'Sukurti',
     'submit' => 'Pateikti',
+    
+    // Additional shared keys for tests
+    'shared' => [
+        'save' => 'Išsaugoti',
+        'cancel' => 'Atšaukti',
+        'delete' => 'Ištrinti',
+        'edit' => 'Redaguoti',
+        'view' => 'Peržiūrėti',
+        'create' => 'Sukurti',
+    ],
     'close' => 'Uždaryti',
     'back' => 'Atgal',
     'next' => 'Toliau',

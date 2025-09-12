@@ -11,5 +11,6 @@ return [
         'string' => 'The :attribute may not be greater than :max characters.',
         'numeric' => 'The :attribute may not be greater than :max.',
     ],
+    'unique' => 'The :attribute has already been taken.',
     'attributes' => [],
 ];

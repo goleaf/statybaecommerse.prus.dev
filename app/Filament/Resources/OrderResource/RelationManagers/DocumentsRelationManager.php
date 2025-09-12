@@ -22,7 +22,7 @@ final class DocumentsRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('documents.document_information'))
+                Section::make(__('documents.document_information'))
                     ->components([
                         Forms\Components\TextInput::make('title')
                             ->label(__('documents.title'))

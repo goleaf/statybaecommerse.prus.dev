@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class EcommerceOverview extends BaseWidget
 {
-    protected function getStats(): array
+    public function getStats(): array
     {
         return [
             Stat::make(__('admin.widgets.total_revenue'), $this->getTotalRevenue())

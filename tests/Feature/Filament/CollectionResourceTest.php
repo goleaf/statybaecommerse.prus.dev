@@ -52,13 +52,11 @@ it('can create manual collection with lt/en translations', function () {
         'name_lt' => 'Nauja kolekcija',
         'slug_lt' => 'nauja-kolekcija',
         'description_lt' => 'Aprašymas LT',
-        'seo_title_lt' => 'SEO pavadinimas LT',
-        'seo_description_lt' => 'SEO aprašymas LT',
         'name_en' => 'New Collection',
         'slug_en' => 'new-collection',
         'description_en' => 'Description EN',
-        'seo_title_en' => 'SEO title EN',
-        'seo_description_en' => 'SEO description EN',
+        'seo_title' => 'SEO Title',
+        'seo_description' => 'SEO Description',
     ];
 
     Livewire::test(CollectionResource\Pages\CreateCollection::class)

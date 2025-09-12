@@ -20,7 +20,7 @@ final class VariantsRelationManager extends RelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('admin.products.variant.sections.information'))
+                Section::make(__('admin.products.variant.sections.information'))
                     ->components([
                         Forms\Components\TextInput::make('sku')
                             ->required()
@@ -43,7 +43,7 @@ final class VariantsRelationManager extends RelationManager
                             ->step(0.01),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('admin.products.variant.sections.inventory'))
+                Section::make(__('admin.products.variant.sections.inventory'))
                     ->components([
                         Forms\Components\TextInput::make('stock_quantity')
                             ->numeric()
@@ -59,7 +59,7 @@ final class VariantsRelationManager extends RelationManager
                             ->default(false),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('admin.products.variant.sections.physical_properties'))
+                Section::make(__('admin.products.variant.sections.physical_properties'))
                     ->components([
                         Forms\Components\TextInput::make('weight')
                             ->numeric()

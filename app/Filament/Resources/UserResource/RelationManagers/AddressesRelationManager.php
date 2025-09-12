@@ -21,7 +21,7 @@ final class AddressesRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('admin.address_information'))
+                Section::make(__('admin.address_information'))
                     ->components([
                         Forms\Components\TextInput::make('first_name')
                             ->label(__('admin.first_name'))
@@ -40,7 +40,7 @@ final class AddressesRelationManager extends RelationManager
                             ->maxLength(20),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('admin.address_details'))
+                Section::make(__('admin.address_details'))
                     ->components([
                         Forms\Components\TextInput::make('street_address')
                             ->label(__('admin.street_address'))

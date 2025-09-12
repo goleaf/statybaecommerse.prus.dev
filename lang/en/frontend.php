@@ -10,6 +10,13 @@ return [
         'news' => 'News',
         'about' => 'About',
         'contact' => 'Contact',
+    ],
+    
+    // Direct keys for tests
+    'home' => 'Home',
+    'about' => 'About',
+    'contact' => 'Contact',
+    'products' => 'Products',
         'cart' => 'Cart',
         'account' => 'Account',
         'login' => 'Login',

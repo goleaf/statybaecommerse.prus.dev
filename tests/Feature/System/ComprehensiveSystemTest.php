@@ -37,8 +37,22 @@ final class ComprehensiveSystemTest extends TestCase
 
     public function test_admin_panel_routes_are_accessible(): void
     {
+        // Test unauthenticated access to admin panel (should redirect to login)
+        $this->get('/admin')
+            ->assertRedirect('/admin/login');
+
+        // Test authenticated access
         $admin = User::factory()->create(['is_admin' => true]);
+        
+        // Create and assign admin role
+        $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
+        $admin->assignRole($adminRole);
+        
         $this->actingAs($admin);
+
+        // Check if user is authenticated
+        $this->assertTrue(auth()->check());
+        $this->assertEquals($admin->id, auth()->id());
 
         $this->get('/admin')
             ->assertOk();
@@ -50,19 +64,19 @@ final class ComprehensiveSystemTest extends TestCase
     public function test_frontend_routes_are_accessible(): void
     {
         $this->get('/')
-            ->assertRedirect('/home');
+            ->assertRedirect('/lt'); // Root redirects to default locale
 
-        $this->get('/home')
+        $this->get('/lt')
             ->assertOk();
 
         $this->get('/products')
             ->assertOk();
 
         $this->get('/categories')
-            ->assertOk();
+            ->assertRedirect('/lt/categories');
 
         $this->get('/brands')
-            ->assertOk();
+            ->assertRedirect('/lt/brands');
     }
 
     public function test_translation_system_works(): void
@@ -90,13 +104,17 @@ final class ComprehensiveSystemTest extends TestCase
     public function test_permissions_system_works(): void
     {
         $admin = User::factory()->create(['is_admin' => true]);
-        $customer = User::factory()->create(['is_admin' => false]);
+        $customer = User::factory()->create();
+        
+        // Create and assign admin role
+        $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
+        $admin->assignRole($adminRole);
 
         $this->actingAs($admin);
         $this->get('/admin')->assertOk();
 
         $this->actingAs($customer);
-        $this->get('/admin')->assertRedirect(); // Should redirect non-admin users
+        $this->get('/admin')->assertStatus(403); // Non-admin users should be blocked
     }
 
     public function test_settings_system_works(): void
@@ -147,10 +165,10 @@ final class ComprehensiveSystemTest extends TestCase
         ]);
 
         app()->setLocale('en');
-        $this->assertEquals('Electronics', $category->translate('name'));
+        $this->assertEquals('Electronics', $category->trans('name'));
 
         app()->setLocale('lt');
-        $this->assertEquals('Elektronika', $category->translate('name'));
+        $this->assertEquals('Elektronika', $category->trans('name'));
     }
 
     public function test_product_visibility_and_publishing_works(): void

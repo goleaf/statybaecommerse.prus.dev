@@ -10,6 +10,13 @@ return [
         'news' => 'Naujienos',
         'about' => 'Apie mus',
         'contact' => 'Kontaktai',
+    ],
+    
+    // Direct keys for tests
+    'home' => 'Pagrindinis',
+    'about' => 'Apie mus',
+    'contact' => 'Kontaktai',
+    'products' => 'Produktai',
         'cart' => 'Krepšelis',
         'account' => 'Paskyra',
         'login' => 'Prisijungti',

@@ -22,7 +22,7 @@ final class OrdersRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('admin.order_information'))
+                Section::make(__('admin.order_information'))
                     ->components([
                         Forms\Components\TextInput::make('number')
                             ->label(__('admin.order_number'))

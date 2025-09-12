@@ -20,7 +20,7 @@ final class ReviewsRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Review Information')
+                Section::make('Review Information')
                     ->components([
                         Forms\Components\TextInput::make('reviewer_name')
                             ->required()
@@ -42,7 +42,7 @@ final class ReviewsRelationManager extends RelationManager
                             ->maxLength(255),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Review Content')
+                Section::make('Review Content')
                     ->components([
                         Forms\Components\Textarea::make('content')
                             ->required()

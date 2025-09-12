@@ -5,11 +5,11 @@ namespace App\Services;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Notifications\DocumentGenerated;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 final class DocumentService
 {
@@ -22,12 +22,12 @@ final class DocumentService
     ): Document {
         // Validate template content for security
         $this->validateTemplateContent($template->content);
-        
+
         // Sanitize variables
         $variables = $this->sanitizeVariables($variables);
-        
+
         $processedContent = $this->processTemplate($template->content, $variables);
-        
+
         $document = Document::create([
             'document_template_id' => $template->id,
             'title' => $title ?? $template->name . ' - ' . $relatedModel->id,
@@ -53,18 +53,18 @@ final class DocumentService
     {
         $template = $document->template;
         $settings = $template->getPrintSettings();
-        
+
         $pdf = Pdf::loadHTML($document->content);
-        
+
         // Apply settings
         $pdf->setPaper($settings['page_size'] ?? 'A4', $settings['orientation'] ?? 'portrait');
-        
+
         // Generate filename
         $filename = 'documents/' . $document->id . '_' . now()->format('Y-m-d_H-i-s') . '.pdf';
-        
+
         // Save to storage
         Storage::disk('public')->put($filename, $pdf->output());
-        
+
         // Update document record
         $document->update([
             'format' => 'pdf',
@@ -83,7 +83,7 @@ final class DocumentService
     private function processTemplate(string $content, array $variables): string
     {
         $processedContent = $content;
-        
+
         foreach ($variables as $key => $value) {
             // Handle different value types
             if (is_array($value)) {
@@ -93,16 +93,16 @@ final class DocumentService
             } elseif (is_bool($value)) {
                 $value = $value ? __('documents.yes') : __('documents.no');
             }
-            
+
             $processedContent = str_replace($key, (string) $value, $processedContent);
         }
-        
+
         return $processedContent;
     }
 
     public function getAvailableVariables(): array
     {
-        return Cache::remember('document_variables_' . app()->getLocale(), 3600, function() {
+        return Cache::remember('document_variables_' . app()->getLocale(), 3600, function () {
             return [
                 // Global variables
                 '$COMPANY_NAME' => config('app.name'),
@@ -110,7 +110,6 @@ final class DocumentService
                 '$CURRENT_DATETIME' => now()->format('Y-m-d H:i:s'),
                 '$CURRENT_YEAR' => now()->year,
                 '$CURRENT_USER' => Auth::user()?->name ?? '',
-                
                 // Common e-commerce variables
                 '$ORDER_NUMBER' => 'Order number',
                 '$ORDER_DATE' => 'Order date',
@@ -132,15 +131,30 @@ final class DocumentService
     {
         $variables = [];
         $attributes = $model->getAttributes();
-        
+
         foreach ($attributes as $key => $value) {
             if (!is_null($value)) {
                 $variableName = '$' . strtoupper($prefix . $key);
                 $variables[$variableName] = $value;
             }
         }
-        
+
+        // Add specific mappings for Order model
+        if ($model instanceof \App\Models\Order) {
+            $variables['$ORDER_NUMBER'] = $model->number ?? $model->id;
+            $variables['$ORDER_TOTAL'] = number_format((float) ($model->total ?? 0), 2);
+            if ($model->user) {
+                $variables['$CUSTOMER_NAME'] = $model->user->name ?? '';
+                $variables['$CUSTOMER_EMAIL'] = $model->user->email ?? '';
+            }
+        }
+
         return $variables;
+    }
+
+    public function renderTemplate(DocumentTemplate $template, array $variables): string
+    {
+        return $this->processTemplate($template->content, $variables);
     }
 
     public function generateDocumentAsync(
@@ -149,7 +163,7 @@ final class DocumentService
         array $variables = [],
         string $title = null
     ): void {
-        dispatch(function() use ($template, $relatedModel, $variables, $title) {
+        dispatch(function () use ($template, $relatedModel, $variables, $title) {
             $this->generateDocument($template, $relatedModel, $variables, $title, true);
         });
     }
@@ -192,13 +206,13 @@ final class DocumentService
         // Basic check for severely malformed HTML (only check for unclosed tags)
         $openTags = preg_match_all('/<([a-zA-Z][a-zA-Z0-9]*)[^>]*>/i', $content);
         $closeTags = preg_match_all('/<\/([a-zA-Z][a-zA-Z0-9]*)[^>]*>/i', $content);
-        
+
         // Allow some flexibility in HTML structure for rich content
     }
 
     private function sanitizeVariables(array $variables): array
     {
-        return array_map(function($value) {
+        return array_map(function ($value) {
             if (is_string($value)) {
                 return strip_tags($value);
             }

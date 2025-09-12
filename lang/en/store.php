@@ -28,6 +28,12 @@ return [
         'order_number' => 'Order number:',
         'proceed' => 'Proceed to checkout',
     ],
+    
+    // Direct keys for tests
+    'add_to_cart' => 'Add to Cart',
+    'checkout' => 'Checkout',
+    'cart' => 'Cart',
+    'wishlist' => 'Wishlist',
     'account' => [
         'profile' => 'Profile',
         'addresses' => 'Addresses',

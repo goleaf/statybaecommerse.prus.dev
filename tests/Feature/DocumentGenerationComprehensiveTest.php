@@ -86,15 +86,15 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         $variables = $this->documentService->extractVariablesFromModel($order);
 
         $this->assertIsArray($variables);
-        $this->assertArrayHasKey('ORDER_NUMBER', $variables);
-        $this->assertArrayHasKey('ORDER_TOTAL', $variables);
-        $this->assertArrayHasKey('CUSTOMER_NAME', $variables);
-        $this->assertArrayHasKey('CUSTOMER_EMAIL', $variables);
+        $this->assertArrayHasKey('$ORDER_NUMBER', $variables);
+        $this->assertArrayHasKey('$ORDER_TOTAL', $variables);
+        $this->assertArrayHasKey('$CUSTOMER_NAME', $variables);
+        $this->assertArrayHasKey('$CUSTOMER_EMAIL', $variables);
 
-        $this->assertEquals('ORD-002', $variables['ORDER_NUMBER']);
-        $this->assertEquals('150.00', $variables['ORDER_TOTAL']);
-        $this->assertEquals('Jane Smith', $variables['CUSTOMER_NAME']);
-        $this->assertEquals('jane@example.com', $variables['CUSTOMER_EMAIL']);
+        $this->assertEquals('ORD-002', $variables['$ORDER_NUMBER']);
+        $this->assertEquals('150.00', $variables['$ORDER_TOTAL']);
+        $this->assertEquals('Jane Smith', $variables['$CUSTOMER_NAME']);
+        $this->assertEquals('jane@example.com', $variables['$CUSTOMER_EMAIL']);
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
@@ -105,9 +105,9 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         ]);
 
         $variables = [
-            'ORDER_NUMBER' => 'ORD-003',
-            'ORDER_TOTAL' => '299.99',
-            'CUSTOMER_NAME' => 'Bob Johnson',
+            '$ORDER_NUMBER' => 'ORD-003',
+            '$ORDER_TOTAL' => '299.99',
+            '$CUSTOMER_NAME' => 'Bob Johnson',
         ];
 
         $renderedContent = $this->documentService->renderTemplate($template, $variables);
@@ -122,7 +122,6 @@ final class DocumentGenerationComprehensiveTest extends TestCase
     {
         $template = DocumentTemplate::factory()->create([
             'content' => '<h1>PDF Test Document</h1><p>This is a test PDF.</p>',
-            'format' => 'pdf',
         ]);
 
         $user = User::factory()->create();
@@ -130,9 +129,14 @@ final class DocumentGenerationComprehensiveTest extends TestCase
 
         $document = $this->documentService->generateDocument($template, $order, []);
 
+        // Generate PDF from the document
+        $pdfUrl = $this->documentService->generatePdf($document);
+
+        $document->refresh();
         $this->assertEquals('pdf', $document->format);
         $this->assertNotNull($document->file_path);
         $this->assertStringContainsString('.pdf', $document->file_path);
+        $this->assertNotNull($pdfUrl);
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
@@ -140,7 +144,6 @@ final class DocumentGenerationComprehensiveTest extends TestCase
     {
         $template = DocumentTemplate::factory()->create([
             'content' => '<h1>HTML Test Document</h1><p>This is a test HTML document.</p>',
-            'format' => 'html',
         ]);
 
         $user = User::factory()->create();
@@ -289,11 +292,13 @@ final class DocumentGenerationComprehensiveTest extends TestCase
     public function it_can_check_if_document_is_generated(): void
     {
         $generatedDocument = Document::factory()->create([
+            'status' => 'published',
             'generated_at' => now(),
             'file_path' => 'documents/test.pdf',
         ]);
 
         $notGeneratedDocument = Document::factory()->create([
+            'status' => 'draft',
             'generated_at' => null,
             'file_path' => null,
         ]);

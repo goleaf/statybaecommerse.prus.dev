@@ -52,7 +52,7 @@ final class Document extends Model
 
     public function isGenerated(): bool
     {
-        return $this->status === 'generated';
+        return $this->status === 'generated' || $this->status === 'published';
     }
 
     public function getFileUrl(): ?string
@@ -90,6 +90,16 @@ final class Document extends Model
     }
 
     public function scopeByFormat($query, string $format)
+    {
+        return $query->where('format', $format);
+    }
+
+    public function scopeOfStatus($query, string $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    public function scopeOfFormat($query, string $format)
     {
         return $query->where('format', $format);
     }

@@ -10,11 +10,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 
 final class Category extends Model implements HasMedia
 {
@@ -95,6 +95,13 @@ final class Category extends Model implements HasMedia
     public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order');
+    }
+
+    public function scopeWithProductCounts($query)
+    {
+        return $query->withCount(['products' => function ($query) {
+            $query->where('is_visible', true);
+        }]);
     }
 
     public function products(): BelongsToMany
@@ -192,6 +199,26 @@ final class Category extends Model implements HasMedia
         }
 
         return $this->getFirstMediaUrl('banner', "banner-{$size}") ?: $this->getFirstMediaUrl('banner');
+    }
+
+    public function getNameAttribute(?string $value): ?string
+    {
+        return $this->trans('name') ?: $value;
+    }
+
+    public function getDescriptionAttribute(?string $value): ?string
+    {
+        return $this->trans('description') ?: $value;
+    }
+
+    public function getSeoTitleAttribute(?string $value): ?string
+    {
+        return $this->trans('seo_title') ?: $value;
+    }
+
+    public function getSeoDescriptionAttribute(?string $value): ?string
+    {
+        return $this->trans('seo_description') ?: $value;
     }
 
     public function registerMediaCollections(): void

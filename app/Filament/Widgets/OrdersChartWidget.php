@@ -22,7 +22,7 @@ final class OrdersChartWidget extends ChartWidget
         return __('analytics.orders_and_revenue_trends');
     }
 
-    protected function getData(): array
+    public function getData(): array
     {
         $data = Order::select(
             DB::raw(DatabaseDateService::dateExpression('created_at') . ' as date'),
@@ -61,12 +61,12 @@ final class OrdersChartWidget extends ChartWidget
         ];
     }
 
-    protected function getType(): string
+    public function getType(): string
     {
         return 'line';
     }
 
-    protected function getOptions(): array
+    public function getOptions(): array
     {
         return [
             'responsive' => true,

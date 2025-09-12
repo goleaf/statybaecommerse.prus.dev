@@ -16,18 +16,20 @@ final class Show extends Component
 
     public function mount(Category $category): void
     {
-        // Ensure category is visible and load media
+        // Ensure category is visible and load media and translations
         if (!$category->is_visible) {
             abort(404);
         }
-        
-        $category->load(['media']);
+
+        $category->load(['media', 'translations']);
         $this->category = $category;
     }
 
     public function getProductsProperty()
     {
-        return $this->category->products()
+        return $this
+            ->category
+            ->products()
             ->where('is_visible', true)
             ->with(['brand', 'media'])
             ->orderBy($this->sortBy, $this->sortDirection)

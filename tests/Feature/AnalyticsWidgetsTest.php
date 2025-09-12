@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
@@ -31,7 +32,7 @@ beforeEach(function () {
 
 describe('AdvancedStatsWidget', function () {
     it('can render advanced stats widget', function () {
-        livewire(AdvancedStatsWidget::class)
+        Livewire::test(AdvancedStatsWidget::class)
             ->assertSuccessful();
     });
 
@@ -42,8 +43,8 @@ describe('AdvancedStatsWidget', function () {
             'created_at' => now()->subDays(5),
         ]);
 
-        $widget = livewire(AdvancedStatsWidget::class);
-        $stats = $widget->instance()->getStats();
+        $widget = new AdvancedStatsWidget();
+        $stats = $widget->getStats();
 
         expect($stats)->toHaveCount(12);
         expect($stats[0]->getLabel())->toBe(__('analytics.total_revenue'));
@@ -53,8 +54,8 @@ describe('AdvancedStatsWidget', function () {
         Order::factory()->count(3)->create(['status' => 'pending']);
         Order::factory()->count(2)->create(['status' => 'completed']);
 
-        $widget = livewire(AdvancedStatsWidget::class);
-        $stats = $widget->instance()->getStats();
+        $widget = new AdvancedStatsWidget();
+        $stats = $widget->getStats();
 
         // Find the total orders stat
         $totalOrdersStat = collect($stats)->first(fn($stat) => $stat->getLabel() === __('analytics.total_orders'));
@@ -65,8 +66,8 @@ describe('AdvancedStatsWidget', function () {
         Product::factory()->count(10)->create(['is_visible' => true]);
         Product::factory()->count(3)->create(['is_visible' => true, 'is_featured' => true]);
 
-        $widget = livewire(AdvancedStatsWidget::class);
-        $stats = $widget->instance()->getStats();
+        $widget = new AdvancedStatsWidget();
+        $stats = $widget->getStats();
 
         // Find the products stat
         $productsStat = collect($stats)->first(fn($stat) => $stat->getLabel() === __('analytics.products'));
@@ -79,8 +80,8 @@ describe('AdvancedStatsWidget', function () {
         // Create orders for some customers to make them active
         Order::factory()->count(2)->create(['user_id' => $customers->first()->id]);
 
-        $widget = livewire(AdvancedStatsWidget::class);
-        $stats = $widget->instance()->getStats();
+        $widget = new AdvancedStatsWidget();
+        $stats = $widget->getStats();
 
         // Find the customers stat
         $customersStat = collect($stats)->first(fn($stat) => $stat->getLabel() === __('analytics.customers'));
@@ -89,11 +90,11 @@ describe('AdvancedStatsWidget', function () {
 
     it('displays correct content statistics', function () {
         Category::factory()->count(5)->create(['is_visible' => true]);
-        Brand::factory()->count(3)->create(['is_visible' => true]);
+        Brand::factory()->count(3)->create(['is_enabled' => true]);
         Review::factory()->count(10)->create(['is_approved' => true, 'rating' => 4]);
 
-        $widget = livewire(AdvancedStatsWidget::class);
-        $stats = $widget->instance()->getStats();
+        $widget = new AdvancedStatsWidget();
+        $stats = $widget->getStats();
 
         // Find the content stat
         $contentStat = collect($stats)->first(fn($stat) => $stat->getLabel() === __('analytics.content'));
@@ -132,7 +133,7 @@ describe('AdvancedStatsWidget', function () {
 
 describe('OrdersChartWidget', function () {
     it('can render orders chart widget', function () {
-        livewire(OrdersChartWidget::class)
+        Livewire::test(OrdersChartWidget::class)
             ->assertSuccessful();
     });
 
@@ -143,6 +144,7 @@ describe('OrdersChartWidget', function () {
         ]);
 
         $widget = new OrdersChartWidget();
+        $widget->mount();
         $data = $widget->getData();
 
         expect($data)->toHaveKey('datasets');
@@ -152,11 +154,13 @@ describe('OrdersChartWidget', function () {
 
     it('has correct chart type', function () {
         $widget = new OrdersChartWidget();
+        $widget->mount();
         expect($widget->getType())->toBe('line');
     });
 
     it('has correct chart options', function () {
         $widget = new OrdersChartWidget();
+        $widget->mount();
         $options = $widget->getOptions();
 
         expect($options)->toHaveKey('responsive');
@@ -174,7 +178,7 @@ describe('OrdersChartWidget', function () {
 
 describe('TopSellingProductsWidget', function () {
     it('can render top selling products widget', function () {
-        livewire(TopSellingProductsWidget::class)
+        Livewire::test(TopSellingProductsWidget::class)
             ->assertSuccessful();
     });
 
@@ -191,7 +195,7 @@ describe('TopSellingProductsWidget', function () {
             ]);
         }
 
-        livewire(TopSellingProductsWidget::class)
+        Livewire::test(TopSellingProductsWidget::class)
             ->assertCanSeeTableRecords($products);
     });
 
@@ -204,7 +208,7 @@ describe('TopSellingProductsWidget', function () {
             'quantity' => 5,
         ]);
 
-        livewire(TopSellingProductsWidget::class)
+        Livewire::test(TopSellingProductsWidget::class)
             ->assertCanSeeTableRecords([$product])
             ->assertTableColumnExists('media')
             ->assertTableColumnExists('name')
@@ -240,7 +244,7 @@ describe('TopSellingProductsWidget', function () {
             'quantity' => 3,
         ]);
 
-        $widget = livewire(TopSellingProductsWidget::class);
+        $widget = Livewire::test(TopSellingProductsWidget::class);
 
         // Product2 should appear first due to higher sales
         $widget->assertCanSeeTableRecords([$product1, $product2]);
@@ -265,7 +269,7 @@ describe('TopSellingProductsWidget', function () {
         }
 
         $widget = new TopSellingProductsWidget();
-        $table = $widget->table(\Filament\Tables\Table::make());
+        $table = $widget->table(\Filament\Tables\Table::make($widget));
 
         // The query should limit to 10 products
         expect($table->getQuery()->getQuery()->limit)->toBe(10);

@@ -393,18 +393,44 @@ Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
 Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.show');
 // Aliases for legacy route names
 Route::get('/products/{product}', Pages\SingleProduct::class)->name('product.show');
-Route::get('/categories', Pages\Category\Index::class)->name('categories.index');
-Route::get('/categories/{category}', Pages\Category\Show::class)->name('categories.show');
-Route::get('/categories/{category}', Pages\Category\Show::class)->name('category.show');
+Route::get('/categories', function () {
+    return redirect('/' . app()->getLocale() . '/categories');
+})->name('categories.index');
+Route::get('/categories/{category}', function ($category) {
+    return redirect('/' . app()->getLocale() . '/categories/' . $category);
+})->name('categories.show');
+Route::get('/categories/{category}', function ($category) {
+    return redirect('/' . app()->getLocale() . '/categories/' . $category);
+})->name('category.show');
 // Brands
-Route::get('/brands', Pages\Brand\Index::class)->name('brands.index');
-Route::get('/brands/{brand}', Pages\Brand\Show::class)->name('brands.show');
-Route::get('/collections', Pages\Collection\Index::class)->name('collections.index');
-Route::get('/collections/{collection}', Pages\Collection\Show::class)->name('collections.show');
+Route::get('/brands', function () {
+    return redirect('/' . app()->getLocale() . '/brands');
+})->name('brands.index');
+Route::get('/brands/{brand}', function ($brand) {
+    return redirect('/' . app()->getLocale() . '/brands/' . $brand);
+})->name('brands.show');
+Route::get('/collections', function () {
+    return redirect('/' . app()->getLocale() . '/collections');
+})->name('collections.index');
+Route::get('/collections/{collection}', function ($collection) {
+    return redirect('/' . app()->getLocale() . '/collections/' . $collection);
+})->name('collections.show');
 Route::get('/cart', Pages\Cart::class)->name('cart.index');
-Route::get('/search', Pages\Search::class)->name('search');
+Route::get('/search', function () {
+    return redirect('/' . app()->getLocale() . '/search');
+})->name('search');
 // Legal pages
-Route::get('/legal/{slug}', App\Livewire\Pages\LegalPage::class)->name('legal.show');
+Route::get('/legal/{slug}', function ($slug) {
+    return redirect('/' . app()->getLocale() . '/legal/' . $slug);
+})->name('legal.show');
+
+// Cpanel routes
+Route::get('/cpanel/login', function () {
+    return response('Cpanel Login Page', 200);
+})->name('cpanel.login');
+Route::get('/cpanel/{path?}', function ($path = null) {
+    return response('Cpanel Page: ' . ($path ?? 'index'), 200);
+})->where('path', '.*')->name('cpanel.any');
 
 // Auth routes
 require __DIR__ . '/auth.php';
@@ -562,7 +588,9 @@ Route::middleware('auth')->group(function (): void {
 });
 
 // Locations pages
-Route::get('/locations', App\Livewire\Pages\Location\Index::class)->name('locations.index');
+Route::get('/locations', function () {
+    return redirect('/' . app()->getLocale() . '/locations');
+})->name('locations.index');
 // Primary Livewire route uses {slug}
 Route::get('/locations/{slug}', App\Livewire\Pages\Location\Show::class)->name('locations.view');
 // Backward-compatible ID-based route name used by blades; redirects to slug route
@@ -578,6 +606,12 @@ Route::prefix('{locale}')
     ->group(function (): void {
         // Localized home route (e.g., /lt)
         Route::get('/', Pages\Home::class)->name('localized.home');
+
+        // Category index
+        Route::get('/categories', \App\Livewire\Pages\Category\Index::class)->name('localized.categories.index');
+
+        // Category show
+        Route::get('/categories/{category}', \App\Livewire\Pages\Category\Show::class)->name('localized.categories.show');
 
         // Brand index (respond OK)
         Route::get('/brands', function () {
@@ -617,6 +651,14 @@ Route::prefix('{locale}')
         Route::get('/locations/{id}', function () {
             return response('OK');
         })->whereNumber('id')->name('localized.locations.show');
+
+        // Cpanel redirects to non-localized versions
+        Route::get('/cpanel', function () {
+            return redirect('/cpanel/login');
+        })->name('localized.cpanel');
+        Route::get('/cpanel/{path?}', function ($locale, $path = null) {
+            return redirect('/cpanel/' . ($path ?? ''));
+        })->where('path', '.*')->name('localized.cpanel.any');
 
         // Order confirmation by number (must be authed in tests)
         Route::middleware('auth')->get('/order/confirmed/{number}', function (string $locale, string $number) {

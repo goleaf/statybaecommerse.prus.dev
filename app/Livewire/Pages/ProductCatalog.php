@@ -15,20 +15,7 @@ final class ProductCatalog extends Component
 {
     use WithFilters, WithCart, WithNotifications;
 
-    public ?int $categoryId = null;
-    public ?int $brandId = null;
-
     public function mount(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatedCategoryId(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatedBrandId(): void
     {
         $this->resetPage();
     }
@@ -43,22 +30,13 @@ final class ProductCatalog extends Component
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());
 
-        // Apply shared filters
+        // Apply shared filters from WithFilters trait
         $query = $this->applySearchFilters($query);
-        
-        // Apply specific filters
-        if ($this->categoryId) {
-            $query->whereHas('categories', fn($q) => $q->where('categories.id', $this->categoryId));
-        }
-        
-        if ($this->brandId) {
-            $query->where('brand_id', $this->brandId);
-        }
 
-        // Apply sorting
+        // Apply sorting from WithFilters trait
         $query = $this->applySorting($query);
 
-        return $query->paginate(12);
+        return $query->paginate($this->perPage);
     }
 
     public function getCategoriesProperty(): Collection

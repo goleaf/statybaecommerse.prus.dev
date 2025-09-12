@@ -209,3 +209,32 @@ Type: Complex System
 - ⚠️ **Test Coverage:** Only 15% coverage, need 85%+ for production readiness
 - ⚠️ **2FA Verification:** Implementation complete but needs production verification
 - ⚠️ **Performance Testing:** System performance under load untested
+
+## Recent Test Fixes (2025-01-12)
+- ✅ **DocumentGenerationComprehensiveTest:** Fixed all 19 test cases
+  - Added missing `renderTemplate` method to DocumentService
+  - Fixed `extractVariablesFromModel` to properly handle Order model relationships
+  - Added missing scope methods (`ofStatus`, `ofFormat`) to Document model
+  - Fixed `isGenerated` method to handle both 'generated' and 'published' statuses
+  - Corrected variable naming conventions (with $ prefix)
+  - Fixed template rendering with proper variable replacement
+  - Removed non-existent `format` field from DocumentTemplate factory calls
+
+- ✅ **ProductCatalogTest:** Fixed all 13 test cases
+  - Updated ProductCatalog component to properly use WithFilters trait
+  - Removed duplicate categoryId/brandId properties in favor of trait's selectedCategories/selectedBrands
+  - Fixed all test methods to ensure products have proper published_at dates (past dates)
+  - All filtering, sorting, pagination, and cart functionality now working correctly
+  - Test coverage: 13/13 tests passing with 23 assertions
+- ✅ **OrderTest:** Fixed currency default test case
+  - Fixed test to respect database default value ('EUR') instead of forcing null
+  - All 19 Order model tests now passing
+- ✅ **Additional Test Validations:**
+  - OrderResourceTest: All 18 tests passing (81 assertions)
+  - CartItemResourceTest: All 22 tests passing (100 assertions)
+  - TranslationSystemComprehensiveTest: All 19 tests passing (57 assertions)
+- ✅ **AccountPagesTest Partial Fix:**
+  - Created missing Livewire profile components (UpdateProfileInformationForm, UpdatePasswordForm, DeleteUserForm)
+  - Fixed component Blade views to use correct form components (x-forms.* instead of x-input-*)
+  - Profile page now loads successfully (1/2 tests passing)
+  - Remaining issue: Address model missing deleted_at column for soft deletes

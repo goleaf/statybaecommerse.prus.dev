@@ -54,7 +54,7 @@ final class InventoryResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('Product Information'))
+                Section::make(__('Product Information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label(__('Product Name'))
@@ -66,7 +66,7 @@ final class InventoryResource extends Resource
                             ->dehydrated(false),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('Inventory Management'))
+                Section::make(__('Inventory Management'))
                     ->schema([
                         Forms\Components\TextInput::make('stock_quantity')
                             ->label(__('Current Stock'))
@@ -91,7 +91,7 @@ final class InventoryResource extends Resource
                             ->default(false),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('Stock Adjustments'))
+                Section::make(__('Stock Adjustments'))
                     ->schema([
                         Forms\Components\TextInput::make('adjustment_quantity')
                             ->label(__('Adjustment Quantity'))

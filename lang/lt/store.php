@@ -28,6 +28,12 @@ return [
         'order_number' => 'Užsakymo numeris:',
         'proceed' => 'Tęsti atsiskaitymą',
     ],
+    
+    // Direct keys for tests
+    'add_to_cart' => 'Pridėti į krepšelį',
+    'checkout' => 'Atsiskaitymas',
+    'cart' => 'Krepšelis',
+    'wishlist' => 'Pageidavimų sąrašas',
     'account' => [
         'profile' => 'Profilis',
         'addresses' => 'Adresai',

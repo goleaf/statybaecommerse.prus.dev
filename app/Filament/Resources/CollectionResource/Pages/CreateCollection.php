@@ -12,16 +12,15 @@ final class CreateCollection extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $prepared = MultiLanguageTabService::prepareTranslationData($data, ['name', 'slug', 'description', 'seo_title', 'seo_description']);
+        $prepared = MultiLanguageTabService::prepareTranslationData($data, ['name', 'slug', 'description']);
         $this->data['translations'] = $prepared['translations'];
         $main = $prepared['main_data'];
         $defaultLocale = config('app.locale', 'lt');
         $tr = $prepared['translations'][$defaultLocale] ?? [];
-        $main['name'] = $main['name'] ?? ($tr['name'] ?? null);
-        $main['slug'] = $main['slug'] ?? ($tr['slug'] ?? null);
+        $main['name'] = $main['name'] ?? ($tr['name'] ?? '');
+        $main['slug'] = $main['slug'] ?? ($tr['slug'] ?? '');
         $main['description'] = $main['description'] ?? ($tr['description'] ?? null);
-        $main['seo_title'] = $main['seo_title'] ?? ($tr['seo_title'] ?? null);
-        $main['seo_description'] = $main['seo_description'] ?? ($tr['seo_description'] ?? null);
+        // SEO fields are handled directly from form data, not from translations
 
         if (!array_key_exists('sort_order', $main) || $main['sort_order'] === null) {
             $main['sort_order'] = 0;
@@ -47,8 +46,6 @@ final class CreateCollection extends CreateRecord
                         'name' => $fields['name'] ?? $this->record->name,
                         'slug' => $fields['slug'] ?? $this->record->slug,
                         'description' => $fields['description'] ?? null,
-                        'seo_title' => $fields['seo_title'] ?? null,
-                        'seo_description' => $fields['seo_description'] ?? null,
                     ]
                 );
             }

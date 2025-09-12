@@ -24,7 +24,7 @@ beforeEach(function () {
     }
     
     // Create admin role with all permissions
-    $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+    $adminRole = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
     $adminRole->syncPermissions($permissions);
     
     // Create admin user
@@ -83,5 +83,5 @@ it('admin dashboard shows widgets', function () {
     $response = $this->actingAs($this->admin)->get('/admin');
     
     $response->assertOk();
-    $response->assertSee('Dashboard');
+    $response->assertSee('Valdymo skydas');
 });

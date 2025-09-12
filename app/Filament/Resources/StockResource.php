@@ -43,7 +43,7 @@ final class StockResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make(__('translations.inventory_entry'))
+                Section::make(__('translations.inventory_entry'))
                     ->schema([
                         Forms\Components\Hidden::make('inventoriable_type')
                             ->default(Product::class),

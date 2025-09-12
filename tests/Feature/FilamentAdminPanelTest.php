@@ -10,7 +10,7 @@ it('can access admin panel with authenticated user', function () {
     ]);
     
     // Create admin role if it doesn't exist
-    $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+    $adminRole = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
     
     // Create necessary permissions
     $permissions = ['view_admin_panel', 'view_any_product', 'view_any_user', 'view_any_order'];
@@ -53,11 +53,11 @@ it('can access dashboard', function () {
         'email' => 'test@admin.com',
     ]);
     
-    $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+    $adminRole = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
     $admin->assignRole($adminRole);
     
     $response = $this->actingAs($admin)->get('/admin');
     
     $response->assertStatus(200);
-    $response->assertSee('Dashboard');
+    $response->assertSee('Valdymo skydas');
 });
