@@ -202,6 +202,12 @@ Type: Complex System
    - [x] Fixed CategoryAccordionMenuTest redirect issues (changed from / to /lt)
    - [x] Fixed AnalyticsWidgetsTest (passed successfully - 19 tests, 40 assertions)
    - [ ] LoginTest Filament Schemas type mismatch error (complex Filament issue)
+   - [ ] ProductApiTest missing API infrastructure (routes, Sanctum guard, controllers)
+   - [x] Fixed AdminPanelTest (passed successfully - 2 tests, 6 assertions)
+   - [x] Fixed AdvancedAdminFeaturesTest (passed successfully - 8 tests, 27 assertions)
+   - [x] Fixed AdvancedSystemTest (passed successfully - 12 tests, 33 assertions)
+   - [x] Fixed FilamentResourcesTest (passed successfully - 5 tests, 6 assertions)
+   - [ ] RegisterTest Filament Schemas type mismatch error (same as LoginTest)
 
 3. **Security Verification**
    - [ ] Test 2FA enrollment and recovery flows

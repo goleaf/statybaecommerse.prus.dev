@@ -121,7 +121,8 @@ it('can delete order', function () {
     ])
         ->callAction(DeleteAction::class);
 
-    $this->assertModelMissing($order);
+    $order->refresh();
+    expect($order->deleted_at)->not()->toBeNull();
 });
 
 it('can search orders', function () {
@@ -174,7 +175,8 @@ it('can bulk delete orders', function () {
         ->callTableBulkAction('delete', $orders);
 
     foreach ($orders as $order) {
-        $this->assertModelMissing($order);
+        $order->refresh();
+        expect($order->deleted_at)->not()->toBeNull();
     }
 });
 

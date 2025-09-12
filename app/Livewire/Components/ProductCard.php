@@ -18,7 +18,7 @@ final class ProductCard extends Component
     public function addToCart(): void
     {
         $this->dispatch('add-to-cart', productId: $this->product->id, quantity: 1);
-        
+
         // Track analytics
         \App\Models\AnalyticsEvent::create([
             'event_type' => 'add_to_cart',
@@ -31,7 +31,7 @@ final class ProductCard extends Component
             ],
             'created_at' => now(),
         ]);
-        
+
         $this->dispatch('notify', [
             'type' => 'success',
             'message' => 'Produktas pridėtas į krepšelį!',

@@ -27,13 +27,13 @@ it('can render enhanced product card', function () {
 
 it('can add product to cart', function () {
     $component = Livewire::test(ProductCard::class, ['product' => $this->product]);
-    
+
     // Debug: Let's see what events are actually dispatched
     $component->call('addToCart');
-    
+
     // Check if the event was dispatched at all
     $component->assertDispatched('add-to-cart');
-    
+
     // Check the notify event
     $component->assertDispatched('notify');
 });
@@ -71,7 +71,7 @@ it('shows login required message when adding to wishlist as guest', function () 
     // Ensure we're not authenticated
     auth()->logout();
     $this->assertFalse(auth()->check());
-    
+
     Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('toggleWishlist')
         ->assertDispatched('notify');
@@ -195,13 +195,22 @@ it('displays product badges correctly', function () {
     $featuredProduct = Product::factory()->create([
         'name' => 'Featured Product',
         'is_featured' => true,
-        'price' => 80.00,
-        'compare_price' => 100.00,
+        'price' => 80.0,
+        'compare_price' => 100.0,
+        'sale_price' => null,  // Explicitly set to null
     ]);
 
-    Livewire::test(ProductCard::class, ['product' => $featuredProduct])
+    $component = Livewire::test(ProductCard::class, ['product' => $featuredProduct]);
+
+    // Debug: Let's see what the actual discount percentage is
+    dump('Product price:', $featuredProduct->price);
+    dump('Product compare_price:', $featuredProduct->compare_price);
+    dump('Product sale_price:', $featuredProduct->sale_price);
+    dump('Discount percentage:', $component->get('discountPercentage'));
+
+    $component
         ->assertSee('Featured')
-        ->assertSet('discountPercentage', 20); // Discount badge
+        ->assertSet('discountPercentage', 20);  // Discount badge
 });
 
 it('shows stock status correctly', function () {
@@ -241,6 +250,7 @@ it('refreshes status on events', function () {
         'product_id' => $this->product->id,
     ]);
 
-    $component->dispatch('wishlist-updated')
+    $component
+        ->dispatch('wishlist-updated')
         ->assertSet('isInWishlist', true);
 });

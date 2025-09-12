@@ -26,21 +26,21 @@ class UserWishlistFactory extends Factory
 
     public function public(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_public' => true,
         ]);
     }
 
     public function private(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_public' => false,
         ]);
     }
 
     public function default(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_default' => true,
             'name' => 'My Wishlist',
         ]);
