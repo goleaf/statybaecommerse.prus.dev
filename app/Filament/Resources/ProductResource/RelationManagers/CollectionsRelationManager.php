@@ -8,10 +8,10 @@ use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Tables\Actions\BulkActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 
 final class CollectionsRelationManager extends RelationManager

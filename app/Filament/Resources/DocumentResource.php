@@ -115,16 +115,20 @@ final class DocumentResource extends Resource
                     ->components([
                         Forms\Components\TextInput::make('documentable_type')
                             ->label(__('documents.related_model_type'))
-                            ->disabled(),
+                            ->default(Order::class),
                         Forms\Components\TextInput::make('documentable_id')
                             ->label(__('documents.related_model_id'))
-                            ->disabled(),
+                            ->numeric(),
                         Forms\Components\TextInput::make('file_path')
                             ->label(__('documents.file_path'))
                             ->disabled(),
                         Forms\Components\DateTimePicker::make('generated_at')
                             ->label(__('documents.generated_at'))
                             ->disabled(),
+                        Forms\Components\TextInput::make('created_by')
+                            ->label(__('documents.created_by'))
+                            ->numeric()
+                            ->default(fn() => auth()->id()),
                     ])
                     ->columns(2)
                     ->collapsed(),

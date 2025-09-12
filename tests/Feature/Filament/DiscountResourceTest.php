@@ -82,17 +82,21 @@ it('can update discount', function () {
         ->call('save')
         ->assertHasNoFormErrors();
 
-    assertDatabaseHas('discounts', array_merge(['id' => $discount->id], $newData));
+    $discount->refresh();
+    expect($discount->name)->toBe('Updated Discount');
+    expect($discount->description)->toBe('Updated description');
+    expect($discount->is_active)->toBeFalse();
 });
 
 it('can delete discount', function () {
     $discount = Discount::factory()->create();
+    $discountId = $discount->id;
 
     \Livewire\Livewire::test(\App\Filament\Resources\DiscountResource\Pages\EditDiscount::class, ['record' => $discount->id])
         ->callAction('delete')
         ->assertOk();
 
-    assertDatabaseMissing('discounts', ['id' => $discount->id]);
+    expect(Discount::find($discountId))->toBeNull();
 });
 
 it('can list discounts', function () {
@@ -134,11 +138,10 @@ it('can filter current discounts', function () {
         'ends_at' => now()->subDays(1),
     ]);
 
-    actingAs($this->admin)
-        ->get(DiscountResource::getUrl('index') . '?filter[current]=1')
-        ->assertSuccessful()
-        ->assertSeeText($currentDiscount->name)
-        ->assertDontSeeText($expiredDiscount->name);
+    \Livewire\Livewire::test(\App\Filament\Resources\DiscountResource\Pages\ListDiscounts::class)
+        ->filterTable('current', 1)
+        ->assertCanSeeTableRecords([$currentDiscount])
+        ->assertCanNotSeeTableRecords([$expiredDiscount]);
 });
 
 it('validates required fields when creating discount', function () {
