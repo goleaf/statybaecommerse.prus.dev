@@ -51,7 +51,7 @@ $links = [
     [
         'title' => __('Contact us'),
         'description' => __('Contact our customer service department by telephone or e-mail'),
-        'href' => route('account'),
+        'href' => route('account.index'),
         'icon' => 'untitledui-phone',
     ],
 ];

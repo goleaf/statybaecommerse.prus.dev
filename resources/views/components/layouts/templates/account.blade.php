@@ -8,7 +8,7 @@
                 <div class="hidden mt-10 space-y-8 lg:block">
                     <nav role="navigation" class="flex flex-col space-y-4 lg:pr-12">
                         <x-nav.account-link
-                                            :href="route('account')"
+                                            :href="route('account.index')"
                                             :title="__('Overview')"
                                             :active="request()->routeIs('account')" />
                         <x-nav.account-link

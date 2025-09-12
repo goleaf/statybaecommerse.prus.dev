@@ -30,7 +30,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
 }; ?>
 
 <div class="space-y-10">
-    <x-breadcrumbs :items="[['label' => __('My account'), 'url' => route('account')], ['label' => __('Documents')]]" />
+    <x-breadcrumbs :items="[['label' => __('My account'), 'url' => route('account.index')], ['label' => __('Documents')]]" />
     <x-page-heading :title="__('Documents')" :description="__('Invoices and generated documents')" />
 
     @if (empty($documents))

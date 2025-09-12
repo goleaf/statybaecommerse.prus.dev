@@ -7,7 +7,7 @@ title(__('Profile'));
 ?>
 
 <div class="space-y-10">
-    <x-breadcrumbs :items="[['label' => __('My account'), 'url' => route('account')], ['label' => __('Profile')]]" />
+    <x-breadcrumbs :items="[['label' => __('My account'), 'url' => route('account.index')], ['label' => __('Profile')]]" />
     <x-page-heading :title="__('Profile')" />
 
     <div class="space-y-6 divide-y divide-gray-200">

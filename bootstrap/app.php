@@ -12,6 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(App\Http\Middleware\SetLocale::class);
+        $middleware->append(App\Http\Middleware\SetFilamentLocale::class);
         // Detect and persist customer sales zone for storefront
         $middleware->append(App\Http\Middleware\ZoneDetector::class);
         // Handle user impersonation for admin support

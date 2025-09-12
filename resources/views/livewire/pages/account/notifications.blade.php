@@ -29,7 +29,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
 }; ?>
 
 <div class="space-y-10">
-    <x-breadcrumbs :items="[['label' => __('My account'), 'url' => route('account')], ['label' => __('Notifications')]]" />
+    <x-breadcrumbs :items="[['label' => __('My account'), 'url' => route('account.index')], ['label' => __('Notifications')]]" />
     <x-page-heading :title="__('Notifications')" :description="__('Messages and alerts')" />
 
     @if (empty($notifications))

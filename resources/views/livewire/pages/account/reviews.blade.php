@@ -1,5 +1,5 @@
 <div class="space-y-10">
-    <x-breadcrumbs :items="[["label"=> __("My account"), "url" => route('account')], ["label" => __("My
+    <x-breadcrumbs :items="[["label"=> __("My account"), "url" => route('account.index')], ["label" => __("My
         reviews")]]" />
         <x-page-heading :title="__('My reviews')" />
 

@@ -251,7 +251,7 @@ class SitemapController extends Controller
 
         // Products (visible & published)
         if (!Schema::hasTable($tables['products'])) {
-            $xml = view('sitemap.xml', ['urls' => $urls])->render();
+            $xml = $this->generateXmlSitemap($urls);
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
         }
@@ -274,7 +274,7 @@ class SitemapController extends Controller
 
         // Legal pages (enabled) with translated slugs
         if (!Schema::hasTable($tables['legals'])) {
-            $xml = view('sitemap.xml', ['urls' => $urls])->render();
+            $xml = $this->generateXmlSitemap($urls);
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
         }
@@ -292,7 +292,7 @@ class SitemapController extends Controller
         }
 
         Cache::put("sitemap:urls:{$locale}", $urls, now()->addDay());
-        $xml = view('sitemap.xml', ['urls' => $urls])->render();
+        $xml = $this->generateXmlSitemap($urls);
 
         return response($xml, 200)->header('Content-Type', 'application/xml');
     }
