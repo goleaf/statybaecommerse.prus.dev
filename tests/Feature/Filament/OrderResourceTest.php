@@ -14,7 +14,8 @@ beforeEach(function () {
 });
 
 it('can render order resource index page', function () {
-    $this->get(OrderResource::getUrl('index'))
+    $this
+        ->get(OrderResource::getUrl('index'))
         ->assertSuccessful();
 });
 
@@ -26,23 +27,24 @@ it('can list orders', function () {
 });
 
 it('can render order resource create page', function () {
-    $this->get(OrderResource::getUrl('create'))
+    $this
+        ->get(OrderResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create order', function () {
     $customer = User::factory()->create();
-    
+
     $newData = [
         'number' => 'ORD-' . now()->format('YmdHis'),
         'user_id' => $customer->id,
         'status' => 'pending',
         'currency' => 'EUR',
-        'subtotal' => 100.00,
-        'tax_amount' => 21.00,
-        'shipping_amount' => 5.00,
-        'discount_amount' => 0.00,
-        'total' => 126.00,
+        'subtotal' => 100.0,
+        'tax_amount' => 21.0,
+        'shipping_amount' => 5.0,
+        'discount_amount' => 0.0,
+        'total' => 126.0,
     ];
 
     Livewire::test(OrderResource\Pages\CreateOrder::class)
@@ -53,7 +55,7 @@ it('can create order', function () {
     $this->assertDatabaseHas(Order::class, [
         'number' => $newData['number'],
         'user_id' => $customer->id,
-        'total' => 126.00,
+        'total' => 126.0,
     ]);
 });
 
@@ -71,7 +73,8 @@ it('can validate order creation', function () {
 it('can render order resource view page', function () {
     $order = Order::factory()->create();
 
-    $this->get(OrderResource::getUrl('view', ['record' => $order]))
+    $this
+        ->get(OrderResource::getUrl('view', ['record' => $order]))
         ->assertSuccessful();
 });
 
@@ -91,7 +94,8 @@ it('can retrieve order data', function () {
 it('can render order resource edit page', function () {
     $order = Order::factory()->create();
 
-    $this->get(OrderResource::getUrl('edit', ['record' => $order]))
+    $this
+        ->get(OrderResource::getUrl('edit', ['record' => $order]))
         ->assertSuccessful();
 });
 
@@ -109,8 +113,10 @@ it('can update order', function () {
         ->assertHasNoFormErrors();
 
     expect($order->refresh())
-        ->status->toBe('processing')
-        ->notes->toBe('Order is being processed');
+        ->status
+        ->toBe('processing')
+        ->notes
+        ->toBe('Order is being processed');
 });
 
 it('can delete order', function () {
@@ -182,21 +188,21 @@ it('can bulk delete orders', function () {
 
 it('displays order totals correctly', function () {
     $order = Order::factory()->create([
-        'subtotal' => 100.00,
-        'tax_amount' => 21.00,
-        'shipping_amount' => 5.00,
-        'discount_amount' => 10.00,
-        'total' => 116.00,
+        'subtotal' => 100.0,
+        'tax_amount' => 21.0,
+        'shipping_amount' => 5.0,
+        'discount_amount' => 10.0,
+        'total' => 116.0,
     ]);
 
     Livewire::test(OrderResource\Pages\ViewOrder::class, [
         'record' => $order->getRouteKey(),
     ])
-        ->assertSee('€100.00') // subtotal
+        ->assertSee('€100.00')  // subtotal
         ->assertSee('€21.00')  // tax
-        ->assertSee('€5.00')   // shipping
+        ->assertSee('€5.00')  // shipping
         ->assertSee('€10.00')  // discount
-        ->assertSee('€116.00'); // total
+        ->assertSee('€116.00');  // total
 });
 
 it('can update order status with timestamps', function () {
@@ -213,6 +219,9 @@ it('can update order status with timestamps', function () {
         ->assertHasNoFormErrors();
 
     expect($order->refresh())
-        ->status->toBe('shipped')
-        ->shipped_at->not->toBeNull();
+        ->status
+        ->toBe('shipped')
+        ->shipped_at
+        ->not
+        ->toBeNull();
 });

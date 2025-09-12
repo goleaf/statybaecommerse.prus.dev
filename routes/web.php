@@ -442,6 +442,9 @@ require __DIR__ . '/auth.php';
 Route::middleware('auth')->group(function (): void {
     Route::get('/checkout', Pages\Checkout::class)->name('checkout.index');
     Route::get('/orders', Pages\Account\Orders::class)->name('orders.index');
+    Route::get('/account', function () {
+        return redirect()->route('account.orders');
+    })->name('account.index');
     Route::get('/account/orders', Pages\Account\Orders::class)->name('account.orders');
     Route::get('/account/addresses', function () {
         return response('Account Addresses Page', 200);

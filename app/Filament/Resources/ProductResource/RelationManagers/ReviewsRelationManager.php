@@ -3,17 +3,17 @@
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\Review;
-use Filament\Schemas\Schema;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Actions\EditAction;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
 use Filament\Actions as Actions;
+use Filament\Forms;
 use Filament\Tables;
 
 final class ReviewsRelationManager extends RelationManager

@@ -3,18 +3,18 @@
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use App\Models\Review;
-use Filament\Forms;
 use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions as Actions;
-use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Actions as Actions;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -71,14 +71,14 @@ final class ReviewsRelationManager extends RelationManager
                     ->limit(50),
                 Tables\Columns\TextColumn::make('rating')
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
+                    ->color(fn(int $state): string => match (true) {
                         $state >= 4 => 'success',
                         $state >= 3 => 'warning',
                         default => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'approved' => 'success',
                         'pending' => 'warning',
                         'rejected' => 'danger',
