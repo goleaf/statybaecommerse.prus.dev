@@ -119,8 +119,11 @@ describe('Filament Widgets', function () {
             $order1 = Order::factory()->create(['status' => 'completed']);
             $order1->items()->create([
                 'product_id' => $product1->id,
+                'name' => $product1->name,
+                'sku' => $product1->sku ?? 'SKU-001',
                 'quantity' => 5,
-                'price' => 1000,
+                'unit_price' => 1000,
+                'total' => 5000,
             ]);
 
             $order2 = Order::factory()->create(['status' => 'completed']);

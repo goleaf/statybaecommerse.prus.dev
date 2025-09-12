@@ -129,7 +129,17 @@ class SitemapController extends Controller
             Cache::put("sitemap:urls:{$loc}", $perLocale, now()->addDay());
         }
 
-        $xml = view('sitemap.xml', ['urls' => $urls])->render();
+        // Generate XML directly to avoid Blade compilation issues with XML declaration
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        
+        foreach ($urls as $url) {
+            $xml .= '    <url>' . "\n";
+            $xml .= '        <loc>' . htmlspecialchars($url) . '</loc>' . "\n";
+            $xml .= '    </url>' . "\n";
+        }
+        
+        $xml .= '</urlset>';
 
         return response($xml, 200)->header('Content-Type', 'application/xml');
     }

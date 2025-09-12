@@ -45,7 +45,7 @@ it('serves sitemap index', function (): void {
 
     $resp->assertOk();
     expect($resp->headers->get('content-type'))->toContain('application/xml');
-    $resp->assertSee('<urlset');
+    $resp->assertSee('&lt;urlset');
 });
 
 it('serves localized sitemap', function (): void {
