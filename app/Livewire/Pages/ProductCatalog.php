@@ -2,12 +2,12 @@
 
 namespace App\Livewire\Pages;
 
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
-use App\Livewire\Concerns\WithFilters;
 use App\Livewire\Concerns\WithCart;
+use App\Livewire\Concerns\WithFilters;
 use App\Livewire\Concerns\WithNotifications;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 

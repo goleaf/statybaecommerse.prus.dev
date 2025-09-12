@@ -233,8 +233,10 @@ Type: Complex System
   - OrderResourceTest: All 18 tests passing (81 assertions)
   - CartItemResourceTest: All 22 tests passing (100 assertions)
   - TranslationSystemComprehensiveTest: All 19 tests passing (57 assertions)
-- ✅ **AccountPagesTest Partial Fix:**
+- ✅ **AccountPagesTest Major Progress:**
   - Created missing Livewire profile components (UpdateProfileInformationForm, UpdatePasswordForm, DeleteUserForm)
   - Fixed component Blade views to use correct form components (x-forms.* instead of x-input-*)
-  - Profile page now loads successfully (1/2 tests passing)
-  - Remaining issue: Address model missing deleted_at column for soft deletes
+  - Added missing deleted_at column to addresses table via migration
+  - Created missing account page components (Reviews, Wishlist, Documents, Notifications) with proper data loading
+  - Profile and addresses pages now working (2/2 tests passing)
+  - Remaining issue: Syntax error in app layout file affecting other account pages

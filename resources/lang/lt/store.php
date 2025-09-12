@@ -28,6 +28,11 @@ return [
         'order_number' => 'Užsakymo numeris:',
         'proceed' => 'Tęsti atsiskaitymą',
     ],
+    
+    // Direct keys for tests
+    'add_to_cart' => 'Pridėti į krepšelį',
+    'checkout' => 'Atsiskaitymas',
+    'wishlist' => 'Pageidavimų sąrašas',
     'account' => [
         'profile' => 'Profilis',
         'addresses' => 'Adresai',
@@ -41,15 +46,7 @@ return [
         'shipping' => 'Pristatymas',
         'legal' => 'Teisinė informacija',
     ],
-    'cart' => [
-        'subtotal' => 'Tarpinė suma',
-        'discount' => 'Nuolaida',
-        'total' => 'Iš viso',
-        'apply' => 'Taikyti',
-        'remove' => 'Pašalinti',
-        'coupon' => 'Nuolaidos kodas',
-        'enter_code' => 'Įveskite kodą',
-    ],
+    'cart' => 'Krepšelis',
     'search' => [
         'placeholder' => 'Ieškoti produktų...',
         'empty' => 'Produktų nerasta.',

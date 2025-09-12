@@ -355,8 +355,11 @@ final class Product extends Model implements HasMedia
     private function resolvePublicUrl(string $path): string
     {
         // Assume stored under public disk or public path
-        if (str_starts_with($path, ['http://', 'https://', '/'])) {
-            return $path;
+        $prefixes = ['http://', 'https://', '/'];
+        foreach ($prefixes as $prefix) {
+            if (str_starts_with($path, $prefix)) {
+                return $path;
+            }
         }
         return asset(trim($path, '/'));
     }

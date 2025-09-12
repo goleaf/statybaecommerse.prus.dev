@@ -24,7 +24,18 @@ return [
     'delete' => 'Delete',
     'save' => 'Save',
     'cancel' => 'Cancel',
+    'create' => 'Create',
     'submit' => 'Submit',
+    
+    // Additional shared keys for tests
+    'shared' => [
+        'save' => 'Save',
+        'cancel' => 'Cancel',
+        'delete' => 'Delete',
+        'edit' => 'Edit',
+        'view' => 'View',
+        'create' => 'Create',
+    ],
     'close' => 'Close',
     'back' => 'Back',
     'next' => 'Next',

@@ -219,6 +219,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->boolean('is_default')->default(false);
             $table->timestamps();
+            $table->softDeletes(); // Add soft deletes support
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->index(['user_id', 'type']);

@@ -282,4 +282,90 @@ return [
     'home_shop_by_collection' => 'Pirkti pagal kolekciją',
     'home_collections_desc' => 'Ištyrinėkite mūsų kruopščiai parinktų aukščiausios kokybės produktų kolekcijas',
     'home_trending_products' => 'Populiarūs produktai',
+    
+    // Additional translations from page content
+    'free_shipping_from' => 'Nemokamas pristatymas nuo',
+    'items_in_cart' => 'prekių krepšelyje, peržiūrėti krepšelį',
+    'view_cart' => 'peržiūrėti krepšelį',
+    'search_products' => 'Ieškoti produktų...',
+    'nav_account' => 'Paskyra',
+    'cart_items_count' => 'prekių krepšelyje',
+    
+    // Category names from page
+    'categories' => [
+        'sealing_films_tapes' => 'Sandarinimo plėvelės ir juostos',
+        'fasteners_bolts_screws' => 'Tvirtinimo elementai, varžtai, medvarsčiai',
+        'screwable_drivable_poles' => 'Įsukami, įkalami poliai',
+        'construction_chemistry' => 'Chemija statyboms',
+        'tools_accessories' => 'Įrankiai ir jų priedai',
+        'roofing_materials' => 'Stogų danga ir priedai',
+        'facades' => 'Fasadams',
+        'electrical_products' => 'Elektros prekės',
+        'workwear_safety' => 'Darbo apranga, saugos priemonės',
+    ],
+    
+    // Product details
+    'product' => [
+        'high_quality_product' => 'Aukštos kokybės produktas profesionalams ir mėgėjams.',
+        'measurements_specifications' => 'Matmenys ir specifikacijos',
+        'height' => 'Aukštis',
+        'width' => 'Plotis',
+        'depth' => 'Gylis',
+        'weight' => 'Svoris',
+        'images_count' => 'Paveikslėliai',
+        'webp_format' => 'WebP formatas',
+        'customer_reviews' => 'Klientų atsiliepimai',
+        'no_reviews_yet' => 'Atsiliepimų dar nėra.',
+        'write_review' => 'Rašyti atsiliepimą',
+        'title' => 'Pavadinimas',
+        'content' => 'Turinys',
+        'rating' => 'Įvertinimas',
+        'submit_review' => 'Pateikti atsiliepimą',
+        'reserved' => 'Rezervuota',
+        'available' => 'Prieinama',
+        'add_to_cart' => 'Įdėti į krepšelį',
+        'policies_delivery' => 'Politikos ir pristatymas',
+        'international_delivery' => 'Tarptautinis pristatymas',
+        'delivery_2_weeks' => 'Užsakymas bus pristatytas per 2 savaites',
+        'loyalty_points' => 'Lojalumo taškai',
+        'loyalty_points_desc' => 'Kaupkite taškus ir gaukite nuolaidas',
+    ],
+    
+    // Footer translations
+    'footer' => [
+        'heading' => 'Apie mus',
+        'tagline' => 'Jūsų patikimas partneris',
+        'about' => 'Apie mus',
+        'documentation' => 'Dokumentacija',
+        'github' => 'GitHub',
+        'secure_payment' => 'Saugus mokėjimas',
+        'contact' => 'Kontaktai',
+        'shop' => 'Parduotuvė',
+        'categories' => 'Kategorijos',
+        'collections' => 'Kolekcijos',
+        'brands' => 'Prekių ženklai',
+        'shipping' => 'Pristatymas',
+        'returns_refunds' => 'Grąžinimai',
+        'subscribe_title' => 'Prenumeruoti naujienlaiškį',
+        'subscribe_desc' => 'Gaukite naujausias naujienas ir pasiūlymus',
+        'enter_email' => 'Įveskite el. paštą',
+        'subscribe_button' => 'Prenumeruoti',
+        'facebook' => 'Facebook',
+        'instagram' => 'Instagram',
+        'hours' => 'Darbo laikas',
+        'hours_desc' => 'Pirmadienis - Penktadienis: 9:00 - 18:00',
+        'all_rights_reserved' => 'Visos teisės saugomos',
+        'powered_by_filament' => 'Sukurta su Filament',
+    ],
+    
+    // Language codes
+    'languages' => [
+        'lt' => 'LT',
+        'en' => 'EN',
+        'ru' => 'RU',
+        'de' => 'DE',
+    ],
+    
+    // Exports
+    'exports' => 'Eksportai',
 ];

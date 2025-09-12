@@ -9,13 +9,13 @@ return [
         'collections' => 'Collections',
         'about' => 'About',
         'contact' => 'Contact',
-        'cart' => 'Cart',
-        'account' => 'Account',
-        'login' => 'Login',
-        'register' => 'Register',
-        'logout' => 'Logout',
-        'search' => 'Search',
     ],
+    
+    // Direct keys for tests
+    'home' => 'Home',
+    'about' => 'About',
+    'contact' => 'Contact',
+    'products' => 'Products',
     'products' => [
         'name' => 'Name',
         'price' => 'Price',

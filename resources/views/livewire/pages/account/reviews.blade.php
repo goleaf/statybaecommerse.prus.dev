@@ -1,21 +1,3 @@
-<?php
-use Livewire\Attributes\Layout;
-use Livewire\Volt\Component;
-
-new #[Layout('components.layouts.templates.account')] class extends Component {
-    public $reviews;
-
-    public function mount(): void
-    {
-        $user = auth()->user();
-        $this->reviews = collect();
-
-        if ($user) {
-            $this->reviews = \App\Models\Review::query()->where('user_id', $user->id)->latest()->limit(200)->get();
-        }
-    }
-}; ?>
-
 <div class="space-y-10">
     <x-breadcrumbs :items="[["label"=> __("My account"), "url" => route('account')], ["label" => __("My
         reviews")]]" />
@@ -38,14 +20,3 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
             </div>
         @endif
 </div>
-
-{
-"cells": [],
-"metadata": {
-"language_info": {
-"name": "python"
-}
-},
-"nbformat": 4,
-"nbformat_minor": 2
-}

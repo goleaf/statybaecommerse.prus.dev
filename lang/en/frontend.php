@@ -282,4 +282,90 @@ return [
     'home_shop_by_collection' => 'Shop by Collection',
     'home_collections_desc' => 'Explore our curated collections of premium products',
     'home_trending_products' => 'Trending Products',
+    
+    // Additional translations from page content
+    'free_shipping_from' => 'Free shipping from',
+    'items_in_cart' => 'items in cart, view cart',
+    'view_cart' => 'view cart',
+    'search_products' => 'Search products...',
+    'nav_account' => 'Account',
+    'cart_items_count' => 'items in cart',
+    
+    // Category names from page
+    'categories' => [
+        'sealing_films_tapes' => 'Sealing films and tapes',
+        'fasteners_bolts_screws' => 'Fasteners, bolts, screws',
+        'screwable_drivable_poles' => 'Screwable, drivable poles',
+        'construction_chemistry' => 'Construction chemistry',
+        'tools_accessories' => 'Tools and accessories',
+        'roofing_materials' => 'Roofing materials and accessories',
+        'facades' => 'For facades',
+        'electrical_products' => 'Electrical products',
+        'workwear_safety' => 'Workwear, safety measures',
+    ],
+    
+    // Product details
+    'product' => [
+        'high_quality_product' => 'High quality product for professionals and enthusiasts.',
+        'measurements_specifications' => 'Measurements and specifications',
+        'height' => 'Height',
+        'width' => 'Width',
+        'depth' => 'Depth',
+        'weight' => 'Weight',
+        'images_count' => 'Images',
+        'webp_format' => 'WebP format',
+        'customer_reviews' => 'Customer reviews',
+        'no_reviews_yet' => 'No reviews yet.',
+        'write_review' => 'Write a review',
+        'title' => 'Title',
+        'content' => 'Content',
+        'rating' => 'Rating',
+        'submit_review' => 'Submit review',
+        'reserved' => 'Reserved',
+        'available' => 'Available',
+        'add_to_cart' => 'Add to cart',
+        'policies_delivery' => 'Policies and delivery',
+        'international_delivery' => 'International delivery',
+        'delivery_2_weeks' => 'Order will be delivered within 2 weeks',
+        'loyalty_points' => 'Loyalty points',
+        'loyalty_points_desc' => 'Earn points and get discounts',
+    ],
+    
+    // Footer translations
+    'footer' => [
+        'heading' => 'About us',
+        'tagline' => 'Your trusted partner',
+        'about' => 'About us',
+        'documentation' => 'Documentation',
+        'github' => 'GitHub',
+        'secure_payment' => 'Secure payment',
+        'contact' => 'Contact',
+        'shop' => 'Shop',
+        'categories' => 'Categories',
+        'collections' => 'Collections',
+        'brands' => 'Brands',
+        'shipping' => 'Shipping',
+        'returns_refunds' => 'Returns & Refunds',
+        'subscribe_title' => 'Subscribe to newsletter',
+        'subscribe_desc' => 'Get the latest news and offers',
+        'enter_email' => 'Enter email',
+        'subscribe_button' => 'Subscribe',
+        'facebook' => 'Facebook',
+        'instagram' => 'Instagram',
+        'hours' => 'Business hours',
+        'hours_desc' => 'Monday - Friday: 9:00 - 18:00',
+        'all_rights_reserved' => 'All rights reserved',
+        'powered_by_filament' => 'Powered by Filament',
+    ],
+    
+    // Language codes
+    'languages' => [
+        'lt' => 'LT',
+        'en' => 'EN',
+        'ru' => 'RU',
+        'de' => 'DE',
+    ],
+    
+    // Exports
+    'exports' => 'Exports',
 ];

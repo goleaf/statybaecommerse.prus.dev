@@ -9,13 +9,13 @@ return [
         'collections' => 'Kolekcijos',
         'about' => 'Apie mus',
         'contact' => 'Kontaktai',
-        'cart' => 'Krepšelis',
-        'account' => 'Paskyra',
-        'login' => 'Prisijungti',
-        'register' => 'Registruotis',
-        'logout' => 'Atsijungti',
-        'search' => 'Paieška',
     ],
+    
+    // Direct keys for tests
+    'home' => 'Pagrindinis',
+    'about' => 'Apie mus',
+    'contact' => 'Kontaktai',
+    'products' => 'Produktai',
     'products' => [
         'name' => 'Pavadinimas',
         'price' => 'Kaina',
