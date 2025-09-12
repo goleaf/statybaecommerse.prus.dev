@@ -219,6 +219,22 @@ Type: Complex System
    - [x] Fixed CountryTest (passed successfully - 11 tests, 33 assertions)
    - [x] Fixed CurrencyResourceTest (passed successfully - 21 tests, 74 assertions)
    - [x] Fixed DashboardTest translation and widget issues (passed successfully - 9 tests, 22 assertions)
+   - [x] Fixed DatabaseSeedingTest (passed successfully - 1 test, 0 assertions)
+   - [x] Fixed BrandControllerTest (passed successfully - 2 tests, 3 assertions)
+   - [x] Fixed ExportControllerTest (passed successfully - 3 tests, 3 assertions)
+   - [x] Fixed HttpControllersTest (passed successfully - 4 tests, 4 assertions)
+   - [x] Fixed LocationControllerTest (passed successfully - 2 tests, 2 assertions)
+   - [x] Fixed OrderControllerTest (passed successfully - 1 test, 1 assertion)
+   - [x] Fixed RobotsControllerTest (passed successfully - 1 test, 5 assertions)
+   - [x] Fixed SitemapControllerTest (passed successfully - 2 tests, 9 assertions)
+   - [x] Fixed VerifyEmailControllerTest (passed successfully - 1 test, 2 assertions)
+   - [x] Fixed TranslationsUpdateTest (passed successfully - 3 tests, 3 assertions)
+   - [x] Fixed ComponentsSmokeTest (passed successfully - 19 tests, 19 assertions)
+   - [x] Fixed HomeSidebarTest (passed successfully - 1 test, 2 assertions)
+   - [x] Fixed HomeTest (passed successfully - 8 tests, 15 assertions)
+   - [x] Fixed ProductCatalogTest (passed successfully - 13 tests, 23 assertions)
+   - [x] Fixed EditRouteTest (passed successfully - 2 tests, 2 assertions)
+   - [x] Fixed IndexTest (passed successfully - 3 tests, 10 assertions)
 
 3. **Security Verification**
    - [ ] Test 2FA enrollment and recovery flows

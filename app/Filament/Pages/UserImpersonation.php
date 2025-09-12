@@ -33,7 +33,8 @@ final class UserImpersonation extends Page implements HasTable
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->hasRole('admin') || auth()->user()?->hasRole('administrator');
+        $user = auth()->user();
+        return $user?->hasRole('administrator') || $user?->hasRole('admin') || $user?->is_admin;
     }
 
     public function table(Table $table): Table

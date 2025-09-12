@@ -8,7 +8,7 @@ title(__('Invoice'));
 
 <div class="space-y-10">
     <x-breadcrumbs :items="[
-        ['label' => __('My account'), 'url' => route('account', ['locale' => app()->getLocale()])],
+        ['label' => __('My account'), 'url' => route('account.index', ['locale' => app()->getLocale()])],
         ['label' => __('My orders'), 'url' => route('account.orders', ['locale' => app()->getLocale()])],
         ['label' => __('Invoice')],
     ]" />

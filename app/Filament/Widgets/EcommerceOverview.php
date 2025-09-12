@@ -12,6 +12,16 @@ use Illuminate\Support\Facades\DB;
 
 class EcommerceOverview extends BaseWidget
 {
+    public static function canView(): bool
+    {
+        return auth()->user()?->hasRole('Administrator') ?? false;
+    }
+
+    public function authorize(): bool
+    {
+        return auth()->user()?->hasRole('Administrator') ?? false;
+    }
+
     public function getStats(): array
     {
         return [

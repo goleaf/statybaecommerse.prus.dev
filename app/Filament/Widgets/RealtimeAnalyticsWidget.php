@@ -19,7 +19,7 @@ final class RealtimeAnalyticsWidget extends ChartWidget
         return __('admin.widgets.realtime_analytics');
     }
 
-    protected function getData(): array
+    public function getData(): array
     {
         $timeRange = $this->getTimeRange();
         
@@ -154,12 +154,10 @@ final class RealtimeAnalyticsWidget extends ChartWidget
         $data = [];
         
         foreach ($timeRange as $time) {
-            $count = User::where('role', 'customer')
-                ->whereBetween('created_at', [
-                    $time->startOfHour(),
-                    $time->copy()->endOfHour()
-                ])
-                ->count();
+            $count = User::whereBetween('created_at', [
+                $time->startOfHour(),
+                $time->copy()->endOfHour()
+            ])->count();
             
             $data[] = $count;
         }

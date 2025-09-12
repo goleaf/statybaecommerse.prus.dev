@@ -12,7 +12,7 @@ new #[Layout('components.layouts.templates.app')] class extends Component {
     public function sendVerification(): void
     {
         if (Auth::user()->hasVerifiedEmail()) {
-            $this->redirectIntended(default: route('account', absolute: false), navigate: true);
+            $this->redirectIntended(default: route('account.index', absolute: false), navigate: true);
 
             return;
         }

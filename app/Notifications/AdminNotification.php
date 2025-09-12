@@ -12,24 +12,32 @@ final class AdminNotification extends Notification implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        public string $title,
-        public string $message,
-        public string $type = 'info'
+        public readonly string $title,
+        public readonly string $message,
+        public readonly string $type = 'info'
     ) {}
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
             ->subject($this->title)
-            ->greeting(__('notifications.greeting', ['name' => $notifiable->name]))
             ->line($this->message)
-            ->action(__('notifications.visit_store'), url('/'))
-            ->line(__('notifications.admin_message_footer'));
+            ->line(__('admin.notifications.admin_message_footer'));
+    }
+
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'title' => $this->title,
+            'message' => $this->message,
+            'type' => $this->type,
+            'sent_at' => now()->toISOString(),
+        ];
     }
 
     public function toArray(object $notifiable): array
@@ -42,5 +50,3 @@ final class AdminNotification extends Notification implements ShouldQueue
         ];
     }
 }
-
-

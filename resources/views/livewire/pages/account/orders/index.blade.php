@@ -1,6 +1,6 @@
 <div class="space-y-10">
     <x-breadcrumbs :items="[
-        ['label' => __('My account'), 'url' => route('account', ['locale' => app()->getLocale()])],
+        ['label' => __('My account'), 'url' => route('account.index', ['locale' => app()->getLocale()])],
         ['label' => __('My orders')],
     ]" />
     <x-page-heading

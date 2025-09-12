@@ -12,6 +12,7 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 final class EnhancedEcommerceOverview extends BaseWidget
 {
     protected ?string $pollingInterval = '15s';
+    public static ?int $sort = null;
 
     public function getStats(): array
     {
@@ -92,5 +93,71 @@ final class EnhancedEcommerceOverview extends BaseWidget
         }
 
         return number_format($average, 1) . '/5';
+    }
+
+    public function getRevenueChange(): string
+    {
+        $currentMonth = Order::query()
+            ->where('status', 'completed')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('total');
+
+        $previousMonth = Order::query()
+            ->where('status', 'completed')
+            ->whereMonth('created_at', now()->subMonth()->month)
+            ->whereYear('created_at', now()->subMonth()->year)
+            ->sum('total');
+
+        if ($previousMonth == 0) {
+            return $currentMonth > 0 ? '+100%' : '0%';
+        }
+
+        $change = (($currentMonth - $previousMonth) / $previousMonth) * 100;
+        return ($change >= 0 ? '+' : '') . number_format($change, 1) . '%';
+    }
+
+    public function getOrdersChange(): string
+    {
+        $currentMonth = Order::query()
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        $previousMonth = Order::query()
+            ->whereMonth('created_at', now()->subMonth()->month)
+            ->whereYear('created_at', now()->subMonth()->year)
+            ->count();
+
+        if ($previousMonth == 0) {
+            return $currentMonth > 0 ? '+100%' : '0%';
+        }
+
+        $change = (($currentMonth - $previousMonth) / $previousMonth) * 100;
+        return ($change >= 0 ? '+' : '') . number_format($change, 1) . '%';
+    }
+
+    public function getRevenueIcon(): string
+    {
+        $change = $this->getRevenueChange();
+        return str_starts_with($change, '+') ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down';
+    }
+
+    public function getOrdersIcon(): string
+    {
+        $change = $this->getOrdersChange();
+        return str_starts_with($change, '+') ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down';
+    }
+
+    public function getRevenueColor(): string
+    {
+        $change = $this->getRevenueChange();
+        return str_starts_with($change, '+') ? 'success' : 'danger';
+    }
+
+    public function getOrdersColor(): string
+    {
+        $change = $this->getOrdersChange();
+        return str_starts_with($change, '+') ? 'success' : 'danger';
     }
 }
