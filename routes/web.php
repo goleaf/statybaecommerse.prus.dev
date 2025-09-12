@@ -1058,37 +1058,6 @@ Route::prefix('posts')->name('posts.')->group(function () {
     Route::get('/{post}', [App\Http\Controllers\PostController::class, 'show'])->name('show');
 });
 
-// Localized routes group
-Route::middleware(['localize'])->group(function (): void {
-    // Brand show
-    Route::get('/brands/{slug}', [\App\Http\Controllers\BrandController::class, 'show'])->name('localized.brands.show');
-
-    // Locations index
-    Route::get('/locations', \App\Livewire\Pages\Location\Index::class)->name('localized.locations.index');
-
-    // Location show by slug
-    Route::get('/locations/{slug}', \App\Livewire\Pages\Location\Show::class)->name('localized.locations.show');
-
-    // Cpanel redirects to non-localized versions
-    Route::get('/cpanel', function () {
-        return redirect('/cpanel/login');
-    })->name('localized.cpanel');
-    Route::get('/cpanel/{path?}', function ($locale, $path = null) {
-        return redirect('/cpanel/'.($path ?? ''));
-    })->where('path', '.*')->name('localized.cpanel.any');
-
-    // Order confirmation by number (must be authed in tests)
-    Route::middleware('auth')->get('/order/confirmed/{number}', function (string $locale, string $number) {
-        if (\Illuminate\Support\Facades\Schema::hasTable('orders')) {
-            $exists = \Illuminate\Support\Facades\DB::table('orders')->where('number', $number)->exists();
-            if ($exists) {
-                return response('OK');
-            }
-        }
-
-        return redirect('/');
-    })->name('localized.order.confirmed');
-});
 
 // --- Admin News helper endpoints (HTTP verbs for tests) ---
 Route::middleware('auth')->group(function (): void {
