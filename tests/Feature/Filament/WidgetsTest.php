@@ -24,6 +24,9 @@ class WidgetsTest extends TestCase
     {
         parent::setUp();
 
+        // Create the super_admin role if it doesn't exist
+        Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
+
         $this->adminUser = User::factory()->create([
             'email' => 'admin@test.com',
             'name' => 'Admin User',

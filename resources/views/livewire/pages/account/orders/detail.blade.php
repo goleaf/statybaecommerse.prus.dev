@@ -19,7 +19,7 @@ title(__('Details of your order'));
 
 <div>
     <x-breadcrumbs :items="[
-        ['label' => __('My account'), 'url' => route('account')],
+        ['label' => __('My account'), 'url' => route('account.index')],
         ['label' => __('My orders'), 'url' => route('account.orders')],
         ['label' => __('Details of your order')],
     ]" />

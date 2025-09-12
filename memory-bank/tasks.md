@@ -323,6 +323,12 @@ Type: Complex System
   - Updated test to use code field for location identification
   - Fixed component mount method to query by code or name instead of id
   - All 2 LocationControllerTest cases now passing with 2 assertions
+- ✅ **SitemapControllerTest:** Fixed all 2 test cases
+  - Fixed Blade syntax error: "syntax error, unexpected identifier 'version'" in sitemap XML template
+  - Replaced Blade template usage with direct XML generation in SitemapController to avoid compilation issues
+  - Fixed EnhancedEcommerceOverview widget pollingInterval property conflict (removed static keyword)
+  - Updated test to check raw response content instead of HTML-encoded content
+  - All 2 SitemapControllerTest cases now passing with 9 assertions
 - ✅ **VerifyEmailControllerTest:** Fixed all 1 test case
   - Fixed missing account.index route that VerifyEmailController was trying to redirect to
   - Added account.index route that redirects to account.orders as the main account page

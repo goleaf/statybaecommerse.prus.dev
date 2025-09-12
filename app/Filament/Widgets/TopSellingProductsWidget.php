@@ -33,13 +33,11 @@ final class TopSellingProductsWidget extends BaseWidget
                             $query->where('status', 'completed');
                         });
                     }])
-                    ->addSelect([
-                        'order_items_sum_quantity' => \App\Models\OrderItem::selectRaw('SUM(quantity)')
-                            ->whereColumn('product_id', 'products.id')
-                            ->whereHas('order', function (Builder $query) {
-                                $query->where('status', 'completed');
-                            })
-                    ])
+                    ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
+                    ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
+                    ->where('orders.status', 'completed')
+                    ->selectRaw('products.*, SUM(order_items.quantity) as order_items_sum_quantity')
+                    ->groupBy('products.id')
                     ->orderByDesc('order_items_sum_quantity')
                     ->limit(10)
             )

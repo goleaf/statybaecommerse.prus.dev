@@ -21,7 +21,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
 }; ?>
 
 <div class="space-y-10">
-    <x-breadcrumbs :items="[['label' => __('My account'), 'url' => route('account')], ['label' => __('Wishlist')]]" />
+    <x-breadcrumbs :items="[['label' => __('My account'), 'url' => route('account.index')], ['label' => __('Wishlist')]]" />
     <x-page-heading :title="__('Wishlist')" :description="__('Products you saved for later')" />
 
     @if (empty($wishlists))

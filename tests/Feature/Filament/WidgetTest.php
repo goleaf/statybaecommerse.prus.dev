@@ -215,8 +215,8 @@ describe('Filament Widgets', function () {
             ]);
 
             Livewire::test(TopSellingProductsWidget::class)
-                ->assertTableColumnStateSet('order_items_sum_quantity', '5', $product)
-                ->assertTableColumnStateSet('order_items_count', '1', $product);
+                ->assertTableColumnStateSet('order_items_sum_quantity', 5, $product)
+                ->assertTableColumnStateSet('order_items_count', 1, $product);
         });
 
         it('limits results to top 10 products', function () {

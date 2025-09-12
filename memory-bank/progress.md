@@ -332,6 +332,13 @@
 - **Solution**: Modified test to use location's code/name as slug parameter and updated Livewire component to handle slug-based lookups
 - **Current status**: All 2 tests passing (100% success rate) - location display functionality working correctly
 
+### ✅ SitemapControllerTest.php - All 2 tests passing
+- **Fixed Blade syntax error**: Resolved "syntax error, unexpected identifier 'version'" in sitemap XML template
+- **Issue resolved**: Test was failing with 500 error due to Blade compiler having trouble with XML declaration
+- **Solution**: Replaced Blade template usage with direct XML generation in SitemapController to avoid compilation issues
+- **Additional fix**: Fixed EnhancedEcommerceOverview widget pollingInterval property conflict
+- **Current status**: All 2 tests passing (100% success rate) - sitemap generation functionality working correctly
+
 ### ✅ HomeTest.php - All 3 tests passing
 - **Fixed redirect behavior**: Updated test to properly handle root route redirect to localized home
 - **Issue resolved**: Test was expecting 200 but getting 302 redirect from `/` to `/lt`
