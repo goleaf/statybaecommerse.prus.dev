@@ -75,9 +75,9 @@ it('shows login required message when adding to wishlist as guest', function () 
     $component = Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('toggleWishlist');
     
-    $component->assertDispatched('notify', [
-        'type' => 'warning',
-    ]);
+    $component->assertDispatched('notify', function ($event) {
+        return $event['type'] === 'warning';
+    });
 });
 
 it('can remove product from wishlist', function () {

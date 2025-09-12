@@ -19,7 +19,7 @@ beforeEach(function () {
     if (class_exists(\Spatie\Permission\Models\Role::class)) {
         $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
         $this->adminUser->assignRole($adminRole);
-        
+
         // Create and give the user the specific permission needed for analytics
         $permission = \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view_analytics']);
         $this->adminUser->givePermissionTo($permission);

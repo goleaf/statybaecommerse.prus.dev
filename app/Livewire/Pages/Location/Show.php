@@ -9,10 +9,9 @@ final class Show extends Component
 {
     public Location $location;
 
-    public function mount(string $slug): void
+    public function mount(int $id): void
     {
-        $this->location = Location::where('code', $slug)
-            ->orWhere('name', $slug)
+        $this->location = Location::where('id', $id)
             ->where('is_enabled', true)
             ->with(['country'])
             ->firstOrFail();

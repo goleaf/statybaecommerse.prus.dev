@@ -48,7 +48,7 @@ final class CountryResourceTest extends TestCase
     public function test_can_create_country(): void
     {
         $this->markTestSkipped('Skipped due to Filament tab-layout-plugin container initialization issue');
-        
+
         $newData = [
             'cca2' => 'XY',
             'cca3' => 'XYZ',
@@ -90,7 +90,7 @@ final class CountryResourceTest extends TestCase
     public function test_can_render_edit_page(): void
     {
         $this->markTestSkipped('Skipped due to Filament tab-layout-plugin container initialization issue');
-        
+
         $country = Country::factory()->create();
 
         $this->get(CountryResource::getUrl('edit', [
@@ -101,7 +101,7 @@ final class CountryResourceTest extends TestCase
     public function test_can_retrieve_data_for_edit(): void
     {
         $this->markTestSkipped('Skipped due to Filament tab-layout-plugin container initialization issue');
-        
+
         $country = Country::factory()->create();
 
         Livewire::test(CountryResource\Pages\EditCountry::class, [
@@ -117,7 +117,7 @@ final class CountryResourceTest extends TestCase
     public function test_can_update_country(): void
     {
         $this->markTestSkipped('Skipped due to Filament tab-layout-plugin container initialization issue');
-        
+
         $country = Country::factory()->create();
         $newData = ['region' => 'Asia'];
 
@@ -137,7 +137,7 @@ final class CountryResourceTest extends TestCase
     public function test_can_delete_country(): void
     {
         $this->markTestSkipped('Skipped due to Filament tab-layout-plugin container initialization issue');
-        
+
         $country = Country::factory()->create();
 
         Livewire::test(CountryResource\Pages\EditCountry::class, [

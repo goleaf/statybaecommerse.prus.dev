@@ -655,8 +655,8 @@ Route::prefix('{locale}')
         // Locations index
         Route::get('/locations', \App\Livewire\Pages\Location\Index::class)->name('localized.locations.index');
 
-        // Location show by ID
-        Route::get('/locations/{id}', \App\Livewire\Pages\Location\Show::class)->whereNumber('id')->name('localized.locations.show');
+        // Location show by slug
+        Route::get('/locations/{slug}', \App\Livewire\Pages\Location\Show::class)->name('localized.locations.show');
 
         // Cpanel redirects to non-localized versions
         Route::get('/cpanel', function () {
