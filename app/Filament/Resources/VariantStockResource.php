@@ -15,12 +15,11 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
-use \BackedEnum;
 final class VariantStockResource extends Resource
 {
     protected static ?string $model = VariantInventory::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
 
 
     protected static ?int $navigationSort = 3;

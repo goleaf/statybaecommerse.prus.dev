@@ -15,12 +15,11 @@ use Filament\Tables\Table;
 use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
-use \BackedEnum;
 final class PartnerTierResource extends Resource
 {
     protected static ?string $model = PartnerTier::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
+    protected static ?string $navigationIcon = 'heroicon-o-star';
 
 
     protected static ?int $navigationSort = 2;

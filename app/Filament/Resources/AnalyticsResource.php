@@ -16,7 +16,6 @@ use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use \BackedEnum;
 final class AnalyticsResource extends Resource
 {
     protected static ?string $model = Order::class;

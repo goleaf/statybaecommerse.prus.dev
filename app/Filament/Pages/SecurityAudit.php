@@ -16,9 +16,8 @@ final class SecurityAudit extends Page implements HasTable
 {
     use InteractsWithTable;
 
-use \BackedEnum;
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-shield-check';
-    protected static UnitEnum|string|null $navigationGroup = \App\Enums\NavigationGroup::System;
+    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+    protected static ?string $navigationGroup = \App\Enums\NavigationGroup::System;
     protected static ?int $navigationSort = 2;
 
     public array $securityStats = [];

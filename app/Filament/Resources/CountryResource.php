@@ -19,12 +19,11 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 use SolutionForest\TabLayoutPlugin\Components\Tabs;
-use \BackedEnum;
 final class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-globe-europe-africa';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-europe-africa';
 
     protected static ?int $navigationSort = 1;
 

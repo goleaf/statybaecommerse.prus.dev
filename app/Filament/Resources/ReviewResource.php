@@ -14,12 +14,11 @@ use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use \BackedEnum;
 final class ReviewResource extends Resource
 {
 	protected static ?string $model = Review::class;
 
-	protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
+	protected static ?string $navigationIcon = 'heroicon-o-star';
 
 
 	protected static ?int $navigationSort = 6;

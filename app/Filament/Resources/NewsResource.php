@@ -14,12 +14,11 @@ use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use SolutionForest\TabLayoutPlugin\Components\Tabs;
-use \BackedEnum;
 final class NewsResource extends Resource
 {
     protected static ?string $model = News::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-newspaper';
+    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 
 
     protected static ?int $navigationSort = 3;

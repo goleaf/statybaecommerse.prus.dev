@@ -6,10 +6,9 @@ use App\Filament\Widgets\EcommerceOverview;
 use App\Filament\Widgets\RealtimeAnalyticsWidget;
 use App\Filament\Widgets\TopProductsWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
-use \BackedEnum;
 final class Dashboard extends BaseDashboard
 {
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+    protected static ?string $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $navigationLabel = null;
 

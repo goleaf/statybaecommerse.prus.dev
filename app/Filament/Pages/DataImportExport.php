@@ -18,10 +18,9 @@ use Filament\Forms;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use \BackedEnum;
 final class DataImportExport extends Page
 {
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-arrows-up-down';
+    protected static ?string $navigationIcon = 'heroicon-o-arrows-up-down';
     protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::System;
     protected static ?int $navigationSort = 3;
 

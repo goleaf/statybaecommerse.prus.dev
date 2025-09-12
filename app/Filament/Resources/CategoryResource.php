@@ -20,12 +20,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 // use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 // use SolutionForest\TabLayoutPlugin\Components\Tabs;
-use \BackedEnum;
 final class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-folder';
+    protected static ?string $navigationIcon = 'heroicon-o-folder';
 
 
     protected static ?int $navigationSort = 3;

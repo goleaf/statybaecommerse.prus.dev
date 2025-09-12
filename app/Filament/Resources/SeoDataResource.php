@@ -16,12 +16,11 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
-use \BackedEnum;
 final class SeoDataResource extends Resource
 {
     protected static ?string $model = SeoData::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-globe-alt';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
 
     protected static ?int $navigationSort = 3;
