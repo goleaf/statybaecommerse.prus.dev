@@ -123,6 +123,7 @@ final class ProductCard extends Component
                 'product_name' => $this->product->name,
                 'product_price' => $this->product->price,
             ],
+            'created_at' => now(),
         ]);
     }
 

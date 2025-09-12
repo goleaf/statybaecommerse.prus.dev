@@ -6,7 +6,14 @@ use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions as Actions;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -106,7 +113,7 @@ final class AddressesRelationManager extends RelationManager
                     ->query(fn(Builder $query): Builder => $query->where('is_default', true)),
             ])
             ->headerActions([
-                Actions\CreateAction::make()
+                CreateAction::make()
                     ->label(__('admin.add_address')),
             ])
             ->recordActions([
@@ -114,8 +121,8 @@ final class AddressesRelationManager extends RelationManager
                 DeleteAction::make(),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

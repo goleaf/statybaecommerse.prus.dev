@@ -21,6 +21,18 @@ it('seeds at least one order with items', function () {
         'published_at' => now(),
     ]);
 
+    // Ensure the seeder has the required data by creating them if they don't exist
+    // The seeder looks for existing data, so we need to make sure it exists
+    if (!\App\Models\Channel::query()->exists()) {
+        Channel::factory()->create();
+    }
+    if (!\App\Models\Zone::query()->exists()) {
+        Zone::factory()->create(['currency_id' => $currency->id]);
+    }
+    if (!\App\Models\Currency::query()->where('code', 'EUR')->exists()) {
+        Currency::factory()->create(['code' => 'EUR', 'is_default' => true]);
+    }
+
     // Sanity: no orders yet
     expect(Order::count())->toBe(0);
 
