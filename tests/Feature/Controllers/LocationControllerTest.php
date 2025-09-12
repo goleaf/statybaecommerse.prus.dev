@@ -32,16 +32,8 @@ it('shows a location', function (): void {
         'is_enabled' => true
     ]);
 
-    // Debug: Check if location exists
-    $this->assertDatabaseHas('locations', ['id' => $location->id, 'is_enabled' => true]);
+    // Use the location's code as the slug parameter
+    $slug = $location->code ?: $location->name;
     
-    $response = $this->get('/en/locations/' . $location->id);
-    
-    // Debug: Check response status
-    if ($response->status() !== 200) {
-        dump('Response status: ' . $response->status());
-        dump('Response content: ' . $response->content());
-    }
-    
-    $response->assertOk();
+    $this->get('/en/locations/' . $slug)->assertOk();
 });

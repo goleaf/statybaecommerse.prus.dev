@@ -64,7 +64,7 @@ class OrderSeeder extends Seeder
                     // 1-4 items per order
                     $items = $visibleProducts->random(min(random_int(1, 4), $visibleProducts->count()));
                     $subtotal = 0.0;
-                    foreach ((array) $items as $p) {
+                    foreach ($items as $p) {
                         $unit = (float) (optional($p->prices()->whereHas('currency', fn($q) => $q->where('code', $currency->code))->first())->amount ?? (random_int(1000, 5000) / 100));
                         $qty = random_int(1, 3);
                         $lineTotal = $unit * $qty;

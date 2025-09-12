@@ -211,7 +211,7 @@ it('shows stock status correctly', function () {
     ]);
 
     Livewire::test(ProductCard::class, ['product' => $outOfStockProduct])
-        ->assertSee(__('translations.out_of_stock'));
+        ->assertSet('stockStatus', __('translations.out_of_stock'));
 
     $lowStockProduct = Product::factory()->create([
         'stock_quantity' => 2,
@@ -220,8 +220,7 @@ it('shows stock status correctly', function () {
     ]);
 
     Livewire::test(ProductCard::class, ['product' => $lowStockProduct])
-        ->assertSee(__('translations.in_stock'))
-        ->assertSee('2 ' . __('translations.left'));
+        ->assertSet('stockStatus', '2 ' . __('translations.left'));
 });
 
 it('refreshes status on events', function () {

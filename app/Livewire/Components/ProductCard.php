@@ -193,11 +193,39 @@ final class ProductCard extends Component
 
     public function getDiscountPercentageProperty(): ?int
     {
-        if (!$this->product->sale_price || !$this->product->price) {
-            return null;
+        // Check for sale_price first (if product is on sale)
+        if ($this->product->sale_price && $this->product->price) {
+            return (int) round((($this->product->price - $this->product->sale_price) / $this->product->price) * 100);
         }
 
-        return (int) round((($this->product->price - $this->product->sale_price) / $this->product->price) * 100);
+        // Check for compare_price (regular price vs compare price)
+        if ($this->product->compare_price && $this->product->price) {
+            return (int) round((($this->product->compare_price - $this->product->price) / $this->product->compare_price) * 100);
+        }
+
+        return null;
+    }
+
+    public function getStockStatusProperty(): string
+    {
+        if (!$this->product->track_inventory) {
+            return __('translations.in_stock');
+        }
+
+        if ($this->product->stock_quantity <= 0) {
+            return __('translations.out_of_stock');
+        }
+
+        if ($this->product->low_stock_threshold && $this->product->stock_quantity <= $this->product->low_stock_threshold) {
+            return $this->product->stock_quantity . ' ' . __('translations.left');
+        }
+
+        return __('translations.in_stock');
+    }
+
+    public function getIsOutOfStockProperty(): bool
+    {
+        return $this->product->track_inventory && $this->product->stock_quantity <= 0;
     }
 
     public function render(): View
