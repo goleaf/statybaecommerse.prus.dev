@@ -11,6 +11,12 @@ it('sitemap routes respond', function (): void {
     if (!Schema::hasTable('sh_collections')) {
         Schema::create('sh_collections', function ($table) { $table->id(); $table->string('slug')->nullable(); $table->boolean('is_enabled')->default(true); $table->timestamps(); });
     }
+    if (!Schema::hasTable('sh_legals')) {
+        Schema::create('sh_legals', function ($table) { $table->id(); $table->string('slug')->nullable(); $table->boolean('is_enabled')->default(true); $table->timestamps(); });
+    }
+    if (!Schema::hasTable('sh_legal_translations')) {
+        Schema::create('sh_legal_translations', function ($table) { $table->id(); $table->unsignedBigInteger('legal_id'); $table->string('locale'); $table->string('slug')->nullable(); $table->timestamps(); });
+    }
     $this->get('/sitemap.xml')->assertStatus(200);
     $this->get('/en/sitemap.xml')->assertStatus(200);
 });

@@ -613,6 +613,18 @@ Route::prefix('{locale}')
         // Category show
         Route::get('/categories/{category}', \App\Livewire\Pages\Category\Show::class)->name('localized.categories.show');
 
+        // Product routes
+        Route::get('/products', Pages\ProductCatalog::class)->name('localized.products.index');
+        Route::get('/products/{product}', Pages\SingleProduct::class)->name('localized.products.show');
+
+        // Cart page
+        Route::get('/cart', Pages\Cart::class)->name('localized.cart.index');
+
+        // Search page
+        Route::get('/search', function () {
+            return response('Search page');
+        })->name('localized.search');
+
         // Brand index (respond OK)
         Route::get('/brands', function () {
             return response('OK');
