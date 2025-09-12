@@ -115,13 +115,14 @@ final class ProductCard extends Component
 
         // Track analytics
         \App\Models\AnalyticsEvent::create([
-            'event_type' => 'quick_view',
+            'event_type' => 'product_view',
             'user_id' => auth()->id(),
             'session_id' => session()->getId(),
             'properties' => [
                 'product_id' => $this->product->id,
                 'product_name' => $this->product->name,
                 'product_price' => $this->product->price,
+                'view_type' => 'quick_view',
             ],
             'created_at' => now(),
         ]);
@@ -164,6 +165,30 @@ final class ProductCard extends Component
             return (float) $this->product->price;
         }
         return null;
+    }
+
+    public function getIsInWishlistProperty(): bool
+    {
+        if (!auth()->check()) {
+            return false;
+        }
+
+        $user = auth()->user();
+        $wishlist = $user->wishlists()->where('is_default', true)->first();
+
+        if (!$wishlist) {
+            return false;
+        }
+
+        return $wishlist->hasProduct($this->product->id);
+    }
+
+    public function getIsInComparisonProperty(): bool
+    {
+        $sessionId = session()->getId();
+        return \App\Models\ProductComparison::where('session_id', $sessionId)
+            ->where('product_id', $this->product->id)
+            ->exists();
     }
 
     public function getDiscountPercentageProperty(): ?int

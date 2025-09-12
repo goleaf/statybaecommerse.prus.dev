@@ -32,6 +32,21 @@ it('seeds at least one order with items', function () {
     if (!\App\Models\Currency::query()->where('code', 'EUR')->exists()) {
         Currency::factory()->create(['code' => 'EUR', 'is_default' => true]);
     }
+    
+    // The orders table has a foreign key constraint to sh_zones table, not zones table
+    // We need to create a zone in the sh_zones table for the foreign key constraint
+    if (!\Illuminate\Support\Facades\DB::table('sh_zones')->exists()) {
+        \Illuminate\Support\Facades\DB::table('sh_zones')->insert([
+            'id' => 1,
+            'name' => 'Default Zone',
+            'code' => 'DEFAULT',
+            'currency_id' => $currency->id,
+            'is_enabled' => true,
+            'is_default' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
 
     // Sanity: no orders yet
     expect(Order::count())->toBe(0);

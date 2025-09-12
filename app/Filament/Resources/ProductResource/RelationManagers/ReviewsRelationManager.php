@@ -8,6 +8,12 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions as Actions;
 use Filament\Tables;
 
 final class ReviewsRelationManager extends RelationManager
@@ -96,7 +102,7 @@ final class ReviewsRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([
-                Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->recordActions([
                 Action::make('approve')

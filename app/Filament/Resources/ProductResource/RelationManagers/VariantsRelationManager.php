@@ -3,6 +3,12 @@
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions as Actions;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -123,7 +129,7 @@ final class VariantsRelationManager extends RelationManager
                     ->query(fn(Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
             ])
             ->headerActions([
-                Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->recordActions([
                 EditAction::make(),

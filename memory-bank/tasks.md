@@ -198,6 +198,9 @@ Type: Complex System
    - [ ] AnalyticsResourceTest table record loading issues (complex Filament testing)
    - [x] Fixed CampaignResourceTest (passed successfully)
    - [ ] AccountPagesTest Blade template syntax error (complex view compilation issue)
+   - [x] Fixed CategoryAccordionMenuTest redirect issues (changed from / to /lt)
+   - [x] Fixed AnalyticsWidgetsTest (passed successfully - 19 tests, 40 assertions)
+   - [ ] LoginTest Filament Schemas type mismatch error (complex Filament issue)
 
 3. **Security Verification**
    - [ ] Test 2FA enrollment and recovery flows

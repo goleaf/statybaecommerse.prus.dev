@@ -46,7 +46,7 @@ final class CategoryAccordionMenuTest extends TestCase
             'description' => 'Test child description',
         ]);
 
-        $response = $this->get('/');
+        $response = $this->get('/lt');
 
         $response->assertStatus(200);
         $response->assertSee('Test Root');
@@ -69,7 +69,7 @@ final class CategoryAccordionMenuTest extends TestCase
             'description' => 'Test description',
         ]);
 
-        $response = $this->get('/');
+        $response = $this->get('/lt');
 
         $response->assertStatus(200);
         // Check for product count badge (should show 0 for empty category)

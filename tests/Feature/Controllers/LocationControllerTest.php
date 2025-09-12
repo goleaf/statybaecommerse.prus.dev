@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use App\Models\Location;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -25,11 +26,22 @@ it('lists locations', function (): void {
 });
 
 it('shows a location', function (): void {
-    $id = DB::table('locations')->insertGetId([
+    $location = Location::factory()->create([
         'name' => 'Main', 
         'is_default' => true,
         'is_enabled' => true
     ]);
 
-    $this->get('/en/locations/' . $id)->assertOk();
+    // Debug: Check if location exists
+    $this->assertDatabaseHas('locations', ['id' => $location->id, 'is_enabled' => true]);
+    
+    $response = $this->get('/en/locations/' . $location->id);
+    
+    // Debug: Check response status
+    if ($response->status() !== 200) {
+        dump('Response status: ' . $response->status());
+        dump('Response content: ' . $response->content());
+    }
+    
+    $response->assertOk();
 });

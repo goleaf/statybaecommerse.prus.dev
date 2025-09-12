@@ -4,6 +4,12 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions as Actions;
 use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -85,7 +91,7 @@ final class ItemsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->recordActions([
                 EditAction::make(),
