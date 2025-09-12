@@ -309,6 +309,11 @@
 - **Current status**: Issue persists - requires further investigation of footer component structure
 - **Tests affected**: 1/2 tests passing (dashboard works, subpages failing)
 
+### ✅ CategoriesPageTest.php - All 2 tests passing
+- **Fixed redirect behavior**: Updated test to properly test the redirect from non-localized to localized route
+- **Added localized route test**: Added test for the actual localized categories index page
+- **Issue resolved**: Test was expecting 200 but getting 302 redirect - now properly tests both behaviors
+
 ### Files Modified:
 - `tests/Feature/MultilanguageTest.php` - Complete fix for all 22 tests
 - `tests/Feature/EnhancedSettingTest.php` - Partial fix (11/12 tests passing)

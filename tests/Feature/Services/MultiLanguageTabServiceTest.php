@@ -3,7 +3,7 @@
 use App\Services\MultiLanguageTabService;
 
 it('returns available languages with codes and flags', function (): void {
-    config()->set('app-features.supported_locales', ['lt', 'en']);
+    config()->set('app.supported_locales', ['lt', 'en']);
 
     $langs = MultiLanguageTabService::getAvailableLanguages();
 
@@ -18,7 +18,7 @@ it('returns available languages with codes and flags', function (): void {
 });
 
 it('prefers lithuanian as default active tab', function (): void {
-    config()->set('app-features.supported_locales', ['en', 'lt', 'de']);
+    config()->set('app.supported_locales', ['en', 'lt', 'de']);
 
     $index = MultiLanguageTabService::getDefaultActiveTab();
 
@@ -26,7 +26,7 @@ it('prefers lithuanian as default active tab', function (): void {
 });
 
 it('prepares and splits translation data correctly', function (): void {
-    config()->set('app-features.supported_locales', ['lt', 'en']);
+    config()->set('app.supported_locales', ['lt', 'en']);
 
     $formData = [
         'title_lt' => 'Pavadinimas',

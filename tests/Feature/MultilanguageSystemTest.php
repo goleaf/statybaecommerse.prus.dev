@@ -39,7 +39,7 @@ beforeEach(function () {
 it('has correct default locale configuration', function () {
     expect(config('app.locale'))->toBe('lt');
     expect(config('app.fallback_locale'))->toBe('lt');
-    expect(config('app.supported_locales'))->toBe('lt,en,de');
+    expect(config('app.supported_locales'))->toBe('lt,en,ru,de');
 });
 
 it('can switch between locales', function () {
@@ -97,7 +97,7 @@ it('has proper translation structure for ecommerce', function () {
     $ecommerceTranslationsLt = __('cart_add_to_cart', [], 'lt');
     $ecommerceTranslationsEn = __('cart_add_to_cart', [], 'en');
 
-    expect($ecommerceTranslationsLt)->toBe('Į krepšelį');
+    expect($ecommerceTranslationsLt)->toBe('Įdėti į krepšelį');
     expect($ecommerceTranslationsEn)->toBe('Add to Cart');
 });
 

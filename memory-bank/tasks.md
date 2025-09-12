@@ -315,7 +315,7 @@ Type: Complex System
     - Added localized cart route (/lt/cart)
     - Added localized search route (/lt/search)
     - All ecommerce flow functionality now working correctly
-  - Successfully committed all changes to git (commits af6f991, 1f39a94, 316878a, and 8aa48f0)
+  - Successfully committed all changes to git (commits af6f991, 1f39a94, 316878a, 8aa48f0, and 38e57a0)
 
 ## Recent Test Fixes Completed
 
@@ -339,6 +339,11 @@ Type: Complex System
 - **Attempted fixes**: Added missing closing div tag, cleared view cache
 - **Current status**: Issue persists - requires further investigation of footer component structure
 - **Tests affected**: 1/2 tests passing (dashboard works, subpages failing)
+
+### ✅ CategoriesPageTest.php - All 2 tests passing
+- **Fixed redirect behavior**: Updated test to properly test the redirect from non-localized to localized route
+- **Added localized route test**: Added test for the actual localized categories index page
+- **Issue resolved**: Test was expecting 200 but getting 302 redirect - now properly tests both behaviors
 
 ### Files Modified:
 - `tests/Feature/MultilanguageTest.php` - Complete fix for all 22 tests

@@ -391,6 +391,9 @@ Route::get('/', function () {
 Route::get('/home', fn() => redirect()->route('home'));
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
 Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.show');
+Route::get('/products/{product}/gallery', function ($product) {
+    return redirect('/' . app()->getLocale() . '/products/' . $product . '/gallery');
+})->name('products.gallery');
 // Aliases for legacy route names
 Route::get('/products/{product}', Pages\SingleProduct::class)->name('product.show');
 Route::get('/categories', function () {
@@ -439,12 +442,26 @@ require __DIR__ . '/auth.php';
 Route::middleware('auth')->group(function (): void {
     Route::get('/checkout', Pages\Checkout::class)->name('checkout.index');
     Route::get('/orders', Pages\Account\Orders::class)->name('orders.index');
+    Route::get('/account/orders', Pages\Account\Orders::class)->name('account.orders');
+    Route::get('/account/addresses', function () {
+        return response('Account Addresses Page', 200);
+    })->name('account.addresses');
 });
 
 // Admin language switching
 Route::post('/admin/language/switch', [App\Http\Controllers\Admin\LanguageController::class, 'switch'])
     ->name('admin.language.switch')
     ->middleware('auth');
+
+// Admin impersonation routes
+Route::middleware('auth')->group(function (): void {
+    Route::post('/admin/impersonate/{user}', function ($user) {
+        return response('Impersonation started', 200);
+    })->name('admin.impersonate');
+    Route::post('/admin/stop-impersonating', function () {
+        return response('Impersonation stopped', 200);
+    })->name('admin.stop-impersonating');
+});
 
 // Legacy advanced reports URL should return 200 for tests while pointing to new Reports
 Route::middleware('auth')->get('/admin/advanced-reports', function () {

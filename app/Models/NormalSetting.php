@@ -55,6 +55,11 @@ final class NormalSetting extends Model
                     return $decoded !== null ? $decoded : [];
                 }
 
+                // Handle boolean type
+                if (($this->attributes['type'] ?? '') === 'boolean') {
+                    return (bool) $value;
+                }
+
                 return $value;
             },
             set: function ($value) {
