@@ -650,7 +650,7 @@ Route::prefix('{locale}')
         Route::get('/naujienos/{slug}', \App\Livewire\Pages\News\Show::class)->name('localized.news.show.lt');
 
         // Brand show
-        Route::get('/brands/{slug}', \App\Livewire\Pages\Brand\Show::class)->name('localized.brands.show');
+        Route::get('/brands/{slug}', [\App\Http\Controllers\BrandController::class, 'show'])->name('localized.brands.show');
 
         // Locations index
         Route::get('/locations', \App\Livewire\Pages\Location\Index::class)->name('localized.locations.index');

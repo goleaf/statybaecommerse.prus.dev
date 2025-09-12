@@ -93,7 +93,7 @@
                             : (bool) $categoryFeature);
             @endphp
 
-            @if ($featureEnabled && isset($categories) && count($categories) && Route::has('category.show'))
+            @if ($featureEnabled && isset($categories) && count($categories) && Route::has('localized.categories.show'))
                 <nav class="flex items-center gap-x-6">
                     @foreach ($categories as $category)
                         @php
@@ -104,7 +104,7 @@
                                 ? $category->trans('name') ?? $category->name
                                 : $category->name;
                         @endphp
-                        <x-nav.item :href="route('category.show', ['category' => $slug])">{{ $name }}</x-nav.item>
+                        <x-nav.item :href="route('localized.categories.show', ['category' => $slug])">{{ $name }}</x-nav.item>
                     @endforeach
                 </nav>
             @endif

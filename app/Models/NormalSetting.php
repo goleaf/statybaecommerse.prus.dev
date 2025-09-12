@@ -50,9 +50,12 @@ final class NormalSetting extends Model
                     }
                 }
 
-                if (in_array($this->attributes['type'] ?? '', ['json', 'array']) && is_string($value)) {
-                    $decoded = json_decode($value, true);
-                    return $decoded !== null ? $decoded : [];
+                if (in_array($this->attributes['type'] ?? '', ['json', 'array'])) {
+                    if (is_string($value)) {
+                        $decoded = json_decode($value, true);
+                        return $decoded !== null ? $decoded : [];
+                    }
+                    return is_array($value) ? $value : [];
                 }
 
                 // Handle boolean type

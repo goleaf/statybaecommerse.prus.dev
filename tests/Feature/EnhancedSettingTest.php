@@ -336,6 +336,7 @@ final class EnhancedSettingTest extends TestCase
         $response = $this->post('/admin/normal-settings', $settingData);
 
         // Should fail validation and return back with errors
+        $response->assertStatus(302); // Redirect back with errors
         $response->assertSessionHasErrors(['key']);
     }
 

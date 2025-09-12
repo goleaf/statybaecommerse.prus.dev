@@ -202,7 +202,7 @@
                     '@type' => 'ListItem',
                     'position' => $position++,
                     'name' => $cat->trans('name') ?? $cat->name,
-                    'item' => route('category.show', [
+                    'item' => route('localized.categories.show', [
                         'category' => $cat->trans('slug') ?? $cat->slug,
                     ]),
                 ];

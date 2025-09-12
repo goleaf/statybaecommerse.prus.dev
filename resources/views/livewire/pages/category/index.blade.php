@@ -292,7 +292,7 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                             @foreach ($this->categories as $category)
-                                <a href="{{ route('category.show', ['category' => $category->slug ?? $category]) }}"
+                                <a href="{{ route('localized.categories.show', ['category' => $category->slug ?? $category]) }}"
                                    class="group relative overflow-hidden rounded-xl border bg-white shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     <div class="aspect-square bg-gray-100 relative overflow-hidden">
                                         @php

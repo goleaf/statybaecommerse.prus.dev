@@ -18,7 +18,7 @@ final class ProductCard extends Component
     public function addToCart(): void
     {
         $this->dispatch('add-to-cart', productId: $this->product->id, quantity: 1);
-        
+
         $this->dispatch('notify', [
             'type' => 'success',
             'message' => 'Produktas pridėtas į krepšelį!',
@@ -28,10 +28,88 @@ final class ProductCard extends Component
     public function addToWishlist(): void
     {
         $this->dispatch('add-to-wishlist', productId: $this->product->id);
-        
+
         $this->dispatch('notify', [
             'type' => 'success',
             'message' => 'Produktas pridėtas į pageidavimų sąrašą!',
+        ]);
+    }
+
+    public function toggleWishlist(): void
+    {
+        if (!auth()->check()) {
+            $this->dispatch('notify', [
+                'type' => 'warning',
+                'message' => 'Norėdami pridėti produktą į pageidavimų sąrašą, turite prisijungti.',
+            ]);
+            return;
+        }
+
+        $user = auth()->user();
+        $wishlist = $user->wishlists()->where('is_default', true)->first();
+
+        if (!$wishlist) {
+            $wishlist = $user->wishlists()->create([
+                'name' => 'My Wishlist',
+                'is_default' => true,
+                'is_public' => false,
+            ]);
+        }
+
+        if ($wishlist->hasProduct($this->product->id)) {
+            $wishlist->removeProduct($this->product->id);
+            $message = 'Produktas pašalintas iš pageidavimų sąrašo!';
+        } else {
+            $wishlist->addProduct($this->product->id);
+            $message = 'Produktas pridėtas į pageidavimų sąrašą!';
+        }
+
+        $this->dispatch('wishlist-updated');
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => $message,
+        ]);
+    }
+
+    public function toggleComparison(): void
+    {
+        $sessionId = session()->getId();
+        $existing = \App\Models\ProductComparison::where('session_id', $sessionId)
+            ->where('product_id', $this->product->id)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+            $message = 'Produktas pašalintas iš palyginimo!';
+        } else {
+            \App\Models\ProductComparison::create([
+                'session_id' => $sessionId,
+                'product_id' => $this->product->id,
+            ]);
+            $message = 'Produktas pridėtas į palyginimą!';
+        }
+
+        $this->dispatch('comparison-updated');
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => $message,
+        ]);
+    }
+
+    public function quickView(): void
+    {
+        $this->dispatch('open-quick-view', productId: $this->product->id);
+
+        // Track analytics
+        \App\Models\AnalyticsEvent::create([
+            'event_type' => 'quick_view',
+            'user_id' => auth()->id(),
+            'session_id' => session()->getId(),
+            'properties' => [
+                'productId' => $this->product->id,
+                'product_name' => $this->product->name,
+                'product_price' => $this->product->price,
+            ],
         ]);
     }
 
@@ -42,7 +120,7 @@ final class ProductCard extends Component
 
     public function getImageUrlProperty(): string
     {
-        return $this->product->getFirstMediaUrl('images', 'thumb') 
+        return $this->product->getFirstMediaUrl('images', 'thumb')
             ?: asset('images/placeholder-product.png');
     }
 

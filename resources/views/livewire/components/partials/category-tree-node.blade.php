@@ -41,7 +41,7 @@
             @endif
             
             <a 
-                href="{{ route('category.show', ['category' => $category['slug']]) }}"
+                href="{{ route('localized.categories.show', ['category' => $category['slug']]) }}"
                 class="{{ $textSizeClass }} text-gray-700 hover:text-indigo-600 transition-colors truncate"
                 wire:click="selectCategory({{ $category['id'] }})"
             >

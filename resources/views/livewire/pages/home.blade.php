@@ -72,7 +72,7 @@
 
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                             @foreach ($featuredCategories as $category)
-                                <a href="{{ route('category.show', ['category' => $category->slug ?? $category]) }}"
+                                <a href="{{ route('localized.categories.show', ['category' => $category->slug ?? $category]) }}"
                                    class="group">
                                     <div
                                          class="bg-gray-100 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105">

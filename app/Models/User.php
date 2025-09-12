@@ -138,6 +138,11 @@ class User extends Authenticatable implements HasLocalePreferenceContract, Filam
             ->withTimestamps();
     }
 
+    public function wishlists(): HasMany
+    {
+        return $this->hasMany(UserWishlist::class);
+    }
+
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
