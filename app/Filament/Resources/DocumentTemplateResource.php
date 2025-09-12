@@ -24,7 +24,6 @@ final class DocumentTemplateResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Content;
 
     protected static ?int $navigationSort = 1;
 

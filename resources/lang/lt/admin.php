@@ -620,6 +620,12 @@ return [
             'security_alert_title' => 'Saugumo įspėjimas',
             'security_alert_message' => 'Aptiktas įtartinas veiksmas. Prašome patikrinti savo paskyrą.',
             'admin_message_footer' => 'Šis pranešimas buvo išsiųstas iš sistemos valdymo skydo.',
+            'live_feed' => 'Tiesioginis srautas',
+            'mark_as_read' => 'Pažymėti kaip perskaitytą',
+            'delete' => 'Ištrinti',
+            'clear_all' => 'Išvalyti visus',
+            'view_all_notifications' => 'Peržiūrėti visus pranešimus',
+            'you_are_all_caught_up' => 'Viskas atnaujinta!',
         ],
     ],
     // Actions

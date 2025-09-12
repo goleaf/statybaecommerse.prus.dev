@@ -29,7 +29,6 @@ final class ZoneResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-globe-europe-africa';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Settings;
 
     protected static ?int $navigationSort = 5;
 

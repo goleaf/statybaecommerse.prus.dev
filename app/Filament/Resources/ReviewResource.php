@@ -23,7 +23,6 @@ final class ReviewResource extends Resource
 
 	protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
-	protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
 
 	protected static ?int $navigationSort = 6;
 

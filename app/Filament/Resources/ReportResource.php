@@ -22,7 +22,6 @@ final class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Analytics;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-chart-bar';
 

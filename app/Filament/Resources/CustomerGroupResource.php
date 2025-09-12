@@ -27,7 +27,6 @@ final class CustomerGroupResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Customers;
 
     protected static ?int $navigationSort = 2;
 

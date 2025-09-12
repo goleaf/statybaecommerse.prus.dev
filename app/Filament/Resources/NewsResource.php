@@ -21,7 +21,6 @@ final class NewsResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-newspaper';
 
-    protected static string|\UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Content;
 
     protected static ?int $navigationSort = 3;
 

@@ -29,7 +29,6 @@ final class CategoryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-folder';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
 
     protected static ?int $navigationSort = 3;
 

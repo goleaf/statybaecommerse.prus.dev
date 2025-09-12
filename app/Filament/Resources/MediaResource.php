@@ -21,7 +21,6 @@ final class MediaResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Content;
 
     protected static ?int $navigationSort = 2;
 

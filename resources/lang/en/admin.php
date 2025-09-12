@@ -687,6 +687,12 @@ return [
             'security_alert_title' => 'Security Alert',
             'security_alert_message' => 'Suspicious activity detected. Please check your account.',
             'admin_message_footer' => 'This message was sent from the system admin panel.',
+            'live_feed' => 'Live Feed',
+            'mark_as_read' => 'Mark as read',
+            'delete' => 'Delete',
+            'clear_all' => 'Clear All',
+            'view_all_notifications' => 'View all notifications',
+            'you_are_all_caught_up' => 'You\'re all caught up!',
         ],
     ],
     // Language Switcher

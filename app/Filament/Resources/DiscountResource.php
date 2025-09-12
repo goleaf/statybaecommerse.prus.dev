@@ -27,7 +27,6 @@ final class DiscountResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Marketing;
 
     protected static ?int $navigationSort = 1;
 

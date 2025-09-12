@@ -30,7 +30,6 @@ final class PartnerResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-building-office';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Marketing;
 
     protected static ?int $navigationSort = 1;
 

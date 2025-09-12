@@ -32,7 +32,6 @@ final class AttributeResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
 
     protected static ?int $navigationSort = 5;
 

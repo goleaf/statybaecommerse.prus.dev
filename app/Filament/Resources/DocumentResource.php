@@ -21,8 +21,6 @@ final class DocumentResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document';
 
-    protected static string|\UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Content;
-
     protected static ?int $navigationSort = 2;
 
     public static function getNavigationGroup(): ?string

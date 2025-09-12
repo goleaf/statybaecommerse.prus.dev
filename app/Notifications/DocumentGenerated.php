@@ -25,8 +25,8 @@ final class DocumentGenerated extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $locale = method_exists($notifiable, 'preferredLocale') 
-            ? ($notifiable->preferredLocale() ?: app()->getLocale()) 
+        $locale = method_exists($notifiable, 'preferredLocale')
+            ? ($notifiable->preferredLocale() ?: app()->getLocale())
             : app()->getLocale();
 
         $message = (new MailMessage)
@@ -44,7 +44,7 @@ final class DocumentGenerated extends Notification
         // Add view action if user has access
         if (auth()->user()?->can('view', $this->document)) {
             $message->action(
-                __('documents.email.view_document', [], $locale), 
+                __('documents.email.view_document', [], $locale),
                 route('filament.admin.resources.documents.view', $this->document)
             );
         }

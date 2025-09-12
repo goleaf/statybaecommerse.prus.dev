@@ -25,7 +25,6 @@ final class SeoDataResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-globe-alt';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Marketing;
 
     protected static ?int $navigationSort = 3;
 

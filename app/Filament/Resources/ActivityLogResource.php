@@ -19,7 +19,6 @@ final class ActivityLogResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::System;
 
     protected static ?int $navigationSort = 10;
 

@@ -25,7 +25,6 @@ final class MenuResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-bars-3';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Content;
 
     protected static ?int $navigationSort = 2;
 

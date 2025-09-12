@@ -26,7 +26,6 @@ final class InventoryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cube-transparent';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
 
     protected static ?int $navigationSort = 1;
 

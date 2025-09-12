@@ -25,7 +25,6 @@ final class StockResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
 
     protected static ?int $navigationSort = 2;
 

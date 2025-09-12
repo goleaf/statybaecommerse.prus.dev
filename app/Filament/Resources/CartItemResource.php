@@ -26,7 +26,6 @@ final class CartItemResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Orders;
 
     protected static ?string $navigationLabel = null;
 

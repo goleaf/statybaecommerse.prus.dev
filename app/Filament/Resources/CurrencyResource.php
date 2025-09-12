@@ -32,7 +32,6 @@ final class CurrencyResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-dollar';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::System;
 
     protected static ?int $navigationSort = 1;
 

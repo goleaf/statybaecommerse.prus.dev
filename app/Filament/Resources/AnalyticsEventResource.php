@@ -20,7 +20,6 @@ final class AnalyticsEventResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Analytics;
 
     protected static ?string $navigationLabel = null;
 
