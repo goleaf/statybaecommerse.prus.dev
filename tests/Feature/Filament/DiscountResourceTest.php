@@ -3,6 +3,7 @@
 use App\Filament\Resources\DiscountResource;
 use App\Models\Discount;
 use App\Models\User;
+
 use function Pest\Laravel\{actingAs, assertDatabaseHas, assertDatabaseMissing};
 
 beforeEach(function () {
@@ -33,7 +34,7 @@ it('can create discount', function () {
         'name' => 'Test Discount',
         'description' => 'Test discount description',
         'type' => 'percentage',
-        'value' => 10.00,
+        'value' => 10.0,
         'starts_at' => now()->toDateTimeString(),
         'ends_at' => now()->addDays(30)->toDateTimeString(),
         'is_active' => true,
@@ -46,7 +47,7 @@ it('can create discount', function () {
     assertDatabaseHas('discounts', [
         'name' => 'Test Discount',
         'type' => 'percentage',
-        'value' => 10.00,
+        'value' => 10.0,
         'is_active' => true,
     ]);
 });
@@ -73,7 +74,7 @@ it('can update discount', function () {
         'name' => 'Updated Discount',
         'description' => 'Updated description',
         'type' => 'fixed',
-        'value' => 25.00,
+        'value' => 25.0,
         'is_active' => false,
     ];
 

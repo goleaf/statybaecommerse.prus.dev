@@ -105,13 +105,13 @@ final class AdminPanelProvider extends PanelProvider
                 // Plugins temporarily disabled for upgrade
             ])
             ->spa()
-            ->renderHook(
-                'panels::topbar.end',
-                fn (): string => view('filament.hooks.live-notification-feed-hook')->render()
-            )
+            // ->renderHook(
+            //     'panels::topbar.end',
+            //     fn (): string => view('filament.hooks.live-notification-feed-hook')->render()
+            // )
             ->renderHook(
                 'panels::body.end',
-                fn (): string => view('filament.layouts.live-notifications-script')->render()
+                fn(): string => view('filament.layouts.live-notifications-script')->render()
             );
     }
 }

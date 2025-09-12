@@ -28,7 +28,6 @@ final class CountryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-globe-europe-africa';
 
-    protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 1;
 

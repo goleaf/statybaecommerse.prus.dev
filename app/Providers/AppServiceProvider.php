@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use App\Filament\Components\LiveNotificationFeed;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Register Livewire components
+        Livewire::component('live-notification-feed', LiveNotificationFeed::class);
+        
         // Set default currency for Number helper (EUR by default)
         try {
             Number::useCurrency(config('shared.localization.default_currency', 'EUR'));

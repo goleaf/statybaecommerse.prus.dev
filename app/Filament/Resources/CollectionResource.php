@@ -16,9 +16,8 @@ final class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
 
-    protected static UnitEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'catalog';
 
     protected static ?int $navigationSort = 3;
 
@@ -92,9 +91,7 @@ final class CollectionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCollections::route('/'),
-            'create' => Pages\CreateCollection::route('/create'),
-            'edit' => Pages\EditCollection::route('/{record}/edit'),
+            // Pages will be created when needed
         ];
     }
 }
