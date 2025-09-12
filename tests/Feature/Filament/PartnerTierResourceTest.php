@@ -2,62 +2,199 @@
 
 namespace Tests\Feature\Filament;
 
-use App\Filament\Resources\PartnerTierResource;
 use App\Models\PartnerTier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 final class PartnerTierResourceTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected User $adminUser;
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->adminUser = User::factory()->create();
-        $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'web']);
-        $this->adminUser->assignRole($adminRole);
-        $this->actingAs($this->adminUser);
+        
+        $this->actingAs(User::factory()->create());
     }
 
-    public function test_can_render_partner_tier_index_page(): void
+    public function test_can_list_partner_tiers(): void
     {
-        $this->get(PartnerTierResource::getUrl('index'))
-            ->assertSuccessful();
+        $partnerTiers = PartnerTier::factory()->count(3)->create();
+
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\ListPartnerTiers::class)
+            ->assertCanSeeTableRecords($partnerTiers);
     }
 
-    public function test_list_displays_partner_tiers(): void
+    public function test_can_create_partner_tier(): void
     {
-        $tiers = [
-            PartnerTier::query()->create([
-                'name' => 'Gold',
-                'code' => 'gold',
-                'discount_rate' => 0.1000,
-                'commission_rate' => 0.0200,
-                'minimum_order_value' => 0,
-                'is_enabled' => true,
-                'benefits' => ['priority_support' => true],
-            ]),
-            PartnerTier::query()->create([
-                'name' => 'Silver',
-                'code' => 'silver',
-                'discount_rate' => 0.0500,
-                'commission_rate' => 0.0100,
-                'minimum_order_value' => 0,
-                'is_enabled' => true,
-                'benefits' => ['priority_support' => false],
-            ]),
-        ];
+        $newPartnerTier = PartnerTier::factory()->make();
 
-        Livewire::test(PartnerTierResource\Pages\ListPartnerTiers::class)
-            ->assertCanSeeTableRecords($tiers);
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
+            ->fillForm([
+                'name' => $newPartnerTier->name,
+                'code' => $newPartnerTier->code,
+                'discount_rate' => $newPartnerTier->discount_rate,
+                'commission_rate' => $newPartnerTier->commission_rate,
+                'minimum_order_value' => $newPartnerTier->minimum_order_value,
+                'is_enabled' => $newPartnerTier->is_enabled,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('partner_tiers', [
+            'name' => $newPartnerTier->name,
+            'code' => $newPartnerTier->code,
+        ]);
+    }
+
+    public function test_can_edit_partner_tier(): void
+    {
+        $partnerTier = PartnerTier::factory()->create();
+        $updatedName = 'Updated Tier Name';
+
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\EditPartnerTier::class, [
+            'record' => $partnerTier->getRouteKey(),
+        ])
+            ->fillForm([
+                'name' => $updatedName,
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('partner_tiers', [
+            'id' => $partnerTier->id,
+            'name' => $updatedName,
+        ]);
+    }
+
+    public function test_can_view_partner_tier(): void
+    {
+        $partnerTier = PartnerTier::factory()->create();
+
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\ViewPartnerTier::class, [
+            'record' => $partnerTier->getRouteKey(),
+        ])
+            ->assertFormSet([
+                'name' => $partnerTier->name,
+                'code' => $partnerTier->code,
+                'discount_rate' => $partnerTier->discount_rate,
+                'commission_rate' => $partnerTier->commission_rate,
+                'minimum_order_value' => $partnerTier->minimum_order_value,
+                'is_enabled' => $partnerTier->is_enabled,
+            ]);
+    }
+
+    public function test_can_delete_partner_tier(): void
+    {
+        $partnerTier = PartnerTier::factory()->create();
+
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\ListPartnerTiers::class)
+            ->callTableAction('delete', $partnerTier);
+
+        $this->assertSoftDeleted('partner_tiers', ['id' => $partnerTier->id]);
+    }
+
+    public function test_name_is_required(): void
+    {
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
+            ->fillForm([
+                'name' => '',
+                'code' => 'TEST',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['name' => 'required']);
+    }
+
+    public function test_code_is_required(): void
+    {
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
+            ->fillForm([
+                'name' => 'Test Tier',
+                'code' => '',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['code' => 'required']);
+    }
+
+    public function test_code_must_be_unique(): void
+    {
+        $existingTier = PartnerTier::factory()->create(['code' => 'UNIQUE']);
+
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
+            ->fillForm([
+                'name' => 'Test Tier',
+                'code' => 'UNIQUE',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['code' => 'unique']);
+    }
+
+    public function test_discount_rate_must_be_numeric(): void
+    {
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
+            ->fillForm([
+                'name' => 'Test Tier',
+                'code' => 'TEST',
+                'discount_rate' => 'invalid',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['discount_rate' => 'numeric']);
+    }
+
+    public function test_discount_rate_must_be_between_0_and_1(): void
+    {
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
+            ->fillForm([
+                'name' => 'Test Tier',
+                'code' => 'TEST',
+                'discount_rate' => 1.5,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['discount_rate' => 'max']);
+    }
+
+    public function test_can_filter_by_enabled_status(): void
+    {
+        $enabledTier = PartnerTier::factory()->enabled()->create();
+        $disabledTier = PartnerTier::factory()->disabled()->create();
+
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\ListPartnerTiers::class)
+            ->filterTable('is_enabled', '1')
+            ->assertCanSeeTableRecords([$enabledTier])
+            ->assertCanNotSeeTableRecords([$disabledTier]);
+    }
+
+    public function test_can_search_by_name(): void
+    {
+        $tier1 = PartnerTier::factory()->create(['name' => 'Gold Tier']);
+        $tier2 = PartnerTier::factory()->create(['name' => 'Silver Tier']);
+
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\ListPartnerTiers::class)
+            ->searchTable('Gold')
+            ->assertCanSeeTableRecords([$tier1])
+            ->assertCanNotSeeTableRecords([$tier2]);
+    }
+
+    public function test_can_search_by_code(): void
+    {
+        $tier1 = PartnerTier::factory()->create(['code' => 'GOLD']);
+        $tier2 = PartnerTier::factory()->create(['code' => 'SILVER']);
+
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\ListPartnerTiers::class)
+            ->searchTable('GOLD')
+            ->assertCanSeeTableRecords([$tier1])
+            ->assertCanNotSeeTableRecords([$tier2]);
+    }
+
+    public function test_can_sort_by_discount_rate(): void
+    {
+        $tier1 = PartnerTier::factory()->create(['discount_rate' => 0.10]);
+        $tier2 = PartnerTier::factory()->create(['discount_rate' => 0.05]);
+
+        Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\ListPartnerTiers::class)
+            ->sortTable('discount_rate')
+            ->assertCanSeeTableRecords([$tier2, $tier1], inOrder: true);
     }
 }
-
-

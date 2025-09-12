@@ -1,26 +1,64 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
 use App\Models\PartnerTier;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class PartnerTierFactory extends Factory
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PartnerTier>
+ */
+final class PartnerTierFactory extends Factory
 {
     protected $model = PartnerTier::class;
 
     public function definition(): array
     {
-        $name = $this->faker->randomElement(['Gold', 'Silver', 'Bronze', 'Custom']);
+        $tierNames = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
+        $tierName = $this->faker->randomElement($tierNames);
+        
         return [
-            'name' => $name,
-            'code' => strtolower($name) . '-' . $this->faker->unique()->lexify('???'),
-            'discount_rate' => $this->faker->randomFloat(4, 0, 0.5),
-            'commission_rate' => $this->faker->randomFloat(4, 0, 0.2),
-            'minimum_order_value' => $this->faker->randomFloat(2, 0, 1000),
-            'is_enabled' => true,
-            'benefits' => ['priority_support' => $this->faker->boolean()],
+            'name' => $tierName,
+            'code' => strtoupper($tierName),
+            'discount_rate' => $this->faker->randomFloat(4, 0.01, 0.15), // 1% to 15%
+            'commission_rate' => $this->faker->randomFloat(4, 0.02, 0.10), // 2% to 10%
+            'minimum_order_value' => $this->faker->randomFloat(2, 100, 5000),
+            'is_enabled' => $this->faker->boolean(80), // 80% chance of being enabled
+            'benefits' => [
+                [
+                    'key' => 'Priority Support',
+                    'value' => '24/7 dedicated support team'
+                ],
+                [
+                    'key' => 'Marketing Materials',
+                    'value' => 'Access to exclusive marketing resources'
+                ],
+                [
+                    'key' => 'Training',
+                    'value' => 'Monthly training sessions and webinars'
+                ]
+            ],
         ];
     }
-}
 
+    public function enabled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_enabled' => true,
+        ]);
+    }
+
+    public function disabled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_enabled' => false,
+        ]);
+    }
+
+    public function withHighDiscount(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'discount_rate' => $this->faker->randomFloat(4, 0.10, 0.20), // 10% to 20%
+        ]);
+    }
+}

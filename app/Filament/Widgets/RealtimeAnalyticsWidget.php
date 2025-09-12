@@ -2,171 +2,57 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\AnalyticsEvent;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
-use Filament\Widgets\ChartWidget;
+use App\Models\Campaign;
 use Illuminate\Support\Facades\DB;
 
-final class RealtimeAnalyticsWidget extends ChartWidget
+final class RealtimeAnalyticsWidget extends BaseWidget
 {
-    public static ?int $sort = 2;
-    public ?string $pollingInterval = '10s';
-    protected int|string|array $columnSpan = 'full';
-
-    public function getHeading(): ?string
+    protected function getStats(): array
     {
-        return __('admin.widgets.realtime_analytics');
-    }
+        $today = now()->startOfDay();
+        $yesterday = now()->subDay()->startOfDay();
 
-    public function getData(): array
-    {
-        $timeRange = $this->getTimeRange();
+        // Today's orders
+        $todayOrders = Order::where('created_at', '>=', $today)->count();
+        $yesterdayOrders = Order::whereBetween('created_at', [$yesterday, $today])->count();
+        $ordersChange = $yesterdayOrders > 0 ? (($todayOrders - $yesterdayOrders) / $yesterdayOrders) * 100 : 0;
+
+        // Today's revenue
+        $todayRevenue = Order::where('created_at', '>=', $today)->sum('total');
+        $yesterdayRevenue = Order::whereBetween('created_at', [$yesterday, $today])->sum('total');
+        $revenueChange = $yesterdayRevenue > 0 ? (($todayRevenue - $yesterdayRevenue) / $yesterdayRevenue) * 100 : 0;
+
+        // Active campaigns
+        $activeCampaigns = Campaign::active()->count();
+
+        // Total products
+        $totalProducts = Product::count();
 
         return [
-            'datasets' => [
-                [
-                    'label' => __('admin.widgets.page_views'),
-                    'data' => $this->getPageViews($timeRange),
-                    'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'borderColor' => 'rgb(59, 130, 246)',
-                    'borderWidth' => 2,
-                    'fill' => true,
-                ],
-                [
-                    'label' => __('admin.widgets.orders'),
-                    'data' => $this->getOrdersData($timeRange),
-                    'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
-                    'borderColor' => 'rgb(34, 197, 94)',
-                    'borderWidth' => 2,
-                    'fill' => true,
-                ],
-                [
-                    'label' => __('admin.widgets.new_users'),
-                    'data' => $this->getNewUsersData($timeRange),
-                    'backgroundColor' => 'rgba(168, 85, 247, 0.1)',
-                    'borderColor' => 'rgb(168, 85, 247)',
-                    'borderWidth' => 2,
-                    'fill' => true,
-                ],
-            ],
-            'labels' => $this->getLabels($timeRange),
+            Stat::make(__('analytics.today_orders'), $todayOrders)
+                ->description($ordersChange >= 0 ? '+' . number_format($ordersChange, 1) . '%' : number_format($ordersChange, 1) . '%')
+                ->descriptionIcon($ordersChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+                ->color($ordersChange >= 0 ? 'success' : 'danger'),
+
+            Stat::make(__('analytics.today_revenue'), '€' . number_format($todayRevenue, 2))
+                ->description($revenueChange >= 0 ? '+' . number_format($revenueChange, 1) . '%' : number_format($revenueChange, 1) . '%')
+                ->descriptionIcon($revenueChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+                ->color($revenueChange >= 0 ? 'success' : 'danger'),
+
+            Stat::make(__('analytics.active_campaigns'), $activeCampaigns)
+                ->description(__('analytics.campaigns_running'))
+                ->descriptionIcon('heroicon-m-megaphone')
+                ->color('info'),
+
+            Stat::make(__('analytics.total_products'), $totalProducts)
+                ->description(__('analytics.products_catalog'))
+                ->descriptionIcon('heroicon-m-cube')
+                ->color('warning'),
         ];
-    }
-
-    protected function getType(): string
-    {
-        return 'line';
-    }
-
-    protected function getOptions(): array
-    {
-        return [
-            'plugins' => [
-                'legend' => [
-                    'display' => true,
-                    'position' => 'top',
-                ],
-                'tooltip' => [
-                    'mode' => 'index',
-                    'intersect' => false,
-                ],
-            ],
-            'scales' => [
-                'x' => [
-                    'display' => true,
-                    'title' => [
-                        'display' => true,
-                        'text' => __('admin.widgets.time'),
-                    ],
-                ],
-                'y' => [
-                    'display' => true,
-                    'title' => [
-                        'display' => true,
-                        'text' => __('admin.widgets.count'),
-                    ],
-                    'beginAtZero' => true,
-                ],
-            ],
-            'interaction' => [
-                'mode' => 'nearest',
-                'axis' => 'x',
-                'intersect' => false,
-            ],
-            'responsive' => true,
-            'maintainAspectRatio' => false,
-        ];
-    }
-
-    private function getTimeRange(): array
-    {
-        $hours = [];
-        for ($i = 23; $i >= 0; $i--) {
-            $hours[] = now()->subHours($i);
-        }
-        return $hours;
-    }
-
-    private function getLabels(array $timeRange): array
-    {
-        return array_map(function ($time) {
-            return $time->format('H:i');
-        }, $timeRange);
-    }
-
-    private function getPageViews(array $timeRange): array
-    {
-        $data = [];
-
-        foreach ($timeRange as $time) {
-            $count = AnalyticsEvent::where('event_type', 'page_view')
-                ->whereBetween('created_at', [
-                    $time->startOfHour(),
-                    $time->copy()->endOfHour()
-                ])
-                ->count();
-
-            $data[] = $count;
-        }
-
-        return $data;
-    }
-
-    private function getOrdersData(array $timeRange): array
-    {
-        $data = [];
-
-        foreach ($timeRange as $time) {
-            $count = Order::whereBetween('created_at', [
-                $time->startOfHour(),
-                $time->copy()->endOfHour()
-            ])->count();
-
-            $data[] = $count;
-        }
-
-        return $data;
-    }
-
-    private function getNewUsersData(array $timeRange): array
-    {
-        $data = [];
-
-        foreach ($timeRange as $time) {
-            $count = User::whereBetween('created_at', [
-                $time->startOfHour(),
-                $time->copy()->endOfHour()
-            ])->count();
-
-            $data[] = $count;
-        }
-
-        return $data;
-    }
-
-    public function getDescription(): ?string
-    {
-        return __('admin.widgets.realtime_analytics_description');
     }
 }

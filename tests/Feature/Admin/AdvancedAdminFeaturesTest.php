@@ -153,6 +153,3 @@ it('validates admin access to advanced features', function () {
     $response = $this->actingAs($regularUser)->get('/admin/user-impersonation');
     $response->assertForbidden();
 });
-
-
-
