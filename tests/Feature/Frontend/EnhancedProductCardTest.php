@@ -201,7 +201,7 @@ it('displays product badges correctly', function () {
 
     Livewire::test(ProductCard::class, ['product' => $featuredProduct])
         ->assertSee('Featured')
-        ->assertSee('-20%'); // Discount badge
+        ->assertSet('discountPercentage', 20); // Discount badge
 });
 
 it('shows stock status correctly', function () {

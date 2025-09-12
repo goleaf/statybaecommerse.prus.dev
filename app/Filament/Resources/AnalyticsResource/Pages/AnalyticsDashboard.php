@@ -3,12 +3,12 @@
 namespace App\Filament\Resources\AnalyticsResource\Pages;
 
 use App\Filament\Resources\AnalyticsResource;
-use App\Filament\Widgets\StatsWidget;
 use App\Filament\Widgets\OrdersChartWidget;
+use App\Filament\Widgets\StatsWidget;
 use App\Filament\Widgets\TopSellingProductsWidget;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Actions;
-use Filament\Notifications\Notification;
 
 final class AnalyticsDashboard extends ListRecords
 {

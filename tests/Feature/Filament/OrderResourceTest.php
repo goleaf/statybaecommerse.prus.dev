@@ -9,7 +9,7 @@ use Livewire\Livewire;
 beforeEach(function () {
     $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
     $this->admin = User::factory()->create();
-    $this->admin->assignRole('admin');
+    $this->admin->assignRole('administrator');
     $this->actingAs($this->admin);
 });
 

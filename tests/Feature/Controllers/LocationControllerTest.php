@@ -27,13 +27,13 @@ it('lists locations', function (): void {
 
 it('shows a location', function (): void {
     $location = Location::factory()->create([
-        'name' => 'Main', 
+        'name' => 'Main',
         'is_default' => true,
         'is_enabled' => true
     ]);
 
     // Use the location's code as the slug parameter
     $slug = $location->code ?: $location->name;
-    
+
     $this->get('/en/locations/' . $slug)->assertOk();
 });

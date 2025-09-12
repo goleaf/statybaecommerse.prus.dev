@@ -345,12 +345,21 @@
 - **Skipped problematic tests**: Tests using Filament tab-layout-plugin were skipped due to third-party plugin container initialization issues
 - **Current status**: 5 tests passing (10 assertions), 5 tests skipped due to plugin issues
 
+### ✅ OrderSeederTest.php - 1 test passing
+- **Fixed foreign key constraint violation**: Resolved `SQLSTATE[23000]: Integrity constraint violation: 19 FOREIGN KEY constraint failed` in OrderSeeder
+- **Issue resolved**: Orders table has foreign key constraint to `sh_zones` table, but test was creating zones in `zones` table
+- **Solution**: Added creation of zone in `sh_zones` table to satisfy foreign key constraint
+- **Fixed Collection casting issue**: Removed unnecessary `(array)` cast that was converting Collection to indexed array
+- **Current status**: 1 test passing (4 assertions) - OrderSeeder now works correctly
+
 ### Files Modified:
 - `tests/Feature/MultilanguageTest.php` - Complete fix for all 22 tests
 - `tests/Feature/EnhancedSettingTest.php` - Partial fix (11/12 tests passing)
 - `tests/Feature/Frontend/HomeTest.php` - Fixed redirect behavior for localized routing
 - `tests/Feature/Filament/Resources/CountryResourceTest.php` - Fixed Country model type issue and skipped plugin-dependent tests
 - `app/Models/Country.php` - Fixed phone code attribute return type to handle null values
+- `tests/Feature/Seeders/OrderSeederTest.php` - Fixed foreign key constraint and Collection casting issues
+- `database/seeders/OrderSeeder.php` - Fixed Collection casting issue in order item creation
 - `app/Models/NormalSetting.php` - Added validation_rules accessor
 - `app/Filament/Resources/NormalSettingResource.php` - Fixed type hints and component defaults
 - `database/factories/NormalSettingFactory.php` - Fixed validation_rules data

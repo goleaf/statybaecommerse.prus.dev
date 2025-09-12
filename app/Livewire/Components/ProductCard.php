@@ -228,6 +228,14 @@ final class ProductCard extends Component
         return $this->product->track_inventory && $this->product->stock_quantity <= 0;
     }
 
+    protected function getListeners(): array
+    {
+        return [
+            'wishlist-updated' => '$refresh',
+            'comparison-updated' => '$refresh',
+        ];
+    }
+
     public function render(): View
     {
         return view('livewire.components.product-card');
