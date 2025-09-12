@@ -50,7 +50,7 @@
                              class="border-t border-gray-200 bg-gray-50">
                             @foreach ($category['children'] as $child)
                                 <a
-                                   href="{{ route('localized.categories.show', ['category' => $child['slug']]) }}"
+                                   href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $child['slug']]) }}"
                                    class="flex items-center justify-between px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                     <span>{{ $child['name'] }}</span>
                                     @if ($child['products_count'] > 0)

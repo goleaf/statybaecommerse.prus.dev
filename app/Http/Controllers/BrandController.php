@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class BrandController extends Controller
 {
-    public function show(Request $request, string $slug): RedirectResponse
+    public function show(Request $request, string $locale, string $slug): RedirectResponse
     {
         // Find brand by slug (check both main slug and translated slugs)
         $brand = Brand::query()
@@ -45,12 +45,12 @@ class BrandController extends Controller
         
         // If the current slug is not the canonical slug, redirect
         if ($canonicalSlug !== $slug) {
-            return redirect()->route('localized.brands.show', $canonicalSlug, 301);
+            return redirect()->route('localized.brands.show', ['locale' => $locale, 'slug' => $canonicalSlug], 301);
         }
 
         // If we reach here, the slug is canonical, but we still need to redirect
         // to the localized route to maintain consistency
-        return redirect()->route('localized.brands.show', $canonicalSlug, 301);
+        return redirect()->route('localized.brands.show', ['locale' => $locale, 'slug' => $canonicalSlug], 301);
     }
 
     private function getCanonicalSlug(Brand $brand): string
@@ -63,4 +63,3 @@ class BrandController extends Controller
         return $translation?->slug ?: $brand->slug;
     }
 }
-

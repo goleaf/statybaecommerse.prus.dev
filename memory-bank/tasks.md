@@ -331,6 +331,12 @@ Type: Complex System
     - Test now skips gracefully on SQLite with appropriate message
     - Test would run normally on other database systems (MySQL, PostgreSQL)
     - Prevents test failures due to SQLite transaction limitations
+  - CategoryNavigationTest: Fixed all 4 tests (8 assertions)
+    - Fixed route redirects by using localized routes (/lt instead of /)
+    - Fixed missing route references from category.show to localized.categories.show
+    - Fixed route parameter issues by adding locale parameter to all route calls
+    - Updated 9 Blade template files to use correct localized route names and parameters
+    - All category navigation functionality now working correctly
   - Successfully committed all changes to git (commits af6f991, 1f39a94, 316878a, 8aa48f0, 38e57a0, and 3d9a934)
 
 ## Recent Test Fixes Completed
