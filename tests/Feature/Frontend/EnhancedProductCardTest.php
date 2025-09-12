@@ -13,7 +13,7 @@ beforeEach(function () {
     $this->product = Product::factory()->create([
         'name' => 'Test Product',
         'price' => 99.99,
-        'status' => 'active',
+        'status' => 'published',
         'is_visible' => true,
     ]);
 });
