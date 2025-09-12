@@ -16,7 +16,7 @@ final class RecentSystemSettingsChangesWidget extends BaseWidget
 
     protected int | string | array $columnSpan = 'full';
 
-    protected static ?int $maxHeight = '300px';
+    protected static ?int $maxHeight = 300;
 
     public function table(Table $table): Table
     {

@@ -112,11 +112,11 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
-                FilamentLoggerPlugin::make(),
-                OverlookPlugin::make(),
-                ResourceLockPlugin::make(),
-                FilamentSocialitePlugin::make(),
-                FilamentLogManagerPlugin::make(),
+                // FilamentLoggerPlugin::make(),
+                // OverlookPlugin::make(),
+                // ResourceLockPlugin::make(),
+                // FilamentSocialitePlugin::make(),
+                // FilamentLogManagerPlugin::make(),
             ])
             ->spa()
             // ->renderHook(

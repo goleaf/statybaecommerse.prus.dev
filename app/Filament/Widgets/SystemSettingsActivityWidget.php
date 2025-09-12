@@ -15,7 +15,7 @@ final class SystemSettingsActivityWidget extends BaseWidget
 
     protected int | string | array $columnSpan = 'full';
 
-    protected static ?int $maxHeight = '400px';
+    protected static ?int $maxHeight = 400;
 
     public function table(Table $table): Table
     {

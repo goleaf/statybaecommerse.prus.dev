@@ -13,7 +13,7 @@ final class CurrencyUsageChartWidget extends ChartWidget
 
     protected static ?int $sort = 2;
 
-    protected static ?string $pollingInterval = '30s';
+    protected ?string $pollingInterval = '30s';
 
     protected function getData(): array
     {
