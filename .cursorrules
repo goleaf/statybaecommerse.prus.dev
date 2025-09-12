@@ -7,6 +7,65 @@
 3. **ПРИОРИТЕТНОСТЬ** - Критические ошибки исправляются первыми
 4. **ПРОИЗВОДИТЕЛЬНОСТЬ** - Параллельные процессы и кэширование
 
+## FILAMENT V4 NAVIGATION GROUP TYPE COMPATIBILITY RULE
+
+**CRITICAL**: Automatic Filament v4 Navigation Group Type Fix
+
+**TRIGGER**: Whenever editing any file under `app/Filament/**` or when linting errors mention `$navigationGroup` type issues.
+
+**AUTOMATIC ACTIONS**:
+
+1. **Check for Navigation Group Type Issues**
+   - Scan for `protected static $navigationGroup` declarations
+   - Verify type is `UnitEnum|string|null`
+   - Check for proper `use UnitEnum;` import
+
+2. **Auto-Fix Navigation Group Type**
+   ```php
+   // WRONG (any of these):
+   protected static NavigationGroup $navigationGroup = NavigationGroup::Products;
+   protected static ?string $navigationGroup = 'Products';
+   protected static $navigationGroup = NavigationGroup::Products;
+   
+   // CORRECT:
+   /** @var UnitEnum|string|null */
+   protected static $navigationGroup = NavigationGroup::Products;
+   ```
+
+3. **Auto-Fix UnitEnum Import**
+   ```php
+   // Add if missing:
+   use UnitEnum;
+   
+   // Remove duplicates if found
+   ```
+
+4. **Apply to ALL Filament Resources**
+   - Resources extending `Filament\Resources\Resource`
+   - Pages extending `Filament\Pages\Page`
+   - Widgets extending `Filament\Widgets\Widget`
+   - Any class with `$navigationGroup` property
+
+5. **Validation Rules**
+   - Type MUST be `UnitEnum|string|null`
+   - Import MUST include `use UnitEnum;`
+   - NO duplicate imports
+   - NO type declarations on the property itself
+   - Use docblock for type hinting
+
+6. **Error Prevention**
+   - Run linting check after any Filament file edit
+   - Auto-fix any `$navigationGroup` type errors
+   - Ensure compatibility with Filament v4 requirements
+   - Prevent future type compatibility issues
+
+**NEVER ALLOW**:
+- `protected static NavigationGroup $navigationGroup`
+- `protected static ?string $navigationGroup`
+- Missing `use UnitEnum;` import
+- Duplicate `use UnitEnum;` imports
+- Type errors on `$navigationGroup` property
+
 ## ТРИГГЕРЫ АКТИВАЦИИ
 
 Система активируется при:
@@ -52,6 +111,14 @@
    php artisan test --filter={TestName} --stop-on-failure
    ```
 
+7. **FILAMENT V4 NAVIGATION GROUP FIX** (при изменении Filament файлов)
+   ```bash
+   # Автоматически исправлять типы navigationGroup
+   # Проверять и добавлять use UnitEnum; импорты
+   # Удалять дублирующие импорты
+   # Обеспечивать совместимость с Filament v4
+   ```
+
 ## АВТОМАТИЧЕСКИЕ ИСПРАВЛЕНИЯ
 
 ### PHP Синтаксис:
@@ -66,6 +133,10 @@
 - Исправление `public static function table(Table $table): Table`
 - Замена `$schema` → `$form` в теле методов
 - Добавление docblock для `$navigationIcon`
+- **КРИТИЧЕСКОЕ**: Исправление типов `$navigationGroup` на `UnitEnum|string|null`
+- **КРИТИЧЕСКОЕ**: Добавление `use UnitEnum;` импортов
+- **КРИТИЧЕСКОЕ**: Удаление дублирующих `use UnitEnum;` импортов
+- **КРИТИЧЕСКОЕ**: Использование docblock для типизации `$navigationGroup`
 
 ### Laravel:
 - Добавление `declare(strict_types=1);`
@@ -81,7 +152,7 @@
 ## ПРИОРИТЕТЫ ИСПРАВЛЕНИЙ
 
 1. **КРИТИЧЕСКИЕ** (0-100мс) - Синтаксические ошибки
-2. **ВЫСОКИЕ** (100-500мс) - Ошибки типов и импортов
+2. **ВЫСОКИЕ** (100-500мс) - Ошибки типов и импортов, **Filament v4 navigation group type errors**
 3. **СРЕДНИЕ** (500мс-1с) - Стиль кода и форматирование
 4. **НИЗКИЕ** (1-3с) - Предупреждения и рекомендации
 
