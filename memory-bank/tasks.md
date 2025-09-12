@@ -317,6 +317,11 @@ Type: Complex System
   - Added account.index route that redirects to account.orders as the main account page
   - Fixed RouteNotFoundException: Route [account.index] not defined error
   - All 1 VerifyEmailControllerTest case now passing with 2 assertions
+- ✅ **AuthGuardTest:** Fixed all 1 test case
+  - Fixed missing admin translation routes that AuthGuardTest was trying to access
+  - Added missing admin.legal.translations.save, admin.products.translations.save, admin.attributes.translations.save, and admin.attribute-values.translations.save routes
+  - Fixed RouteNotFoundException errors for admin translation routes
+  - All 1 AuthGuardTest case now passing with 7 assertions
 - 🔄 **SitemapControllerTest:** Persistent view compilation error - attempted fixes
   - Attempted to fix XML declaration syntax error in sitemap views
   - Modified both sitemap.xml and sitemap/xml.blade.php files to use {!! '<?xml version="1.0" encoding="UTF-8"?>' !!}

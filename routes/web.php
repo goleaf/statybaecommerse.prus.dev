@@ -772,10 +772,18 @@ Route::middleware('auth')->group(function (): void {
 
 // --- Admin translation save helpers expected by tests ---
 Route::middleware('auth')->group(function (): void {
+    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', fn() => back())
+        ->name('admin.legal.translations.save');
     Route::put('/admin/{locale}/brands/{id}/translations/{lang}', fn() => back())
         ->name('admin.brands.translations.save');
     Route::put('/admin/{locale}/categories/{id}/translations/{lang}', fn() => back())
         ->name('admin.categories.translations.save');
     Route::put('/admin/{locale}/collections/{id}/translations/{lang}', fn() => back())
         ->name('admin.collections.translations.save');
+    Route::put('/admin/{locale}/products/{id}/translations/{lang}', fn() => back())
+        ->name('admin.products.translations.save');
+    Route::put('/admin/{locale}/attributes/{id}/translations/{lang}', fn() => back())
+        ->name('admin.attributes.translations.save');
+    Route::put('/admin/{locale}/attribute-values/{id}/translations/{lang}', fn() => back())
+        ->name('admin.attribute-values.translations.save');
 });

@@ -129,8 +129,11 @@ describe('Filament Widgets', function () {
             $order2 = Order::factory()->create(['status' => 'completed']);
             $order2->items()->create([
                 'product_id' => $product2->id,
+                'name' => $product2->name,
+                'sku' => $product2->sku ?? 'SKU-002',
                 'quantity' => 3,
-                'price' => 2000,
+                'unit_price' => 2000,
+                'total' => 6000,
             ]);
 
             Livewire::test(TopSellingProductsWidget::class)
@@ -145,16 +148,22 @@ describe('Filament Widgets', function () {
             $order1 = Order::factory()->create(['status' => 'completed']);
             $order1->items()->create([
                 'product_id' => $product1->id,
+                'name' => $product1->name,
+                'sku' => $product1->sku ?? 'SKU-001',
                 'quantity' => 2,
-                'price' => 1000,
+                'unit_price' => 1000,
+                'total' => 2000,
             ]);
 
             // Product 2: 10 items sold
             $order2 = Order::factory()->create(['status' => 'completed']);
             $order2->items()->create([
                 'product_id' => $product2->id,
+                'name' => $product2->name,
+                'sku' => $product2->sku ?? 'SKU-002',
                 'quantity' => 10,
-                'price' => 1000,
+                'unit_price' => 1000,
+                'total' => 10000,
             ]);
 
             Livewire::test(TopSellingProductsWidget::class)
