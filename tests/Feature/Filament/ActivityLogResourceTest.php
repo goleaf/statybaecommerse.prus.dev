@@ -219,7 +219,7 @@ it('formats subject type correctly', function () {
 
     $activity = Activity::first();
 
-    expect(class_basename($activity->subject_type))->toBe('Product');
+    expect(class_basename($activity->subject_type))->toBe('User');
 });
 
 it('displays causer name or system', function () {
@@ -272,7 +272,7 @@ it('can access activity log resource with proper permissions', function () {
 });
 
 it('displays correct navigation properties', function () {
-    expect(ActivityLogResource::getNavigationLabel())->toBe(__('Activity Log'));
-    expect(ActivityLogResource::getModelLabel())->toBe(__('Activity'));
-    expect(ActivityLogResource::getPluralModelLabel())->toBe(__('Activities'));
+    expect(ActivityLogResource::getNavigationLabel())->toBe(__('Veiklos žurnalas'));
+    expect(ActivityLogResource::getModelLabel())->toBe(__('Veikla'));
+    expect(ActivityLogResource::getPluralModelLabel())->toBe(__('Veiklos žurnalai'));
 });

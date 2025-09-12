@@ -547,6 +547,9 @@ Type: Complex System
 - `database/seeders/OrderSeeder.php` - Fixed Collection casting issue in order item creation
 - `tests/Unit/Widgets/EnhancedEcommerceOverviewTest.php` - Created missing widget class and fixed all test issues
 - `app/Filament/Widgets/EnhancedEcommerceOverview.php` - Created new Filament StatsOverviewWidget with e-commerce statistics
+- `tests/Feature/Filament/WidgetsTest.php` - Fixed role creation, database columns, missing methods, and property accessibility issues
+- `app/Filament/Widgets/RealtimeAnalyticsWidget.php` - Fixed method accessibility and property visibility
+- `app/Filament/Widgets/OrdersChartWidget.php` - Fixed property accessibility for sort order
 - `tests/Feature/EnhancedSettingTest.php` - Partial fix (11/12 tests passing)
 - `app/Models/NormalSetting.php` - Added validation_rules accessor
 - `app/Filament/Resources/NormalSettingResource.php` - Fixed type hints and component defaults

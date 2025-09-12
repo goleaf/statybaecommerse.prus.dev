@@ -17,7 +17,6 @@ class EcommerceOverview extends BaseWidget
         return auth()->user()?->hasRole('Administrator') ?? false;
     }
 
-
     public function getStats(): array
     {
         return [
