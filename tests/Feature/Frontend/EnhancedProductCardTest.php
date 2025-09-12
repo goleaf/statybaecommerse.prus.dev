@@ -68,12 +68,12 @@ it('can add product to wishlist when authenticated', function () {
 });
 
 it('shows login required message when adding to wishlist as guest', function () {
+    // Ensure we're not authenticated
+    auth()->logout();
+    $this->assertFalse(auth()->check());
+    
     $component = Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('toggleWishlist');
-    
-    // Debug: Let's see what events were dispatched
-    $dispatchedEvents = $component->dispatched();
-    dump('Dispatched events:', $dispatchedEvents);
     
     $component->assertDispatched('notify', [
         'type' => 'warning',

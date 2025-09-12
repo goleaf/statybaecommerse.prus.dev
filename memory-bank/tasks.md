@@ -191,6 +191,11 @@ Type: Complex System
    - [x] Fixed DocumentService renderTemplate method
    - [x] Fixed Document model missing ofStatus/ofFormat scopes
    - [ ] EnhancedSettingTest KeyValue component array_key_first() error (complex Filament issue)
+   - [x] Fixed AnalyticsResourceTest permission issues (added view_analytics permission)
+   - [x] Fixed AnalyticsResourceTest livewire function calls (replaced with Livewire::test)
+   - [x] Fixed AnalyticsResourceTest reference column issue (removed non-existent field)
+   - [x] Fixed AnalyticsResourceTest translation key mismatch
+   - [ ] AnalyticsResourceTest table record loading issues (complex Filament testing)
 
 3. **Security Verification**
    - [ ] Test 2FA enrollment and recovery flows

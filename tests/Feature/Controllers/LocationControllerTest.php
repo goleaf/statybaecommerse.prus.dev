@@ -27,10 +27,8 @@ it('lists locations', function (): void {
 it('shows a location', function (): void {
     $id = DB::table('locations')->insertGetId([
         'name' => 'Main', 
-        'code' => 'main-location',
         'is_default' => true
     ]);
 
-    // Use the code as the slug parameter instead of ID
-    $this->get('/en/locations/main-location')->assertOk();
+    $this->get('/en/locations/' . $id)->assertOk();
 });
