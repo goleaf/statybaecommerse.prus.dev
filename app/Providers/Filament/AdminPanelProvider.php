@@ -104,6 +104,10 @@ final class AdminPanelProvider extends PanelProvider
             ->plugins([
                 // Plugins temporarily disabled for upgrade
             ])
-            ->spa();
+            ->spa()
+            ->renderHook(
+                'panels::topbar.end',
+                fn (): string => view('filament.hooks.live-notification-feed-hook')->render()
+            );
     }
 }

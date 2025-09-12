@@ -9,8 +9,6 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
-use UnitEnum;
-use BackedEnum;
 
 final class CollectionResource extends Resource
 {
@@ -18,7 +16,7 @@ final class CollectionResource extends Resource
 
     protected static UnitEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'catalog';
+    protected static UnitEnum|string|null $navigationGroup = 'catalog';
 
     protected static ?int $navigationSort = 3;
 

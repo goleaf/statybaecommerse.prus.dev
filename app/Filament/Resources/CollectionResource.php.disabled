@@ -14,9 +14,9 @@ final class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static UnitEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static BackedEnum|string|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
+    protected static ?string $navigationGroup = 'catalog';
 
     protected static ?int $navigationSort = 3;
 
