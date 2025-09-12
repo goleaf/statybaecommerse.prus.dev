@@ -176,7 +176,6 @@ final class NormalSetting extends Model
         return $query->where('locale', $locale);
     }
 
-
     protected static function booted(): void
     {
         static::creating(function (self $setting) {

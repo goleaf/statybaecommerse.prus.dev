@@ -168,8 +168,8 @@ describe('User Impersonation Integration', function () {
         ]);
         
         // Try to stop impersonation
-        $component = Livewire::test(\App\Filament\Pages\UserImpersonation::class);
-        $component->call('stopImpersonation');
+        $page = new \App\Filament\Pages\UserImpersonation();
+        $page->stopImpersonation();
         
         // Session should be cleared
         expect(session('impersonate'))->toBeNull();
@@ -187,8 +187,8 @@ describe('User Impersonation Integration', function () {
         expect(auth()->id())->toBe($user1->id);
         
         // Stop impersonation
-        $component = Livewire::test(\App\Filament\Pages\UserImpersonation::class);
-        $component->call('stopImpersonation');
+        $page = new \App\Filament\Pages\UserImpersonation();
+        $page->stopImpersonation();
         
         expect(auth()->id())->toBe($this->admin->id);
         

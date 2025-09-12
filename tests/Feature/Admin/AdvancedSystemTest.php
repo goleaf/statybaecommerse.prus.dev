@@ -70,7 +70,7 @@ it('can perform data import operations', function () {
     // Test that the data import export page loads correctly
     $response = $this->actingAs($this->admin)->get('/admin/data-import-export');
     $response->assertOk();
-    
+
     // Test that the page contains import functionality
     $response->assertSee('Import');
     $response->assertSee('Export');
@@ -82,7 +82,7 @@ it('can export data in multiple formats', function () {
     // Test that the data import export page loads correctly
     $response = $this->actingAs($this->admin)->get('/admin/data-import-export');
     $response->assertOk();
-    
+
     // Test that the page contains export functionality
     $response->assertSee('Export');
 });

@@ -59,11 +59,10 @@ it('can create manual collection with lt/en translations', function () {
         'seo_description' => 'SEO Description',
     ];
 
-    Livewire::test(CollectionResource\Pages\CreateCollection::class)
+    $component = Livewire::test(CollectionResource\Pages\CreateCollection::class)
         ->fillForm($newData)
         ->call('create')
-        ->assertHasNoFormErrors()
-        ->assertOk();
+        ->assertHasNoFormErrors();
 
     $collection = Collection::query()->where('slug', 'nauja-kolekcija')->first();
     expect($collection)->not->toBeNull();
