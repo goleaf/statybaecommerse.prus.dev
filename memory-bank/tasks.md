@@ -248,6 +248,14 @@ Type: Complex System
   - Fixed all test methods to ensure products have proper published_at dates (past dates)
   - All filtering, sorting, pagination, and cart functionality now working correctly
   - Test coverage: 13/13 tests passing with 23 assertions
+
+- 🔄 **AccountPagesTest:** Partially fixed - addresses issue resolved, but view compilation error persists
+  - Fixed addresses table migration to include deleted_at column for soft deletes
+  - Fixed Reviews component to properly load user reviews data
+  - Added missing reviews navigation link to account layout
+  - Fixed syntax errors in sitemap XML files
+  - **Remaining Issue:** Persistent syntax error in compiled view a8659d8caadb053c79387ef5e1808cba.php at line 141
+  - **Status:** 1 test passing, 1 test failing due to view compilation issue
 - ✅ **OrderTest:** Fixed currency default test case
   - Fixed test to respect database default value ('EUR') instead of forcing null
   - All 19 Order model tests now passing
