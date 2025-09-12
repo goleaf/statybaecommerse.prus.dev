@@ -17,14 +17,12 @@ use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 class NormalSettingResource extends Resource
 {
     protected static ?string $model = NormalSetting::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
 
     protected static ?int $navigationSort = 1;

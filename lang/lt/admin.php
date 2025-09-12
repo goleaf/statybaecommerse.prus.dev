@@ -1078,6 +1078,8 @@ return [
         'campaigns' => 'Kampanijos',
         'document' => 'Dokumentas',
         'documents' => 'Dokumentai',
+        'report' => 'Ataskaita',
+        'reports' => 'Ataskaitos',
         'document_template' => 'Dokumentų šablonas',
         'document_templates' => 'Dokumentų šablonai',
         'media' => 'Medija',

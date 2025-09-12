@@ -635,6 +635,13 @@ Type: Complex System
   - Fixed NotificationFeedPage $navigationIcon property type declaration
   - All CollectionResource type errors resolved
   - **Status:** CollectionResource type errors fixed, AdminPanelTest and ExampleTest now passing
+- 🔄 **AdvancedAdminFeaturesTest:** Fixed table action mounting issues
+  - Fixed UserImpersonation page table action calls from callTableAction to mountTableAction + callMountedTableAction
+  - Fixed test user setup to use 'administrator' role and is_admin = true for proper access
+  - Fixed NotificationResource form method signature from Form to Schema
+  - Fixed NotificationResource navigation property type declarations
+  - **Remaining Issue:** Multiple Filament resource type declaration errors causing fatal errors
+  - **Status:** 2/2 tests fixed for table actions, but multiple type errors in other resources preventing full test execution
 
 
 ### ✅ CollectionTest.php - 8 tests passing (Fixed image/banner accessor expectations)

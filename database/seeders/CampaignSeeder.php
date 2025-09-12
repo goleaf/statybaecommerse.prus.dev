@@ -1,93 +1,238 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Campaign;
+use App\Models\CampaignView;
+use App\Models\CampaignClick;
+use App\Models\CampaignConversion;
+use App\Models\CampaignCustomerSegment;
+use App\Models\CampaignProductTarget;
+use App\Models\CampaignSchedule;
+use App\Models\Channel;
+use App\Models\Zone;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\CustomerGroup;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
-class CampaignSeeder extends Seeder
+final class CampaignSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::transaction(function () {
-            $campaigns = [
-                [
-                    'name' => 'Black Friday',
-                    'status' => 'scheduled',
-                    'starts_at' => now()->addMonth()->startOfMonth(),
-                    'ends_at' => now()->addMonth()->endOfMonth(),
-                    'is_featured' => true,
-                ],
-                [
-                    'name' => 'Cyber Monday',
-                    'status' => 'scheduled',
-                    'starts_at' => now()->addMonths(1)->startOfMonth()->addDays(3),
-                    'ends_at' => now()->addMonths(1)->startOfMonth()->addDays(3),
-                ],
-                [
-                    'name' => 'Vasaros išpardavimas',
-                    'status' => 'active',
-                    'starts_at' => now()->subDays(5),
-                    'ends_at' => now()->addDays(20),
-                    'is_featured' => true,
-                ],
-            ];
+        // Create channels and zones if they don't exist
+        $channels = Channel::factory()->count(3)->create();
+        $zones = Zone::factory()->count(5)->create();
+        $categories = Category::factory()->count(10)->create();
+        $products = Product::factory()->count(20)->create();
+        $customerGroups = CustomerGroup::factory()->count(5)->create();
 
-            foreach ($campaigns as $c) {
-                $slug = Str::slug($c['name']);
-                $campaignId = DB::table('discount_campaigns')->where('slug', $slug)->value('id');
+        // Create featured campaigns
+        $featuredCampaigns = Campaign::factory()
+            ->count(5)
+            ->featured()
+            ->active()
+            ->highPerformance()
+            ->create([
+                'channel_id' => $channels->random()->id,
+                'zone_id' => $zones->random()->id,
+            ]);
 
-                if (! $campaignId) {
-                    $campaignId = DB::table('discount_campaigns')->insertGetId([
-                        'name' => $c['name'],
-                        'slug' => $slug,
-                        'starts_at' => $c['starts_at'] ?? null,
-                        'ends_at' => $c['ends_at'] ?? null,
-                        'channel_id' => null,
-                        'zone_id' => null,
-                        'status' => $c['status'] ?? 'draft',
-                        'metadata' => json_encode([]),
-                        'is_featured' => $c['is_featured'] ?? false,
-                        'send_notifications' => true,
-                        'track_conversions' => true,
-                        'max_uses' => null,
-                        'budget_limit' => null,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
+        // Create regular active campaigns
+        $activeCampaigns = Campaign::factory()
+            ->count(15)
+            ->active()
+            ->create([
+                'channel_id' => $channels->random()->id,
+                'zone_id' => $zones->random()->id,
+            ]);
 
-                // Seed translations (lt as default, en as secondary)
-                foreach ([
-                    'lt' => $c['name'],
-                    'en' => Str::title($slug),
-                ] as $locale => $name) {
-                    DB::table('campaign_translations')->updateOrInsert(
-                        ['campaign_id' => $campaignId, 'locale' => $locale],
-                        [
-                            'name' => $name,
-                            'slug' => Str::slug($name),
-                            'description' => $locale === 'lt' ? 'Kampanijos aprašymas' : 'Campaign description',
-                            'updated_at' => now(),
-                            'created_at' => now(),
-                        ]
-                    );
-                }
+        // Create scheduled campaigns
+        $scheduledCampaigns = Campaign::factory()
+            ->count(8)
+            ->scheduled()
+            ->create([
+                'channel_id' => $channels->random()->id,
+                'zone_id' => $zones->random()->id,
+            ]);
 
-                // Attach up to 6 discounts if any exist
-                $discountIds = DB::table('discounts')->inRandomOrder()->limit(6)->pluck('id')->all();
-                foreach ($discountIds as $did) {
-                    $exists = DB::table('campaign_discount')->where('campaign_id', $campaignId)->where('discount_id', $did)->exists();
-                    if (! $exists) {
-                        DB::table('campaign_discount')->insert([
-                            'campaign_id' => $campaignId,
-                            'discount_id' => $did,
-                        ]);
-                    }
-                }
+        // Create expired campaigns
+        $expiredCampaigns = Campaign::factory()
+            ->count(5)
+            ->expired()
+            ->create([
+                'channel_id' => $channels->random()->id,
+                'zone_id' => $zones->random()->id,
+            ]);
+
+        // Create draft campaigns
+        $draftCampaigns = Campaign::factory()
+            ->count(7)
+            ->create([
+                'status' => 'draft',
+                'channel_id' => $channels->random()->id,
+                'zone_id' => $zones->random()->id,
+            ]);
+
+        $allCampaigns = $featuredCampaigns->concat($activeCampaigns)
+            ->concat($scheduledCampaigns)
+            ->concat($expiredCampaigns)
+            ->concat($draftCampaigns);
+
+        // Create campaign views for active and featured campaigns
+        foreach ($featuredCampaigns->concat($activeCampaigns) as $campaign) {
+            $viewCount = fake()->numberBetween(100, 5000);
+            
+            for ($i = 0; $i < $viewCount; $i++) {
+                CampaignView::factory()->create([
+                    'campaign_id' => $campaign->id,
+                    'viewed_at' => fake()->dateTimeBetween($campaign->starts_at, now()),
+                ]);
             }
-        });
+        }
+
+        // Create campaign clicks
+        foreach ($featuredCampaigns->concat($activeCampaigns) as $campaign) {
+            $clickCount = fake()->numberBetween(10, 500);
+            
+            for ($i = 0; $i < $clickCount; $i++) {
+                CampaignClick::factory()->create([
+                    'campaign_id' => $campaign->id,
+                    'click_type' => fake()->randomElement(['cta', 'banner', 'link']),
+                    'clicked_at' => fake()->dateTimeBetween($campaign->starts_at, now()),
+                ]);
+            }
+        }
+
+        // Create campaign conversions
+        foreach ($featuredCampaigns->concat($activeCampaigns) as $campaign) {
+            $conversionCount = fake()->numberBetween(5, 100);
+            
+            for ($i = 0; $i < $conversionCount; $i++) {
+                CampaignConversion::factory()->create([
+                    'campaign_id' => $campaign->id,
+                    'conversion_type' => fake()->randomElement(['purchase', 'signup', 'download']),
+                    'conversion_value' => fake()->randomFloat(2, 10, 500),
+                    'converted_at' => fake()->dateTimeBetween($campaign->starts_at, now()),
+                ]);
+            }
+        }
+
+        // Create customer segments for campaigns
+        foreach ($allCampaigns as $campaign) {
+            $segmentCount = fake()->numberBetween(1, 3);
+            
+            for ($i = 0; $i < $segmentCount; $i++) {
+                CampaignCustomerSegment::factory()->create([
+                    'campaign_id' => $campaign->id,
+                    'customer_group_id' => $customerGroups->random()->id,
+                    'segment_type' => fake()->randomElement(['group', 'location', 'behavior', 'custom']),
+                ]);
+            }
+        }
+
+        // Create product targets for campaigns
+        foreach ($allCampaigns as $campaign) {
+            $targetCount = fake()->numberBetween(2, 8);
+            
+            for ($i = 0; $i < $targetCount; $i++) {
+                CampaignProductTarget::factory()->create([
+                    'campaign_id' => $campaign->id,
+                    'product_id' => $products->random()->id,
+                    'category_id' => $categories->random()->id,
+                    'target_type' => fake()->randomElement(['product', 'category', 'brand', 'collection']),
+                ]);
+            }
+        }
+
+        // Create schedules for some campaigns
+        foreach ($allCampaigns->random(10) as $campaign) {
+            CampaignSchedule::factory()->create([
+                'campaign_id' => $campaign->id,
+                'schedule_type' => fake()->randomElement(['daily', 'weekly', 'monthly', 'custom']),
+                'is_active' => fake()->boolean(80),
+            ]);
+        }
+
+        // Create special seasonal campaigns
+        $seasonalCampaigns = [
+            [
+                'name' => 'Summer Sale 2024',
+                'slug' => 'summer-sale-2024',
+                'status' => 'active',
+                'is_featured' => true,
+                'display_priority' => 10,
+                'starts_at' => now()->subDays(10),
+                'ends_at' => now()->addDays(20),
+                'banner_image' => 'summer-sale-banner.jpg',
+                'cta_text' => 'Shop Summer Collection',
+                'cta_url' => '/collections/summer',
+                'meta_title' => 'Summer Sale 2024 - Up to 50% Off',
+                'meta_description' => 'Discover amazing summer deals with up to 50% off on selected items. Limited time offer!',
+                'target_audience' => [
+                    'age_range' => '18-45',
+                    'gender' => 'all',
+                    'interests' => ['fashion', 'summer', 'outdoor'],
+                ],
+            ],
+            [
+                'name' => 'Black Friday 2024',
+                'slug' => 'black-friday-2024',
+                'status' => 'scheduled',
+                'is_featured' => true,
+                'display_priority' => 10,
+                'starts_at' => now()->addDays(30),
+                'ends_at' => now()->addDays(33),
+                'banner_image' => 'black-friday-banner.jpg',
+                'cta_text' => 'Get Early Access',
+                'cta_url' => '/black-friday',
+                'meta_title' => 'Black Friday 2024 - Biggest Sale of the Year',
+                'meta_description' => 'Don\'t miss our biggest sale of the year! Massive discounts on all products.',
+                'target_audience' => [
+                    'age_range' => 'all',
+                    'gender' => 'all',
+                    'interests' => ['shopping', 'deals', 'electronics'],
+                ],
+            ],
+            [
+                'name' => 'New Year Special',
+                'slug' => 'new-year-special-2024',
+                'status' => 'scheduled',
+                'is_featured' => true,
+                'display_priority' => 9,
+                'starts_at' => now()->addDays(60),
+                'ends_at' => now()->addDays(67),
+                'banner_image' => 'new-year-banner.jpg',
+                'cta_text' => 'Start Fresh',
+                'cta_url' => '/new-year',
+                'meta_title' => 'New Year Special - Fresh Start with New Products',
+                'meta_description' => 'Start the new year with our special collection of fresh and innovative products.',
+                'target_audience' => [
+                    'age_range' => '25-55',
+                    'gender' => 'all',
+                    'interests' => ['lifestyle', 'wellness', 'home'],
+                ],
+            ],
+        ];
+
+        foreach ($seasonalCampaigns as $campaignData) {
+            $campaign = Campaign::factory()->create(array_merge($campaignData, [
+                'channel_id' => $channels->random()->id,
+                'zone_id' => $zones->random()->id,
+            ]));
+
+            // Add analytics data for active campaigns
+            if ($campaign->status === 'active') {
+                $campaign->update([
+                    'total_views' => fake()->numberBetween(1000, 10000),
+                    'total_clicks' => fake()->numberBetween(100, 1000),
+                    'total_conversions' => fake()->numberBetween(20, 200),
+                    'total_revenue' => fake()->randomFloat(2, 2000, 20000),
+                    'conversion_rate' => fake()->randomFloat(2, 2, 20),
+                ]);
+            }
+        }
+
+        $this->command->info('Created ' . $allCampaigns->count() . ' campaigns with full analytics and targeting data.');
     }
 }
-

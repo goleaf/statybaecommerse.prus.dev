@@ -16,14 +16,12 @@ use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class StockResource extends Resource
 {
     protected static ?string $model = Inventory::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
 
     protected static ?int $navigationSort = 2;

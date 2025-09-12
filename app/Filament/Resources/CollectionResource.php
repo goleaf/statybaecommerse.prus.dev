@@ -10,14 +10,12 @@ use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Actions\EditAction;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 3;
 

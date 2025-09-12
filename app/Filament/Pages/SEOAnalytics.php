@@ -16,15 +16,12 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Http;
-use BackedEnum;
-use UnitEnum;
-
 final class SEOAnalytics extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass';
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Marketing;
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass';
+    protected static UnitEnum|string|null $navigationGroup = \App\Enums\NavigationGroup::Marketing;
     protected static ?int $navigationSort = 2;
 
     public ?string $seoEntityType = 'products';
@@ -420,6 +417,7 @@ final class SEOAnalytics extends Page implements HasTable
         Product::where('is_visible', true)->chunk(20, function ($products) use (&$brokenLinks, $baseUrl) {
             foreach ($products as $product) {
                 $url = "{$baseUrl}/products/{$product->slug}";
+use \BackedEnum;
                 try {
                     $response = Http::timeout(5)->get($url);
                     if ($response->failed()) {

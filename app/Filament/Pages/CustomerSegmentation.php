@@ -14,17 +14,14 @@ use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
-use UnitEnum;
-
 final class CustomerSegmentation extends Page implements HasTable
 {
     use InteractsWithTable;
 
     protected string $view = 'filament.pages.customer-segmentation';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Marketing;
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
+    protected static UnitEnum|string|null $navigationGroup = \App\Enums\NavigationGroup::Marketing;
     protected static ?int $navigationSort = 1;
 
     public static function getNavigationGroup(): ?string

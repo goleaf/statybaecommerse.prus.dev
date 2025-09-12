@@ -14,8 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
-use BackedEnum;
-use UnitEnum;
+use \BackedEnum;
 
 final class ActivityLogResource extends Resource
 {

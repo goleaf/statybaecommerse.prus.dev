@@ -391,6 +391,7 @@ Route::get('/', function () {
 Route::get('/home', fn() => redirect()->route('home'));
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
 Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.show');
+Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
 Route::get('/products/{product}/gallery', function ($product) {
     return redirect('/' . app()->getLocale() . '/products/' . $product . '/gallery');
 })->name('products.gallery');
@@ -503,7 +504,7 @@ Route::middleware('auth')->group(function (): void {
         }
         return $placeholder('System Monitoring')();
     })->name('filament.admin.pages.system-monitoring');
-    Route::get('/admin/inventory-management', $placeholder('Inventory Management'))->name('filament.admin.pages.inventory-management');
+    Route::get('/admin/inventory-management', \App\Filament\Pages\InventoryManagement::class)->name('filament.admin.pages.inventory-management');
 
     // Discount Presets placeholder routes (auth required)
     Route::get('/admin/discounts/presets', $placeholder('Discount Presets'))
@@ -632,6 +633,9 @@ Route::prefix('{locale}')
         // Product routes
         Route::get('/products', Pages\ProductCatalog::class)->name('localized.products.index');
         Route::get('/products/{product}', Pages\SingleProduct::class)->name('localized.products.show');
+        
+        // Inventory routes
+        Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('localized.inventory.index');
 
         // Cart page
         Route::get('/cart', Pages\Cart::class)->name('localized.cart.index');

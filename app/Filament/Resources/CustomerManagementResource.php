@@ -18,14 +18,12 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class CustomerManagementResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
 
     protected static ?int $navigationSort = 1;

@@ -21,14 +21,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 use SolutionForest\TabLayoutPlugin\Components\Tabs;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class PartnerResource extends Resource
 {
     protected static ?string $model = Partner::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-building-office';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-building-office';
 
 
     protected static ?int $navigationSort = 1;

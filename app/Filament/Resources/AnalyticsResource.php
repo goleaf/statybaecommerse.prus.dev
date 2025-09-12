@@ -16,14 +16,12 @@ use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class AnalyticsResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
 
     protected static ?int $navigationSort = 1;

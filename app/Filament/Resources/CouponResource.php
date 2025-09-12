@@ -20,14 +20,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 use SolutionForest\TabLayoutPlugin\Components\Tabs;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class CouponResource extends Resource
 {
     protected static ?string $model = Coupon::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-ticket';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-ticket';
 
 
     protected static ?int $navigationSort = 1;

@@ -12,14 +12,12 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class MediaResource extends Resource
 {
     protected static ?string $model = Media::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
 
     protected static ?int $navigationSort = 2;

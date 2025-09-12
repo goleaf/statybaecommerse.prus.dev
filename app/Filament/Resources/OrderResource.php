@@ -23,14 +23,12 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-bag';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-bag';
 
     public static function getNavigationGroup(): ?string
     {

@@ -18,14 +18,12 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 use SolutionForest\TabLayoutPlugin\Components\Tabs;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class CustomerGroupResource extends Resource
 {
     protected static ?string $model = CustomerGroup::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
 
     protected static ?int $navigationSort = 2;

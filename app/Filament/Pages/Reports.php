@@ -13,14 +13,12 @@ use Filament\Forms;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class Reports extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Reports;
+    protected static UnitEnum|string|null $navigationGroup = \App\Enums\NavigationGroup::Reports;
 
     protected static ?int $navigationSort = 1;
 

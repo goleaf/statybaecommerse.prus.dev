@@ -15,11 +15,12 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 
+use \BackedEnum;
 final class DocumentResource extends Resource
 {
     protected static ?string $model = Document::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
 
     protected static ?int $navigationSort = 2;
 

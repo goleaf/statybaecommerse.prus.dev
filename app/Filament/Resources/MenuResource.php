@@ -16,14 +16,12 @@ use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-bars-3';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-bars-3';
 
 
     protected static ?int $navigationSort = 2;

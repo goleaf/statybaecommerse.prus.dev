@@ -11,14 +11,12 @@ use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class AnalyticsEventResource extends Resource
 {
     protected static ?string $model = AnalyticsEvent::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
 
     protected static ?string $navigationLabel = null;

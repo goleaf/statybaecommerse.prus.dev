@@ -10,7 +10,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -18,15 +18,15 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
-use UnitEnum;
-
 final class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;
 
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-chart-bar';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-document-chart-bar';
+    }
 
     public static function getNavigationGroup(): ?string
     {

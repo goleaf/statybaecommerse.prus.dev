@@ -99,6 +99,62 @@ final class Product extends Model implements HasMedia
         return 0;
     }
 
+    public function isInStock(): bool
+    {
+        if (!$this->manage_stock) {
+            return true; // Always in stock if not tracking
+        }
+        
+        return $this->availableQuantity() > 0;
+    }
+
+    public function isLowStock(): bool
+    {
+        if (!$this->manage_stock) {
+            return false; // Never low stock if not tracking
+        }
+        
+        return $this->stock_quantity <= $this->low_stock_threshold;
+    }
+
+    public function getStockStatus(): string
+    {
+        if (!$this->manage_stock) {
+            return 'not_tracked';
+        }
+        
+        if ($this->isOutOfStock()) {
+            return 'out_of_stock';
+        }
+        
+        if ($this->isLowStock()) {
+            return 'low_stock';
+        }
+        
+        return 'in_stock';
+    }
+
+    public function decreaseStock(int $quantity): bool
+    {
+        if (!$this->manage_stock) {
+            return true; // Always allow if not tracking
+        }
+        
+        if ($this->availableQuantity() < $quantity) {
+            return false; // Not enough stock
+        }
+        
+        $this->decrement('stock_quantity', $quantity);
+        return true;
+    }
+
+    public function increaseStock(int $quantity): void
+    {
+        if ($this->manage_stock) {
+            $this->increment('stock_quantity', $quantity);
+        }
+    }
+
     public function availableQuantity(): int
     {
         if (!$this->manage_stock) {

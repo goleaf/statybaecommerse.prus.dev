@@ -17,14 +17,12 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class InventoryResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cube-transparent';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-cube-transparent';
 
 
     protected static ?int $navigationSort = 1;

@@ -17,14 +17,12 @@ use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class CartItemResource extends Resource
 {
     protected static ?string $model = CartItem::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
 
 
     protected static ?string $navigationLabel = null;

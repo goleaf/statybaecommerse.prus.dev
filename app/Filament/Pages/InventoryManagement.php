@@ -3,313 +3,270 @@
 namespace App\Filament\Pages;
 
 use App\Models\Product;
-use App\Models\ProductVariant;
+use App\Services\InventoryService;
 use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Pages\Page;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
-use UnitEnum;
+use Illuminate\Support\Facades\DB;
 
 final class InventoryManagement extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cube-transparent';
+    protected static ?string $navigationIcon = 'heroicon-o-cube-transparent';
+    protected static ?string $navigationLabel = 'Inventory Management';
+    protected static ?string $title = 'Inventory Management';
+    protected static ?string $slug = 'inventory-management';
+    protected static ?int $navigationSort = 1;
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
+    protected static string $view = 'filament.pages.inventory-management';
 
-    protected static ?int $navigationSort = 10;
-
-    public ?string $stockFilter = 'all';
-
-    public static function getNavigationLabel(): string
+    public function getNavigationGroup(): ?string
     {
-        return __('admin.navigation.inventory_management');
+        return __('navigation.groups.catalog');
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->paginated([10, 25, 50])
-            ->striped()
-            ->poll(null)
             ->query(
                 Product::query()
-                    ->with(['brand', 'media', 'variants'])
-                    ->withCount('variants')
-                    ->when($this->stockFilter === 'low', fn(Builder $query) => $query->where('stock_quantity', '<=', 10))
-                    ->when($this->stockFilter === 'out', fn(Builder $query) => $query->where('stock_quantity', '<=', 0))
-                    ->when($this->stockFilter === 'good', fn(Builder $query) => $query->where('stock_quantity', '>', 10))
+                    ->with(['brand', 'categories'])
+                    ->where('is_visible', true)
             )
             ->columns([
-                Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
-                    ->label('')
-                    ->collection('images')
-                    ->conversion('thumb')
+                Tables\Columns\ImageColumn::make('image')
+                    ->label(__('Image'))
+                    ->getStateUsing(fn(Product $record) => $record->getFirstMediaUrl('images', 'thumb'))
+                    ->defaultImageUrl(asset('images/placeholder-product.png'))
                     ->circular()
-                    ->size(40),
+                    ->size(60),
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('admin.table.name'))
+                    ->label(__('Product'))
                     ->searchable()
                     ->sortable()
-                    ->weight('medium'),
+                    ->weight('medium')
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('sku')
-                    ->label(__('admin.table.sku'))
+                    ->label(__('SKU'))
                     ->searchable()
                     ->copyable()
-                    ->badge()
-                    ->color('gray'),
+                    ->weight('mono'),
                 Tables\Columns\TextColumn::make('brand.name')
-                    ->label(__('admin.table.brand'))
-                    ->searchable()
-                    ->sortable(),
+                    ->label(__('Brand'))
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('stock_quantity')
-                    ->label(__('admin.table.current_stock'))
+                    ->label(__('Stock'))
                     ->numeric()
                     ->sortable()
                     ->badge()
-                    ->color(fn(int $state): string => match (true) {
-                        $state <= 0 => 'danger',
-                        $state <= 10 => 'warning',
-                        $state <= 50 => 'info',
-                        default => 'success',
+                    ->color(fn(Product $record) => match($record->getStockStatus()) {
+                        'in_stock' => 'success',
+                        'low_stock' => 'warning',
+                        'out_of_stock' => 'danger',
+                        'not_tracked' => 'gray',
+                        default => 'primary',
                     }),
                 Tables\Columns\TextColumn::make('low_stock_threshold')
-                    ->label(__('admin.table.threshold'))
+                    ->label(__('Threshold'))
                     ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('variants_count')
-                    ->label(__('admin.table.variants'))
-                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\IconColumn::make('manage_stock')
+                    ->label(__('Tracked'))
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('stock_status')
+                    ->label(__('Status'))
                     ->badge()
-                    ->color('info'),
-                Tables\Columns\IconColumn::make('track_inventory')
-                    ->label(__('admin.table.tracked'))
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->label(__('admin.table.last_updated'))
-                    ->date('Y-m-d')
-                    ->sortable(),
-            ])
-            ->headerActions([
-                Action::make('stock_filter')
-                    ->label(__('admin.actions.filter_stock'))
-                    ->icon('heroicon-o-funnel')
-                    ->form([
-                        Forms\Components\Select::make('stock_filter')
-                            ->label(__('admin.fields.stock_filter'))
-                            ->options([
-                                'all' => __('admin.stock_filters.all'),
-                                'good' => __('admin.stock_filters.good_stock'),
-                                'low' => __('admin.stock_filters.low_stock'),
-                                'out' => __('admin.stock_filters.out_of_stock'),
-                            ])
-                            ->default($this->stockFilter),
-                    ])
-                    ->action(function (array $data): void {
-                        $this->stockFilter = $data['stock_filter'];
+                    ->color(fn(Product $record) => match($record->getStockStatus()) {
+                        'in_stock' => 'success',
+                        'low_stock' => 'warning',
+                        'out_of_stock' => 'danger',
+                        'not_tracked' => 'gray',
+                        default => 'primary',
+                    })
+                    ->formatStateUsing(fn(Product $record) => match($record->getStockStatus()) {
+                        'in_stock' => __('In Stock'),
+                        'low_stock' => __('Low Stock'),
+                        'out_of_stock' => __('Out of Stock'),
+                        'not_tracked' => __('Not Tracked'),
+                        default => __('Unknown'),
                     }),
+                Tables\Columns\TextColumn::make('price')
+                    ->label(__('Price'))
+                    ->money('EUR')
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('Last Updated'))
+                    ->date('Y-m-d H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->recordActions([
-                Action::make('update_stock')
-                    ->label(__('admin.actions.update_stock'))
-                    ->icon('heroicon-o-pencil')
+            ->filters([
+                Tables\Filters\SelectFilter::make('stock_status')
+                    ->label(__('Stock Status'))
+                    ->options([
+                        'in_stock' => __('In Stock'),
+                        'low_stock' => __('Low Stock'),
+                        'out_of_stock' => __('Out of Stock'),
+                        'not_tracked' => __('Not Tracked'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return match ($data['value'] ?? null) {
+                            'in_stock' => $query
+                                ->where('manage_stock', true)
+                                ->whereRaw('stock_quantity > low_stock_threshold'),
+                            'low_stock' => $query
+                                ->where('manage_stock', true)
+                                ->where('stock_quantity', '>', 0)
+                                ->whereRaw('stock_quantity <= low_stock_threshold'),
+                            'out_of_stock' => $query
+                                ->where('manage_stock', true)
+                                ->where('stock_quantity', '<=', 0),
+                            'not_tracked' => $query->where('manage_stock', false),
+                            default => $query,
+                        };
+                    }),
+                Tables\Filters\SelectFilter::make('brand')
+                    ->relationship('brand', 'name')
+                    ->searchable()
+                    ->preload(),
+                Tables\Filters\TernaryFilter::make('manage_stock')
+                    ->label(__('Track Inventory'))
+                    ->placeholder(__('All'))
+                    ->trueLabel(__('Tracked'))
+                    ->falseLabel(__('Not Tracked')),
+            ])
+            ->actions([
+                Tables\Actions\Action::make('adjust_stock')
+                    ->label(__('Adjust Stock'))
+                    ->icon('heroicon-o-adjustments-horizontal')
+                    ->color('primary')
                     ->form([
-                        Forms\Components\TextInput::make('stock_quantity')
-                            ->label(__('admin.fields.stock_quantity'))
+                        Forms\Components\TextInput::make('quantity')
+                            ->label(__('Adjustment Quantity'))
                             ->numeric()
                             ->required()
-                            ->minValue(0),
-                        Forms\Components\TextInput::make('low_stock_threshold')
-                            ->label(__('admin.fields.low_stock_threshold'))
+                            ->helperText(__('Positive to add stock, negative to remove')),
+                        Forms\Components\Select::make('reason')
+                            ->label(__('Reason'))
+                            ->options([
+                                'restock' => __('Restock'),
+                                'damaged' => __('Damaged'),
+                                'lost' => __('Lost'),
+                                'returned' => __('Returned'),
+                                'correction' => __('Correction'),
+                                'promotion' => __('Promotion'),
+                                'other' => __('Other'),
+                            ])
+                            ->required(),
+                        Forms\Components\Textarea::make('notes')
+                            ->label(__('Notes'))
+                            ->rows(3),
+                    ])
+                    ->action(function (Product $record, array $data): void {
+                        $inventoryService = app(InventoryService::class);
+                        $inventoryService->adjustProductStock(
+                            $record,
+                            (int) $data['quantity'],
+                            $data['reason'],
+                            $data['notes'] ?? null
+                        );
+                    })
+                    ->requiresConfirmation()
+                    ->modalDescription(__('Adjust stock quantity for this product')),
+                Tables\Actions\Action::make('quick_restock')
+                    ->label(__('Quick Restock'))
+                    ->icon('heroicon-o-plus-circle')
+                    ->color('success')
+                    ->form([
+                        Forms\Components\TextInput::make('quantity')
+                            ->label(__('Add Quantity'))
                             ->numeric()
-                            ->minValue(0),
-                        Forms\Components\Textarea::make('note')
-                            ->label(__('admin.fields.inventory_note'))
-                            ->maxLength(500),
+                            ->required()
+                            ->minValue(1)
+                            ->default(10),
+                        Forms\Components\Textarea::make('notes')
+                            ->label(__('Notes'))
+                            ->rows(2),
                     ])
-                    ->fillForm(fn(Product $record): array => [
-                        'stock_quantity' => $record->stock_quantity,
-                        'low_stock_threshold' => $record->low_stock_threshold,
-                    ])
-                    ->action(function (array $data, Product $record): void {
-                        $record->update([
-                            'stock_quantity' => $data['stock_quantity'],
-                            'low_stock_threshold' => $data['low_stock_threshold'] ?? $record->low_stock_threshold,
-                        ]);
-
-                        \Filament\Notifications\Notification::make()
-                            ->title(__('admin.notifications.stock_updated'))
-                            ->body(__('admin.notifications.stock_updated_for', ['name' => $record->name]))
-                            ->success()
-                            ->send();
-                    }),
-                Action::make('view_variants')
-                    ->label(__('admin.actions.view_variants'))
-                    ->icon('heroicon-o-squares-2x2')
-                    ->color('info')
-                    ->visible(fn(Product $record): bool => $record->variants_count > 0)
-                    ->url(fn(Product $record): string =>
-                        route('filament.admin.resources.products.view', ['record' => $record, 'activeTab' => 'variants']))
-                    ->openUrlInNewTab(),
+                    ->action(function (Product $record, array $data): void {
+                        $inventoryService = app(InventoryService::class);
+                        $inventoryService->adjustProductStock(
+                            $record,
+                            (int) $data['quantity'],
+                            'restock',
+                            $data['notes'] ?? null
+                        );
+                    })
+                    ->requiresConfirmation()
+                    ->modalDescription(__('Add stock to this product')),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    BulkAction::make('bulk_stock_update')
-                        ->label(__('admin.actions.bulk_stock_update'))
-                        ->icon('heroicon-m-pencil-square')
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('bulk_restock')
+                        ->label(__('Bulk Restock'))
+                        ->icon('heroicon-o-plus-circle')
+                        ->color('success')
                         ->form([
-                            Forms\Components\Select::make('operation')
-                                ->label(__('admin.fields.operation'))
-                                ->options([
-                                    'set' => __('admin.stock_operations.set_to'),
-                                    'increase' => __('admin.stock_operations.increase_by'),
-                                    'decrease' => __('admin.stock_operations.decrease_by'),
-                                ])
-                                ->required(),
                             Forms\Components\TextInput::make('quantity')
-                                ->label(__('admin.fields.quantity'))
+                                ->label(__('Add Quantity'))
                                 ->numeric()
                                 ->required()
-                                ->minValue(0),
+                                ->minValue(1)
+                                ->default(10),
+                            Forms\Components\Select::make('reason')
+                                ->label(__('Reason'))
+                                ->options([
+                                    'restock' => __('Restock'),
+                                    'correction' => __('Correction'),
+                                    'promotion' => __('Promotion'),
+                                ])
+                                ->default('restock'),
                         ])
                         ->action(function (array $data, $records): void {
-                            $normalized = $records instanceof \Illuminate\Support\Collection ? $records->all() : $records;
-                            $records = collect($normalized)
-                                ->map(fn($record) => $record instanceof Product ? $record : Product::find($record))
-                                ->filter();
-
+                            $inventoryService = app(InventoryService::class);
                             foreach ($records as $record) {
-                                $newStock = match ($data['operation']) {
-                                    'set' => (int) $data['quantity'],
-                                    'increase' => (int) $record->stock_quantity + (int) $data['quantity'],
-                                    'decrease' => max(0, (int) $record->stock_quantity - (int) $data['quantity']),
-                                };
-
-                                $record->update(['stock_quantity' => $newStock]);
+                                $inventoryService->adjustProductStock(
+                                    $record,
+                                    (int) $data['quantity'],
+                                    $data['reason']
+                                );
                             }
-
-                            \Filament\Notifications\Notification::make()
-                                ->title(__('admin.notifications.bulk_stock_updated'))
-                                ->body(__('admin.notifications.updated_items', ['count' => count($records)]))
-                                ->success()
-                                ->send();
-                        }),
-                    BulkAction::make('enable_tracking')
-                        ->label(__('admin.actions.enable_tracking'))
-                        ->icon('heroicon-m-eye')
-                        ->color('success')
-                        ->action(function ($records): void {
-                            $normalized = $records instanceof \Illuminate\Support\Collection ? $records->all() : $records;
-                            $records = collect($normalized)
-                                ->map(fn($record) => $record instanceof Product ? $record : Product::find($record))
-                                ->filter();
-
-                            $records->each(fn(Product $record) => $record->update(['track_inventory' => true]));
-                        }),
-                    BulkAction::make('disable_tracking')
-                        ->label(__('admin.actions.disable_tracking'))
-                        ->icon('heroicon-m-eye-slash')
-                        ->color('danger')
-                        ->action(function ($records): void {
-                            $normalized = $records instanceof \Illuminate\Support\Collection ? $records->all() : $records;
-                            $records = collect($normalized)
-                                ->map(fn($record) => $record instanceof Product ? $record : Product::find($record))
-                                ->filter();
-
-                            $records->each(fn(Product $record) => $record->update(['track_inventory' => false]));
-                        }),
+                        })
+                        ->requiresConfirmation()
+                        ->modalDescription(__('Add stock to selected products')),
                 ]),
             ])
-            ->defaultSort('stock_quantity', 'asc');
-    }
-
-    protected function shouldLoadTableOnMount(): bool
-    {
-        return true;
+            ->poll('30s')
+            ->striped();
     }
 
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('export_inventory')
-                ->label(__('admin.actions.export_inventory'))
-                ->icon('heroicon-o-arrow-down-tray')
-                ->color('success')
-                ->action(function (): void {
-                    // Export inventory to CSV
-                    $products = Product::with('brand')->get();
-                    $csv = "Name,SKU,Brand,Stock,Threshold,Price\n";
-
-                    foreach ($products as $product) {
-                        $csv .= sprintf(
-                            '"%s","%s","%s",%d,%d,%.2f' . "\n",
-                            $product->name,
-                            $product->sku,
-                            $product->brand?->name ?? 'N/A',
-                            $product->stock_quantity,
-                            $product->low_stock_threshold,
-                            $product->price
-                        );
-                    }
-
-                    $filename = 'inventory-' . now()->format('Y-m-d-H-i-s') . '.csv';
-                    \Storage::disk('public')->put('exports/' . $filename, $csv);
-
-                    \Filament\Notifications\Notification::make()
-                        ->title(__('admin.notifications.inventory_exported'))
-                        ->body(__('admin.notifications.file_saved', ['filename' => $filename]))
-                        ->success()
-                        ->recordActions([
-                            \Filament\Notifications\Actions\Action::make('download')
-                                ->label(__('admin.actions.download'))
-                                ->url(asset('storage/exports/' . $filename))
-                                ->openUrlInNewTab(),
-                        ])
-                        ->send();
-                }),
-            Action::make('low_stock_alert')
-                ->label(__('admin.actions.low_stock_alert'))
-                ->icon('heroicon-o-exclamation-triangle')
-                ->color('warning')
-                ->action(function (): void {
-                    $lowStockCount = Product::where('stock_quantity', '<=', 10)->count();
-
-                    \Filament\Notifications\Notification::make()
-                        ->title(__('admin.notifications.low_stock_check'))
-                        ->body(__('admin.notifications.low_stock_items', ['count' => $lowStockCount]))
-                        ->warning()
-                        ->send();
-                }),
+            Action::make('inventory_summary')
+                ->label(__('Inventory Summary'))
+                ->icon('heroicon-o-chart-bar')
+                ->color('info')
+                ->modalContent(function (): string {
+                    $inventoryService = app(InventoryService::class);
+                    $summary = $inventoryService->getInventorySummary();
+                    
+                    return view('filament.pages.inventory-summary', compact('summary'))->render();
+                })
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel(__('Close')),
         ];
-    }
-
-    public function clearCache(): void
-    {
-        \Artisan::call('optimize:clear');
-        $this->loadSystemStats();
-
-        \Filament\Notifications\Notification::make()
-            ->title(__('admin.notifications.cache_cleared'))
-            ->success()
-            ->send();
-    }
-
-    public function optimizeSystem(): void
-    {
-        \Artisan::call('optimize');
-        $this->loadSystemStats();
-
-        \Filament\Notifications\Notification::make()
-            ->title(__('admin.notifications.system_optimized'))
-            ->success()
-            ->send();
     }
 }

@@ -20,14 +20,12 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class ZoneResource extends Resource
 {
     protected static ?string $model = Zone::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-globe-europe-africa';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-globe-europe-africa';
 
 
     protected static ?int $navigationSort = 5;

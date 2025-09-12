@@ -13,14 +13,12 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
-use BackedEnum;
-use UnitEnum;
-
+use \BackedEnum;
 final class SystemMonitoring extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cpu-chip';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-cpu-chip';
 
-    protected static string|UnitEnum|null $navigationGroup = \App\Enums\NavigationGroup::System;
+    protected static UnitEnum|string|null $navigationGroup = \App\Enums\NavigationGroup::System;
 
     protected static ?int $navigationSort = 1;
 
