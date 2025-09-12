@@ -7,6 +7,7 @@ use Filament\Actions\DeleteAction;
 use Livewire\Livewire;
 
 beforeEach(function () {
+    $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
     $this->admin = User::factory()->create();
     $this->admin->assignRole('admin');
     $this->actingAs($this->admin);
