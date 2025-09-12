@@ -31,7 +31,7 @@ it('can access analytics dashboard', function () {
 });
 
 it('can view analytics dashboard page', function () {
-    livewire(AnalyticsDashboard::class)
+    Livewire::test(AnalyticsDashboard::class)
         ->assertSuccessful();
 });
 
