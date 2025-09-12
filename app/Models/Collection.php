@@ -142,7 +142,7 @@ final class Collection extends Model implements HasMedia
         }
 
         $url = $this->getFirstMediaUrl('banner', "banner-{$size}") ?: $this->getFirstMediaUrl('banner');
-        return $url ?: null;
+        return $url ?: '';
     }
 
     public function registerMediaCollections(): void

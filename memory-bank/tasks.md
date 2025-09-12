@@ -360,6 +360,12 @@ Type: Complex System
   - Solution: Fixed syntax error by removing extra closing bracket and corrected navigationGroup property type
   - Fixed navigationGroup property type from UnitEnum to BackedEnum to match Filament requirements
   - All 1 RobotsControllerTest case now passing with 5 assertions
+- ✅ **CollectionTest:** Fixed all 8 test cases
+  - Fixed Collection model getImageUrl and getBannerUrl methods returning wrong values
+  - Issue resolved: Test was failing because methods returned empty string instead of null when no media found
+  - Solution: Updated methods to return null when no size specified, empty string when size specified but no media found
+  - Fixed ViewAnalyticsEvent getView method access level from protected to public
+  - All 8 CollectionTest cases now passing with 26 assertions
 - ✅ **VerifyEmailControllerTest:** Fixed all 1 test case
   - Fixed missing account.index route that VerifyEmailController was trying to redirect to
   - Added account.index route that redirects to account.orders as the main account page

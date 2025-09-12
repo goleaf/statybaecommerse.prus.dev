@@ -17,7 +17,7 @@ final class ViewAnalyticsEvent extends ViewRecord
         ];
     }
 
-    protected function getView(): string
+    public function getView(): string
     {
         return 'filament.resources.analytics-event-resource.pages.view-analytics-event';
     }

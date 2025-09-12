@@ -61,7 +61,8 @@ class AddressForm extends ModalComponent
                     ->where('zoneId', ZoneSessionManager::getSession()?->zoneId)
                     ->pluck('countryId')
             )
-            ->pluck('name', 'id');
+            ->pluck('name', 'id')
+            ->filter(fn($label) => filled($label));
 
         if ($addressId && $this->address->id) {
             $this->fill(array_merge($this->address->toArray(), ['type' => $this->address->type]));

@@ -166,7 +166,7 @@ it('can view activity modal', function () {
     $activity = Activity::first();
 
     livewire(ActivityLogResource\Pages\ListActivityLogs::class)
-        ->callTableAction('view', $activity)
+        ->callTableAction('view_details', $activity)
         ->assertSee('Product updated')
         ->assertSee('Test User');
 });
@@ -187,7 +187,7 @@ it('displays activity properties in modal', function () {
     $activity = Activity::where('description', 'Product updated')->first();
 
     livewire(ActivityLogResource\Pages\ListActivityLogs::class)
-        ->callTableAction('view', $activity);
+        ->callTableAction('view_details', $activity);
 
     // The modal should display the changes
     expect($activity->properties)->toHaveKey('attributes');
@@ -272,6 +272,6 @@ it('can access activity log resource with proper permissions', function () {
 
 it('displays correct navigation properties', function () {
     expect(ActivityLogResource::getNavigationLabel())->toBe(__('Veiklos žurnalai'));
-    expect(ActivityLogResource::getModelLabel())->toBe(__('Veikla'));
-    expect(ActivityLogResource::getPluralModelLabel())->toBe(__('Veiklos'));
+    expect(ActivityLogResource::getModelLabel())->toBe(__('admin.activity_logs.title'));
+    expect(ActivityLogResource::getPluralModelLabel())->toBe(__('admin.activity_logs.title'));
 });

@@ -353,6 +353,13 @@
 - **Additional fix**: Fixed navigationGroup property type from UnitEnum to BackedEnum to match Filament requirements
 - **Current status**: All 1 test passing (100% success rate) - robots.txt generation functionality working correctly
 
+### ✅ CollectionTest.php - All 8 tests passing
+- **Fixed Collection model media URL methods**: Resolved getImageUrl and getBannerUrl methods returning wrong values
+- **Issue resolved**: Test was failing because methods returned empty string instead of null when no media found
+- **Solution**: Updated methods to return null when no size specified, empty string when size specified but no media found
+- **Additional fix**: Fixed ViewAnalyticsEvent getView method access level from protected to public
+- **Current status**: All 8 tests passing (100% success rate) - Collection model functionality working correctly
+
 ### ✅ HomeTest.php - All 3 tests passing
 - **Fixed redirect behavior**: Updated test to properly handle root route redirect to localized home
 - **Issue resolved**: Test was expecting 200 but getting 302 redirect from `/` to `/lt`

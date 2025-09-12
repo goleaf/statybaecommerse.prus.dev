@@ -124,7 +124,7 @@ final class Index extends Component implements HasSchemas
 
     private function getBrandOptions(): array
     {
-        return $this->brands->pluck('name', 'id')->toArray();
+        return $this->brands->pluck('name', 'id')->filter(fn($label) => filled($label))->toArray();
     }
 
     #[Computed]

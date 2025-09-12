@@ -36,6 +36,7 @@ final class DocumentAction extends Action
                     ->options(
                         DocumentTemplate::active()
                             ->pluck('name', 'id')
+                            ->filter(fn($label) => filled($label))
                             ->toArray()
                     )
                     ->required()

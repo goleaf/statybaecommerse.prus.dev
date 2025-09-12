@@ -949,11 +949,94 @@ return [
     'partner' => [
         'plural' => 'Partneriai',
         'singular' => 'Partneris',
+        'form' => [
+            'basic_info' => 'Pagrindinė informacija',
+            'name' => 'Pavadinimas',
+            'code' => 'Kodas',
+            'email' => 'El. paštas',
+            'phone' => 'Telefonas',
+            'tier' => 'Lygis',
+            'active' => 'Aktyvus',
+            'additional' => 'Papildoma informacija',
+            'discount_rate' => 'Nuolaidos tarifas',
+            'commission_rate' => 'Komisijos tarifas',
+        ],
+        'table' => [
+            'name' => 'Pavadinimas',
+            'email' => 'El. paštas',
+            'tier' => 'Lygis',
+            'phone' => 'Telefonas',
+            'active' => 'Aktyvus',
+            'created_at' => 'Sukurta',
+        ],
+        'filters' => [
+            'tier' => 'Lygis',
+            'active' => 'Aktyvus',
+        ],
     ],
     // Partner Tiers
     'partner_tier' => [
         'plural' => 'Partnerių lygiai',
         'singular' => 'Partnerio lygis',
+        'form' => [
+            'basic_info' => 'Pagrindinė informacija',
+            'name' => 'Pavadinimas',
+            'code' => 'Kodas',
+            'discount_rate' => 'Nuolaidos tarifas',
+            'discount_rate_help' => 'Nuolaidos tarifas nuo 0 iki 1 (pvz., 0.1 = 10%)',
+            'commission_rate' => 'Komisijos tarifas',
+            'commission_rate_help' => 'Komisijos tarifas nuo 0 iki 1 (pvz., 0.05 = 5%)',
+            'minimum_order_value' => 'Minimali užsakymo vertė',
+            'active' => 'Aktyvus',
+            'benefits' => 'Privalumai',
+            'benefit_key' => 'Privalumo pavadinimas',
+            'benefit_value' => 'Privalumo aprašymas',
+            'add_benefit' => 'Pridėti privalumą',
+        ],
+        'table' => [
+            'name' => 'Pavadinimas',
+            'code' => 'Kodas',
+            'discount_rate' => 'Nuolaidos tarifas',
+            'commission_rate' => 'Komisijos tarifas',
+            'minimum_order_value' => 'Minimali užsakymo vertė',
+            'partners_count' => 'Partnerių skaičius',
+            'active' => 'Aktyvus',
+            'created_at' => 'Sukurta',
+        ],
+        'filters' => [
+            'active' => 'Aktyvus',
+        ],
+    ],
+    // Countries
+    'countries' => [
+        'title' => 'Šalys',
+        'description' => 'Valdykite šalis, jų kodus ir regionus.',
+        'sections' => [
+            'country_information' => 'Šalies informacija',
+            'geographic_information' => 'Geografinė informacija',
+        ],
+        'fields' => [
+            'cca2' => 'CCA2 kodas',
+            'cca3' => 'CCA3 kodas',
+            'phone_calling_code' => 'Telefono kviesimo kodas',
+            'flag' => 'Vėliava',
+            'code' => 'Kodas',
+            'name' => 'Pavadinimas',
+            'translations' => 'Vertimai',
+        ],
+        'regions' => [
+            'europe' => 'Europa',
+            'asia' => 'Azija',
+            'africa' => 'Afrika',
+            'americas' => 'Amerikos',
+            'oceania' => 'Okeanija',
+        ],
+        'placeholders' => [
+            'add_currency_codes' => 'Pridėti valiutų kodus',
+        ],
+        'filters' => [
+            'has_translations' => 'Turi vertimus',
+        ],
     ],
     // Models
     'models' => [

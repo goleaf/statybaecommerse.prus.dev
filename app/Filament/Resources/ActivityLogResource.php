@@ -230,7 +230,7 @@ final class ActivityLogResource extends Resource
                 Tables\Filters\SelectFilter::make('causer_id')
                     ->label(__('admin.activity_logs.filters.user'))
                     ->options(function () {
-                        return \App\Models\User::pluck('name', 'id')->toArray();
+                        return \App\Models\User::pluck('name', 'id')->filter(fn($label) => filled($label))->toArray();
                     })
                     ->searchable(),
 

@@ -76,6 +76,7 @@ it('can impersonate users', function () {
 
     Livewire::actingAs($this->admin)
         ->test(\App\Filament\Pages\UserImpersonation::class)
+        ->assertSuccessful()
         ->mountTableAction('impersonate', $customer)
         ->callMountedTableAction();
 
@@ -129,11 +130,14 @@ it('can send notifications to users', function () {
 
     Livewire::actingAs($this->admin)
         ->test(\App\Filament\Pages\UserImpersonation::class)
-        ->callTableAction('send_notification', $customer, [
+        ->assertSuccessful()
+        ->mountTableAction('send_notification', $customer)
+        ->setTableActionData([
             'title' => 'Test Notification',
             'message' => 'This is a test message',
             'type' => 'info',
-        ]);
+        ])
+        ->callMountedTableAction();
 
     expect($customer->notifications)->toHaveCount(1);
     expect($customer->notifications->first()->data['title'])->toBe('Test Notification');

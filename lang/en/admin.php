@@ -1031,6 +1031,102 @@ return [
         ],
     ],
 
+    // Countries
+    'countries' => [
+        'title' => 'Countries',
+        'description' => 'Manage countries, their codes and regions.',
+        'sections' => [
+            'country_information' => 'Country Information',
+            'geographic_information' => 'Geographic Information',
+        ],
+        'fields' => [
+            'cca2' => 'CCA2 Code',
+            'cca3' => 'CCA3 Code',
+            'phone_calling_code' => 'Phone Calling Code',
+            'flag' => 'Flag',
+            'code' => 'Code',
+            'name' => 'Name',
+            'translations' => 'Translations',
+        ],
+        'regions' => [
+            'europe' => 'Europe',
+            'asia' => 'Asia',
+            'africa' => 'Africa',
+            'americas' => 'Americas',
+            'oceania' => 'Oceania',
+        ],
+        'placeholders' => [
+            'add_currency_codes' => 'Add Currency Codes',
+        ],
+        'filters' => [
+            'has_translations' => 'Has Translations',
+        ],
+    ],
+
+    // Partners
+    'partner' => [
+        'plural' => 'Partners',
+        'singular' => 'Partner',
+        'form' => [
+            'basic_info' => 'Basic Information',
+            'name' => 'Name',
+            'code' => 'Code',
+            'email' => 'Email',
+            'phone' => 'Phone',
+            'tier' => 'Tier',
+            'active' => 'Active',
+            'additional' => 'Additional Information',
+            'discount_rate' => 'Discount Rate',
+            'commission_rate' => 'Commission Rate',
+        ],
+        'table' => [
+            'name' => 'Name',
+            'email' => 'Email',
+            'tier' => 'Tier',
+            'phone' => 'Phone',
+            'active' => 'Active',
+            'created_at' => 'Created At',
+        ],
+        'filters' => [
+            'tier' => 'Tier',
+            'active' => 'Active',
+        ],
+    ],
+
+    // Partner Tiers
+    'partner_tier' => [
+        'plural' => 'Partner Tiers',
+        'singular' => 'Partner Tier',
+        'form' => [
+            'basic_info' => 'Basic Information',
+            'name' => 'Name',
+            'code' => 'Code',
+            'discount_rate' => 'Discount Rate',
+            'discount_rate_help' => 'Discount rate from 0 to 1 (e.g., 0.1 = 10%)',
+            'commission_rate' => 'Commission Rate',
+            'commission_rate_help' => 'Commission rate from 0 to 1 (e.g., 0.05 = 5%)',
+            'minimum_order_value' => 'Minimum Order Value',
+            'active' => 'Active',
+            'benefits' => 'Benefits',
+            'benefit_key' => 'Benefit Name',
+            'benefit_value' => 'Benefit Description',
+            'add_benefit' => 'Add Benefit',
+        ],
+        'table' => [
+            'name' => 'Name',
+            'code' => 'Code',
+            'discount_rate' => 'Discount Rate',
+            'commission_rate' => 'Commission Rate',
+            'minimum_order_value' => 'Minimum Order Value',
+            'partners_count' => 'Partners Count',
+            'active' => 'Active',
+            'created_at' => 'Created At',
+        ],
+        'filters' => [
+            'active' => 'Active',
+        ],
+    ],
+
     // Additional translations
     'view_subject' => 'View Subject',
     'clear_old_logs' => 'Clear Old Logs',

@@ -17,8 +17,14 @@
                 </div>
                 
                 <div>
-                    <label class="text-sm font-medium text-gray-700">{{ __('User ID') }}</label>
-                    <p class="mt-1 text-sm text-gray-900">{{ $record->user_id ?? 'N/A' }}</p>
+                    <label class="text-sm font-medium text-gray-700">{{ __('User') }}</label>
+                    <p class="mt-1 text-sm text-gray-900">
+                        @if($record->user)
+                            {{ $record->user->name }} (ID: {{ $record->user_id }})
+                        @else
+                            {{ $record->user_id ?? 'N/A' }}
+                        @endif
+                    </p>
                 </div>
                 
                 <div>

@@ -101,13 +101,13 @@ final class SeoDataResource extends Resource
                             ->options(function (callable $get) {
                                 $type = $get('seoable_type');
                                 if ($type === Product::class) {
-                                    return Product::query()->orderBy('name')->pluck('name', 'id');
+                                    return Product::query()->orderBy('name')->pluck('name', 'id')->filter(fn($label) => filled($label))->toArray();
                                 }
                                 if ($type === Category::class) {
-                                    return Category::query()->orderBy('name')->pluck('name', 'id');
+                                    return Category::query()->orderBy('name')->pluck('name', 'id')->filter(fn($label) => filled($label))->toArray();
                                 }
                                 if ($type === Brand::class) {
-                                    return Brand::query()->orderBy('name')->pluck('name', 'id');
+                                    return Brand::query()->orderBy('name')->pluck('name', 'id')->filter(fn($label) => filled($label))->toArray();
                                 }
                                 return [];
                             })

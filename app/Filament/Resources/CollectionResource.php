@@ -9,6 +9,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Actions\EditAction;
 use BackedEnum;
 use UnitEnum;
 
@@ -70,7 +71,7 @@ final class CollectionResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
