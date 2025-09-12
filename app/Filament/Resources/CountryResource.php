@@ -25,10 +25,11 @@ final class CountryResource extends Resource
      */
     protected static $navigationIcon = 'heroicon-o-globe-alt';
 
+    /** @var string|\BackedEnum|null */
+
     /**
-     * @var string|\BackedEnum|null
+     * @var UnitEnum|string|null
      */
-    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'shipping';
 
     protected static ?string $navigationLabel = 'admin.countries.navigation_label';

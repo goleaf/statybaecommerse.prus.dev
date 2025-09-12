@@ -35,7 +35,9 @@ final class BrandResource extends Resource
 
     protected static NavigationIcon $navigationIcon = NavigationIcon::Tag;
 
-    /** @var UnitEnum|string|null */
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -96,7 +98,6 @@ final class BrandResource extends Resource
                         ->helperText(__('admin.brands.helpers.enabled')),
                 ])
                 ->columns(2),
-
             Section::make(__('admin.brands.sections.seo'))
                 ->components([
                     Forms\Components\TextInput::make('seo_title')
@@ -111,7 +112,6 @@ final class BrandResource extends Resource
                 ])
                 ->columns(1)
                 ->collapsible(),
-
             Section::make(__('admin.brands.sections.translations'))
                 ->components([
                     Forms\Components\Repeater::make('translations')
@@ -146,7 +146,7 @@ final class BrandResource extends Resource
                         ->columns(2)
                         ->addActionLabel(__('admin.brands.actions.add_translation'))
                         ->collapsible()
-                        ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
+                        ->itemLabel(fn(array $state): ?string => $state['locale'] ?? null),
                 ])
                 ->collapsible(),
         ]);
@@ -223,7 +223,7 @@ final class BrandResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['value'],
-                            fn (Builder $query, $locale): Builder => $query->whereHas('translations', fn (Builder $query) => $query->where('locale', $locale))
+                            fn(Builder $query, $locale): Builder => $query->whereHas('translations', fn(Builder $query) => $query->where('locale', $locale))
                         );
                     }),
             ])

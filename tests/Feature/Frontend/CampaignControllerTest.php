@@ -314,7 +314,6 @@ final class CampaignControllerTest extends TestCase
         $response->assertDontSee($smsCampaign->trans('name'));
     }
 
-
     public function test_only_active_campaigns_are_shown(): void
     {
         $activeCampaign = Campaign::factory()->create([

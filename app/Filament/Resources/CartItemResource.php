@@ -6,26 +6,30 @@ use App\Filament\Resources\CartItemResource\Pages;
 use App\Filament\Resources\CartItemResource\RelationManagers;
 use App\Filament\Resources\CartItemResource\Widgets;
 use App\Models\CartItem;
-use UnitEnum;
 use App\Models\Product;
 use App\Models\User;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use BackedEnum;
+use UnitEnum;
 
 final class CartItemResource extends Resource
 {
     protected static ?string $model = CartItem::class;
 
-    /** @var string|\BackedEnum|null */
+    /**
+     * @var string|\BackedEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-shopping-bag';
 
-    /** @var UnitEnum|string|null */
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static $navigationGroup = 'admin.navigation.sales';
 
     protected static ?string $recordTitleAttribute = 'id';
@@ -201,7 +205,7 @@ final class CartItemResource extends Resource
                     ->numeric()
                     ->sortable()
                     ->badge()
-                    ->color(fn (CartItem $record) => $record->needsRestocking() ? 'danger' : 'success'),
+                    ->color(fn(CartItem $record) => $record->needsRestocking() ? 'danger' : 'success'),
                 Tables\Columns\TextColumn::make('minimum_quantity')
                     ->label(__('admin.cart_items.fields.minimum_quantity'))
                     ->numeric()
@@ -225,7 +229,7 @@ final class CartItemResource extends Resource
                 Tables\Columns\IconColumn::make('needs_restocking')
                     ->label(__('admin.cart_items.fields.needs_restocking'))
                     ->boolean()
-                    ->getStateUsing(fn (CartItem $record) => $record->needsRestocking())
+                    ->getStateUsing(fn(CartItem $record) => $record->needsRestocking())
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.cart_items.fields.created_at'))
@@ -259,8 +263,8 @@ final class CartItemResource extends Resource
                 Tables\Filters\TernaryFilter::make('needs_restocking')
                     ->label(__('admin.cart_items.filters.needs_restocking'))
                     ->queries(
-                        true: fn (Builder $query) => $query->whereRaw('quantity < minimum_quantity'),
-                        false: fn (Builder $query) => $query->whereRaw('quantity >= minimum_quantity'),
+                        true: fn(Builder $query) => $query->whereRaw('quantity < minimum_quantity'),
+                        false: fn(Builder $query) => $query->whereRaw('quantity >= minimum_quantity'),
                     ),
                 Tables\Filters\Filter::make('created_at')
                     ->form([

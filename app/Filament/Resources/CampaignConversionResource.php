@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Filament\Resources\CampaignConversionResource\RelationManagers;
 use App\Models\Campaign;
-use UnitEnum;
 use App\Models\CampaignConversion;
 use App\Models\Customer;
 use App\Models\Order;
@@ -45,6 +44,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\HtmlString;
+use UnitEnum;
 
 class CampaignConversionResource extends Resource
 {
@@ -61,10 +61,11 @@ class CampaignConversionResource extends Resource
 
     protected static ?string $pluralModelLabel = 'campaign_conversions.model.plural';
 
+    /** @var string|\BackedEnum|null */
+
     /**
-     * @var string|\BackedEnum|null
+     * @var UnitEnum|string|null
      */
-    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'campaign_conversions.navigation.group';
 
     protected static ?int $navigationSort = 3;

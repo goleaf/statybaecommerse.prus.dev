@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignClickResource\Pages;
 use App\Models\CampaignClick;
-use UnitEnum;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -31,6 +30,7 @@ use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 class CampaignClickResource extends Resource
 {
@@ -47,10 +47,11 @@ class CampaignClickResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Campaign Clicks';
 
+    /** @var string|\BackedEnum|null */
+
     /**
-     * @var string|\BackedEnum|null
+     * @var UnitEnum|string|null
      */
-    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'Campaigns';
 
     protected static ?int $navigationSort = 3;

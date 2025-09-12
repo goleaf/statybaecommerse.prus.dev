@@ -23,3 +23,4 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/referral/{code}', [ReferralController::class, 'show'])->name('referrals.apply');
 
 
+

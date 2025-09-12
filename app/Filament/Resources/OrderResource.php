@@ -73,10 +73,11 @@ class OrderResource extends Resource
 
     protected static ?string $pluralModelLabel = 'orders.plural_model_label';
 
+    /** @var string|\BackedEnum|null */
+
     /**
-     * @var string|\BackedEnum|null
+     * @var UnitEnum|string|null
      */
-    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'orders.navigation_group';
 
     protected static ?int $navigationSort = 1;

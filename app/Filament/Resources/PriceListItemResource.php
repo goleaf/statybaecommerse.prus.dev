@@ -5,9 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Filament\Resources\PriceListItemResource\RelationManagers;
 use App\Filament\Resources\PriceListItemResource\Widgets;
-use App\Models\PriceListItem;
-use UnitEnum;
 use App\Models\PriceList;
+use App\Models\PriceListItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Filament\Actions\BulkActionGroup;
@@ -15,30 +14,31 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use BackedEnum;
+use UnitEnum;
 
 final class PriceListItemResource extends Resource
 {
@@ -47,7 +47,10 @@ final class PriceListItemResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|\BackedEnum|null */
-    /** @var UnitEnum|string|null */
+
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static $navigationGroup = 'Pricing';
 
     protected static ?int $navigationSort = 3;
@@ -118,11 +121,11 @@ final class PriceListItemResource extends Resource
                                                     ->relationship(
                                                         name: 'variant',
                                                         titleAttribute: 'name',
-                                                        modifyQueryUsing: fn (Builder $query, callable $get) => $query->where('product_id', $get('product_id'))
+                                                        modifyQueryUsing: fn(Builder $query, callable $get) => $query->where('product_id', $get('product_id'))
                                                     )
                                                     ->searchable()
                                                     ->preload()
-                                                    ->visible(fn (callable $get) => $get('product_id')),
+                                                    ->visible(fn(callable $get) => $get('product_id')),
                                                 Toggle::make('is_active')
                                                     ->label(__('admin.price_list_items.fields.is_active'))
                                                     ->default(true),
@@ -274,8 +277,8 @@ final class PriceListItemResource extends Resource
                     ->toggleable(),
                 BadgeColumn::make('discount_percentage')
                     ->label(__('admin.price_list_items.fields.discount_percentage'))
-                    ->formatStateUsing(fn ($state) => $state ? $state . '%' : '-')
-                    ->color(fn ($state) => $state > 20 ? 'success' : ($state > 10 ? 'warning' : 'gray'))
+                    ->formatStateUsing(fn($state) => $state ? $state . '%' : '-')
+                    ->color(fn($state) => $state > 20 ? 'success' : ($state > 10 ? 'warning' : 'gray'))
                     ->toggleable(),
                 TextColumn::make('priority')
                     ->label(__('admin.price_list_items.fields.priority'))
@@ -322,18 +325,22 @@ final class PriceListItemResource extends Resource
                     ->falseLabel(__('admin.price_list_items.filters.inactive_only')),
                 Filter::make('with_discount')
                     ->label(__('admin.price_list_items.filters.with_discount'))
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('compare_amount')
+                    ->query(fn(Builder $query): Builder => $query
+                        ->whereNotNull('compare_amount')
                         ->whereColumn('compare_amount', '>', 'net_amount')),
                 Filter::make('valid_now')
                     ->label(__('admin.price_list_items.filters.valid_now'))
-                    ->query(fn (Builder $query): Builder => $query->where('is_active', true)
+                    ->query(fn(Builder $query): Builder => $query
+                        ->where('is_active', true)
                         ->where(function ($q) {
-                            $q->whereNull('valid_from')
-                              ->orWhere('valid_from', '<=', now());
+                            $q
+                                ->whereNull('valid_from')
+                                ->orWhere('valid_from', '<=', now());
                         })
                         ->where(function ($q) {
-                            $q->whereNull('valid_until')
-                              ->orWhere('valid_until', '>=', now());
+                            $q
+                                ->whereNull('valid_until')
+                                ->orWhere('valid_until', '>=', now());
                         })),
                 DateFilter::make('valid_from')
                     ->label(__('admin.price_list_items.filters.valid_from')),

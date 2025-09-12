@@ -9,46 +9,46 @@ use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Filament\Resources\CategoryResource\Widgets;
 use App\Models\Category;
 use App\Models\Product;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
-use UnitEnum;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\KeyValue;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Support\Enums\FontWeight;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Collection;
-use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 final class CategoryResource extends Resource
 {
@@ -56,7 +56,9 @@ final class CategoryResource extends Resource
 
     protected static NavigationIcon $navigationIcon = NavigationIcon::RectangleStack;
 
-    /** @var UnitEnum|string|null */
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
@@ -100,27 +102,22 @@ final class CategoryResource extends Resource
                                                 }
                                                 $set('slug', \Illuminate\Support\Str::slug($state));
                                             }),
-
                                         RichEditor::make('translations.description.lt')
                                             ->label(__('categories.fields.description'))
                                             ->columnSpanFull(),
-
                                         Textarea::make('translations.short_description.lt')
                                             ->label(__('categories.fields.short_description'))
                                             ->rows(3)
                                             ->columnSpanFull(),
-
                                         TextInput::make('translations.seo_title.lt')
                                             ->label(__('categories.fields.seo_title'))
                                             ->maxLength(255)
                                             ->columnSpanFull(),
-
                                         Textarea::make('translations.seo_description.lt')
                                             ->label(__('categories.fields.seo_description'))
                                             ->rows(3)
                                             ->maxLength(500)
                                             ->columnSpanFull(),
-
                                         TextInput::make('translations.seo_keywords.lt')
                                             ->label(__('categories.fields.seo_keywords'))
                                             ->maxLength(255)
@@ -128,7 +125,6 @@ final class CategoryResource extends Resource
                                     ])
                                     ->columns(2),
                             ]),
-
                         Tab::make(__('categories.tabs.english'))
                             ->icon('heroicon-o-language')
                             ->schema([
@@ -137,27 +133,22 @@ final class CategoryResource extends Resource
                                         TextInput::make('translations.name.en')
                                             ->label(__('categories.fields.name'))
                                             ->maxLength(255),
-
                                         RichEditor::make('translations.description.en')
                                             ->label(__('categories.fields.description'))
                                             ->columnSpanFull(),
-
                                         Textarea::make('translations.short_description.en')
                                             ->label(__('categories.fields.short_description'))
                                             ->rows(3)
                                             ->columnSpanFull(),
-
                                         TextInput::make('translations.seo_title.en')
                                             ->label(__('categories.fields.seo_title'))
                                             ->maxLength(255)
                                             ->columnSpanFull(),
-
                                         Textarea::make('translations.seo_description.en')
                                             ->label(__('categories.fields.seo_description'))
                                             ->rows(3)
                                             ->maxLength(500)
                                             ->columnSpanFull(),
-
                                         TextInput::make('translations.seo_keywords.en')
                                             ->label(__('categories.fields.seo_keywords'))
                                             ->maxLength(255)
@@ -167,7 +158,6 @@ final class CategoryResource extends Resource
                             ]),
                     ])
                     ->columnSpanFull(),
-
                 Section::make(__('categories.sections.settings'))
                     ->schema([
                         TextInput::make('slug')
@@ -176,7 +166,6 @@ final class CategoryResource extends Resource
                             ->maxLength(255)
                             ->unique(Category::class, 'slug', ignoreRecord: true)
                             ->rules(['alpha_dash']),
-
                         Select::make('parent_id')
                             ->label(__('categories.fields.parent'))
                             ->relationship('parent', 'name')
@@ -190,35 +179,28 @@ final class CategoryResource extends Resource
                                     ->required()
                                     ->maxLength(255),
                             ]),
-
                         TextInput::make('sort_order')
                             ->label(__('categories.fields.sort_order'))
                             ->numeric()
                             ->default(0),
-
                         Toggle::make('is_enabled')
                             ->label(__('categories.fields.is_enabled'))
                             ->default(true),
-
                         Toggle::make('is_featured')
                             ->label(__('categories.fields.is_featured'))
                             ->default(false),
-
                         Toggle::make('is_visible')
                             ->label(__('categories.fields.is_visible'))
                             ->default(true),
-
                         Toggle::make('show_in_menu')
                             ->label(__('categories.fields.show_in_menu'))
                             ->default(true),
-
                         TextInput::make('product_limit')
                             ->label(__('categories.fields.product_limit'))
                             ->numeric()
                             ->default(20),
                     ])
                     ->columns(2),
-
                 Section::make(__('categories.sections.media'))
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('image')
@@ -232,7 +214,6 @@ final class CategoryResource extends Resource
                             ])
                             ->collection('image')
                             ->columnSpanFull(),
-
                         SpatieMediaLibraryFileUpload::make('banner')
                             ->label(__('categories.fields.banner'))
                             ->image()
@@ -244,7 +225,6 @@ final class CategoryResource extends Resource
                             ])
                             ->collection('banner')
                             ->columnSpanFull(),
-
                         SpatieMediaLibraryFileUpload::make('gallery')
                             ->label(__('categories.fields.gallery'))
                             ->image()
@@ -253,7 +233,6 @@ final class CategoryResource extends Resource
                             ->collection('gallery')
                             ->columnSpanFull(),
                     ]),
-
                 Section::make(__('categories.sections.hierarchy'))
                     ->schema([
                         Repeater::make('children')
@@ -272,7 +251,7 @@ final class CategoryResource extends Resource
                             ])
                             ->columns(3)
                             ->collapsible()
-                            ->itemLabel(fn (array $state): ?string => $state['name'] ?? null),
+                            ->itemLabel(fn(array $state): ?string => $state['name'] ?? null),
                     ])
                     ->collapsible(),
             ]);
@@ -287,7 +266,6 @@ final class CategoryResource extends Resource
                     ->circular()
                     ->size(40)
                     ->defaultImageUrl('/images/placeholder-category.png'),
-
                 TextColumn::make('name')
                     ->label(__('categories.fields.name'))
                     ->searchable()
@@ -297,14 +275,12 @@ final class CategoryResource extends Resource
                     ->getStateUsing(function (Category $record): string {
                         return $record->trans('name', app()->getLocale()) ?: $record->trans('name', 'lt') ?: 'N/A';
                     }),
-
                 TextColumn::make('slug')
                     ->label(__('categories.fields.slug'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
                     ->copyMessage(__('admin.common.copied')),
-
                 TextColumn::make('parent.name')
                     ->label(__('categories.fields.parent'))
                     ->searchable()
@@ -317,59 +293,49 @@ final class CategoryResource extends Resource
                         }
                         return $record->parent->trans('name', app()->getLocale()) ?: $record->parent->trans('name', 'lt');
                     }),
-
                 TextColumn::make('children_count')
                     ->label(__('categories.fields.children_count'))
                     ->counts('children')
                     ->sortable()
                     ->badge()
                     ->color('success'),
-
                 TextColumn::make('products_count')
                     ->label(__('categories.fields.products_count'))
                     ->counts('products')
                     ->sortable()
                     ->badge()
                     ->color('warning'),
-
                 TextColumn::make('sort_order')
                     ->label(__('categories.fields.sort_order'))
                     ->sortable()
                     ->badge()
                     ->color('gray'),
-
                 IconColumn::make('is_enabled')
                     ->label(__('categories.fields.is_enabled'))
                     ->boolean()
                     ->sortable(),
-
                 IconColumn::make('is_featured')
                     ->label(__('categories.fields.is_featured'))
                     ->boolean()
                     ->sortable(),
-
                 IconColumn::make('is_visible')
                     ->label(__('categories.fields.is_visible'))
                     ->boolean()
                     ->sortable(),
-
                 IconColumn::make('show_in_menu')
                     ->label(__('categories.fields.show_in_menu'))
                     ->boolean()
                     ->sortable(),
-
                 TextColumn::make('product_limit')
                     ->label(__('categories.fields.product_limit'))
                     ->sortable()
                     ->badge()
                     ->color('info'),
-
                 TextColumn::make('created_at')
                     ->label(__('categories.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-
                 TextColumn::make('updated_at')
                     ->label(__('categories.fields.updated_at'))
                     ->dateTime()
@@ -382,31 +348,26 @@ final class CategoryResource extends Resource
                     ->placeholder(__('admin.common.all'))
                     ->trueLabel(__('admin.common.enabled'))
                     ->falseLabel(__('admin.common.disabled')),
-
                 TernaryFilter::make('is_featured')
                     ->label(__('categories.filters.is_featured'))
                     ->placeholder(__('admin.common.all'))
                     ->trueLabel(__('admin.common.featured'))
                     ->falseLabel(__('admin.common.not_featured')),
-
                 TernaryFilter::make('is_visible')
                     ->label(__('categories.filters.is_visible'))
                     ->placeholder(__('admin.common.all'))
                     ->trueLabel(__('admin.common.visible'))
                     ->falseLabel(__('admin.common.hidden')),
-
                 TernaryFilter::make('show_in_menu')
                     ->label(__('categories.filters.show_in_menu'))
                     ->placeholder(__('admin.common.all'))
                     ->trueLabel(__('admin.common.yes'))
                     ->falseLabel(__('admin.common.no')),
-
                 SelectFilter::make('parent_id')
                     ->label(__('categories.filters.parent'))
                     ->relationship('parent', 'name')
                     ->searchable()
                     ->preload(),
-
                 SelectFilter::make('has_children')
                     ->label(__('categories.filters.has_children'))
                     ->options([
@@ -420,7 +381,6 @@ final class CategoryResource extends Resource
                             default => $query,
                         };
                     }),
-
                 SelectFilter::make('has_products')
                     ->label(__('categories.filters.has_products'))
                     ->options([
@@ -434,7 +394,6 @@ final class CategoryResource extends Resource
                             default => $query,
                         };
                     }),
-
                 SelectFilter::make('products_count_range')
                     ->label(__('categories.filters.products_count_range'))
                     ->options([
@@ -454,7 +413,6 @@ final class CategoryResource extends Resource
                             default => $query,
                         };
                     }),
-
                 Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
@@ -466,27 +424,26 @@ final class CategoryResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
-
                 Filter::make('has_seo')
                     ->label(__('categories.filters.has_seo'))
-                    ->query(fn (Builder $query): Builder => $query->where(function ($q) {
-                        $q->whereNotNull('seo_title')->where('seo_title', '!=', '')
-                          ->orWhere(function ($q2) {
-                              $q2->whereNotNull('seo_description')->where('seo_description', '!=', '');
-                          });
+                    ->query(fn(Builder $query): Builder => $query->where(function ($q) {
+                        $q
+                            ->whereNotNull('seo_title')
+                            ->where('seo_title', '!=', '')
+                            ->orWhere(function ($q2) {
+                                $q2->whereNotNull('seo_description')->where('seo_description', '!=', '');
+                            });
                     })),
-
                 Filter::make('root_categories')
                     ->label(__('categories.filters.root_categories'))
-                    ->query(fn (Builder $query): Builder => $query->whereNull('parent_id')),
-
+                    ->query(fn(Builder $query): Builder => $query->whereNull('parent_id')),
                 TrashedFilter::make(),
             ])
             ->actions([
@@ -497,13 +454,13 @@ final class CategoryResource extends Resource
                         ->label(__('categories.actions.translate'))
                         ->icon('heroicon-o-language')
                         ->color('info')
-                        ->url(fn (Category $record): string => route('filament.admin.resources.categories.edit', ['record' => $record]) . '?tab=translations')
+                        ->url(fn(Category $record): string => route('filament.admin.resources.categories.edit', ['record' => $record]) . '?tab=translations')
                         ->openUrlInNewTab(false),
                     Action::make('view_products')
                         ->label(__('categories.actions.view_products'))
                         ->icon('heroicon-o-shopping-bag')
                         ->color('warning')
-                        ->url(fn (Category $record): string => route('filament.admin.resources.products.index', ['tableFilters[category_id][value]' => $record->id]))
+                        ->url(fn(Category $record): string => route('filament.admin.resources.products.index', ['tableFilters[category_id][value]' => $record->id]))
                         ->openUrlInNewTab(false),
                     Action::make('duplicate')
                         ->label(__('categories.actions.duplicate'))
@@ -514,7 +471,7 @@ final class CategoryResource extends Resource
                             $newCategory->name = $record->trans('name') . ' (Copy)';
                             $newCategory->slug = $record->slug . '-copy';
                             $newCategory->save();
-                            
+
                             Notification::make()
                                 ->title(__('categories.messages.created'))
                                 ->success()

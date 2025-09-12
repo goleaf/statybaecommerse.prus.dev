@@ -5,28 +5,32 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
-use UnitEnum;
 use App\Models\NewsCategory;
 use App\Models\NewsTag;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 use BackedEnum;
+use UnitEnum;
 
 final class NewsResource extends Resource
 {
     protected static ?string $model = News::class;
 
-    /** @var string|\BackedEnum|null */
+    /**
+     * @var string|\BackedEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 
-    /** @var UnitEnum|string|null */
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static $navigationGroup = 'Content Management';
 
     public static function getModelLabel(): string
@@ -94,7 +98,6 @@ final class NewsResource extends Resource
                             ])
                             ->columnSpanFull(),
                     ]),
-                
                 Forms\Components\Section::make(__('admin.news.fields.content'))
                     ->schema([
                         Forms\Components\Grid::make(2)
@@ -116,7 +119,6 @@ final class NewsResource extends Resource
                                     ->maxLength(255),
                             ]),
                     ]),
-
                 Forms\Components\Section::make(__('admin.news.fields.categories'))
                     ->schema([
                         Forms\Components\Select::make('categories')
@@ -126,7 +128,6 @@ final class NewsResource extends Resource
                             ->preload()
                             ->searchable(),
                     ]),
-
                 Forms\Components\Section::make(__('admin.news.fields.tags'))
                     ->schema([
                         Forms\Components\Select::make('tags')
@@ -145,7 +146,6 @@ final class NewsResource extends Resource
                                 Forms\Components\ColorPicker::make('color'),
                             ]),
                     ]),
-
                 Forms\Components\Section::make(__('admin.news.fields.meta_data'))
                     ->schema([
                         Forms\Components\KeyValue::make('meta_data')
@@ -222,13 +222,15 @@ final class NewsResource extends Resource
                     ->label(__('admin.news.filters.is_featured')),
                 Tables\Filters\Filter::make('published')
                     ->label(__('admin.news.filters.published'))
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('published_at')
+                    ->query(fn(Builder $query): Builder => $query
+                        ->whereNotNull('published_at')
                         ->where('published_at', '<=', now())),
                 Tables\Filters\Filter::make('unpublished')
                     ->label(__('admin.news.filters.unpublished'))
-                    ->query(fn (Builder $query): Builder => $query->where(function ($q) {
-                        $q->whereNull('published_at')
-                          ->orWhere('published_at', '>', now());
+                    ->query(fn(Builder $query): Builder => $query->where(function ($q) {
+                        $q
+                            ->whereNull('published_at')
+                            ->orWhere('published_at', '>', now());
                     })),
                 Tables\Filters\SelectFilter::make('categories')
                     ->label(__('admin.news.fields.categories'))
@@ -242,10 +244,10 @@ final class NewsResource extends Resource
                     ->preload(),
                 Tables\Filters\Filter::make('has_images')
                     ->label(__('admin.news.filters.has_images'))
-                    ->query(fn (Builder $query): Builder => $query->whereHas('images')),
+                    ->query(fn(Builder $query): Builder => $query->whereHas('images')),
                 Tables\Filters\Filter::make('has_comments')
                     ->label(__('admin.news.filters.has_comments'))
-                    ->query(fn (Builder $query): Builder => $query->whereHas('comments')),
+                    ->query(fn(Builder $query): Builder => $query->whereHas('comments')),
                 Tables\Filters\Filter::make('author')
                     ->label(__('admin.news.filters.author'))
                     ->form([
@@ -255,7 +257,7 @@ final class NewsResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['author_name'],
-                            fn (Builder $query, $authorName): Builder => $query->where('author_name', 'like', "%{$authorName}%"),
+                            fn(Builder $query, $authorName): Builder => $query->where('author_name', 'like', "%{$authorName}%"),
                         );
                     }),
                 Tables\Filters\Filter::make('published_from')
@@ -267,7 +269,7 @@ final class NewsResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['published_from'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('published_at', '>=', $date),
+                            fn(Builder $query, $date): Builder => $query->whereDate('published_at', '>=', $date),
                         );
                     }),
                 Tables\Filters\Filter::make('published_until')
@@ -279,7 +281,7 @@ final class NewsResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['published_until'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('published_at', '<=', $date),
+                            fn(Builder $query, $date): Builder => $query->whereDate('published_at', '<=', $date),
                         );
                     }),
             ])
@@ -295,7 +297,7 @@ final class NewsResource extends Resource
                             'published_at' => now(),
                         ]);
                     })
-                    ->visible(fn (News $record): bool => !$record->isPublished()),
+                    ->visible(fn(News $record): bool => !$record->isPublished()),
                 Tables\Actions\Action::make('unpublish')
                     ->label(__('admin.news.actions.unpublish'))
                     ->icon('heroicon-o-x-mark')
@@ -305,21 +307,21 @@ final class NewsResource extends Resource
                             'published_at' => null,
                         ]);
                     })
-                    ->visible(fn (News $record): bool => $record->isPublished()),
+                    ->visible(fn(News $record): bool => $record->isPublished()),
                 Tables\Actions\Action::make('feature')
                     ->label(__('admin.news.actions.feature'))
                     ->icon('heroicon-o-star')
                     ->action(function (News $record) {
                         $record->update(['is_featured' => true]);
                     })
-                    ->visible(fn (News $record): bool => !$record->is_featured),
+                    ->visible(fn(News $record): bool => !$record->is_featured),
                 Tables\Actions\Action::make('unfeature')
                     ->label(__('admin.news.actions.unfeature'))
                     ->icon('heroicon-o-star')
                     ->action(function (News $record) {
                         $record->update(['is_featured' => false]);
                     })
-                    ->visible(fn (News $record): bool => $record->is_featured),
+                    ->visible(fn(News $record): bool => $record->is_featured),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

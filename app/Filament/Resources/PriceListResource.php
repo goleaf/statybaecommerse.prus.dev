@@ -5,49 +5,54 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PriceListResource\Pages;
 use App\Filament\Resources\PriceListResource\RelationManagers;
 use App\Filament\Resources\PriceListResource\Widgets;
-use App\Models\PriceList;
 use App\Models\Currency;
-use App\Models\Zone;
 use App\Models\CustomerGroup;
 use App\Models\Partner;
-use Filament\Schemas\Schema;
-use Filament\Forms;
-use Filament\Forms\Components\Section;
-use UnitEnum;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
+use App\Models\PriceList;
+use App\Models\Zone;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Filters\DateFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 final class PriceListResource extends Resource
 {
     protected static ?string $model = PriceList::class;
 
-    /** @var string|\BackedEnum|null */
+    /**
+     * @var string|\BackedEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-currency-dollar';
 
     /** @var string|\BackedEnum|null */
-    /** @var UnitEnum|string|null */
+
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static $navigationGroup = 'Pricing Management';
 
     protected static ?int $navigationSort = 1;
@@ -82,9 +87,8 @@ final class PriceListResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live()
-                                    ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
-                                        $operation === 'create' ? $set('code', \Str::slug($state)) : null
-                                    ),
+                                    ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) =>
+                                        $operation === 'create' ? $set('code', \Str::slug($state)) : null),
                                 TextInput::make('code')
                                     ->label(__('admin.price_lists.fields.code'))
                                     ->required()
@@ -123,7 +127,6 @@ final class PriceListResource extends Resource
                             ->label(__('admin.price_lists.fields.description'))
                             ->rows(3),
                     ]),
-
                 Section::make(__('admin.price_lists.settings'))
                     ->schema([
                         Grid::make(3)
@@ -155,7 +158,6 @@ final class PriceListResource extends Resource
                                     ->step(0.01),
                             ]),
                     ]),
-
                 Section::make(__('admin.price_lists.validity_period'))
                     ->schema([
                         Grid::make(2)
@@ -169,7 +171,6 @@ final class PriceListResource extends Resource
                                     ->after('starts_at'),
                             ]),
                     ]),
-
                 Section::make(__('admin.price_lists.associations'))
                     ->schema([
                         Select::make('customerGroups')
@@ -185,7 +186,6 @@ final class PriceListResource extends Resource
                             ->searchable()
                             ->preload(),
                     ]),
-
                 Section::make(__('admin.price_lists.metadata'))
                     ->schema([
                         KeyValue::make('metadata')

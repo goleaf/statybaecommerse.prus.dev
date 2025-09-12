@@ -4,45 +4,49 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceResource\Pages;
 use App\Filament\Resources\PriceResource\RelationManagers;
-use App\Models\Price;
-use UnitEnum;
 use App\Models\Currency;
-use Filament\Forms;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
+use App\Models\Price;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tab;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Schema;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tab;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 final class PriceResource extends Resource
 {
     protected static ?string $model = Price::class;
 
-    /** @var string|\BackedEnum|null */
+    /**
+     * @var string|\BackedEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-currency-euro';
 
-    /** @var UnitEnum|string|null */
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static $navigationGroup = 'Pricing';
 
     protected static ?int $navigationSort = 1;
@@ -86,15 +90,16 @@ final class PriceResource extends Resource
                                                     ])
                                                     ->required()
                                                     ->live()
-                                                    ->afterStateUpdated(fn (callable $set) => $set('priceable_id', null)),
+                                                    ->afterStateUpdated(fn(callable $set) => $set('priceable_id', null)),
                                                 Select::make('priceable_id')
                                                     ->label(__('admin.prices.fields.priceable_item'))
                                                     ->searchable()
                                                     ->preload()
                                                     ->options(function (callable $get) {
                                                         $type = $get('priceable_type');
-                                                        if (!$type) return [];
-                                                        
+                                                        if (!$type)
+                                                            return [];
+
                                                         return match ($type) {
                                                             'App\Models\Product' => \App\Models\Product::pluck('name', 'id'),
                                                             'App\Models\ProductVariant' => \App\Models\ProductVariant::pluck('name', 'id'),
@@ -229,14 +234,14 @@ final class PriceResource extends Resource
             ->columns([
                 TextColumn::make('priceable_type')
                     ->label(__('admin.prices.fields.priceable_type'))
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'App\Models\Product' => __('admin.prices.types.product'),
                         'App\Models\ProductVariant' => __('admin.prices.types.variant'),
                         'App\Models\Service' => __('admin.prices.types.service'),
                         default => $state,
                     })
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'App\Models\Product' => 'success',
                         'App\Models\ProductVariant' => 'info',
                         'App\Models\Service' => 'warning',
@@ -278,7 +283,7 @@ final class PriceResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 BadgeColumn::make('type')
                     ->label(__('admin.prices.fields.type'))
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'retail' => __('admin.prices.types.retail'),
                         'wholesale' => __('admin.prices.types.wholesale'),
                         'special' => __('admin.prices.types.special'),
@@ -315,7 +320,7 @@ final class PriceResource extends Resource
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => $record->created_at?->format('d/m/Y H:i:s')),
+                    ->tooltip(fn($record) => $record->created_at?->format('d/m/Y H:i:s')),
             ])
             ->filters([
                 SelectFilter::make('priceable_type')

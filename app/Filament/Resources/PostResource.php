@@ -26,10 +26,11 @@ final class PostResource extends Resource
      */
     protected static $navigationIcon = 'heroicon-o-document-text';
 
+    /** @var string|\BackedEnum|null */
+
     /**
-     * @var string|\BackedEnum|null
+     * @var UnitEnum|string|null
      */
-    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 1;

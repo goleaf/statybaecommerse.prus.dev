@@ -4,19 +4,19 @@ namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
 use App\Enums\NavigationIcon;
-use UnitEnum;
 use App\Filament\Resources\RegionResource\Pages;
 use App\Filament\Resources\RegionResource\Widgets;
-use App\Models\Region;
 use App\Models\Country;
+use App\Models\Region;
 use App\Models\Zone;
-use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 class RegionResource extends Resource
 {
@@ -24,7 +24,9 @@ class RegionResource extends Resource
 
     protected static NavigationIcon $navigationIcon = NavigationIcon::Map;
 
-    /** @var UnitEnum|string|null */
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static $navigationGroup = NavigationGroup::Content;
 
     protected static ?int $navigationSort = 2;
@@ -52,14 +54,12 @@ class RegionResource extends Resource
                                 }
                                 $set('slug', \Illuminate\Support\Str::slug($state));
                             }),
-                        
                         Forms\Components\TextInput::make('slug')
                             ->label(__('regions.slug'))
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
                             ->rules(['alpha_dash']),
-                        
                         Forms\Components\TextInput::make('code')
                             ->label(__('regions.code'))
                             ->required()
@@ -67,13 +67,12 @@ class RegionResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->rules(['alpha_dash'])
                             ->helperText(__('regions.code_help')),
-                        
                         Forms\Components\Textarea::make('description')
                             ->label(__('regions.description'))
                             ->rows(3)
                             ->columnSpanFull(),
-                    ])->columns(2),
-
+                    ])
+                    ->columns(2),
                 Forms\Components\Section::make(__('regions.location'))
                     ->schema([
                         Forms\Components\Select::make('country_id')
@@ -92,7 +91,6 @@ class RegionResource extends Resource
                             ->createOptionUsing(function (array $data): int {
                                 return Country::create($data)->getKey();
                             }),
-                        
                         Forms\Components\Select::make('zone_id')
                             ->label(__('regions.zone'))
                             ->relationship('zone', 'name')
@@ -109,14 +107,12 @@ class RegionResource extends Resource
                             ->createOptionUsing(function (array $data): int {
                                 return Zone::create($data)->getKey();
                             }),
-                        
                         Forms\Components\Select::make('parent_id')
                             ->label(__('regions.parent_region'))
                             ->relationship('parent', 'name')
                             ->searchable()
                             ->preload()
                             ->helperText(__('regions.parent_region_help')),
-                        
                         Forms\Components\Select::make('level')
                             ->label(__('regions.level'))
                             ->options([
@@ -130,28 +126,26 @@ class RegionResource extends Resource
                             ->default(0)
                             ->required()
                             ->helperText(__('regions.level_help')),
-                    ])->columns(2),
-
+                    ])
+                    ->columns(2),
                 Forms\Components\Section::make(__('regions.status'))
                     ->schema([
                         Forms\Components\Toggle::make('is_enabled')
                             ->label(__('regions.is_enabled'))
                             ->default(true)
                             ->helperText(__('regions.is_enabled_help')),
-                        
                         Forms\Components\Toggle::make('is_default')
                             ->label(__('regions.is_default'))
                             ->default(false)
                             ->helperText(__('regions.is_default_help')),
-                        
                         Forms\Components\TextInput::make('sort_order')
                             ->label(__('regions.sort_order'))
                             ->numeric()
                             ->default(0)
                             ->minValue(0)
                             ->helperText(__('regions.sort_order_help')),
-                    ])->columns(3),
-
+                    ])
+                    ->columns(3),
                 Forms\Components\Section::make(__('regions.translations'))
                     ->schema([
                         Forms\Components\Repeater::make('translations')
@@ -171,12 +165,10 @@ class RegionResource extends Resource
                                     ])
                                     ->required()
                                     ->searchable(),
-                                
                                 Forms\Components\TextInput::make('name')
                                     ->label(__('regions.name'))
                                     ->required()
                                     ->maxLength(255),
-                                
                                 Forms\Components\Textarea::make('description')
                                     ->label(__('regions.description'))
                                     ->rows(2)
@@ -188,7 +180,6 @@ class RegionResource extends Resource
                             ->cloneable()
                             ->reorderable(),
                     ]),
-
                 Forms\Components\Section::make(__('regions.metadata'))
                     ->schema([
                         Forms\Components\KeyValue::make('metadata')
@@ -211,14 +202,12 @@ class RegionResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color('primary'),
-                
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('regions.name'))
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
-                    ->description(fn (Region $record): string => $record->translated_description ?: ''),
-                
+                    ->description(fn(Region $record): string => $record->translated_description ?: ''),
                 Tables\Columns\TextColumn::make('full_path')
                     ->label(__('regions.full_path'))
                     ->searchable()
@@ -228,39 +217,35 @@ class RegionResource extends Resource
                         $state = $column->getState();
                         return strlen($state) > 50 ? $state : null;
                     }),
-                
                 Tables\Columns\TextColumn::make('country.name')
                     ->label(__('regions.country'))
                     ->sortable()
                     ->searchable()
                     ->badge()
                     ->color('info'),
-                
                 Tables\Columns\TextColumn::make('zone.name')
                     ->label(__('regions.zone'))
                     ->sortable()
                     ->searchable()
                     ->badge()
                     ->color('warning'),
-                
                 Tables\Columns\TextColumn::make('parent.name')
                     ->label(__('regions.parent_region'))
                     ->sortable()
                     ->searchable()
                     ->placeholder('—'),
-                
                 Tables\Columns\TextColumn::make('level')
                     ->label(__('regions.level'))
                     ->sortable()
                     ->badge()
-                    ->color(fn (int $state): string => match($state) {
+                    ->color(fn(int $state): string => match ($state) {
                         0 => 'success',
                         1 => 'primary',
                         2 => 'warning',
                         3 => 'info',
                         default => 'gray'
                     })
-                    ->formatStateUsing(fn (int $state): string => match($state) {
+                    ->formatStateUsing(fn(int $state): string => match ($state) {
                         0 => 'Root',
                         1 => 'State/Province',
                         2 => 'County',
@@ -269,42 +254,35 @@ class RegionResource extends Resource
                         5 => 'Village',
                         default => "Level {$state}"
                     }),
-                
                 Tables\Columns\TextColumn::make('cities_count')
                     ->label(__('regions.cities_count'))
                     ->counts('cities')
                     ->sortable()
                     ->badge()
                     ->color('success'),
-                
                 Tables\Columns\TextColumn::make('addresses_count')
                     ->label(__('regions.addresses_count'))
                     ->counts('addresses')
                     ->sortable()
                     ->badge()
                     ->color('info'),
-                
                 Tables\Columns\IconColumn::make('is_enabled')
                     ->label(__('regions.is_enabled'))
                     ->boolean()
                     ->sortable(),
-                
                 Tables\Columns\IconColumn::make('is_default')
                     ->label(__('regions.is_default'))
                     ->boolean()
                     ->sortable(),
-                
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label(__('regions.sort_order'))
                     ->sortable()
                     ->alignCenter(),
-                
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('regions.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('regions.updated_at'))
                     ->dateTime()
@@ -317,25 +295,21 @@ class RegionResource extends Resource
                     ->placeholder(__('regions.all_regions'))
                     ->trueLabel(__('regions.enabled_regions'))
                     ->falseLabel(__('regions.disabled_regions')),
-                
                 Tables\Filters\TernaryFilter::make('is_default')
                     ->label(__('regions.is_default'))
                     ->placeholder(__('regions.all_regions'))
                     ->trueLabel(__('regions.default_regions'))
                     ->falseLabel(__('regions.non_default_regions')),
-                
                 Tables\Filters\SelectFilter::make('country')
                     ->label(__('regions.country'))
                     ->relationship('country', 'name')
                     ->searchable()
                     ->preload(),
-                
                 Tables\Filters\SelectFilter::make('zone')
                     ->label(__('regions.zone'))
                     ->relationship('zone', 'name')
                     ->searchable()
                     ->preload(),
-                
                 Tables\Filters\SelectFilter::make('level')
                     ->label(__('regions.level'))
                     ->options([
@@ -347,21 +321,17 @@ class RegionResource extends Resource
                         5 => 'Village',
                     ])
                     ->multiple(),
-                
                 Tables\Filters\SelectFilter::make('parent_id')
                     ->label(__('regions.parent_region'))
                     ->relationship('parent', 'name')
                     ->searchable()
                     ->preload(),
-                
                 Tables\Filters\Filter::make('has_children')
                     ->label(__('regions.has_children'))
-                    ->query(fn (Builder $query): Builder => $query->has('children')),
-                
+                    ->query(fn(Builder $query): Builder => $query->has('children')),
                 Tables\Filters\Filter::make('has_cities')
                     ->label(__('regions.has_cities'))
-                    ->query(fn (Builder $query): Builder => $query->has('cities')),
-                
+                    ->query(fn(Builder $query): Builder => $query->has('cities')),
                 Tables\Filters\Filter::make('created_from')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
@@ -371,10 +341,9 @@ class RegionResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             );
                     }),
-                
                 Tables\Filters\Filter::make('created_until')
                     ->form([
                         Forms\Components\DatePicker::make('created_until')
@@ -384,7 +353,7 @@ class RegionResource extends Resource
                         return $query
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -398,7 +367,7 @@ class RegionResource extends Resource
                     ->action(function (Region $record): void {
                         $record->update(['is_enabled' => !$record->is_enabled]);
                     })
-                    ->color(fn (Region $record): string => $record->is_enabled ? 'warning' : 'success')
+                    ->color(fn(Region $record): string => $record->is_enabled ? 'warning' : 'success')
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
@@ -407,12 +376,12 @@ class RegionResource extends Resource
                     Tables\Actions\BulkAction::make('enable')
                         ->label(__('regions.enable_selected'))
                         ->icon('heroicon-o-check-circle')
-                        ->action(fn ($records) => $records->each->update(['is_enabled' => true]))
+                        ->action(fn($records) => $records->each->update(['is_enabled' => true]))
                         ->requiresConfirmation(),
                     Tables\Actions\BulkAction::make('disable')
                         ->label(__('regions.disable_selected'))
                         ->icon('heroicon-o-x-circle')
-                        ->action(fn ($records) => $records->each->update(['is_enabled' => false]))
+                        ->action(fn($records) => $records->each->update(['is_enabled' => false]))
                         ->requiresConfirmation(),
                 ]),
             ])

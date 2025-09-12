@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\StockResource\Pages;
 use App\Filament\Resources\StockResource\RelationManagers;
-use UnitEnum;
 use App\Models\Inventory;
 use App\Models\Location;
 use App\Models\Partner;
@@ -49,6 +48,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use UnitEnum;
 
 class StockResource extends Resource
 {
@@ -59,10 +59,11 @@ class StockResource extends Resource
      */
     protected static $navigationIcon = 'heroicon-o-cube';
 
+    /** @var string|\BackedEnum|null */
+
     /**
-     * @var string|\BackedEnum|null
+     * @var UnitEnum|string|null
      */
-    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'inventory_management';
 
     protected static ?int $navigationSort = 1;

@@ -6,7 +6,6 @@ use App\Filament\Resources\AttributeValueResource\Pages;
 use App\Filament\Resources\AttributeValueResource\RelationManagers;
 use App\Filament\Resources\AttributeValueResource\Widgets;
 use App\Models\Attribute;
-use UnitEnum;
 use App\Models\AttributeValue;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
@@ -23,6 +22,7 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 final class AttributeValueResource extends Resource
 {
@@ -33,10 +33,11 @@ final class AttributeValueResource extends Resource
      */
     protected static $navigationIcon = 'heroicon-o-tag';
 
+    /** @var string|\BackedEnum|null */
+
     /**
-     * @var string|\BackedEnum|null
+     * @var UnitEnum|string|null
      */
-    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'Product Management';
 
     protected static ?int $navigationSort = 3;

@@ -6,24 +6,28 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\CityResource\Pages;
 use App\Filament\Resources\CityResource\RelationManagers;
 use App\Models\City;
-use BackedEnum;
-use UnitEnum;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use BackedEnum;
+use UnitEnum;
 
 class CityResource extends Resource
 {
     protected static ?string $model = City::class;
 
-    /** @var string|\BackedEnum|null */
+    /**
+     * @var string|\BackedEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-building-office';
 
-    /** @var UnitEnum|string|null */
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static $navigationGroup = NavigationGroup::Content;
 
     protected static ?int $navigationSort = 3;
@@ -70,27 +74,24 @@ class CityResource extends Resource
                                     $set('slug', \Str::slug($state));
                                 }
                             }),
-                        
                         Forms\Components\TextInput::make('slug')
                             ->label(__('cities.slug'))
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
                             ->rules(['alpha_dash']),
-                        
                         Forms\Components\TextInput::make('code')
                             ->label(__('cities.code'))
                             ->required()
                             ->maxLength(10)
                             ->unique(ignoreRecord: true)
                             ->rules(['alpha_dash']),
-                        
                         Forms\Components\Textarea::make('description')
                             ->label(__('cities.description'))
                             ->rows(3)
                             ->maxLength(1000),
-                    ])->columns(2),
-
+                    ])
+                    ->columns(2),
                 Forms\Components\Section::make(__('cities.location'))
                     ->schema([
                         Forms\Components\Select::make('country_id')
@@ -104,7 +105,6 @@ class CityResource extends Resource
                                 $set('zone_id', null);
                                 $set('region_id', null);
                             }),
-                        
                         Forms\Components\Select::make('zone_id')
                             ->label(__('cities.zone'))
                             ->relationship('zone', 'name', function (Builder $query, Forms\Get $get) {
@@ -120,7 +120,6 @@ class CityResource extends Resource
                             ->afterStateUpdated(function (Forms\Set $set) {
                                 $set('region_id', null);
                             }),
-                        
                         Forms\Components\Select::make('region_id')
                             ->label(__('cities.region'))
                             ->relationship('region', 'name', function (Builder $query, Forms\Get $get) {
@@ -130,7 +129,6 @@ class CityResource extends Resource
                             })
                             ->searchable()
                             ->preload(),
-                        
                         Forms\Components\Select::make('parent_id')
                             ->label(__('cities.parent_city'))
                             ->relationship('parent', 'name', function (Builder $query, Forms\Get $get) {
@@ -140,7 +138,6 @@ class CityResource extends Resource
                             })
                             ->searchable()
                             ->preload(),
-                        
                         Forms\Components\Select::make('level')
                             ->label(__('cities.level'))
                             ->options([
@@ -152,8 +149,8 @@ class CityResource extends Resource
                             ->default(0)
                             ->required()
                             ->helperText(__('cities.level_help')),
-                    ])->columns(2),
-
+                    ])
+                    ->columns(2),
                 Forms\Components\Section::make(__('cities.geographic_data'))
                     ->schema([
                         Forms\Components\TextInput::make('latitude')
@@ -163,7 +160,6 @@ class CityResource extends Resource
                             ->suffix('°')
                             ->minValue(-90)
                             ->maxValue(90),
-                        
                         Forms\Components\TextInput::make('longitude')
                             ->label(__('cities.longitude'))
                             ->numeric()
@@ -171,40 +167,35 @@ class CityResource extends Resource
                             ->suffix('°')
                             ->minValue(-180)
                             ->maxValue(180),
-                        
                         Forms\Components\TextInput::make('population')
                             ->label(__('cities.population'))
                             ->numeric()
                             ->minValue(0)
                             ->maxValue(999999999),
-                        
                         Forms\Components\TagsInput::make('postal_codes')
                             ->label(__('cities.postal_codes'))
                             ->placeholder(__('cities.postal_codes_placeholder'))
                             ->separator(','),
-                    ])->columns(2),
-
+                    ])
+                    ->columns(2),
                 Forms\Components\Section::make(__('cities.status'))
                     ->schema([
                         Forms\Components\Toggle::make('is_enabled')
                             ->label(__('cities.is_enabled'))
                             ->default(true),
-                        
                         Forms\Components\Toggle::make('is_default')
                             ->label(__('cities.is_default'))
                             ->default(false),
-                        
                         Forms\Components\Toggle::make('is_capital')
                             ->label(__('cities.is_capital'))
                             ->default(false),
-                        
                         Forms\Components\TextInput::make('sort_order')
                             ->label(__('cities.sort_order'))
                             ->numeric()
                             ->default(0)
                             ->minValue(0),
-                    ])->columns(2),
-
+                    ])
+                    ->columns(2),
                 Forms\Components\Section::make(__('cities.translations'))
                     ->schema([
                         Forms\Components\Repeater::make('translations')
@@ -220,12 +211,10 @@ class CityResource extends Resource
                                         'ru' => __('cities.locale_ru'),
                                     ])
                                     ->required(),
-                                
                                 Forms\Components\TextInput::make('name')
                                     ->label(__('cities.name'))
                                     ->required()
                                     ->maxLength(255),
-                                
                                 Forms\Components\Textarea::make('description')
                                     ->label(__('cities.description'))
                                     ->rows(2)
@@ -234,9 +223,8 @@ class CityResource extends Resource
                             ->columns(3)
                             ->addActionLabel(__('cities.add_translation'))
                             ->collapsible()
-                            ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
+                            ->itemLabel(fn(array $state): ?string => $state['locale'] ?? null),
                     ]),
-
                 Forms\Components\Section::make(__('cities.metadata'))
                     ->schema([
                         Forms\Components\KeyValue::make('metadata')
@@ -257,37 +245,31 @@ class CityResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color('primary'),
-                
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('cities.name'))
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
-                
                 Tables\Columns\TextColumn::make('country.name')
                     ->label(__('cities.country'))
                     ->sortable()
                     ->toggleable(),
-                
                 Tables\Columns\TextColumn::make('region.name')
                     ->label(__('cities.region'))
                     ->sortable()
                     ->toggleable(),
-                
                 Tables\Columns\TextColumn::make('zone.name')
                     ->label(__('cities.zone'))
                     ->sortable()
                     ->toggleable(),
-                
                 Tables\Columns\TextColumn::make('parent.name')
                     ->label(__('cities.parent_city'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 Tables\Columns\TextColumn::make('level')
                     ->label(__('cities.level'))
                     ->sortable()
-                    ->formatStateUsing(fn (int $state): string => match($state) {
+                    ->formatStateUsing(fn(int $state): string => match ($state) {
                         0 => __('cities.level_city'),
                         1 => __('cities.level_district'),
                         2 => __('cities.level_neighborhood'),
@@ -295,27 +277,24 @@ class CityResource extends Resource
                         default => __('cities.level_city'),
                     })
                     ->badge()
-                    ->color(fn (int $state): string => match($state) {
+                    ->color(fn(int $state): string => match ($state) {
                         0 => 'success',
                         1 => 'info',
                         2 => 'warning',
                         3 => 'gray',
                         default => 'gray',
                     }),
-                
                 Tables\Columns\TextColumn::make('population')
                     ->label(__('cities.population'))
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn (?int $state): string => $state ? number_format($state) : '-')
+                    ->formatStateUsing(fn(?int $state): string => $state ? number_format($state) : '-')
                     ->toggleable(),
-                
                 Tables\Columns\TextColumn::make('postal_codes')
                     ->label(__('cities.postal_codes'))
                     ->badge()
                     ->separator(',')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 Tables\Columns\IconColumn::make('is_capital')
                     ->label(__('cities.is_capital'))
                     ->boolean()
@@ -323,30 +302,25 @@ class CityResource extends Resource
                     ->falseIcon('heroicon-o-building-office')
                     ->trueColor('warning')
                     ->falseColor('gray'),
-                
                 Tables\Columns\IconColumn::make('is_enabled')
                     ->label(__('cities.is_enabled'))
                     ->boolean()
                     ->trueColor('success')
                     ->falseColor('danger'),
-                
                 Tables\Columns\IconColumn::make('is_default')
                     ->label(__('cities.is_default'))
                     ->boolean()
                     ->trueColor('primary')
                     ->falseColor('gray'),
-                
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label(__('cities.sort_order'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('cities.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('cities.updated_at'))
                     ->dateTime()
@@ -359,37 +333,31 @@ class CityResource extends Resource
                     ->placeholder(__('cities.filter_all'))
                     ->trueLabel(__('cities.filter_enabled'))
                     ->falseLabel(__('cities.filter_disabled')),
-                
                 Tables\Filters\TernaryFilter::make('is_capital')
                     ->label(__('cities.is_capital'))
                     ->placeholder(__('cities.filter_all'))
                     ->trueLabel(__('cities.filter_capital'))
                     ->falseLabel(__('cities.filter_non_capital')),
-                
                 Tables\Filters\TernaryFilter::make('is_default')
                     ->label(__('cities.is_default'))
                     ->placeholder(__('cities.filter_all'))
                     ->trueLabel(__('cities.filter_default'))
                     ->falseLabel(__('cities.filter_non_default')),
-                
                 Tables\Filters\SelectFilter::make('country')
                     ->label(__('cities.country'))
                     ->relationship('country', 'name')
                     ->searchable()
                     ->preload(),
-                
                 Tables\Filters\SelectFilter::make('region')
                     ->label(__('cities.region'))
                     ->relationship('region', 'name')
                     ->searchable()
                     ->preload(),
-                
                 Tables\Filters\SelectFilter::make('zone')
                     ->label(__('cities.zone'))
                     ->relationship('zone', 'name')
                     ->searchable()
                     ->preload(),
-                
                 Tables\Filters\SelectFilter::make('level')
                     ->label(__('cities.level'))
                     ->options([
@@ -398,15 +366,12 @@ class CityResource extends Resource
                         2 => __('cities.level_neighborhood'),
                         3 => __('cities.level_suburb'),
                     ]),
-                
                 Tables\Filters\Filter::make('with_coordinates')
                     ->label(__('cities.with_coordinates'))
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('latitude')->whereNotNull('longitude')),
-                
+                    ->query(fn(Builder $query): Builder => $query->whereNotNull('latitude')->whereNotNull('longitude')),
                 Tables\Filters\Filter::make('with_population')
                     ->label(__('cities.with_population'))
-                    ->query(fn (Builder $query): Builder => $query->where('population', '>', 0)),
-                
+                    ->query(fn(Builder $query): Builder => $query->where('population', '>', 0)),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
@@ -469,7 +434,7 @@ class CityResource extends Resource
         return [
             __('cities.country') => $record->country?->name,
             __('cities.region') => $record->region?->name,
-            __('cities.level') => match($record->level) {
+            __('cities.level') => match ($record->level) {
                 0 => __('cities.level_city'),
                 1 => __('cities.level_district'),
                 2 => __('cities.level_neighborhood'),
@@ -486,7 +451,6 @@ class CityResource extends Resource
                 ->label(__('cities.view'))
                 ->url(static::getUrl('view', ['record' => $record]))
                 ->icon('heroicon-o-eye'),
-            
             Tables\Actions\Action::make('edit')
                 ->label(__('cities.edit'))
                 ->url(static::getUrl('edit', ['record' => $record]))
@@ -502,8 +466,8 @@ class CityResource extends Resource
     public static function getNavigationBadgeColor(): ?string
     {
         $count = static::getModel()::count();
-        
-        return match(true) {
+
+        return match (true) {
             $count === 0 => 'danger',
             $count < 10 => 'warning',
             default => 'success',

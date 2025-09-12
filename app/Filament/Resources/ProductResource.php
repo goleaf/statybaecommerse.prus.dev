@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
-use UnitEnum;
 use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
@@ -42,6 +41,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class ProductResource extends Resource
 {
@@ -52,10 +52,11 @@ class ProductResource extends Resource
      */
     protected static $navigationIcon = 'heroicon-o-cube';
 
+    /** @var string|\BackedEnum|null */
+
     /**
-     * @var string|\BackedEnum|null
+     * @var UnitEnum|string|null
      */
-    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'E-commerce';
 
     protected static ?int $navigationSort = 1;
