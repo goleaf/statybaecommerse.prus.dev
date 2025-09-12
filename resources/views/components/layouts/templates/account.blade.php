@@ -24,6 +24,10 @@
                                             :title="__('Orders')"
                                             :active="request()->routeIs('account.orders*')" />
                         <x-nav.account-link
+                                            :href="route('account.reviews')"
+                                            :title="__('Reviews')"
+                                            :active="request()->routeIs('account.reviews')" />
+                        <x-nav.account-link
                                             :href="route('account.wishlist')"
                                             :title="__('Wishlist')"
                                             :active="request()->routeIs('account.wishlist')" />

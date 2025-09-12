@@ -45,15 +45,7 @@ return [
         'shipping' => 'Shipping',
         'legal' => 'Legal',
     ],
-    'cart' => [
-        'subtotal' => 'Subtotal',
-        'discount' => 'Discount',
-        'total' => 'Total',
-        'apply' => 'Apply',
-        'remove' => 'Remove',
-        'coupon' => 'Coupon code',
-        'enter_code' => 'Enter code',
-    ],
+    'cart' => 'Cart',
     'search' => [
         'placeholder' => 'Search products...',
         'empty' => 'No products found.',

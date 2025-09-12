@@ -201,7 +201,7 @@ final class EnhancedSettingTest extends TestCase
 
         EnhancedSetting::factory()->count(3)->create();
 
-        $response = $this->get('/admin/enhanced-settings');
+        $response = $this->get('/admin/normal-settings');
 
         $response->assertStatus(200);
     }
@@ -210,7 +210,7 @@ final class EnhancedSettingTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        $response = $this->get('/admin/enhanced-settings/create');
+        $response = $this->get('/admin/normal-settings/create');
 
         $response->assertStatus(200);
     }
@@ -230,7 +230,7 @@ final class EnhancedSettingTest extends TestCase
             'sort_order' => 1,
         ];
 
-        $response = $this->post('/admin/enhanced-settings', $settingData);
+        $response = $this->post('/admin/normal-settings', $settingData);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('enhanced_settings', [
@@ -245,7 +245,7 @@ final class EnhancedSettingTest extends TestCase
 
         $setting = EnhancedSetting::factory()->create();
 
-        $response = $this->get("/admin/enhanced-settings/{$setting->id}");
+        $response = $this->get("/admin/normal-settings/{$setting->id}");
 
         $response->assertStatus(200);
     }
@@ -256,7 +256,7 @@ final class EnhancedSettingTest extends TestCase
 
         $setting = EnhancedSetting::factory()->create();
 
-        $response = $this->get("/admin/enhanced-settings/{$setting->id}/edit");
+        $response = $this->get("/admin/normal-settings/{$setting->id}/edit");
 
         $response->assertStatus(200);
     }
@@ -281,7 +281,7 @@ final class EnhancedSettingTest extends TestCase
             'sort_order' => $setting->sort_order,
         ];
 
-        $response = $this->put("/admin/enhanced-settings/{$setting->id}", $updateData);
+        $response = $this->put("/admin/normal-settings/{$setting->id}", $updateData);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('enhanced_settings', [
@@ -297,7 +297,7 @@ final class EnhancedSettingTest extends TestCase
 
         $setting = EnhancedSetting::factory()->create();
 
-        $response = $this->delete("/admin/enhanced-settings/{$setting->id}");
+        $response = $this->delete("/admin/normal-settings/{$setting->id}");
 
         $response->assertRedirect();
         $this->assertDatabaseMissing('enhanced_settings', [
@@ -310,16 +310,16 @@ final class EnhancedSettingTest extends TestCase
         $setting = EnhancedSetting::factory()->create();
 
         // Test that unauthenticated users are redirected to login
-        $response = $this->get('/admin/enhanced-settings');
+        $response = $this->get('/admin/normal-settings');
         $response->assertRedirect('/admin/login');
 
-        $response = $this->get('/admin/enhanced-settings/create');
+        $response = $this->get('/admin/normal-settings/create');
         $response->assertRedirect('/admin/login');
 
-        $response = $this->get("/admin/enhanced-settings/{$setting->id}");
+        $response = $this->get("/admin/normal-settings/{$setting->id}");
         $response->assertRedirect('/admin/login');
 
-        $response = $this->get("/admin/enhanced-settings/{$setting->id}/edit");
+        $response = $this->get("/admin/normal-settings/{$setting->id}/edit");
         $response->assertRedirect('/admin/login');
     }
 
@@ -342,7 +342,7 @@ final class EnhancedSettingTest extends TestCase
             'sort_order' => 1,
         ];
 
-        $response = $this->post('/admin/enhanced-settings', $settingData);
+        $response = $this->post('/admin/normal-settings', $settingData);
 
         // Should fail validation and return back with errors
         $response->assertSessionHasErrors(['key']);

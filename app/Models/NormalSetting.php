@@ -145,5 +145,20 @@ final class NormalSetting extends Model
         $locale = $locale ?? app()->getLocale();
         return $query->where('locale', $locale);
     }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $setting) {
+            if ($setting->is_encrypted && $setting->value !== null) {
+                $setting->attributes['value'] = encrypt($setting->value);
+            }
+        });
+
+        static::updating(function (self $setting) {
+            if ($setting->is_encrypted && $setting->isDirty('value') && $setting->value !== null) {
+                $setting->attributes['value'] = encrypt($setting->value);
+            }
+        });
+    }
 }
 

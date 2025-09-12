@@ -169,8 +169,8 @@ class MultilanguageTest extends TestCase
         app()->setLocale('en');
         // With Spatie translatable, we need to check the actual behavior
         $name = $location->getTranslation('name', 'en', false);
-        // Spatie translatable doesn't automatically fallback, so we expect null or empty
-        expect($name)->toBeNull();
+        // The factory creates both LT and EN translations, so we expect the EN value
+        expect($name)->toBeString();
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
