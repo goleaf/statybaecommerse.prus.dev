@@ -338,11 +338,13 @@ class WidgetsTest extends TestCase
         // Current month better than previous
         Order::factory()->count(5)->create([
             'status' => 'completed',
+            'total' => 1000, // Higher total for current month
             'created_at' => now(),
         ]);
 
         Order::factory()->count(3)->create([
             'status' => 'completed',
+            'total' => 500, // Lower total for previous month
             'created_at' => now()->subMonth(),
         ]);
 

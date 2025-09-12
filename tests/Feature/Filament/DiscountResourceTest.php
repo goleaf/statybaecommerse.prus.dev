@@ -77,11 +77,10 @@ it('can update discount', function () {
         'is_active' => false,
     ];
 
-    actingAs($this->admin)
-        ->put(DiscountResource::getUrl('edit', ['record' => $discount]), array_merge($newData, [
-            'starts_at' => $discount->starts_at->toDateTimeString(),
-        ]))
-        ->assertRedirect();
+    \Livewire\Livewire::test(\App\Filament\Resources\DiscountResource\Pages\EditDiscount::class, ['record' => $discount->id])
+        ->fillForm($newData)
+        ->call('save')
+        ->assertHasNoFormErrors();
 
     assertDatabaseHas('discounts', array_merge(['id' => $discount->id], $newData));
 });
@@ -89,9 +88,9 @@ it('can update discount', function () {
 it('can delete discount', function () {
     $discount = Discount::factory()->create();
 
-    actingAs($this->admin)
-        ->delete(DiscountResource::getUrl('edit', ['record' => $discount]))
-        ->assertRedirect();
+    \Livewire\Livewire::test(\App\Filament\Resources\DiscountResource\Pages\EditDiscount::class, ['record' => $discount->id])
+        ->callAction('delete')
+        ->assertOk();
 
     assertDatabaseMissing('discounts', ['id' => $discount->id]);
 });
@@ -109,22 +108,20 @@ it('can filter discounts by type', function () {
     $percentageDiscount = Discount::factory()->create(['type' => 'percentage']);
     $fixedDiscount = Discount::factory()->create(['type' => 'fixed']);
 
-    actingAs($this->admin)
-        ->get(DiscountResource::getUrl('index') . '?filter[type]=percentage')
-        ->assertSuccessful()
-        ->assertSeeText($percentageDiscount->name)
-        ->assertDontSeeText($fixedDiscount->name);
+    \Livewire\Livewire::test(\App\Filament\Resources\DiscountResource\Pages\ListDiscounts::class)
+        ->filterTable('type', 'percentage')
+        ->assertCanSeeTableRecords([$percentageDiscount])
+        ->assertCanNotSeeTableRecords([$fixedDiscount]);
 });
 
 it('can filter active discounts', function () {
     $activeDiscount = Discount::factory()->create(['is_active' => true]);
     $inactiveDiscount = Discount::factory()->create(['is_active' => false]);
 
-    actingAs($this->admin)
-        ->get(DiscountResource::getUrl('index') . '?filter[active]=1')
-        ->assertSuccessful()
-        ->assertSeeText($activeDiscount->name)
-        ->assertDontSeeText($inactiveDiscount->name);
+    \Livewire\Livewire::test(\App\Filament\Resources\DiscountResource\Pages\ListDiscounts::class)
+        ->filterTable('is_active', 1)
+        ->assertCanSeeTableRecords([$activeDiscount])
+        ->assertCanNotSeeTableRecords([$inactiveDiscount]);
 });
 
 it('can filter current discounts', function () {

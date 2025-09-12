@@ -56,7 +56,7 @@ final class ProductResource extends Resource
         return [
             __('admin.products.fields.brand') => $record->brand?->name,
             __('admin.products.fields.sku') => $record->sku,
-            __('admin.products.fields.price') => '€' . number_format($record->price, 2),
+            __('admin.products.fields.price') => '€' . number_format((float) $record->price, 2),
             __('admin.products.fields.stock_quantity') => $record->stock_quantity,
         ];
     }
@@ -442,7 +442,7 @@ final class ProductResource extends Resource
                     ->variables(fn(Product $record) => [
                         '$PRODUCT_NAME' => $record->name,
                         '$PRODUCT_SKU' => $record->sku,
-                        '$PRODUCT_PRICE' => number_format($record->price, 2) . ' EUR',
+                        '$PRODUCT_PRICE' => number_format((float) $record->price, 2) . ' EUR',
                         '$PRODUCT_DESCRIPTION' => $record->description,
                         '$PRODUCT_BRAND' => $record->brand?->name ?? '',
                         '$PRODUCT_CATEGORY' => $record->categories->pluck('name')->join(', '),

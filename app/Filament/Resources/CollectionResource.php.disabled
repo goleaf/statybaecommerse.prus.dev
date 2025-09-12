@@ -16,7 +16,7 @@ final class CollectionResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
+    protected static BackedEnum|string|null $navigationGroup = \App\Enums\NavigationGroup::Catalog;
 
     protected static ?int $navigationSort = 3;
 
