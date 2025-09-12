@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Livewire\Livewire;
 
@@ -55,7 +57,7 @@ $livewireComponents = [
     \App\Livewire\Actions\Logout::class,
 ];
 
-dataset('livewire_components', fn() => $livewireComponents);
+dataset('livewire_components', fn () => $livewireComponents);
 
 it('mounts Livewire components without fatal errors', function (string $componentClass): void {
     // Some components require auth or specific state; authenticate by default

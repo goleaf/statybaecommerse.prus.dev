@@ -12,7 +12,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/share', [ReferralController::class, 'shareCode'])->name('share');
         Route::get('/statistics', [ReferralController::class, 'statistics'])->name('statistics');
         Route::get('/rewards', [ReferralController::class, 'rewards'])->name('rewards');
-        
+
         // AJAX routes
         Route::post('/generate-code', [ReferralController::class, 'generateCode'])->name('generate_code');
         Route::post('/apply-code', [ReferralController::class, 'applyCode'])->name('apply_code');
@@ -21,6 +21,3 @@ Route::middleware(['auth'])->group(function () {
 
 // Public referral application route
 Route::get('/referral/{code}', [ReferralController::class, 'show'])->name('referrals.apply');
-
-
-

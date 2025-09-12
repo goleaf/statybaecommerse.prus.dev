@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Livewire;
 
@@ -24,11 +26,11 @@ final class ProductCatalogTest extends TestCase
     {
         $products = Product::factory()->count(5)->create([
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
         $hiddenProduct = Product::factory()->create([
             'is_visible' => false,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
 
         Livewire::test(ProductCatalog::class)
@@ -36,12 +38,12 @@ final class ProductCatalogTest extends TestCase
                 $productIds = $paginatedProducts->pluck('id')->toArray();
 
                 foreach ($products as $product) {
-                    if (!in_array($product->id, $productIds)) {
+                    if (! in_array($product->id, $productIds)) {
                         return false;
                     }
                 }
 
-                return !in_array($hiddenProduct->id, $productIds);
+                return ! in_array($hiddenProduct->id, $productIds);
             });
     }
 
@@ -50,21 +52,22 @@ final class ProductCatalogTest extends TestCase
         $matchingProduct = Product::factory()->create([
             'name' => 'iPhone 15',
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
 
         $nonMatchingProduct = Product::factory()->create([
             'name' => 'Samsung Galaxy',
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
 
         Livewire::test(ProductCatalog::class)
             ->set('search', 'iPhone')
             ->assertViewHas('products', function ($paginatedProducts) use ($matchingProduct, $nonMatchingProduct) {
                 $productIds = $paginatedProducts->pluck('id')->toArray();
+
                 return in_array($matchingProduct->id, $productIds) &&
-                    !in_array($nonMatchingProduct->id, $productIds);
+                    ! in_array($nonMatchingProduct->id, $productIds);
             });
     }
 
@@ -73,11 +76,11 @@ final class ProductCatalogTest extends TestCase
         $category = Category::factory()->create();
         $productInCategory = Product::factory()->create([
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
         $productNotInCategory = Product::factory()->create([
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
 
         $productInCategory->categories()->attach($category);
@@ -86,8 +89,9 @@ final class ProductCatalogTest extends TestCase
             ->set('selectedCategories', [$category->id])
             ->assertViewHas('products', function ($paginatedProducts) use ($productInCategory, $productNotInCategory) {
                 $productIds = $paginatedProducts->pluck('id')->toArray();
+
                 return in_array($productInCategory->id, $productIds) &&
-                    !in_array($productNotInCategory->id, $productIds);
+                    ! in_array($productNotInCategory->id, $productIds);
             });
     }
 
@@ -97,20 +101,21 @@ final class ProductCatalogTest extends TestCase
         $productWithBrand = Product::factory()->create([
             'brand_id' => $brand->id,
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
         $productWithoutBrand = Product::factory()->create([
             'brand_id' => null,
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
 
         Livewire::test(ProductCatalog::class)
             ->set('selectedBrands', [$brand->id])
             ->assertViewHas('products', function ($paginatedProducts) use ($productWithBrand, $productWithoutBrand) {
                 $productIds = $paginatedProducts->pluck('id')->toArray();
+
                 return in_array($productWithBrand->id, $productIds) &&
-                    !in_array($productWithoutBrand->id, $productIds);
+                    ! in_array($productWithoutBrand->id, $productIds);
             });
     }
 
@@ -119,12 +124,12 @@ final class ProductCatalogTest extends TestCase
         $cheapProduct = Product::factory()->create([
             'price' => 50.0,
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
         $expensiveProduct = Product::factory()->create([
             'price' => 500.0,
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
 
         Livewire::test(ProductCatalog::class)
@@ -132,7 +137,8 @@ final class ProductCatalogTest extends TestCase
             ->set('priceMax', 1000)
             ->assertViewHas('products', function ($paginatedProducts) use ($cheapProduct, $expensiveProduct) {
                 $productIds = $paginatedProducts->pluck('id')->toArray();
-                return !in_array($cheapProduct->id, $productIds) &&
+
+                return ! in_array($cheapProduct->id, $productIds) &&
                     in_array($expensiveProduct->id, $productIds);
             });
     }
@@ -142,20 +148,21 @@ final class ProductCatalogTest extends TestCase
         $inStockProduct = Product::factory()->create([
             'stock_quantity' => 10,
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
         $outOfStockProduct = Product::factory()->create([
             'stock_quantity' => 0,
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
 
         Livewire::test(ProductCatalog::class)
             ->set('availability', 'in_stock')
             ->assertViewHas('products', function ($paginatedProducts) use ($inStockProduct, $outOfStockProduct) {
                 $productIds = $paginatedProducts->pluck('id')->toArray();
+
                 return in_array($inStockProduct->id, $productIds) &&
-                    !in_array($outOfStockProduct->id, $productIds);
+                    ! in_array($outOfStockProduct->id, $productIds);
             });
     }
 
@@ -165,13 +172,13 @@ final class ProductCatalogTest extends TestCase
             'name' => 'Apple iPhone',
             'price' => 1000.0,
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
         $productB = Product::factory()->create([
             'name' => 'Samsung Galaxy',
             'price' => 800.0,
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
 
         // Test sorting by name ascending
@@ -180,6 +187,7 @@ final class ProductCatalogTest extends TestCase
             ->set('sortDirection', 'asc')
             ->assertViewHas('products', function ($paginatedProducts) use ($productA, $productB) {
                 $products = $paginatedProducts->items();
+
                 return $products[0]->id === $productA->id && $products[1]->id === $productB->id;
             });
 
@@ -189,6 +197,7 @@ final class ProductCatalogTest extends TestCase
             ->set('sortDirection', 'desc')
             ->assertViewHas('products', function ($paginatedProducts) use ($productA, $productB) {
                 $products = $paginatedProducts->items();
+
                 return $products[0]->id === $productA->id && $products[1]->id === $productB->id;
             });
     }
@@ -228,7 +237,7 @@ final class ProductCatalogTest extends TestCase
         $product = Product::factory()->create([
             'stock_quantity' => 5,
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
 
         Livewire::test(ProductCatalog::class)
@@ -245,7 +254,7 @@ final class ProductCatalogTest extends TestCase
     {
         Product::factory()->count(25)->create([
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
 
         Livewire::test(ProductCatalog::class)
@@ -259,7 +268,7 @@ final class ProductCatalogTest extends TestCase
     {
         Product::factory()->count(30)->create([
             'is_visible' => true,
-            'published_at' => now()->subDays(1)
+            'published_at' => now()->subDays(1),
         ]);
 
         Livewire::test(ProductCatalog::class)

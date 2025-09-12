@@ -9,19 +9,8 @@ Route::prefix('campaigns')->name('campaigns.')->group(function () {
     Route::get('/{campaign:slug}', [CampaignController::class, 'show'])->name('show');
     Route::get('/{campaign:slug}/products', [CampaignController::class, 'products'])->name('products');
     Route::get('/{campaign:slug}/analytics', [CampaignController::class, 'analytics'])->name('analytics');
-    
+
     // AJAX routes for tracking
     Route::post('/{campaign}/click', [CampaignController::class, 'click'])->name('click');
     Route::post('/{campaign}/conversion', [CampaignController::class, 'conversion'])->name('conversion');
 });
-
-
-
-
-
-
-
-
-
-
-

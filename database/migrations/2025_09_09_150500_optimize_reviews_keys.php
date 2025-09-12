@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -8,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('reviews')) {
+        if (! Schema::hasTable('reviews')) {
             return;
         }
 
@@ -23,16 +25,24 @@ return new class extends Migration
 
     public function down(): void
     {
-        if (!Schema::hasTable('reviews')) {
+        if (! Schema::hasTable('reviews')) {
             return;
         }
 
         Schema::table('reviews', function (Blueprint $table): void {
             // Drop by explicit names to be SQLite/MySQL friendly
-            try { $table->dropIndex('reviews_user_created_idx'); } catch (\Throwable $e) {}
-            try { $table->dropIndex('reviews_prod_loc_approved_created_idx'); } catch (\Throwable $e) {}
-            try { $table->dropIndex('reviews_prod_rating_idx'); } catch (\Throwable $e) {}
+            try {
+                $table->dropIndex('reviews_user_created_idx');
+            } catch (\Throwable $e) {
+            }
+            try {
+                $table->dropIndex('reviews_prod_loc_approved_created_idx');
+            } catch (\Throwable $e) {
+            }
+            try {
+                $table->dropIndex('reviews_prod_rating_idx');
+            } catch (\Throwable $e) {
+            }
         });
     }
 };
-

@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\NewsTranslation;
 use App\Models\News;
+use App\Models\Translations\NewsTranslation;
 use Illuminate\Database\Seeder;
 
 final class NewsSeeder extends Seeder
@@ -11,8 +13,8 @@ final class NewsSeeder extends Seeder
     public function run(): void
     {
         $locales = collect(config('app.supported_locales', 'lt,en'))
-            ->when(fn($v) => is_string($v), fn($c) => collect(preg_split('/[\s,|]+/', (string) $v, -1, PREG_SPLIT_NO_EMPTY)))
-            ->map(fn($v) => trim((string) $v))
+            ->when(fn ($v) => is_string($v), fn ($c) => collect(preg_split('/[\s,|]+/', (string) $v, -1, PREG_SPLIT_NO_EMPTY)))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values();
@@ -32,8 +34,8 @@ final class NewsSeeder extends Seeder
                 $content = '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio.</p>';
 
                 // Localize title minimally by appending locale code
-                $title = $locale === 'lt' ? "Demonstracinė naujiena {$i}" : ($locale === 'en' ? $titleBase : $titleBase . " ({$locale})");
-                $slug = $locale === 'lt' ? str("Demonstracinė naujiena {$i}")->slug()->toString() : $slugBase . ($locale === 'en' ? '' : "-{$locale}");
+                $title = $locale === 'lt' ? "Demonstracinė naujiena {$i}" : ($locale === 'en' ? $titleBase : $titleBase." ({$locale})");
+                $slug = $locale === 'lt' ? str("Demonstracinė naujiena {$i}")->slug()->toString() : $slugBase.($locale === 'en' ? '' : "-{$locale}");
 
                 NewsTranslation::updateOrCreate([
                     'news_id' => $news->id,

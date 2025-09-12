@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -90,13 +92,13 @@ final class NormalSettingSeeder extends Seeder
             }
         }
 
-        $this->command?->info('NormalSettingSeeder: seeded settings with translations (locales: ' . implode(',', $locales) . ').');
+        $this->command?->info('NormalSettingSeeder: seeded settings with translations (locales: '.implode(',', $locales).').');
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()

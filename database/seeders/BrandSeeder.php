@@ -14,7 +14,7 @@ class BrandSeeder extends Seeder
 
     public function __construct()
     {
-        $this->imageGenerator = new LocalImageGeneratorService();
+        $this->imageGenerator = new LocalImageGeneratorService;
     }
 
     /**
@@ -178,18 +178,18 @@ class BrandSeeder extends Seeder
             }
             DB::table('brand_translations')->upsert(
                 $trRows,
-                ['brand_id','locale'],
-                ['name','slug','description','seo_title','seo_description','updated_at']
+                ['brand_id', 'locale'],
+                ['name', 'slug', 'description', 'seo_title', 'seo_description', 'updated_at']
             );
 
             // Add logo if brand was created and doesn't have one
-            if ($brand->wasRecentlyCreated || !$brand->hasMedia('logo')) {
-                $this->downloadAndAttachImage($brand, $brandData['logo_url'], 'logo', $brandData['name'] . ' Logo');
+            if ($brand->wasRecentlyCreated || ! $brand->hasMedia('logo')) {
+                $this->downloadAndAttachImage($brand, $brandData['logo_url'], 'logo', $brandData['name'].' Logo');
             }
 
             // Add banner if brand was created and doesn't have one
-            if ($brand->wasRecentlyCreated || !$brand->hasMedia('banner')) {
-                $this->downloadAndAttachImage($brand, $brandData['banner_url'], 'banner', $brandData['name'] . ' Banner');
+            if ($brand->wasRecentlyCreated || ! $brand->hasMedia('banner')) {
+                $this->downloadAndAttachImage($brand, $brandData['banner_url'], 'banner', $brandData['name'].' Banner');
             }
         }
     }
@@ -208,7 +208,7 @@ class BrandSeeder extends Seeder
             };
 
             if (file_exists($imagePath)) {
-                $filename = Str::slug($name) . '.webp';
+                $filename = Str::slug($name).'.webp';
 
                 // Add media to brand
                 $brand
@@ -228,14 +228,14 @@ class BrandSeeder extends Seeder
                 $this->command->warn("✗ Failed to generate {$collection} image for {$brand->name}");
             }
         } catch (\Exception $e) {
-            $this->command->warn("✗ Failed to generate {$collection} image for {$brand->name}: " . $e->getMessage());
+            $this->command->warn("✗ Failed to generate {$collection} image for {$brand->name}: ".$e->getMessage());
         }
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()->unique()->values()->all();
     }
 
@@ -243,10 +243,10 @@ class BrandSeeder extends Seeder
     {
         return match ($locale) {
             'lt' => $text,
-            'en' => $text . ' (EN)',
-            'ru' => $text . ' (RU)',
-            'de' => $text . ' (DE)',
-            default => $text . ' (' . strtoupper($locale) . ')',
+            'en' => $text.' (EN)',
+            'ru' => $text.' (RU)',
+            'de' => $text.' (DE)',
+            default => $text.' ('.strtoupper($locale).')',
         };
     }
 }

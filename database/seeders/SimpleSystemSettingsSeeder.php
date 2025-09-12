@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -1032,6 +1034,6 @@ final class SimpleSystemSettingsSeeder extends Seeder
         }
 
         echo "System settings seeder completed successfully!\n";
-        echo "Created " . count($categories) . " categories and " . count($settings) . " settings.\n";
+        echo 'Created '.count($categories).' categories and '.count($settings)." settings.\n";
     }
 }

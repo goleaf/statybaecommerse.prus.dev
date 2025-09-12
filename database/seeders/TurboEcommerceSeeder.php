@@ -1,19 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
 use App\Models\Attribute;
-use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
@@ -28,16 +28,25 @@ use Illuminate\Support\Str;
 final class TurboEcommerceSeeder extends Seeder
 {
     private LocalImageGeneratorService $imageGen;
+
     /** @var array<int,string> */
     private array $sharedImagePool = [];
+
     private string $sharedImagePoolDir;
+
     // Tuneable via env; choose very high yet safe defaults (no artificial caps)
     private int $productsPerBrand;
+
     private int $categoriesPerProduct;
+
     private int $attributesPerProductMin;
+
     private int $attributesPerProductMax;
+
     private int $minImagesPerProduct;
+
     private int $maxImagesPerProduct;
+
     private int $chunkSize;
 
     public function __construct()
@@ -131,8 +140,8 @@ final class TurboEcommerceSeeder extends Seeder
 
             for ($i = 0; $i < $batchSize; $i++) {
                 $nameLt = $namePoolLt[array_rand($namePoolLt)];
-                $sku = 'PRD-' . strtoupper(Str::random(10));
-                $slug = Str::slug($nameLt . '-' . Str::random(6));
+                $sku = 'PRD-'.strtoupper(Str::random(10));
+                $slug = Str::slug($nameLt.'-'.Str::random(6));
                 $price = mt_rand(500, 250000) / 100;  // 5.00 - 2500.00
 
                 $rows[] = [
@@ -171,7 +180,7 @@ final class TurboEcommerceSeeder extends Seeder
                 [
                     'name', 'slug', 'description', 'short_description', 'price', 'sale_price', 'manage_stock', 'stock_quantity',
                     'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_visible', 'is_featured', 'published_at',
-                    'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'updated_at'
+                    'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'updated_at',
                 ]
             );
 
@@ -181,7 +190,7 @@ final class TurboEcommerceSeeder extends Seeder
         // Resolve product IDs for the new/updated SKUs
         $allSkus = array_merge(...$createdSkuBatches);
         $productIdBySku = DB::table('products')->whereIn('sku', $allSkus)->pluck('id', 'sku');
-        $productIds = collect($allSkus)->map(fn($s) => (int) ($productIdBySku[$s] ?? 0))->filter()->values();
+        $productIds = collect($allSkus)->map(fn ($s) => (int) ($productIdBySku[$s] ?? 0))->filter()->values();
 
         if ($productIds->isEmpty()) {
             return;
@@ -240,7 +249,7 @@ final class TurboEcommerceSeeder extends Seeder
                 /** @var Attribute $attr */
                 $vals = $attr->values->where('is_enabled', true);
                 $val = $vals->isNotEmpty() ? $vals->random() : null;
-                if (!$val) {
+                if (! $val) {
                     continue;
                 }
                 $rows[] = [
@@ -274,7 +283,7 @@ final class TurboEcommerceSeeder extends Seeder
                     'product_id' => (int) $row->id,
                     'locale' => (string) $loc,
                     'name' => $this->translateLike($row->name, $loc),
-                    'slug' => Str::slug($this->translateLike($row->name, $loc) . '-' . substr($row->slug, -6)),
+                    'slug' => Str::slug($this->translateLike($row->name, $loc).'-'.substr($row->slug, -6)),
                     'summary' => $this->translateLike('Profesionalus įrankis', $loc),
                     'description' => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $loc),
                     'seo_title' => $this->translateLike($row->name, $loc),
@@ -319,12 +328,12 @@ final class TurboEcommerceSeeder extends Seeder
                             ? [Arr::random($this->sharedImagePool)]
                             : Arr::random($this->sharedImagePool, $toAdd);
                         foreach ($picks as $index => $path) {
-                            if (!$path || !file_exists($path)) {
+                            if (! $path || ! file_exists($path)) {
                                 continue;
                             }
                             ProductImage::query()->create([
                                 'product_id' => $product->id,
-                                'path' => 'storage/shared_product_images/' . basename($path),
+                                'path' => 'storage/shared_product_images/'.basename($path),
                                 'alt_text' => $product->name,
                                 'sort_order' => $current + $index + 1,
                             ]);
@@ -354,14 +363,15 @@ final class TurboEcommerceSeeder extends Seeder
 
     private function buildSharedImagePool(int $count = 100): void
     {
-        if (!is_dir($this->sharedImagePoolDir)) {
+        if (! is_dir($this->sharedImagePoolDir)) {
             @mkdir($this->sharedImagePoolDir, 0755, true);
         }
 
         // If directory already has enough images, reuse them
-        $existing = glob($this->sharedImagePoolDir . DIRECTORY_SEPARATOR . 'pool_image_*.webp') ?: [];
+        $existing = glob($this->sharedImagePoolDir.DIRECTORY_SEPARATOR.'pool_image_*.webp') ?: [];
         if (count($existing) >= $count) {
             $this->sharedImagePool = array_values($existing);
+
             return;
         }
 
@@ -372,18 +382,18 @@ final class TurboEcommerceSeeder extends Seeder
         $generated = [];
         for ($i = 1; $i <= $needed; $i++) {
             try {
-                $name = 'Sample Product Image ' . ($i + count($existing));
+                $name = 'Sample Product Image '.($i + count($existing));
                 $file = $this->imageGen->generateWebPImage(
                     text: $name,
                     width: 600,
                     height: 600,
                     backgroundColor: null,
                     textColor: '#FFFFFF',
-                    filename: 'pool_image_' . str_pad((string) ($i + count($existing)), 3, '0', STR_PAD_LEFT)
+                    filename: 'pool_image_'.str_pad((string) ($i + count($existing)), 3, '0', STR_PAD_LEFT)
                 );
 
                 // Move into pool directory if generated elsewhere
-                $dest = $this->sharedImagePoolDir . DIRECTORY_SEPARATOR . basename($file);
+                $dest = $this->sharedImagePoolDir.DIRECTORY_SEPARATOR.basename($file);
                 if ($file !== $dest) {
                     @rename($file, $dest);
                 }
@@ -409,8 +419,9 @@ final class TurboEcommerceSeeder extends Seeder
     private function supportedLocales(): array
     {
         $raw = (string) config('app.supported_locales', 'lt');
+
         return collect(explode(',', $raw))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -422,10 +433,10 @@ final class TurboEcommerceSeeder extends Seeder
         // Lightweight pseudo-translation to avoid network calls but ensure per-locale difference
         return match ($locale) {
             'lt' => $text,
-            'en' => $text . ' (EN)',
-            'ru' => $text . ' (RU)',
-            'de' => $text . ' (DE)',
-            default => $text . ' (' . strtoupper($locale) . ')',
+            'en' => $text.' (EN)',
+            'ru' => $text.' (RU)',
+            'de' => $text.' (DE)',
+            default => $text.' ('.strtoupper($locale).')',
         };
     }
 
@@ -439,7 +450,7 @@ final class TurboEcommerceSeeder extends Seeder
             'Cemento mišinys', 'Gipso plokštės', 'Termoizoliacijos plokštės', 'Hidroizoliacijos plėvelė',
             'Statybinės putos', 'Akrilo hermetikas', 'Gruntavimo skystis', 'Fasadiniai dažai', 'Klijų mišinys',
             'Betono priedas', 'Apsauginiai akiniai', 'Darbo pirštinės', 'Apsauginis šalmas', 'Apsauginiai batai',
-            'Respiratorius', 'Ausų apsaugos', 'Apsauginis diržas', 'Šviečianti liemenė', 'Pirmos pagalbos rinkinys'
+            'Respiratorius', 'Ausų apsaugos', 'Apsauginis diržas', 'Šviečianti liemenė', 'Pirmos pagalbos rinkinys',
         ];
     }
 }

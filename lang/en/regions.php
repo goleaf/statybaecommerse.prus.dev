@@ -8,7 +8,7 @@ return [
     'code' => 'Code',
     'code_help' => 'Unique region code (e.g., LT-VIL)',
     'description' => 'Description',
-    
+
     // Location
     'location' => 'Location',
     'country' => 'Country',
@@ -17,7 +17,7 @@ return [
     'parent_region_help' => 'Select parent region for hierarchy',
     'level' => 'Level',
     'level_help' => 'Hierarchy level: 0=root, 1=state/province, 2=county, 3=district',
-    
+
     // Status
     'status' => 'Status',
     'is_enabled' => 'Enabled',
@@ -26,24 +26,24 @@ return [
     'is_default_help' => 'Whether this is the default region',
     'sort_order' => 'Sort Order',
     'sort_order_help' => 'Number to sort regions by',
-    
+
     // Translations
     'translations' => 'Translations',
     'locale' => 'Locale',
     'add_translation' => 'Add Translation',
-    
+
     // Metadata
     'metadata' => 'Metadata',
     'metadata_help' => 'Additional region data in key-value format',
     'key' => 'Key',
     'value' => 'Value',
-    
+
     // Table columns
     'cities_count' => 'Cities Count',
     'addresses_count' => 'Addresses Count',
     'created_at' => 'Created At',
     'updated_at' => 'Updated At',
-    
+
     // Actions
     'create' => 'Create Region',
     'edit' => 'Edit Region',
@@ -54,13 +54,13 @@ return [
     'toggle_enabled' => 'Toggle Status',
     'enable_selected' => 'Enable Selected',
     'disable_selected' => 'Disable Selected',
-    
+
     // Messages
     'created_successfully' => 'Region created successfully',
     'updated_successfully' => 'Region updated successfully',
     'deleted_successfully' => 'Region deleted successfully',
     'not_found' => 'Region not found',
-    
+
     // Filters
     'filter_by_country' => 'Filter by Country',
     'filter_by_zone' => 'Filter by Zone',
@@ -75,7 +75,7 @@ return [
     'has_cities' => 'Has Cities',
     'created_from' => 'Created From',
     'created_until' => 'Created Until',
-    
+
     // Widgets
     'total_regions' => 'Total Regions',
     'enabled_regions' => 'Enabled Regions',
@@ -83,7 +83,7 @@ return [
     'regions_by_country' => 'Regions by Country',
     'regions_by_level' => 'Regions by Level',
     'recent_regions' => 'Recent Regions',
-    
+
     // Frontend
     'select_region' => 'Select Region',
     'all_regions' => 'All Regions',
@@ -113,7 +113,7 @@ return [
     'back_to_regions' => 'Back to Regions',
     'back_to_parent' => 'Back to Parent',
     'default_region' => 'Default Region',
-    
+
     // Hierarchy
     'root_regions' => 'Root Regions',
     'child_regions' => 'Child Regions',

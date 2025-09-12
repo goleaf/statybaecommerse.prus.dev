@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
 use App\Models\Channel;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 final class ChannelSeeder extends Seeder
 {
@@ -27,5 +28,3 @@ final class ChannelSeeder extends Seeder
         $this->command?->info('ChannelSeeder: default channel seeded.');
     }
 }
-
-

@@ -29,10 +29,10 @@ return new class extends Migration
             $table->string('placeholder')->nullable()->after('step_value');
             $table->text('help_text')->nullable()->after('placeholder');
             $table->json('meta_data')->nullable()->after('help_text');
-            
+
             // Add soft deletes
             $table->softDeletes();
-            
+
             // Add indexes
             $table->index(['category_id']);
             $table->index(['group_name']);
@@ -53,7 +53,7 @@ return new class extends Migration
             $table->dropIndex(['type']);
             $table->dropIndex(['is_enabled', 'is_visible']);
             $table->dropIndex(['is_filterable', 'is_searchable']);
-            
+
             $table->dropSoftDeletes();
             $table->dropColumn([
                 'description',

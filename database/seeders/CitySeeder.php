@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\City;
 use App\Models\Country;
 use App\Models\Region;
-use App\Models\City;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
@@ -635,17 +637,16 @@ class CitySeeder extends Seeder
             $this->command->info("Upserted city: {$cityData['code']} - {$cityName}");
         }
 
-        $this->command->info('City seeding completed successfully with translations (locales: ' . implode(',', $locales) . ')!');
+        $this->command->info('City seeding completed successfully with translations (locales: '.implode(',', $locales).')!');
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
             ->toArray();
     }
 }
-

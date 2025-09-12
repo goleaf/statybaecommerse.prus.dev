@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\VariantInventory;
-use App\Models\ProductVariant;
 use App\Models\Location;
 use App\Models\Partner;
+use App\Models\ProductVariant;
+use App\Models\VariantInventory;
 use Illuminate\Database\Seeder;
 
 class VariantInventorySeeder extends Seeder
@@ -19,6 +21,7 @@ class VariantInventorySeeder extends Seeder
 
         if ($variants->isEmpty() || $locations->isEmpty()) {
             $this->command->warn('No variants or locations found. Skipping VariantInventory seeding.');
+
             return;
         }
 
@@ -54,7 +57,7 @@ class VariantInventorySeeder extends Seeder
                 // Create some stock movements for this inventory
                 if (fake()->boolean(70)) {
                     $movementCount = fake()->numberBetween(1, 5);
-                    
+
                     for ($i = 0; $i < $movementCount; $i++) {
                         $inventory->stockMovements()->create([
                             'quantity' => fake()->numberBetween(1, 50),
@@ -66,7 +69,7 @@ class VariantInventorySeeder extends Seeder
                                 'manual_adjustment',
                                 'restock',
                                 'damage',
-                                'transfer'
+                                'transfer',
                             ]),
                             'reference' => fake()->optional(0.6)->regexify('[A-Z0-9]{6}'),
                             'notes' => fake()->optional(0.3)->sentence(),

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     // Navigation
@@ -73,7 +75,7 @@ return [
         'in_stock' => 'Sandėlyje',
         'low_stock' => 'Mažos atsargos',
         'out_of_stock' => 'Nėra sandėlyje',
-        
+
         // Report Types
         'types' => [
             'sales' => 'Pardavimai',
@@ -85,7 +87,7 @@ return [
             'marketing' => 'Rinkodara',
             'custom' => 'Pritaikytas',
         ],
-        
+
         // Report Categories
         'categories' => [
             'sales' => 'Pardavimai',
@@ -96,7 +98,7 @@ return [
             'inventory' => 'Atsargos',
             'analytics' => 'Analitika',
         ],
-        
+
         // Date Ranges
         'date_ranges' => [
             'today' => 'Šiandien',
@@ -107,7 +109,7 @@ return [
             'this_year' => 'Šie metai',
             'custom' => 'Pasirinkti laikotarpį',
         ],
-        
+
         // Schedule Frequencies
         'schedule_frequencies' => [
             'daily' => 'Kasdien',
@@ -116,7 +118,7 @@ return [
             'quarterly' => 'Kas ketvirtį',
             'yearly' => 'Kasmet',
         ],
-        
+
         // Fields
         'fields' => [
             'name' => 'Pavadinimas',
@@ -151,7 +153,7 @@ return [
             'metadata_value' => 'Metaduomenų reikšmė',
             'advanced_filters' => 'Išplėstiniai filtrai',
         ],
-        
+
         // Filter Fields
         'filter_fields' => [
             'status' => 'Būsena',
@@ -160,7 +162,7 @@ return [
             'price_range' => 'Kainų intervalas',
             'date_range' => 'Datos intervalas',
         ],
-        
+
         // Filter Operators
         'filter_operators' => [
             'equals' => 'Lygu',
@@ -171,7 +173,7 @@ return [
             'less_than' => 'Mažiau nei',
             'between' => 'Tarp',
         ],
-        
+
         // Actions
         'actions' => [
             'generate' => 'Generuoti',
@@ -185,7 +187,7 @@ return [
             'add_setting' => 'Pridėti nustatymą',
             'add_metadata' => 'Pridėti metaduomenis',
         ],
-        
+
         // Tabs
         'tabs' => [
             'all' => 'Visi',
@@ -198,7 +200,7 @@ return [
             'filters' => 'Filtrai',
             'settings' => 'Nustatymai',
         ],
-        
+
         // Stats
         'stats' => [
             'total_reports' => 'Iš viso ataskaitų',
@@ -214,12 +216,12 @@ return [
             'total_downloads' => 'Iš viso atsisiuntimų',
             'total_downloads_description' => 'Bendras atsisiuntimų skaičius',
         ],
-        
+
         // Charts
         'charts' => [
             'report_types' => 'Ataskaitų tipai',
         ],
-        
+
         // Notifications
         'notifications' => [
             'generated' => 'Ataskaita sėkmingai sugeneruota',

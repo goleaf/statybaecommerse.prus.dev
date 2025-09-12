@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Order;
 use App\Models\User;
@@ -35,7 +37,7 @@ describe('User Impersonation Integration', function () {
         expect(auth()->id())->toBe($targetUser->id);
 
         // Stop impersonation
-        $page = new \App\Filament\Pages\UserImpersonation();
+        $page = new \App\Filament\Pages\UserImpersonation;
         $page->stopImpersonation();
 
         // Verify session is cleared
@@ -87,14 +89,14 @@ describe('User Impersonation Integration', function () {
             'is_admin' => false,
             'is_active' => true,
             'name' => 'John Doe',
-            'email' => 'john@example.com'
+            'email' => 'john@example.com',
         ]);
 
         $inactiveUser = User::factory()->create([
             'is_admin' => false,
             'is_active' => false,
             'name' => 'Jane Smith',
-            'email' => 'jane@example.com'
+            'email' => 'jane@example.com',
         ]);
 
         // Test filtering by active status
@@ -132,7 +134,7 @@ describe('User Impersonation Integration', function () {
                 'original_user_id' => $this->admin->id,
                 'impersonated_user_id' => $targetUser->id,
                 'started_at' => now()->toISOString(),
-            ]
+            ],
         ]);
 
         // Make a request that goes through middleware
@@ -165,11 +167,11 @@ describe('User Impersonation Integration', function () {
                 'original_user_id' => $this->admin->id,
                 'impersonated_user_id' => $targetUser->id,
                 'started_at' => now()->subHours(25)->toISOString(),  // Expired
-            ]
+            ],
         ]);
 
         // Try to stop impersonation
-        $page = new \App\Filament\Pages\UserImpersonation();
+        $page = new \App\Filament\Pages\UserImpersonation;
         $page->stopImpersonation();
 
         // Session should be cleared
@@ -188,7 +190,7 @@ describe('User Impersonation Integration', function () {
         expect(auth()->id())->toBe($user1->id);
 
         // Stop impersonation
-        $page = new \App\Filament\Pages\UserImpersonation();
+        $page = new \App\Filament\Pages\UserImpersonation;
         $page->stopImpersonation();
 
         expect(auth()->id())->toBe($this->admin->id);

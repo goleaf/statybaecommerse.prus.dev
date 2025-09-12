@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\NewsCategoryTranslation;
 use App\Models\News;
 use App\Models\NewsCategory;
+use App\Models\Translations\NewsCategoryTranslation;
 use Illuminate\Database\Seeder;
 
 final class NewsCategorySeeder extends Seeder
@@ -12,8 +14,8 @@ final class NewsCategorySeeder extends Seeder
     public function run(): void
     {
         $locales = collect(config('app.supported_locales', 'lt,en'))
-            ->when(fn($v) => is_string($v), fn($c) => collect(preg_split('/[\s,|]+/', (string) $v, -1, PREG_SPLIT_NO_EMPTY)))
-            ->map(fn($v) => trim((string) $v))
+            ->when(fn ($v) => is_string($v), fn ($c) => collect(preg_split('/[\s,|]+/', (string) $v, -1, PREG_SPLIT_NO_EMPTY)))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values();

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -8,12 +10,10 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
-use App\Models\Setting;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Spatie\Activitylog\ActivityLogStatus;
+use Spatie\Permission\Models\Role;
 
 class LithuanianBuilderShopSeeder extends Seeder
 {
@@ -67,7 +67,7 @@ class LithuanianBuilderShopSeeder extends Seeder
         // Create roles
         $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         $managerRole = Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'web']);
-        
+
         // Assign permissions to roles
         $adminRole->syncPermissions($permissions);
         $managerRole->syncPermissions(['view_admin_panel', 'manage_products', 'manage_categories', 'manage_orders', 'view_reports']);
@@ -134,7 +134,7 @@ class LithuanianBuilderShopSeeder extends Seeder
                 'slug' => 'matavimo-iranga',
                 'description' => 'Preciziškas matavimo ir žymėjimo įrankiai',
                 'sort_order' => 5,
-            ]
+            ],
         ];
 
         $categories = [];
@@ -143,8 +143,8 @@ class LithuanianBuilderShopSeeder extends Seeder
                 ['slug' => $categoryData['slug']],
                 $categoryData + [
                     'is_visible' => true,
-                    'seo_title' => $categoryData['name'] . ' - Statybaecommerse.lt',
-                    'seo_description' => $categoryData['description'] . '. Geriausi sprendimai statybininkams.',
+                    'seo_title' => $categoryData['name'].' - Statybaecommerse.lt',
+                    'seo_description' => $categoryData['description'].'. Geriausi sprendimai statybininkams.',
                 ]
             );
         }
@@ -186,7 +186,7 @@ class LithuanianBuilderShopSeeder extends Seeder
         ];
 
         foreach ($subcategories as $parentName => $subs) {
-            $parent = collect($mainCategories)->first(fn($cat) => $cat->name === $parentName);
+            $parent = collect($mainCategories)->first(fn ($cat) => $cat->name === $parentName);
             if ($parent) {
                 foreach ($subs as $index => $subName) {
                     Category::firstOrCreate(
@@ -198,7 +198,7 @@ class LithuanianBuilderShopSeeder extends Seeder
                             'parent_id' => $parent->id,
                             'sort_order' => $index + 1,
                             'is_visible' => true,
-                            'seo_title' => $subName . ' - ' . $parentName,
+                            'seo_title' => $subName.' - '.$parentName,
                             'seo_description' => "Profesionalūs {$subName} statybos darbams. Platus pasirinkimas ir konkurencingos kainos.",
                         ]
                     );
@@ -244,7 +244,7 @@ class LithuanianBuilderShopSeeder extends Seeder
                 'description' => 'Gipso plokščių ir statybinių mišinių lyderis',
                 'website' => 'https://knauf.lt',
                 'is_enabled' => true,
-            ]
+            ],
         ];
 
         $brands = [];
@@ -252,8 +252,8 @@ class LithuanianBuilderShopSeeder extends Seeder
             $brands[] = Brand::firstOrCreate(
                 ['slug' => $brandData['slug']],
                 $brandData + [
-                    'seo_title' => $brandData['name'] . ' - Oficialus atstovas Lietuvoje',
-                    'seo_description' => $brandData['description'] . '. Originalūs gaminiai su garantija.',
+                    'seo_title' => $brandData['name'].' - Oficialus atstovas Lietuvoje',
+                    'seo_description' => $brandData['description'].'. Originalūs gaminiai su garantija.',
                 ]
             );
         }
@@ -269,11 +269,11 @@ class LithuanianBuilderShopSeeder extends Seeder
         // Create 50 products with Lithuanian builder focus
         for ($i = 0; $i < 50; $i++) {
             $product = Product::factory()->create([
-                'brand_id' => !empty($brandIds) ? fake()->randomElement($brandIds) : null,
+                'brand_id' => ! empty($brandIds) ? fake()->randomElement($brandIds) : null,
             ]);
-            
+
             // Assign to 1-2 random categories
-            if (!empty($categoryIds)) {
+            if (! empty($categoryIds)) {
                 $product->categories()->attach(
                     fake()->randomElements($categoryIds, fake()->numberBetween(1, 2))
                 );
@@ -285,19 +285,19 @@ class LithuanianBuilderShopSeeder extends Seeder
     {
         // Create some sample customers
         $customers = User::factory()->count(20)->create();
-        
+
         // Create orders for some customers
         $customers->take(10)->each(function (User $customer) {
             $orderCount = fake()->numberBetween(1, 5);
             for ($i = 0; $i < $orderCount; $i++) {
                 $order = Order::factory()->create(['user_id' => $customer->id]);
-                
+
                 // Add order items
                 $products = Product::inRandomOrder()->take(fake()->numberBetween(1, 5))->get();
                 foreach ($products as $product) {
                     $quantity = fake()->numberBetween(1, 3);
                     $price = $product->sale_price ?? $product->price;
-                    
+
                     OrderItem::create([
                         'order_id' => $order->id,
                         'product_id' => $product->id,
@@ -311,6 +311,4 @@ class LithuanianBuilderShopSeeder extends Seeder
             }
         });
     }
-
-
 }

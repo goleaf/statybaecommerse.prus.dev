@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\CountryTranslation;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
@@ -10,6 +11,7 @@ use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Location;
 use App\Models\Product;
+use App\Models\Translations\CountryTranslation;
 use App\Models\Zone;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
@@ -20,6 +22,7 @@ use Illuminate\Support\Str;
 final class ComprehensiveMultilanguageSeeder extends Seeder
 {
     private LocalImageGeneratorService $imageGenerator;
+
     private array $supportedLocales = ['lt', 'en'];
 
     public function __construct()
@@ -57,7 +60,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Lietuva', 'name_official' => 'Lietuvos Respublika'],
                     'en' => ['name' => 'Lithuania', 'name_official' => 'Republic of Lithuania'],
-                ]
+                ],
             ],
             [
                 'cca2' => 'LV', 'cca3' => 'LVA', 'phone_calling_code' => '371', 'flag' => '🇱🇻',
@@ -66,7 +69,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Latvija', 'name_official' => 'Latvijos Respublika'],
                     'en' => ['name' => 'Latvia', 'name_official' => 'Republic of Latvia'],
-                ]
+                ],
             ],
             [
                 'cca2' => 'EE', 'cca3' => 'EST', 'phone_calling_code' => '372', 'flag' => '🇪🇪',
@@ -75,7 +78,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Estija', 'name_official' => 'Estijos Respublika'],
                     'en' => ['name' => 'Estonia', 'name_official' => 'Republic of Estonia'],
-                ]
+                ],
             ],
             [
                 'cca2' => 'DE', 'cca3' => 'DEU', 'phone_calling_code' => '49', 'flag' => '🇩🇪',
@@ -84,7 +87,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Vokietija', 'name_official' => 'Vokietijos Federacinė Respublika'],
                     'en' => ['name' => 'Germany', 'name_official' => 'Federal Republic of Germany'],
-                ]
+                ],
             ],
             [
                 'cca2' => 'PL', 'cca3' => 'POL', 'phone_calling_code' => '48', 'flag' => '🇵🇱',
@@ -93,7 +96,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Lenkija', 'name_official' => 'Lenkijos Respublika'],
                     'en' => ['name' => 'Poland', 'name_official' => 'Republic of Poland'],
-                ]
+                ],
             ],
             [
                 'cca2' => 'FR', 'cca3' => 'FRA', 'phone_calling_code' => '33', 'flag' => '🇫🇷',
@@ -102,7 +105,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Prancūzija', 'name_official' => 'Prancūzijos Respublika'],
                     'en' => ['name' => 'France', 'name_official' => 'French Republic'],
-                ]
+                ],
             ],
             [
                 'cca2' => 'GB', 'cca3' => 'GBR', 'phone_calling_code' => '44', 'flag' => '🇬🇧',
@@ -111,7 +114,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Jungtinė Karalystė', 'name_official' => 'Didžiosios Britanijos ir Šiaurės Airijos Jungtinė Karalystė'],
                     'en' => ['name' => 'United Kingdom', 'name_official' => 'United Kingdom of Great Britain and Northern Ireland'],
-                ]
+                ],
             ],
             [
                 'cca2' => 'US', 'cca3' => 'USA', 'phone_calling_code' => '1', 'flag' => '🇺🇸',
@@ -120,7 +123,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Jungtinės Amerikos Valstijos', 'name_official' => 'Amerikos Jungtinės Valstijos'],
                     'en' => ['name' => 'United States', 'name_official' => 'United States of America'],
-                ]
+                ],
             ],
         ];
 
@@ -149,7 +152,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
         }
 
-        $this->command->info('   ✅ Created ' . count($countries) . ' countries with translations');
+        $this->command->info('   ✅ Created '.count($countries).' countries with translations');
     }
 
     private function seedZonesWithTranslations(): void
@@ -165,7 +168,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Europa', 'description' => 'Europos regionas'],
                     'en' => ['name' => 'Europe', 'description' => 'European region'],
-                ]
+                ],
             ],
             [
                 'name' => 'North America',
@@ -175,7 +178,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Šiaurės Amerika', 'description' => 'Šiaurės Amerikos regionas'],
                     'en' => ['name' => 'North America', 'description' => 'North American region'],
-                ]
+                ],
             ],
             [
                 'name' => 'Baltic States',
@@ -185,7 +188,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Baltijos šalys', 'description' => 'Lietuvos, Latvijos ir Estijos regionas'],
                     'en' => ['name' => 'Baltic States', 'description' => 'Lithuania, Latvia and Estonia region'],
-                ]
+                ],
             ],
         ];
 
@@ -210,7 +213,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
         }
 
-        $this->command->info('   ✅ Created ' . count($zones) . ' zones with translations');
+        $this->command->info('   ✅ Created '.count($zones).' zones with translations');
     }
 
     private function seedCurrenciesWithTranslations(): void
@@ -227,7 +230,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Euras'],
                     'en' => ['name' => 'Euro'],
-                ]
+                ],
             ],
             [
                 'code' => 'USD',
@@ -238,7 +241,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'JAV doleris'],
                     'en' => ['name' => 'US Dollar'],
-                ]
+                ],
             ],
             [
                 'code' => 'GBP',
@@ -249,7 +252,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'translations' => [
                     'lt' => ['name' => 'Didžiosios Britanijos svaras'],
                     'en' => ['name' => 'British Pound'],
-                ]
+                ],
             ],
         ];
 
@@ -276,7 +279,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
         }
 
-        $this->command->info('   ✅ Created ' . count($currencies) . ' currencies with translations');
+        $this->command->info('   ✅ Created '.count($currencies).' currencies with translations');
     }
 
     private function seedLocationsWithTranslations(): void
@@ -307,7 +310,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'vilnius-warehouse',
                         'description' => 'Main warehouse in Vilnius with full range of construction materials',
                     ],
-                ]
+                ],
             ],
             [
                 'code' => 'KNS001',
@@ -332,7 +335,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'kaunas-store',
                         'description' => 'Store in Kaunas with construction materials and tools',
                     ],
-                ]
+                ],
             ],
             [
                 'code' => 'KLP001',
@@ -357,7 +360,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'klaipeda-pickup-point',
                         'description' => 'Convenient pickup point in Klaipėda',
                     ],
-                ]
+                ],
             ],
         ];
 
@@ -368,16 +371,16 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             $location = Location::updateOrCreate(
                 ['code' => $locationData['code']],
                 array_merge($locationData, [
-                    'name' => collect($translations)->mapWithKeys(fn($trans, $locale) => [$locale => $trans['name']])->all(),
-                    'slug' => collect($translations)->mapWithKeys(fn($trans, $locale) => [$locale => $trans['slug']])->all(),
-                    'description' => collect($translations)->mapWithKeys(fn($trans, $locale) => [$locale => $trans['description']])->all(),
+                    'name' => collect($translations)->mapWithKeys(fn ($trans, $locale) => [$locale => $trans['name']])->all(),
+                    'slug' => collect($translations)->mapWithKeys(fn ($trans, $locale) => [$locale => $trans['slug']])->all(),
+                    'description' => collect($translations)->mapWithKeys(fn ($trans, $locale) => [$locale => $trans['description']])->all(),
                 ])
             );
 
             $this->command->info("   📍 Created location: {$location->getTranslation('name', 'en')}");
         }
 
-        $this->command->info('   ✅ Created ' . count($locations) . ' locations with translations');
+        $this->command->info('   ✅ Created '.count($locations).' locations with translations');
     }
 
     private function seedCategoriesWithTranslations(): void
@@ -402,7 +405,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'construction-materials',
                         'description' => 'High-quality construction materials for all your building needs',
                     ],
-                ]
+                ],
             ],
             [
                 'name' => 'Tools & Equipment',
@@ -421,7 +424,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'tools-equipment',
                         'description' => 'Professional tools and equipment for construction and renovation',
                     ],
-                ]
+                ],
             ],
             [
                 'name' => 'Electrical Supplies',
@@ -440,7 +443,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'electrical-supplies',
                         'description' => 'Complete range of electrical supplies and components',
                     ],
-                ]
+                ],
             ],
             [
                 'name' => 'Plumbing & Heating',
@@ -459,7 +462,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'plumbing-heating',
                         'description' => 'Plumbing fixtures, pipes, and heating systems',
                     ],
-                ]
+                ],
             ],
         ];
 
@@ -483,7 +486,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         $category
                             ->addMedia($imagePath)
                             ->withCustomProperties(['source' => 'local_generated'])
-                            ->usingName($categoryData['name'] . ' Image')
+                            ->usingName($categoryData['name'].' Image')
                             ->toMediaCollection('images');
 
                         if (file_exists($imagePath)) {
@@ -493,7 +496,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 } catch (\Throwable $e) {
                     Log::warning('Failed to generate category image', [
                         'category' => $categoryData['name'],
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }
@@ -509,7 +512,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
         }
 
-        $this->command->info('   ✅ Created ' . count($categories) . ' categories with translations and images');
+        $this->command->info('   ✅ Created '.count($categories).' categories with translations and images');
     }
 
     private function seedBrandsWithTranslations(): void
@@ -534,7 +537,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'buildpro',
                         'description' => 'Professional construction materials and tools',
                     ],
-                ]
+                ],
             ],
             [
                 'name' => 'ElectroMax',
@@ -553,7 +556,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'electromax',
                         'description' => 'Leading electrical supplies manufacturer',
                     ],
-                ]
+                ],
             ],
             [
                 'name' => 'PlumbTech',
@@ -572,7 +575,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'plumbtech',
                         'description' => 'Advanced plumbing and heating solutions',
                     ],
-                ]
+                ],
             ],
         ];
 
@@ -596,7 +599,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         $brand
                             ->addMedia($imagePath)
                             ->withCustomProperties(['source' => 'local_generated'])
-                            ->usingName($brandData['name'] . ' Logo')
+                            ->usingName($brandData['name'].' Logo')
                             ->toMediaCollection('logo');
 
                         if (file_exists($imagePath)) {
@@ -606,7 +609,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 } catch (\Throwable $e) {
                     Log::warning('Failed to generate brand logo', [
                         'brand' => $brandData['name'],
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }
@@ -622,7 +625,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
         }
 
-        $this->command->info('   ✅ Created ' . count($brands) . ' brands with translations and images');
+        $this->command->info('   ✅ Created '.count($brands).' brands with translations and images');
     }
 
     private function seedCollectionsWithTranslations(): void
@@ -647,7 +650,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'professional-series',
                         'description' => 'Premium products for professional contractors',
                     ],
-                ]
+                ],
             ],
             [
                 'name' => 'Home Builder',
@@ -666,7 +669,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'slug' => 'home-builder',
                         'description' => 'Everything you need for home construction and renovation',
                     ],
-                ]
+                ],
             ],
         ];
 
@@ -692,7 +695,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
         }
 
-        $this->command->info('   ✅ Created ' . count($collections) . ' collections with translations');
+        $this->command->info('   ✅ Created '.count($collections).' collections with translations');
     }
 
     private function seedProductsWithTranslations(): void
@@ -704,6 +707,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
 
         if ($categories->isEmpty() || $brands->isEmpty()) {
             $this->command->warn('Categories or brands not found. Skipping product seeding.');
+
             return;
         }
 
@@ -731,7 +735,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'summary' => 'High-quality Portland cement for construction',
                         'description' => 'Premium Portland cement suitable for all construction projects. Provides excellent strength and durability.',
                     ],
-                ]
+                ],
             ],
             [
                 'name' => 'Professional Drill Set',
@@ -756,7 +760,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'summary' => 'Complete professional drill set with accessories',
                         'description' => 'Professional-grade drill set including drill bits, screwdriver bits, and carrying case.',
                     ],
-                ]
+                ],
             ],
             [
                 'name' => 'LED Light Bulb 10W',
@@ -781,7 +785,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         'summary' => 'Energy-efficient LED light bulb',
                         'description' => 'High-efficiency LED bulb with warm white light. Long-lasting and energy-saving.',
                     ],
-                ]
+                ],
             ],
         ];
 
@@ -819,7 +823,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         $product
                             ->addMedia($imagePath)
                             ->withCustomProperties(['source' => 'local_generated'])
-                            ->usingName($productData['name'] . ' Image')
+                            ->usingName($productData['name'].' Image')
                             ->toMediaCollection('images');
 
                         if (file_exists($imagePath)) {
@@ -829,7 +833,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 } catch (\Throwable $e) {
                     Log::warning('Failed to generate product image', [
                         'product' => $productData['name'],
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }
@@ -845,6 +849,6 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
         }
 
-        $this->command->info('   ✅ Created ' . count($products) . ' products with translations and images');
+        $this->command->info('   ✅ Created '.count($products).' products with translations and images');
     }
 }

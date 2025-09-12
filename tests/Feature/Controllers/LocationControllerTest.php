@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Location;
 use Illuminate\Support\Facades\DB;
@@ -6,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 
 beforeEach(function (): void {
     $this->artisan('migrate', ['--force' => true]);
-    if (!Schema::hasTable('locations')) {
+    if (! Schema::hasTable('locations')) {
         Schema::create('locations', function ($table) {
             $table->id();
             $table->string('name');
@@ -29,11 +31,11 @@ it('shows a location', function (): void {
     $location = Location::factory()->create([
         'name' => 'Main',
         'is_default' => true,
-        'is_enabled' => true
+        'is_enabled' => true,
     ]);
 
     // Use the location's code as the slug parameter
     $slug = $location->code ?: $location->name;
 
-    $this->get('/en/locations/' . $slug)->assertOk();
+    $this->get('/en/locations/'.$slug)->assertOk();
 });

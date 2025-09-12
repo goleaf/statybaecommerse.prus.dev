@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Schema;
 
@@ -8,7 +10,7 @@ it('robots returns text content', function (): void {
 });
 
 it('sitemap routes respond', function (): void {
-    if (!Schema::hasTable('sh_collections')) {
+    if (! Schema::hasTable('sh_collections')) {
         Schema::create('sh_collections', function ($table) {
             $table->id();
             $table->string('slug')->nullable();
@@ -16,7 +18,7 @@ it('sitemap routes respond', function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_legals')) {
+    if (! Schema::hasTable('sh_legals')) {
         Schema::create('sh_legals', function ($table) {
             $table->id();
             $table->string('slug')->nullable();
@@ -24,7 +26,7 @@ it('sitemap routes respond', function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_legal_translations')) {
+    if (! Schema::hasTable('sh_legal_translations')) {
         Schema::create('sh_legal_translations', function ($table) {
             $table->id();
             $table->unsignedBigInteger('legal_id');
@@ -47,7 +49,7 @@ it('root redirects to localized home', function (): void {
 
 it('brand and location index routes respond', function (): void {
     // These may rely on Livewire/feature toggles; ensure routes exist
-    if (!Schema::hasTable('sh_inventories')) {
+    if (! Schema::hasTable('sh_inventories')) {
         Schema::create('sh_inventories', function ($table) {
             $table->id();
             $table->string('name');

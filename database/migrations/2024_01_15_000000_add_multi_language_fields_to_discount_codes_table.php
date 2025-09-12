@@ -15,7 +15,7 @@ return new class extends Migration
             // Add multi-language description fields
             $table->text('description_lt')->nullable()->after('code');
             $table->text('description_en')->nullable()->after('description_lt');
-            
+
             // Add new fields for enhanced functionality
             $table->timestamp('starts_at')->nullable()->after('description_en');
             $table->integer('usage_limit')->nullable()->change();
@@ -23,20 +23,20 @@ return new class extends Migration
             $table->boolean('is_active')->default(true)->after('usage_limit_per_user');
             $table->string('status')->default('active')->after('is_active');
             $table->json('metadata')->nullable()->after('status');
-            
+
             // Add tracking fields
             $table->unsignedBigInteger('created_by')->nullable()->after('metadata');
             $table->unsignedBigInteger('updated_by')->nullable()->after('created_by');
-            
+
             // Add soft deletes
             $table->softDeletes();
-            
+
             // Add indexes
             $table->index(['is_active', 'status']);
             $table->index(['starts_at', 'expires_at']);
             $table->index('created_by');
             $table->index('updated_by');
-            
+
             // Add foreign key constraints
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
@@ -65,7 +65,7 @@ return new class extends Migration
                 'status',
                 'metadata',
                 'created_by',
-                'updated_by'
+                'updated_by',
             ]);
         });
     }

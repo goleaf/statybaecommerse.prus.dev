@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -9,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         // Enhanced Settings Table
-        if (!Schema::hasTable('enhanced_settings')) {
+        if (! Schema::hasTable('enhanced_settings')) {
             Schema::create('enhanced_settings', function (Blueprint $table): void {
                 $table->id();
                 $table->string('group')->default('general');
@@ -29,7 +31,7 @@ return new class extends Migration
         }
 
         // Enhanced Media Management
-        if (!Schema::hasTable('media_collections')) {
+        if (! Schema::hasTable('media_collections')) {
             Schema::create('media_collections', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -45,7 +47,7 @@ return new class extends Migration
         }
 
         // Enhanced Notification System
-        if (!Schema::hasTable('notification_templates')) {
+        if (! Schema::hasTable('notification_templates')) {
             Schema::create('notification_templates', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -61,7 +63,7 @@ return new class extends Migration
         }
 
         // Enhanced Audit Log
-        if (!Schema::hasTable('system_logs')) {
+        if (! Schema::hasTable('system_logs')) {
             Schema::create('system_logs', function (Blueprint $table): void {
                 $table->id();
                 $table->string('level'); // info, warning, error, critical
@@ -82,7 +84,7 @@ return new class extends Migration
         }
 
         // Enhanced Feature Flags
-        if (!Schema::hasTable('feature_flags')) {
+        if (! Schema::hasTable('feature_flags')) {
             Schema::create('feature_flags', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -99,7 +101,7 @@ return new class extends Migration
         }
 
         // Enhanced Cache Management
-        if (!Schema::hasTable('cache_tags')) {
+        if (! Schema::hasTable('cache_tags')) {
             Schema::create('cache_tags', function (Blueprint $table): void {
                 $table->id();
                 $table->string('tag');
@@ -114,7 +116,7 @@ return new class extends Migration
         }
 
         // Enhanced Performance Monitoring
-        if (!Schema::hasTable('performance_metrics')) {
+        if (! Schema::hasTable('performance_metrics')) {
             Schema::create('performance_metrics', function (Blueprint $table): void {
                 $table->id();
                 $table->string('metric_name');
@@ -130,7 +132,7 @@ return new class extends Migration
         }
 
         // Enhanced Background Jobs
-        if (!Schema::hasTable('job_batches_extended')) {
+        if (! Schema::hasTable('job_batches_extended')) {
             Schema::create('job_batches_extended', function (Blueprint $table): void {
                 $table->string('id')->primary();
                 $table->string('name');
@@ -150,7 +152,7 @@ return new class extends Migration
         }
 
         // Enhanced API Management
-        if (!Schema::hasTable('api_keys')) {
+        if (! Schema::hasTable('api_keys')) {
             Schema::create('api_keys', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -169,7 +171,7 @@ return new class extends Migration
         }
 
         // Enhanced Multi-tenant Support
-        if (!Schema::hasTable('tenants')) {
+        if (! Schema::hasTable('tenants')) {
             Schema::create('tenants', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -183,7 +185,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('tenant_users')) {
+        if (! Schema::hasTable('tenant_users')) {
             Schema::create('tenant_users', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('tenant_id')->constrained()->onDelete('cascade');

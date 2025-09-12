@@ -30,7 +30,7 @@ return new class extends Migration
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('responded_by')->references('id')->on('users')->onDelete('set null');
-            
+
             $table->index(['product_id', 'status']);
             $table->index(['user_id', 'created_at']);
             $table->index(['status', 'created_at']);
@@ -45,4 +45,3 @@ return new class extends Migration
         Schema::dropIfExists('product_requests');
     }
 };
-

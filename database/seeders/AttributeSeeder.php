@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 final class AttributeSeeder extends Seeder
 {
@@ -112,11 +113,13 @@ final class AttributeSeeder extends Seeder
                     'sort_order' => (int) $data['sort_order'],
                     'updated_at' => $now,
                     'created_at' => $now,
-                ]
-            ], ['slug'], ['name','type','is_required','is_filterable','is_searchable','is_enabled','sort_order','updated_at']);
+                ],
+            ], ['slug'], ['name', 'type', 'is_required', 'is_filterable', 'is_searchable', 'is_enabled', 'sort_order', 'updated_at']);
 
             $attrId = (int) DB::table('attributes')->where('slug', $data['slug'])->value('id');
-            if (!$attrId) { continue; }
+            if (! $attrId) {
+                continue;
+            }
 
             // Translations per locale
             $trRows = [];
@@ -129,7 +132,7 @@ final class AttributeSeeder extends Seeder
                     'updated_at' => $now,
                 ];
             }
-            DB::table('attribute_translations')->upsert($trRows, ['attribute_id','locale'], ['name','updated_at']);
+            DB::table('attribute_translations')->upsert($trRows, ['attribute_id', 'locale'], ['name', 'updated_at']);
         }
 
         $this->command?->info('AttributeSeeder: seeded attributes with translations (locales: '.implode(',', $locales).').');
@@ -138,9 +141,8 @@ final class AttributeSeeder extends Seeder
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()->values()->all();
     }
 }
-

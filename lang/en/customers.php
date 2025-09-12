@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'title' => 'Customers',
@@ -12,10 +14,10 @@ return [
     'preferences' => 'Preferences',
     'statistics' => 'Statistics',
     'customer_statistics' => 'Customer Statistics',
-    
+
     'fields' => [
-    'name' => 'Name',
-    'email' => 'Email',
+        'name' => 'Name',
+        'email' => 'Email',
         'phone' => 'Phone',
         'phone_number' => 'Phone Number',
         'first_name' => 'First Name',
@@ -36,7 +38,7 @@ return [
         'position' => 'Position',
         'job_title' => 'Job Title',
         'website' => 'Website',
-    'total_spent' => 'Total Spent',
+        'total_spent' => 'Total Spent',
         'orders_count' => 'Orders Count',
         'average_order_value' => 'Average Order Value',
         'reviews_count' => 'Reviews Count',
@@ -45,20 +47,20 @@ return [
         'created_at' => 'Created',
         'updated_at' => 'Updated',
     ],
-    
+
     'status' => [
         'active' => 'Active',
         'inactive' => 'Inactive',
         'suspended' => 'Suspended',
         'pending' => 'Pending',
     ],
-    
+
     'placeholders' => [
         'no_phone' => 'No phone number provided',
         'never_logged_in' => 'Never logged in',
         'no_orders' => 'No orders',
     ],
-    
+
     'filters' => [
         'status' => 'Status',
         'all' => 'All',
@@ -83,7 +85,7 @@ return [
         'regular_customers' => 'Regular Customers',
         'vip_customers' => 'VIP Customers',
         'inactive_customers' => 'Inactive Customers',
-    'high_value_customers' => 'High Value Customers',
+        'high_value_customers' => 'High Value Customers',
         'frequent_buyers' => 'Frequent Buyers',
         'has_orders' => 'Has Orders',
         'with_orders' => 'With Orders',
@@ -92,7 +94,7 @@ return [
         'verified' => 'Verified',
         'unverified' => 'Unverified',
     ],
-    
+
     'advanced_filters' => 'Advanced Filters',
     'toggle_filters' => 'Toggle Filters',
     'show_filters' => 'Show Filters',
@@ -101,14 +103,14 @@ return [
     'filter' => 'Filter',
     'clear_filters' => 'Clear Filters',
     'export' => 'Export',
-    
+
     'stats' => [
         'total_customers' => 'Total Customers',
         'active_customers' => 'Active Customers',
         'total_revenue' => 'Total Revenue',
         'new_this_month' => 'New This Month',
     ],
-    
+
     'table' => [
         'name' => 'Name',
         'email' => 'Email',
@@ -123,20 +125,20 @@ return [
         'created_at' => 'Created',
         'actions' => 'Actions',
     ],
-    
+
     'actions' => [
         'view' => 'View',
         'edit' => 'Edit',
         'delete' => 'Delete',
         'generate_document' => 'Generate Document',
     ],
-    
+
     'no_customers_found' => 'No customers found',
     'no_customers_description' => 'No customers match your search criteria.',
-    
+
     'search_placeholder' => 'Search customers by name, email, or phone number...',
     'search' => 'Search',
-    
+
     'pagination' => [
         'showing' => 'Showing',
         'to' => 'to',

@@ -1,30 +1,33 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::table('countries', function (Blueprint $table) {
             // Add missing columns
-            if (!Schema::hasColumn('countries', 'phone_calling_code')) {
+            if (! Schema::hasColumn('countries', 'phone_calling_code')) {
                 $table->string('phone_calling_code')->nullable()->after('phone_code');
             }
-            if (!Schema::hasColumn('countries', 'region')) {
+            if (! Schema::hasColumn('countries', 'region')) {
                 $table->string('region')->nullable()->after('flag');
             }
-            if (!Schema::hasColumn('countries', 'subregion')) {
+            if (! Schema::hasColumn('countries', 'subregion')) {
                 $table->string('subregion')->nullable()->after('region');
             }
-            if (!Schema::hasColumn('countries', 'latitude')) {
+            if (! Schema::hasColumn('countries', 'latitude')) {
                 $table->decimal('latitude', 10, 8)->nullable()->after('subregion');
             }
-            if (!Schema::hasColumn('countries', 'longitude')) {
+            if (! Schema::hasColumn('countries', 'longitude')) {
                 $table->decimal('longitude', 11, 8)->nullable()->after('latitude');
             }
-            if (!Schema::hasColumn('countries', 'currencies')) {
+            if (! Schema::hasColumn('countries', 'currencies')) {
                 $table->json('currencies')->nullable()->after('longitude');
             }
 
@@ -44,7 +47,7 @@ return new class extends Migration {
                 'subregion',
                 'latitude',
                 'longitude',
-                'currencies'
+                'currencies',
             ]);
 
             $table->string('name')->nullable(false)->change();

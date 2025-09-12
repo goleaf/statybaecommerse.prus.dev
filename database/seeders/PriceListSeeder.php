@@ -45,7 +45,9 @@ class PriceListSeeder extends Seeder
             $productIds = DB::table('sh_products')->inRandomOrder()->limit(50)->pluck('id')->all();
             foreach ($productIds as $pid) {
                 $has = DB::table('sh_price_list_items')->where('price_list_id', $priceListId)->where('product_id', $pid)->exists();
-                if ($has) { continue; }
+                if ($has) {
+                    continue;
+                }
 
                 $basePrice = DB::table('sh_prices')->where('priceable_type', 'Product')->where('priceable_id', $pid)->value('amount');
                 if ($basePrice === null) {
@@ -64,5 +66,3 @@ class PriceListSeeder extends Seeder
         });
     }
 }
-
-

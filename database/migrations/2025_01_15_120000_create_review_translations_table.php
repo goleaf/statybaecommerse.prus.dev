@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -24,10 +26,10 @@ return new class extends Migration
         // Add missing columns to reviews table if they don't exist
         if (Schema::hasTable('reviews')) {
             Schema::table('reviews', function (Blueprint $table): void {
-                if (!Schema::hasColumn('reviews', 'is_featured')) {
+                if (! Schema::hasColumn('reviews', 'is_featured')) {
                     $table->boolean('is_featured')->default(false)->after('is_approved');
                 }
-                if (!Schema::hasColumn('reviews', 'metadata')) {
+                if (! Schema::hasColumn('reviews', 'metadata')) {
                     $table->json('metadata')->nullable()->after('comment');
                 }
             });
@@ -37,7 +39,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('review_translations');
-        
+
         if (Schema::hasTable('reviews')) {
             Schema::table('reviews', function (Blueprint $table): void {
                 $table->dropColumn(['is_featured', 'metadata']);
@@ -45,4 +47,3 @@ return new class extends Migration
         }
     }
 };
-

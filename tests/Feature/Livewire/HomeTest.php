@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Livewire;
 
@@ -131,8 +133,8 @@ final class HomeTest extends TestCase
         Livewire::test(Home::class)
             ->assertViewHas('featuredProducts', function ($products) use ($publishedProduct, $unpublishedProduct) {
                 $ids = $products->pluck('id');
-                return $ids->contains($publishedProduct->id) && !$ids->contains($unpublishedProduct->id);
+
+                return $ids->contains($publishedProduct->id) && ! $ids->contains($unpublishedProduct->id);
             });
     }
 }
-

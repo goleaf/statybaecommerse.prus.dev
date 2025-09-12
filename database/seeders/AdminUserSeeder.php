@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -58,7 +60,7 @@ final class AdminUserSeeder extends Seeder
         );
 
         // Assign administrator role
-        if (!$superAdmin->hasRole('administrator')) {
+        if (! $superAdmin->hasRole('administrator')) {
             $superAdmin->assignRole('administrator');
         }
 

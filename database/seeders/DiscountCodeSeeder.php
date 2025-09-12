@@ -24,7 +24,7 @@ class DiscountCodeSeeder extends Seeder
             for ($i = 0; $i < 20; $i++) {
                 $base = is_string($discount->name ?? null) ? $discount->name : 'DISCOUNT';
                 $prefix = Str::upper(Str::slug($base));
-                $code = $prefix . '-' . Str::upper(Str::random(6));
+                $code = $prefix.'-'.Str::upper(Str::random(6));
                 $exists = DB::table('sh_discount_codes')->where('code', $code)->exists();
                 if ($exists) {
                     continue;

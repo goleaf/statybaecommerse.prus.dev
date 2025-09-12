@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'title' => 'Ataskaitos',
     'description' => 'Peržiūrėkite ir atsisiųskite mūsų ataskaitas',
-    
+
     // Filters
     'filters' => [
         'search' => 'Paieška',
@@ -20,7 +22,7 @@ return [
         'apply' => 'Taikyti',
         'clear' => 'Išvalyti',
     ],
-    
+
     // Actions
     'actions' => [
         'view' => 'Peržiūrėti',
@@ -29,7 +31,7 @@ return [
         'print' => 'Spausdinti',
         'title' => 'Veiksmai',
     ],
-    
+
     // Stats
     'stats' => [
         'views' => 'Peržiūros',
@@ -37,12 +39,12 @@ return [
         'created' => 'Sukurta',
         'last_generated' => 'Paskutinį kartą sugeneruota',
     ],
-    
+
     // Content
     'content' => [
         'title' => 'Turinys',
     ],
-    
+
     // Info
     'info' => [
         'title' => 'Informacija',
@@ -53,24 +55,24 @@ return [
         'last_generated' => 'Paskutinį kartą sugeneruota',
         'generated_by' => 'Sugeneravo',
     ],
-    
+
     // Related
     'related' => [
         'title' => 'Susijusios ataskaitos',
     ],
-    
+
     // Empty state
     'empty' => [
         'title' => 'Ataskaitų nerasta',
         'description' => 'Pagal jūsų paieškos kriterijus ataskaitų nerasta.',
     ],
-    
+
     // Messages
     'messages' => [
         'access_denied' => 'Neturite leidimo peržiūrėti šios ataskaitos.',
         'generated_successfully' => 'Ataskaita sėkmingai sugeneruota.',
     ],
-    
+
     // PDF
     'pdf' => [
         'generated_on' => 'Sugeneruota',
@@ -91,4 +93,3 @@ return [
         'footer' => 'Ataskaita: :name | Sugeneruota: :date',
     ],
 ];
-

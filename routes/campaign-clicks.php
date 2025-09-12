@@ -9,7 +9,7 @@ Route::prefix('campaign-clicks')->group(function () {
     Route::get('/statistics', [CampaignClickController::class, 'statistics']);
     Route::get('/analytics', [CampaignClickController::class, 'analytics']);
     Route::get('/export', [CampaignClickController::class, 'export']);
-    
+
     Route::get('/{campaignClick}', [CampaignClickController::class, 'show']);
     Route::put('/{campaignClick}', [CampaignClickController::class, 'update']);
     Route::delete('/{campaignClick}', [CampaignClickController::class, 'destroy']);

@@ -7,13 +7,13 @@
  * This script demonstrates how to use the CodeStyleService
  * to fix code style issues in your project.
  */
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 use App\Services\CodeStyleService;
 use Illuminate\Foundation\Application;
 
 // Bootstrap Laravel
-$app = new Application(realpath(__DIR__ . '/..'));
+$app = new Application(realpath(__DIR__.'/..'));
 $app->singleton(
     Illuminate\Contracts\Http\Kernel::class,
     App\Http\Kernel::class
@@ -58,13 +58,13 @@ final class TestClass
 file_put_contents($testFile, $testContent);
 
 echo "📄 Original file content:\n";
-echo $testContent . "\n\n";
+echo $testContent."\n\n";
 
 echo "🔍 Validating file...\n";
 $violations = $codeStyleService->validateFile($testFile);
 
-if (!empty($violations)) {
-    echo '⚠️  Found ' . count($violations) . " violations:\n";
+if (! empty($violations)) {
+    echo '⚠️  Found '.count($violations)." violations:\n";
     foreach ($violations as $violation) {
         echo "   Line {$violation['line']}: {$violation['message']}\n";
     }
@@ -76,8 +76,8 @@ if (!empty($violations)) {
 echo "🔧 Fixing file...\n";
 $fixes = $codeStyleService->fixFile($testFile);
 
-if (!empty($fixes)) {
-    echo '✅ Applied ' . count($fixes) . " fixes:\n";
+if (! empty($fixes)) {
+    echo '✅ Applied '.count($fixes)." fixes:\n";
     foreach ($fixes as $fix) {
         echo "   - {$fix['message']}\n";
     }
@@ -87,7 +87,7 @@ if (!empty($fixes)) {
 }
 
 echo "📄 Fixed file content:\n";
-echo file_get_contents($testFile) . "\n";
+echo file_get_contents($testFile)."\n";
 
 // Clean up
 unlink($testFile);

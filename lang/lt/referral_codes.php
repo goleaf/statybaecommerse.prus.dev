@@ -139,4 +139,3 @@ return [
         'url_copied' => 'Nuoroda nukopijuota į iškarpinę',
     ],
 ];
-

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -35,7 +37,7 @@ final class AnalyticsEventSeeder extends Seeder
 
         // Generate some session IDs for realistic user sessions
         for ($i = 0; $i < 100; $i++) {
-            $sessionIds[] = 'session_' . fake()->uuid();
+            $sessionIds[] = 'session_'.fake()->uuid();
         }
 
         $events = [];
@@ -95,9 +97,9 @@ final class AnalyticsEventSeeder extends Seeder
         }
 
         // Insert remaining events
-        if (!empty($events)) {
+        if (! empty($events)) {
             DB::table('analytics_events')->insert($events);
-            $this->command->info('📊 Inserted final batch of ' . count($events) . ' analytics events...');
+            $this->command->info('📊 Inserted final batch of '.count($events).' analytics events...');
         }
 
         $totalEvents = AnalyticsEvent::count();
@@ -180,10 +182,10 @@ final class AnalyticsEventSeeder extends Seeder
                 ];
                 if ($products->isNotEmpty()) {
                     $purchasedProducts = fake()->randomElements($products->toArray(), rand(1, 3));
-                    $properties['products'] = array_map(fn($p) => [
+                    $properties['products'] = array_map(fn ($p) => [
                         'id' => $p['id'],
                         'name' => $p['name'],
-                        'price' => $p['price']
+                        'price' => $p['price'],
                     ], $purchasedProducts);
                 }
                 break;
@@ -197,10 +199,10 @@ final class AnalyticsEventSeeder extends Seeder
         $baseUrl = config('app.url', 'http://localhost');
 
         return match ($eventType) {
-            'page_view' => $baseUrl . '/' . ($properties['page'] ?? 'home'),
-            'product_view' => $baseUrl . '/products/' . ($properties['product_id'] ?? '1'),
-            'add_to_cart' => $baseUrl . '/products/' . ($properties['product_id'] ?? '1'),
-            'purchase' => $baseUrl . '/checkout/success',
+            'page_view' => $baseUrl.'/'.($properties['page'] ?? 'home'),
+            'product_view' => $baseUrl.'/products/'.($properties['product_id'] ?? '1'),
+            'add_to_cart' => $baseUrl.'/products/'.($properties['product_id'] ?? '1'),
+            'purchase' => $baseUrl.'/checkout/success',
             default => $baseUrl,
         };
     }

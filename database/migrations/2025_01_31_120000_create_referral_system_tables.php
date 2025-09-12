@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->json('metadata')->nullable();
-            
+
             // Additional tracking fields
             $table->string('source')->nullable(); // website, email, social, etc.
             $table->string('campaign')->nullable(); // campaign name
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('utm_campaign')->nullable();
             $table->string('ip_address', 45)->nullable(); // IPv6 support
             $table->text('user_agent')->nullable();
-            
+
             $table->timestamps();
             $table->softDeletes();
 
@@ -182,4 +182,3 @@ return new class extends Migration
         });
     }
 };
-

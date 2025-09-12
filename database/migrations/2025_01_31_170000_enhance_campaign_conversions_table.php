@@ -27,7 +27,7 @@ return new class extends Migration
             $table->boolean('is_mobile')->default(false)->after('city');
             $table->boolean('is_tablet')->default(false)->after('is_mobile');
             $table->boolean('is_desktop')->default(false)->after('is_tablet');
-            
+
             // Conversion analytics
             $table->integer('conversion_duration')->nullable()->after('is_desktop');
             $table->integer('page_views')->nullable()->after('conversion_duration');
@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('exit_page')->nullable()->after('bounce_rate');
             $table->string('landing_page')->nullable()->after('exit_page');
             $table->string('funnel_step')->nullable()->after('landing_page');
-            
+
             // Attribution tracking
             $table->string('attribution_model')->default('last_click')->after('funnel_step');
             $table->json('conversion_path')->nullable()->after('attribution_model');
@@ -47,17 +47,17 @@ return new class extends Migration
             $table->decimal('time_decay_attribution', 12, 2)->nullable()->after('linear_attribution');
             $table->decimal('position_based_attribution', 12, 2)->nullable()->after('time_decay_attribution');
             $table->decimal('data_driven_attribution', 12, 2)->nullable()->after('position_based_attribution');
-            
+
             // Conversion windows
             $table->integer('conversion_window')->default(30)->after('data_driven_attribution');
             $table->integer('lookback_window')->default(90)->after('conversion_window');
-            
+
             // Assisted conversions
             $table->integer('assisted_conversions')->default(0)->after('lookback_window');
             $table->decimal('assisted_conversion_value', 12, 2)->default(0)->after('assisted_conversions');
             $table->integer('total_conversions')->default(1)->after('assisted_conversion_value');
             $table->decimal('total_conversion_value', 12, 2)->default(0)->after('total_conversions');
-            
+
             // Performance metrics
             $table->decimal('conversion_rate', 8, 4)->nullable()->after('total_conversion_value');
             $table->decimal('cost_per_conversion', 12, 2)->nullable()->after('conversion_rate');
@@ -66,7 +66,7 @@ return new class extends Migration
             $table->decimal('lifetime_value', 12, 2)->nullable()->after('roas');
             $table->decimal('customer_acquisition_cost', 12, 2)->nullable()->after('lifetime_value');
             $table->integer('payback_period')->nullable()->after('customer_acquisition_cost');
-            
+
             // Additional fields
             $table->text('notes')->nullable()->after('payback_period');
             $table->json('tags')->nullable()->after('notes');
@@ -81,7 +81,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->json('custom_attributes')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['campaign_conversion_id', 'locale']);
             $table->index(['locale']);
         });
@@ -103,7 +103,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('campaign_conversion_translations');
-        
+
         Schema::table('campaign_conversions', function (Blueprint $table) {
             $table->dropIndex(['status']);
             $table->dropIndex(['source']);
@@ -114,7 +114,7 @@ return new class extends Migration
             $table->dropIndex(['converted_at', 'status']);
             $table->dropIndex(['campaign_id', 'conversion_type']);
             $table->dropIndex(['customer_id', 'converted_at']);
-            
+
             $table->dropColumn([
                 'status', 'source', 'medium', 'campaign_name', 'utm_content', 'utm_term',
                 'referrer', 'ip_address', 'user_agent', 'device_type', 'browser', 'os',
@@ -128,9 +128,8 @@ return new class extends Migration
                 'assisted_conversion_value', 'total_conversions', 'total_conversion_value',
                 'conversion_rate', 'cost_per_conversion', 'roi', 'roas',
                 'lifetime_value', 'customer_acquisition_cost', 'payback_period',
-                'notes', 'tags', 'custom_attributes'
+                'notes', 'tags', 'custom_attributes',
             ]);
         });
     }
 };
-

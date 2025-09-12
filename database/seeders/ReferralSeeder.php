@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -25,21 +27,21 @@ final class ReferralSeeder extends Seeder
 
         // Create referrals between users
         $referrals = collect();
-        
+
         for ($i = 0; $i < 50; $i++) {
             $referrer = $users->random();
             $referred = $users->where('id', '!=', $referrer->id)->random();
-            
+
             // Check if this combination already exists
-            if ($referrals->contains(fn($r) => $r->referrer_id === $referrer->id && $r->referred_id === $referred->id)) {
+            if ($referrals->contains(fn ($r) => $r->referrer_id === $referrer->id && $r->referred_id === $referred->id)) {
                 continue;
             }
-            
+
             $referral = Referral::factory()->create([
                 'referrer_id' => $referrer->id,
                 'referred_id' => $referred->id,
             ]);
-            
+
             $referrals->push($referral);
         }
 
@@ -63,7 +65,7 @@ final class ReferralSeeder extends Seeder
         // Create some completed referrals with applied rewards
         $referrals->random(15)->each(function (Referral $referral) {
             $referral->update(['status' => 'completed', 'completed_at' => now()]);
-            
+
             // Apply some rewards
             $referral->rewards()->take(1)->each(function ($reward) {
                 $reward->update(['status' => 'applied', 'applied_at' => now()]);
@@ -80,9 +82,9 @@ final class ReferralSeeder extends Seeder
 
         $this->command->info('Referral system seeded successfully!');
         $this->command->info('Created:');
-        $this->command->info('- ' . $users->count() . ' users');
-        $this->command->info('- ' . $referrals->count() . ' referrals');
-        $this->command->info('- ' . ReferralCode::count() . ' referral codes');
-        $this->command->info('- ' . ReferralReward::count() . ' referral rewards');
+        $this->command->info('- '.$users->count().' users');
+        $this->command->info('- '.$referrals->count().' referrals');
+        $this->command->info('- '.ReferralCode::count().' referral codes');
+        $this->command->info('- '.ReferralReward::count().' referral rewards');
     }
 }

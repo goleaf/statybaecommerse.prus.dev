@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('minimum_quantity')->default(1)->after('requests_count');
             $table->boolean('hide_add_to_cart')->default(false)->after('minimum_quantity');
             $table->text('request_message')->nullable()->after('hide_add_to_cart');
-            
+
             // Add indexes for performance
             $table->index(['is_requestable', 'requests_count']);
             $table->index(['hide_add_to_cart']);
@@ -33,15 +33,14 @@ return new class extends Migration
         Schema::table('products', function (Blueprint $table) {
             $table->dropIndex(['is_requestable', 'requests_count']);
             $table->dropIndex(['hide_add_to_cart']);
-            
+
             $table->dropColumn([
                 'is_requestable',
-                'requests_count', 
+                'requests_count',
                 'minimum_quantity',
                 'hide_add_to_cart',
-                'request_message'
+                'request_message',
             ]);
         });
     }
 };
-

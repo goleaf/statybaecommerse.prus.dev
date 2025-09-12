@@ -156,7 +156,7 @@ class AdminPresetDiscountsSeeder extends Seeder
         foreach ([
             'priority', 'exclusive', 'applies_to_shipping', 'free_shipping', 'first_order_only',
             'per_customer_limit', 'per_code_limit', 'per_day_limit', 'channel_restrictions',
-            'currency_restrictions', 'weekday_mask', 'time_window', 'stacking_policy'
+            'currency_restrictions', 'weekday_mask', 'time_window', 'stacking_policy',
         ] as $opt) {
             if (in_array($opt, $columns, true) && array_key_exists($opt, $data)) {
                 $base[$opt] = $data[$opt];
@@ -166,15 +166,17 @@ class AdminPresetDiscountsSeeder extends Seeder
         if (in_array('name', $columns, true) && isset($data['name'])) {
             $base['name'] = $data['name'];
         }
-        if (in_array('status', $columns, true) && !isset($base['status'])) {
+        if (in_array('status', $columns, true) && ! isset($base['status'])) {
             $base['status'] = 'active';
         }
         if ($existing) {
             DB::table('sh_discounts')->where('id', $existing->id)->update(array_merge($base, [
                 'updated_at' => now(),
             ]));
+
             return (int) $existing->id;
         }
+
         return (int) DB::table('sh_discounts')->insertGetId(array_merge($base, [
             'created_at' => now(),
             'updated_at' => now(),
@@ -189,7 +191,7 @@ class AdminPresetDiscountsSeeder extends Seeder
             ->where('type', $type)
             ->where('value', $encoded)
             ->exists();
-        if (!$exists) {
+        if (! $exists) {
             DB::table('sh_discount_conditions')->insert([
                 'discount_id' => $discountId,
                 'type' => $type,
@@ -214,7 +216,7 @@ class AdminPresetDiscountsSeeder extends Seeder
     private function generateCodes(int $discountId, string $prefix, int $quantity): void
     {
         for ($i = 0; $i < $quantity; $i++) {
-            $code = strtoupper($prefix) . '-' . Str::upper(Str::random(8));
+            $code = strtoupper($prefix).'-'.Str::upper(Str::random(8));
             $exists = DB::table('sh_discount_codes')->where('code', $code)->exists();
             if ($exists) {
                 continue;
@@ -235,7 +237,7 @@ class AdminPresetDiscountsSeeder extends Seeder
     private function ensureCode(int $discountId, string $code): void
     {
         $exists = DB::table('sh_discount_codes')->where('code', $code)->exists();
-        if (!$exists) {
+        if (! $exists) {
             DB::table('sh_discount_codes')->insert([
                 'discount_id' => $discountId,
                 'code' => $code,

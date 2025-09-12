@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -9,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         // Create enhanced_settings_translations table
-        if (!Schema::hasTable('enhanced_settings_translations')) {
+        if (! Schema::hasTable('enhanced_settings_translations')) {
             Schema::create('enhanced_settings_translations', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('enhanced_setting_id');
@@ -26,7 +28,7 @@ return new class extends Migration
         }
 
         // Add locale column to enhanced_settings table if it doesn't exist
-        if (!Schema::hasColumn('enhanced_settings', 'locale')) {
+        if (! Schema::hasColumn('enhanced_settings', 'locale')) {
             Schema::table('enhanced_settings', function (Blueprint $table): void {
                 $table->string('locale', 10)->default('lt')->after('key');
                 $table->index('locale');

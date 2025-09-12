@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Livewire;
 
-use App\Models\User;
+use App\Livewire\Pages\Category\Show;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Brand;
-use App\Livewire\Pages\Category\Show;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -18,7 +19,7 @@ class CategoryShowTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create a visible category
         $this->category = Category::factory()->create([
             'is_visible' => true,
@@ -39,7 +40,7 @@ class CategoryShowTest extends TestCase
         $invisibleCategory = Category::factory()->create(['is_visible' => false]);
 
         $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
-        
+
         Livewire::test(Show::class, ['category' => $invisibleCategory]);
     }
 
@@ -47,7 +48,7 @@ class CategoryShowTest extends TestCase
     {
         Livewire::test(Show::class, ['category' => $this->category])
             ->assertSet('category.id', $this->category->id);
-        
+
         // Verify that the category has been loaded with relationships
         $this->assertTrue($this->category->relationLoaded('media'));
         $this->assertTrue($this->category->relationLoaded('translations'));
@@ -160,9 +161,9 @@ class CategoryShowTest extends TestCase
         $this->category->products()->attach($products->pluck('id'));
 
         $component = Livewire::test(Show::class, ['category' => $this->category]);
-        
+
         $productsProperty = $component->get('products');
-        
+
         $this->assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $productsProperty);
         $this->assertCount(5, $productsProperty->items());
     }
@@ -179,10 +180,10 @@ class CategoryShowTest extends TestCase
         $this->category->products()->attach($product->id);
 
         $component = Livewire::test(Show::class, ['category' => $this->category]);
-        
+
         $productsProperty = $component->get('products');
         $firstProduct = $productsProperty->items()[0];
-        
+
         // Verify that products are loaded with brand and media relationships
         $this->assertTrue($firstProduct->relationLoaded('brand'));
         $this->assertTrue($firstProduct->relationLoaded('media'));

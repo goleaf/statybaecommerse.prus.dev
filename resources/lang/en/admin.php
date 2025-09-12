@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     // Navigation
@@ -646,7 +648,7 @@ return [
         'in_stock' => 'In Stock',
         'low_stock' => 'Low Stock',
         'out_of_stock' => 'Out of Stock',
-        
+
         // Report Types
         'types' => [
             'sales' => 'Sales',
@@ -658,7 +660,7 @@ return [
             'marketing' => 'Marketing',
             'custom' => 'Custom',
         ],
-        
+
         // Report Categories
         'categories' => [
             'sales' => 'Sales',
@@ -669,7 +671,7 @@ return [
             'inventory' => 'Inventory',
             'analytics' => 'Analytics',
         ],
-        
+
         // Date Ranges
         'date_ranges' => [
             'today' => 'Today',
@@ -680,7 +682,7 @@ return [
             'this_year' => 'This Year',
             'custom' => 'Custom Range',
         ],
-        
+
         // Schedule Frequencies
         'schedule_frequencies' => [
             'daily' => 'Daily',
@@ -689,7 +691,7 @@ return [
             'quarterly' => 'Quarterly',
             'yearly' => 'Yearly',
         ],
-        
+
         // Fields
         'fields' => [
             'name' => 'Name',
@@ -724,7 +726,7 @@ return [
             'metadata_value' => 'Metadata Value',
             'advanced_filters' => 'Advanced Filters',
         ],
-        
+
         // Filter Fields
         'filter_fields' => [
             'status' => 'Status',
@@ -733,7 +735,7 @@ return [
             'price_range' => 'Price Range',
             'date_range' => 'Date Range',
         ],
-        
+
         // Filter Operators
         'filter_operators' => [
             'equals' => 'Equals',
@@ -744,7 +746,7 @@ return [
             'less_than' => 'Less Than',
             'between' => 'Between',
         ],
-        
+
         // Actions
         'actions' => [
             'generate' => 'Generate',
@@ -758,7 +760,7 @@ return [
             'add_setting' => 'Add Setting',
             'add_metadata' => 'Add Metadata',
         ],
-        
+
         // Tabs
         'tabs' => [
             'all' => 'All',
@@ -771,7 +773,7 @@ return [
             'filters' => 'Filters',
             'settings' => 'Settings',
         ],
-        
+
         // Stats
         'stats' => [
             'total_reports' => 'Total Reports',
@@ -787,12 +789,12 @@ return [
             'total_downloads' => 'Total Downloads',
             'total_downloads_description' => 'Total number of downloads',
         ],
-        
+
         // Charts
         'charts' => [
             'report_types' => 'Report Types',
         ],
-        
+
         // Notifications
         'notifications' => [
             'generated' => 'Report generated successfully',

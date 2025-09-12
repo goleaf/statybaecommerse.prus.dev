@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'brand_name' => 'Statyba E-komercija',
@@ -544,7 +546,7 @@ return [
         'stock_not_tracked' => 'Atsargos nesekamos',
         'price_from' => 'Kaina nuo',
         'price_to' => 'Kaina iki',
-        
+
         // User Management Filters
         'active_users' => 'Aktyvūs naudotojai',
         'admin_users' => 'Administratoriai',
@@ -578,7 +580,7 @@ return [
         'enable' => 'Įjungti',
         'disable' => 'Išjungti',
         'bulk_actions' => 'Masiniai veiksmai',
-        
+
         // User Management Actions
         'activate' => 'Aktyvuoti',
         'deactivate' => 'Deaktyvuoti',
@@ -624,7 +626,7 @@ return [
         'per_order' => 'Už užsakymą',
         'customer_feedback' => 'Klientų atsiliepimai',
         'stars_out_of_5' => 'žvaigždutės iš 5',
-        
+
         // User Management Dashboard
         'total_users' => 'Iš viso naudotojų',
         'all_registered_users' => 'Visi užsiregistravę naudotojai',
@@ -2236,7 +2238,7 @@ return [
     ],
     'super_administrator' => 'Super Administratorius',
     'inventory_management' => 'Atsargų valdymas',
-    
+
     // Inventory translations
     'inventory' => [
         'stock_management' => 'Atsargų valdymas',
@@ -2247,7 +2249,7 @@ return [
         'stock_in' => 'Atsargų įplaukos',
         'stock_out' => 'Atsargų išplaukos',
         'unknown' => 'Nežinoma',
-        
+
         // Basic information
         'basic_information' => 'Pagrindinė informacija',
         'product' => 'Produktas',
@@ -2261,7 +2263,7 @@ return [
         'city' => 'Miestas',
         'postal_code' => 'Pašto kodas',
         'is_enabled' => 'Įjungta',
-        
+
         // Stock levels
         'stock_levels' => 'Atsargų lygiai',
         'current_stock' => 'Dabartinės atsargos',
@@ -2277,7 +2279,7 @@ return [
         'reorder_point_help' => 'Atsargų lygis, kuriam pasiekus reikia užsakyti naują partiją',
         'max_stock_level' => 'Maksimalus atsargų lygis',
         'max_stock_level_help' => 'Maksimalus atsargų kiekis, kurį galima laikyti šioje vietoje',
-        
+
         // Additional information
         'additional_information' => 'Papildoma informacija',
         'supplier' => 'Tiekėjas',
@@ -2293,21 +2295,21 @@ return [
         'tracked' => 'Sekama',
         'track_inventory_help' => 'Ar šis produktas turi būti sekamas atsargų sistemoje',
         'notes' => 'Pastabos',
-        
+
         // Timestamps
         'timestamps' => 'Laiko žymos',
         'last_restocked_at' => 'Paskutinį kartą papildyta',
         'last_sold_at' => 'Paskutinį kartą parduota',
         'created_at' => 'Sukurta',
         'updated_at' => 'Atnaujinta',
-        
+
         // Status labels
         'not_tracked' => 'Nesekama',
         'out_of_stock' => 'Išparduota',
         'low_stock' => 'Mažai atsargų',
         'needs_reorder' => 'Reikia užsakyti',
         'in_stock' => 'Yra atsargų',
-        
+
         // Movement reasons
         'reason_sale' => 'Pardavimas',
         'reason_return' => 'Grąžinimas',
@@ -2317,7 +2319,7 @@ return [
         'reason_damage' => 'Pažeidimas',
         'reason_theft' => 'Vagystė',
         'reason_transfer' => 'Perkėlimas',
-        
+
         // Actions
         'adjust_stock' => 'Koreguoti atsargas',
         'adjustment_quantity' => 'Koregavimo kiekis',
@@ -2326,7 +2328,7 @@ return [
         'adjustment_notes' => 'Koregavimo pastabos',
         'stock_adjusted' => 'Atsargos pakoreguotos',
         'stock_adjusted_message' => 'Atsargos pakoreguotos: :quantity vienetų produktui :product',
-        
+
         'reserve_stock' => 'Rezervuoti atsargas',
         'reserve_quantity' => 'Rezervuojamas kiekis',
         'reserve_notes' => 'Rezervavimo pastabos',
@@ -2334,13 +2336,13 @@ return [
         'stock_reserved_message' => 'Rezervuota :quantity vienetų produktui :product',
         'reserve_failed' => 'Rezervavimas nepavyko',
         'reserve_failed_message' => 'Nepakanka atsargų rezervavimui',
-        
+
         'unreserve_stock' => 'Atšaukti rezervavimą',
         'unreserve_quantity' => 'Atšaukiamas kiekis',
         'unreserve_notes' => 'Atšaukimo pastabos',
         'stock_unreserved' => 'Rezervavimas atšauktas',
         'stock_unreserved_message' => 'Atšaukta :quantity vienetų rezervavimas produktui :product',
-        
+
         // Bulk actions
         'bulk_adjust_stock' => 'Masinis atsargų koregavimas',
         'bulk_stock_adjusted' => 'Masinis atsargų koregavimas',
@@ -2348,7 +2350,7 @@ return [
         'export_stock' => 'Eksportuoti atsargas',
         'export_started' => 'Eksportas pradėtas',
         'export_started_message' => 'Eksportuojama :count elementų',
-        
+
         // Tabs
         'all_stock' => 'Visos atsargos',
         'low_stock_items' => 'Mažai atsargų',
@@ -2356,7 +2358,7 @@ return [
         'needs_reorder_items' => 'Reikia užsakyti',
         'expiring_soon_items' => 'Greitai baigiasi',
         'tracked_only' => 'Tik sekamos',
-        
+
         // Widgets
         'total_items' => 'Iš viso elementų',
         'total_items_description' => 'Visų atsargų elementų skaičius',
@@ -2373,7 +2375,7 @@ return [
         'available_stock_value' => 'Prieinamų atsargų vertė',
         'reserved_stock_value' => 'Rezervuotų atsargų vertė',
         'recent_stock_movements' => 'Paskutiniai atsargų judėjimai',
-        
+
         // Stock details
         'current_stock_description' => 'Dabartinis atsargų kiekis',
         'reserved_stock_description' => 'Rezervuotas atsargų kiekis',
@@ -2381,14 +2383,14 @@ return [
         'incoming_stock_description' => 'Gaunamas atsargų kiekis',
         'stock_value_description' => 'Atsargų vertė',
         'total_value_description' => 'Bendra vertė',
-        
+
         // Restock
         'restock' => 'Papildyti',
         'restock_quantity' => 'Papildymo kiekis',
         'restock_notes' => 'Papildymo pastabos',
         'restock_successful' => 'Papildymas sėkmingas',
         'restock_successful_message' => 'Papildyta :quantity vienetų produktui :product',
-        
+
         // Filters
         'all_items' => 'Visi elementai',
         'tracked_only' => 'Tik sekami',
@@ -2398,7 +2400,7 @@ return [
         'this_month' => 'Šį mėnesį',
         'this_year' => 'Šiais metais',
         'recent_movements' => 'Paskutiniai judėjimai',
-        
+
         // Groups
         'group_by_location' => 'Grupuoti pagal vietą',
         'group_by_product' => 'Grupuoti pagal produktą',
@@ -2407,7 +2409,7 @@ return [
         'group_by_type' => 'Grupuoti pagal tipą',
         'group_by_reason' => 'Grupuoti pagal priežastį',
         'group_by_date' => 'Grupuoti pagal datą',
-        
+
         // Movement types
         'movement_type' => 'Judėjimo tipas',
         'quantity' => 'Kiekis',
@@ -2425,11 +2427,11 @@ return [
         'never' => 'Niekada',
         'yes' => 'Taip',
         'no' => 'Ne',
-        
+
         // Financial
         'financial_information' => 'Finansinė informacija',
         'reserved_value' => 'Rezervuotų atsargų vertė',
-        
+
         // Create/Edit messages
         'create_stock_item' => 'Sukurti atsargų elementą',
         'edit_stock_item' => 'Redaguoti atsargų elementą',
@@ -2440,7 +2442,7 @@ return [
         'stock_item_updated' => 'Atsargų elementas atnaujintas',
         'stock_item_updated_message' => 'Atnaujintas atsargų elementas :product vietoje :location',
         'initial_stock_creation' => 'Pradinio atsargų kūrimas',
-        
+
         // Import/Export
         'import_stock' => 'Importuoti atsargas',
         'export_stock' => 'Eksportuoti atsargas',
@@ -2481,7 +2483,7 @@ return [
     'Slaptažodis' => 'Slaptažodis',
     'Prisiminti mane' => 'Prisiminti mane',
     'Prisijungti' => 'Prisijungti',
-    
+
     // Categories specific translations
     'categories' => [
         'title' => 'Kategorijos',
@@ -2541,7 +2543,7 @@ return [
             'translate' => 'Vertimai',
         ],
     ],
-    
+
     // Customer Management
     'customers' => [
         'navigation_label' => 'Klientų valdymas',
@@ -2790,7 +2792,7 @@ return [
             'details' => 'Detalės',
         ],
     ],
-    
+
     // Relation Managers
     'orders' => [
         'title' => 'Užsakymai',
@@ -2837,7 +2839,7 @@ return [
         'not_shipped' => 'Neišsiųstas',
         'not_delivered' => 'Nepristatytas',
     ],
-    
+
     'addresses' => [
         'title' => 'Adresai',
         'address_information' => 'Adreso informacija',
@@ -2867,7 +2869,7 @@ return [
         'default_only' => 'Tik numatytieji',
         'non_default_only' => 'Tik ne numatytieji',
     ],
-    
+
     'cart_items' => [
         'title' => 'Krepšelio prekės',
         'cart_information' => 'Krepšelio informacija',
@@ -2887,7 +2889,7 @@ return [
         ],
         'create' => 'Pridėti į krepšelį',
     ],
-    
+
     'reviews' => [
         'title' => 'Atsiliepimai',
         'review_information' => 'Atsiliepimo informacija',
@@ -2918,7 +2920,7 @@ return [
         'featured' => 'Rekomenduojamas',
         'not_featured' => 'Nerekomenduojamas',
     ],
-    
+
     'wishlist' => [
         'title' => 'Norų sąrašas',
         'wishlist_information' => 'Norų sąrašo informacija',
@@ -2941,7 +2943,7 @@ return [
         'active' => 'Aktyvus',
         'inactive' => 'Neaktyvus',
     ],
-    
+
     'documents' => [
         'title' => 'Dokumentai',
         'document_information' => 'Dokumento informacija',
@@ -2984,21 +2986,21 @@ return [
         'generated_successfully_description' => 'Dokumentas "{title}" buvo sėkmingai sugeneruotas',
         'generation_failed' => 'Dokumento generavimas nepavyko',
     ],
-    
+
     // Document Generation
     'documents' => [
         'generated_successfully' => 'Dokumentas sėkmingai sugeneruotas',
         'generated_successfully_description' => 'Dokumentas "{title}" buvo sėkmingai sugeneruotas',
         'generation_failed' => 'Dokumento generavimas nepavyko',
     ],
-    
+
     // Locales
     'locales' => [
         'lithuanian' => 'Lietuvių',
         'english' => 'Anglų',
         'german' => 'Vokiečių',
     ],
-    
+
     // Customer Groups
     'customer_groups' => [
         'title' => 'Klientų grupės',
@@ -3009,7 +3011,7 @@ return [
         'discount_percentage' => 'Nuolaidos procentas',
         'is_enabled' => 'Aktyvi',
     ],
-    
+
     // Actions
     'actions' => [
         'view' => 'Peržiūrėti',
@@ -3176,32 +3178,32 @@ return [
     'is_approved_help' => 'Ar atsiliepimas patvirtintas ir matomas',
     'is_featured_help' => 'Ar atsiliepimas rekomenduojamas',
     'is_verified_purchase_help' => 'Ar atsiliepimas parašytas po patvirtinto pirkimo',
-        'is_default_help' => 'Ar tai numatytasis kliento adresas',
-        'is_billing_help' => 'Ar tai sąskaitos adresas',
-        'is_shipping_help' => 'Ar tai pristatymo adresas',
-        
-        // Enhanced filtering translations
-        'total_spent_range' => 'Išleista suma',
-        'min_spent' => 'Minimali suma',
-        'max_spent' => 'Maksimali suma',
-        'orders_count_range' => 'Užsakymų skaičius',
-        'min_orders' => 'Minimalus skaičius',
-        'max_orders' => 'Maksimalus skaičius',
-        'last_login_range' => 'Paskutinis prisijungimas',
-        'last_login_from' => 'Nuo',
-        'last_login_to' => 'Iki',
-        'customer_segments' => 'Klientų segmentai',
-        'segment' => 'Segmentas',
-        'new_customers' => 'Nauji klientai',
-        'regular_customers' => 'Reguliarūs klientai',
-        'vip_customers' => 'VIP klientai',
-        'inactive_customers' => 'Neaktyvūs klientai',
-        'high_value_customers' => 'Aukštos vertės klientai',
-        'frequent_buyers' => 'Dažni pirkėjai',
-        'has_addresses' => 'Turi adresus',
-        'address_type' => 'Adreso tipas',
-        'any_address' => 'Bet koks adresas',
-        'billing_address' => 'Sąskaitos adresas',
-        'shipping_address' => 'Pristatymo adresas',
-        'default_address' => 'Numatytasis adresas',
-        ];
+    'is_default_help' => 'Ar tai numatytasis kliento adresas',
+    'is_billing_help' => 'Ar tai sąskaitos adresas',
+    'is_shipping_help' => 'Ar tai pristatymo adresas',
+
+    // Enhanced filtering translations
+    'total_spent_range' => 'Išleista suma',
+    'min_spent' => 'Minimali suma',
+    'max_spent' => 'Maksimali suma',
+    'orders_count_range' => 'Užsakymų skaičius',
+    'min_orders' => 'Minimalus skaičius',
+    'max_orders' => 'Maksimalus skaičius',
+    'last_login_range' => 'Paskutinis prisijungimas',
+    'last_login_from' => 'Nuo',
+    'last_login_to' => 'Iki',
+    'customer_segments' => 'Klientų segmentai',
+    'segment' => 'Segmentas',
+    'new_customers' => 'Nauji klientai',
+    'regular_customers' => 'Reguliarūs klientai',
+    'vip_customers' => 'VIP klientai',
+    'inactive_customers' => 'Neaktyvūs klientai',
+    'high_value_customers' => 'Aukštos vertės klientai',
+    'frequent_buyers' => 'Dažni pirkėjai',
+    'has_addresses' => 'Turi adresus',
+    'address_type' => 'Adreso tipas',
+    'any_address' => 'Bet koks adresas',
+    'billing_address' => 'Sąskaitos adresas',
+    'shipping_address' => 'Pristatymo adresas',
+    'default_address' => 'Numatytasis adresas',
+];

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->json('meta_keywords')->nullable()->after('meta_description');
             $table->text('short_description')->nullable()->after('meta_keywords');
             $table->longText('long_description')->nullable()->after('short_description');
-            
+
             // Add indexes for better performance
             $table->index(['zone_id', 'locale']);
             $table->index('locale');
@@ -32,7 +32,7 @@ return new class extends Migration
         Schema::table('zone_translations', function (Blueprint $table) {
             $table->dropIndex(['zone_id', 'locale']);
             $table->dropIndex('locale');
-            
+
             $table->dropColumn([
                 'meta_title',
                 'meta_description',
@@ -43,4 +43,3 @@ return new class extends Migration
         });
     }
 };
-

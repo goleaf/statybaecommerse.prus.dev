@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\LegalTranslation;
 use App\Models\Legal;
+use App\Models\Translations\LegalTranslation;
 use Illuminate\Database\Seeder;
 
 class LegalSeeder extends Seeder
@@ -17,45 +19,45 @@ class LegalSeeder extends Seeder
                 'key' => 'privacy',
                 'title' => [
                     'lt' => 'Privatumo politika',
-                    'en' => 'Privacy Policy'
+                    'en' => 'Privacy Policy',
                 ],
                 'content' => [
                     'lt' => 'Privatumo politikos turinys lietuvių kalba...',
-                    'en' => 'Privacy policy content in English...'
-                ]
+                    'en' => 'Privacy policy content in English...',
+                ],
             ],
             [
                 'key' => 'terms',
                 'title' => [
                     'lt' => 'Naudojimosi sąlygos',
-                    'en' => 'Terms of Use'
+                    'en' => 'Terms of Use',
                 ],
                 'content' => [
                     'lt' => 'Naudojimosi sąlygų turinys lietuvių kalba...',
-                    'en' => 'Terms of use content in English...'
-                ]
+                    'en' => 'Terms of use content in English...',
+                ],
             ],
             [
                 'key' => 'refund',
                 'title' => [
                     'lt' => 'Grąžinimo politika',
-                    'en' => 'Refund Policy'
+                    'en' => 'Refund Policy',
                 ],
                 'content' => [
                     'lt' => 'Grąžinimo politikos turinys lietuvių kalba...',
-                    'en' => 'Refund policy content in English...'
-                ]
+                    'en' => 'Refund policy content in English...',
+                ],
             ],
             [
                 'key' => 'shipping',
                 'title' => [
                     'lt' => 'Pristatymo politika',
-                    'en' => 'Shipping Policy'
+                    'en' => 'Shipping Policy',
                 ],
                 'content' => [
                     'lt' => 'Pristatymo politikos turinys lietuvių kalba...',
-                    'en' => 'Shipping policy content in English...'
-                ]
+                    'en' => 'Shipping policy content in English...',
+                ],
             ],
         ];
 
@@ -70,8 +72,8 @@ class LegalSeeder extends Seeder
             // Create translations for each locale
             foreach ($locales as $locale) {
                 $title = $document['title'][$locale] ?? $document['title']['lt'];
-                $slug = \Illuminate\Support\Str::slug($title) . '-' . $locale;
-                
+                $slug = \Illuminate\Support\Str::slug($title).'-'.$locale;
+
                 LegalTranslation::updateOrCreate([
                     'legal_id' => $legal->id,
                     'locale' => $locale,
@@ -83,13 +85,13 @@ class LegalSeeder extends Seeder
             }
         }
 
-        $this->command?->info('LegalSeeder: seeded legal documents with translations (locales: ' . implode(',', $locales) . ').');
+        $this->command?->info('LegalSeeder: seeded legal documents with translations (locales: '.implode(',', $locales).').');
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()

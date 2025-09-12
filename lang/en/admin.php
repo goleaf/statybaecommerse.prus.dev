@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'brand_name' => 'Statyba E-Commerce',
@@ -343,7 +345,7 @@ return [
             'details' => 'Details',
         ],
     ],
-    
+
     // Relation Managers
     'orders' => [
         'title' => 'Orders',
@@ -390,7 +392,7 @@ return [
         'not_shipped' => 'Not Shipped',
         'not_delivered' => 'Not Delivered',
     ],
-    
+
     'addresses' => [
         'title' => 'Addresses',
         'address_information' => 'Address Information',
@@ -420,7 +422,7 @@ return [
         'default_only' => 'Default Only',
         'non_default_only' => 'Non Default Only',
     ],
-    
+
     'cart_items' => [
         'title' => 'Cart Items',
         'cart_information' => 'Cart Information',
@@ -440,7 +442,7 @@ return [
         ],
         'create' => 'Add to Cart',
     ],
-    
+
     'reviews' => [
         'title' => 'Reviews',
         'review_information' => 'Review Information',
@@ -471,7 +473,7 @@ return [
         'featured' => 'Featured',
         'not_featured' => 'Not Featured',
     ],
-    
+
     'wishlist' => [
         'title' => 'Wishlist',
         'wishlist_information' => 'Wishlist Information',
@@ -494,7 +496,7 @@ return [
         'active' => 'Active',
         'inactive' => 'Inactive',
     ],
-    
+
     'documents' => [
         'title' => 'Documents',
         'document_information' => 'Document Information',
@@ -537,21 +539,21 @@ return [
         'generated_successfully_description' => 'Document "{title}" was generated successfully',
         'generation_failed' => 'Document generation failed',
     ],
-    
+
     // Document Generation
     'documents' => [
         'generated_successfully' => 'Document generated successfully',
         'generated_successfully_description' => 'Document "{title}" was generated successfully',
         'generation_failed' => 'Document generation failed',
     ],
-    
+
     // Locales
     'locales' => [
         'lithuanian' => 'Lithuanian',
         'english' => 'English',
         'german' => 'German',
     ],
-    
+
     // Customer Groups
     'customer_groups' => [
         'title' => 'Customer Groups',
@@ -562,7 +564,7 @@ return [
         'discount_percentage' => 'Discount Percentage',
         'is_enabled' => 'Is Enabled',
     ],
-    
+
     // Actions
     'actions' => [
         'view' => 'View',
@@ -2585,7 +2587,7 @@ return [
     ],
     'super_administrator' => 'Super Administrator',
     'inventory_management' => 'Inventory Management',
-    
+
     // Inventory translations
     'inventory' => [
         'stock_management' => 'Stock Management',
@@ -2596,7 +2598,7 @@ return [
         'stock_in' => 'Stock In',
         'stock_out' => 'Stock Out',
         'unknown' => 'Unknown',
-        
+
         // Basic information
         'basic_information' => 'Basic Information',
         'product' => 'Product',
@@ -2610,7 +2612,7 @@ return [
         'city' => 'City',
         'postal_code' => 'Postal Code',
         'is_enabled' => 'Enabled',
-        
+
         // Stock levels
         'stock_levels' => 'Stock Levels',
         'current_stock' => 'Current Stock',
@@ -2626,7 +2628,7 @@ return [
         'reorder_point_help' => 'Stock level at which a new order should be placed',
         'max_stock_level' => 'Max Stock Level',
         'max_stock_level_help' => 'Maximum stock quantity that can be held at this location',
-        
+
         // Additional information
         'additional_information' => 'Additional Information',
         'supplier' => 'Supplier',
@@ -2642,21 +2644,21 @@ return [
         'tracked' => 'Tracked',
         'track_inventory_help' => 'Whether this product should be tracked in the inventory system',
         'notes' => 'Notes',
-        
+
         // Timestamps
         'timestamps' => 'Timestamps',
         'last_restocked_at' => 'Last Restocked',
         'last_sold_at' => 'Last Sold',
         'created_at' => 'Created',
         'updated_at' => 'Updated',
-        
+
         // Status labels
         'not_tracked' => 'Not Tracked',
         'out_of_stock' => 'Out of Stock',
         'low_stock' => 'Low Stock',
         'needs_reorder' => 'Needs Reorder',
         'in_stock' => 'In Stock',
-        
+
         // Movement reasons
         'reason_sale' => 'Sale',
         'reason_return' => 'Return',
@@ -2666,7 +2668,7 @@ return [
         'reason_damage' => 'Damage',
         'reason_theft' => 'Theft',
         'reason_transfer' => 'Transfer',
-        
+
         // Actions
         'adjust_stock' => 'Adjust Stock',
         'adjustment_quantity' => 'Adjustment Quantity',
@@ -2675,7 +2677,7 @@ return [
         'adjustment_notes' => 'Adjustment Notes',
         'stock_adjusted' => 'Stock Adjusted',
         'stock_adjusted_message' => 'Stock adjusted: :quantity units for product :product',
-        
+
         'reserve_stock' => 'Reserve Stock',
         'reserve_quantity' => 'Reserve Quantity',
         'reserve_notes' => 'Reserve Notes',
@@ -2683,13 +2685,13 @@ return [
         'stock_reserved_message' => 'Reserved :quantity units for product :product',
         'reserve_failed' => 'Reserve Failed',
         'reserve_failed_message' => 'Insufficient stock for reservation',
-        
+
         'unreserve_stock' => 'Unreserve Stock',
         'unreserve_quantity' => 'Unreserve Quantity',
         'unreserve_notes' => 'Unreserve Notes',
         'stock_unreserved' => 'Stock Unreserved',
         'stock_unreserved_message' => 'Unreserved :quantity units for product :product',
-        
+
         // Bulk actions
         'bulk_adjust_stock' => 'Bulk Adjust Stock',
         'bulk_stock_adjusted' => 'Bulk Stock Adjusted',
@@ -2697,7 +2699,7 @@ return [
         'export_stock' => 'Export Stock',
         'export_started' => 'Export Started',
         'export_started_message' => 'Exporting :count items',
-        
+
         // Tabs
         'all_stock' => 'All Stock',
         'low_stock_items' => 'Low Stock',
@@ -2705,7 +2707,7 @@ return [
         'needs_reorder_items' => 'Needs Reorder',
         'expiring_soon_items' => 'Expiring Soon',
         'tracked_only' => 'Tracked Only',
-        
+
         // Widgets
         'total_items' => 'Total Items',
         'total_items_description' => 'Total number of stock items',
@@ -2722,7 +2724,7 @@ return [
         'available_stock_value' => 'Available Stock Value',
         'reserved_stock_value' => 'Reserved Stock Value',
         'recent_stock_movements' => 'Recent Stock Movements',
-        
+
         // Stock details
         'current_stock_description' => 'Current stock quantity',
         'reserved_stock_description' => 'Reserved stock quantity',
@@ -2730,14 +2732,14 @@ return [
         'incoming_stock_description' => 'Incoming stock quantity',
         'stock_value_description' => 'Stock value',
         'total_value_description' => 'Total value',
-        
+
         // Restock
         'restock' => 'Restock',
         'restock_quantity' => 'Restock Quantity',
         'restock_notes' => 'Restock Notes',
         'restock_successful' => 'Restock Successful',
         'restock_successful_message' => 'Restocked :quantity units for product :product',
-        
+
         // Filters
         'all_items' => 'All Items',
         'tracked_only' => 'Tracked Only',
@@ -2747,7 +2749,7 @@ return [
         'this_month' => 'This Month',
         'this_year' => 'This Year',
         'recent_movements' => 'Recent Movements',
-        
+
         // Groups
         'group_by_location' => 'Group by Location',
         'group_by_product' => 'Group by Product',
@@ -2756,7 +2758,7 @@ return [
         'group_by_type' => 'Group by Type',
         'group_by_reason' => 'Group by Reason',
         'group_by_date' => 'Group by Date',
-        
+
         // Movement types
         'movement_type' => 'Movement Type',
         'quantity' => 'Quantity',
@@ -2774,11 +2776,11 @@ return [
         'never' => 'Never',
         'yes' => 'Yes',
         'no' => 'No',
-        
+
         // Financial
         'financial_information' => 'Financial Information',
         'reserved_value' => 'Reserved Stock Value',
-        
+
         // Create/Edit messages
         'create_stock_item' => 'Create Stock Item',
         'edit_stock_item' => 'Edit Stock Item',
@@ -2789,12 +2791,12 @@ return [
         'stock_item_updated' => 'Stock Item Updated',
         'stock_item_updated_message' => 'Updated stock item :product at location :location',
         'initial_stock_creation' => 'Initial Stock Creation',
-        
+
         // Import/Export
         'import_stock' => 'Import Stock',
         'export_stock' => 'Export Stock',
         'stock_report' => 'Stock Report',
-        
+
         // Frontend specific
         'stock_management_description' => 'Manage all stock items, track movements and monitor stock levels',
         'search' => 'Search',
@@ -2854,7 +2856,7 @@ return [
     'Slaptažodis' => 'Password',
     'Prisiminti mane' => 'Remember me',
     'Prisijungti' => 'Sign in',
-    
+
     // Categories specific translations
     'categories' => [
         'title' => 'Categories',
@@ -2914,7 +2916,7 @@ return [
             'translate' => 'Translations',
         ],
     ],
-    
+
     // Common translations
     'common' => [
         'copied' => 'Copied',
@@ -2972,7 +2974,7 @@ return [
     'is_default_help' => 'Whether this is the customer\'s default address',
     'is_billing_help' => 'Whether this is a billing address',
     'is_shipping_help' => 'Whether this is a shipping address',
-    
+
     // Enhanced filtering translations
     'total_spent_range' => 'Total Spent Range',
     'min_spent' => 'Minimum Spent',

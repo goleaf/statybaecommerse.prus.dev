@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\User;
 use App\Services\CategoryDocsImporter;
@@ -13,9 +15,9 @@ it('imports categories from docs via service', function (): void {
 
     $tmp = base_path('docs-test-import');
     @mkdir($tmp);
-    @mkdir($tmp . '/guides');
-    file_put_contents($tmp . '/intro.md', '# Intro');
-    file_put_contents($tmp . '/guides/getting-started.md', '# Getting Started');
+    @mkdir($tmp.'/guides');
+    file_put_contents($tmp.'/intro.md', '# Intro');
+    file_put_contents($tmp.'/guides/getting-started.md', '# Getting Started');
 
     $result = $service->import($tmp);
 

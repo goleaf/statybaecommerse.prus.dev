@@ -41,7 +41,7 @@ Route::prefix('referrals')->group(function () {
     Route::post('/process', [ReferralController::class, 'processReferral']);
     Route::get('/code-statistics', [ReferralController::class, 'codeStatistics']);
     Route::get('/referral-url', [ReferralController::class, 'getReferralUrl']);
-    
+
     // Authenticated routes
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/dashboard', [ReferralController::class, 'dashboard']);

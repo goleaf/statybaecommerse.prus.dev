@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -14,6 +16,7 @@ final class InventorySeeder extends Seeder
         $locationIds = Location::query()->pluck('id');
         if ($locationIds->isEmpty()) {
             $this->command?->warn('InventorySeeder: no locations found, skipping.');
+
             return;
         }
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -8,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('users') && !Schema::hasColumn('users', 'deleted_at')) {
+        if (Schema::hasTable('users') && ! Schema::hasColumn('users', 'deleted_at')) {
             Schema::table('users', function (Blueprint $table): void {
                 $table->softDeletes();
             });
@@ -24,5 +26,3 @@ return new class extends Migration
         }
     }
 };
-
-

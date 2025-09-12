@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -36,7 +38,7 @@ final class AllCitiesSeeder extends Seeder
                 $this->call($seederClass);
                 $this->command->info("✓ Successfully seeded cities for {$country}");
             } catch (\Exception $e) {
-                $this->command->error("✗ Failed to seed cities for {$country}: " . $e->getMessage());
+                $this->command->error("✗ Failed to seed cities for {$country}: ".$e->getMessage());
             }
         }
 

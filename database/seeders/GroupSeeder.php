@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class GroupSeeder extends Seeder
 {
@@ -36,7 +35,9 @@ class GroupSeeder extends Seeder
                 $groupIds = DB::table('sh_customer_groups')->pluck('id')->all();
                 foreach ($groupIds as $groupId) {
                     $count = count($userIds);
-                    if ($count === 0) { continue; }
+                    if ($count === 0) {
+                        continue;
+                    }
                     $take = min($count, random_int(1, min(5, $count)));
                     foreach (array_slice($userIds, 0, $take) as $userId) {
                         $exists = DB::table('sh_customer_group_user')
@@ -55,5 +56,3 @@ class GroupSeeder extends Seeder
         });
     }
 }
-
-

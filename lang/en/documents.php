@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     // Document Types
@@ -71,14 +73,14 @@ return [
     'duplicate' => 'Duplicate',
     'archive' => 'Archive',
     'restore' => 'Restore',
-    
+
     // Document Action Form Fields
     'title_placeholder' => 'Enter document title (optional)',
     'custom_variables' => 'Custom Variables',
-    'custom_variables_placeholder' => 'VARIABLE_NAME=value' . "\n" . 'ANOTHER_VARIABLE=another value',
+    'custom_variables_placeholder' => 'VARIABLE_NAME=value'."\n".'ANOTHER_VARIABLE=another value',
     'custom_variables_help' => 'Add custom variables in format: VARIABLE_NAME=value (one per line)',
     'generate_pdf_help' => 'Generate PDF version of the document',
-    
+
     // Document Action Messages
     'document_generated_successfully' => 'Document Generated Successfully',
     'document_ready_for_review' => 'Your document has been generated and is ready for review.',

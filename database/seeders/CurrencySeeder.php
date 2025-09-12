@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\CurrencyTranslation;
 use App\Models\Currency;
+use App\Models\Translations\CurrencyTranslation;
 use Illuminate\Database\Seeder;
 
 final class CurrencySeeder extends Seeder
@@ -219,13 +221,13 @@ final class CurrencySeeder extends Seeder
         }
 
         $this->command->info('Currency seeder completed successfully!');
-        $this->command->info('Created ' . count($currencies) . ' currencies with translations (locales: ' . implode(',', $locales) . ').');
+        $this->command->info('Created '.count($currencies).' currencies with translations (locales: '.implode(',', $locales).').');
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()

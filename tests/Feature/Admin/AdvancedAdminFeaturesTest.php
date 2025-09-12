@@ -1,7 +1,7 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\Order;
-use App\Models\OrderItem;
+declare(strict_types=1);
+
 use App\Models\Product;
 use App\Models\User;
 use Livewire\Livewire;

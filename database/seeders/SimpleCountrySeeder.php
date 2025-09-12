@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\CountryTranslation;
 use App\Models\Country;
+use App\Models\Translations\CountryTranslation;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -105,6 +107,6 @@ final class SimpleCountrySeeder extends Seeder
             'name_official' => 'United States of America',
         ]);
 
-        echo 'Created ' . Country::count() . ' countries with ' . CountryTranslation::count() . " translations.\n";
+        echo 'Created '.Country::count().' countries with '.CountryTranslation::count()." translations.\n";
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -12,7 +14,7 @@ final class NotificationSeeder extends Seeder
     {
         // Get all users or create a test user
         $users = User::all();
-        
+
         if ($users->isEmpty()) {
             $users = collect([User::factory()->create([
                 'name' => 'Test User',
@@ -24,7 +26,7 @@ final class NotificationSeeder extends Seeder
         foreach ($users as $user) {
             // Create 20-50 random notifications per user
             $notificationCount = fake()->numberBetween(20, 50);
-            
+
             for ($i = 0; $i < $notificationCount; $i++) {
                 Notification::factory()
                     ->for($user, 'notifiable')
@@ -54,7 +56,7 @@ final class NotificationSeeder extends Seeder
 
             // Create type-specific notifications
             $types = ['order', 'product', 'user', 'system', 'payment', 'shipping', 'review', 'promotion', 'newsletter', 'support'];
-            
+
             foreach ($types as $type) {
                 Notification::factory()
                     ->for($user, 'notifiable')
@@ -64,6 +66,6 @@ final class NotificationSeeder extends Seeder
             }
         }
 
-        $this->command->info('Created ' . Notification::count() . ' notifications for ' . $users->count() . ' users.');
+        $this->command->info('Created '.Notification::count().' notifications for '.$users->count().' users.');
     }
 }

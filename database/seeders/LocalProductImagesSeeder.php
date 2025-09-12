@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -12,21 +14,21 @@ final class LocalProductImagesSeeder extends Seeder
     public function run(): void
     {
         $this->command->info('Adding local product images...');
-        
+
         // Create simple colored placeholder images for different product types
         $this->createProductImages();
-        
+
         // Assign images to products
         $this->assignImagesToProducts();
-        
+
         $this->command->info('Local product images seeding completed!');
     }
 
     private function createProductImages(): void
     {
         $imageDir = public_path('images/products');
-        
-        if (!File::exists($imageDir)) {
+
+        if (! File::exists($imageDir)) {
             File::makeDirectory($imageDir, 0755, true);
         }
 
@@ -45,8 +47,8 @@ final class LocalProductImagesSeeder extends Seeder
         ];
 
         foreach ($productImages as $filename => $content) {
-            $path = $imageDir . '/' . $filename;
-            if (!File::exists($path)) {
+            $path = $imageDir.'/'.$filename;
+            if (! File::exists($path)) {
                 File::put($path, $content);
                 $this->command->info("Created: {$filename}");
             }
@@ -57,39 +59,39 @@ final class LocalProductImagesSeeder extends Seeder
     {
         $imageFiles = [
             'drill.svg', 'hammer.svg', 'saw.svg', 'screwdriver.svg', 'wrench.svg',
-            'level.svg', 'safety-helmet.svg', 'safety-boots.svg', 'measuring-tape.svg', 'pliers.svg'
+            'level.svg', 'safety-helmet.svg', 'safety-boots.svg', 'measuring-tape.svg', 'pliers.svg',
         ];
 
         $products = Product::query()
             ->with('media')
             ->get()
             ->filter(function ($product) {
-                return !$product->hasMedia('images') || 
-                       $product->getMedia('images')->every(fn($media) => $media->getCustomProperty('placeholder', false));
+                return ! $product->hasMedia('images') ||
+                       $product->getMedia('images')->every(fn ($media) => $media->getCustomProperty('placeholder', false));
             });
 
         foreach ($products as $index => $product) {
             try {
                 $imageFile = $imageFiles[$index % count($imageFiles)];
                 $imagePath = public_path("images/products/{$imageFile}");
-                
+
                 if (File::exists($imagePath)) {
                     // Clear existing placeholder images
                     $product->clearMediaCollection('images');
-                    
+
                     // Add the new image
                     $product->addMedia($imagePath)
                         ->withCustomProperties(['source' => 'local_svg'])
-                        ->usingName($product->name . ' Image')
+                        ->usingName($product->name.' Image')
                         ->toMediaCollection('images');
-                    
+
                     $this->command->info("✓ Added {$imageFile} to: {$product->name}");
                 }
             } catch (\Throwable $e) {
                 Log::warning('Failed to add local image to product', [
                     'product_id' => $product->id,
                     'product_name' => $product->name,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }

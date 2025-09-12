@@ -102,4 +102,3 @@ return [
         'description' => 'Beginnen Sie mit der Erstellung Ihrer ersten Marke.',
     ],
 ];
-

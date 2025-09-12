@@ -1,20 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::table('prices', function (Blueprint $table) {
             // Add cost_amount column if it doesn't exist
-            if (!Schema::hasColumn('prices', 'cost_amount')) {
+            if (! Schema::hasColumn('prices', 'cost_amount')) {
                 $table->decimal('cost_amount', 12, 4)->nullable()->after('compare_amount');
             }
-            
+
             // Add metadata column if it doesn't exist
-            if (!Schema::hasColumn('prices', 'metadata')) {
+            if (! Schema::hasColumn('prices', 'metadata')) {
                 $table->json('metadata')->nullable()->after('is_enabled');
             }
         });
@@ -37,7 +40,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('price_translations');
-        
+
         Schema::table('prices', function (Blueprint $table) {
             if (Schema::hasColumn('prices', 'cost_amount')) {
                 $table->dropColumn('cost_amount');

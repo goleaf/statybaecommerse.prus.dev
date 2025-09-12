@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     // Category page sidebar & controls
@@ -630,7 +632,7 @@ return [
     'this_month' => 'This Month',
     // Brands
     'brands' => 'Brands',
-    
+
     // Additional translations for attributes
     'updated_at' => 'Updated At',
 ];

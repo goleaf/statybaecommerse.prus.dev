@@ -1,13 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Livewire;
 
-use App\Models\User;
-use App\Models\Product;
+use App\Livewire\Pages\SingleProduct;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\Review;
-use App\Livewire\Pages\SingleProduct;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -19,14 +20,14 @@ class ProductTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->brand = Brand::factory()->create();
         $this->category = Category::factory()->create();
         $this->product = Product::factory()->create([
             'brand_id' => $this->brand->id,
             'is_visible' => true,
         ]);
-        
+
         // Attach category to product
         $this->product->categories()->attach($this->category->id);
     }
@@ -43,7 +44,7 @@ class ProductTest extends TestCase
         $invisibleProduct = Product::factory()->create(['is_visible' => false]);
 
         $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
-        
+
         Livewire::test(SingleProduct::class, ['product' => $invisibleProduct]);
     }
 
@@ -51,7 +52,7 @@ class ProductTest extends TestCase
     {
         Livewire::test(SingleProduct::class, ['product' => $this->product])
             ->assertSet('product.id', $this->product->id);
-        
+
         // Verify that the product has been loaded with all relationships
         $this->assertTrue($this->product->relationLoaded('brand'));
         $this->assertTrue($this->product->relationLoaded('categories'));

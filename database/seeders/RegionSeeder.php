@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -474,13 +476,13 @@ class RegionSeeder extends Seeder
             $this->command->info("Upserted region: {$regionData['code']} - {$regionName}");
         }
 
-        $this->command->info('Region seeding completed successfully with translations (locales: ' . implode(',', $locales) . ')!');
+        $this->command->info('Region seeding completed successfully with translations (locales: '.implode(',', $locales).')!');
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()

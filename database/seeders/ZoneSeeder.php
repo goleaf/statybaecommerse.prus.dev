@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
 use App\Models\Country;
 use App\Models\Currency;
-use App\Models\Zone;
 use App\Models\Translations\ZoneTranslation;
+use App\Models\Zone;
 use Illuminate\Database\Seeder;
 
 class ZoneSeeder extends Seeder
@@ -21,7 +23,7 @@ class ZoneSeeder extends Seeder
         $gbp = Currency::where('code', 'GBP')->first();
 
         $locales = $this->supportedLocales();
-        
+
         // Create zones with translations
         $zones = [
             [
@@ -47,7 +49,7 @@ class ZoneSeeder extends Seeder
                         'name' => 'European Union',
                         'description' => 'European Union countries zone with EUR currency',
                     ],
-                ]
+                ],
             ],
             [
                 'slug' => 'north-america',
@@ -72,7 +74,7 @@ class ZoneSeeder extends Seeder
                         'name' => 'North America',
                         'description' => 'North American countries zone with USD currency',
                     ],
-                ]
+                ],
             ],
             [
                 'slug' => 'united-kingdom',
@@ -97,7 +99,7 @@ class ZoneSeeder extends Seeder
                         'name' => 'United Kingdom',
                         'description' => 'United Kingdom zone with GBP currency',
                     ],
-                ]
+                ],
             ],
             [
                 'slug' => 'lithuania',
@@ -123,17 +125,17 @@ class ZoneSeeder extends Seeder
                         'name' => 'Lithuania',
                         'description' => 'Lithuania zone with EUR currency and lower shipping costs',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
 
         foreach ($zones as $zoneData) {
             $translations = $zoneData['translations'] ?? [];
             unset($zoneData['translations']);
-            
+
             // Set a default name from translations or use code as fallback
             $defaultName = $translations['en']['name'] ?? $zoneData['code'];
-            
+
             $zone = Zone::updateOrCreate(
                 ['code' => $zoneData['code']],
                 [
@@ -145,7 +147,7 @@ class ZoneSeeder extends Seeder
                     'tax_rate' => $zoneData['tax_rate'],
                     'shipping_rate' => $zoneData['shipping_rate'],
                     'sort_order' => $zoneData['sort_order'],
-                    'metadata' => $zoneData['metadata']
+                    'metadata' => $zoneData['metadata'],
                 ]
             );
 
@@ -164,7 +166,7 @@ class ZoneSeeder extends Seeder
             // Attach countries to zones by region/codes
             $countryCodes = match ($zoneData['code']) {
                 'EU' => [
-                    'LT', 'LV', 'EE', 'PL', 'DE', 'FR', 'NL', 'BE', 'ES', 'IT', 'AT', 'CH', 'CZ', 'SK', 'HU', 'RO', 'BG', 'HR', 'SI', 'SE', 'NO', 'DK', 'FI', 'GB'
+                    'LT', 'LV', 'EE', 'PL', 'DE', 'FR', 'NL', 'BE', 'ES', 'IT', 'AT', 'CH', 'CZ', 'SK', 'HU', 'RO', 'BG', 'HR', 'SI', 'SE', 'NO', 'DK', 'FI', 'GB',
                 ],
                 'NA' => ['US', 'CA', 'MX'],
                 'UK' => ['GB'],
@@ -172,28 +174,28 @@ class ZoneSeeder extends Seeder
                 default => [],
             };
 
-            if (!empty($countryCodes)) {
+            if (! empty($countryCodes)) {
                 $countryIds = Country::query()
                     ->whereIn('cca2', $countryCodes)
                     ->pluck('id')
                     ->all();
 
-                if (!empty($countryIds)) {
+                if (! empty($countryIds)) {
                     $zone->countries()->syncWithoutDetaching($countryIds);
                 }
             }
 
             $zoneName = $translations['en']['name'] ?? $translations['lt']['name'] ?? 'Zone';
-            $this->command->info("Upserted zone: {$zoneData['code']} - {$zoneName} (countries: " . implode(',', $countryCodes) . ')');
+            $this->command->info("Upserted zone: {$zoneData['code']} - {$zoneName} (countries: ".implode(',', $countryCodes).')');
         }
 
-        $this->command->info('Zone seeding completed successfully with translations (locales: ' . implode(',', $locales) . ')!');
+        $this->command->info('Zone seeding completed successfully with translations (locales: '.implode(',', $locales).')!');
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -210,7 +212,7 @@ class ZoneSeeder extends Seeder
                 'exchange_rate' => 1.0,
                 'is_default' => true,
                 'is_enabled' => true,
-                'decimal_places' => 2
+                'decimal_places' => 2,
             ],
             [
                 'code' => 'USD',
@@ -219,7 +221,7 @@ class ZoneSeeder extends Seeder
                 'exchange_rate' => 1.08,
                 'is_default' => false,
                 'is_enabled' => true,
-                'decimal_places' => 2
+                'decimal_places' => 2,
             ],
             [
                 'code' => 'GBP',
@@ -228,8 +230,8 @@ class ZoneSeeder extends Seeder
                 'exchange_rate' => 0.85,
                 'is_default' => false,
                 'is_enabled' => true,
-                'decimal_places' => 2
-            ]
+                'decimal_places' => 2,
+            ],
         ];
 
         foreach ($currencies as $currencyData) {

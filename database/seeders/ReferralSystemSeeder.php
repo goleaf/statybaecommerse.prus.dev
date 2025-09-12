@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\ReferralReward;
 use App\Models\ReferralStatistics;
+use App\Models\User;
 use App\Services\ReferralService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +39,7 @@ final class ReferralSystemSeeder extends Seeder
         $users = User::limit(5)->get();
 
         foreach ($users as $user) {
-            if (!$user->hasActiveReferralCode()) {
+            if (! $user->hasActiveReferralCode()) {
                 ReferralCode::factory()->active()->forUser($user)->create();
             }
         }
@@ -54,10 +56,10 @@ final class ReferralSystemSeeder extends Seeder
             $referred = $users->where('id', '!=', $referrer->id)->random();
 
             // Check if this combination already exists
-            if (!Referral::where('referrer_id', $referrer->id)
+            if (! Referral::where('referrer_id', $referrer->id)
                 ->where('referred_id', $referred->id)
                 ->exists()) {
-                
+
                 $referral = Referral::factory()->create([
                     'referrer_id' => $referrer->id,
                     'referred_id' => $referred->id,
@@ -119,9 +121,9 @@ final class ReferralSystemSeeder extends Seeder
             // Create statistics for the last 30 days
             for ($i = 0; $i < 30; $i++) {
                 $date = now()->subDays($i)->toDateString();
-                
+
                 $stats = ReferralStatistics::getOrCreateForUserAndDate($user->id, $date);
-                
+
                 // Randomly update statistics
                 if (rand(1, 5) === 1) {
                     $stats->update([
@@ -136,4 +138,3 @@ final class ReferralSystemSeeder extends Seeder
         }
     }
 }
-

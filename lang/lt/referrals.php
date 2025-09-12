@@ -27,7 +27,7 @@ return [
     'navigation_label' => 'Rekomendacijos',
     'model_label' => 'Rekomendacija',
     'plural_model_label' => 'Rekomendacijos',
-    
+
     // Forms
     'forms' => [
         'referrer' => 'Referralas',
@@ -74,16 +74,16 @@ return [
     'completed_at' => 'Užbaigta',
     'metadata' => 'Papildomi duomenys',
     'additional_data' => 'Papildomi duomenys',
-    
+
     // Status Options
     'status_pending' => 'Laukiantis',
     'status_completed' => 'Užbaigtas',
     'status_expired' => 'Pasibaigęs',
-    
+
     // Table Columns
     'created_at' => 'Sukurta',
     'rewards' => 'Atlygiai',
-    
+
     // Actions
     'actions' => [
         'view' => 'Peržiūrėti',
@@ -97,7 +97,7 @@ return [
         'apply_selected' => 'Pritaikyti pasirinktus',
         'expire_selected' => 'Pažymėti pasirinktus kaip pasibaigusius',
     ],
-    
+
     // Filters
     'filters' => [
         'all' => 'Visi',
@@ -110,32 +110,32 @@ return [
         'referred_discount' => 'Referralo nuolaidos',
         'applied' => 'Pritaikyti',
     ],
-    
+
     // Infolist
     'referral_details' => 'Rekomendacijos detalės',
     'not_completed' => 'Neužbaigta',
     'never_expires' => 'Niekada nesibaigia',
-    
+
     // Rewards Section
     'rewards_section' => 'Atlygiai',
     'type' => 'Tipas',
     'amount' => 'Suma',
     'applied_at' => 'Pritaikyta',
     'not_applied' => 'Nepritaikyta',
-    
+
     // Messages
     'referral_created' => 'Rekomendacija sėkmingai sukurta',
     'referral_updated' => 'Rekomendacija sėkmingai atnaujinta',
     'referral_deleted' => 'Rekomendacija sėkmingai ištrinta',
     'referral_restored' => 'Rekomendacija sėkmingai atkurta',
-    
+
     // Validation Messages
     'referrer_required' => 'Rekomendavęs vartotojas yra privalomas',
     'referred_required' => 'Rekomenduotas vartotojas yra privalomas',
     'referral_code_required' => 'Rekomendacijos kodas yra privalomas',
     'referral_code_unique' => 'Šis rekomendacijos kodas jau egzistuoja',
     'status_required' => 'Būsena yra privaloma',
-    
+
     // Statistics
     'statistics' => [
         'title' => 'Referralų statistika',
@@ -161,7 +161,7 @@ return [
         'rewards_count' => 'Atlygių skaičius',
         'rewards_amount' => 'Atlygių suma',
     ],
-    
+
     // Widgets
     'referral_stats' => 'Rekomendacijų statistika',
     'top_referrers' => 'Geriausi rekomendavę',
@@ -170,7 +170,7 @@ return [
     'monthly_referrals' => 'Mėnesio rekomendacijos',
     'weekly_referrals' => 'Savaitės rekomendacijos',
     'daily_referrals' => 'Dienos rekomendacijos',
-    
+
     // Frontend
     'my_referrals' => 'Mano rekomendacijos',
     'refer_friends' => 'Rekomenduok draugus',
@@ -187,7 +187,7 @@ return [
     'referral_benefits' => 'Rekomendacijų nauda',
     'how_it_works' => 'Kaip tai veikia',
     'terms_conditions' => 'Taisyklės ir sąlygos',
-    
+
     // Additional translations
     'referral_code_help' => 'Automatiškai sugeneruotas unikalus kodas',
     'expires_at_help' => 'Palikite tuščią, jei kodas niekada nesibaigia',
@@ -198,7 +198,7 @@ return [
     'mark_completed' => 'Pažymėti užbaigtu',
     'mark_expired' => 'Pažymėti pasibaigusiu',
     'referrals_updated' => 'Rekomendacijos sėkmingai atnaujintos',
-    
+
     // Translation fields
     'translation_information' => 'Vertimo informacija',
     'title' => 'Pavadinimas',
@@ -210,7 +210,7 @@ return [
     'seo_title' => 'SEO pavadinimas',
     'seo_description' => 'SEO aprašymas',
     'seo_keywords' => 'SEO raktažodžiai',
-    
+
     // Additional statistics
     'active_referrers' => 'Aktyvūs referralai',
     'unique_referrers' => 'Unikalūs referralai',
@@ -220,7 +220,7 @@ return [
     'vs_last_week' => 'lyginant su praeita savaite',
     'reward_rate' => 'Atlygio norma',
     'referrals_with_rewards' => 'Rekomendacijos su atlygiais',
-    
+
     // Additional filters
     'filter_expired' => 'Pasibaigę',
     'filter_active' => 'Aktyvūs',
@@ -231,7 +231,7 @@ return [
     'performance_score' => 'Veiklos balas',
     'source' => 'Šaltinis',
     'campaign' => 'Kampanija',
-    
+
     // Frontend specific translations
     'refer_friends_description' => 'Kvieskite draugus ir gaukite atlygius',
     'create_referral' => 'Sukurti rekomendaciją',
@@ -276,7 +276,7 @@ return [
     'code_application_failed' => 'Nepavyko pritaikyti rekomendacijos kodo. Bandykite dar kartą.',
     'default_title' => 'Rekomendacijos kvietimas',
     'default_description' => 'Prisijunkite prie manęs šioje nuostabioje platformoje!',
-    
+
     // Widget translations
     'all_time' => 'Viso laiko',
     'awaiting_completion' => 'Laukiantys užbaigimo',

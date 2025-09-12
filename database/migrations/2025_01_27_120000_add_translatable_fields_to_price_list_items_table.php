@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,7 +15,7 @@ return new class extends Migration
             $table->json('name')->nullable()->after('variant_id');
             $table->json('description')->nullable()->after('name');
             $table->json('notes')->nullable()->after('description');
-            
+
             // Add additional fields for enhanced functionality
             $table->boolean('is_active')->default(true)->after('notes');
             $table->integer('priority')->default(100)->after('is_active');
@@ -21,12 +23,12 @@ return new class extends Migration
             $table->integer('max_quantity')->nullable()->after('min_quantity');
             $table->timestamp('valid_from')->nullable()->after('max_quantity');
             $table->timestamp('valid_until')->nullable()->after('valid_from');
-            
+
             // Add compare_amount if it doesn't exist
-            if (!Schema::hasColumn('price_list_items', 'compare_amount')) {
+            if (! Schema::hasColumn('price_list_items', 'compare_amount')) {
                 $table->decimal('compare_amount', 12, 4)->nullable()->after('net_amount');
             }
-            
+
             // Add indexes for performance
             $table->index(['is_active', 'priority']);
             $table->index(['valid_from', 'valid_until']);
@@ -40,10 +42,10 @@ return new class extends Migration
             $table->dropIndex(['is_active', 'priority']);
             $table->dropIndex(['valid_from', 'valid_until']);
             $table->dropIndex(['min_quantity', 'max_quantity']);
-            
+
             $table->dropColumn([
                 'name',
-                'description', 
+                'description',
                 'notes',
                 'is_active',
                 'priority',

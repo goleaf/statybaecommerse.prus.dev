@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
 // System Settings Admin Routes (bypassing Filament compatibility issues)
 Route::prefix('admin/system-settings')->middleware(['web'])->group(function () {
@@ -10,7 +10,7 @@ Route::prefix('admin/system-settings')->middleware(['web'])->group(function () {
         $categories = DB::table('system_setting_categories')
             ->orderBy('sort_order')
             ->get();
-        
+
         $settings = DB::table('system_settings')
             ->join('system_setting_categories', 'system_settings.category_id', '=', 'system_setting_categories.id')
             ->select('system_settings.*', 'system_setting_categories.name as category_name', 'system_setting_categories.color as category_color')
@@ -18,31 +18,31 @@ Route::prefix('admin/system-settings')->middleware(['web'])->group(function () {
             ->orderBy('system_settings.sort_order')
             ->get()
             ->groupBy('category_name');
-        
+
         return view('admin.system-settings.index', compact('categories', 'settings'));
     })->name('admin.system-settings.index');
-    
+
     Route::post('/update', function (Request $request) {
         $settings = $request->input('settings', []);
-        
+
         foreach ($settings as $key => $value) {
             DB::table('system_settings')
                 ->where('key', $key)
                 ->update([
                     'value' => $value,
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ]);
         }
-        
+
         return redirect()->back()->with('success', 'Settings updated successfully!');
     })->name('admin.system-settings.update');
-    
+
     Route::get('/export', function () {
         $settings = DB::table('system_settings')
             ->join('system_setting_categories', 'system_settings.category_id', '=', 'system_setting_categories.id')
             ->select('system_settings.*', 'system_setting_categories.name as category_name')
             ->get();
-        
+
         $data = $settings->map(function ($setting) {
             return [
                 'key' => $setting->key,
@@ -61,10 +61,10 @@ Route::prefix('admin/system-settings')->middleware(['web'])->group(function () {
                 'default_value' => $setting->default_value,
             ];
         });
-        
+
         return response()->json($data, 200, [], JSON_PRETTY_PRINT);
     })->name('admin.system-settings.export');
-    
+
     Route::get('/stats', function () {
         $stats = [
             'total_settings' => DB::table('system_settings')->count(),
@@ -81,7 +81,7 @@ Route::prefix('admin/system-settings')->middleware(['web'])->group(function () {
                 ->groupBy('group')
                 ->pluck('count', 'group'),
         ];
-        
+
         return response()->json($stats);
     })->name('admin.system-settings.stats');
 });
@@ -92,7 +92,7 @@ Route::get('/api/settings/public', function () {
         ->where('is_public', true)
         ->where('is_active', true)
         ->pluck('value', 'key');
-    
+
     return response()->json($settings);
 })->name('api.settings.public');
 
@@ -102,11 +102,11 @@ Route::get('/api/settings/{key}', function ($key) {
         ->where('key', $key)
         ->where('is_active', true)
         ->first();
-    
-    if (!$setting) {
+
+    if (! $setting) {
         return response()->json(['error' => 'Setting not found'], 404);
     }
-    
+
     return response()->json([
         'key' => $setting->key,
         'value' => $setting->value,

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -55,7 +57,7 @@ return new class extends Migration
             $table->index(['group', 'is_active']);
             $table->index(['is_public', 'is_active']);
             $table->index('updated_by');
-            
+
             $table->foreign('category_id')->references('id')->on('system_setting_categories')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
         });
@@ -101,7 +103,7 @@ return new class extends Migration
 
             $table->index(['system_setting_id', 'created_at']);
             $table->index('changed_by');
-            
+
             $table->foreign('system_setting_id')->references('id')->on('system_settings')->onDelete('cascade');
             $table->foreign('changed_by')->references('id')->on('users')->onDelete('cascade');
         });
@@ -117,7 +119,7 @@ return new class extends Migration
 
             $table->index(['setting_id', 'is_active']);
             $table->index('depends_on_setting_id');
-            
+
             $table->foreign('setting_id')->references('id')->on('system_settings')->onDelete('cascade');
             $table->foreign('depends_on_setting_id')->references('id')->on('system_settings')->onDelete('cascade');
         });

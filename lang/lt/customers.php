@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'title' => 'Klientai',
@@ -12,7 +14,7 @@ return [
     'preferences' => 'Nustatymai',
     'statistics' => 'Statistika',
     'customer_statistics' => 'Kliento statistika',
-    
+
     'fields' => [
         'name' => 'Vardas',
         'email' => 'El. paštas',
@@ -45,20 +47,20 @@ return [
         'created_at' => 'Sukurta',
         'updated_at' => 'Atnaujinta',
     ],
-    
+
     'status' => [
         'active' => 'Aktyvus',
         'inactive' => 'Neaktyvus',
         'suspended' => 'Sustabdytas',
         'pending' => 'Laukiantis',
     ],
-    
+
     'placeholders' => [
         'no_phone' => 'Telefono numeris nenurodytas',
         'never_logged_in' => 'Niekada nesijungė',
         'no_orders' => 'Užsakymų nėra',
     ],
-    
+
     'filters' => [
         'status' => 'Būsena',
         'all' => 'Visi',
@@ -92,7 +94,7 @@ return [
         'verified' => 'Patvirtintas',
         'unverified' => 'Nepatvirtintas',
     ],
-    
+
     'advanced_filters' => 'Išplėstiniai filtrai',
     'toggle_filters' => 'Rodyti filtrus',
     'show_filters' => 'Rodyti filtrus',
@@ -101,14 +103,14 @@ return [
     'filter' => 'Filtruoti',
     'clear_filters' => 'Išvalyti filtrus',
     'export' => 'Eksportuoti',
-    
+
     'stats' => [
         'total_customers' => 'Iš viso klientų',
         'active_customers' => 'Aktyvūs klientai',
         'total_revenue' => 'Bendros pajamos',
         'new_this_month' => 'Nauji šį mėnesį',
     ],
-    
+
     'table' => [
         'name' => 'Vardas',
         'email' => 'El. paštas',
@@ -123,20 +125,20 @@ return [
         'created_at' => 'Sukurta',
         'actions' => 'Veiksmai',
     ],
-    
+
     'actions' => [
         'view' => 'Peržiūrėti',
         'edit' => 'Redaguoti',
         'delete' => 'Ištrinti',
         'generate_document' => 'Generuoti dokumentą',
     ],
-    
+
     'no_customers_found' => 'Klientų nerasta',
     'no_customers_description' => 'Nėra klientų, kurie atitiktų jūsų paieškos kriterijus.',
-    
+
     'search_placeholder' => 'Ieškoti klientų pagal vardą, el. paštą ar telefono numerį...',
     'search' => 'Ieškoti',
-    
+
     'pagination' => [
         'showing' => 'Rodoma',
         'to' => 'iki',

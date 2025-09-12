@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Livewire\Pages\Brand\Index;
-use App\Models\Translations\BrandTranslation;
 use App\Models\Brand;
+use App\Models\Translations\BrandTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 

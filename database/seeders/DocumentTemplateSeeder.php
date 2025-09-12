@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -21,7 +23,7 @@ final class DocumentTemplateSeeder extends Seeder
                     '$COMPANY_NAME', '$COMPANY_ADDRESS', '$COMPANY_PHONE', '$COMPANY_EMAIL',
                     '$ORDER_NUMBER', '$ORDER_DATE', '$ORDER_TOTAL', '$ORDER_SUBTOTAL',
                     '$ORDER_TAX', '$ORDER_SHIPPING', '$CUSTOMER_NAME', '$CUSTOMER_EMAIL',
-                    '$BILLING_ADDRESS', '$SHIPPING_ADDRESS'
+                    '$BILLING_ADDRESS', '$SHIPPING_ADDRESS',
                 ],
                 'settings' => [
                     'page_size' => 'A4',
@@ -39,7 +41,7 @@ final class DocumentTemplateSeeder extends Seeder
                 'content' => $this->getReceiptTemplate(),
                 'variables' => [
                     '$COMPANY_NAME', '$ORDER_NUMBER', '$ORDER_DATE', '$ORDER_TOTAL',
-                    '$CUSTOMER_NAME', '$CURRENT_DATE'
+                    '$CUSTOMER_NAME', '$CURRENT_DATE',
                 ],
                 'settings' => [
                     'page_size' => 'A4',
@@ -57,7 +59,7 @@ final class DocumentTemplateSeeder extends Seeder
                 'variables' => [
                     '$COMPANY_NAME', '$PRODUCT_NAME', '$PRODUCT_SKU', '$PRODUCT_PRICE',
                     '$PRODUCT_DESCRIPTION', '$PRODUCT_BRAND', '$PRODUCT_CATEGORY',
-                    '$CURRENT_DATE'
+                    '$CURRENT_DATE',
                 ],
                 'settings' => [
                     'page_size' => 'A4',
@@ -74,7 +76,7 @@ final class DocumentTemplateSeeder extends Seeder
                 'content' => $this->getServiceAgreementTemplate(),
                 'variables' => [
                     '$COMPANY_NAME', '$COMPANY_ADDRESS', '$CUSTOMER_NAME',
-                    '$CUSTOMER_EMAIL', '$CURRENT_DATE', '$CURRENT_YEAR'
+                    '$CUSTOMER_EMAIL', '$CURRENT_DATE', '$CURRENT_YEAR',
                 ],
                 'settings' => [
                     'page_size' => 'A4',
@@ -91,7 +93,7 @@ final class DocumentTemplateSeeder extends Seeder
                 'content' => $this->getOrderConfirmationTemplate(),
                 'variables' => [
                     '$COMPANY_NAME', '$ORDER_NUMBER', '$ORDER_DATE', '$ORDER_TOTAL',
-                    '$CUSTOMER_NAME', '$CUSTOMER_EMAIL', '$ORDER_STATUS'
+                    '$CUSTOMER_NAME', '$CUSTOMER_EMAIL', '$ORDER_STATUS',
                 ],
                 'settings' => [
                     'page_size' => 'A4',

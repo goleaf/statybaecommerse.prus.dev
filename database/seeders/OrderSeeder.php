@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -20,7 +22,7 @@ class OrderSeeder extends Seeder
                 ?: \App\Models\Zone::query()->first();
             $channelId = \App\Models\Channel::query()->value('id');
 
-            if (!$currency || !$zone || !$channelId) {
+            if (! $currency || ! $zone || ! $channelId) {
                 return;
             }
 
@@ -49,7 +51,7 @@ class OrderSeeder extends Seeder
                 for ($i = 0; $i < $config['count']; $i++) {
                     /** @var \App\Models\Order $order */
                     $order = \App\Models\Order::query()->create([
-                        'number' => 'WEB-' . Str::upper(Str::random(8)),
+                        'number' => 'WEB-'.Str::upper(Str::random(8)),
                         'currency' => $currency->code,
                         'channel_id' => $channelId,
                         'zone_id' => $zone->id,
@@ -65,14 +67,14 @@ class OrderSeeder extends Seeder
                     $items = $visibleProducts->random(min(random_int(1, 4), $visibleProducts->count()));
                     $subtotal = 0.0;
                     foreach ($items as $p) {
-                        $unit = (float) (optional($p->prices()->whereHas('currency', fn($q) => $q->where('code', $currency->code))->first())->amount ?? (random_int(1000, 5000) / 100));
+                        $unit = (float) (optional($p->prices()->whereHas('currency', fn ($q) => $q->where('code', $currency->code))->first())->amount ?? (random_int(1000, 5000) / 100));
                         $qty = random_int(1, 3);
                         $lineTotal = $unit * $qty;
                         $subtotal += $lineTotal;
                         $order->items()->create([
                             'product_id' => $p->id,
                             'name' => $p->name,
-                            'sku' => $p->sku ?? 'SKU-' . Str::upper(Str::random(6)),
+                            'sku' => $p->sku ?? 'SKU-'.Str::upper(Str::random(6)),
                             'unit_price' => $unit,
                             'quantity' => $qty,
                             'total' => $lineTotal,

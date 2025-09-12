@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\CampaignTranslation;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
 use App\Models\CampaignConversion;
@@ -14,6 +15,7 @@ use App\Models\Category;
 use App\Models\Channel;
 use App\Models\CustomerGroup;
 use App\Models\Product;
+use App\Models\Translations\CampaignTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
 
@@ -32,31 +34,31 @@ final class CampaignSeeder extends Seeder
         try {
             $channels = Channel::factory()->count(3)->create();
         } catch (\Exception $e) {
-            $channels = collect(range(1, 3))->map(fn($i) => (object) ['id' => $i]);
+            $channels = collect(range(1, 3))->map(fn ($i) => (object) ['id' => $i]);
         }
 
         try {
             $zones = Zone::factory()->count(5)->create();
         } catch (\Exception $e) {
-            $zones = collect(range(1, 5))->map(fn($i) => (object) ['id' => $i]);
+            $zones = collect(range(1, 5))->map(fn ($i) => (object) ['id' => $i]);
         }
 
         try {
             $categories = Category::factory()->count(10)->create();
         } catch (\Exception $e) {
-            $categories = collect(range(1, 10))->map(fn($i) => (object) ['id' => $i]);
+            $categories = collect(range(1, 10))->map(fn ($i) => (object) ['id' => $i]);
         }
 
         try {
             $products = Product::factory()->count(20)->create();
         } catch (\Exception $e) {
-            $products = collect(range(1, 20))->map(fn($i) => (object) ['id' => $i]);
+            $products = collect(range(1, 20))->map(fn ($i) => (object) ['id' => $i]);
         }
 
         try {
             $customerGroups = CustomerGroup::factory()->count(5)->create();
         } catch (\Exception $e) {
-            $customerGroups = collect(range(1, 5))->map(fn($i) => (object) ['id' => $i]);
+            $customerGroups = collect(range(1, 5))->map(fn ($i) => (object) ['id' => $i]);
         }
 
         // Create featured campaigns
@@ -286,13 +288,13 @@ final class CampaignSeeder extends Seeder
             }
         }
 
-        $this->command->info('Created ' . $allCampaigns->count() . ' campaigns with full analytics and targeting data.');
+        $this->command->info('Created '.$allCampaigns->count().' campaigns with full analytics and targeting data.');
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()

@@ -56,7 +56,7 @@ class PartnerSeeder extends Seeder
                             'name' => $p['name'],
                             'tier_id' => $tierId,
                             'contact_email' => $p['code'].'@example.test',
-                            'contact_phone' => '+370600'.str_pad((string)random_int(100,999), 3, '0', STR_PAD_LEFT),
+                            'contact_phone' => '+370600'.str_pad((string) random_int(100, 999), 3, '0', STR_PAD_LEFT),
                             'is_enabled' => true,
                             'discount_rate' => 0,
                             'commission_rate' => 0,

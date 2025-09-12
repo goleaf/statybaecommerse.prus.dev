@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -7,15 +9,17 @@ use App\Services\Images\LocalImageGeneratorService;
 use App\Services\Images\ProductImageService;
 use App\Services\Images\WebPConversionService;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Collection;
 
 final class EnhancedProductImageSeeder extends Seeder
 {
     private ProductImageService $productImageService;
+
     private LocalImageGeneratorService $localImageService;
+
     private WebPConversionService $webpService;
 
     private array $imageGenerationStrategies = [
@@ -86,7 +90,7 @@ final class EnhancedProductImageSeeder extends Seeder
                     'product_id' => $product->id,
                     'product_name' => $product->name,
                     'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
+                    'trace' => $e->getTraceAsString(),
                 ]);
 
                 $this->command->error("   ❌ Klaida generuojant paveikslėlius produktui {$product->name}: {$e->getMessage()}");
@@ -131,8 +135,9 @@ final class EnhancedProductImageSeeder extends Seeder
         } catch (\Throwable $e) {
             Log::warning('Gradient image generation failed', [
                 'product_id' => $product->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -141,12 +146,14 @@ final class EnhancedProductImageSeeder extends Seeder
     {
         try {
             $categoryName = $product->categories->first()?->name ?? 'general';
+
             return $this->localImageService->generateProductImage($product->name, $categoryName);
         } catch (\Throwable $e) {
             Log::warning('Category styled image generation failed', [
                 'product_id' => $product->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -155,7 +162,7 @@ final class EnhancedProductImageSeeder extends Seeder
     {
         try {
             $svgContent = $this->generateProductSvg($product, $imageNumber);
-            $tempPath = sys_get_temp_dir() . '/product_svg_' . $product->id . '_' . $imageNumber . '.svg';
+            $tempPath = sys_get_temp_dir().'/product_svg_'.$product->id.'_'.$imageNumber.'.svg';
 
             file_put_contents($tempPath, $svgContent);
 
@@ -168,8 +175,9 @@ final class EnhancedProductImageSeeder extends Seeder
         } catch (\Throwable $e) {
             Log::warning('SVG icon image generation failed', [
                 'product_id' => $product->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -183,13 +191,14 @@ final class EnhancedProductImageSeeder extends Seeder
                 height: 600,
                 backgroundColor: $this->getProductColor($product),
                 textColor: '#FFFFFF',
-                filename: 'placeholder_' . $product->id . '_' . $imageNumber
+                filename: 'placeholder_'.$product->id.'_'.$imageNumber
             );
         } catch (\Throwable $e) {
             Log::warning('Placeholder image generation failed', [
                 'product_id' => $product->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -253,14 +262,14 @@ final class EnhancedProductImageSeeder extends Seeder
     private function convertSvgToWebP(string $svgPath, int $productId, int $imageNumber): string
     {
         try {
-            $imagick = new \Imagick();
+            $imagick = new \Imagick;
             $imagick->setBackgroundColor(new \ImagickPixel('transparent'));
             $imagick->readImage($svgPath);
             $imagick->setImageFormat('webp');
             $imagick->setImageCompressionQuality(90);
             $imagick->resizeImage(600, 600, \Imagick::FILTER_LANCZOS, 1);
 
-            $webpPath = sys_get_temp_dir() . '/product_webp_' . $productId . '_' . $imageNumber . '.webp';
+            $webpPath = sys_get_temp_dir().'/product_webp_'.$productId.'_'.$imageNumber.'.webp';
             $imagick->writeImage($webpPath);
             $imagick->clear();
 
@@ -271,8 +280,9 @@ final class EnhancedProductImageSeeder extends Seeder
         } catch (\Throwable $e) {
             Log::warning('SVG to WebP conversion failed', [
                 'svg_path' => $svgPath,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return $svgPath;  // Return original SVG if conversion fails
         }
     }
@@ -287,18 +297,18 @@ final class EnhancedProductImageSeeder extends Seeder
             'generation_date' => now()->toISOString(),
             'alt_text' => __('translations.product_image_alt', [
                 'name' => $product->name,
-                'number' => $imageNumber
+                'number' => $imageNumber,
             ]),
         ];
 
-        $fileName = 'product_' . $product->id . '_' . $strategy . '_' . $imageNumber;
+        $fileName = 'product_'.$product->id.'_'.$strategy.'_'.$imageNumber;
         $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
 
         $media = $product
             ->addMedia($imagePath)
             ->withCustomProperties($customProperties)
-            ->usingName($product->name . ' - ' . __('translations.image') . ' ' . $imageNumber)
-            ->usingFileName($fileName . '.' . $extension)
+            ->usingName($product->name.' - '.__('translations.image').' '.$imageNumber)
+            ->usingFileName($fileName.'.'.$extension)
             ->toMediaCollection('images');
 
         $this->command->info("   ✓ Paveikslėlis #{$imageNumber} ({$strategy}) sukurtas: {$media->name}");
@@ -432,7 +442,7 @@ final class EnhancedProductImageSeeder extends Seeder
 
     private function truncateText(string $text, int $maxLength): string
     {
-        return strlen($text) > $maxLength ? substr($text, 0, $maxLength - 3) . '...' : $text;
+        return strlen($text) > $maxLength ? substr($text, 0, $maxLength - 3).'...' : $text;
     }
 
     private function ensureDirectoriesExist(): void
@@ -443,7 +453,7 @@ final class EnhancedProductImageSeeder extends Seeder
         ];
 
         foreach ($directories as $directory) {
-            if (!File::exists($directory)) {
+            if (! File::exists($directory)) {
                 File::makeDirectory($directory, 0755, true);
                 $this->command->info("📁 Sukurtas katalogas: {$directory}");
             }

@@ -1,14 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         // Enhanced Settings System for Filament
-        if (!Schema::hasTable('settings')) {
+        if (! Schema::hasTable('settings')) {
             Schema::create('settings', function (Blueprint $table) {
                 $table->id();
                 $table->string('key')->unique();
@@ -28,7 +31,7 @@ return new class extends Migration {
         }
 
         // Enhanced Feature Flags System
-        if (!Schema::hasTable('feature_flags')) {
+        if (! Schema::hasTable('feature_flags')) {
             Schema::create('feature_flags', function (Blueprint $table) {
                 $table->id();
                 $table->string('name')->unique();
@@ -46,7 +49,7 @@ return new class extends Migration {
         }
 
         // Enhanced Notification Templates
-        if (!Schema::hasTable('notification_templates')) {
+        if (! Schema::hasTable('notification_templates')) {
             Schema::create('notification_templates', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -66,7 +69,7 @@ return new class extends Migration {
         }
 
         // Enhanced User Wishlists with better structure
-        if (!Schema::hasTable('user_wishlists')) {
+        if (! Schema::hasTable('user_wishlists')) {
             Schema::create('user_wishlists', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -81,7 +84,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('wishlist_items')) {
+        if (! Schema::hasTable('wishlist_items')) {
             Schema::create('wishlist_items', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('wishlist_id')->constrained('user_wishlists')->cascadeOnDelete();
@@ -97,7 +100,7 @@ return new class extends Migration {
         }
 
         // Enhanced Cart System
-        if (!Schema::hasTable('cart_items')) {
+        if (! Schema::hasTable('cart_items')) {
             Schema::create('cart_items', function (Blueprint $table) {
                 $table->id();
                 $table->string('session_id')->nullable();
@@ -117,7 +120,7 @@ return new class extends Migration {
         }
 
         // Enhanced Product Comparisons
-        if (!Schema::hasTable('product_comparisons')) {
+        if (! Schema::hasTable('product_comparisons')) {
             Schema::create('product_comparisons', function (Blueprint $table) {
                 $table->id();
                 $table->string('session_id')->nullable();
@@ -132,7 +135,7 @@ return new class extends Migration {
         }
 
         // Enhanced Analytics System
-        if (!Schema::hasTable('analytics_events')) {
+        if (! Schema::hasTable('analytics_events')) {
             Schema::create('analytics_events', function (Blueprint $table) {
                 $table->id();
                 $table->string('event_type');  // page_view, product_view, add_to_cart, etc.
@@ -153,7 +156,7 @@ return new class extends Migration {
         }
 
         // Enhanced SEO System
-        if (!Schema::hasTable('seo_data')) {
+        if (! Schema::hasTable('seo_data')) {
             Schema::create('seo_data', function (Blueprint $table) {
                 $table->id();
                 $table->morphs('seoable');  // Can be attached to any model
@@ -176,16 +179,16 @@ return new class extends Migration {
         // Enhanced Media Collections
         if (Schema::hasTable('media')) {
             Schema::table('media', function (Blueprint $table) {
-                if (!Schema::hasColumn('media', 'alt_text')) {
+                if (! Schema::hasColumn('media', 'alt_text')) {
                     $table->string('alt_text')->nullable()->after('name');
                 }
-                if (!Schema::hasColumn('media', 'caption')) {
+                if (! Schema::hasColumn('media', 'caption')) {
                     $table->text('caption')->nullable()->after('alt_text');
                 }
-                if (!Schema::hasColumn('media', 'is_featured')) {
+                if (! Schema::hasColumn('media', 'is_featured')) {
                     $table->boolean('is_featured')->default(false)->after('caption');
                 }
-                if (!Schema::hasColumn('media', 'sort_order')) {
+                if (! Schema::hasColumn('media', 'sort_order')) {
                     $table->integer('sort_order')->default(0)->after('is_featured');
                 }
             });
@@ -194,16 +197,16 @@ return new class extends Migration {
         // Enhanced Reviews System
         if (Schema::hasTable('reviews')) {
             Schema::table('reviews', function (Blueprint $table) {
-                if (!Schema::hasColumn('reviews', 'locale')) {
+                if (! Schema::hasColumn('reviews', 'locale')) {
                     $table->string('locale', 5)->default('lt')->after('rating');
                 }
-                if (!Schema::hasColumn('reviews', 'is_verified_purchase')) {
+                if (! Schema::hasColumn('reviews', 'is_verified_purchase')) {
                     $table->boolean('is_verified_purchase')->default(false)->after('locale');
                 }
-                if (!Schema::hasColumn('reviews', 'helpful_count')) {
+                if (! Schema::hasColumn('reviews', 'helpful_count')) {
                     $table->integer('helpful_count')->default(0)->after('is_verified_purchase');
                 }
-                if (!Schema::hasColumn('reviews', 'reported_count')) {
+                if (! Schema::hasColumn('reviews', 'reported_count')) {
                     $table->integer('reported_count')->default(0)->after('helpful_count');
                 }
             });
@@ -212,25 +215,25 @@ return new class extends Migration {
         // Enhanced Order System
         if (Schema::hasTable('orders')) {
             Schema::table('orders', function (Blueprint $table) {
-                if (!Schema::hasColumn('orders', 'payment_method')) {
+                if (! Schema::hasColumn('orders', 'payment_method')) {
                     $table->string('payment_method')->nullable()->after('currency');
                 }
-                if (!Schema::hasColumn('orders', 'payment_status')) {
+                if (! Schema::hasColumn('orders', 'payment_status')) {
                     $table->string('payment_status')->default('pending')->after('payment_method');
                 }
-                if (!Schema::hasColumn('orders', 'fulfillment_status')) {
+                if (! Schema::hasColumn('orders', 'fulfillment_status')) {
                     $table->string('fulfillment_status')->default('pending')->after('payment_status');
                 }
-                if (!Schema::hasColumn('orders', 'tracking_number')) {
+                if (! Schema::hasColumn('orders', 'tracking_number')) {
                     $table->string('tracking_number')->nullable()->after('fulfillment_status');
                 }
-                if (!Schema::hasColumn('orders', 'estimated_delivery')) {
+                if (! Schema::hasColumn('orders', 'estimated_delivery')) {
                     $table->date('estimated_delivery')->nullable()->after('tracking_number');
                 }
-                if (!Schema::hasColumn('orders', 'customer_notes')) {
+                if (! Schema::hasColumn('orders', 'customer_notes')) {
                     $table->text('customer_notes')->nullable()->after('estimated_delivery');
                 }
-                if (!Schema::hasColumn('orders', 'admin_notes')) {
+                if (! Schema::hasColumn('orders', 'admin_notes')) {
                     $table->text('admin_notes')->nullable()->after('customer_notes');
                 }
             });
@@ -239,16 +242,16 @@ return new class extends Migration {
         // Enhanced Product System
         if (Schema::hasTable('products')) {
             Schema::table('products', function (Blueprint $table) {
-                if (!Schema::hasColumn('products', 'meta_title')) {
+                if (! Schema::hasColumn('products', 'meta_title')) {
                     $table->string('meta_title')->nullable()->after('description');
                 }
-                if (!Schema::hasColumn('products', 'meta_description')) {
+                if (! Schema::hasColumn('products', 'meta_description')) {
                     $table->text('meta_description')->nullable()->after('meta_title');
                 }
-                if (!Schema::hasColumn('products', 'view_count')) {
+                if (! Schema::hasColumn('products', 'view_count')) {
                     $table->bigInteger('view_count')->default(0)->after('meta_description');
                 }
-                if (!Schema::hasColumn('products', 'last_viewed_at')) {
+                if (! Schema::hasColumn('products', 'last_viewed_at')) {
                     $table->timestamp('last_viewed_at')->nullable()->after('view_count');
                 }
             });
@@ -257,22 +260,22 @@ return new class extends Migration {
         // Enhanced User System
         if (Schema::hasTable('users')) {
             Schema::table('users', function (Blueprint $table) {
-                if (!Schema::hasColumn('users', 'avatar')) {
+                if (! Schema::hasColumn('users', 'avatar')) {
                     $table->string('avatar')->nullable()->after('email_verified_at');
                 }
-                if (!Schema::hasColumn('users', 'company')) {
+                if (! Schema::hasColumn('users', 'company')) {
                     $table->string('company')->nullable()->after('avatar');
                 }
-                if (!Schema::hasColumn('users', 'tax_number')) {
+                if (! Schema::hasColumn('users', 'tax_number')) {
                     $table->string('tax_number')->nullable()->after('company');
                 }
-                if (!Schema::hasColumn('users', 'last_login_at')) {
+                if (! Schema::hasColumn('users', 'last_login_at')) {
                     $table->timestamp('last_login_at')->nullable()->after('tax_number');
                 }
-                if (!Schema::hasColumn('users', 'last_login_ip')) {
+                if (! Schema::hasColumn('users', 'last_login_ip')) {
                     $table->ipAddress('last_login_ip')->nullable()->after('last_login_at');
                 }
-                if (!Schema::hasColumn('users', 'login_count')) {
+                if (! Schema::hasColumn('users', 'login_count')) {
                     $table->integer('login_count')->default(0)->after('last_login_ip');
                 }
             });
@@ -296,7 +299,7 @@ return new class extends Migration {
             Schema::table('users', function (Blueprint $table) {
                 $table->dropColumn([
                     'login_count', 'last_login_ip', 'last_login_at',
-                    'tax_number', 'company', 'avatar'
+                    'tax_number', 'company', 'avatar',
                 ]);
             });
         }
@@ -304,7 +307,7 @@ return new class extends Migration {
         if (Schema::hasTable('products')) {
             Schema::table('products', function (Blueprint $table) {
                 $table->dropColumn([
-                    'last_viewed_at', 'view_count', 'meta_description', 'meta_title'
+                    'last_viewed_at', 'view_count', 'meta_description', 'meta_title',
                 ]);
             });
         }
@@ -313,7 +316,7 @@ return new class extends Migration {
             Schema::table('orders', function (Blueprint $table) {
                 $table->dropColumn([
                     'admin_notes', 'customer_notes', 'estimated_delivery',
-                    'tracking_number', 'fulfillment_status', 'payment_status', 'payment_method'
+                    'tracking_number', 'fulfillment_status', 'payment_status', 'payment_method',
                 ]);
             });
         }
@@ -321,7 +324,7 @@ return new class extends Migration {
         if (Schema::hasTable('reviews')) {
             Schema::table('reviews', function (Blueprint $table) {
                 $table->dropColumn([
-                    'reported_count', 'helpful_count', 'is_verified_purchase', 'locale'
+                    'reported_count', 'helpful_count', 'is_verified_purchase', 'locale',
                 ]);
             });
         }

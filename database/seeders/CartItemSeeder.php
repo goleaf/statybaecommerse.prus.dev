@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -22,7 +24,7 @@ final class CartItemSeeder extends Seeder
             $products = Product::factory()->count(20)->create();
         }
 
-        $sessionIds = collect(range(1, 10))->map(fn(int $i): string => 'session-' . $i);
+        $sessionIds = collect(range(1, 10))->map(fn (int $i): string => 'session-'.$i);
 
         $createItems = function (?User $user, Collection $productsPool, string $sessionId): void {
             $count = random_int(1, 3);
@@ -60,7 +62,7 @@ final class CartItemSeeder extends Seeder
 
         // Seed some guest carts
         foreach (range(1, 5) as $i) {
-            $createItems(null, $products, 'guest-' . $sessionIds->get($i % $sessionIds->count()));
+            $createItems(null, $products, 'guest-'.$sessionIds->get($i % $sessionIds->count()));
         }
     }
 }

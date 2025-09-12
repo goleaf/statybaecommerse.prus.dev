@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Post;
 use App\Models\User;
@@ -241,4 +243,3 @@ it('shows post statistics', function () {
         ->assertSee('25')
         ->assertSee('10');
 });
-

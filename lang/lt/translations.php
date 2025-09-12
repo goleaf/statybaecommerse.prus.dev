@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     // Category page sidebar & controls
@@ -648,7 +650,7 @@ return [
     'this_month' => 'Šį mėnesį',
     // Brands
     'brands' => 'Prekės ženklai',
-    
+
     // Additional translations for attributes
     'updated_at' => 'Atnaujinta',
 ];

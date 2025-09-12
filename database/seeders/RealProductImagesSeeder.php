@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -13,7 +15,7 @@ final class RealProductImagesSeeder extends Seeder
 
     public function __construct()
     {
-        $this->imageGenerator = new LocalImageGeneratorService();
+        $this->imageGenerator = new LocalImageGeneratorService;
     }
 
     public function run(): void
@@ -25,7 +27,7 @@ final class RealProductImagesSeeder extends Seeder
             ->with('media', 'category')
             ->get()
             ->filter(function ($product) {
-                if (!$product->hasMedia('images')) {
+                if (! $product->hasMedia('images')) {
                     return true;
                 }
 
@@ -41,6 +43,7 @@ final class RealProductImagesSeeder extends Seeder
 
         if ($products->isEmpty()) {
             $this->command->info('All products already have images.');
+
             return;
         }
 
@@ -65,7 +68,7 @@ final class RealProductImagesSeeder extends Seeder
                     $product
                         ->addMedia($imagePath)
                         ->withCustomProperties(['source' => 'local_generated'])
-                        ->usingName($product->name . ' Image')
+                        ->usingName($product->name.' Image')
                         ->toMediaCollection('images');
 
                     // Clean up temp file
@@ -81,7 +84,7 @@ final class RealProductImagesSeeder extends Seeder
                 Log::warning('Failed to generate image for product', [
                     'product_id' => $product->id,
                     'product_name' => $product->name,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
                 $this->command->warn("Error generating image for {$product->name}: {$e->getMessage()}");
             }

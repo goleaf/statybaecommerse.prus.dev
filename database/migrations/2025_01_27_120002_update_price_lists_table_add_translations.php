@@ -39,7 +39,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('price_list_translations');
-        
+
         Schema::table('price_lists', function (Blueprint $table) {
             $table->dropColumn([
                 'description',

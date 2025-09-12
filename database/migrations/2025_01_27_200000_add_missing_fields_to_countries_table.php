@@ -46,9 +46,8 @@ return new class extends Migration
                 'vat_rate',
                 'timezone',
                 'metadata',
-                'sort_order'
+                'sort_order',
             ]);
         });
     }
 };
-

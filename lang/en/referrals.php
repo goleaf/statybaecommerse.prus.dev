@@ -27,7 +27,7 @@ return [
     'navigation_label' => 'Referrals',
     'model_label' => 'Referral',
     'plural_model_label' => 'Referrals',
-    
+
     // Forms
     'forms' => [
         'referrer' => 'Referrer',
@@ -74,16 +74,16 @@ return [
     'completed_at' => 'Completed At',
     'metadata' => 'Metadata',
     'additional_data' => 'Additional Data',
-    
+
     // Status Options
     'status_pending' => 'Pending',
     'status_completed' => 'Completed',
     'status_expired' => 'Expired',
-    
+
     // Table Columns
     'created_at' => 'Created At',
     'rewards' => 'Rewards',
-    
+
     // Actions
     'actions' => [
         'view' => 'View',
@@ -97,7 +97,7 @@ return [
         'apply_selected' => 'Apply Selected',
         'expire_selected' => 'Expire Selected',
     ],
-    
+
     // Filters
     'filters' => [
         'all' => 'All',
@@ -110,32 +110,32 @@ return [
         'referred_discount' => 'Referred Discounts',
         'applied' => 'Applied',
     ],
-    
+
     // Infolist
     'referral_details' => 'Referral Details',
     'not_completed' => 'Not completed',
     'never_expires' => 'Never expires',
-    
+
     // Rewards Section
     'rewards_section' => 'Rewards',
     'type' => 'Type',
     'amount' => 'Amount',
     'applied_at' => 'Applied At',
     'not_applied' => 'Not applied',
-    
+
     // Messages
     'referral_created' => 'Referral created successfully',
     'referral_updated' => 'Referral updated successfully',
     'referral_deleted' => 'Referral deleted successfully',
     'referral_restored' => 'Referral restored successfully',
-    
+
     // Validation Messages
     'referrer_required' => 'Referrer is required',
     'referred_required' => 'Referred user is required',
     'referral_code_required' => 'Referral code is required',
     'referral_code_unique' => 'This referral code already exists',
     'status_required' => 'Status is required',
-    
+
     // Statistics
     'statistics' => [
         'title' => 'Referral Statistics',
@@ -161,7 +161,7 @@ return [
         'rewards_count' => 'Rewards count',
         'rewards_amount' => 'Rewards amount',
     ],
-    
+
     // Widgets
     'referral_stats' => 'Referral Statistics',
     'top_referrers' => 'Top Referrers',
@@ -170,7 +170,7 @@ return [
     'monthly_referrals' => 'Monthly Referrals',
     'weekly_referrals' => 'Weekly Referrals',
     'daily_referrals' => 'Daily Referrals',
-    
+
     // Frontend
     'my_referrals' => 'My Referrals',
     'refer_friends' => 'Refer Friends',
@@ -187,7 +187,7 @@ return [
     'referral_benefits' => 'Referral Benefits',
     'how_it_works' => 'How It Works',
     'terms_conditions' => 'Terms & Conditions',
-    
+
     // Additional translations
     'referral_code_help' => 'Automatically generated unique code',
     'expires_at_help' => 'Leave empty if code never expires',
@@ -198,7 +198,7 @@ return [
     'mark_completed' => 'Mark as Completed',
     'mark_expired' => 'Mark as Expired',
     'referrals_updated' => 'Referrals updated successfully',
-    
+
     // Translation fields
     'translation_information' => 'Translation Information',
     'title' => 'Title',
@@ -210,7 +210,7 @@ return [
     'seo_title' => 'SEO Title',
     'seo_description' => 'SEO Description',
     'seo_keywords' => 'SEO Keywords',
-    
+
     // Additional statistics
     'active_referrers' => 'Active Referrers',
     'unique_referrers' => 'Unique referrers',
@@ -220,7 +220,7 @@ return [
     'vs_last_week' => 'vs last week',
     'reward_rate' => 'Reward Rate',
     'referrals_with_rewards' => 'Referrals with rewards',
-    
+
     // Additional filters
     'filter_expired' => 'Expired',
     'filter_active' => 'Active',
@@ -231,7 +231,7 @@ return [
     'performance_score' => 'Performance Score',
     'source' => 'Source',
     'campaign' => 'Campaign',
-    
+
     // Frontend specific translations
     'refer_friends_description' => 'Invite friends and earn rewards',
     'create_referral' => 'Create Referral',
@@ -276,7 +276,7 @@ return [
     'code_application_failed' => 'Failed to apply referral code. Please try again.',
     'default_title' => 'Referral Invitation',
     'default_description' => 'Join me on this amazing platform!',
-    
+
     // Widget translations
     'all_time' => 'All time',
     'awaiting_completion' => 'Awaiting completion',
@@ -287,7 +287,7 @@ return [
     'expired_referrals' => 'Expired Referrals',
     'date' => 'Date',
     'count' => 'Count',
-    
+
     // Frontend translations
     'referral_program_description' => 'Refer friends and earn rewards',
     'your_referral_code' => 'Your Referral Code',

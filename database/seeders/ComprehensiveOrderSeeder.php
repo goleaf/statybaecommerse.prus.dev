@@ -1,18 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Channel;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderShipping;
-use App\Models\Partner;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Zone;
-use App\Services\DocumentService;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -21,10 +20,15 @@ use Illuminate\Support\Facades\Log;
 final class ComprehensiveOrderSeeder extends Seeder
 {
     private array $orderStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+
     private array $paymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
+
     private array $paymentMethods = ['credit_card', 'paypal', 'bank_transfer', 'cash_on_delivery', 'stripe', 'mollie'];
+
     private array $currencies = ['EUR'];
+
     private array $shippingCarriers = ['DPD', 'Omniva', 'LP Express', 'UPS', 'FedEx', 'DHL'];
+
     private array $shippingServices = ['Standard', 'Express', 'Next Day', 'Economy', 'Premium'];
 
     public function run(): void
@@ -177,7 +181,7 @@ final class ComprehensiveOrderSeeder extends Seeder
                 $this->generateOrderDocuments($order, $invoiceTemplate, $receiptTemplate);
 
                 if (($i + 1) % 50 === 0) {
-                    $this->command->info('Generated ' . ($i + 1) . ' orders...');
+                    $this->command->info('Generated '.($i + 1).' orders...');
                 }
             }
         });
@@ -266,7 +270,7 @@ final class ComprehensiveOrderSeeder extends Seeder
 
     private function createOrderShipping(Order $order): void
     {
-        if (!in_array($order->status, ['shipped', 'delivered'])) {
+        if (! in_array($order->status, ['shipped', 'delivered'])) {
             return;
         }
 
@@ -298,7 +302,7 @@ final class ComprehensiveOrderSeeder extends Seeder
 
     private function generateOrderDocuments(Order $order, ?DocumentTemplate $invoiceTemplate, ?DocumentTemplate $receiptTemplate): void
     {
-        if (!$invoiceTemplate || !$receiptTemplate) {
+        if (! $invoiceTemplate || ! $receiptTemplate) {
             return;
         }
 
@@ -341,14 +345,14 @@ final class ComprehensiveOrderSeeder extends Seeder
                 ]);
             }
         } catch (\Exception $e) {
-            Log::warning("Failed to generate documents for order {$order->number}: " . $e->getMessage());
+            Log::warning("Failed to generate documents for order {$order->number}: ".$e->getMessage());
         }
     }
 
     private function generateOrderNumber(): string
     {
         do {
-            $number = 'ORD-' . date('Y') . '-' . str_pad((string) fake()->numberBetween(1000, 99999), 5, '0', STR_PAD_LEFT);
+            $number = 'ORD-'.date('Y').'-'.str_pad((string) fake()->numberBetween(1000, 99999), 5, '0', STR_PAD_LEFT);
         } while (Order::where('number', $number)->exists());
 
         return $number;
@@ -359,7 +363,7 @@ final class ComprehensiveOrderSeeder extends Seeder
         $lithuanianCounties = [
             'Alytaus apskritis', 'Kauno apskritis', 'Klaipėdos apskritis',
             'Marijampolės apskritis', 'Panevėžio apskritis', 'Šiaulių apskritis',
-            'Tauragės apskritis', 'Telšių apskritis', 'Utenos apskritis', 'Vilniaus apskritis'
+            'Tauragės apskritis', 'Telšių apskritis', 'Utenos apskritis', 'Vilniaus apskritis',
         ];
 
         return [
@@ -401,7 +405,7 @@ final class ComprehensiveOrderSeeder extends Seeder
 
     private function getShippedDate(string $status, Carbon $orderDate): ?Carbon
     {
-        if (!in_array($status, ['shipped', 'delivered'])) {
+        if (! in_array($status, ['shipped', 'delivered'])) {
             return null;
         }
 
@@ -415,6 +419,7 @@ final class ComprehensiveOrderSeeder extends Seeder
         }
 
         $shippedDate = $this->getShippedDate($status, $orderDate);
+
         return $shippedDate?->addDays(fake()->numberBetween(1, 7));
     }
 
@@ -506,11 +511,11 @@ final class ComprehensiveOrderSeeder extends Seeder
             '$COMPANY_WEBSITE' => 'https://statybaecommerce.lt',
             '$ORDER_NUMBER' => $order->number,
             '$ORDER_DATE' => $order->created_at->format('Y-m-d'),
-            '$ORDER_TOTAL' => number_format(floatval($order->total ?? 0), 2) . ' €',
-            '$ORDER_SUBTOTAL' => number_format(floatval($order->subtotal ?? 0), 2) . ' €',
-            '$ORDER_TAX' => number_format(floatval($order->tax_amount ?? 0), 2) . ' €',
-            '$ORDER_SHIPPING' => number_format(floatval($order->shipping_amount ?? 0), 2) . ' €',
-            '$ORDER_DISCOUNT' => number_format(floatval($order->discount_amount ?? 0), 2) . ' €',
+            '$ORDER_TOTAL' => number_format(floatval($order->total ?? 0), 2).' €',
+            '$ORDER_SUBTOTAL' => number_format(floatval($order->subtotal ?? 0), 2).' €',
+            '$ORDER_TAX' => number_format(floatval($order->tax_amount ?? 0), 2).' €',
+            '$ORDER_SHIPPING' => number_format(floatval($order->shipping_amount ?? 0), 2).' €',
+            '$ORDER_DISCOUNT' => number_format(floatval($order->discount_amount ?? 0), 2).' €',
             '$CUSTOMER_NAME' => $user ? "{$user->first_name} {$user->last_name}" : 'Svečias',
             '$CUSTOMER_EMAIL' => $user?->email ?? $billingAddress['email'] ?? '',
             '$BILLING_ADDRESS' => $this->formatAddress($billingAddress),
@@ -533,40 +538,40 @@ final class ComprehensiveOrderSeeder extends Seeder
 
     private function formatAddress(?array $address): string
     {
-        if (!$address) {
+        if (! $address) {
             return '';
         }
 
         $parts = [];
 
-        if (!empty($address['first_name']) || !empty($address['last_name'])) {
-            $parts[] = trim(($address['first_name'] ?? '') . ' ' . ($address['last_name'] ?? ''));
+        if (! empty($address['first_name']) || ! empty($address['last_name'])) {
+            $parts[] = trim(($address['first_name'] ?? '').' '.($address['last_name'] ?? ''));
         }
 
-        if (!empty($address['company'])) {
+        if (! empty($address['company'])) {
             $parts[] = $address['company'];
         }
 
-        if (!empty($address['address_line_1'])) {
+        if (! empty($address['address_line_1'])) {
             $parts[] = $address['address_line_1'];
         }
 
-        if (!empty($address['address_line_2'])) {
+        if (! empty($address['address_line_2'])) {
             $parts[] = $address['address_line_2'];
         }
 
         $cityLine = [];
-        if (!empty($address['postal_code'])) {
+        if (! empty($address['postal_code'])) {
             $cityLine[] = $address['postal_code'];
         }
-        if (!empty($address['city'])) {
+        if (! empty($address['city'])) {
             $cityLine[] = $address['city'];
         }
-        if (!empty($cityLine)) {
+        if (! empty($cityLine)) {
             $parts[] = implode(' ', $cityLine);
         }
 
-        if (!empty($address['country'])) {
+        if (! empty($address['country'])) {
             $parts[] = $address['country'];
         }
 

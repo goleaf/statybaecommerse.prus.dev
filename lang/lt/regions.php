@@ -8,7 +8,7 @@ return [
     'code' => 'Kodas',
     'code_help' => 'Unikalus regiono kodas (pvz., LT-VIL)',
     'description' => 'Aprašymas',
-    
+
     // Location
     'location' => 'Vieta',
     'country' => 'Šalis',
@@ -17,7 +17,7 @@ return [
     'parent_region_help' => 'Pasirinkite tėvinį regioną hierarchijai',
     'level' => 'Lygis',
     'level_help' => 'Hierarchijos lygis: 0=šaknis, 1=valstija/provincija, 2=apskritis, 3=rajonas',
-    
+
     // Status
     'status' => 'Būsena',
     'is_enabled' => 'Įjungtas',
@@ -26,24 +26,24 @@ return [
     'is_default_help' => 'Ar tai yra numatytasis regionas',
     'sort_order' => 'Rūšiavimo tvarka',
     'sort_order_help' => 'Skaičius, pagal kurį bus rūšiuojami regionai',
-    
+
     // Translations
     'translations' => 'Vertimai',
     'locale' => 'Kalbos kodas',
     'add_translation' => 'Pridėti vertimą',
-    
+
     // Metadata
     'metadata' => 'Papildomi duomenys',
     'metadata_help' => 'Papildomi regiono duomenys raktas-reikšmė formatu',
     'key' => 'Raktas',
     'value' => 'Reikšmė',
-    
+
     // Table columns
     'cities_count' => 'Miestų skaičius',
     'addresses_count' => 'Adresų skaičius',
     'created_at' => 'Sukurta',
     'updated_at' => 'Atnaujinta',
-    
+
     // Actions
     'create' => 'Sukurti regioną',
     'edit' => 'Redaguoti regioną',
@@ -54,13 +54,13 @@ return [
     'toggle_enabled' => 'Perjungti būseną',
     'enable_selected' => 'Įjungti pasirinktus',
     'disable_selected' => 'Išjungti pasirinktus',
-    
+
     // Messages
     'created_successfully' => 'Regionas sėkmingai sukurtas',
     'updated_successfully' => 'Regionas sėkmingai atnaujintas',
     'deleted_successfully' => 'Regionas sėkmingai ištrintas',
     'not_found' => 'Regionas nerastas',
-    
+
     // Filters
     'filter_by_country' => 'Filtruoti pagal šalį',
     'filter_by_zone' => 'Filtruoti pagal zoną',
@@ -75,7 +75,7 @@ return [
     'has_cities' => 'Turi miestų',
     'created_from' => 'Sukurta nuo',
     'created_until' => 'Sukurta iki',
-    
+
     // Widgets
     'total_regions' => 'Iš viso regionų',
     'enabled_regions' => 'Įjungti regionai',
@@ -83,7 +83,7 @@ return [
     'regions_by_country' => 'Regionai pagal šalį',
     'regions_by_level' => 'Regionai pagal lygį',
     'recent_regions' => 'Naujausi regionai',
-    
+
     // Frontend
     'select_region' => 'Pasirinkite regioną',
     'all_regions' => 'Visi regionai',
@@ -113,7 +113,7 @@ return [
     'back_to_regions' => 'Grįžti į regionus',
     'back_to_parent' => 'Grįžti į tėvinį regioną',
     'default_region' => 'Numatytasis regionas',
-    
+
     // Hierarchy
     'root_regions' => 'Šakniniai regionai',
     'child_regions' => 'Dukteriniai regionai',

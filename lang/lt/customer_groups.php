@@ -11,11 +11,11 @@ return [
     'users_count' => 'Vartotojų skaičius',
     'created_at' => 'Sukurta',
     'updated_at' => 'Atnaujinta',
-    
+
     // Navigation
     'navigation_label' => 'Klientų grupės',
     'navigation_group' => 'Klientų valdymas',
-    
+
     // Table columns
     'table_name' => 'Pavadinimas',
     'table_slug' => 'Slug',
@@ -25,38 +25,38 @@ return [
     'table_users_count' => 'Vartotojai',
     'table_created_at' => 'Sukurta',
     'table_updated_at' => 'Atnaujinta',
-    
+
     // Filters
     'filter_enabled' => 'Įjungta',
     'filter_with_discount' => 'Su nuolaida',
     'filter_discount_range' => 'Nuolaidos diapazonas',
     'filter_users_count_range' => 'Vartotojų skaičiaus diapazonas',
     'filter_created_date' => 'Sukūrimo data',
-    
+
     // Actions
     'action_view' => 'Peržiūrėti',
     'action_edit' => 'Redaguoti',
     'action_delete' => 'Ištrinti',
     'action_create' => 'Sukurti naują',
-    
+
     // Messages
     'created_successfully' => 'Klientų grupė sėkmingai sukurta',
     'updated_successfully' => 'Klientų grupė sėkmingai atnaujinta',
     'deleted_successfully' => 'Klientų grupė sėkmingai ištrinta',
-    
+
     // Widgets
     'widget_total_groups' => 'Iš viso grupių',
     'widget_active_groups' => 'Aktyvios grupės',
     'widget_groups_with_discount' => 'Grupės su nuolaida',
     'widget_total_customers' => 'Iš viso klientų',
     'widget_average_discount' => 'Vidutinė nuolaida',
-    
+
     // Relations
     'relation_users' => 'Vartotojai',
     'relation_discounts' => 'Nuolaidos',
     'relation_price_lists' => 'Kainų sąrašai',
     'relation_campaigns' => 'Kampanijos',
-    
+
     // Form validation
     'validation_name_required' => 'Pavadinimas yra privalomas',
     'validation_slug_required' => 'Slug yra privalomas',
@@ -64,7 +64,7 @@ return [
     'validation_discount_percentage_numeric' => 'Nuolaidos procentas turi būti skaičius',
     'validation_discount_percentage_min' => 'Nuolaidos procentas negali būti mažesnis nei 0',
     'validation_discount_percentage_max' => 'Nuolaidos procentas negali būti didesnis nei 100',
-    
+
     // Additional translations
     'no_discount' => 'Be nuolaidos',
     'all_groups' => 'Visos grupės',
@@ -74,7 +74,7 @@ return [
     'discount_to' => 'Nuolaida iki',
     'users_from' => 'Vartotojai nuo',
     'users_to' => 'Vartotojai iki',
-    
+
     // Relation actions
     'attach_user' => 'Pridėti vartotoją',
     'detach_user' => 'Pašalinti vartotoją',

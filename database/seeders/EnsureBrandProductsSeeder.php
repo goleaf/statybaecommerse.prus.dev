@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 class EnsureBrandProductsSeeder extends Seeder
 {
     private const TARGET_PER_BRAND = 100;
+
     private const TARGET_PER_CATEGORY = 100;
 
     public function run(): void
@@ -71,7 +72,7 @@ class EnsureBrandProductsSeeder extends Seeder
                     ->pluck('id')
                     ->all();
 
-                if (!empty($pool)) {
+                if (! empty($pool)) {
                     $category->products()->syncWithoutDetaching($pool);
                     $needed -= count($pool);
                 }
@@ -95,4 +96,3 @@ class EnsureBrandProductsSeeder extends Seeder
         });
     }
 }
-

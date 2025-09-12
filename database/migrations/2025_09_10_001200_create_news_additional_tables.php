@@ -4,11 +4,12 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         // News Tags table
-        if (!Schema::hasTable('news_tags')) {
+        if (! Schema::hasTable('news_tags')) {
             Schema::create('news_tags', function (Blueprint $table): void {
                 $table->id();
                 $table->boolean('is_visible')->default(true);
@@ -22,7 +23,7 @@ return new class extends Migration {
         }
 
         // News Tag Translations table
-        if (!Schema::hasTable('sh_news_tag_translations')) {
+        if (! Schema::hasTable('sh_news_tag_translations')) {
             Schema::create('sh_news_tag_translations', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('news_tag_id');
@@ -39,7 +40,7 @@ return new class extends Migration {
         }
 
         // News Tag Pivot table
-        if (!Schema::hasTable('news_tag_pivot')) {
+        if (! Schema::hasTable('news_tag_pivot')) {
             Schema::create('news_tag_pivot', function (Blueprint $table): void {
                 $table->unsignedBigInteger('news_id');
                 $table->unsignedBigInteger('news_tag_id');
@@ -50,7 +51,7 @@ return new class extends Migration {
         }
 
         // News Comments table
-        if (!Schema::hasTable('news_comments')) {
+        if (! Schema::hasTable('news_comments')) {
             Schema::create('news_comments', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('news_id');
@@ -70,7 +71,7 @@ return new class extends Migration {
         }
 
         // News Images table
-        if (!Schema::hasTable('news_images')) {
+        if (! Schema::hasTable('news_images')) {
             Schema::create('news_images', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('news_id');
@@ -100,4 +101,3 @@ return new class extends Migration {
         Schema::dropIfExists('news_tags');
     }
 };
-

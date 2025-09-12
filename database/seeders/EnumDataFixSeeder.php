@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -18,7 +20,7 @@ class EnumDataFixSeeder extends Seeder
 
     protected function fixDiscountEnums(): void
     {
-        if (!DB::getSchemaBuilder()->hasTable('sh_discounts')) {
+        if (! DB::getSchemaBuilder()->hasTable('sh_discounts')) {
             return;
         }
 
@@ -79,7 +81,7 @@ class EnumDataFixSeeder extends Seeder
                 }
             }
 
-            if (!empty($updates)) {
+            if (! empty($updates)) {
                 DB::table('sh_discounts')->where('id', $row->id)->update($updates);
             }
         }
@@ -87,7 +89,7 @@ class EnumDataFixSeeder extends Seeder
 
     protected function fixCollectionEnums(): void
     {
-        if (!DB::getSchemaBuilder()->hasTable('sh_collections')) {
+        if (! DB::getSchemaBuilder()->hasTable('sh_collections')) {
             return;
         }
         $typeMap = [
@@ -107,7 +109,7 @@ class EnumDataFixSeeder extends Seeder
 
     protected function fixProductEnums(): void
     {
-        if (!DB::getSchemaBuilder()->hasTable('sh_products')) {
+        if (! DB::getSchemaBuilder()->hasTable('sh_products')) {
             return;
         }
         $typeMap = [
@@ -129,7 +131,7 @@ class EnumDataFixSeeder extends Seeder
 
     protected function fixOrderEnums(): void
     {
-        if (!DB::getSchemaBuilder()->hasTable('sh_orders')) {
+        if (! DB::getSchemaBuilder()->hasTable('sh_orders')) {
             return;
         }
         $statusMap = [
@@ -154,7 +156,7 @@ class EnumDataFixSeeder extends Seeder
 
     protected function fixOrderRefundEnums(): void
     {
-        if (!DB::getSchemaBuilder()->hasTable('sh_order_refunds')) {
+        if (! DB::getSchemaBuilder()->hasTable('sh_order_refunds')) {
             return;
         }
         $statusMap = [

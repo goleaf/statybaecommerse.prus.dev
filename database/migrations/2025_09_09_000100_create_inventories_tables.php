@@ -1,13 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
-        if (!Schema::hasTable('inventories')) {
+        if (! Schema::hasTable('inventories')) {
             Schema::create('inventories', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
@@ -27,7 +30,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('variant_inventories')) {
+        if (! Schema::hasTable('variant_inventories')) {
             Schema::create('variant_inventories', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -6,14 +8,15 @@ use App\Models\Product;
 use App\Services\Images\ProductImageService;
 use App\Services\Images\WebPConversionService;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Collection;
 
 final class OptimizedProductImageSeeder extends Seeder
 {
     private ProductImageService $imageService;
+
     private WebPConversionService $webpService;
 
     private array $categoryColors = [
@@ -143,8 +146,9 @@ final class OptimizedProductImageSeeder extends Seeder
             Log::warning('Image generation failed', [
                 'product_id' => $product->id,
                 'image_number' => $imageNumber,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -204,20 +208,21 @@ final class OptimizedProductImageSeeder extends Seeder
         $this->addStyledText($image, $text, $width, $height, $brandStyle);
 
         // Add decorative elements
-        if (!$brandStyle) {
+        if (! $brandStyle) {
             $this->addDecorativeElements($image, $width, $height);
         }
 
         // Save as WebP
-        $filename = "product_{$productId}_img_{$imageNumber}_" . uniqid() . '.webp';
-        $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
+        $filename = "product_{$productId}_img_{$imageNumber}_".uniqid().'.webp';
+        $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.$filename;
 
-        if (!imagewebp($image, $path, 90)) {
+        if (! imagewebp($image, $path, 90)) {
             imagedestroy($image);
             throw new \RuntimeException('Failed to save WebP image');
         }
 
         imagedestroy($image);
+
         return $path;
     }
 
@@ -291,7 +296,7 @@ final class OptimizedProductImageSeeder extends Seeder
         }
 
         // Truncate long product names
-        return strlen($text) > 30 ? substr($text, 0, 27) . '...' : $text;
+        return strlen($text) > 30 ? substr($text, 0, 27).'...' : $text;
     }
 
     private function wrapText(string $text, int $maxWidth): array
@@ -302,7 +307,7 @@ final class OptimizedProductImageSeeder extends Seeder
         $font = 5;
 
         foreach ($words as $word) {
-            $testLine = $currentLine . ($currentLine ? ' ' : '') . $word;
+            $testLine = $currentLine.($currentLine ? ' ' : '').$word;
             $textWidth = imagefontwidth($font) * strlen($testLine);
 
             if ($textWidth > $maxWidth * 0.8) {
@@ -334,16 +339,16 @@ final class OptimizedProductImageSeeder extends Seeder
             'generation_date' => now()->toISOString(),
             'alt_text' => __('translations.product_image_alt', [
                 'name' => $product->name,
-                'number' => $imageNumber
+                'number' => $imageNumber,
             ]),
         ];
 
-        $fileName = 'product_' . $product->id . '_optimized_' . $imageNumber . '.webp';
+        $fileName = 'product_'.$product->id.'_optimized_'.$imageNumber.'.webp';
 
         $product
             ->addMedia($imagePath)
             ->withCustomProperties($customProperties)
-            ->usingName($product->name . ' - ' . __('translations.image') . ' ' . $imageNumber)
+            ->usingName($product->name.' - '.__('translations.image').' '.$imageNumber)
             ->usingFileName($fileName)
             ->toMediaCollection('images');
     }
@@ -394,9 +399,10 @@ final class OptimizedProductImageSeeder extends Seeder
     {
         $hex = ltrim($hex, '#');
         if (strlen($hex) === 3) {
-            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
         }
         $int = hexdec($hex);
+
         return [($int >> 16) & 255, ($int >> 8) & 255, $int & 255];
     }
 
@@ -408,7 +414,7 @@ final class OptimizedProductImageSeeder extends Seeder
         ];
 
         foreach ($directories as $directory) {
-            if (!File::exists($directory)) {
+            if (! File::exists($directory)) {
                 File::makeDirectory($directory, 0755, true);
             }
         }
@@ -417,7 +423,7 @@ final class OptimizedProductImageSeeder extends Seeder
     private function cleanupTempFiles(): void
     {
         $tempDir = sys_get_temp_dir();
-        $pattern = $tempDir . '/product_*';
+        $pattern = $tempDir.'/product_*';
 
         foreach (glob($pattern) as $file) {
             if (is_file($file) && (time() - filemtime($file)) > 3600) {  // 1 hour old

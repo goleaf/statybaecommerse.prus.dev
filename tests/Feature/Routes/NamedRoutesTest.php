@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 
@@ -38,7 +40,7 @@ it('has expected named routes registered', function (string $routeName): void {
     'admin.stop-impersonating',
 ])->skip(function () {
     // Skip entirely if permission middleware is not available in this environment
-    return !class_exists(\Spatie\Permission\Middleware\PermissionMiddleware::class);
+    return ! class_exists(\Spatie\Permission\Middleware\PermissionMiddleware::class);
 }, 'Spatie Permission middleware not installed; route registration may differ.');
 
 it('guest is redirected from protected routes', function (string $method, string $routeName, array $params = []): void {
@@ -51,5 +53,5 @@ it('guest is redirected from protected routes', function (string $method, string
     ['GET', 'account.orders'],
     ['GET', 'account.addresses'],
 ])->skip(function () {
-    return !class_exists(\Spatie\Permission\Middleware\PermissionMiddleware::class);
+    return ! class_exists(\Spatie\Permission\Middleware\PermissionMiddleware::class);
 }, 'Spatie Permission middleware not installed; protected routes may not boot.');

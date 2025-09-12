@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -6,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 beforeEach(function (): void {
     // Ensure tables exist used by sitemap queries (minimal columns)
     $this->artisan('migrate', ['--force' => true]);
-    if (!Schema::hasTable('sh_categories')) {
+    if (! Schema::hasTable('sh_categories')) {
         Schema::create('sh_categories', function ($table) {
             $table->id();
             $table->string('slug')->nullable();
@@ -14,7 +16,7 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_category_translations')) {
+    if (! Schema::hasTable('sh_category_translations')) {
         Schema::create('sh_category_translations', function ($table) {
             $table->id();
             $table->unsignedBigInteger('category_id');
@@ -23,7 +25,7 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_collections')) {
+    if (! Schema::hasTable('sh_collections')) {
         Schema::create('sh_collections', function ($table) {
             $table->id();
             $table->string('slug')->nullable();
@@ -31,7 +33,7 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_collection_translations')) {
+    if (! Schema::hasTable('sh_collection_translations')) {
         Schema::create('sh_collection_translations', function ($table) {
             $table->id();
             $table->unsignedBigInteger('collection_id');
@@ -40,7 +42,7 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_brands')) {
+    if (! Schema::hasTable('sh_brands')) {
         Schema::create('sh_brands', function ($table) {
             $table->id();
             $table->string('slug')->nullable();
@@ -48,7 +50,7 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_brand_translations')) {
+    if (! Schema::hasTable('sh_brand_translations')) {
         Schema::create('sh_brand_translations', function ($table) {
             $table->id();
             $table->unsignedBigInteger('brand_id');
@@ -57,7 +59,7 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_products')) {
+    if (! Schema::hasTable('sh_products')) {
         Schema::create('sh_products', function ($table) {
             $table->id();
             $table->string('slug')->nullable();
@@ -66,7 +68,7 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_product_translations')) {
+    if (! Schema::hasTable('sh_product_translations')) {
         Schema::create('sh_product_translations', function ($table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
@@ -75,7 +77,7 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_legals')) {
+    if (! Schema::hasTable('sh_legals')) {
         Schema::create('sh_legals', function ($table) {
             $table->id();
             $table->string('slug')->nullable();
@@ -83,7 +85,7 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('sh_legal_translations')) {
+    if (! Schema::hasTable('sh_legal_translations')) {
         Schema::create('sh_legal_translations', function ($table) {
             $table->id();
             $table->unsignedBigInteger('legal_id');

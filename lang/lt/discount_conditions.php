@@ -126,4 +126,3 @@ return [
         'deleted' => 'Sąlyga sėkmingai ištrinta',
     ],
 ];
-

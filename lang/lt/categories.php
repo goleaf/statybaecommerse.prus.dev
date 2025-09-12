@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'title' => 'Kategorijos',
     'single' => 'Kategorija',
     'plural' => 'Kategorijos',
-    
+
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
         'media' => 'Medija',
@@ -12,7 +14,7 @@ return [
         'settings' => 'Nustatymai',
         'hierarchy' => 'Hierarchija',
     ],
-    
+
     'fields' => [
         'name' => 'Pavadinimas',
         'slug' => 'URL dalis',
@@ -37,7 +39,7 @@ return [
         'updated_at' => 'Atnaujinta',
         'deleted_at' => 'Ištrinta',
     ],
-    
+
     'filters' => [
         'is_enabled' => 'Įjungimo būsena',
         'is_featured' => 'Rekomendacijos būsena',
@@ -60,7 +62,7 @@ return [
         '51_to_100_products' => '51-100 produktų',
         '100_plus_products' => '100+ produktų',
     ],
-    
+
     'actions' => [
         'create' => 'Sukurti kategoriją',
         'edit' => 'Redaguoti kategoriją',
@@ -79,13 +81,13 @@ return [
         'import' => 'Importuoti',
         'translate' => 'Vertimai',
     ],
-    
+
     'tabs' => [
         'translations' => 'Vertimai',
         'lithuanian' => 'Lietuvių',
         'english' => 'Anglų',
     ],
-    
+
     'messages' => [
         'created' => 'Kategorija sėkmingai sukurta',
         'updated' => 'Kategorija sėkmingai atnaujinta',
@@ -109,7 +111,7 @@ return [
         'slug_already_exists' => 'URL dalis jau egzistuoja',
         'invalid_sort_order' => 'Neteisingas rūšiavimo eiliškumas',
     ],
-    
+
     'placeholders' => [
         'name' => 'Įveskite kategorijos pavadinimą',
         'slug' => 'Įveskite URL dalį',
@@ -123,7 +125,7 @@ return [
         'sort_order' => 'Įveskite rūšiavimo eiliškumą',
         'product_limit' => 'Įveskite produktų limitą',
     ],
-    
+
     'help' => [
         'name' => 'Kategorijos pavadinimas, kuris bus rodomas vartotojams',
         'slug' => 'URL dalis, kuri bus naudojama adrese (pvz., /kategorijos/elektronika)',
@@ -142,7 +144,7 @@ return [
         'image' => 'Pagrindinis kategorijos paveikslėlis',
         'banner' => 'Baneris, kuris bus rodomas kategorijos puslapyje',
     ],
-    
+
     'validation' => [
         'name_required' => 'Kategorijos pavadinimas yra privalomas',
         'name_max' => 'Kategorijos pavadinimas negali būti ilgesnis nei :max simbolių',
@@ -157,7 +159,7 @@ return [
         'seo_description_max' => 'SEO aprašymas negali būti ilgesnis nei :max simbolių',
         'seo_keywords_max' => 'SEO raktažodžiai negali būti ilgesni nei :max simbolių',
     ],
-    
+
     'stats' => [
         'total_categories' => 'Iš viso kategorijų',
         'active_categories' => 'Aktyvių kategorijų',
@@ -169,14 +171,14 @@ return [
         'total_products_in_categories' => 'Iš viso produktų kategorijose',
         'average_products_per_category' => 'Vidutiniškai produktų per kategoriją',
     ],
-    
+
     'breadcrumbs' => [
         'categories' => 'Kategorijos',
         'create' => 'Sukurti kategoriją',
         'edit' => 'Redaguoti kategoriją',
         'view' => 'Peržiūrėti kategoriją',
     ],
-    
+
     'tabs' => [
         'general' => 'Bendroji informacija',
         'content' => 'Turinys',
@@ -186,7 +188,7 @@ return [
         'settings' => 'Nustatymai',
         'hierarchy' => 'Hierarchija',
     ],
-    
+
     'bulk_actions' => [
         'enable_selected' => 'Įjungti pasirinktas',
         'disable_selected' => 'Išjungti pasirinktas',
@@ -197,7 +199,7 @@ return [
         'move_to_parent' => 'Perkelti į tėvinę kategoriją',
         'change_sort_order' => 'Keisti rūšiavimo eiliškumą',
     ],
-    
+
     'export' => [
         'title' => 'Eksportuoti kategorijas',
         'format' => 'Formatas',
@@ -208,7 +210,7 @@ return [
         'generated' => 'Failas sugeneruotas',
         'download' => 'Atsisiųsti',
     ],
-    
+
     'import' => [
         'title' => 'Importuoti kategorijas',
         'file' => 'Failas',
@@ -222,7 +224,7 @@ return [
         'errors_count' => 'Rasta :count klaidų',
         'skipped_count' => 'Praleista :count kategorijų',
     ],
-    
+
     'tree' => [
         'expand_all' => 'Išskleisti visas',
         'collapse_all' => 'Suskleisti visas',
@@ -234,7 +236,7 @@ return [
         'move_down' => 'Perkelti žemyn',
         'move_to_parent' => 'Perkelti į tėvinę kategoriją',
     ],
-    
+
     'preview' => [
         'title' => 'Kategorijos peržiūra',
         'frontend_view' => 'Peržiūrėti svetainėje',

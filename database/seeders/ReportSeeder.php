@@ -1,9 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
 use App\Models\Report;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 final class ReportSeeder extends Seeder
@@ -17,9 +18,9 @@ final class ReportSeeder extends Seeder
                     'lt' => 'Pardavimų ataskaita',
                     'en' => 'Sales Report',
                 ],
-            'type' => 'sales',
+                'type' => 'sales',
                 'category' => 'sales',
-            'date_range' => 'last_30_days',
+                'date_range' => 'last_30_days',
                 'description' => [
                     'lt' => 'Išsamus pardavimų ataskaita su analize ir tendencijomis',
                     'en' => 'Comprehensive sales report with analysis and trends',
@@ -32,9 +33,9 @@ final class ReportSeeder extends Seeder
                     'lt' => 'Produktų veiklos ataskaita',
                     'en' => 'Product Performance Report',
                 ],
-            'type' => 'products',
+                'type' => 'products',
                 'category' => 'analytics',
-            'date_range' => 'last_30_days',
+                'date_range' => 'last_30_days',
                 'description' => [
                     'lt' => 'Produktų pardavimų ir populiarumo analizė',
                     'en' => 'Product sales and popularity analysis',
@@ -47,9 +48,9 @@ final class ReportSeeder extends Seeder
                     'lt' => 'Klientų analizės ataskaita',
                     'en' => 'Customer Analysis Report',
                 ],
-            'type' => 'customers',
+                'type' => 'customers',
                 'category' => 'analytics',
-            'date_range' => 'last_30_days',
+                'date_range' => 'last_30_days',
                 'description' => [
                     'lt' => 'Klientų elgsenos ir segmentacijos analizė',
                     'en' => 'Customer behavior and segmentation analysis',
@@ -62,9 +63,9 @@ final class ReportSeeder extends Seeder
                     'lt' => 'Atsargų ataskaita',
                     'en' => 'Inventory Report',
                 ],
-            'type' => 'inventory',
+                'type' => 'inventory',
                 'category' => 'operations',
-            'date_range' => 'last_30_days',
+                'date_range' => 'last_30_days',
                 'description' => [
                     'lt' => 'Atsargų būklės ir judėjimo ataskaita',
                     'en' => 'Inventory status and movement report',
@@ -112,10 +113,10 @@ final class ReportSeeder extends Seeder
 
         // Create additional random reports
         Report::factory(10)->create();
-        
+
         // Create some popular reports
         Report::factory(3)->popular()->create();
-        
+
         // Create some scheduled reports
         Report::factory(2)->scheduled()->create();
     }

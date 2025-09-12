@@ -42,7 +42,8 @@ return new class extends Migration
                 'SELECT COUNT(1) as cnt FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND INDEX_NAME = ?',
                 [$database, DB::getTablePrefix().$table, $index]
             );
-            return (int)($result[0]->cnt ?? 0) > 0;
+
+            return (int) ($result[0]->cnt ?? 0) > 0;
         } catch (\Throwable) {
             return false;
         }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     // Navigation and Labels
@@ -7,7 +9,7 @@ return [
     'plural_model_label' => 'System Settings',
     'setting' => 'Setting',
     'settings' => 'Settings',
-    
+
     // Form Fields
     'category' => 'Category',
     'category_name' => 'Category Name',
@@ -35,7 +37,7 @@ return [
     'sort_order' => 'Sort Order',
     'updated_by' => 'Updated By',
     'updated_at' => 'Updated At',
-    
+
     // Groups
     'general' => 'General',
     'ecommerce' => 'E-commerce',
@@ -47,7 +49,7 @@ return [
     'api' => 'API',
     'appearance' => 'Appearance',
     'notifications' => 'Notifications',
-    
+
     // Types
     'string' => 'String',
     'text' => 'Text',
@@ -61,7 +63,7 @@ return [
     'color' => 'Color',
     'date' => 'Date',
     'datetime' => 'DateTime',
-    
+
     // Form Sections
     'setting_information' => 'Setting Information',
     'value_configuration' => 'Value Configuration',
@@ -73,7 +75,7 @@ return [
     'display_settings' => 'Display Settings',
     'value_configuration' => 'Value Configuration',
     'advanced_options' => 'Advanced Options',
-    
+
     // Actions
     'create_setting' => 'Create Setting',
     'save_settings' => 'Save Settings',
@@ -81,7 +83,7 @@ return [
     'export_settings' => 'Export Settings',
     'import_settings' => 'Import Settings',
     'reset_to_default' => 'Reset to Default',
-    
+
     // Messages
     'setting_created' => 'Setting created successfully',
     'setting_updated' => 'Setting updated successfully',
@@ -92,14 +94,14 @@ return [
     'key_copied' => 'Key copied to clipboard',
     'export_success' => 'Settings exported successfully',
     'import_success' => 'Settings imported successfully',
-    
+
     // Errors
     'save_error' => 'Error saving settings',
     'reset_error' => 'Error resetting settings',
     'export_error' => 'Error exporting settings',
     'import_error' => 'Error importing settings',
     'invalid_import_file' => 'Invalid import file format',
-    
+
     // Help Text
     'key_help' => 'Use lowercase letters, numbers, underscores and dots only',
     'type_help' => 'Data type for this setting',
@@ -112,7 +114,7 @@ return [
     'options_help' => 'Options for select type settings',
     'default_value_help' => 'Default value when setting is not set',
     'help_text_help' => 'Additional help text for users',
-    
+
     // Stats
     'total_settings' => 'Total Settings',
     'active_settings' => 'Active Settings',
@@ -124,7 +126,7 @@ return [
     'public_settings_description' => 'Settings accessible from frontend',
     'encrypted_settings_description' => 'Settings with encrypted values',
     'categories_description' => 'Number of setting categories',
-    
+
     // Activity
     'recent_activity' => 'Recent Activity',
     'old_value' => 'Old Value',
@@ -132,34 +134,34 @@ return [
     'changed_by' => 'Changed By',
     'change_reason' => 'Change Reason',
     'changed_at' => 'Changed At',
-    
+
     // Overview
     'settings_overview' => 'Settings Overview',
     'by_categories' => 'By Categories',
     'by_types' => 'By Types',
     'by_groups' => 'By Groups',
     'settings_count' => 'Settings Count',
-    
+
     // Confirmations
     'reset_confirm' => 'Reset Settings',
     'reset_description' => 'Are you sure you want to reset all settings to their default values? This action cannot be undone.',
     'reset_to_default_confirm' => 'Reset to Default',
     'reset_to_default_description' => 'Are you sure you want to reset this setting to its default value?',
-    
+
     // Import/Export
     'import_file' => 'Import File',
     'export_file' => 'Export File',
-    
+
     // All Settings Tabs
     'all_settings' => 'All Settings',
-    
+
     // Not Set
     'not_set' => 'Not Set',
-    
+
     // Yes/No
     'yes' => 'Yes',
     'no' => 'No',
-    
+
     // Widget Labels
     'widgets' => [
         'settings_overview' => 'Settings Overview',
@@ -173,7 +175,7 @@ return [
         'settings_stats' => 'Settings Statistics',
         'category_stats' => 'Category Statistics',
     ],
-    
+
     // Frontend Labels
     'frontend' => [
         'title' => 'System Settings',
@@ -202,7 +204,7 @@ return [
         'is_readonly_label' => 'Read Only',
         'is_active_label' => 'Active Setting',
     ],
-    
+
     // API Labels
     'api' => [
         'title' => 'System Settings API',
@@ -222,7 +224,7 @@ return [
         'create_setting' => 'Create Setting',
         'delete_setting' => 'Delete Setting',
     ],
-    
+
     // Advanced Features
     'advanced' => [
         'bulk_operations' => 'Bulk Operations',
@@ -252,7 +254,7 @@ return [
         'revert_changes' => 'Revert Changes',
         'changes_reverted' => 'Changes reverted',
     ],
-    
+
     // Validation Messages
     'validation' => [
         'key_required' => 'Key is required',
@@ -273,7 +275,7 @@ return [
         'setting_inactive' => 'Setting is inactive',
         'permission_denied' => 'Permission denied',
     ],
-    
+
     // Status Messages
     'status' => [
         'active' => 'Active',

@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'title' => 'Categories',
     'single' => 'Category',
     'plural' => 'Categories',
-    
+
     'sections' => [
         'basic_information' => 'Basic Information',
         'media' => 'Media',
@@ -12,7 +14,7 @@ return [
         'settings' => 'Settings',
         'hierarchy' => 'Hierarchy',
     ],
-    
+
     'fields' => [
         'name' => 'Name',
         'slug' => 'Slug',
@@ -37,7 +39,7 @@ return [
         'updated_at' => 'Updated At',
         'deleted_at' => 'Deleted At',
     ],
-    
+
     'filters' => [
         'is_enabled' => 'Enabled Status',
         'is_featured' => 'Featured Status',
@@ -60,7 +62,7 @@ return [
         '51_to_100_products' => '51-100 Products',
         '100_plus_products' => '100+ Products',
     ],
-    
+
     'actions' => [
         'create' => 'Create Category',
         'edit' => 'Edit Category',
@@ -79,13 +81,13 @@ return [
         'import' => 'Import',
         'translate' => 'Translations',
     ],
-    
+
     'tabs' => [
         'translations' => 'Translations',
         'lithuanian' => 'Lithuanian',
         'english' => 'English',
     ],
-    
+
     'messages' => [
         'created' => 'Category created successfully',
         'updated' => 'Category updated successfully',
@@ -109,7 +111,7 @@ return [
         'slug_already_exists' => 'Slug already exists',
         'invalid_sort_order' => 'Invalid sort order',
     ],
-    
+
     'placeholders' => [
         'name' => 'Enter category name',
         'slug' => 'Enter slug',
@@ -123,7 +125,7 @@ return [
         'sort_order' => 'Enter sort order',
         'product_limit' => 'Enter product limit',
     ],
-    
+
     'help' => [
         'name' => 'Category name that will be displayed to users',
         'slug' => 'URL part that will be used in the address (e.g., /categories/electronics)',
@@ -142,7 +144,7 @@ return [
         'image' => 'Main category image',
         'banner' => 'Banner that will be displayed on category page',
     ],
-    
+
     'validation' => [
         'name_required' => 'Category name is required',
         'name_max' => 'Category name cannot be longer than :max characters',
@@ -157,7 +159,7 @@ return [
         'seo_description_max' => 'SEO description cannot be longer than :max characters',
         'seo_keywords_max' => 'SEO keywords cannot be longer than :max characters',
     ],
-    
+
     'stats' => [
         'total_categories' => 'Total Categories',
         'active_categories' => 'Active Categories',
@@ -169,14 +171,14 @@ return [
         'total_products_in_categories' => 'Total Products in Categories',
         'average_products_per_category' => 'Average Products per Category',
     ],
-    
+
     'breadcrumbs' => [
         'categories' => 'Categories',
         'create' => 'Create Category',
         'edit' => 'Edit Category',
         'view' => 'View Category',
     ],
-    
+
     'tabs' => [
         'general' => 'General Information',
         'content' => 'Content',
@@ -186,7 +188,7 @@ return [
         'settings' => 'Settings',
         'hierarchy' => 'Hierarchy',
     ],
-    
+
     'bulk_actions' => [
         'enable_selected' => 'Enable Selected',
         'disable_selected' => 'Disable Selected',
@@ -197,7 +199,7 @@ return [
         'move_to_parent' => 'Move to Parent',
         'change_sort_order' => 'Change Sort Order',
     ],
-    
+
     'export' => [
         'title' => 'Export Categories',
         'format' => 'Format',
@@ -208,7 +210,7 @@ return [
         'generated' => 'File generated',
         'download' => 'Download',
     ],
-    
+
     'import' => [
         'title' => 'Import Categories',
         'file' => 'File',
@@ -222,7 +224,7 @@ return [
         'errors_count' => 'Found :count errors',
         'skipped_count' => 'Skipped :count categories',
     ],
-    
+
     'tree' => [
         'expand_all' => 'Expand All',
         'collapse_all' => 'Collapse All',
@@ -234,7 +236,7 @@ return [
         'move_down' => 'Move Down',
         'move_to_parent' => 'Move to Parent',
     ],
-    
+
     'preview' => [
         'title' => 'Category Preview',
         'frontend_view' => 'View on Frontend',

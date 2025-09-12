@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -45,10 +47,10 @@ final class ProductRandomImagesSeeder extends Seeder
 
             // Generate 2-4 random images per product
             $imageCount = random_int(2, 4);
-            
+
             for ($i = 0; $i < $imageCount; $i++) {
                 $imagePath = $this->imageService->generateProductImage($product);
-                
+
                 $media = $product
                     ->addMedia($imagePath)
                     ->withCustomProperties([
@@ -57,8 +59,8 @@ final class ProductRandomImagesSeeder extends Seeder
                         'image_number' => $i + 1,
                         'alt_text' => __('translations.product_image_alt', ['name' => $product->name, 'number' => $i + 1]),
                     ])
-                    ->usingName($product->name . ' - ' . __('translations.image') . ' ' . ($i + 1))
-                                                ->usingFileName('product_' . $product->id . '_image_' . ($i + 1) . '.webp')
+                    ->usingName($product->name.' - '.__('translations.image').' '.($i + 1))
+                    ->usingFileName('product_'.$product->id.'_image_'.($i + 1).'.webp')
                     ->toMediaCollection('images');
 
                 // Clean up temporary file
@@ -66,16 +68,16 @@ final class ProductRandomImagesSeeder extends Seeder
                     unlink($imagePath);
                 }
 
-                $this->command->info("   ✓ Paveikslėlis #" . ($i + 1) . " sukurtas: {$media->name}");
+                $this->command->info('   ✓ Paveikslėlis #'.($i + 1)." sukurtas: {$media->name}");
             }
 
         } catch (\Throwable $e) {
             Log::warning('Nepavyko sugeneruoti paveikslėlio produktui', [
                 'product_id' => $product->id,
                 'product_name' => $product->name,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
-            
+
             $this->command->error("   ❌ Klaida generuojant paveikslėlius produktui {$product->name}: {$e->getMessage()}");
         }
     }

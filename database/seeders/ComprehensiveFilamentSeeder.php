@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -67,7 +69,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
                 'is_public' => true,
                 'is_required' => false,
             ],
-            
+
             // Currency Settings
             [
                 'key' => 'default_currency',
@@ -89,7 +91,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
                 'is_public' => true,
                 'is_required' => true,
             ],
-            
+
             // Email Settings
             [
                 'key' => 'email_from_name',
@@ -111,13 +113,13 @@ final class ComprehensiveFilamentSeeder extends Seeder
                 'is_public' => false,
                 'is_required' => true,
             ],
-            
+
             // SEO Settings
             [
                 'key' => 'meta_title',
                 'display_name' => 'Default Meta Title',
                 'type' => 'string',
-                'value' => config('app.name') . ' - Online Store',
+                'value' => config('app.name').' - Online Store',
                 'group' => 'seo',
                 'description' => 'Default meta title for pages',
                 'is_public' => true,
@@ -133,7 +135,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
                 'is_public' => true,
                 'is_required' => false,
             ],
-            
+
             // Features Settings
             [
                 'key' => 'enable_reviews',
@@ -174,14 +176,14 @@ final class ComprehensiveFilamentSeeder extends Seeder
             'view_customer_analytics',
             'view_product_analytics',
             'view_sales_analytics',
-            
+
             // Inventory permissions
             'view_inventory',
             'manage_inventory',
             'adjust_stock',
             'bulk_stock_operations',
             'view_inventory_reports',
-            
+
             // Customer management permissions
             'view_customer_details',
             'edit_customer_preferences',
@@ -189,7 +191,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
             'export_customer_data',
             'send_customer_emails',
             'impersonate_customers',
-            
+
             // System permissions
             'view_system_health',
             'manage_system_settings',
@@ -290,25 +292,25 @@ final class ComprehensiveFilamentSeeder extends Seeder
         Product::where('is_visible', true)->chunk(50, function ($products): void {
             foreach ($products as $product) {
                 $updateData = [];
-                
+
                 // Only update columns that exist
-                if (!$product->meta_title && $product->name) {
+                if (! $product->meta_title && $product->name) {
                     $updateData['meta_title'] = $product->name;
                 }
-                
-                if (!$product->is_featured) {
+
+                if (! $product->is_featured) {
                     $updateData['is_featured'] = fake()->boolean(15); // 15% featured
                 }
-                
-                if (!$product->sort_order) {
+
+                if (! $product->sort_order) {
                     $updateData['sort_order'] = fake()->numberBetween(1, 1000);
                 }
-                
-                if (!$product->published_at) {
+
+                if (! $product->published_at) {
                     $updateData['published_at'] = fake()->dateTimeBetween('-6 months', 'now');
                 }
 
-                if (!empty($updateData)) {
+                if (! empty($updateData)) {
                     try {
                         $product->update($updateData);
                     } catch (\Exception $e) {

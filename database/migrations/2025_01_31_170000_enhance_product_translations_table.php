@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,15 +13,15 @@ return new class extends Migration
         if (Schema::hasTable('product_translations')) {
             Schema::table('product_translations', function (Blueprint $table) {
                 // Add missing translation fields if they don't exist
-                if (!Schema::hasColumn('product_translations', 'short_description')) {
+                if (! Schema::hasColumn('product_translations', 'short_description')) {
                     $table->text('short_description')->nullable()->after('summary');
                 }
-                
-                if (!Schema::hasColumn('product_translations', 'meta_keywords')) {
+
+                if (! Schema::hasColumn('product_translations', 'meta_keywords')) {
                     $table->json('meta_keywords')->nullable()->after('seo_description');
                 }
-                
-                if (!Schema::hasColumn('product_translations', 'alt_text')) {
+
+                if (! Schema::hasColumn('product_translations', 'alt_text')) {
                     $table->string('alt_text')->nullable()->after('meta_keywords');
                 }
             });
@@ -52,7 +54,7 @@ return new class extends Migration
                 ];
 
                 foreach ($fields as $field => $type) {
-                    if (!Schema::hasColumn('products', $field)) {
+                    if (! Schema::hasColumn('products', $field)) {
                         match ($type) {
                             'string' => $table->string($field)->nullable(),
                             'text' => $table->text($field)->nullable(),
@@ -102,5 +104,3 @@ return new class extends Migration
         }
     }
 };
-
-

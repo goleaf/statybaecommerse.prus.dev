@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     // Navigation and Labels
@@ -151,4 +153,3 @@ return [
     'is_false' => 'Is False',
     'unknown_setting' => 'Unknown Setting',
 ];
-

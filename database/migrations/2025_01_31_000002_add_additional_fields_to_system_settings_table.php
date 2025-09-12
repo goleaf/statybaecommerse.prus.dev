@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -21,7 +23,7 @@ return new class extends Migration
             $table->string('version')->default('1.0.0')->after('tags');
             $table->timestamp('last_accessed_at')->nullable()->after('version');
             $table->integer('access_count')->default(0)->after('last_accessed_at');
-            
+
             // Add indexes for performance
             $table->index(['is_cacheable', 'is_active']);
             $table->index(['environment', 'is_active']);
@@ -37,7 +39,7 @@ return new class extends Migration
             $table->boolean('show_in_sidebar')->default(true)->after('is_collapsible');
             $table->string('permission')->nullable()->after('show_in_sidebar');
             $table->json('tags')->nullable()->after('permission');
-            
+
             // Add indexes
             $table->index(['is_collapsible', 'is_active']);
             $table->index(['show_in_sidebar', 'is_active']);
@@ -52,7 +54,7 @@ return new class extends Migration
             $table->dropIndex(['environment', 'is_active']);
             $table->dropIndex('last_accessed_at');
             $table->dropIndex('access_count');
-            
+
             $table->dropColumn([
                 'placeholder',
                 'tooltip',
@@ -72,7 +74,7 @@ return new class extends Migration
             $table->dropIndex(['is_collapsible', 'is_active']);
             $table->dropIndex(['show_in_sidebar', 'is_active']);
             $table->dropIndex('permission');
-            
+
             $table->dropColumn([
                 'template',
                 'metadata',
@@ -84,4 +86,3 @@ return new class extends Migration
         });
     }
 };
-

@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
-use App\Models\SystemSettingTranslation;
 use App\Models\SystemSettingCategoryTranslation;
+use App\Models\SystemSettingTranslation;
 use Illuminate\Database\Seeder;
 
 final class SystemSettingsSeeder extends Seeder
@@ -112,7 +114,7 @@ final class SystemSettingsSeeder extends Seeder
 
         foreach ($categories as $categoryData) {
             $category = SystemSettingCategory::create($categoryData);
-            
+
             // Create translations
             SystemSettingCategoryTranslation::create([
                 'system_setting_category_id' => $category->id,
@@ -126,7 +128,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createGeneralSettings(): void
     {
         $generalCategory = SystemSettingCategory::where('slug', 'general')->first();
-        
+
         $settings = [
             [
                 'category_id' => $generalCategory->id,
@@ -241,7 +243,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createEcommerceSettings(): void
     {
         $ecommerceCategory = SystemSettingCategory::where('slug', 'ecommerce')->first();
-        
+
         $settings = [
             [
                 'category_id' => $ecommerceCategory->id,
@@ -348,7 +350,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createEmailSettings(): void
     {
         $emailCategory = SystemSettingCategory::where('slug', 'email')->first();
-        
+
         $settings = [
             [
                 'category_id' => $emailCategory->id,
@@ -434,7 +436,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createPaymentSettings(): void
     {
         $paymentCategory = SystemSettingCategory::where('slug', 'payment')->first();
-        
+
         $settings = [
             [
                 'category_id' => $paymentCategory->id,
@@ -487,7 +489,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createShippingSettings(): void
     {
         $shippingCategory = SystemSettingCategory::where('slug', 'shipping')->first();
-        
+
         $settings = [
             [
                 'category_id' => $shippingCategory->id,
@@ -539,7 +541,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createSeoSettings(): void
     {
         $seoCategory = SystemSettingCategory::where('slug', 'seo')->first();
-        
+
         $settings = [
             [
                 'category_id' => $seoCategory->id,
@@ -609,7 +611,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createSecuritySettings(): void
     {
         $securityCategory = SystemSettingCategory::where('slug', 'security')->first();
-        
+
         $settings = [
             [
                 'category_id' => $securityCategory->id,
@@ -680,7 +682,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createApiSettings(): void
     {
         $apiCategory = SystemSettingCategory::where('slug', 'api')->first();
-        
+
         $settings = [
             [
                 'category_id' => $apiCategory->id,
@@ -726,7 +728,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createAppearanceSettings(): void
     {
         $appearanceCategory = SystemSettingCategory::where('slug', 'appearance')->first();
-        
+
         $settings = [
             [
                 'category_id' => $appearanceCategory->id,
@@ -784,7 +786,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createNotificationSettings(): void
     {
         $notificationCategory = SystemSettingCategory::where('slug', 'notifications')->first();
-        
+
         $settings = [
             [
                 'category_id' => $notificationCategory->id,
@@ -831,7 +833,7 @@ final class SystemSettingsSeeder extends Seeder
     {
         foreach ($settings as $settingData) {
             $setting = SystemSetting::create($settingData);
-            
+
             // Create Lithuanian translations
             SystemSettingTranslation::create([
                 'system_setting_id' => $setting->id,
@@ -857,7 +859,7 @@ final class SystemSettingsSeeder extends Seeder
             'API' => 'API',
             'Appearance' => 'Išvaizda',
             'Notifications' => 'Pranešimai',
-            
+
             // General Settings
             'Application Name' => 'Programos pavadinimas',
             'Application Description' => 'Programos aprašymas',
@@ -866,7 +868,7 @@ final class SystemSettingsSeeder extends Seeder
             'Default Language' => 'Numatytoji kalba',
             'Maintenance Mode' => 'Priežiūros režimas',
             'Debug Mode' => 'Derinimo režimas',
-            
+
             // E-commerce Settings
             'Default Tax Rate' => 'Numatytasis PVM tarifas',
             'Minimum Order Amount' => 'Minimalus užsakymo dydis',
@@ -876,7 +878,7 @@ final class SystemSettingsSeeder extends Seeder
             'Allow Guest Checkout' => 'Leisti svečių užsakymus',
             'Enable Product Reviews' => 'Įjungti produktų atsiliepimus',
             'Enable Wishlist' => 'Įjungti pageidavimų sąrašą',
-            
+
             // Email Settings
             'From Email Address' => 'Siuntėjo el. pašto adresas',
             'From Name' => 'Siuntėjo vardas',
@@ -884,42 +886,42 @@ final class SystemSettingsSeeder extends Seeder
             'Admin Email' => 'Administratoriaus el. paštas',
             'Queue Emails' => 'El. laiškų eilė',
             'Email Rate Limit' => 'El. laiškų limitas',
-            
+
             // Payment Settings
             'Default Payment Method' => 'Numatytasis mokėjimo būdas',
             'Auto Approve Orders' => 'Automatinis užsakymų patvirtinimas',
             'Payment Timeout (minutes)' => 'Mokėjimo laiko limitas (minutės)',
-            
+
             // Shipping Settings
             'Default Shipping Method' => 'Numatytasis pristatymo būdas',
             'Default Shipping Cost' => 'Numatytasis pristatymo kaina',
             'Estimated Delivery Days' => 'Numatomi pristatymo dienos',
-            
+
             // SEO Settings
             'Default Meta Title' => 'Numatytasis meta pavadinimas',
             'Default Meta Description' => 'Numatytasis meta aprašymas',
             'Default Meta Keywords' => 'Numatytieji meta raktažodžiai',
             'Google Analytics ID' => 'Google Analytics ID',
             'Google Search Console Verification' => 'Google Search Console patvirtinimas',
-            
+
             // Security Settings
             'Minimum Password Length' => 'Minimalus slaptažodžio ilgis',
             'Require Special Characters' => 'Reikalauti specialių simbolių',
             'Session Timeout (minutes)' => 'Sesijos laiko limitas (minutės)',
             'Max Login Attempts' => 'Maksimalus prisijungimo bandymų skaičius',
             'Enable Two-Factor Authentication' => 'Įjungti dviejų faktorių autentifikavimą',
-            
+
             // API Settings
             'API Rate Limit' => 'API užklausų limitas',
             'API Key Length' => 'API rakto ilgis',
             'Enable API' => 'Įjungti API',
-            
+
             // Appearance Settings
             'Primary Color' => 'Pagrindinė spalva',
             'Secondary Color' => 'Antrinė spalva',
             'Logo URL' => 'Logotipo URL',
             'Favicon URL' => 'Favicon URL',
-            
+
             // Notification Settings
             'Enable Email Notifications' => 'Įjungti el. pašto pranešimus',
             'Enable SMS Notifications' => 'Įjungti SMS pranešimus',

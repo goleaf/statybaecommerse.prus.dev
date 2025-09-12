@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Support\Facades\Route;
+declare(strict_types=1);
+
 use App\Http\Controllers\ReportController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +21,7 @@ Route::prefix('reports')->name('reports.')->group(function () {
     Route::get('/', [ReportController::class, 'index'])->name('index');
     Route::get('/{report:slug}', [ReportController::class, 'show'])->name('show');
     Route::get('/{report:slug}/download', [ReportController::class, 'download'])->name('download');
-    
+
     // Authenticated routes
     Route::middleware('auth')->group(function () {
         Route::post('/{report:slug}/generate', [ReportController::class, 'generate'])->name('generate');

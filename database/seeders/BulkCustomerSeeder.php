@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -62,7 +64,7 @@ final class BulkCustomerSeeder extends Seeder
                 // Users batch
                 $usersBatch = [];
                 for ($i = $baseIndex; $i <= $end; $i++) {
-                    $name = 'Customer ' . $i;
+                    $name = 'Customer '.$i;
                     $usersBatch[] = [
                         'name' => $name,
                         'email' => sprintf('customer%05d@example.com', $i),
@@ -82,7 +84,7 @@ final class BulkCustomerSeeder extends Seeder
                 }
 
                 // Resolve IDs
-                $emails = array_map(fn($i) => sprintf('customer%05d@example.com', $i), range($baseIndex, $end));
+                $emails = array_map(fn ($i) => sprintf('customer%05d@example.com', $i), range($baseIndex, $end));
                 $insertedUsers = DB::table('users')->whereIn('email', $emails)->select('id', 'name', 'email')->get();
 
                 // Addresses batch
@@ -117,7 +119,7 @@ final class BulkCustomerSeeder extends Seeder
                         $addresses[] = array_merge($base, ['type' => 'shipping']);
                         $addresses[] = array_merge($base, ['type' => 'billing', 'is_default' => false]);
                     }
-                    if (!empty($addresses)) {
+                    if (! empty($addresses)) {
                         DB::table('addresses')->insert($addresses);
                         if (isset($addressesBar)) {
                             $addressesBar->advance(count($addresses));
@@ -130,7 +132,7 @@ final class BulkCustomerSeeder extends Seeder
                     $groupId = DB::table('customer_groups')->value('id');
                     if ($groupId) {
                         // init groups bar on first use
-                        if ($this->command && !isset($groupsBar)) {
+                        if ($this->command && ! isset($groupsBar)) {
                             $groupsBar = $this->command->getOutput()->createProgressBar($targetCount);
                             $groupsBar->setFormat('Groups: %current%/%max% [%bar%] %percent:3s%%');
                             $this->command->line('');

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('max_order_amount', 10, 2)->nullable()->after('min_order_amount');
             $table->decimal('free_shipping_threshold', 10, 2)->nullable()->after('max_order_amount');
             $table->boolean('is_active')->default(true)->after('is_default');
-            
+
             // Add indexes for better performance
             $table->index(['type', 'is_active']);
             $table->index(['currency_id', 'is_active']);
@@ -35,7 +35,7 @@ return new class extends Migration
             $table->dropIndex(['type', 'is_active']);
             $table->dropIndex(['currency_id', 'is_active']);
             $table->dropIndex(['priority', 'sort_order']);
-            
+
             $table->dropColumn([
                 'type',
                 'priority',
@@ -47,4 +47,3 @@ return new class extends Migration
         });
     }
 };
-

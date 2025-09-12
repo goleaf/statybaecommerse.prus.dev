@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
@@ -105,7 +107,7 @@ final class DiscountCodeResourceTest extends TestCase
         $codes = collect(range(1, 3))->map(function () use ($discountId) {
             return DiscountCode::query()->create([
                 'discount_id' => $discountId,
-                'code' => strtoupper('CODE' . rand(1000, 9999)),
+                'code' => strtoupper('CODE'.rand(1000, 9999)),
                 'expires_at' => now()->addMonth(),
                 'max_uses' => 500,
                 'usage_count' => 0,
@@ -247,5 +249,3 @@ final class DiscountCodeResourceTest extends TestCase
         $this->assertModelMissing($code);
     }
 }
-
-

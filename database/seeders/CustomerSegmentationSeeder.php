@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -21,7 +23,7 @@ final class CustomerSegmentationSeeder extends Seeder
                 'conditions' => [
                     'min_order_value' => 1000,
                     'min_orders' => 10,
-                    'loyalty_months' => 12
+                    'loyalty_months' => 12,
                 ],
             ],
             [
@@ -33,7 +35,7 @@ final class CustomerSegmentationSeeder extends Seeder
                 'is_active' => true,
                 'conditions' => [
                     'min_order_value' => 100,
-                    'min_orders' => 3
+                    'min_orders' => 3,
                 ],
             ],
             [
@@ -45,7 +47,7 @@ final class CustomerSegmentationSeeder extends Seeder
                 'is_active' => true,
                 'conditions' => [
                     'max_orders' => 1,
-                    'registration_days' => 30
+                    'registration_days' => 30,
                 ],
             ],
             [
@@ -57,7 +59,7 @@ final class CustomerSegmentationSeeder extends Seeder
                 'is_active' => true,
                 'conditions' => [
                     'min_quantity' => 50,
-                    'min_order_value' => 500
+                    'min_order_value' => 500,
                 ],
             ],
             [
@@ -69,7 +71,7 @@ final class CustomerSegmentationSeeder extends Seeder
                 'is_active' => true,
                 'conditions' => [
                     'customer_type' => 'business',
-                    'min_monthly_volume' => 5000
+                    'min_monthly_volume' => 5000,
                 ],
             ],
             [
@@ -81,7 +83,7 @@ final class CustomerSegmentationSeeder extends Seeder
                 'is_active' => false,
                 'conditions' => [
                     'last_order_days' => 180,
-                    'reactivation_campaign' => true
+                    'reactivation_campaign' => true,
                 ],
             ],
         ];

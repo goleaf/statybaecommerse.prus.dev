@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ReviewsSeeder extends Seeder
 {
@@ -58,7 +59,7 @@ class ReviewsSeeder extends Seeder
                 ->select('id', 'name', 'email')
                 ->get()
                 ->keyBy('id')
-                ->map(fn($u) => ['name' => $u->name ?? 'Customer', 'email' => $u->email ?? 'customer@example.com'])
+                ->map(fn ($u) => ['name' => $u->name ?? 'Customer', 'email' => $u->email ?? 'customer@example.com'])
                 ->all();
 
             $buffer = [];
@@ -127,7 +128,7 @@ class ReviewsSeeder extends Seeder
                 }
             }
 
-            if (!empty($buffer)) {
+            if (! empty($buffer)) {
                 DB::table('reviews')->insert($buffer);
             }
         });

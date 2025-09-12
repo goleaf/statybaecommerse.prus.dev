@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\ReferralReward;
-use App\Models\Referral;
-use App\Models\User;
 use App\Models\Order;
+use App\Models\Referral;
+use App\Models\ReferralReward;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 final class ReferralRewardSeeder extends Seeder
@@ -19,6 +21,7 @@ final class ReferralRewardSeeder extends Seeder
 
         if ($users->isEmpty() || $referrals->isEmpty()) {
             $this->command->warn('No users or referrals found. Please run UserSeeder and ReferralSeeder first.');
+
             return;
         }
 

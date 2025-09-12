@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Product;
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Review;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 final class EnhancedFilamentSeeder extends Seeder
 {
@@ -27,7 +29,7 @@ final class EnhancedFilamentSeeder extends Seeder
     {
         // Create admin role if not exists
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        
+
         // Create admin permissions
         $permissions = [
             'view_admin_panel',
@@ -92,6 +94,7 @@ final class EnhancedFilamentSeeder extends Seeder
 
         if ($users->isEmpty() || $products->isEmpty()) {
             $this->command->warn('⚠️ No users or products found for creating sample orders');
+
             return;
         }
 
@@ -105,7 +108,7 @@ final class EnhancedFilamentSeeder extends Seeder
             }
 
             Order::create([
-                'number' => 'ORD-' . str_pad($i, 6, '0', STR_PAD_LEFT),
+                'number' => 'ORD-'.str_pad($i, 6, '0', STR_PAD_LEFT),
                 'user_id' => $user->id,
                 'status' => ['pending', 'processing', 'shipped', 'delivered'][rand(0, 3)],
                 'payment_status' => ['pending', 'paid', 'failed'][rand(0, 2)],
@@ -129,6 +132,7 @@ final class EnhancedFilamentSeeder extends Seeder
 
         if ($users->isEmpty() || $products->isEmpty()) {
             $this->command->warn('⚠️ No users or products found for creating sample reviews');
+
             return;
         }
 
@@ -170,7 +174,7 @@ final class EnhancedFilamentSeeder extends Seeder
         foreach ($products as $product) {
             foreach (range(0, 30) as $daysAgo) {
                 $date = now()->subDays($daysAgo)->format('Y-m-d');
-                
+
                 \DB::table('product_analytics')->insertOrIgnore([
                     'product_id' => $product->id,
                     'date' => $date,

@@ -6,17 +6,17 @@ return [
     'slug' => 'URL adresas',
     'code' => 'Kodas',
     'description' => 'Aprašymas',
-    
+
     // Configuration
     'currency' => 'Valiuta',
     'tax_rate' => 'Mokesčio tarifas',
     'shipping_rate' => 'Pristatymo kaina',
     'sort_order' => 'Rūšiavimo tvarka',
-    
+
     // Status
     'is_enabled' => 'Aktyvus',
     'is_default' => 'Numatytasis',
-    
+
     // Relations
     'countries' => 'Šalys',
     'countries_count' => 'Šalių skaičius',
@@ -25,35 +25,35 @@ return [
     'orders' => 'Užsakymai',
     'price_lists' => 'Kainų sąrašai',
     'discounts' => 'Nuolaidos',
-    
+
     // Translations
     'translations' => 'Vertimai',
     'locale' => 'Kalba',
     'add_translation' => 'Pridėti vertimą',
-    
+
     // Metadata
     'metadata' => 'Metaduomenys',
     'key' => 'Raktas',
     'value' => 'Reikšmė',
-    
+
     // Timestamps
     'created_at' => 'Sukurta',
     'updated_at' => 'Atnaujinta',
     'deleted_at' => 'Ištrinta',
-    
+
     // Actions
     'create_zone' => 'Sukurti zoną',
     'edit_zone' => 'Redaguoti zoną',
     'view_zone' => 'Peržiūrėti zoną',
     'delete_zone' => 'Ištrinti zoną',
     'duplicate_zone' => 'Dublikuoti zoną',
-    
+
     // Messages
     'zone_created' => 'Zona sėkmingai sukurta',
     'zone_updated' => 'Zona sėkmingai atnaujinta',
     'zone_deleted' => 'Zona sėkmingai ištrinta',
     'zone_duplicated' => 'Zona sėkmingai dublikuota',
-    
+
     // Validation
     'name_required' => 'Pavadinimas yra privalomas',
     'slug_required' => 'URL adresas yra privalomas',
@@ -61,13 +61,13 @@ return [
     'currency_required' => 'Valiuta yra privaloma',
     'slug_unique' => 'URL adresas jau egzistuoja',
     'code_unique' => 'Kodas jau egzistuoja',
-    
+
     // Filters
     'filter_enabled' => 'Filtruoti pagal aktyvumą',
     'filter_default' => 'Filtruoti pagal numatytumą',
     'filter_currency' => 'Filtruoti pagal valiutą',
     'filter_countries' => 'Filtruoti pagal šalis',
-    
+
     // Statistics
     'total_zones' => 'Iš viso zonų',
     'active_zones' => 'Aktyvių zonų',
@@ -75,7 +75,7 @@ return [
     'zones_with_countries' => 'Zonų su šalimis',
     'average_tax_rate' => 'Vidutinis mokesčio tarifas',
     'total_shipping_cost' => 'Bendra pristatymo kaina',
-    
+
     // Frontend
     'select_zone' => 'Pasirinkite zoną',
     'zone_not_found' => 'Zona nerasta',
@@ -84,39 +84,39 @@ return [
     'tax_excluded' => 'Be mokesčių',
     'free_shipping' => 'Nemokamas pristatymas',
     'shipping_calculated' => 'Pristatymo kaina apskaičiuojama',
-    
+
     // Widgets
     'zone_overview' => 'Zonų apžvalga',
     'zone_statistics' => 'Zonų statistika',
     'recent_zones' => 'Paskutinės zonos',
     'zone_performance' => 'Zonų veikla',
     'zone_distribution' => 'Zonų pasiskirstymas',
-    
+
     // Export/Import
     'export_zones' => 'Eksportuoti zonas',
     'import_zones' => 'Importuoti zonas',
     'export_success' => 'Zonos sėkmingai eksportuotos',
     'import_success' => 'Zonos sėkmingai importuotos',
     'import_errors' => 'Importavimo klaidos',
-    
+
     // Bulk Actions
     'bulk_enable' => 'Aktyvuoti pasirinktas',
     'bulk_disable' => 'Deaktyvuoti pasirinktas',
     'bulk_delete' => 'Ištrinti pasirinktas',
     'bulk_export' => 'Eksportuoti pasirinktas',
-    
+
     // Search
     'search_zones' => 'Ieškoti zonų...',
     'no_zones_found' => 'Zonų nerasta',
     'search_results' => 'Paieškos rezultatai',
-    
+
     // Help
     'zone_help' => 'Zonos pagalba',
     'zone_description_help' => 'Zonos aprašymas padeda identifikuoti jos paskirtį',
     'tax_rate_help' => 'Mokesčio tarifas procentais (pvz., 21.00)',
     'shipping_rate_help' => 'Pristatymo kaina eurais (pvz., 5.99)',
     'metadata_help' => 'Papildomi metaduomenys JSON formatu',
-    
+
     // Additional fields
     'type' => 'Tipas',
     'type_shipping' => 'Pristatymas',
@@ -135,7 +135,7 @@ return [
     'meta_description' => 'Meta aprašymas',
     'meta_keywords' => 'Meta raktažodžiai',
     'meta_keywords_help' => 'Raktažodžiai atskirti kableliais',
-    
+
     // Help texts
     'is_enabled_help' => 'Ar zona yra įjungta ir gali būti naudojama',
     'is_active_help' => 'Ar zona yra aktyvi sistemoje',
@@ -144,15 +144,15 @@ return [
     'min_order_amount_help' => 'Minimali užsakymo suma šiai zonai',
     'max_order_amount_help' => 'Maksimali užsakymo suma šiai zonai',
     'free_shipping_threshold_help' => 'Užsakymo suma, nuo kurios pristatymas nemokamas',
-    
+
     // Bulk actions
     'bulk_activate' => 'Aktyvuoti pasirinktas',
     'bulk_deactivate' => 'Deaktyvuoti pasirinktas',
-    
+
     // Filters
     'has_countries' => 'Turintys šalis',
     'free_shipping_available' => 'Su nemokamu pristatymu',
-    
+
     // Widget translations
     'all_zones' => 'Visos zonos sistemoje',
     'available_zones' => 'Galimos naudoti zonos',
@@ -173,7 +173,7 @@ return [
     'zone_count' => 'Zonų skaičius',
     'recent_zones' => 'Paskutinės zonos',
     'recent_zones_desc' => 'Paskutinės sukurtos zonos',
-    
+
     // Frontend specific
     'zones_description' => 'Peržiūrėkite visas mūsų paslaugų zonas',
     'view_details' => 'Peržiūrėti detales',

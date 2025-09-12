@@ -29,4 +29,3 @@ return new class extends Migration
         Schema::dropIfExists('referral_reward_logs');
     }
 };
-

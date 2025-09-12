@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 it('serves robots.txt with sitemaps per locale', function (): void {
     config()->set('app.url', 'https://example.com');
@@ -12,5 +14,3 @@ it('serves robots.txt with sitemaps per locale', function (): void {
     $resp->assertSee('Sitemap: https://example.com/en/sitemap.xml');
     $resp->assertSee('Sitemap: https://example.com/fr/sitemap.xml');
 });
-
-

@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Models\User;
-use App\Models\VariantInventory;
-use App\Models\ProductVariant;
-use App\Models\Product;
 use App\Models\Location;
 use App\Models\Partner;
+use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\User;
+use App\Models\VariantInventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -21,7 +23,7 @@ class VariantStockResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->adminUser = User::factory()->create([
             'is_admin' => true,
         ]);
@@ -32,7 +34,7 @@ class VariantStockResourceTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
         $location = Location::factory()->create();
-        
+
         $variantStock = VariantInventory::factory()->create([
             'variant_id' => $variant->id,
             'location_id' => $location->id,
@@ -103,7 +105,7 @@ class VariantStockResourceTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
         $location = Location::factory()->create();
-        
+
         $variantStock = VariantInventory::factory()->create([
             'variant_id' => $variant->id,
             'location_id' => $location->id,
@@ -136,7 +138,7 @@ class VariantStockResourceTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
         $location = Location::factory()->create();
-        
+
         $variantStock = VariantInventory::factory()->create([
             'variant_id' => $variant->id,
             'location_id' => $location->id,
@@ -161,12 +163,12 @@ class VariantStockResourceTest extends TestCase
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
         $location1 = Location::factory()->create(['name' => 'Warehouse A']);
         $location2 = Location::factory()->create(['name' => 'Warehouse B']);
-        
+
         $stock1 = VariantInventory::factory()->create([
             'variant_id' => $variant->id,
             'location_id' => $location1->id,
         ]);
-        
+
         $stock2 = VariantInventory::factory()->create([
             'variant_id' => $variant->id,
             'location_id' => $location2->id,
@@ -185,14 +187,14 @@ class VariantStockResourceTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
         $location = Location::factory()->create();
-        
+
         $lowStock = VariantInventory::factory()->create([
             'variant_id' => $variant->id,
             'location_id' => $location->id,
             'stock' => 5,
             'threshold' => 10,
         ]);
-        
+
         $normalStock = VariantInventory::factory()->create([
             'variant_id' => $variant->id,
             'location_id' => $location->id,
@@ -213,13 +215,13 @@ class VariantStockResourceTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
         $location = Location::factory()->create();
-        
+
         $stock1 = VariantInventory::factory()->create([
             'variant_id' => $variant->id,
             'location_id' => $location->id,
             'stock' => 100,
         ]);
-        
+
         $stock2 = VariantInventory::factory()->create([
             'variant_id' => $variant->id,
             'location_id' => $location->id,
@@ -239,7 +241,7 @@ class VariantStockResourceTest extends TestCase
             'id' => $stock1->id,
             'stock' => 150,
         ]);
-        
+
         $this->assertDatabaseHas('variant_inventories', [
             'id' => $stock2->id,
             'stock' => 250,
@@ -251,7 +253,7 @@ class VariantStockResourceTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
         $location = Location::factory()->create();
-        
+
         $variantStock = VariantInventory::factory()->create([
             'variant_id' => $variant->id,
             'location_id' => $location->id,
@@ -278,7 +280,7 @@ class VariantStockResourceTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
         $location = Location::factory()->create();
-        
+
         $variantStock = VariantInventory::factory()->create([
             'variant_id' => $variant->id,
             'location_id' => $location->id,
@@ -305,7 +307,7 @@ class VariantStockResourceTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
         $location = Location::factory()->create();
-        
+
         // Create low stock items
         VariantInventory::factory()->count(3)->create([
             'variant_id' => $variant->id,
@@ -317,7 +319,7 @@ class VariantStockResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $badge = \App\Filament\Resources\VariantStockResource::getNavigationBadge();
-        
+
         $this->assertEquals('3', $badge);
     }
 
@@ -326,7 +328,7 @@ class VariantStockResourceTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
         $location = Location::factory()->create();
-        
+
         // Create out of stock items
         VariantInventory::factory()->count(2)->create([
             'variant_id' => $variant->id,
@@ -338,7 +340,7 @@ class VariantStockResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $badgeColor = \App\Filament\Resources\VariantStockResource::getNavigationBadgeColor();
-        
+
         $this->assertEquals('danger', $badgeColor);
     }
 }

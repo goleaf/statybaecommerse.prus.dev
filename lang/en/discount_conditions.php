@@ -126,4 +126,3 @@ return [
         'deleted' => 'Condition deleted successfully',
     ],
 ];
-

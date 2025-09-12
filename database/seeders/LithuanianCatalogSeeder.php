@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -14,7 +16,7 @@ final class LithuanianCatalogSeeder extends Seeder
 
     public function __construct()
     {
-        $this->imageGenerator = new LocalImageGeneratorService();
+        $this->imageGenerator = new LocalImageGeneratorService;
     }
 
     public function run(): void
@@ -326,7 +328,7 @@ final class LithuanianCatalogSeeder extends Seeder
                 'category_id' => $category->id,
                 'locale' => $loc,
                 'name' => $name,
-                'slug' => Str::slug($data['slug'] . '-' . $loc), // Ensure unique slugs per locale
+                'slug' => Str::slug($data['slug'].'-'.$loc), // Ensure unique slugs per locale
                 'description' => $this->translateLike((string) ($data['description'] ?? ''), $loc),
                 'seo_title' => $name,
                 'seo_description' => $this->translateLike('Statybinių prekių kategorija.', $loc),
@@ -340,8 +342,8 @@ final class LithuanianCatalogSeeder extends Seeder
             ['name', 'slug', 'description', 'seo_title', 'seo_description', 'updated_at']
         );
 
-        if ($category && ($category->wasRecentlyCreated || !$category->hasMedia('images')) && isset($data['image_url'])) {
-            $this->attachGeneratedImage($category, 'images', $data['name'] . ' Image');
+        if ($category && ($category->wasRecentlyCreated || ! $category->hasMedia('images')) && isset($data['image_url'])) {
+            $this->attachGeneratedImage($category, 'images', $data['name'].' Image');
         }
 
         if (isset($data['children']) && is_array($data['children'])) {
@@ -355,10 +357,10 @@ final class LithuanianCatalogSeeder extends Seeder
     {
         try {
             $imagePath = $this->imageGenerator->generateCategoryImage($category->name);
-            if (!file_exists($imagePath)) {
+            if (! file_exists($imagePath)) {
                 return;
             }
-            $filename = Str::slug($name) . '.webp';
+            $filename = Str::slug($name).'.webp';
             $category
                 ->addMedia($imagePath)
                 ->withCustomProperties(['source' => 'local_generated'])
@@ -374,7 +376,7 @@ final class LithuanianCatalogSeeder extends Seeder
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -385,10 +387,10 @@ final class LithuanianCatalogSeeder extends Seeder
     {
         return match ($locale) {
             'lt' => $text,
-            'en' => $text . ' (EN)',
-            'ru' => $text . ' (RU)',
-            'de' => $text . ' (DE)',
-            default => $text . ' (' . strtoupper($locale) . ')',
+            'en' => $text.' (EN)',
+            'ru' => $text.' (RU)',
+            'de' => $text.' (DE)',
+            default => $text.' ('.strtoupper($locale).')',
         };
     }
 }

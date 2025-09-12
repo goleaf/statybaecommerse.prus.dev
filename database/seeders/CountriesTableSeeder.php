@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -47,7 +49,7 @@ final class CountriesTableSeeder extends Seeder
         // Re-enable foreign key checks
         $this->enableForeignKeyChecks();
 
-        $this->command->info('European countries seeded successfully! Total: ' . count($countries));
+        $this->command->info('European countries seeded successfully! Total: '.count($countries));
     }
 
     private function disableForeignKeyChecks(): void
@@ -90,7 +92,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Albania', 'name_official' => 'Republic of Albania'],
                     'lt' => ['name' => 'Albanija', 'name_official' => 'Albanijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -105,7 +107,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Andorra', 'name_official' => 'Principality of Andorra'],
                     'lt' => ['name' => 'Andora', 'name_official' => 'Andoros Kunigaikštystė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -120,7 +122,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Austria', 'name_official' => 'Republic of Austria'],
                     'lt' => ['name' => 'Austrija', 'name_official' => 'Austrijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -135,7 +137,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Belarus', 'name_official' => 'Republic of Belarus'],
                     'lt' => ['name' => 'Baltarusija', 'name_official' => 'Baltarusijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -150,7 +152,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Belgium', 'name_official' => 'Kingdom of Belgium'],
                     'lt' => ['name' => 'Belgija', 'name_official' => 'Belgijos Karalystė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -165,7 +167,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Bosnia and Herzegovina', 'name_official' => 'Bosnia and Herzegovina'],
                     'lt' => ['name' => 'Bosnija ir Hercegovina', 'name_official' => 'Bosnija ir Hercegovina'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -180,7 +182,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Bulgaria', 'name_official' => 'Republic of Bulgaria'],
                     'lt' => ['name' => 'Bulgarija', 'name_official' => 'Bulgarijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -195,7 +197,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Croatia', 'name_official' => 'Republic of Croatia'],
                     'lt' => ['name' => 'Kroatija', 'name_official' => 'Kroatijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -210,7 +212,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Cyprus', 'name_official' => 'Republic of Cyprus'],
                     'lt' => ['name' => 'Kipras', 'name_official' => 'Kipro Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -225,7 +227,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Czech Republic', 'name_official' => 'Czech Republic'],
                     'lt' => ['name' => 'Čekija', 'name_official' => 'Čekijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -240,7 +242,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Denmark', 'name_official' => 'Kingdom of Denmark'],
                     'lt' => ['name' => 'Danija', 'name_official' => 'Danijos Karalystė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -255,7 +257,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Estonia', 'name_official' => 'Republic of Estonia'],
                     'lt' => ['name' => 'Estija', 'name_official' => 'Estijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -270,7 +272,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Faroe Islands', 'name_official' => 'Faroe Islands'],
                     'lt' => ['name' => 'Farerų salos', 'name_official' => 'Farerų salos'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -285,7 +287,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Finland', 'name_official' => 'Republic of Finland'],
                     'lt' => ['name' => 'Suomija', 'name_official' => 'Suomijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -300,7 +302,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'France', 'name_official' => 'French Republic'],
                     'lt' => ['name' => 'Prancūzija', 'name_official' => 'Prancūzijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -315,7 +317,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Germany', 'name_official' => 'Federal Republic of Germany'],
                     'lt' => ['name' => 'Vokietija', 'name_official' => 'Vokietijos Federacinė Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -330,7 +332,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Gibraltar', 'name_official' => 'Gibraltar'],
                     'lt' => ['name' => 'Gibraltaras', 'name_official' => 'Gibraltaras'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -345,7 +347,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Greece', 'name_official' => 'Hellenic Republic'],
                     'lt' => ['name' => 'Graikija', 'name_official' => 'Graikijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -360,7 +362,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Guernsey', 'name_official' => 'Bailiwick of Guernsey'],
                     'lt' => ['name' => 'Gernsis', 'name_official' => 'Gernsio Bailivikas'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -375,7 +377,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Hungary', 'name_official' => 'Hungary'],
                     'lt' => ['name' => 'Vengrija', 'name_official' => 'Vengrija'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -390,7 +392,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Iceland', 'name_official' => 'Iceland'],
                     'lt' => ['name' => 'Islandija', 'name_official' => 'Islandija'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -405,7 +407,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Ireland', 'name_official' => 'Republic of Ireland'],
                     'lt' => ['name' => 'Airija', 'name_official' => 'Airijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -420,7 +422,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Isle of Man', 'name_official' => 'Isle of Man'],
                     'lt' => ['name' => 'Meno sala', 'name_official' => 'Meno sala'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -435,7 +437,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Italy', 'name_official' => 'Italian Republic'],
                     'lt' => ['name' => 'Italija', 'name_official' => 'Italijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -450,7 +452,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Jersey', 'name_official' => 'Bailiwick of Jersey'],
                     'lt' => ['name' => 'Džersis', 'name_official' => 'Džersio Bailivikas'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -465,7 +467,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Latvia', 'name_official' => 'Republic of Latvia'],
                     'lt' => ['name' => 'Latvija', 'name_official' => 'Latvijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -480,7 +482,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Liechtenstein', 'name_official' => 'Principality of Liechtenstein'],
                     'lt' => ['name' => 'Lichtenšteinas', 'name_official' => 'Lichtenšteino Kunigaikštystė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -495,7 +497,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Lithuania', 'name_official' => 'Republic of Lithuania'],
                     'lt' => ['name' => 'Lietuva', 'name_official' => 'Lietuvos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -510,7 +512,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Luxembourg', 'name_official' => 'Grand Duchy of Luxembourg'],
                     'lt' => ['name' => 'Liuksemburgas', 'name_official' => 'Liuksemburgo Didžioji Hercogystė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -525,7 +527,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Malta', 'name_official' => 'Republic of Malta'],
                     'lt' => ['name' => 'Malta', 'name_official' => 'Maltos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -540,7 +542,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Moldova', 'name_official' => 'Republic of Moldova'],
                     'lt' => ['name' => 'Moldova', 'name_official' => 'Moldovos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -555,7 +557,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Monaco', 'name_official' => 'Principality of Monaco'],
                     'lt' => ['name' => 'Monakas', 'name_official' => 'Monako Kunigaikštystė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -570,7 +572,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Montenegro', 'name_official' => 'Montenegro'],
                     'lt' => ['name' => 'Juodkalnija', 'name_official' => 'Juodkalnija'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -585,7 +587,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Netherlands', 'name_official' => 'Kingdom of the Netherlands'],
                     'lt' => ['name' => 'Nyderlandai', 'name_official' => 'Nyderlandų Karalystė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -600,7 +602,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'North Macedonia', 'name_official' => 'Republic of North Macedonia'],
                     'lt' => ['name' => 'Šiaurės Makedonija', 'name_official' => 'Šiaurės Makedonijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -615,7 +617,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Norway', 'name_official' => 'Kingdom of Norway'],
                     'lt' => ['name' => 'Norvegija', 'name_official' => 'Norvegijos Karalystė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -630,7 +632,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Poland', 'name_official' => 'Republic of Poland'],
                     'lt' => ['name' => 'Lenkija', 'name_official' => 'Lenkijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -645,7 +647,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Portugal', 'name_official' => 'Portuguese Republic'],
                     'lt' => ['name' => 'Portugalija', 'name_official' => 'Portugalijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -660,7 +662,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Romania', 'name_official' => 'Romania'],
                     'lt' => ['name' => 'Rumunija', 'name_official' => 'Rumunija'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -675,7 +677,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Russia', 'name_official' => 'Russian Federation'],
                     'lt' => ['name' => 'Rusija', 'name_official' => 'Rusijos Federacija'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -690,7 +692,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'San Marino', 'name_official' => 'Republic of San Marino'],
                     'lt' => ['name' => 'San Marinas', 'name_official' => 'San Marino Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -705,7 +707,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Serbia', 'name_official' => 'Republic of Serbia'],
                     'lt' => ['name' => 'Serbija', 'name_official' => 'Serbijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -720,7 +722,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Slovakia', 'name_official' => 'Slovak Republic'],
                     'lt' => ['name' => 'Slovakija', 'name_official' => 'Slovakijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -735,7 +737,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Slovenia', 'name_official' => 'Republic of Slovenia'],
                     'lt' => ['name' => 'Slovėnija', 'name_official' => 'Slovėnijos Respublika'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -750,7 +752,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Spain', 'name_official' => 'Kingdom of Spain'],
                     'lt' => ['name' => 'Ispanija', 'name_official' => 'Ispanijos Karalystė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -765,7 +767,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Svalbard and Jan Mayen', 'name_official' => 'Svalbard and Jan Mayen'],
                     'lt' => ['name' => 'Svalbardas ir Jan Majenas', 'name_official' => 'Svalbardas ir Jan Majenas'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -780,7 +782,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Sweden', 'name_official' => 'Kingdom of Sweden'],
                     'lt' => ['name' => 'Švedija', 'name_official' => 'Švedijos Karalystė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -795,7 +797,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Switzerland', 'name_official' => 'Swiss Confederation'],
                     'lt' => ['name' => 'Šveicarija', 'name_official' => 'Šveicarijos Konfederacija'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -810,7 +812,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Ukraine', 'name_official' => 'Ukraine'],
                     'lt' => ['name' => 'Ukraina', 'name_official' => 'Ukraina'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -825,7 +827,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'United Kingdom', 'name_official' => 'United Kingdom of Great Britain and Northern Ireland'],
                     'lt' => ['name' => 'Jungtinė Karalystė', 'name_official' => 'Didžiosios Britanijos ir Šiaurės Airijos Jungtinė Karalystė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -840,7 +842,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Vatican City', 'name_official' => 'Vatican City State'],
                     'lt' => ['name' => 'Vatikanas', 'name_official' => 'Vatikano Miesto Valstybė'],
-                ]
+                ],
             ],
             [
                 'region' => 'Europe',
@@ -855,7 +857,7 @@ final class CountriesTableSeeder extends Seeder
                 'translations' => [
                     'en' => ['name' => 'Åland Islands', 'name_official' => 'Åland Islands'],
                     'lt' => ['name' => 'Alandų salos', 'name_official' => 'Alandų salos'],
-                ]
+                ],
             ],
         ];
     }

@@ -1,26 +1,29 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         // Reviews: indexes and FKs
         if (Schema::hasTable('reviews')) {
             Schema::table('reviews', function (Blueprint $table): void {
-                if (!$this->hasIndex('reviews', 'reviews_user_idx')) {
+                if (! $this->hasIndex('reviews', 'reviews_user_idx')) {
                     $table->index('user_id', 'reviews_user_idx');
                 }
-                if (!$this->hasIndex('reviews', 'reviews_product_idx')) {
+                if (! $this->hasIndex('reviews', 'reviews_product_idx')) {
                     $table->index('product_id', 'reviews_product_idx');
                 }
-                if (!$this->hasIndex('reviews', 'reviews_locale_idx')) {
+                if (! $this->hasIndex('reviews', 'reviews_locale_idx')) {
                     $table->index('locale', 'reviews_locale_idx');
                 }
-                if (!$this->hasIndex('reviews', 'reviews_approved_idx')) {
+                if (! $this->hasIndex('reviews', 'reviews_approved_idx')) {
                     $table->index('is_approved', 'reviews_approved_idx');
                 }
             });
@@ -32,7 +35,7 @@ return new class extends Migration {
         // Addresses: composite index already likely exists; ensure
         if (Schema::hasTable('addresses')) {
             Schema::table('addresses', function (Blueprint $table): void {
-                if (!$this->hasIndex('addresses', 'addresses_user_type_idx')) {
+                if (! $this->hasIndex('addresses', 'addresses_user_type_idx')) {
                     $table->index(['user_id', 'type'], 'addresses_user_type_idx');
                 }
             });
@@ -42,7 +45,7 @@ return new class extends Migration {
         // Orders: ensure user_id index exists (composite may exist)
         if (Schema::hasTable('orders')) {
             Schema::table('orders', function (Blueprint $table): void {
-                if (!$this->hasIndex('orders', 'orders_user_idx')) {
+                if (! $this->hasIndex('orders', 'orders_user_idx')) {
                     $table->index('user_id', 'orders_user_idx');
                 }
             });
@@ -52,10 +55,10 @@ return new class extends Migration {
         // Cart items: user/product indexes
         if (Schema::hasTable('cart_items')) {
             Schema::table('cart_items', function (Blueprint $table): void {
-                if (!$this->hasIndex('cart_items', 'cart_items_user_idx')) {
+                if (! $this->hasIndex('cart_items', 'cart_items_user_idx')) {
                     $table->index('user_id', 'cart_items_user_idx');
                 }
-                if (!$this->hasIndex('cart_items', 'cart_items_session_idx')) {
+                if (! $this->hasIndex('cart_items', 'cart_items_session_idx')) {
                     $table->index('session_id', 'cart_items_session_idx');
                 }
             });
@@ -65,10 +68,10 @@ return new class extends Migration {
         // User wishlists pivot
         if (Schema::hasTable('user_wishlists')) {
             Schema::table('user_wishlists', function (Blueprint $table): void {
-                if (!$this->hasIndex('user_wishlists', 'user_wishlists_user_idx')) {
+                if (! $this->hasIndex('user_wishlists', 'user_wishlists_user_idx')) {
                     $table->index('user_id', 'user_wishlists_user_idx');
                 }
-                if (!$this->hasIndex('user_wishlists', 'user_wishlists_product_idx')) {
+                if (! $this->hasIndex('user_wishlists', 'user_wishlists_product_idx')) {
                     $table->index('product_id', 'user_wishlists_product_idx');
                 }
             });
@@ -79,10 +82,10 @@ return new class extends Migration {
         // Discount redemptions (new table name without sh_ if exists)
         if (Schema::hasTable('discount_redemptions')) {
             Schema::table('discount_redemptions', function (Blueprint $table): void {
-                if (!$this->hasIndex('discount_redemptions', 'discount_redemptions_user_idx')) {
+                if (! $this->hasIndex('discount_redemptions', 'discount_redemptions_user_idx')) {
                     $table->index('user_id', 'discount_redemptions_user_idx');
                 }
-                if (!$this->hasIndex('discount_redemptions', 'discount_redemptions_order_idx')) {
+                if (! $this->hasIndex('discount_redemptions', 'discount_redemptions_order_idx')) {
                     $table->index('order_id', 'discount_redemptions_order_idx');
                 }
             });
@@ -93,10 +96,10 @@ return new class extends Migration {
         // Customer group user pivot
         if (Schema::hasTable('customer_group_user')) {
             Schema::table('customer_group_user', function (Blueprint $table): void {
-                if (!$this->hasIndex('customer_group_user', 'customer_group_user_user_idx')) {
+                if (! $this->hasIndex('customer_group_user', 'customer_group_user_user_idx')) {
                     $table->index('user_id', 'customer_group_user_user_idx');
                 }
-                if (!$this->hasIndex('customer_group_user', 'customer_group_user_group_idx')) {
+                if (! $this->hasIndex('customer_group_user', 'customer_group_user_group_idx')) {
                     $table->index('customer_group_id', 'customer_group_user_group_idx');
                 }
             });
@@ -125,8 +128,10 @@ return new class extends Migration {
             $driver = $connection->getDriverName();
             if ($driver === 'sqlite') {
                 $exists = DB::selectOne("SELECT name FROM sqlite_master WHERE type = 'index' AND name = ?", [$index]);
+
                 return (bool) $exists;
             }
+
             // Fallback: attempt to create and catch
             return false;
         } catch (\Throwable $e) {
@@ -134,4 +139,3 @@ return new class extends Migration {
         }
     }
 };
-

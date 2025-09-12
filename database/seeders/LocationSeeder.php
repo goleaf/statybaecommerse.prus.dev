@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\LocationTranslation;
 use App\Models\Location;
+use App\Models\Translations\LocationTranslation;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 final class LocationSeeder extends Seeder
 {
@@ -73,7 +74,7 @@ final class LocationSeeder extends Seeder
             // Create translations for each locale
             foreach ($locales as $locale) {
                 $translationData = $translations[$locale] ?? [];
-                $slug = $translationData['slug'] ?? $location->code . '-' . $locale;
+                $slug = $translationData['slug'] ?? $location->code.'-'.$locale;
                 LocationTranslation::updateOrCreate([
                     'location_id' => $location->id,
                     'locale' => $locale,
@@ -85,13 +86,13 @@ final class LocationSeeder extends Seeder
             }
         }
 
-        $this->command?->info('LocationSeeder: seeded locations with translations (locales: ' . implode(',', $locales) . ').');
+        $this->command?->info('LocationSeeder: seeded locations with translations (locales: '.implode(',', $locales).').');
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()

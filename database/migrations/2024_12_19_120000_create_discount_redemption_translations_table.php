@@ -33,4 +33,3 @@ return new class extends Migration
         Schema::dropIfExists('discount_redemption_translations');
     }
 };
-

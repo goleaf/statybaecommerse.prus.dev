@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -46,8 +48,9 @@ final class AttributeValueSeeder extends Seeder
 
         foreach ($map as $attrSlug => $values) {
             $attributeId = (int) DB::table('attributes')->where('slug', $attrSlug)->value('id');
-            if (!$attributeId) {
+            if (! $attributeId) {
                 $this->command?->warn("AttributeValueSeeder: attribute '{$attrSlug}' not found, skipping.");
+
                 continue;
             }
 
@@ -63,11 +66,15 @@ final class AttributeValueSeeder extends Seeder
                         'is_enabled' => true,
                         'created_at' => $now,
                         'updated_at' => $now,
-                    ]
-                ], ['attribute_id','slug'], ['value','sort_order','is_enabled','updated_at']);
+                    ],
+                ], ['attribute_id', 'slug'], ['value', 'sort_order', 'is_enabled', 'updated_at']);
 
                 $valueId = (int) DB::table('attribute_values')->where('attribute_id', $attributeId)->where('slug', $v['slug'])->value('id');
-                if (!$valueId) { $order++; continue; }
+                if (! $valueId) {
+                    $order++;
+
+                    continue;
+                }
 
                 // Translations per locale
                 $trRows = [];
@@ -83,8 +90,8 @@ final class AttributeValueSeeder extends Seeder
                 }
                 DB::table('attribute_value_translations')->upsert(
                     $trRows,
-                    ['attribute_value_id','locale'],
-                    ['value','key','updated_at']
+                    ['attribute_value_id', 'locale'],
+                    ['value', 'key', 'updated_at']
                 );
 
                 $order++;
@@ -97,9 +104,8 @@ final class AttributeValueSeeder extends Seeder
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()->values()->all();
     }
 }
-

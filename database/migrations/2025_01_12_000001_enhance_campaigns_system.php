@@ -4,79 +4,80 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         // Add campaign analytics and tracking
         if (Schema::hasTable('discount_campaigns')) {
             Schema::table('discount_campaigns', function (Blueprint $table) {
                 // Campaign performance metrics
-                if (!Schema::hasColumn('discount_campaigns', 'total_views')) {
+                if (! Schema::hasColumn('discount_campaigns', 'total_views')) {
                     $table->unsignedBigInteger('total_views')->default(0)->after('budget_limit');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'total_clicks')) {
+                if (! Schema::hasColumn('discount_campaigns', 'total_clicks')) {
                     $table->unsignedBigInteger('total_clicks')->default(0)->after('total_views');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'total_conversions')) {
+                if (! Schema::hasColumn('discount_campaigns', 'total_conversions')) {
                     $table->unsignedBigInteger('total_conversions')->default(0)->after('total_clicks');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'total_revenue')) {
+                if (! Schema::hasColumn('discount_campaigns', 'total_revenue')) {
                     $table->decimal('total_revenue', 12, 2)->default(0)->after('total_conversions');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'conversion_rate')) {
+                if (! Schema::hasColumn('discount_campaigns', 'conversion_rate')) {
                     $table->decimal('conversion_rate', 5, 2)->default(0)->after('total_revenue');
                 }
 
                 // Campaign targeting
-                if (!Schema::hasColumn('discount_campaigns', 'target_audience')) {
+                if (! Schema::hasColumn('discount_campaigns', 'target_audience')) {
                     $table->json('target_audience')->nullable()->after('conversion_rate');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'target_categories')) {
+                if (! Schema::hasColumn('discount_campaigns', 'target_categories')) {
                     $table->json('target_categories')->nullable()->after('target_audience');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'target_products')) {
+                if (! Schema::hasColumn('discount_campaigns', 'target_products')) {
                     $table->json('target_products')->nullable()->after('target_categories');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'target_customer_groups')) {
+                if (! Schema::hasColumn('discount_campaigns', 'target_customer_groups')) {
                     $table->json('target_customer_groups')->nullable()->after('target_products');
                 }
 
                 // Campaign display settings
-                if (!Schema::hasColumn('discount_campaigns', 'display_priority')) {
+                if (! Schema::hasColumn('discount_campaigns', 'display_priority')) {
                     $table->integer('display_priority')->default(0)->after('target_customer_groups');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'banner_image')) {
+                if (! Schema::hasColumn('discount_campaigns', 'banner_image')) {
                     $table->string('banner_image')->nullable()->after('display_priority');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'banner_alt_text')) {
+                if (! Schema::hasColumn('discount_campaigns', 'banner_alt_text')) {
                     $table->string('banner_alt_text')->nullable()->after('banner_image');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'cta_text')) {
+                if (! Schema::hasColumn('discount_campaigns', 'cta_text')) {
                     $table->string('cta_text')->nullable()->after('banner_alt_text');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'cta_url')) {
+                if (! Schema::hasColumn('discount_campaigns', 'cta_url')) {
                     $table->string('cta_url')->nullable()->after('cta_text');
                 }
 
                 // Campaign automation
-                if (!Schema::hasColumn('discount_campaigns', 'auto_start')) {
+                if (! Schema::hasColumn('discount_campaigns', 'auto_start')) {
                     $table->boolean('auto_start')->default(false)->after('cta_url');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'auto_end')) {
+                if (! Schema::hasColumn('discount_campaigns', 'auto_end')) {
                     $table->boolean('auto_end')->default(false)->after('auto_start');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'auto_pause_on_budget')) {
+                if (! Schema::hasColumn('discount_campaigns', 'auto_pause_on_budget')) {
                     $table->boolean('auto_pause_on_budget')->default(false)->after('auto_end');
                 }
 
                 // SEO and marketing
-                if (!Schema::hasColumn('discount_campaigns', 'meta_title')) {
+                if (! Schema::hasColumn('discount_campaigns', 'meta_title')) {
                     $table->string('meta_title')->nullable()->after('auto_pause_on_budget');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'meta_description')) {
+                if (! Schema::hasColumn('discount_campaigns', 'meta_description')) {
                     $table->text('meta_description')->nullable()->after('meta_title');
                 }
-                if (!Schema::hasColumn('discount_campaigns', 'social_media_ready')) {
+                if (! Schema::hasColumn('discount_campaigns', 'social_media_ready')) {
                     $table->boolean('social_media_ready')->default(false)->after('meta_description');
                 }
 
@@ -88,7 +89,7 @@ return new class extends Migration {
         }
 
         // Create campaign views tracking table
-        if (!Schema::hasTable('campaign_views')) {
+        if (! Schema::hasTable('campaign_views')) {
             Schema::create('campaign_views', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -106,7 +107,7 @@ return new class extends Migration {
         }
 
         // Create campaign clicks tracking table
-        if (!Schema::hasTable('campaign_clicks')) {
+        if (! Schema::hasTable('campaign_clicks')) {
             Schema::create('campaign_clicks', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -126,7 +127,7 @@ return new class extends Migration {
         }
 
         // Create campaign conversions tracking table
-        if (!Schema::hasTable('campaign_conversions')) {
+        if (! Schema::hasTable('campaign_conversions')) {
             Schema::create('campaign_conversions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -148,7 +149,7 @@ return new class extends Migration {
         }
 
         // Create campaign customer segments table
-        if (!Schema::hasTable('campaign_customer_segments')) {
+        if (! Schema::hasTable('campaign_customer_segments')) {
             Schema::create('campaign_customer_segments', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -163,7 +164,7 @@ return new class extends Migration {
         }
 
         // Create campaign product targets table
-        if (!Schema::hasTable('campaign_product_targets')) {
+        if (! Schema::hasTable('campaign_product_targets')) {
             Schema::create('campaign_product_targets', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -179,7 +180,7 @@ return new class extends Migration {
         }
 
         // Create campaign schedule table for recurring campaigns
-        if (!Schema::hasTable('campaign_schedules')) {
+        if (! Schema::hasTable('campaign_schedules')) {
             Schema::create('campaign_schedules', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -212,7 +213,7 @@ return new class extends Migration {
                     'target_audience', 'target_categories', 'target_products', 'target_customer_groups',
                     'display_priority', 'banner_image', 'banner_alt_text', 'cta_text', 'cta_url',
                     'auto_start', 'auto_end', 'auto_pause_on_budget', 'meta_title', 'meta_description',
-                    'social_media_ready'
+                    'social_media_ready',
                 ];
 
                 foreach ($columns as $column) {

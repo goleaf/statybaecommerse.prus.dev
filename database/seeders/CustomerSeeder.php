@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -66,7 +65,7 @@ class CustomerSeeder extends Seeder
                 'type' => $type,
                 'first_name' => $user->first_name ?? 'Customer',
                 'last_name' => $user->last_name ?? 'User',
-                'address_line_1' => 'Gedimino pr. ' . random_int(1, 50),
+                'address_line_1' => 'Gedimino pr. '.random_int(1, 50),
                 'city' => 'Vilnius',
                 'postal_code' => '01103',
                 'is_default' => $isDefault,

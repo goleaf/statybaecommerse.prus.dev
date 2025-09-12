@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         // Create coupon_products pivot table
-        if (!Schema::hasTable('coupon_products')) {
+        if (! Schema::hasTable('coupon_products')) {
             Schema::create('coupon_products', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('coupon_id')->constrained('coupons')->cascadeOnDelete();
@@ -23,7 +23,7 @@ return new class extends Migration
         }
 
         // Create coupon_categories pivot table
-        if (!Schema::hasTable('coupon_categories')) {
+        if (! Schema::hasTable('coupon_categories')) {
             Schema::create('coupon_categories', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('coupon_id')->constrained('coupons')->cascadeOnDelete();
@@ -37,7 +37,7 @@ return new class extends Migration
         }
 
         // Create coupon_usages table for tracking usage
-        if (!Schema::hasTable('coupon_usages')) {
+        if (! Schema::hasTable('coupon_usages')) {
             Schema::create('coupon_usages', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('coupon_id')->constrained('coupons')->cascadeOnDelete();
@@ -56,7 +56,7 @@ return new class extends Migration
         }
 
         // Add coupon_id to orders table if it doesn't exist
-        if (!Schema::hasColumn('orders', 'coupon_id')) {
+        if (! Schema::hasColumn('orders', 'coupon_id')) {
             Schema::table('orders', function (Blueprint $table) {
                 $table->foreignId('coupon_id')->nullable()->constrained('coupons')->nullOnDelete();
                 $table->index(['coupon_id']);
@@ -65,16 +65,16 @@ return new class extends Migration
 
         // Update coupons table to add missing fields
         Schema::table('coupons', function (Blueprint $table) {
-            if (!Schema::hasColumn('coupons', 'maximum_discount')) {
+            if (! Schema::hasColumn('coupons', 'maximum_discount')) {
                 $table->decimal('maximum_discount', 10, 2)->nullable()->after('minimum_amount');
             }
-            if (!Schema::hasColumn('coupons', 'usage_limit_per_user')) {
+            if (! Schema::hasColumn('coupons', 'usage_limit_per_user')) {
                 $table->integer('usage_limit_per_user')->nullable()->after('usage_limit');
             }
-            if (!Schema::hasColumn('coupons', 'applicable_products')) {
+            if (! Schema::hasColumn('coupons', 'applicable_products')) {
                 $table->json('applicable_products')->nullable()->after('expires_at');
             }
-            if (!Schema::hasColumn('coupons', 'applicable_categories')) {
+            if (! Schema::hasColumn('coupons', 'applicable_categories')) {
                 $table->json('applicable_categories')->nullable()->after('applicable_products');
             }
         });
@@ -96,9 +96,8 @@ return new class extends Migration
                 'maximum_discount',
                 'usage_limit_per_user',
                 'applicable_products',
-                'applicable_categories'
+                'applicable_categories',
             ]);
         });
     }
 };
-

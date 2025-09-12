@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -41,8 +43,8 @@ final class SeoDataSeeder extends Seeder
         Product::query()->limit(50)->get()->each(function (Product $product) use ($createFor): void {
             $createFor(Product::class, $product->id, [
                 'title' => [
-                    'lt' => mb_substr($product->name . ' | ' . config('app.name'), 0, 60),
-                    'en' => mb_substr($product->name . ' | ' . config('app.name'), 0, 60),
+                    'lt' => mb_substr($product->name.' | '.config('app.name'), 0, 60),
+                    'en' => mb_substr($product->name.' | '.config('app.name'), 0, 60),
                 ],
                 'description' => [
                     'lt' => mb_substr(strip_tags((string) $product->description), 0, 160),
@@ -53,8 +55,8 @@ final class SeoDataSeeder extends Seeder
                     'en' => implode(', ', array_filter([$product->name, $product->brand?->name])),
                 ],
                 'canonical_url' => [
-                    'lt' => url('/lt/products/' . $product->slug),
-                    'en' => url('/en/products/' . $product->slug),
+                    'lt' => url('/lt/products/'.$product->slug),
+                    'en' => url('/en/products/'.$product->slug),
                 ],
                 'meta_tags' => [
                     'lt' => ['og:type' => 'product'],
@@ -80,8 +82,8 @@ final class SeoDataSeeder extends Seeder
         Category::query()->limit(30)->get()->each(function (Category $category) use ($createFor): void {
             $createFor(Category::class, $category->id, [
                 'title' => [
-                    'lt' => mb_substr($category->name . ' | ' . config('app.name'), 0, 60),
-                    'en' => mb_substr($category->name . ' | ' . config('app.name'), 0, 60),
+                    'lt' => mb_substr($category->name.' | '.config('app.name'), 0, 60),
+                    'en' => mb_substr($category->name.' | '.config('app.name'), 0, 60),
                 ],
                 'description' => [
                     'lt' => mb_substr(strip_tags((string) $category->description), 0, 160),
@@ -92,8 +94,8 @@ final class SeoDataSeeder extends Seeder
                     'en' => implode(', ', array_filter([$category->name])),
                 ],
                 'canonical_url' => [
-                    'lt' => url('/lt/categories/' . $category->slug),
-                    'en' => url('/en/categories/' . $category->slug),
+                    'lt' => url('/lt/categories/'.$category->slug),
+                    'en' => url('/en/categories/'.$category->slug),
                 ],
                 'meta_tags' => [
                     'lt' => ['og:type' => 'website'],
@@ -109,8 +111,8 @@ final class SeoDataSeeder extends Seeder
         Brand::query()->limit(30)->get()->each(function (Brand $brand) use ($createFor): void {
             $createFor(Brand::class, $brand->id, [
                 'title' => [
-                    'lt' => mb_substr($brand->name . ' | ' . config('app.name'), 0, 60),
-                    'en' => mb_substr($brand->name . ' | ' . config('app.name'), 0, 60),
+                    'lt' => mb_substr($brand->name.' | '.config('app.name'), 0, 60),
+                    'en' => mb_substr($brand->name.' | '.config('app.name'), 0, 60),
                 ],
                 'description' => [
                     'lt' => mb_substr(strip_tags((string) $brand->description), 0, 160),
@@ -121,8 +123,8 @@ final class SeoDataSeeder extends Seeder
                     'en' => implode(', ', array_filter([$brand->name])),
                 ],
                 'canonical_url' => [
-                    'lt' => url('/lt/brands/' . $brand->slug),
-                    'en' => url('/en/brands/' . $brand->slug),
+                    'lt' => url('/lt/brands/'.$brand->slug),
+                    'en' => url('/en/brands/'.$brand->slug),
                 ],
                 'meta_tags' => [
                     'lt' => ['og:type' => 'website'],

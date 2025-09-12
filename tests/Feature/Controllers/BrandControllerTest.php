@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\Translations\BrandTranslation;
+declare(strict_types=1);
+
 use App\Models\Brand;
 use App\Models\Product;
+use App\Models\Translations\BrandTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -224,7 +226,7 @@ describe('BrandController', function () {
         $response = $this->get('/lt/brands/fallback-seo-brand');
 
         $response->assertStatus(200);
-        $response->assertViewHas('seoTitle', 'Translated Name - ' . config('app.name'));
+        $response->assertViewHas('seoTitle', 'Translated Name - '.config('app.name'));
         $response->assertViewHas('seoDescription', null);
     });
 });

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 $controllers = [
     \App\Http\Controllers\RobotsController::class,
@@ -23,7 +25,7 @@ $controllers = [
     \App\Http\Controllers\Auth\VerifyEmailController::class,
 ];
 
-dataset('controllers', fn() => $controllers);
+dataset('controllers', fn () => $controllers);
 
 it('controllers can be instantiated', function (string $class): void {
     $instance = app($class);

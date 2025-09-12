@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\StockResource\Pages\ListStocks;
 use App\Models\Inventory;
@@ -53,5 +55,3 @@ it('creates inventory record', function () {
         'quantity' => 5,
     ]);
 });
-
-

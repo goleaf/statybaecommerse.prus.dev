@@ -139,4 +139,3 @@ return [
         'url_copied' => 'URL copied to clipboard',
     ],
 ];
-

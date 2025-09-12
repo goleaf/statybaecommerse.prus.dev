@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
@@ -16,6 +18,7 @@ class LocationResourceTest extends TestCase
     use RefreshDatabase;
 
     protected User $adminUser;
+
     protected Country $country;
 
     protected function setUp(): void

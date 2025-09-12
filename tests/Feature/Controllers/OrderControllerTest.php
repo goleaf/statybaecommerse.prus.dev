@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\User;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 beforeEach(function (): void {
     $this->artisan('migrate', ['--force' => true]);
@@ -14,10 +16,21 @@ beforeEach(function (): void {
         });
     }
     if (! Schema::hasTable('discount_redemptions')) {
-        Schema::create('discount_redemptions', function ($table) { $table->id(); $table->unsignedBigInteger('discount_id'); $table->unsignedBigInteger('order_id'); $table->decimal('amount', 12, 2)->default(0); $table->timestamps(); });
+        Schema::create('discount_redemptions', function ($table) {
+            $table->id();
+            $table->unsignedBigInteger('discount_id');
+            $table->unsignedBigInteger('order_id');
+            $table->decimal('amount', 12, 2)->default(0);
+            $table->timestamps();
+        });
     }
     if (! Schema::hasTable('discounts')) {
-        Schema::create('discounts', function ($table) { $table->id(); $table->string('type')->nullable(); $table->string('code')->nullable(); $table->timestamps(); });
+        Schema::create('discounts', function ($table) {
+            $table->id();
+            $table->string('type')->nullable();
+            $table->string('code')->nullable();
+            $table->timestamps();
+        });
     }
 });
 
@@ -29,5 +42,3 @@ it('shows confirmation page for order number', function (): void {
     $resp = $this->get('/en/order/confirmed/ABC123');
     $resp->assertOk();
 });
-
-

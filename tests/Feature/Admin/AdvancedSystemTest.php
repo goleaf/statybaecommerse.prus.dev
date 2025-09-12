@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\CustomerGroup;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Livewire\Livewire;
-use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -60,7 +61,7 @@ it('can access all advanced admin pages', function () {
     foreach ($pages as $page) {
         $response = $this->actingAs($this->admin)->get($page);
         if ($response->status() !== 200) {
-            dump("Failed page: $page with status: " . $response->status());
+            dump("Failed page: $page with status: ".$response->status());
         }
         $response->assertOk();
     }
@@ -231,4 +232,3 @@ it('can perform comprehensive system monitoring', function () {
         ->test(\App\Filament\Pages\SystemMonitoring::class)
         ->assertOk();
 });
-
