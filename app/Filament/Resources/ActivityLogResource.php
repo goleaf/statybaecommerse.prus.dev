@@ -3,16 +3,16 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityLogResource\Pages;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
-use Filament\Tables;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
 use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
 use BackedEnum;
 use UnitEnum;
@@ -22,7 +22,6 @@ final class ActivityLogResource extends Resource
     protected static ?string $model = Activity::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-list';
-
 
     protected static ?int $navigationSort = 10;
 
@@ -79,7 +78,6 @@ final class ActivityLogResource extends Resource
                     ->formatStateUsing(fn(string $state): string => __('admin.activity_logs.log_types.' . $state, [], $state))
                     ->sortable()
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('event')
                     ->label(__('admin.activity_logs.table.event'))
                     ->badge()
@@ -98,7 +96,6 @@ final class ActivityLogResource extends Resource
                     })
                     ->formatStateUsing(fn(?string $state): string => $state ? __('admin.activity_logs.events.' . $state, [], $state) : '-')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('description')
                     ->label(__('admin.activity_logs.table.description'))
                     ->searchable()
@@ -107,32 +104,27 @@ final class ActivityLogResource extends Resource
                         $state = $column->getState();
                         return strlen($state) > 60 ? $state : null;
                     }),
-
                 Tables\Columns\TextColumn::make('subject_type')
                     ->label(__('admin.activity_logs.table.subject_type'))
                     ->formatStateUsing(fn(?string $state): string => $state ? __('admin.activity_logs.subject_types.' . $state, [], class_basename($state)) : '-')
                     ->badge()
                     ->color('primary')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('subject_id')
                     ->label(__('admin.activity_logs.table.subject_id'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-
                 Tables\Columns\TextColumn::make('causer.name')
                     ->label(__('admin.activity_logs.table.user'))
                     ->searchable()
                     ->sortable()
                     ->default(__('admin.activity_logs.details.system_generated'))
                     ->formatStateUsing(fn(?string $state, Activity $record): string => $record->causer?->name ?? __('admin.activity_logs.details.system_generated')),
-
                 Tables\Columns\TextColumn::make('ip_address')
                     ->label(__('admin.activity_logs.table.ip_address'))
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->copyable()
                     ->copyMessage(__('admin.activity_logs.table.ip_address') . ' ' . __('admin.copied')),
-
                 Tables\Columns\TextColumn::make('user_agent')
                     ->label(__('admin.activity_logs.table.user_agent'))
                     ->limit(50)
@@ -141,19 +133,16 @@ final class ActivityLogResource extends Resource
                         return $state ? $state : null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
-
                 Tables\Columns\TextColumn::make('batch_uuid')
                     ->label(__('admin.activity_logs.table.batch_uuid'))
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->copyable()
                     ->copyMessage(__('admin.activity_logs.table.batch_uuid') . ' ' . __('admin.copied')),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.activity_logs.table.date'))
                     ->dateTime('Y-m-d H:i:s')
                     ->sortable()
                     ->toggleable(),
-
                 Tables\Columns\IconColumn::make('has_properties')
                     ->label(__('admin.activity_logs.table.properties'))
                     ->boolean()
@@ -186,7 +175,6 @@ final class ActivityLogResource extends Resource
                         'security' => __('admin.activity_logs.log_types.security'),
                     ])
                     ->multiple(),
-
                 Tables\Filters\SelectFilter::make('event')
                     ->label(__('admin.activity_logs.filters.event'))
                     ->options([
@@ -202,7 +190,6 @@ final class ActivityLogResource extends Resource
                         'profile_updated' => __('admin.activity_logs.events.profile_updated'),
                     ])
                     ->multiple(),
-
                 Tables\Filters\SelectFilter::make('subject_type')
                     ->label(__('admin.activity_logs.filters.subject_type'))
                     ->options([
@@ -226,14 +213,12 @@ final class ActivityLogResource extends Resource
                         'App\Models\Currency' => __('admin.activity_logs.subject_types.App\Models\Currency'),
                     ])
                     ->multiple(),
-
                 Tables\Filters\SelectFilter::make('causer_id')
                     ->label(__('admin.activity_logs.filters.user'))
                     ->options(function () {
                         return \App\Models\User::pluck('name', 'id')->filter(fn($label) => filled($label))->toArray();
                     })
                     ->searchable(),
-
                 Tables\Filters\Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
@@ -252,11 +237,9 @@ final class ActivityLogResource extends Resource
                                 fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
-
                 Tables\Filters\Filter::make('has_properties')
                     ->label(__('admin.activity_logs.table.properties'))
                     ->query(fn(Builder $query): Builder => $query->whereNotNull('properties')),
-
                 Tables\Filters\Filter::make('system_activities')
                     ->label(__('admin.activity_logs.details.system_generated'))
                     ->query(fn(Builder $query): Builder => $query->whereNull('causer_id')),
@@ -273,19 +256,19 @@ final class ActivityLogResource extends Resource
                     })
                     ->modalWidth('7xl')
                     ->modalHeading(__('admin.activity_logs.details.title')),
-
                 Action::make('view_subject')
                     ->label(__('admin.view_subject'))
                     ->icon('heroicon-o-arrow-top-right-on-square')
-                    ->url(fn(Activity $record): ?string => $record->subject_type && $record->subject_id ? 
-                        match (class_basename($record->subject_type)) {
+                    ->url(fn(Activity $record): ?string => $record->subject_type && $record->subject_id
+                        ? match (class_basename($record->subject_type)) {
                             'Product' => route('filament.admin.resources.products.view', $record->subject_id),
                             'Order' => route('filament.admin.resources.orders.view', $record->subject_id),
                             'User' => route('filament.admin.resources.users.view', $record->subject_id),
                             'Category' => route('filament.admin.resources.categories.view', $record->subject_id),
                             'Brand' => route('filament.admin.resources.brands.view', $record->subject_id),
                             default => null,
-                        } : null)
+                        }
+                        : null)
                     ->openUrlInNewTab()
                     ->visible(fn(Activity $record): bool => $record->subject_type && $record->subject_id !== null),
             ])

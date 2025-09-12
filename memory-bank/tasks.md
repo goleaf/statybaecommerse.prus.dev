@@ -645,3 +645,11 @@ Type: Complex System
 - **Fixed CollectionResource type errors**: Added proper UnitEnum and BackedEnum imports and corrected property types
 - **Created missing Pages classes**: Added ListCollections, CreateCollection, and EditCollection pages for CollectionResource
 - **Current status**: 8 tests passing (26 assertions) - Collection model fully functional
+
+
+### ✅ OrderResourceTest.php - 17 tests passing (Fixed order totals formatting expectations)
+- **Fixed order totals display test failure**: Updated test expectations to match actual Order model data format
+- **Issue resolved**: Test expected raw float values but Order model returns formatted strings with 2 decimal places
+- **Root cause**: Order model casts decimal fields to formatted strings (e.g., 100.0 becomes '100.00')
+- **Solution**: Updated test expectations from float values to formatted string values with 2 decimal places
+- **Current status**: 17 tests passing (81 assertions) - OrderResource fully functional

@@ -21,8 +21,10 @@
                     <p class="mt-1 text-sm text-gray-900">
                         @if($record->user)
                             {{ $record->user->name }} (ID: {{ $record->user_id }})
+                        @elseif($record->user_id)
+                            User ID: {{ $record->user_id }}
                         @else
-                            {{ $record->user_id ?? 'N/A' }}
+                            Anonymous
                         @endif
                     </p>
                 </div>

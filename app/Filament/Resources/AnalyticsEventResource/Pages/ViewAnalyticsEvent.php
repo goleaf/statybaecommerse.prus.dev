@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\AnalyticsEventResource\Pages;
 
 use App\Filament\Resources\AnalyticsEventResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Actions;
 
 final class ViewAnalyticsEvent extends ViewRecord
 {

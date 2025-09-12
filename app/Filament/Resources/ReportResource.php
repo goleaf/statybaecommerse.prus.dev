@@ -104,28 +104,28 @@ final class ReportResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label(__('admin.form_name'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('type')
+                TextColumn::make('type')
                     ->label(__('admin.fields.report_type'))
                     ->badge()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('date_range')
+                TextColumn::make('date_range')
                     ->label(__('admin.fields.date_range'))
                     ->sortable(),
-                Tables\Columns\IconColumn::make('is_active')
+                IconColumn::make('is_active')
                     ->label(__('admin.products.status.active'))
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label(__('admin.fields.created_at'))
                     ->dateTime()
                     ->since()
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
+                SelectFilter::make('type')
                     ->label(__('admin.fields.report_type'))
                     ->options([
                         'sales' => __('admin.reports.sales_report'),
@@ -133,7 +133,7 @@ final class ReportResource extends Resource
                         'customers' => __('admin.reports.customer_analysis'),
                         'inventory' => __('admin.reports.inventory_report'),
                     ]),
-                Tables\Filters\TernaryFilter::make('is_active')
+                TernaryFilter::make('is_active')
                     ->label(__('admin.products.status.active')),
             ])
             ->actions([
