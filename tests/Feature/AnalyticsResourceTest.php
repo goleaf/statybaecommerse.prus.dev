@@ -5,6 +5,7 @@ use App\Filament\Resources\AnalyticsResource;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 

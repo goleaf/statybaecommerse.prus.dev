@@ -88,7 +88,7 @@ final class Country extends Model
         return $this->cca3;
     }
 
-    public function getPhoneCodeAttribute(): string
+    public function getPhoneCodeAttribute(): ?string
     {
         return $this->phone_calling_code;
     }

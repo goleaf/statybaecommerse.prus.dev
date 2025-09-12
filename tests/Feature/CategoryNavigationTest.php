@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Category;
 use App\Models\Translations\CategoryTranslation;
+use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -101,7 +101,7 @@ final class CategoryNavigationTest extends TestCase
     public function test_category_show_route_fails_without_parameter(): void
     {
         $this->expectException(\Illuminate\Routing\Exceptions\UrlGenerationException::class);
-        
+
         route('localized.categories.show', ['locale' => app()->getLocale()]);
     }
 }

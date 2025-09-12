@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -22,7 +20,8 @@ class BrandController extends Controller
             // Try to find by translated slug
             $brand = Brand::query()
                 ->whereHas('translations', function ($query) use ($slug) {
-                    $query->where('slug', $slug)
+                    $query
+                        ->where('slug', $slug)
                         ->where('locale', app()->getLocale());
                 })
                 ->where('is_enabled', true)
@@ -30,19 +29,12 @@ class BrandController extends Controller
         }
 
         if (!$brand) {
-            // Debug: Log what we're looking for
-            \Log::info('Brand not found', [
-                'slug' => $slug,
-                'locale' => app()->getLocale(),
-                'all_brands' => Brand::all()->pluck('slug'),
-                'all_translations' => \App\Models\Translations\BrandTranslation::all()->pluck('slug')
-            ]);
             abort(404);
         }
 
         // Get canonical slug for current locale
         $canonicalSlug = $this->getCanonicalSlug($brand);
-        
+
         // If the current slug is not the canonical slug, redirect
         if ($canonicalSlug !== $slug) {
             return redirect()->route('localized.brands.show', ['locale' => $locale, 'slug' => $canonicalSlug], 301);
@@ -56,7 +48,8 @@ class BrandController extends Controller
     private function getCanonicalSlug(Brand $brand): string
     {
         // Get translated slug for current locale, fallback to main slug
-        $translation = $brand->translations()
+        $translation = $brand
+            ->translations()
             ->where('locale', app()->getLocale())
             ->first();
 
