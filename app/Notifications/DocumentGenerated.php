@@ -30,7 +30,6 @@ final class DocumentGenerated extends Notification
             : app()->getLocale();
 
         $message = (new MailMessage)
-            ->locale($locale)
             ->subject(__('documents.email.subject', ['title' => $this->document->title], $locale))
             ->greeting(__('documents.email.greeting', ['name' => $notifiable->name], $locale))
             ->line(__('documents.email.generated', [

@@ -9,6 +9,12 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkAction;
 
 final class ChildrenRelationManager extends RelationManager
 {
@@ -53,9 +59,9 @@ final class ChildrenRelationManager extends RelationManager
                     }),
             ])
             ->recordActions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
                 Action::make('detach_child')
                     ->label(__('translations.detach_child'))
                     ->icon('heroicon-o-arrow-uturn-left')
@@ -65,9 +71,9 @@ final class ChildrenRelationManager extends RelationManager
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('bulk_detach')
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    BulkAction::make('bulk_detach')
                         ->label(__('translations.bulk_detach'))
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->action(function ($records): void {

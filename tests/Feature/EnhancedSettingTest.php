@@ -358,7 +358,7 @@ final class EnhancedSettingTest extends TestCase
             $this->markTestSkipped('POST route not available - requires Filament resource configuration');
             return;
         }
-        
+
         // Should fail validation and return back with errors
         $response->assertStatus(302);  // Redirect back with errors
         $response->assertSessionHasErrors(['key']);

@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Models\User;
-use App\Notifications\TestNotification;
-use App\Notifications\LowStockAlert;
 use App\Models\Product;
+use App\Models\User;
+use App\Notifications\LowStockAlert;
+use App\Notifications\TestNotification;
 use Illuminate\Console\Command;
 
 final class CreateTestNotifications extends Command
@@ -63,7 +63,7 @@ final class CreateTestNotifications extends Command
 
         // Create low stock alerts if products exist
         $lowStockProducts = Product::where('stock_quantity', '<=', 10)->take(3)->get();
-        
+
         foreach ($lowStockProducts as $product) {
             foreach ($adminUsers as $user) {
                 $user->notify(new LowStockAlert($product));
@@ -71,9 +71,9 @@ final class CreateTestNotifications extends Command
         }
 
         $totalNotifications = $adminUsers->count() * count($notifications) + ($lowStockProducts->count() * $adminUsers->count());
-        
-        $this->info("Created {$totalNotifications} test notifications for " . $adminUsers->count() . " admin users.");
-        $this->info("Check the notification bell icon in the admin panel!");
+
+        $this->info("Created {$totalNotifications} test notifications for " . $adminUsers->count() . ' admin users.');
+        $this->info('Check the notification bell icon in the admin panel!');
 
         return 0;
     }

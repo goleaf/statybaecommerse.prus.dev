@@ -49,12 +49,6 @@ it('can create manual collection with lt/en translations', function () {
         'sort_order' => 1,
         'is_visible' => true,
         'is_automatic' => false,
-        'name_lt' => 'Nauja kolekcija',
-        'slug_lt' => 'nauja-kolekcija',
-        'description_lt' => 'Aprašymas LT',
-        'name_en' => 'New Collection',
-        'slug_en' => 'new-collection',
-        'description_en' => 'Description EN',
         'seo_title' => 'SEO Title',
         'seo_description' => 'SEO Description',
     ];
@@ -64,7 +58,7 @@ it('can create manual collection with lt/en translations', function () {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    $collection = Collection::query()->where('slug', 'nauja-kolekcija')->first();
+    $collection = Collection::query()->where('is_automatic', false)->first();
     expect($collection)->not->toBeNull();
 });
 

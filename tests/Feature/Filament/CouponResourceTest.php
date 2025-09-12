@@ -4,8 +4,12 @@ use App\Filament\Resources\CouponResource;
 use Illuminate\Support\Str;
 use App\Models\User;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
+    // Create the admin role if it doesn't exist
+    Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+    
     $this->admin = User::factory()->create();
     $this->admin->assignRole('admin');
     $this->actingAs($this->admin);

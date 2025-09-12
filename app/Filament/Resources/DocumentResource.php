@@ -48,7 +48,7 @@ final class DocumentResource extends Resource
                             ->preload()
                             ->required()
                             ->live()
-                            ->afterStateUpdated(function (Forms\Set $set, $state) {
+                            ->afterStateUpdated(function (\Filament\Schemas\Components\Utilities\Set $set, $state) {
                                 if ($state) {
                                     $template = DocumentTemplate::find($state);
                                     if ($template) {

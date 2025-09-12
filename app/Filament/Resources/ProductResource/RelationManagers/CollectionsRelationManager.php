@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 
 final class CollectionsRelationManager extends RelationManager
@@ -72,7 +73,7 @@ final class CollectionsRelationManager extends RelationManager
                 DetachAction::make(),
             ])
             ->toolbarActions([
-                Tables\Actions\BulkActionGroup::make([
+                BulkActionGroup::make([
                     DetachBulkAction::make(),
                 ]),
             ]);
