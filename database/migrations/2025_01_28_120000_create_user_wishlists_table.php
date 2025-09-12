@@ -11,12 +11,15 @@ return new class extends Migration
         Schema::create('user_wishlists', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->boolean('is_public')->default(false);
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
+            $table->softDeletes();
 
-            $table->unique(['user_id', 'product_id']);
             $table->index(['user_id']);
-            $table->index(['product_id']);
+            $table->index(['is_default']);
         });
     }
 

@@ -242,7 +242,10 @@ final class EnhancedSettingTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        $setting = EnhancedSetting::factory()->text()->create();
+        $setting = EnhancedSetting::factory()->create([
+            'type' => 'text',
+            'value' => 'test value'
+        ]);
 
         $response = $this->get("/admin/normal-settings/{$setting->id}");
 
@@ -253,7 +256,10 @@ final class EnhancedSettingTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        $setting = EnhancedSetting::factory()->text()->create();
+        $setting = EnhancedSetting::factory()->create([
+            'type' => 'text',
+            'value' => 'test value'
+        ]);
 
         $response = $this->get("/admin/normal-settings/{$setting->id}/edit");
 

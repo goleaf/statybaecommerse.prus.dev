@@ -53,11 +53,6 @@ it('brand show redirects to canonical slug', function (): void {
     DB::table('brand_translations')->insert(['brand_id' => $id, 'locale' => 'en', 'name' => 'Acme Inc', 'slug' => 'acme-inc', 'created_at' => now(), 'updated_at' => now()]);
 
     config()->set('app-features.features.brand', true);
-    
-    // Skip this test due to persistent Blade syntax error in app.blade.php
-    // The error is: "syntax error, unexpected end of file" at line 141
-    // This appears to be a compilation issue with the Blade template
-    $this->markTestSkipped('Skipping due to persistent Blade syntax error in app.blade.php compilation');
-    
+
     $this->get('/en/brands/acme')->assertRedirect('/en/brands/acme-inc');
 });

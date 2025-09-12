@@ -9,6 +9,10 @@ use Livewire\Livewire;
 
 it('renders home page', function () {
     $this->get('/')
+        ->assertRedirect('/lt'); // Root redirects to localized home
+    
+    // Test the actual localized home page
+    $this->get('/lt')
         ->assertOk()
         ->assertSee('Profesionalūs įrankiai'); // Check for Lithuanian text
 });

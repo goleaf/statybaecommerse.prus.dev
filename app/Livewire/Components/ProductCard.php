@@ -18,7 +18,20 @@ final class ProductCard extends Component
     public function addToCart(): void
     {
         $this->dispatch('add-to-cart', productId: $this->product->id, quantity: 1);
-
+        
+        // Track analytics
+        \App\Models\AnalyticsEvent::create([
+            'event_type' => 'add_to_cart',
+            'user_id' => auth()->id(),
+            'session_id' => session()->getId(),
+            'properties' => [
+                'productId' => $this->product->id,
+                'product_name' => $this->product->name,
+                'product_price' => $this->product->price,
+            ],
+            'created_at' => now(),
+        ]);
+        
         $this->dispatch('notify', [
             'type' => 'success',
             'message' => 'Produktas pridėtas į krepšelį!',

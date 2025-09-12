@@ -30,6 +30,13 @@ class BrandController extends Controller
         }
 
         if (!$brand) {
+            // Debug: Log what we're looking for
+            \Log::info('Brand not found', [
+                'slug' => $slug,
+                'locale' => app()->getLocale(),
+                'all_brands' => Brand::all()->pluck('slug'),
+                'all_translations' => \App\Models\Translations\BrandTranslation::all()->pluck('slug')
+            ]);
             abort(404);
         }
 

@@ -203,6 +203,7 @@
                     'position' => $position++,
                     'name' => $cat->trans('name') ?? $cat->name,
                     'item' => route('localized.categories.show', [
+                        'locale' => app()->getLocale(),
                         'category' => $cat->trans('slug') ?? $cat->slug,
                     ]),
                 ];
