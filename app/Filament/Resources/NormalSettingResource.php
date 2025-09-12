@@ -9,13 +9,13 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Builder;
 use BackedEnum;
 use UnitEnum;
@@ -147,11 +147,11 @@ class NormalSettingResource extends Resource
                         Forms\Components\Toggle::make('is_encrypted')
                             ->label(__('Is Encrypted'))
                             ->helperText(__('Sensitive settings will be encrypted in database')),
-            Forms\Components\Textarea::make('validation_rules')
-                ->label(__('Validation Rules'))
-                ->helperText(__('Laravel validation rules in key-value format'))
-                ->formatStateUsing(fn ($state) => is_array($state) ? json_encode($state, JSON_PRETTY_PRINT) : $state)
-                ->dehydrateStateUsing(fn ($state) => is_string($state) ? json_decode($state, true) : $state),
+                        Forms\Components\Textarea::make('validation_rules')
+                            ->label(__('Validation Rules'))
+                            ->helperText(__('Laravel validation rules in key-value format'))
+                            ->formatStateUsing(fn($state) => is_array($state) ? json_encode($state, JSON_PRETTY_PRINT) : $state)
+                            ->dehydrateStateUsing(fn($state) => is_string($state) ? json_decode($state, true) : $state),
                     ])
                     ->columns(2),
             ]);

@@ -257,6 +257,11 @@ Type: Complex System
   - Added missing admin monitoring translation keys for SystemMonitoring page
   - Fixed marketing email test by simplifying to check page load instead of complex notification flow
   - All 12 AdvancedSystemTest cases now passing with 33 assertions
+- ✅ **ImportFromDocsTest:** Fixed all 2 test cases
+  - Fixed CategoryDocsImporter service syntax error by adding missing closing braces
+  - Created missing Livewire Admin Categories Index component with proper pagination and search
+  - Created corresponding Blade view with table layout and sorting functionality
+  - All 2 ImportFromDocsTest cases now passing with 4 assertions
 - 🔄 **AccountPagesTest:** Partially fixed - addresses issue resolved, but view compilation error persists
   - Fixed addresses table migration to include deleted_at column for soft deletes
   - Fixed Reviews component to properly load user reviews data
@@ -293,7 +298,9 @@ Type: Complex System
     - Fixed JSON-LD syntax error in footer.blade.php (removed malformed JSON-LD section)
     - Fixed double @ symbols in JSON-LD context and type fields
     - Dashboard test now working (account dashboard loads successfully)
-    - Remaining issue: syntax error in app.blade.php (unexpected end of file)
+    - Remaining issue: syntax error in app.blade.php (unexpected end of file at line 141 in compiled view)
+    - All Blade directives properly matched (if/endif, foreach/endforeach, etc.)
+    - Issue may be in included components (header, footer, or other components)
   - Successfully committed all changes to git (commits af6f991 and 1f39a94)
 
 ## Recent Test Fixes Completed

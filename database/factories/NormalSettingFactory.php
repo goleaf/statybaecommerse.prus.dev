@@ -20,7 +20,7 @@ final class NormalSettingFactory extends Factory
     public function definition(): array
     {
         $type = $this->faker->randomElement(['text', 'number', 'boolean', 'json', 'array']);
-        $value = match($type) {
+        $value = match ($type) {
             'json', 'array' => json_encode(['key1' => 'value1', 'key2' => 'value2']),
             'number' => (string) $this->faker->numberBetween(1, 1000),
             'boolean' => $this->faker->boolean() ? '1' : '0',
