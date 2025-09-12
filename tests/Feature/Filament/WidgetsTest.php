@@ -218,7 +218,7 @@ class WidgetsTest extends TestCase
         $description = $widget->getDescription();
 
         expect($description)->not()->toBeNull();
-        expect($description)->toContain('30 days');
+        expect($description)->toContain('30 dienų');
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
