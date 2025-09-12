@@ -68,11 +68,16 @@ it('can add product to wishlist when authenticated', function () {
 });
 
 it('shows login required message when adding to wishlist as guest', function () {
-    Livewire::test(ProductCard::class, ['product' => $this->product])
-        ->call('toggleWishlist')
-        ->assertDispatched('notify', [
-            'type' => 'warning',
-        ]);
+    $component = Livewire::test(ProductCard::class, ['product' => $this->product])
+        ->call('toggleWishlist');
+    
+    // Debug: Let's see what events were dispatched
+    $dispatchedEvents = $component->dispatched();
+    dump('Dispatched events:', $dispatchedEvents);
+    
+    $component->assertDispatched('notify', [
+        'type' => 'warning',
+    ]);
 });
 
 it('can remove product from wishlist', function () {

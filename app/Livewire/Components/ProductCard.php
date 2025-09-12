@@ -25,7 +25,7 @@ final class ProductCard extends Component
             'user_id' => auth()->id(),
             'session_id' => session()->getId(),
             'properties' => [
-                'productId' => $this->product->id,
+                'product_id' => $this->product->id,
                 'product_name' => $this->product->name,
                 'product_price' => $this->product->price,
             ],
@@ -119,7 +119,7 @@ final class ProductCard extends Component
             'user_id' => auth()->id(),
             'session_id' => session()->getId(),
             'properties' => [
-                'productId' => $this->product->id,
+                'product_id' => $this->product->id,
                 'product_name' => $this->product->name,
                 'product_price' => $this->product->price,
             ],

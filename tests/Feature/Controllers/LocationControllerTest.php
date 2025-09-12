@@ -9,7 +9,9 @@ beforeEach(function (): void {
         Schema::create('locations', function ($table) {
             $table->id();
             $table->string('name');
+            $table->string('code')->nullable();
             $table->boolean('is_default')->default(false);
+            $table->boolean('is_enabled')->default(true);
             $table->timestamps();
         });
     }
@@ -23,7 +25,12 @@ it('lists locations', function (): void {
 });
 
 it('shows a location', function (): void {
-    $id = DB::table('locations')->insertGetId(['name' => 'Main', 'is_default' => true]);
+    $id = DB::table('locations')->insertGetId([
+        'name' => 'Main', 
+        'code' => 'main-location',
+        'is_default' => true
+    ]);
 
-    $this->get('/en/locations/' . $id)->assertOk();
+    // Use the code as the slug parameter instead of ID
+    $this->get('/en/locations/main-location')->assertOk();
 });
