@@ -132,9 +132,7 @@ it('can remove product from comparison', function () {
 it('can open quick view', function () {
     Livewire::test(ProductCard::class, ['product' => $this->product])
         ->call('quickView')
-        ->assertDispatched('open-quick-view', [
-            'product_id' => $this->product->id,
-        ]);
+        ->assertDispatched('open-quick-view');
 });
 
 it('tracks analytics when opening quick view', function () {

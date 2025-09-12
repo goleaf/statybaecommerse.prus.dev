@@ -16,7 +16,8 @@ class OrderSeeder extends Seeder
             $currency = \App\Models\Currency::query()->where('code', 'EUR')->first()
                 ?: \App\Models\Currency::query()->where('is_default', true)->first();
 
-            $zone = \App\Models\Zone::query()->first();
+            $zone = \App\Models\Zone::query()->where('currency_id', $currency->id)->first()
+                ?: \App\Models\Zone::query()->first();
             $channelId = \App\Models\Channel::query()->value('id');
 
             if (!$currency || !$zone || !$channelId) {

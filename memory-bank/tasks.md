@@ -196,6 +196,8 @@ Type: Complex System
    - [x] Fixed AnalyticsResourceTest reference column issue (removed non-existent field)
    - [x] Fixed AnalyticsResourceTest translation key mismatch
    - [ ] AnalyticsResourceTest table record loading issues (complex Filament testing)
+   - [x] Fixed CampaignResourceTest (passed successfully)
+   - [ ] AccountPagesTest Blade template syntax error (complex view compilation issue)
 
 3. **Security Verification**
    - [ ] Test 2FA enrollment and recovery flows

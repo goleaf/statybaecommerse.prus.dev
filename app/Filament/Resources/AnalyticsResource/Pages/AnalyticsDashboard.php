@@ -8,6 +8,7 @@ use App\Filament\Widgets\OrdersChartWidget;
 use App\Filament\Widgets\TopSellingProductsWidget;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 
 final class AnalyticsDashboard extends ListRecords
 {
@@ -27,7 +28,10 @@ final class AnalyticsDashboard extends ListRecords
                 ->color('success')
                 ->action(function () {
                     // Export analytics report logic
-                    $this->notify('success', __('analytics.report_exported_successfully'));
+                    Notification::make()
+                        ->title(__('analytics.report_exported_successfully'))
+                        ->success()
+                        ->send();
                 }),
             Actions\Action::make('refresh_data')
                 ->label(__('analytics.refresh_data'))
@@ -35,7 +39,10 @@ final class AnalyticsDashboard extends ListRecords
                 ->action(function () {
                     // Clear analytics cache
                     cache()->tags(['analytics'])->flush();
-                    $this->notify('success', __('analytics.data_refreshed_successfully'));
+                    Notification::make()
+                        ->title(__('analytics.data_refreshed_successfully'))
+                        ->success()
+                        ->send();
                 }),
         ];
     }
