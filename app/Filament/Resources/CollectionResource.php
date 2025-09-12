@@ -9,15 +9,14 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 final class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
-
 
     protected static ?int $navigationSort = 3;
 

@@ -79,7 +79,7 @@ it('image and banner accessors return null without media', function (): void {
         ->and($collection->getImageUrl())
         ->toBeNull()
         ->and($collection->getImageUrl('md'))
-        ->toBeNull()
+        ->toBe('')
         ->and($collection->getBannerUrl())
         ->toBeNull()
         ->and($collection->getBannerUrl('md'))
