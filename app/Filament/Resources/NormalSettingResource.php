@@ -119,7 +119,9 @@ class NormalSettingResource extends Resource
                             ->visible(fn(Get $get) => in_array($get('type'), ['json', 'array']))
                             ->keyLabel(__('Key'))
                             ->valueLabel(__('Value'))
-                            ->default([]),
+                            ->default([])
+                            ->formatStateUsing(fn($state) => is_array($state) ? $state : [])
+                            ->dehydrateStateUsing(fn($state) => is_array($state) ? $state : []),
                         Forms\Components\Select::make('value')
                             ->label(__('Value'))
                             ->visible(fn(Get $get) => $get('type') === 'select')

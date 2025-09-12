@@ -35,8 +35,8 @@ describe('User Impersonation Integration', function () {
         expect(auth()->id())->toBe($targetUser->id);
         
         // Stop impersonation
-        $component = Livewire::test(\App\Filament\Pages\UserImpersonation::class);
-        $component->call('stopImpersonation');
+        $page = new \App\Filament\Pages\UserImpersonation();
+        $page->stopImpersonation();
         
         // Verify session is cleared
         expect(session('impersonate'))->toBeNull();
@@ -118,8 +118,8 @@ describe('User Impersonation Integration', function () {
         $orders = Order::factory()->count(2)->create(['user_id' => $user->id]);
         
         // Test that orders are displayed in the table
-        $component = Livewire::test(\App\Filament\Pages\UserImpersonation::class);
-        expect($component->get('tableRecords'))->toContain($user);
+        $this->get('/admin/user-impersonation')
+            ->assertSee($user->email);
     });
 
     it('handles impersonation with middleware correctly', function () {

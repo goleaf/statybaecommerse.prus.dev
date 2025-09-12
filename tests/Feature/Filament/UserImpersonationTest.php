@@ -66,12 +66,12 @@ describe('User Impersonation Page Functionality', function () {
         $users = User::factory()->count(3)->create(['is_admin' => false]);
         
         $this->get('/admin/user-impersonation')
-            ->assertSee(__('admin.table.name'))
-            ->assertSee(__('admin.table.email'))
-            ->assertSee(__('admin.table.orders'))
-            ->assertSee(__('admin.table.created_at'))
-            ->assertSee(__('admin.table.last_login'))
-            ->assertSee(__('admin.table.status'));
+            ->assertSee('Pavadinimas') // Name in Lithuanian
+            ->assertSee('El. paštas') // Email in Lithuanian
+            ->assertSee('užsakymai') // Orders in Lithuanian
+            ->assertSee('Sukurta') // Created At in Lithuanian
+            ->assertSee('Paskutinis prisijungimas') // Last Login in Lithuanian
+            ->assertSee('Būsena'); // Status in Lithuanian
     });
 
     it('filters out admin users from impersonation list', function () {
@@ -140,8 +140,9 @@ describe('User Impersonation Actions', function () {
         ]);
         auth()->login($targetUser);
         
-        $component = Livewire::test(\App\Filament\Pages\UserImpersonation::class);
-        $component->call('stopImpersonation');
+        // Test the stopImpersonation method directly
+        $page = new \App\Filament\Pages\UserImpersonation();
+        $page->stopImpersonation();
         
         expect(session('impersonate'))->toBeNull();
         expect(auth()->id())->toBe($this->admin->id);
@@ -156,14 +157,27 @@ describe('User Impersonation Actions', function () {
             ]
         ]);
         
-        $component = Livewire::test(\App\Filament\Pages\UserImpersonation::class);
-        expect($component->get('getHeaderActions'))->toContain('stop_impersonation');
+        // Test that the header actions include stop_impersonation when impersonating
+        $page = new \App\Filament\Pages\UserImpersonation();
+        $headerActions = $page->getHeaderActions();
+        
+        $hasStopAction = collect($headerActions)->contains(function ($action) {
+            return $action->getName() === 'stop_impersonation';
+        });
+        
+        expect($hasStopAction)->toBeTrue();
     });
 
     it('hides stop impersonation button when not impersonating', function () {
-        $component = Livewire::test(\App\Filament\Pages\UserImpersonation::class);
-        $headerActions = $component->get('getHeaderActions');
-        expect($headerActions)->not()->toContain('stop_impersonation');
+        // Test that the header actions don't include stop_impersonation when not impersonating
+        $page = new \App\Filament\Pages\UserImpersonation();
+        $headerActions = $page->getHeaderActions();
+        
+        $hasStopAction = collect($headerActions)->contains(function ($action) {
+            return $action->getName() === 'stop_impersonation';
+        });
+        
+        expect($hasStopAction)->toBeFalse();
     });
 });
 

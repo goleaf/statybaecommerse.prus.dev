@@ -339,6 +339,13 @@
 - **Additional fix**: Fixed EnhancedEcommerceOverview widget pollingInterval property conflict
 - **Current status**: All 2 tests passing (100% success rate) - sitemap generation functionality working correctly
 
+### ✅ AdvancedSystemTest.php - All 12 tests passing
+- **Fixed role name mismatch**: Changed test to use 'admin' role instead of 'Admin' to match Filament page expectations
+- **Issue resolved**: Tests were failing with 403 Forbidden errors due to role name inconsistencies
+- **Solution**: Standardized role names across Filament pages and test setup, added is_admin property to admin user
+- **Additional fixes**: Fixed EcommerceOverview widget authorize method signature, removed duplicate validationRules method in NormalSetting model
+- **Current status**: All 12 tests passing (100% success rate) - advanced admin functionality working correctly
+
 ### ✅ HomeTest.php - All 3 tests passing
 - **Fixed redirect behavior**: Updated test to properly handle root route redirect to localized home
 - **Issue resolved**: Test was expecting 200 but getting 302 redirect from `/` to `/lt`
