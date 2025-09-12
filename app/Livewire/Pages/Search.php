@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
@@ -27,7 +29,7 @@ class Search extends Component
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
             ->when($this->q !== '', function ($q) use ($locale) {
-                $term = '%' . str_replace(['%', '_'], ['\%', '\_'], $this->q) . '%';
+                $term = '%'.str_replace(['%', '_'], ['\%', '\_'], $this->q).'%';
                 $q->where(function ($w) use ($term, $locale) {
                     $w
                         ->where('name', 'like', $term)

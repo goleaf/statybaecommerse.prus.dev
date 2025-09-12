@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -14,9 +16,10 @@ final class HomeSidebar extends Component
     public function categoryTree()
     {
         $locale = app()->getLocale();
+
         return Cache::remember("home:category_tree:{$locale}", now()->addMinutes(30), function () {
             $roots = Category::query()
-                ->with(['translations' => fn($q) => $q->where('locale', app()->getLocale()), 'children.translations'])
+                ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale()), 'children.translations'])
                 ->visible()
                 ->roots()
                 ->ordered()
@@ -27,11 +30,11 @@ final class HomeSidebar extends Component
                     'id' => $cat->id,
                     'slug' => method_exists($cat, 'trans') ? ($cat->trans('slug') ?? $cat->slug) : $cat->slug,
                     'name' => method_exists($cat, 'trans') ? ($cat->trans('name') ?? $cat->name) : $cat->name,
-                    'children' => $cat->children->map(fn($ch) => $mapNode($ch)),
+                    'children' => $cat->children->map(fn ($ch) => $mapNode($ch)),
                 ];
             };
 
-            return $roots->map(fn($root) => $mapNode($root));
+            return $roots->map(fn ($root) => $mapNode($root));
         });
     }
 

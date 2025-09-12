@@ -1,23 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Order;
-use App\Models\Address;
-use App\Models\Review;
-use App\Models\CartItem;
 use App\Models\Document;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 final class UserController extends Controller
 {
@@ -27,7 +24,7 @@ final class UserController extends Controller
     public function profile(): View
     {
         $user = Auth::user();
-        
+
         return view('frontend.users.profile', compact('user'));
     }
 
@@ -37,7 +34,7 @@ final class UserController extends Controller
     public function dashboard(): View
     {
         $user = Auth::user();
-        
+
         // Get user statistics
         $stats = [
             'orders_count' => $user->orders()->count(),
@@ -148,7 +145,7 @@ final class UserController extends Controller
 
         // Store new avatar
         $avatarPath = $request->file('avatar')->store('avatars', 'public');
-        
+
         $user->update(['avatar_url' => $avatarPath]);
 
         return response()->json([
@@ -291,7 +288,7 @@ final class UserController extends Controller
             abort(403, __('users.unauthorized_document_access'));
         }
 
-        if (!Storage::disk('public')->exists($document->file_path)) {
+        if (! Storage::disk('public')->exists($document->file_path)) {
             abort(404, __('users.document_not_found'));
         }
 
@@ -348,7 +345,7 @@ final class UserController extends Controller
         ]);
 
         $user = Auth::user();
-        
+
         // Log deactivation reason if provided
         if ($request->reason) {
             activity()

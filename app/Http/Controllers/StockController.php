@@ -1,17 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\VariantInventory;
-use App\Models\Product;
 use App\Models\Location;
 use App\Models\Partner;
-use Illuminate\Http\Request;
+use App\Models\VariantInventory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
 final class StockController extends Controller
 {
@@ -26,7 +24,7 @@ final class StockController extends Controller
                 $q->where('name', 'like', "%{$search}%");
             })->orWhereHas('variant', function ($q) use ($search) {
                 $q->where('sku', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%");
+                    ->orWhere('name', 'like', "%{$search}%");
             });
         }
 
@@ -74,7 +72,7 @@ final class StockController extends Controller
     public function show(VariantInventory $stock): View
     {
         $stock->load(['variant.product', 'location', 'supplier', 'stockMovements.user']);
-        
+
         return view('frontend.stock.show', compact('stock'));
     }
 
@@ -88,20 +86,20 @@ final class StockController extends Controller
 
         try {
             $stock->adjustStock($request->quantity, $request->reason);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => __('inventory.stock_adjusted'),
                 'data' => [
                     'new_stock' => $stock->fresh()->stock,
                     'available_stock' => $stock->fresh()->available_stock,
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => __('inventory.adjustment_failed'),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -109,7 +107,7 @@ final class StockController extends Controller
     public function reserveStock(Request $request, VariantInventory $stock): JsonResponse
     {
         $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $stock->available_stock,
+            'quantity' => 'required|integer|min:1|max:'.$stock->available_stock,
             'notes' => 'nullable|string|max:1000',
         ]);
 
@@ -121,19 +119,19 @@ final class StockController extends Controller
                     'data' => [
                         'reserved' => $stock->fresh()->reserved,
                         'available_stock' => $stock->fresh()->available_stock,
-                    ]
+                    ],
                 ]);
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => __('inventory.reserve_failed_message')
+                    'message' => __('inventory.reserve_failed_message'),
                 ], 400);
             }
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => __('inventory.reserve_failed'),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -141,26 +139,26 @@ final class StockController extends Controller
     public function unreserveStock(Request $request, VariantInventory $stock): JsonResponse
     {
         $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $stock->reserved,
+            'quantity' => 'required|integer|min:1|max:'.$stock->reserved,
             'notes' => 'nullable|string|max:1000',
         ]);
 
         try {
             $stock->unreserve($request->quantity);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => __('inventory.stock_unreserved'),
                 'data' => [
                     'reserved' => $stock->fresh()->reserved,
                     'available_stock' => $stock->fresh()->available_stock,
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => __('inventory.unreserve_failed'),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -200,9 +198,9 @@ final class StockController extends Controller
             'total_items' => $stockItems->count(),
             'total_stock_value' => $stockItems->sum('stock_value'),
             'total_reserved_value' => $stockItems->sum('reserved_value'),
-            'low_stock_items' => $stockItems->filter(fn($item) => $item->isLowStock())->count(),
-            'out_of_stock_items' => $stockItems->filter(fn($item) => $item->isOutOfStock())->count(),
-            'needs_reorder_items' => $stockItems->filter(fn($item) => $item->needsReorder())->count(),
+            'low_stock_items' => $stockItems->filter(fn ($item) => $item->isLowStock())->count(),
+            'out_of_stock_items' => $stockItems->filter(fn ($item) => $item->isOutOfStock())->count(),
+            'needs_reorder_items' => $stockItems->filter(fn ($item) => $item->needsReorder())->count(),
         ];
 
         // Group by location
@@ -211,8 +209,8 @@ final class StockController extends Controller
                 'count' => $items->count(),
                 'total_value' => $items->sum('stock_value'),
                 'reserved_value' => $items->sum('reserved_value'),
-                'low_stock' => $items->filter(fn($item) => $item->isLowStock())->count(),
-                'out_of_stock' => $items->filter(fn($item) => $item->isOutOfStock())->count(),
+                'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(),
+                'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count(),
             ];
         });
 
@@ -222,8 +220,8 @@ final class StockController extends Controller
                 'count' => $items->count(),
                 'total_value' => $items->sum('stock_value'),
                 'reserved_value' => $items->sum('reserved_value'),
-                'low_stock' => $items->filter(fn($item) => $item->isLowStock())->count(),
-                'out_of_stock' => $items->filter(fn($item) => $item->isOutOfStock())->count(),
+                'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(),
+                'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count(),
             ];
         });
 
@@ -257,11 +255,11 @@ final class StockController extends Controller
 
         $stockItems = $query->get();
 
-        $filename = 'stock_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        $filename = 'stock_export_'.now()->format('Y-m-d_H-i-s').'.csv';
 
         return response()->streamDownload(function () use ($stockItems) {
             $handle = fopen('php://output', 'w');
-            
+
             // CSV headers
             fputcsv($handle, [
                 __('inventory.product'),
@@ -299,8 +297,7 @@ final class StockController extends Controller
             fclose($handle);
         }, $filename, [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 }
-

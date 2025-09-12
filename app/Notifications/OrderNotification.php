@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Notifications;
 
@@ -31,10 +33,7 @@ final class OrderNotification extends Notification implements ShouldQueue
             ->subject($this->data['title'])
             ->line($this->data['message'])
             ->when(isset($this->data['order_number']), function ($mail) {
-                return $mail->line('Užsakymo numeris: ' . $this->data['order_number']);
+                return $mail->line('Užsakymo numeris: '.$this->data['order_number']);
             });
     }
 }
-
-
-

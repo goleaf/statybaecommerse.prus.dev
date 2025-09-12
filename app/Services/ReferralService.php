@@ -1,14 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\User;
-use App\Models\Referral;
-use App\Models\ReferralCode;
-use App\Models\ReferralReward;
-use App\Models\ReferralStatistics;
 use App\Models\Discount;
 use App\Models\Order;
+use App\Models\Referral;
+use App\Models\ReferralCode;
+use App\Models\ReferralStatistics;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -35,12 +36,12 @@ final class ReferralService
             }
 
             // Check if referrer can make referrals
-            if (!Referral::canUserRefer($referrerId)) {
+            if (! Referral::canUserRefer($referrerId)) {
                 throw new \Exception('Referrer has reached referral limit');
             }
 
             // Generate referral code if not provided
-            if (!$referralCode) {
+            if (! $referralCode) {
                 $referralCode = $this->referralCodeService->generateUniqueCode();
             }
 
@@ -88,7 +89,7 @@ final class ReferralService
                 ->where('status', 'pending')
                 ->first();
 
-            if (!$referral) {
+            if (! $referral) {
                 throw new \Exception('No pending referral found for user');
             }
 
@@ -204,7 +205,7 @@ final class ReferralService
         $stats = ReferralStatistics::getTotalForUser($userId);
 
         // Add additional calculated stats
-        $stats['conversion_rate'] = $stats['total_referrals'] > 0 
+        $stats['conversion_rate'] = $stats['total_referrals'] > 0
             ? round(($stats['completed_referrals'] / $stats['total_referrals']) * 100, 2)
             : 0;
 
@@ -238,7 +239,7 @@ final class ReferralService
     {
         $referralCode = ReferralCode::findByCode($code);
 
-        if (!$referralCode || !$referralCode->isValid()) {
+        if (! $referralCode || ! $referralCode->isValid()) {
             return null;
         }
 
@@ -292,4 +293,3 @@ final class ReferralService
         return $count;
     }
 }
-

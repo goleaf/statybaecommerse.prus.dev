@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
@@ -8,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class BrandTranslation extends Model
 {
     protected $table = 'brand_translations';
-    
+
     protected $fillable = [
         'brand_id',
         'locale',

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -44,7 +46,7 @@ final class UserWishlist extends Model
     {
         return $this->items()
             ->where('product_id', $productId)
-            ->when($variantId, fn($query) => $query->where('variant_id', $variantId))
+            ->when($variantId, fn ($query) => $query->where('variant_id', $variantId))
             ->exists();
     }
 
@@ -62,7 +64,7 @@ final class UserWishlist extends Model
     {
         return $this->items()
             ->where('product_id', $productId)
-            ->when($variantId, fn($query) => $query->where('variant_id', $variantId))
+            ->when($variantId, fn ($query) => $query->where('variant_id', $variantId))
             ->delete() > 0;
     }
 

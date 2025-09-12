@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class NormalSetting extends Model
 {
@@ -43,8 +45,10 @@ final class NormalSetting extends Model
                             $decrypted = decrypt($value);
                             if (in_array($this->attributes['type'] ?? '', ['json', 'array']) && is_string($decrypted)) {
                                 $decoded = json_decode($decrypted, true);
+
                                 return $decoded !== null ? $decoded : [];
                             }
+
                             return $decrypted;
                         } catch (\Exception $e) {
                         }
@@ -54,8 +58,10 @@ final class NormalSetting extends Model
                 if (in_array($this->attributes['type'] ?? '', ['json', 'array'])) {
                     if (is_string($value)) {
                         $decoded = json_decode($value, true);
+
                         return $decoded !== null ? $decoded : [];
                     }
+
                     return is_array($value) ? $value : [];
                 }
 
@@ -93,14 +99,17 @@ final class NormalSetting extends Model
                 }
                 if (is_string($value)) {
                     $decoded = json_decode($value, true);
+
                     return $decoded !== null ? $decoded : [];
                 }
+
                 return $value;
             },
             set: function ($value) {
                 if (is_array($value) || is_object($value)) {
                     return json_encode($value);
                 }
+
                 return $value;
             }
         );
@@ -123,15 +132,16 @@ final class NormalSetting extends Model
 
     public static function getValue(string $key, $default = null)
     {
-        $setting = static::where('key', $key)->first();
+        $setting = self::where('key', $key)->first();
+
         return $setting ? $setting->value : $default;
     }
 
-    public static function setValue(string $key, $value, string $group = 'general', string $locale = null): void
+    public static function setValue(string $key, $value, string $group = 'general', ?string $locale = null): void
     {
         $locale = $locale ?? app()->getLocale();
 
-        static::updateOrCreate(
+        self::updateOrCreate(
             ['key' => $key, 'locale' => $locale],
             [
                 'value' => $value,
@@ -146,45 +156,50 @@ final class NormalSetting extends Model
         return $this->hasMany(NormalSettingTranslation::class);
     }
 
-    public function translation(string $locale = null)
+    public function translation(?string $locale = null)
     {
         $locale = $locale ?? app()->getLocale();
+
         return $this->translations()->where('locale', $locale)->first();
     }
 
-    public function getTranslatedDescription(string $locale = null): ?string
+    public function getTranslatedDescription(?string $locale = null): ?string
     {
         $translation = $this->translation($locale);
+
         return $translation?->description ?? $this->description;
     }
 
-    public function getDisplayName(string $locale = null): ?string
+    public function getDisplayName(?string $locale = null): ?string
     {
         $translation = $this->translation($locale);
+
         return $translation?->display_name ?? $this->key;
     }
 
-    public function getHelpText(string $locale = null): ?string
+    public function getHelpText(?string $locale = null): ?string
     {
         $translation = $this->translation($locale);
+
         return $translation?->help_text;
     }
 
-    public function scopeForLocale($query, string $locale = null)
+    public function scopeForLocale($query, ?string $locale = null)
     {
         $locale = $locale ?? app()->getLocale();
+
         return $query->where('locale', $locale);
     }
 
     protected static function booted(): void
     {
-        static::creating(function (self $setting) {
+        self::creating(function (self $setting) {
             if ($setting->is_encrypted && $setting->value !== null) {
                 $setting->attributes['value'] = encrypt($setting->value);
             }
         });
 
-        static::updating(function (self $setting) {
+        self::updating(function (self $setting) {
             if ($setting->is_encrypted && $setting->isDirty('value') && $setting->value !== null) {
                 $setting->attributes['value'] = encrypt($setting->value);
             }

@@ -1,25 +1,27 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Referral;
-use App\Models\User;
 use App\Models\ReferralReward;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 
 final class ReferralController extends Controller
 {
     public function index(): View
     {
         $user = Auth::user();
-        
+
         $referrals = Referral::where('referrer_id', $user->id)
             ->with(['referred', 'rewards'])
             ->orderBy('created_at', 'desc')
@@ -42,16 +44,16 @@ final class ReferralController extends Controller
     public function show(string $code): View
     {
         $referral = Referral::where('referral_code', $code)->firstOrFail();
-        
+
         return view('frontend.referrals.show', compact('referral'));
     }
 
     public function create(): View
     {
         $user = Auth::user();
-        
+
         // Check if user can create referral
-        if (!Referral::canUserRefer($user->id)) {
+        if (! Referral::canUserRefer($user->id)) {
             return redirect()->route('referrals.index')
                 ->with('error', __('referrals.referral_limit_reached'));
         }
@@ -90,7 +92,7 @@ final class ReferralController extends Controller
         }
 
         // Check if user can refer
-        if (!Referral::canUserRefer($user->id)) {
+        if (! Referral::canUserRefer($user->id)) {
             return redirect()->back()
                 ->with('error', __('referrals.referral_limit_reached'));
         }
@@ -122,7 +124,7 @@ final class ReferralController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return redirect()->back()
                 ->with('error', __('referrals.referral_creation_failed'));
         }
@@ -143,7 +145,7 @@ final class ReferralController extends Controller
 
         try {
             $code = Referral::generateUniqueCode();
-            
+
             $user->update([
                 'referral_code' => $code,
                 'referral_code_generated_at' => now(),
@@ -188,8 +190,8 @@ final class ReferralController extends Controller
 
         // Find referral by code
         $referral = Referral::findByCode($request->code);
-        
-        if (!$referral) {
+
+        if (! $referral) {
             return response()->json([
                 'success' => false,
                 'message' => __('referrals.invalid_code'),
@@ -197,7 +199,7 @@ final class ReferralController extends Controller
         }
 
         // Check if referral is valid
-        if (!$referral->isValid()) {
+        if (! $referral->isValid()) {
             return response()->json([
                 'success' => false,
                 'message' => __('referrals.invalid_code'),
@@ -229,7 +231,7 @@ final class ReferralController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return response()->json([
                 'success' => false,
                 'message' => __('referrals.code_application_failed'),
@@ -240,8 +242,8 @@ final class ReferralController extends Controller
     public function shareCode(): View
     {
         $user = Auth::user();
-        
-        if (!$user->referral_code) {
+
+        if (! $user->referral_code) {
             return redirect()->route('referrals.create')
                 ->with('info', __('referrals.no_active_code'));
         }
@@ -257,7 +259,7 @@ final class ReferralController extends Controller
     public function statistics(): View
     {
         $user = Auth::user();
-        
+
         $referrals = Referral::where('referrer_id', $user->id)
             ->with(['referred', 'rewards'])
             ->get();
@@ -298,7 +300,7 @@ final class ReferralController extends Controller
     public function rewards(): View
     {
         $user = Auth::user();
-        
+
         $rewards = ReferralReward::where('user_id', $user->id)
             ->with(['referral.referred'])
             ->orderBy('created_at', 'desc')
@@ -316,6 +318,3 @@ final class ReferralController extends Controller
         ));
     }
 }
-
-
-

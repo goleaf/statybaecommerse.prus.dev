@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Images;
 
@@ -8,9 +10,13 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 final class WebPConversionService
 {
     private const WEBP_QUALITY = 90;
+
     private const MAX_WIDTH = 1920;
+
     private const MAX_HEIGHT = 1920;
+
     private const THUMBNAIL_WIDTH = 400;
+
     private const THUMBNAIL_HEIGHT = 400;
 
     public function convertExistingImages(): void
@@ -34,8 +40,9 @@ final class WebPConversionService
         try {
             $originalPath = $media->getPath();
 
-            if (!file_exists($originalPath)) {
+            if (! file_exists($originalPath)) {
                 Log::warning("Original file not found: {$originalPath}");
+
                 return false;
             }
 
@@ -56,31 +63,36 @@ final class WebPConversionService
                 }
 
                 Log::info("Successfully converted {$media->name} to WebP");
+
                 return true;
             }
 
             return false;
         } catch (\Exception $e) {
-            Log::error("Failed to convert media {$media->id} to WebP: " . $e->getMessage());
+            Log::error("Failed to convert media {$media->id} to WebP: ".$e->getMessage());
+
             return false;
         }
     }
 
     public function convertImageToWebP(string $sourcePath, string $outputPath): bool
     {
-        if (!extension_loaded('gd')) {
+        if (! extension_loaded('gd')) {
             Log::error('GD extension is required for WebP conversion');
+
             return false;
         }
 
-        if (!function_exists('imagewebp')) {
+        if (! function_exists('imagewebp')) {
             Log::error('WebP support is not available in GD extension');
+
             return false;
         }
 
         $imageInfo = getimagesize($sourcePath);
-        if (!$imageInfo) {
+        if (! $imageInfo) {
             Log::error("Invalid image file: {$sourcePath}");
+
             return false;
         }
 
@@ -95,8 +107,9 @@ final class WebPConversionService
             default => null
         };
 
-        if (!$image) {
+        if (! $image) {
             Log::error("Failed to create image resource from: {$sourcePath}");
+
             return false;
         }
 
@@ -108,7 +121,7 @@ final class WebPConversionService
 
         // Ensure output directory exists
         $outputDir = dirname($outputPath);
-        if (!is_dir($outputDir)) {
+        if (! is_dir($outputDir)) {
             mkdir($outputDir, 0755, true);
         }
 
@@ -116,8 +129,9 @@ final class WebPConversionService
         $success = imagewebp($image, $outputPath, self::WEBP_QUALITY);
         imagedestroy($image);
 
-        if (!$success) {
+        if (! $success) {
             Log::error("Failed to save WebP image: {$outputPath}");
+
             return false;
         }
 
@@ -154,19 +168,20 @@ final class WebPConversionService
 
     private function checkWebPSupport(): bool
     {
-        if (!function_exists('imagewebp')) {
+        if (! function_exists('imagewebp')) {
             return false;
         }
 
         // Create a small test image
         $testImage = imagecreatetruecolor(1, 1);
-        $tmpPath = sys_get_temp_dir() . '/webp_test_' . uniqid() . '.webp';
+        $tmpPath = sys_get_temp_dir().'/webp_test_'.uniqid().'.webp';
 
         $result = imagewebp($testImage, $tmpPath, 85);
         imagedestroy($testImage);
 
         if ($result && file_exists($tmpPath)) {
             unlink($tmpPath);
+
             return true;
         }
 
@@ -176,7 +191,8 @@ final class WebPConversionService
     private function generateWebPPath(string $originalPath): string
     {
         $pathInfo = pathinfo($originalPath);
-        return $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.webp';
+
+        return $pathInfo['dirname'].'/'.$pathInfo['filename'].'.webp';
     }
 
     /**
@@ -184,16 +200,16 @@ final class WebPConversionService
      */
     public function convertAndOptimizeToWebP(string $sourcePath, ?string $outputPath = null, bool $createThumbnail = false): array
     {
-        if (!file_exists($sourcePath)) {
+        if (! file_exists($sourcePath)) {
             throw new \InvalidArgumentException("Source file does not exist: {$sourcePath}");
         }
 
         $results = [];
 
         // Generate output path if not provided
-        if (!$outputPath) {
+        if (! $outputPath) {
             $pathInfo = pathinfo($sourcePath);
-            $outputPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.webp';
+            $outputPath = $pathInfo['dirname'].'/'.$pathInfo['filename'].'.webp';
         }
 
         // Convert main image
@@ -218,7 +234,7 @@ final class WebPConversionService
     {
         try {
             $imageInfo = getimagesize($sourcePath);
-            if (!$imageInfo) {
+            if (! $imageInfo) {
                 throw new \InvalidArgumentException("Invalid image file: {$sourcePath}");
             }
 
@@ -233,7 +249,7 @@ final class WebPConversionService
                 default => throw new \InvalidArgumentException("Unsupported image type: {$imageType}")
             };
 
-            if (!$image) {
+            if (! $image) {
                 throw new \RuntimeException("Failed to create image resource from: {$sourcePath}");
             }
 
@@ -259,7 +275,7 @@ final class WebPConversionService
 
             // Ensure output directory exists
             $outputDir = dirname($outputPath);
-            if (!is_dir($outputDir)) {
+            if (! is_dir($outputDir)) {
                 mkdir($outputDir, 0755, true);
             }
 
@@ -267,7 +283,7 @@ final class WebPConversionService
             $success = imagewebp($image, $outputPath, self::WEBP_QUALITY);
             imagedestroy($image);
 
-            if (!$success) {
+            if (! $success) {
                 throw new \RuntimeException("Failed to save WebP image: {$outputPath}");
             }
 
@@ -277,14 +293,15 @@ final class WebPConversionService
                 'width' => $newWidth,
                 'height' => $newHeight,
                 'original_size' => filesize($sourcePath),
-                'compression_ratio' => round((1 - filesize($outputPath) / filesize($sourcePath)) * 100, 2)
+                'compression_ratio' => round((1 - filesize($outputPath) / filesize($sourcePath)) * 100, 2),
             ];
         } catch (\Throwable $e) {
             Log::error('Image processing failed', [
                 'source' => $sourcePath,
                 'output' => $outputPath,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -301,20 +318,21 @@ final class WebPConversionService
 
         return [
             (int) round($originalWidth * $ratio),
-            (int) round($originalHeight * $ratio)
+            (int) round($originalHeight * $ratio),
         ];
     }
 
     private function generateThumbnailPath(string $mainPath): string
     {
         $pathInfo = pathinfo($mainPath);
-        return $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '_thumb.webp';
+
+        return $pathInfo['dirname'].'/'.$pathInfo['filename'].'_thumb.webp';
     }
 
     /**
      * Batch convert multiple images with progress tracking
      */
-    public function batchConvertImages(array $imagePaths, callable $progressCallback = null): array
+    public function batchConvertImages(array $imagePaths, ?callable $progressCallback = null): array
     {
         $results = [];
         $total = count($imagePaths);

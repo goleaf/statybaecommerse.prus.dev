@@ -1,9 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
 use App\Models\Attribute;
-use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -21,15 +22,25 @@ final class SearchWidget extends Component
     public string $query = '';
 
     public array $selectedCategories = [];
+
     public array $selectedBrands = [];
+
     public array $selectedAttributes = [];
+
     public ?float $minPrice = null;
+
     public ?float $maxPrice = null;
+
     public string $sortBy = 'relevance';
+
     public string $sortDirection = 'desc';
+
     public bool $inStock = false;
+
     public bool $onSale = false;
+
     public string $viewMode = 'grid';  // grid, list
+
     public int $perPage = 12;
 
     protected $queryString = [
@@ -89,7 +100,7 @@ final class SearchWidget extends Component
             'minPrice',
             'maxPrice',
             'inStock',
-            'onSale'
+            'onSale',
         ]);
         $this->resetPage();
     }
@@ -134,32 +145,32 @@ final class SearchWidget extends Component
         if ($this->query) {
             $query->where(function ($q) {
                 $q
-                    ->where('name', 'like', '%' . $this->query . '%')
-                    ->orWhere('description', 'like', '%' . $this->query . '%')
-                    ->orWhere('sku', 'like', '%' . $this->query . '%')
+                    ->where('name', 'like', '%'.$this->query.'%')
+                    ->orWhere('description', 'like', '%'.$this->query.'%')
+                    ->orWhere('sku', 'like', '%'.$this->query.'%')
                     ->orWhereHas('brand', function ($brandQuery) {
-                        $brandQuery->where('name', 'like', '%' . $this->query . '%');
+                        $brandQuery->where('name', 'like', '%'.$this->query.'%');
                     })
                     ->orWhereHas('categories', function ($catQuery) {
-                        $catQuery->where('name', 'like', '%' . $this->query . '%');
+                        $catQuery->where('name', 'like', '%'.$this->query.'%');
                     });
             });
         }
 
         // Category filter
-        if (!empty($this->selectedCategories)) {
+        if (! empty($this->selectedCategories)) {
             $query->whereHas('categories', function ($q) {
                 $q->whereIn('categories.id', $this->selectedCategories);
             });
         }
 
         // Brand filter
-        if (!empty($this->selectedBrands)) {
+        if (! empty($this->selectedBrands)) {
             $query->whereIn('brand_id', $this->selectedBrands);
         }
 
         // Attribute filter
-        if (!empty($this->selectedAttributes)) {
+        if (! empty($this->selectedAttributes)) {
             $query->whereHas('variants.attributeValues', function ($q) {
                 $q->whereIn('attribute_values.id', $this->selectedAttributes);
             });
@@ -227,8 +238,8 @@ final class SearchWidget extends Component
                         ELSE 4
                     END', [
                         $this->query,
-                        '%' . $this->query . '%',
-                        '%' . $this->query . '%'
+                        '%'.$this->query.'%',
+                        '%'.$this->query.'%',
                     ]);
                 } else {
                     $query->orderBy('created_at', 'desc');

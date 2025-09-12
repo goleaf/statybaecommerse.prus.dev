@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Resources;
 
@@ -47,7 +49,7 @@ class CampaignClickResource extends JsonResource
             'conversion_value' => $this->conversion_value,
             'is_converted' => $this->is_converted,
             'conversion_data' => $this->conversion_data,
-            'conversions_count' => $this->whenLoaded('conversions', fn() => $this->conversions->count()),
+            'conversions_count' => $this->whenLoaded('conversions', fn () => $this->conversions->count()),
             'total_conversion_value' => $this->getTotalConversionValue(),
             'conversion_rate' => $this->getConversionRate(),
             'utm_params' => $this->getUtmParams(),

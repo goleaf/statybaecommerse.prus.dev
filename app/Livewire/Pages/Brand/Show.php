@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages\Brand;
 
@@ -18,7 +20,7 @@ final class Show extends Component
             ->where('is_enabled', true)
             ->first();
 
-        if (!$brand) {
+        if (! $brand) {
             // Try to find by translated slug
             $brand = Brand::query()
                 ->whereHas('translations', function ($query) use ($slug) {
@@ -29,7 +31,7 @@ final class Show extends Component
                 ->first();
         }
 
-        if (!$brand) {
+        if (! $brand) {
             abort(404);
         }
 
@@ -37,6 +39,7 @@ final class Show extends Component
         $canonicalSlug = $this->getCanonicalSlug($brand);
         if ($canonicalSlug !== $slug) {
             $this->redirect(route('localized.brands.show', $canonicalSlug), 301);
+
             return;
         }
 

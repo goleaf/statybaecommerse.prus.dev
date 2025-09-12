@@ -1,19 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
 use App\Actions\CountriesWithZone;
 use App\Actions\ZoneSessionManager;
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response;
-use Closure;
 
 class ZoneDetector
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!ZoneSessionManager::checkSession()) {
+        if (! ZoneSessionManager::checkSession()) {
             try {
                 $countries = (new CountriesWithZone)->handle();
 
@@ -31,7 +33,7 @@ class ZoneDetector
                 }
             } catch (\Exception $e) {
                 // Log the error but don't break the request
-                \Log::warning('Zone detection failed: ' . $e->getMessage());
+                \Log::warning('Zone detection failed: '.$e->getMessage());
                 // Continue without zone detection
             }
         }
@@ -43,7 +45,7 @@ class ZoneDetector
     {
         $defaultZone = $countries->firstWhere('zoneCode', config('starterkit.default_zone'));
 
-        if (!ZoneSessionManager::checkSession() && $defaultZone) {
+        if (! ZoneSessionManager::checkSession() && $defaultZone) {
             ZoneSessionManager::setSession($defaultZone);
         }
     }

@@ -1,26 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 final class OrderController extends Controller
 {
     public function index(Request $request): View
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             abort(403, 'Unauthorized');
         }
 
@@ -35,7 +35,7 @@ final class OrderController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('number', 'like', "%{$search}%")
-                  ->orWhere('notes', 'like', "%{$search}%");
+                    ->orWhere('notes', 'like', "%{$search}%");
             });
         }
 
@@ -47,8 +47,8 @@ final class OrderController extends Controller
     public function show(Order $order): View
     {
         $user = Auth::user();
-        
-        if (!$user || $order->user_id !== $user->id) {
+
+        if (! $user || $order->user_id !== $user->id) {
             abort(403, 'Unauthorized');
         }
 
@@ -60,8 +60,8 @@ final class OrderController extends Controller
     public function create(): View
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             abort(403, 'Unauthorized');
         }
 
@@ -73,8 +73,8 @@ final class OrderController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             abort(403, 'Unauthorized');
         }
 
@@ -98,7 +98,7 @@ final class OrderController extends Controller
 
             foreach ($validated['items'] as $itemData) {
                 $product = Product::findOrFail($itemData['product_id']);
-                $variant = $itemData['product_variant_id'] 
+                $variant = $itemData['product_variant_id']
                     ? ProductVariant::findOrFail($itemData['product_variant_id'])
                     : null;
 
@@ -120,7 +120,7 @@ final class OrderController extends Controller
 
             // Create order
             $order = Order::create([
-                'number' => 'ORD-' . strtoupper(uniqid()),
+                'number' => 'ORD-'.strtoupper(uniqid()),
                 'user_id' => $user->id,
                 'status' => 'pending',
                 'subtotal' => $subtotal,
@@ -148,7 +148,7 @@ final class OrderController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return back()
                 ->withInput()
                 ->with('error', __('orders.messages.creation_failed'));
@@ -158,12 +158,12 @@ final class OrderController extends Controller
     public function edit(Order $order): View
     {
         $user = Auth::user();
-        
-        if (!$user || $order->user_id !== $user->id) {
+
+        if (! $user || $order->user_id !== $user->id) {
             abort(403, 'Unauthorized');
         }
 
-        if (!$order->canBeCancelled()) {
+        if (! $order->canBeCancelled()) {
             abort(403, __('orders.messages.cannot_edit'));
         }
 
@@ -176,12 +176,12 @@ final class OrderController extends Controller
     public function update(Request $request, Order $order): RedirectResponse
     {
         $user = Auth::user();
-        
-        if (!$user || $order->user_id !== $user->id) {
+
+        if (! $user || $order->user_id !== $user->id) {
             abort(403, 'Unauthorized');
         }
 
-        if (!$order->canBeCancelled()) {
+        if (! $order->canBeCancelled()) {
             abort(403, __('orders.messages.cannot_edit'));
         }
 
@@ -208,7 +208,7 @@ final class OrderController extends Controller
 
             foreach ($validated['items'] as $itemData) {
                 $product = Product::findOrFail($itemData['product_id']);
-                $variant = $itemData['product_variant_id'] 
+                $variant = $itemData['product_variant_id']
                     ? ProductVariant::findOrFail($itemData['product_variant_id'])
                     : null;
 
@@ -250,7 +250,7 @@ final class OrderController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return back()
                 ->withInput()
                 ->with('error', __('orders.messages.update_failed'));
@@ -260,12 +260,12 @@ final class OrderController extends Controller
     public function destroy(Order $order): RedirectResponse
     {
         $user = Auth::user();
-        
-        if (!$user || $order->user_id !== $user->id) {
+
+        if (! $user || $order->user_id !== $user->id) {
             abort(403, 'Unauthorized');
         }
 
-        if (!$order->canBeCancelled()) {
+        if (! $order->canBeCancelled()) {
             abort(403, __('orders.messages.cannot_delete'));
         }
 
@@ -278,12 +278,12 @@ final class OrderController extends Controller
     public function cancel(Order $order): RedirectResponse
     {
         $user = Auth::user();
-        
-        if (!$user || $order->user_id !== $user->id) {
+
+        if (! $user || $order->user_id !== $user->id) {
             abort(403, 'Unauthorized');
         }
 
-        if (!$order->canBeCancelled()) {
+        if (! $order->canBeCancelled()) {
             abort(403, __('orders.messages.cannot_cancel'));
         }
 
@@ -293,4 +293,3 @@ final class OrderController extends Controller
             ->with('success', __('orders.messages.cancelled_successfully'));
     }
 }
-

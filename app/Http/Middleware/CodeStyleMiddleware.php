@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
 use App\Services\CodeStyleService;
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Closure;
 
 final class CodeStyleMiddleware
 {
@@ -16,7 +18,7 @@ final class CodeStyleMiddleware
     public function handle(Request $request, Closure $next)
     {
         // Only apply in development environment
-        if (!app()->environment('local', 'testing')) {
+        if (! app()->environment('local', 'testing')) {
             return $next($request);
         }
 
@@ -62,17 +64,17 @@ final class CodeStyleMiddleware
 
     private function validateSingleFile($file): void
     {
-        if (!$file->isValid() || !str_ends_with($file->getClientOriginalName(), '.php')) {
+        if (! $file->isValid() || ! str_ends_with($file->getClientOriginalName(), '.php')) {
             return;
         }
 
         $content = file_get_contents($file->getPathname());
         $violations = $this->codeStyleService->validateFile($file->getClientOriginalName());
 
-        if (!empty($violations)) {
+        if (! empty($violations)) {
             Log::warning('Code style violations detected in uploaded file', [
                 'file' => $file->getClientOriginalName(),
-                'violations' => $violations
+                'violations' => $violations,
             ]);
         }
     }

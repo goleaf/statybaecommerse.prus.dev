@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
@@ -15,16 +17,16 @@ final class NotificationRateLimit
     public function handle(Request $request, Closure $next, string $action = 'default'): Response
     {
         $key = $this->resolveRequestSignature($request, $action);
-        
+
         $maxAttempts = $this->getMaxAttempts($action);
         $decayMinutes = $this->getDecayMinutes($action);
 
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($key);
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'Too many notification requests. Please try again in ' . $seconds . ' seconds.',
+                'message' => 'Too many notification requests. Please try again in '.$seconds.' seconds.',
                 'retry_after' => $seconds,
             ], 429);
         }
@@ -48,7 +50,7 @@ final class NotificationRateLimit
     {
         $user = $request->user();
         $userId = $user ? $user->id : $request->ip();
-        
+
         return "notifications:{$action}:{$userId}";
     }
 

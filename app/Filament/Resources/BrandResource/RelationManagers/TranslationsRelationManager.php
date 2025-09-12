@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
@@ -7,7 +9,6 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 final class TranslationsRelationManager extends RelationManager
 {
@@ -59,13 +60,13 @@ final class TranslationsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('locale')
                     ->label(__('admin.brands.fields.locale'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'lt' => 'primary',
                         'en' => 'success',
                         'de' => 'warning',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'lt' => 'Lietuvių',
                         'en' => 'English',
                         'de' => 'Deutsch',

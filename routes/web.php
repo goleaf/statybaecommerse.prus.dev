@@ -153,22 +153,6 @@ Route::middleware(['web'])->group(function () {
         Route::post('/{discountCode}/generate-document', [App\Http\Controllers\Frontend\DiscountCodeController::class, 'generateDocument'])->name('generate-document');
     });
 
-    // System Settings Routes
-    Route::prefix('system-settings')->name('frontend.system-settings.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\SystemSettingsController::class, 'index'])->name('index');
-        Route::get('/{setting}', [App\Http\Controllers\Frontend\SystemSettingsController::class, 'show'])->name('show');
-        Route::get('/category/{category}', [App\Http\Controllers\Frontend\SystemSettingsController::class, 'byCategory'])->name('category');
-        Route::get('/group/{group}', [App\Http\Controllers\Frontend\SystemSettingsController::class, 'byGroup'])->name('group');
-
-        // API Routes
-        Route::prefix('api')->name('api.')->group(function () {
-            Route::get('/', [App\Http\Controllers\Frontend\SystemSettingsController::class, 'api'])->name('index');
-            Route::get('/value/{key}', [App\Http\Controllers\Frontend\SystemSettingsController::class, 'getValue'])->name('value');
-            Route::get('/categories', [App\Http\Controllers\Frontend\SystemSettingsController::class, 'categories'])->name('categories');
-            Route::get('/groups', [App\Http\Controllers\Frontend\SystemSettingsController::class, 'groups'])->name('groups');
-        });
-    });
-
     // Review Routes
     Route::prefix('reviews')->name('reviews.')->group(function () {
         Route::get('/', [App\Http\Controllers\ReviewController::class, 'index'])->name('index');

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -97,7 +99,7 @@ final class Coupon extends Model
 
     public function isValid(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -118,7 +120,7 @@ final class Coupon extends Model
 
     public function canBeUsed(float $orderTotal): bool
     {
-        if (!$this->isValid()) {
+        if (! $this->isValid()) {
             return false;
         }
 
@@ -131,7 +133,7 @@ final class Coupon extends Model
 
     public function calculateDiscount(float $orderTotal): float
     {
-        if (!$this->canBeUsed($orderTotal)) {
+        if (! $this->canBeUsed($orderTotal)) {
             return 0;
         }
 

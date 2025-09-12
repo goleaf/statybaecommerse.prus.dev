@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -6,14 +8,13 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\CityResource\Pages;
 use App\Filament\Resources\CityResource\RelationManagers;
 use App\Models\City;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use BackedEnum;
 use UnitEnum;
 
 class CityResource extends Resource
@@ -223,7 +224,7 @@ class CityResource extends Resource
                             ->columns(3)
                             ->addActionLabel(__('cities.add_translation'))
                             ->collapsible()
-                            ->itemLabel(fn(array $state): ?string => $state['locale'] ?? null),
+                            ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
                     ]),
                 Forms\Components\Section::make(__('cities.metadata'))
                     ->schema([
@@ -269,7 +270,7 @@ class CityResource extends Resource
                 Tables\Columns\TextColumn::make('level')
                     ->label(__('cities.level'))
                     ->sortable()
-                    ->formatStateUsing(fn(int $state): string => match ($state) {
+                    ->formatStateUsing(fn (int $state): string => match ($state) {
                         0 => __('cities.level_city'),
                         1 => __('cities.level_district'),
                         2 => __('cities.level_neighborhood'),
@@ -277,7 +278,7 @@ class CityResource extends Resource
                         default => __('cities.level_city'),
                     })
                     ->badge()
-                    ->color(fn(int $state): string => match ($state) {
+                    ->color(fn (int $state): string => match ($state) {
                         0 => 'success',
                         1 => 'info',
                         2 => 'warning',
@@ -288,7 +289,7 @@ class CityResource extends Resource
                     ->label(__('cities.population'))
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn(?int $state): string => $state ? number_format($state) : '-')
+                    ->formatStateUsing(fn (?int $state): string => $state ? number_format($state) : '-')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('postal_codes')
                     ->label(__('cities.postal_codes'))
@@ -368,10 +369,10 @@ class CityResource extends Resource
                     ]),
                 Tables\Filters\Filter::make('with_coordinates')
                     ->label(__('cities.with_coordinates'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('latitude')->whereNotNull('longitude')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('latitude')->whereNotNull('longitude')),
                 Tables\Filters\Filter::make('with_population')
                     ->label(__('cities.with_population'))
-                    ->query(fn(Builder $query): Builder => $query->where('population', '>', 0)),
+                    ->query(fn (Builder $query): Builder => $query->where('population', '>', 0)),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
@@ -426,7 +427,7 @@ class CityResource extends Resource
 
     public static function getGlobalSearchResultTitle($record): string
     {
-        return $record->name . ' (' . $record->code . ')';
+        return $record->name.' ('.$record->code.')';
     }
 
     public static function getGlobalSearchResultDetails($record): array

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Concerns;
 
@@ -10,7 +12,7 @@ trait WithSeo
     {
         $siteName = config('app.name');
         $fullTitle = $suffix ? "{$title} - {$suffix}" : $title;
-        
+
         return SharedHelpers::getSeoTitle($fullTitle, $siteName);
     }
 
@@ -29,8 +31,8 @@ trait WithSeo
         $urls = [];
         $supportedLocales = ['lt', 'en', 'de'];
         $currentRoute = request()->route();
-        
-        if (!$currentRoute) {
+
+        if (! $currentRoute) {
             return $urls;
         }
 

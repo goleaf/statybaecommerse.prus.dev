@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
@@ -29,4 +31,3 @@ final class ReviewTranslation extends Model
         return $this->belongsTo(\App\Models\Review::class);
     }
 }
-

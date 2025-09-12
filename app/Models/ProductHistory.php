@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -7,8 +9,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 final class ProductHistory extends Model
 {
@@ -38,6 +40,7 @@ final class ProductHistory extends Model
     ];
 
     protected $table = 'product_histories';
+
     protected string $translationModel = \App\Models\Translations\ProductHistoryTranslation::class;
 
     public function getActivitylogOptions(): LogOptions
@@ -46,7 +49,7 @@ final class ProductHistory extends Model
             ->logOnly(['action', 'field_name', 'description'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "ProductHistory {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "ProductHistory {$eventName}")
             ->useLogName('product_history');
     }
 
@@ -105,7 +108,7 @@ final class ProductHistory extends Model
 
     public function getActionDisplayAttribute(): string
     {
-        return match($this->action) {
+        return match ($this->action) {
             'created' => __('admin.product_history.actions.created'),
             'updated' => __('admin.product_history.actions.updated'),
             'deleted' => __('admin.product_history.actions.deleted'),
@@ -119,7 +122,7 @@ final class ProductHistory extends Model
 
     public function getFieldDisplayAttribute(): string
     {
-        return __('admin.product_history.fields.' . $this->field_name, [], $this->field_name);
+        return __('admin.product_history.fields.'.$this->field_name, [], $this->field_name);
     }
 
     public function getChangeSummaryAttribute(): string
@@ -160,12 +163,13 @@ final class ProductHistory extends Model
     public function isSignificantChange(): bool
     {
         $significantFields = ['price', 'sale_price', 'stock_quantity', 'status', 'is_visible'];
+
         return in_array($this->field_name, $significantFields);
     }
 
     public function getChangeImpact(): string
     {
-        if (!$this->isSignificantChange()) {
+        if (! $this->isSignificantChange()) {
             return 'low';
         }
 
@@ -224,6 +228,7 @@ final class ProductHistory extends Model
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
+
         return $query->with(['translations' => function ($q) use ($locale) {
             $q->where('locale', $locale);
         }]);
@@ -258,6 +263,7 @@ final class ProductHistory extends Model
     public function updateTranslation(string $locale, array $data): bool
     {
         $translation = $this->getOrCreateTranslation($locale);
+
         return $translation->update($data);
     }
 

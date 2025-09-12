@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -9,18 +11,20 @@ use Illuminate\Console\Command;
 final class GenerateSampleNotifications extends Command
 {
     protected $signature = 'notifications:generate-sample {--count=10 : Number of notifications to generate}';
+
     protected $description = 'Generate sample notifications for testing';
 
     public function handle(): int
     {
         $count = (int) $this->option('count');
         $notificationService = app(NotificationService::class);
-        
+
         // Get a random user or create one for testing
         $user = User::inRandomOrder()->first();
-        
-        if (!$user) {
+
+        if (! $user) {
             $this->error('No users found. Please create a user first.');
+
             return 1;
         }
 
@@ -42,9 +46,9 @@ final class GenerateSampleNotifications extends Command
         for ($i = 0; $i < $count; $i++) {
             $type = array_rand($notificationTypes);
             $action = $notificationTypes[$type][array_rand($notificationTypes[$type])];
-            
+
             $data = $this->generateSampleData($type, $action);
-            
+
             match ($type) {
                 'order' => $notificationService->sendToUser($user, $data['title'], $data['message'], 'order'),
                 'product' => $notificationService->sendToUser($user, $data['title'], $data['message'], 'product'),
@@ -58,12 +62,13 @@ final class GenerateSampleNotifications extends Command
                 'support' => $notificationService->sendToUser($user, $data['title'], $data['message'], 'support'),
                 default => $notificationService->sendToUser($user, $data['title'], $data['message'], 'info'),
             };
-            
+
             // Add some random delay to make timestamps more realistic
             usleep(100000); // 0.1 second
         }
 
         $this->info("Successfully generated {$count} sample notifications!");
+
         return 0;
     }
 
@@ -128,21 +133,21 @@ final class GenerateSampleNotifications extends Command
 
         $messages = [
             'order' => [
-                'created' => 'Jūsų užsakymas #' . rand(1000, 9999) . ' buvo sėkmingai sukurtas.',
-                'updated' => 'Užsakymo #' . rand(1000, 9999) . ' statusas buvo atnaujintas.',
-                'shipped' => 'Jūsų užsakymas #' . rand(1000, 9999) . ' buvo išsiųstas.',
-                'delivered' => 'Jūsų užsakymas #' . rand(1000, 9999) . ' buvo pristatytas.',
-                'payment_received' => 'Mokėjimas už užsakymą #' . rand(1000, 9999) . ' buvo gautas.',
+                'created' => 'Jūsų užsakymas #'.rand(1000, 9999).' buvo sėkmingai sukurtas.',
+                'updated' => 'Užsakymo #'.rand(1000, 9999).' statusas buvo atnaujintas.',
+                'shipped' => 'Jūsų užsakymas #'.rand(1000, 9999).' buvo išsiųstas.',
+                'delivered' => 'Jūsų užsakymas #'.rand(1000, 9999).' buvo pristatytas.',
+                'payment_received' => 'Mokėjimas už užsakymą #'.rand(1000, 9999).' buvo gautas.',
             ],
             'product' => [
-                'created' => 'Nauja prekė "' . $this->getRandomProductName() . '" buvo pridėta į katalogą.',
-                'updated' => 'Prekės "' . $this->getRandomProductName() . '" informacija buvo atnaujinta.',
-                'low_stock' => 'Prekės "' . $this->getRandomProductName() . '" likutis mažas.',
-                'out_of_stock' => 'Prekė "' . $this->getRandomProductName() . '" išparduota.',
-                'back_in_stock' => 'Prekė "' . $this->getRandomProductName() . '" vėl turima.',
+                'created' => 'Nauja prekė "'.$this->getRandomProductName().'" buvo pridėta į katalogą.',
+                'updated' => 'Prekės "'.$this->getRandomProductName().'" informacija buvo atnaujinta.',
+                'low_stock' => 'Prekės "'.$this->getRandomProductName().'" likutis mažas.',
+                'out_of_stock' => 'Prekė "'.$this->getRandomProductName().'" išparduota.',
+                'back_in_stock' => 'Prekė "'.$this->getRandomProductName().'" vėl turima.',
             ],
             'user' => [
-                'registered' => 'Naujas vartotojas ' . $this->getRandomName() . ' užsiregistravo sistemoje.',
+                'registered' => 'Naujas vartotojas '.$this->getRandomName().' užsiregistravo sistemoje.',
                 'profile_updated' => 'Jūsų profilio informacija buvo atnaujinta.',
                 'email_verified' => 'Jūsų el. pašto adresas buvo patvirtintas.',
             ],
@@ -168,9 +173,9 @@ final class GenerateSampleNotifications extends Command
                 'rejected' => 'Jūsų atsiliepimas nebuvo patvirtintas.',
             ],
             'promotion' => [
-                'created' => 'Nauja akcija "' . $this->getRandomPromotionName() . '" buvo sukurta.',
-                'started' => 'Akcija "' . $this->getRandomPromotionName() . '" prasidėjo.',
-                'ended' => 'Akcija "' . $this->getRandomPromotionName() . '" baigėsi.',
+                'created' => 'Nauja akcija "'.$this->getRandomPromotionName().'" buvo sukurta.',
+                'started' => 'Akcija "'.$this->getRandomPromotionName().'" prasidėjo.',
+                'ended' => 'Akcija "'.$this->getRandomPromotionName().'" baigėsi.',
             ],
             'newsletter' => [
                 'subscribed' => 'Sėkmingai prenumeravote naujienlaiškį.',
@@ -203,7 +208,7 @@ final class GenerateSampleNotifications extends Command
             'Klimato valdymas',
             'Garso sistema',
         ];
-        
+
         return $products[array_rand($products)];
     }
 
@@ -219,7 +224,7 @@ final class GenerateSampleNotifications extends Command
             'Mindaugas Mindaugaitis',
             'Kęstutis Kęstutaitis',
         ];
-        
+
         return $names[array_rand($names)];
     }
 
@@ -235,11 +240,7 @@ final class GenerateSampleNotifications extends Command
             'Saugumo sprendimų pasiūlymas',
             'Energijos taupymo akcija',
         ];
-        
+
         return $promotions[array_rand($promotions)];
     }
 }
-
-
-
-

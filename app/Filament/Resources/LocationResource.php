@@ -22,7 +22,7 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Filters\SelectFilter;
@@ -61,9 +61,9 @@ final class LocationResource extends Resource
         return __('locations.plural_model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('locations.basic_information'))
                     ->schema([

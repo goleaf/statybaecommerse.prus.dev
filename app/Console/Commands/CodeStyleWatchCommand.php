@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -6,7 +8,6 @@ use App\Services\CodeStyleService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use React\EventLoop\Loop;
-use React\EventLoop\TimerInterface;
 
 final class CodeStyleWatchCommand extends Command
 {
@@ -18,6 +19,7 @@ final class CodeStyleWatchCommand extends Command
     protected $description = 'Watch files for changes and auto-fix code style issues';
 
     private array $fileTimestamps = [];
+
     private CodeStyleService $codeStyleService;
 
     public function handle(CodeStyleService $codeStyleService): int
@@ -28,13 +30,14 @@ final class CodeStyleWatchCommand extends Command
         $extensions = explode(',', $this->option('extensions'));
         $interval = (float) $this->option('interval');
 
-        if (!File::isDirectory($path)) {
+        if (! File::isDirectory($path)) {
             $this->error("Directory does not exist: {$path}");
+
             return 1;
         }
 
         $this->info("🔍 Watching directory: {$path}");
-        $this->info('📁 File extensions: ' . implode(', ', $extensions));
+        $this->info('📁 File extensions: '.implode(', ', $extensions));
         $this->info("⏱️  Watch interval: {$interval}s");
         $this->newLine();
         $this->info('Press Ctrl+C to stop watching...');
@@ -59,7 +62,7 @@ final class CodeStyleWatchCommand extends Command
             }
         }
 
-        $this->info('📊 Initialized timestamps for ' . count($this->fileTimestamps) . ' files');
+        $this->info('📊 Initialized timestamps for '.count($this->fileTimestamps).' files');
     }
 
     private function watchFiles(string $path, array $extensions, float $interval): void
@@ -82,7 +85,7 @@ final class CodeStyleWatchCommand extends Command
         try {
             $loop->run();
         } catch (\Exception $e) {
-            $this->error('Error in file watcher: ' . $e->getMessage());
+            $this->error('Error in file watcher: '.$e->getMessage());
         }
     }
 
@@ -92,7 +95,7 @@ final class CodeStyleWatchCommand extends Command
         $changedFiles = [];
 
         foreach ($files as $file) {
-            if (!in_array($file->getExtension(), $extensions)) {
+            if (! in_array($file->getExtension(), $extensions)) {
                 continue;
             }
 
@@ -113,17 +116,18 @@ final class CodeStyleWatchCommand extends Command
 
     private function processChangedFile(string $filePath): void
     {
-        $relativePath = str_replace(base_path() . '/', '', $filePath);
+        $relativePath = str_replace(base_path().'/', '', $filePath);
 
         // Check for violations
         $violations = $this->codeStyleService->validateFile($filePath);
 
         if (empty($violations)) {
             $this->line("✅ {$relativePath} - No issues found");
+
             return;
         }
 
-        $this->warn("⚠️  {$relativePath} - Found " . count($violations) . ' issues');
+        $this->warn("⚠️  {$relativePath} - Found ".count($violations).' issues');
 
         // Show violations
         foreach ($violations as $violation) {
@@ -133,8 +137,8 @@ final class CodeStyleWatchCommand extends Command
         // Auto-fix
         $fixes = $this->codeStyleService->fixFile($filePath);
 
-        if (!empty($fixes)) {
-            $this->info('🔧 Auto-fixed ' . count($fixes) . ' issues');
+        if (! empty($fixes)) {
+            $this->info('🔧 Auto-fixed '.count($fixes).' issues');
         }
 
         $this->newLine();

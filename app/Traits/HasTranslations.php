@@ -10,6 +10,7 @@ trait HasTranslations
     {
         $translationModel = $this->translationModelClass();
         $foreignKey = $this->getForeignKey();
+
         return $this->hasMany($translationModel, $foreignKey);
     }
 
@@ -22,8 +23,10 @@ trait HasTranslations
             if (is_array($value)) {
                 return $value[$locale] ?? reset($value) ?? ($this->{$field} ?? null);
             }
+
             return $value;
         }
+
         return $this->{$field} ?? null;
     }
 
@@ -36,5 +39,3 @@ trait HasTranslations
         throw new \RuntimeException(static::class.' must define $translationModel to use HasTranslations');
     }
 }
-
-

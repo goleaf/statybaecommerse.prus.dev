@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -39,6 +41,7 @@ final class ValidateCodeStyleCommand extends Command
             $allViolations = array_merge($allViolations, $violations);
         } else {
             $this->error("Path does not exist: {$path}");
+
             return 1;
         }
 
@@ -52,7 +55,7 @@ final class ValidateCodeStyleCommand extends Command
             $this->generateReport($allViolations);
         }
 
-        $exitCode = ($strict && !empty($allViolations)) ? 1 : 0;
+        $exitCode = ($strict && ! empty($allViolations)) ? 1 : 0;
 
         if ($exitCode === 1) {
             $this->error('Code style validation failed!');
@@ -75,18 +78,18 @@ final class ValidateCodeStyleCommand extends Command
 
         foreach ($files as $file) {
             $extension = $file->getExtension();
-            
+
             if (in_array($extension, $extensions)) {
                 $violations = $codeStyleService->validateFile($file->getPathname());
                 $allViolations = array_merge($allViolations, $violations);
-                
-                if (!empty($violations)) {
+
+                if (! empty($violations)) {
                     $filesWithViolations++;
                 }
-                
+
                 $processedFiles++;
             }
-            
+
             $progressBar->advance();
         }
 
@@ -107,35 +110,35 @@ final class ValidateCodeStyleCommand extends Command
         foreach ($allViolations as $violation) {
             $type = $violation['type'];
             $file = $violation['file'];
-            
+
             $violationTypes[$type] = ($violationTypes[$type] ?? 0) + 1;
             $violationsByFile[$file] = ($violationsByFile[$file] ?? 0) + 1;
         }
 
-        $this->info("📈 Summary:");
+        $this->info('📈 Summary:');
         $this->line("   Total violations found: {$totalViolations}");
-        $this->line("   Files with violations: " . count($violationsByFile));
+        $this->line('   Files with violations: '.count($violationsByFile));
         $this->line("   Execution time: {$executionTime}s");
 
-        if (!empty($violationTypes)) {
+        if (! empty($violationTypes)) {
             $this->newLine();
-            $this->info("📋 Violation types:");
-            
+            $this->info('📋 Violation types:');
+
             foreach ($violationTypes as $type => $count) {
                 $color = $count > 10 ? 'red' : ($count > 5 ? 'yellow' : 'green');
                 $this->line("   <fg={$color}>{$type}: {$count}</>");
             }
         }
 
-        if (!empty($violationsByFile)) {
+        if (! empty($violationsByFile)) {
             $this->newLine();
-            $this->info("📁 Files with most violations:");
-            
+            $this->info('📁 Files with most violations:');
+
             arsort($violationsByFile);
             $topFiles = array_slice($violationsByFile, 0, 10, true);
-            
+
             foreach ($topFiles as $file => $count) {
-                $relativePath = str_replace(base_path() . '/', '', $file);
+                $relativePath = str_replace(base_path().'/', '', $file);
                 $color = $count > 10 ? 'red' : ($count > 5 ? 'yellow' : 'green');
                 $this->line("   <fg={$color}>{$relativePath}: {$count} violations</>");
             }
@@ -143,7 +146,7 @@ final class ValidateCodeStyleCommand extends Command
 
         if ($totalViolations === 0) {
             $this->newLine();
-            $this->info("🎉 All files are following code style guidelines!");
+            $this->info('🎉 All files are following code style guidelines!');
         }
     }
 
@@ -155,13 +158,13 @@ final class ValidateCodeStyleCommand extends Command
             'total_violations' => count($allViolations),
             'violations_by_type' => [],
             'violations_by_file' => [],
-            'all_violations' => $allViolations
+            'all_violations' => $allViolations,
         ];
 
         foreach ($allViolations as $violation) {
             $type = $violation['type'];
             $file = $violation['file'];
-            
+
             $reportData['violations_by_type'][$type] = ($reportData['violations_by_type'][$type] ?? 0) + 1;
             $reportData['violations_by_file'][$file] = ($reportData['violations_by_file'][$file] ?? 0) + 1;
         }
@@ -170,4 +173,3 @@ final class ValidateCodeStyleCommand extends Command
         $this->info("📄 Detailed report saved to: {$reportPath}");
     }
 }
-

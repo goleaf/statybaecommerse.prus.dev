@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -37,14 +39,3 @@ final class CampaignView extends Model
         return $this->belongsTo(Customer::class);
     }
 }
-
-
-
-
-
-
-
-
-
-
-

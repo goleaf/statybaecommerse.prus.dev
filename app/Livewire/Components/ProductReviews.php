@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -15,6 +17,7 @@ final class ProductReviews extends Component
     use WithPagination;
 
     public Product $product;
+
     public bool $showReviewForm = false;
 
     #[Validate('required|string|max:255')]
@@ -33,14 +36,15 @@ final class ProductReviews extends Component
 
     public function toggleReviewForm(): void
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             $this->redirect(route('login'));
+
             return;
         }
 
-        $this->showReviewForm = !$this->showReviewForm;
-        
-        if (!$this->showReviewForm) {
+        $this->showReviewForm = ! $this->showReviewForm;
+
+        if (! $this->showReviewForm) {
             $this->reset(['title', 'content', 'rating']);
             $this->resetValidation();
         }
@@ -48,8 +52,9 @@ final class ProductReviews extends Component
 
     public function submitReview(): void
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             $this->redirect(route('login'));
+
             return;
         }
 
@@ -62,6 +67,7 @@ final class ProductReviews extends Component
 
         if ($existingReview) {
             $this->addError('review', __('translations.already_reviewed_product'));
+
             return;
         }
 

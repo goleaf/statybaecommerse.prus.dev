@@ -1,14 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\SeoDataResource\Widgets;
 
 use App\Models\SeoData;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class SeoDataOverviewWidget extends BaseWidget
 {
@@ -18,19 +16,19 @@ final class SeoDataOverviewWidget extends BaseWidget
         $totalProducts = SeoData::forProducts()->count();
         $totalCategories = SeoData::forCategories()->count();
         $totalBrands = SeoData::forBrands()->count();
-        
+
         $lithuanianSeo = SeoData::forLocale('lt')->count();
         $englishSeo = SeoData::forLocale('en')->count();
-        
+
         $withTitle = SeoData::withTitle()->count();
         $withDescription = SeoData::withDescription()->count();
         $withKeywords = SeoData::withKeywords()->count();
         $withCanonicalUrl = SeoData::withCanonicalUrl()->count();
         $withStructuredData = SeoData::withStructuredData()->count();
-        
+
         $noIndexCount = SeoData::where('no_index', true)->count();
         $noFollowCount = SeoData::where('no_follow', true)->count();
-        
+
         // Calculate average SEO score
         $avgSeoScore = SeoData::selectRaw('
             AVG(
@@ -76,12 +74,12 @@ final class SeoDataOverviewWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-language')
                 ->color('secondary'),
 
-            Stat::make(__('admin.seo_data.widgets.avg_seo_score'), number_format($avgSeoScore, 1) . '/100')
+            Stat::make(__('admin.seo_data.widgets.avg_seo_score'), number_format($avgSeoScore, 1).'/100')
                 ->description(__('admin.seo_data.widgets.avg_seo_score_description'))
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color($avgSeoScore >= 80 ? 'success' : ($avgSeoScore >= 60 ? 'warning' : 'danger')),
 
-            Stat::make(__('admin.seo_data.widgets.complete_seo'), 
+            Stat::make(__('admin.seo_data.widgets.complete_seo'),
                 SeoData::whereNotNull('title')
                     ->whereNotNull('description')
                     ->whereNotNull('keywords')
@@ -93,7 +91,7 @@ final class SeoDataOverviewWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
-            Stat::make(__('admin.seo_data.widgets.needs_optimization'), 
+            Stat::make(__('admin.seo_data.widgets.needs_optimization'),
                 SeoData::where(function ($query) {
                     $query->whereNull('title')
                         ->orWhereNull('description')

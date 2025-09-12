@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
 final class Currency extends Model
 {
-    use HasFactory, SoftDeletes, HasTranslations;
+    use HasFactory, HasTranslations, SoftDeletes;
 
     protected $table = 'currencies';
 
@@ -109,11 +111,11 @@ final class Currency extends Model
     public function formatAmount(float $amount): string
     {
         $formattedAmount = number_format($amount, $this->decimal_places);
-        
+
         if ($this->symbol) {
-            return $this->symbol . ' ' . $formattedAmount;
+            return $this->symbol.' '.$formattedAmount;
         }
-        
-        return $formattedAmount . ' ' . $this->code;
+
+        return $formattedAmount.' '.$this->code;
     }
 }

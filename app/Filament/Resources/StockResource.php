@@ -1,13 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StockResource\Pages;
 use App\Filament\Resources\StockResource\RelationManagers;
-use App\Models\Inventory;
 use App\Models\Location;
-use App\Models\Partner;
-use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use Filament\Actions\Action;
@@ -21,6 +20,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Form;
 use Filament\Infolists\Components\BadgeEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
@@ -28,12 +28,10 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\FontWeight;
+use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -41,12 +39,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Infolists;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use UnitEnum;
 
@@ -99,12 +93,13 @@ class StockResource extends Resource
     public static function getNavigationBadgeColor(): ?string
     {
         $lowStockCount = static::getModel()::lowStock()->count();
+
         return $lowStockCount > 0 ? 'warning' : 'success';
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('inventory.basic_information'))
                     ->schema([
@@ -281,8 +276,7 @@ class StockResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight(FontWeight::Bold)
-                    ->url(fn(VariantInventory $record): string =>
-                        ProductResource::getUrl('view', ['record' => $record->variant->product_id])),
+                    ->url(fn (VariantInventory $record): string => ProductResource::getUrl('view', ['record' => $record->variant->product_id])),
                 TextColumn::make('variant.display_name')
                     ->label(__('inventory.variant'))
                     ->searchable()
@@ -299,12 +293,11 @@ class StockResource extends Resource
                     ->sortable()
                     ->alignEnd()
                     ->weight(FontWeight::Bold)
-                    ->color(fn(int $state, VariantInventory $record): string =>
-                        match (true) {
-                            $record->isOutOfStock() => 'danger',
-                            $record->isLowStock() => 'warning',
-                            default => 'success'
-                        }),
+                    ->color(fn (int $state, VariantInventory $record): string => match (true) {
+                        $record->isOutOfStock() => 'danger',
+                        $record->isLowStock() => 'warning',
+                        default => 'success'
+                    }),
                 TextColumn::make('reserved')
                     ->label(__('inventory.reserved'))
                     ->sortable()
@@ -315,23 +308,21 @@ class StockResource extends Resource
                     ->sortable()
                     ->alignEnd()
                     ->weight(FontWeight::Bold)
-                    ->color(fn(int $state): string =>
-                        match (true) {
-                            $state <= 0 => 'danger',
-                            $state <= 10 => 'warning',
-                            default => 'success'
-                        }),
+                    ->color(fn (int $state): string => match (true) {
+                        $state <= 0 => 'danger',
+                        $state <= 10 => 'warning',
+                        default => 'success'
+                    }),
                 BadgeColumn::make('stock_status')
                     ->label(__('inventory.status'))
                     ->colors([
-                        'success' => 'in_stock',
-                        'warning' => 'low_stock',
-                        'danger' => 'out_of_stock',
-                        'secondary' => 'not_tracked',
-                        'info' => 'needs_reorder',
+                    'success' => 'in_stock',
+                    'warning' => 'low_stock',
+                    'danger' => 'out_of_stock',
+                    'secondary' => 'not_tracked',
+                    'info' => 'needs_reorder',
                     ])
-                    ->formatStateUsing(fn(string $state): string =>
-                        __('inventory.' . $state)),
+                    ->formatStateUsing(fn (string $state): string => __('inventory.'.$state)),
                 TextColumn::make('cost_per_unit')
                     ->label(__('inventory.cost_per_unit'))
                     ->money('EUR')
@@ -352,13 +343,12 @@ class StockResource extends Resource
                     ->label(__('inventory.expiry_date'))
                     ->date()
                     ->sortable()
-                    ->color(fn(?string $state): string =>
-                        match (true) {
-                            !$state => 'gray',
-                            strtotime($state) < strtotime('+30 days') => 'warning',
-                            strtotime($state) < strtotime('+7 days') => 'danger',
-                            default => 'success'
-                        })
+                    ->color(fn (?string $state): string => match (true) {
+                        ! $state => 'gray',
+                        strtotime($state) < strtotime('+30 days') => 'warning',
+                        strtotime($state) < strtotime('+7 days') => 'danger',
+                        default => 'success'
+                    })
                     ->toggleable(),
                 IconColumn::make('is_tracked')
                     ->label(__('inventory.tracked'))
@@ -394,10 +384,10 @@ class StockResource extends Resource
                 SelectFilter::make('status')
                     ->label(__('inventory.status'))
                     ->options([
-                        'active' => __('inventory.status_active'),
-                        'inactive' => __('inventory.status_inactive'),
-                        'discontinued' => __('inventory.status_discontinued'),
-                        'quarantine' => __('inventory.status_quarantine'),
+                    'active' => __('inventory.status_active'),
+                    'inactive' => __('inventory.status_inactive'),
+                    'discontinued' => __('inventory.status_discontinued'),
+                    'quarantine' => __('inventory.status_quarantine'),
                     ]),
                 TernaryFilter::make('is_tracked')
                     ->label(__('inventory.tracked'))
@@ -406,122 +396,121 @@ class StockResource extends Resource
                     ->falseLabel(__('inventory.not_tracked_only')),
                 Filter::make('low_stock')
                     ->label(__('inventory.low_stock'))
-                    ->query(fn(Builder $query): Builder => $query->lowStock()),
+                    ->query(fn (Builder $query): Builder => $query->lowStock()),
                 Filter::make('out_of_stock')
                     ->label(__('inventory.out_of_stock'))
-                    ->query(fn(Builder $query): Builder => $query->outOfStock()),
+                    ->query(fn (Builder $query): Builder => $query->outOfStock()),
                 Filter::make('needs_reorder')
                     ->label(__('inventory.needs_reorder'))
-                    ->query(fn(Builder $query): Builder => $query->needsReorder()),
+                    ->query(fn (Builder $query): Builder => $query->needsReorder()),
                 Filter::make('expiring_soon')
                     ->label(__('inventory.expiring_soon'))
-                    ->query(fn(Builder $query): Builder => $query->expiringSoon()),
+                    ->query(fn (Builder $query): Builder => $query->expiringSoon()),
                 Filter::make('expired')
                     ->label(__('inventory.expired'))
-                    ->query(fn(Builder $query): Builder =>
-                        $query
-                            ->whereNotNull('expiry_date')
-                            ->where('expiry_date', '<', now())),
+                    ->query(fn (Builder $query): Builder => $query
+                    ->whereNotNull('expiry_date')
+                    ->where('expiry_date', '<', now())),
             ])
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Action::make('adjust_stock')
-                        ->label(__('inventory.adjust_stock'))
-                        ->icon('heroicon-o-adjustments-horizontal')
-                        ->color('warning')
-                        ->form([
-                            TextInput::make('quantity')
-                                ->label(__('inventory.adjustment_quantity'))
-                                ->numeric()
-                                ->required()
-                                ->helperText(__('inventory.adjustment_quantity_help')),
-                            Select::make('reason')
-                                ->label(__('inventory.adjustment_reason'))
-                                ->options([
-                                    'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-                                    'damage' => __('inventory.reason_damage'),
-                                    'theft' => __('inventory.reason_theft'),
-                                    'return' => __('inventory.reason_return'),
-                                    'restock' => __('inventory.reason_restock'),
-                                    'transfer' => __('inventory.reason_transfer'),
-                                ])
-                                ->required(),
-                            Textarea::make('notes')
-                                ->label(__('inventory.adjustment_notes'))
-                                ->rows(3),
-                        ])
-                        ->action(function (VariantInventory $record, array $data): void {
-                            $record->adjustStock($data['quantity'], $data['reason']);
+                    ->label(__('inventory.adjust_stock'))
+                    ->icon('heroicon-o-adjustments-horizontal')
+                    ->color('warning')
+                    ->form([
+                        TextInput::make('quantity')
+                            ->label(__('inventory.adjustment_quantity'))
+                            ->numeric()
+                            ->required()
+                            ->helperText(__('inventory.adjustment_quantity_help')),
+                        Select::make('reason')
+                            ->label(__('inventory.adjustment_reason'))
+                            ->options([
+                                'manual_adjustment' => __('inventory.reason_manual_adjustment'),
+                                'damage' => __('inventory.reason_damage'),
+                                'theft' => __('inventory.reason_theft'),
+                                'return' => __('inventory.reason_return'),
+                                'restock' => __('inventory.reason_restock'),
+                                'transfer' => __('inventory.reason_transfer'),
+                            ])
+                            ->required(),
+                        Textarea::make('notes')
+                            ->label(__('inventory.adjustment_notes'))
+                            ->rows(3),
+                    ])
+                    ->action(function (VariantInventory $record, array $data): void {
+                        $record->adjustStock($data['quantity'], $data['reason']);
 
-                            Notification::make()
-                                ->title(__('inventory.stock_adjusted'))
-                                ->body(__('inventory.stock_adjusted_message', [
-                                    'quantity' => $data['quantity'],
-                                    'product' => $record->display_name
-                                ]))
-                                ->success()
-                                ->send();
-                        }),
+                        Notification::make()
+                            ->title(__('inventory.stock_adjusted'))
+                            ->body(__('inventory.stock_adjusted_message', [
+                                'quantity' => $data['quantity'],
+                                'product' => $record->display_name,
+                            ]))
+                            ->success()
+                            ->send();
+                    }),
                     Action::make('reserve_stock')
-                        ->label(__('inventory.reserve_stock'))
-                        ->icon('heroicon-o-lock-closed')
-                        ->color('info')
-                        ->form([
-                            TextInput::make('quantity')
-                                ->label(__('inventory.reserve_quantity'))
-                                ->numeric()
-                                ->required()
-                                ->maxValue(fn(VariantInventory $record): int => $record->available_stock),
-                            Textarea::make('notes')
-                                ->label(__('inventory.reserve_notes'))
-                                ->rows(3),
-                        ])
-                        ->action(function (VariantInventory $record, array $data): void {
-                            if ($record->reserve($data['quantity'])) {
-                                Notification::make()
-                                    ->title(__('inventory.stock_reserved'))
-                                    ->body(__('inventory.stock_reserved_message', [
-                                        'quantity' => $data['quantity'],
-                                        'product' => $record->display_name
-                                    ]))
-                                    ->success()
-                                    ->send();
-                            } else {
-                                Notification::make()
-                                    ->title(__('inventory.reserve_failed'))
-                                    ->body(__('inventory.reserve_failed_message'))
-                                    ->danger()
-                                    ->send();
-                            }
-                        }),
-                    Action::make('unreserve_stock')
-                        ->label(__('inventory.unreserve_stock'))
-                        ->icon('heroicon-o-lock-open')
-                        ->color('gray')
-                        ->form([
-                            TextInput::make('quantity')
-                                ->label(__('inventory.unreserve_quantity'))
-                                ->numeric()
-                                ->required()
-                                ->maxValue(fn(VariantInventory $record): int => $record->reserved),
-                            Textarea::make('notes')
-                                ->label(__('inventory.unreserve_notes'))
-                                ->rows(3),
-                        ])
-                        ->action(function (VariantInventory $record, array $data): void {
-                            $record->unreserve($data['quantity']);
-
+                    ->label(__('inventory.reserve_stock'))
+                    ->icon('heroicon-o-lock-closed')
+                    ->color('info')
+                    ->form([
+                        TextInput::make('quantity')
+                            ->label(__('inventory.reserve_quantity'))
+                            ->numeric()
+                            ->required()
+                            ->maxValue(fn (VariantInventory $record): int => $record->available_stock),
+                        Textarea::make('notes')
+                            ->label(__('inventory.reserve_notes'))
+                            ->rows(3),
+                    ])
+                    ->action(function (VariantInventory $record, array $data): void {
+                        if ($record->reserve($data['quantity'])) {
                             Notification::make()
-                                ->title(__('inventory.stock_unreserved'))
-                                ->body(__('inventory.stock_unreserved_message', [
+                                ->title(__('inventory.stock_reserved'))
+                                ->body(__('inventory.stock_reserved_message', [
                                     'quantity' => $data['quantity'],
-                                    'product' => $record->display_name
+                                    'product' => $record->display_name,
                                 ]))
                                 ->success()
                                 ->send();
-                        }),
+                        } else {
+                            Notification::make()
+                                ->title(__('inventory.reserve_failed'))
+                                ->body(__('inventory.reserve_failed_message'))
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+                    Action::make('unreserve_stock')
+                    ->label(__('inventory.unreserve_stock'))
+                    ->icon('heroicon-o-lock-open')
+                    ->color('gray')
+                    ->form([
+                        TextInput::make('quantity')
+                            ->label(__('inventory.unreserve_quantity'))
+                            ->numeric()
+                            ->required()
+                            ->maxValue(fn (VariantInventory $record): int => $record->reserved),
+                        Textarea::make('notes')
+                            ->label(__('inventory.unreserve_notes'))
+                            ->rows(3),
+                    ])
+                    ->action(function (VariantInventory $record, array $data): void {
+                        $record->unreserve($data['quantity']);
+
+                        Notification::make()
+                            ->title(__('inventory.stock_unreserved'))
+                            ->body(__('inventory.stock_unreserved_message', [
+                                'quantity' => $data['quantity'],
+                                'product' => $record->display_name,
+                            ]))
+                            ->success()
+                            ->send();
+                    }),
                     Tables\Actions\DeleteAction::make(),
                 ]),
             ])
@@ -529,60 +518,60 @@ class StockResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     BulkAction::make('bulk_adjust_stock')
-                        ->label(__('inventory.bulk_adjust_stock'))
-                        ->icon('heroicon-o-adjustments-horizontal')
-                        ->color('warning')
-                        ->form([
-                            TextInput::make('quantity')
-                                ->label(__('inventory.adjustment_quantity'))
-                                ->numeric()
-                                ->required(),
-                            Select::make('reason')
-                                ->label(__('inventory.adjustment_reason'))
-                                ->options([
-                                    'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-                                    'damage' => __('inventory.reason_damage'),
-                                    'theft' => __('inventory.reason_theft'),
-                                    'return' => __('inventory.reason_return'),
-                                    'restock' => __('inventory.reason_restock'),
-                                    'transfer' => __('inventory.reason_transfer'),
-                                ])
-                                ->required(),
-                            Textarea::make('notes')
-                                ->label(__('inventory.adjustment_notes'))
-                                ->rows(3),
-                        ])
-                        ->action(function (Collection $records, array $data): void {
-                            $adjustedCount = 0;
+                    ->label(__('inventory.bulk_adjust_stock'))
+                    ->icon('heroicon-o-adjustments-horizontal')
+                    ->color('warning')
+                    ->form([
+                        TextInput::make('quantity')
+                            ->label(__('inventory.adjustment_quantity'))
+                            ->numeric()
+                            ->required(),
+                        Select::make('reason')
+                            ->label(__('inventory.adjustment_reason'))
+                            ->options([
+                                'manual_adjustment' => __('inventory.reason_manual_adjustment'),
+                                'damage' => __('inventory.reason_damage'),
+                                'theft' => __('inventory.reason_theft'),
+                                'return' => __('inventory.reason_return'),
+                                'restock' => __('inventory.reason_restock'),
+                                'transfer' => __('inventory.reason_transfer'),
+                            ])
+                            ->required(),
+                        Textarea::make('notes')
+                            ->label(__('inventory.adjustment_notes'))
+                            ->rows(3),
+                    ])
+                    ->action(function (Collection $records, array $data): void {
+                        $adjustedCount = 0;
 
-                            foreach ($records as $record) {
-                                $record->adjustStock($data['quantity'], $data['reason']);
-                                $adjustedCount++;
-                            }
+                        foreach ($records as $record) {
+                            $record->adjustStock($data['quantity'], $data['reason']);
+                            $adjustedCount++;
+                        }
 
-                            Notification::make()
-                                ->title(__('inventory.bulk_stock_adjusted'))
-                                ->body(__('inventory.bulk_stock_adjusted_message', [
-                                    'count' => $adjustedCount,
-                                    'quantity' => $data['quantity']
-                                ]))
-                                ->success()
-                                ->send();
-                        }),
+                        Notification::make()
+                            ->title(__('inventory.bulk_stock_adjusted'))
+                            ->body(__('inventory.bulk_stock_adjusted_message', [
+                                'count' => $adjustedCount,
+                                'quantity' => $data['quantity'],
+                            ]))
+                            ->success()
+                            ->send();
+                    }),
                     BulkAction::make('export_stock')
-                        ->label(__('inventory.export_stock'))
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color('info')
-                        ->action(function (Collection $records): void {
-                            // Export logic would go here
-                            Notification::make()
-                                ->title(__('inventory.export_started'))
-                                ->body(__('inventory.export_started_message', [
-                                    'count' => $records->count()
-                                ]))
-                                ->success()
-                                ->send();
-                        }),
+                    ->label(__('inventory.export_stock'))
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('info')
+                    ->action(function (Collection $records): void {
+                        // Export logic would go here
+                        Notification::make()
+                            ->title(__('inventory.export_started'))
+                            ->body(__('inventory.export_started_message', [
+                                'count' => $records->count(),
+                            ]))
+                            ->success()
+                            ->send();
+                    }),
                 ]),
             ])
             ->groups([
@@ -614,8 +603,7 @@ class StockResource extends Resource
                     ->schema([
                         TextEntry::make('variant.product.name')
                             ->label(__('inventory.product'))
-                            ->url(fn(VariantInventory $record): string =>
-                                ProductResource::getUrl('view', ['record' => $record->variant->product_id])),
+                            ->url(fn (VariantInventory $record): string => ProductResource::getUrl('view', ['record' => $record->variant->product_id])),
                         TextEntry::make('variant.display_name')
                             ->label(__('inventory.variant')),
                         TextEntry::make('location.name')
@@ -633,12 +621,11 @@ class StockResource extends Resource
                         TextEntry::make('stock')
                             ->label(__('inventory.current_stock'))
                             ->badge()
-                            ->color(fn(int $state, VariantInventory $record): string =>
-                                match (true) {
-                                    $record->isOutOfStock() => 'danger',
-                                    $record->isLowStock() => 'warning',
-                                    default => 'success'
-                                }),
+                            ->color(fn (int $state, VariantInventory $record): string => match (true) {
+                                $record->isOutOfStock() => 'danger',
+                                $record->isLowStock() => 'warning',
+                                default => 'success'
+                            }),
                         TextEntry::make('reserved')
                             ->label(__('inventory.reserved_stock'))
                             ->badge()
@@ -646,12 +633,11 @@ class StockResource extends Resource
                         TextEntry::make('available_stock')
                             ->label(__('inventory.available_stock'))
                             ->badge()
-                            ->color(fn(int $state): string =>
-                                match (true) {
-                                    $state <= 0 => 'danger',
-                                    $state <= 10 => 'warning',
-                                    default => 'success'
-                                }),
+                            ->color(fn (int $state): string => match (true) {
+                                $state <= 0 => 'danger',
+                                $state <= 10 => 'warning',
+                                default => 'success'
+                            }),
                         TextEntry::make('incoming')
                             ->label(__('inventory.incoming_stock'))
                             ->badge()
@@ -665,14 +651,13 @@ class StockResource extends Resource
                         BadgeEntry::make('stock_status')
                             ->label(__('inventory.status'))
                             ->colors([
-                                'success' => 'in_stock',
-                                'warning' => 'low_stock',
-                                'danger' => 'out_of_stock',
-                                'secondary' => 'not_tracked',
-                                'info' => 'needs_reorder',
+                            'success' => 'in_stock',
+                            'warning' => 'low_stock',
+                            'danger' => 'out_of_stock',
+                            'secondary' => 'not_tracked',
+                            'info' => 'needs_reorder',
                             ])
-                            ->formatStateUsing(fn(string $state): string =>
-                                __('inventory.' . $state)),
+                            ->formatStateUsing(fn (string $state): string => __('inventory.'.$state)),
                     ])
                     ->columns(4),
                 InfolistSection::make(__('inventory.financial_information'))
@@ -701,20 +686,18 @@ class StockResource extends Resource
                         TextEntry::make('expiry_date')
                             ->label(__('inventory.expiry_date'))
                             ->date()
-                            ->color(fn(?string $state): string =>
-                                match (true) {
-                                    !$state => 'gray',
-                                    strtotime($state) < strtotime('+30 days') => 'warning',
-                                    strtotime($state) < strtotime('+7 days') => 'danger',
-                                    default => 'success'
-                                })
+                            ->color(fn (?string $state): string => match (true) {
+                                ! $state => 'gray',
+                                strtotime($state) < strtotime('+30 days') => 'warning',
+                                strtotime($state) < strtotime('+7 days') => 'danger',
+                                default => 'success'
+                            })
                             ->placeholder(__('inventory.no_expiry')),
                         TextEntry::make('is_tracked')
                             ->label(__('inventory.tracked'))
                             ->badge()
-                            ->color(fn(bool $state): string => $state ? 'success' : 'gray')
-                            ->formatStateUsing(fn(bool $state): string =>
-                                $state ? __('inventory.yes') : __('inventory.no')),
+                            ->color(fn (bool $state): string => $state ? 'success' : 'gray')
+                            ->formatStateUsing(fn (bool $state): string => $state ? __('inventory.yes') : __('inventory.no')),
                         TextEntry::make('notes')
                             ->label(__('inventory.notes'))
                             ->placeholder(__('inventory.no_notes'))
@@ -746,29 +729,26 @@ class StockResource extends Resource
                         RepeatableEntry::make('stockMovements')
                             ->label('')
                             ->schema([
-                                TextEntry::make('type')
-                                    ->label(__('inventory.movement_type'))
-                                    ->badge()
-                                    ->color(fn(string $state): string =>
-                                        $state === 'in' ? 'success' : 'danger')
-                                    ->formatStateUsing(fn(string $state): string =>
-                                        __('inventory.' . $state)),
-                                TextEntry::make('quantity')
-                                    ->label(__('inventory.quantity'))
-                                    ->badge()
-                                    ->color(fn(int $state, $record): string =>
-                                        $record->type === 'in' ? 'success' : 'danger'),
-                                TextEntry::make('reason')
-                                    ->label(__('inventory.reason'))
-                                    ->badge()
-                                    ->color('info'),
-                                TextEntry::make('user.name')
-                                    ->label(__('inventory.user'))
-                                    ->badge()
-                                    ->color('gray'),
-                                TextEntry::make('moved_at')
-                                    ->label(__('inventory.moved_at'))
-                                    ->dateTime(),
+                            TextEntry::make('type')
+                                ->label(__('inventory.movement_type'))
+                                ->badge()
+                                ->color(fn (string $state): string => $state === 'in' ? 'success' : 'danger')
+                                ->formatStateUsing(fn (string $state): string => __('inventory.'.$state)),
+                            TextEntry::make('quantity')
+                                ->label(__('inventory.quantity'))
+                                ->badge()
+                                ->color(fn (int $state, $record): string => $record->type === 'in' ? 'success' : 'danger'),
+                            TextEntry::make('reason')
+                                ->label(__('inventory.reason'))
+                                ->badge()
+                                ->color('info'),
+                            TextEntry::make('user.name')
+                                ->label(__('inventory.user'))
+                                ->badge()
+                                ->color('gray'),
+                            TextEntry::make('moved_at')
+                                ->label(__('inventory.moved_at'))
+                                ->dateTime(),
                             ])
                             ->columns(5)
                             ->limit(10),

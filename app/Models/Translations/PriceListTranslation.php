@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
@@ -8,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class PriceListTranslation extends Model
 {
     protected $table = 'price_list_translations';
-    
+
     protected $fillable = [
         'price_list_id',
         'locale',
@@ -34,4 +36,3 @@ final class PriceListTranslation extends Model
         return $this->belongsTo(\App\Models\PriceList::class);
     }
 }
-

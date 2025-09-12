@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -8,9 +10,13 @@ use Livewire\Component;
 final class RelatedProducts extends Component
 {
     public Product $product;
+
     public int $limit = 4;
+
     public string $title = '';
+
     public bool $showTitle = true;
+
     public string $class = '';
 
     public function mount(

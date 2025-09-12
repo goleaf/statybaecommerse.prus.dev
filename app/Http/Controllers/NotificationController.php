@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Auth;
@@ -17,8 +18,8 @@ final class NotificationController extends Controller
     public function markAsRead(string $id): JsonResponse
     {
         $notification = DatabaseNotification::find($id);
-        
-        if (!$notification || $notification->notifiable_id !== Auth::id()) {
+
+        if (! $notification || $notification->notifiable_id !== Auth::id()) {
             return response()->json(['error' => 'Notification not found'], 404);
         }
 
@@ -26,15 +27,15 @@ final class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('Notification marked as read')
+            'message' => __('Notification marked as read'),
         ]);
     }
 
     public function markAsUnread(string $id): JsonResponse
     {
         $notification = DatabaseNotification::find($id);
-        
-        if (!$notification || $notification->notifiable_id !== Auth::id()) {
+
+        if (! $notification || $notification->notifiable_id !== Auth::id()) {
             return response()->json(['error' => 'Notification not found'], 404);
         }
 
@@ -42,7 +43,7 @@ final class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('Notification marked as unread')
+            'message' => __('Notification marked as unread'),
         ]);
     }
 
@@ -52,15 +53,15 @@ final class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('All notifications marked as read')
+            'message' => __('All notifications marked as read'),
         ]);
     }
 
     public function delete(string $id): JsonResponse
     {
         $notification = DatabaseNotification::find($id);
-        
-        if (!$notification || $notification->notifiable_id !== Auth::id()) {
+
+        if (! $notification || $notification->notifiable_id !== Auth::id()) {
             return response()->json(['error' => 'Notification not found'], 404);
         }
 
@@ -68,7 +69,7 @@ final class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('Notification deleted')
+            'message' => __('Notification deleted'),
         ]);
     }
 
@@ -78,7 +79,7 @@ final class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('All notifications cleared')
+            'message' => __('All notifications cleared'),
         ]);
     }
 
@@ -87,7 +88,7 @@ final class NotificationController extends Controller
         $count = Auth::user()->unreadNotifications->count();
 
         return response()->json([
-            'count' => $count
+            'count' => $count,
         ]);
     }
 
@@ -109,7 +110,7 @@ final class NotificationController extends Controller
             });
 
         return response()->json([
-            'notifications' => $notifications
+            'notifications' => $notifications,
         ]);
     }
 }

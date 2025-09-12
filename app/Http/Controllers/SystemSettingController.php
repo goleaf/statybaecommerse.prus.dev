@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -100,7 +102,7 @@ final class SystemSettingController extends Controller
     public function search(Request $request): View
     {
         $query = $request->get('q', '');
-        
+
         $settings = SystemSetting::active()
             ->public()
             ->searchable($query)
@@ -110,7 +112,7 @@ final class SystemSettingController extends Controller
         $categories = SystemSettingCategory::active()
             ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
-                  ->orWhere('description', 'like', "%{$query}%");
+                    ->orWhere('description', 'like', "%{$query}%");
             })
             ->get();
 
@@ -148,7 +150,7 @@ final class SystemSettingController extends Controller
             ->public()
             ->first();
 
-        if (!$setting) {
+        if (! $setting) {
             return response()->json(['error' => 'Setting not found'], 404);
         }
 
@@ -211,4 +213,3 @@ final class SystemSettingController extends Controller
         return response()->json($groups);
     }
 }
-

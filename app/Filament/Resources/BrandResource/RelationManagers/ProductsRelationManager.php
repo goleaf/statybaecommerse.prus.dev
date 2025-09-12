@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
@@ -82,7 +84,7 @@ final class ProductsRelationManager extends RelationManager
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\Filter::make('enabled')
                     ->label(__('admin.products.filters.enabled_only'))
-                    ->query(fn(Builder $query): Builder => $query->where('is_enabled', true))
+                    ->query(fn (Builder $query): Builder => $query->where('is_enabled', true))
                     ->toggle(),
             ])
             ->headerActions([
@@ -100,7 +102,7 @@ final class ProductsRelationManager extends RelationManager
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn(Builder $query): Builder => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]))
             ->defaultSort('name', 'asc');

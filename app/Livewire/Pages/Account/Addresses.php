@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Pages\Account;
 
+use App\Models\Address;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use App\Models\Address;
 
 #[Layout('components.layouts.templates.account')]
 class Addresses extends Component

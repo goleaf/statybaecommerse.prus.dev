@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
@@ -17,5 +19,3 @@ final class CityTranslation extends Model
 
     public $timestamps = true;
 }
-
-

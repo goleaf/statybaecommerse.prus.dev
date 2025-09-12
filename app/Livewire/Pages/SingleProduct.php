@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
@@ -11,18 +13,19 @@ final class SingleProduct extends Component
     use WithCart;
 
     public Product $product;
+
     public int $quantity = 1;
 
     public function mount(Product $product): void
     {
         // Ensure product is visible and load relationships
-        if (!$product->is_visible) {
+        if (! $product->is_visible) {
             abort(404);
         }
 
         $product->load(['brand', 'categories', 'media', 'variants', 'reviews', 'translations']);
         $this->product = $product;
-        
+
         // Track product view for recommendations
         $this->trackProductView();
     }
@@ -31,16 +34,16 @@ final class SingleProduct extends Component
     {
         // Track in session for recently viewed products
         $viewedProducts = session('recently_viewed', []);
-        
+
         // Remove if already exists and add to front
-        $viewedProducts = array_filter($viewedProducts, fn($id) => $id !== $this->product->id);
+        $viewedProducts = array_filter($viewedProducts, fn ($id) => $id !== $this->product->id);
         array_unshift($viewedProducts, $this->product->id);
-        
+
         // Keep only last 10 viewed products
         $viewedProducts = array_slice($viewedProducts, 0, 10);
-        
+
         session(['recently_viewed' => $viewedProducts]);
-        
+
         // Track analytics event if analytics is enabled
         if (class_exists(\App\Models\AnalyticsEvent::class)) {
             \App\Models\AnalyticsEvent::create([
@@ -64,16 +67,18 @@ final class SingleProduct extends Component
         // Check if product should hide add to cart
         if ($this->product->shouldHideAddToCart()) {
             $this->addError('quantity', __('frontend.product.cannot_add_to_cart'));
+
             return;
         }
 
         $this->validate([
-            'quantity' => 'required|integer|min:1|max:' . $this->product->availableQuantity(),
+            'quantity' => 'required|integer|min:1|max:'.$this->product->availableQuantity(),
         ]);
 
         // Check minimum quantity
         if ($this->quantity < $this->product->getMinimumQuantity()) {
             $this->addError('quantity', __('frontend.product.minimum_quantity_required', ['min' => $this->product->getMinimumQuantity()]));
+
             return;
         }
 
@@ -84,12 +89,13 @@ final class SingleProduct extends Component
     private function addToCartTrait(int $productId, int $quantity = 1): void
     {
         $product = Product::findOrFail($productId);
-        
+
         if ($product->availableQuantity() < $quantity) {
             $this->addError('quantity', __('frontend.product.not_enough_stock'));
+
             return;
         }
-        
+
         // Create or update cart item in database
         $cartItem = \App\Models\CartItem::updateOrCreate(
             [
@@ -110,9 +116,9 @@ final class SingleProduct extends Component
                 ],
             ]
         );
-        
+
         $cartItem->updateTotalPrice();
-        
+
         $this->dispatch('cart-updated');
     }
 

@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
 use App\Models\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class AttributeTranslation extends Model
 {
@@ -80,27 +82,27 @@ final class AttributeTranslation extends Model
     // Helper methods
     public function hasName(): bool
     {
-        return !empty($this->name);
+        return ! empty($this->name);
     }
 
     public function hasDescription(): bool
     {
-        return !empty($this->description);
+        return ! empty($this->description);
     }
 
     public function hasPlaceholder(): bool
     {
-        return !empty($this->placeholder);
+        return ! empty($this->placeholder);
     }
 
     public function hasHelpText(): bool
     {
-        return !empty($this->help_text);
+        return ! empty($this->help_text);
     }
 
     public function isEmpty(): bool
     {
-        return !$this->hasName() && !$this->hasDescription() && !$this->hasPlaceholder() && !$this->hasHelpText();
+        return ! $this->hasName() && ! $this->hasDescription() && ! $this->hasPlaceholder() && ! $this->hasHelpText();
     }
 
     public function isComplete(): bool
@@ -111,14 +113,14 @@ final class AttributeTranslation extends Model
     // Static helper methods
     public static function getByAttributeAndLocale(int $attributeId, string $locale): ?self
     {
-        return static::where('attribute_id', $attributeId)
+        return self::where('attribute_id', $attributeId)
             ->where('locale', $locale)
             ->first();
     }
 
     public static function getOrCreateForAttributeAndLocale(int $attributeId, string $locale): self
     {
-        return static::firstOrCreate(
+        return self::firstOrCreate(
             [
                 'attribute_id' => $attributeId,
                 'locale' => $locale,
@@ -131,21 +133,22 @@ final class AttributeTranslation extends Model
 
     public static function getTranslationsForAttribute(int $attributeId): \Illuminate\Database\Eloquent\Collection
     {
-        return static::where('attribute_id', $attributeId)
+        return self::where('attribute_id', $attributeId)
             ->orderBy('locale')
             ->get();
     }
 
     public static function getAvailableLocalesForAttribute(int $attributeId): array
     {
-        return static::where('attribute_id', $attributeId)
+        return self::where('attribute_id', $attributeId)
             ->pluck('locale')
             ->toArray();
     }
 
     public static function getMissingLocalesForAttribute(int $attributeId, array $supportedLocales): array
     {
-        $existingLocales = static::getAvailableLocalesForAttribute($attributeId);
+        $existingLocales = self::getAvailableLocalesForAttribute($attributeId);
+
         return array_diff($supportedLocales, $existingLocales);
     }
 }

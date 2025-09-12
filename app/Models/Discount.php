@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Discount extends Model
@@ -265,7 +267,7 @@ final class Discount extends Model
 
     public function canStackWith(Discount $other): bool
     {
-        return !$this->isExclusive() && !$other->isExclusive();
+        return ! $this->isExclusive() && ! $other->isExclusive();
     }
 
     /**
@@ -316,6 +318,7 @@ final class Discount extends Model
         if ($this->usage_limit === null) {
             return false;
         }
+
         return (int) $this->usage_count >= (int) $this->usage_limit;
     }
 }

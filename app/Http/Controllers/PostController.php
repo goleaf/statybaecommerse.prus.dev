@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -107,4 +109,3 @@ final class PostController extends Controller
         return view('posts.search', compact('posts', 'searchTerm'));
     }
 }
-

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -14,9 +16,13 @@ final class ProductQuickView extends Component
     use WithCart, WithNotifications;
 
     public ?Product $product = null;
+
     public bool $showModal = false;
+
     public int $quantity = 1;
+
     public ?int $selectedVariantId = null;
+
     public array $selectedAttributes = [];
 
     #[On('product-quick-view')]
@@ -24,7 +30,7 @@ final class ProductQuickView extends Component
     {
         $this->product = Product::with(['media', 'brand', 'categories', 'variants.attributeValues', 'reviews'])
             ->findOrFail($productId);
-        
+
         $this->quantity = 1;
         $this->selectedVariantId = null;
         $this->selectedAttributes = [];
@@ -39,7 +45,9 @@ final class ProductQuickView extends Component
 
     public function updatedSelectedAttributes(): void
     {
-        if (!$this->product) return;
+        if (! $this->product) {
+            return;
+        }
 
         // Find matching variant based on selected attributes
         $variant = $this->product->variants()
@@ -53,8 +61,9 @@ final class ProductQuickView extends Component
 
     public function addToCart(): void
     {
-        if (!$this->product) {
+        if (! $this->product) {
             $this->notifyError(__('ecommerce.product_not_found'));
+
             return;
         }
 
@@ -75,7 +84,9 @@ final class ProductQuickView extends Component
 
     public function addToWishlist(): void
     {
-        if (!$this->product) return;
+        if (! $this->product) {
+            return;
+        }
 
         $this->dispatch('wishlist-toggle', productId: $this->product->id);
         $this->notifySuccess(__('ecommerce.added_to_wishlist'));
@@ -83,8 +94,10 @@ final class ProductQuickView extends Component
 
     public function getAverageRating(): float
     {
-        if (!$this->product) return 0;
-        
+        if (! $this->product) {
+            return 0;
+        }
+
         return $this->product->reviews()
             ->where('is_approved', true)
             ->avg('rating') ?? 0;
@@ -92,8 +105,10 @@ final class ProductQuickView extends Component
 
     public function getReviewsCount(): int
     {
-        if (!$this->product) return 0;
-        
+        if (! $this->product) {
+            return 0;
+        }
+
         return $this->product->reviews()
             ->where('is_approved', true)
             ->count();
@@ -101,10 +116,13 @@ final class ProductQuickView extends Component
 
     public function getCurrentPrice(): float
     {
-        if (!$this->product) return 0;
+        if (! $this->product) {
+            return 0;
+        }
 
         if ($this->selectedVariantId) {
             $variant = $this->product->variants->find($this->selectedVariantId);
+
             return $variant?->price ?? $this->product->price;
         }
 
@@ -116,6 +134,3 @@ final class ProductQuickView extends Component
         return view('livewire.components.product-quick-view');
     }
 }
-
-
-

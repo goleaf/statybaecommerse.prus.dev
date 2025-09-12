@@ -1,14 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Images;
-
-use Illuminate\Support\Facades\Log;
 
 final class GradientImageService
 {
     public function generateGradientPng(int $width = 800, int $height = 800, ?string $startHex = null, ?string $endHex = null): string
     {
-        if (!\function_exists('imagecreatetruecolor')) {
+        if (! \function_exists('imagecreatetruecolor')) {
             throw new \RuntimeException('GD extension is required to generate images.');
         }
 
@@ -34,10 +34,10 @@ final class GradientImageService
         }
 
         $tmpDir = sys_get_temp_dir();
-        $filename = 'gradient_' . uniqid('', true) . '.png';
-        $path = rtrim($tmpDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
+        $filename = 'gradient_'.uniqid('', true).'.png';
+        $path = rtrim($tmpDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$filename;
 
-        if (!imagepng($image, $path, 6)) {
+        if (! imagepng($image, $path, 6)) {
             imagedestroy($image);
             throw new \RuntimeException('Failed to save PNG image.');
         }
@@ -54,9 +54,10 @@ final class GradientImageService
     {
         $hex = ltrim($hex, '#');
         if (strlen($hex) === 3) {
-            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
         }
         $int = hexdec($hex);
+
         return [($int >> 16) & 255, ($int >> 8) & 255, $int & 255];
     }
 
@@ -66,6 +67,7 @@ final class GradientImageService
         $r = random_int(64, 224);
         $g = random_int(64, 224);
         $b = random_int(64, 224);
+
         return sprintf('#%02X%02X%02X', $r, $g, $b);
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -26,12 +28,14 @@ class ShippingPrice extends Component
         $selected = (float) data_get(session()->get('checkout'), 'shipping_option.0.price', 0.0);
         if ($selected > 0) {
             $this->amount = $selected;
+
             return;
         }
         $zoneCode = (string) (session('zone.code') ?? session('zoneCode') ?? '');
         $zones = (array) config('shipping.zones', []);
         if ($zoneCode && isset($zones[$zoneCode])) {
             $this->amount = (float) $zones[$zoneCode];
+
             return;
         }
         $this->amount = (float) config('shipping.default_rate', 0.0);

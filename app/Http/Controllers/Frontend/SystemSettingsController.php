@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class SystemSettingsController extends Controller
@@ -34,9 +36,9 @@ final class SystemSettingsController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('key', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('key', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -70,7 +72,7 @@ final class SystemSettingsController extends Controller
     public function show(SystemSetting $setting): View
     {
         // Ensure the setting is public and active
-        if (!$setting->is_public || !$setting->is_active) {
+        if (! $setting->is_public || ! $setting->is_active) {
             abort(404);
         }
 
@@ -81,7 +83,7 @@ final class SystemSettingsController extends Controller
 
     public function byCategory(SystemSettingCategory $category): View
     {
-        if (!$category->is_active) {
+        if (! $category->is_active) {
             abort(404);
         }
 
@@ -152,7 +154,7 @@ final class SystemSettingsController extends Controller
             ->where('is_public', true)
             ->first();
 
-        if (!$setting) {
+        if (! $setting) {
             return response()->json([
                 'success' => false,
                 'message' => __('admin.system_settings.setting_not_found'),
@@ -209,7 +211,7 @@ final class SystemSettingsController extends Controller
 
                 return [
                     'name' => $setting->group,
-                    'label' => __('admin.system_settings.' . $setting->group),
+                    'label' => __('admin.system_settings.'.$setting->group),
                     'count' => $count,
                 ];
             });
@@ -220,4 +222,3 @@ final class SystemSettingsController extends Controller
         ]);
     }
 }
-

@@ -1,18 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\CampaignClick;
-use App\Models\Campaign;
 use App\Http\Requests\StoreCampaignClickRequest;
 use App\Http\Requests\UpdateCampaignClickRequest;
-use App\Http\Resources\CampaignClickResource;
 use App\Http\Resources\CampaignClickCollection;
-use Illuminate\Http\Request;
+use App\Http\Resources\CampaignClickResource;
+use App\Models\CampaignClick;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 final class CampaignClickController extends Controller
 {
@@ -155,9 +156,9 @@ final class CampaignClickController extends Controller
 
         // Clicks over time
         $clicksOverTime = $query->select(
-                DB::raw('DATE(clicked_at) as date'),
-                DB::raw('COUNT(*) as count')
-            )
+            DB::raw('DATE(clicked_at) as date'),
+            DB::raw('COUNT(*) as count')
+        )
             ->groupBy('date')
             ->orderBy('date')
             ->get();
@@ -230,7 +231,7 @@ final class CampaignClickController extends Controller
         $clicks = $query->orderBy('clicked_at', 'desc')->get();
 
         $format = $request->get('format', 'csv');
-        $filename = 'campaign_clicks_' . now()->format('Y-m-d_H-i-s') . '.' . $format;
+        $filename = 'campaign_clicks_'.now()->format('Y-m-d_H-i-s').'.'.$format;
 
         if ($format === 'csv') {
             return $this->exportCsv($clicks, $filename);
@@ -243,15 +244,15 @@ final class CampaignClickController extends Controller
     {
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
         return response()->stream(function () use ($clicks) {
             $handle = fopen('php://output', 'w');
-            
+
             // Add BOM for UTF-8
             fwrite($handle, "\xEF\xBB\xBF");
-            
+
             // CSV headers
             fputcsv($handle, [
                 'ID',

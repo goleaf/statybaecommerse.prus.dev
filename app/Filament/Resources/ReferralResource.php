@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -6,22 +8,19 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralResource\Pages;
 use App\Filament\Resources\ReferralResource\Widgets;
 use App\Models\Referral;
-use App\Models\User;
-use Filament\Actions\Action;
+use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Infolists;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use BackedEnum;
 use UnitEnum;
 
 final class ReferralResource extends Resource
@@ -104,7 +103,7 @@ final class ReferralResource extends Resource
                             ->required()
                             ->maxLength(20)
                             ->unique(ignoreRecord: true)
-                            ->default(fn() => strtoupper(substr(md5(uniqid()), 0, 8)))
+                            ->default(fn () => strtoupper(substr(md5(uniqid()), 0, 8)))
                             ->helperText(__('referrals.referral_code_help')),
                         Forms\Components\Select::make('status')
                             ->label(__('referrals.status'))
@@ -122,7 +121,7 @@ final class ReferralResource extends Resource
                         Forms\Components\DateTimePicker::make('completed_at')
                             ->label(__('referrals.completed_at'))
                             ->nullable()
-                            ->disabled(fn(Forms\Get $get) => $get('status') !== 'completed'),
+                            ->disabled(fn (Forms\Get $get) => $get('status') !== 'completed'),
                     ])
                     ->columns(2),
                 Forms\Components\Section::make(__('referrals.translation_information'))
@@ -185,13 +184,13 @@ final class ReferralResource extends Resource
                     ->label(__('referrals.referrer'))
                     ->searchable()
                     ->sortable()
-                    ->url(fn(Referral $record): string => route('filament.admin.resources.users.view', $record->referrer_id))
+                    ->url(fn (Referral $record): string => route('filament.admin.resources.users.view', $record->referrer_id))
                     ->icon('heroicon-o-user'),
                 Tables\Columns\TextColumn::make('referred.name')
                     ->label(__('referrals.referred_user'))
                     ->searchable()
                     ->sortable()
-                    ->url(fn(Referral $record): string => route('filament.admin.resources.users.view', $record->referred_id))
+                    ->url(fn (Referral $record): string => route('filament.admin.resources.users.view', $record->referred_id))
                     ->icon('heroicon-o-user'),
                 Tables\Columns\TextColumn::make('referral_code')
                     ->label(__('referrals.referral_code'))
@@ -203,7 +202,7 @@ final class ReferralResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('referrals.status'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'completed' => 'success',
                         'expired' => 'danger',
@@ -234,14 +233,12 @@ final class ReferralResource extends Resource
                     ->color('success'),
                 Tables\Columns\TextColumn::make('total_rewards_amount')
                     ->label(__('referrals.total_rewards_amount'))
-                    ->getStateUsing(fn(Referral $record): string =>
-                        number_format($record->rewards()->sum('amount'), 2) . ' €')
+                    ->getStateUsing(fn (Referral $record): string => number_format($record->rewards()->sum('amount'), 2).' €')
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('days_since_created')
                     ->label(__('referrals.days_since_created'))
-                    ->getStateUsing(fn(Referral $record): int =>
-                        $record->created_at->diffInDays(now()))
+                    ->getStateUsing(fn (Referral $record): int => $record->created_at->diffInDays(now()))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('title')
@@ -266,32 +263,29 @@ final class ReferralResource extends Resource
                     ->color('warning'),
                 Tables\Columns\TextColumn::make('conversion_rate')
                     ->label(__('referrals.conversion_rate'))
-                    ->getStateUsing(fn(Referral $record): string =>
-                        $record->conversion_rate . '%')
+                    ->getStateUsing(fn (Referral $record): string => $record->conversion_rate.'%')
                     ->sortable()
                     ->toggleable()
                     ->badge()
-                    ->color(fn(string $state): string => match (true) {
+                    ->color(fn (string $state): string => match (true) {
                         (float) $state >= 50 => 'success',
                         (float) $state >= 25 => 'warning',
                         default => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('performance_score')
                     ->label(__('referrals.performance_score'))
-                    ->getStateUsing(fn(Referral $record): int =>
-                        $record->performance_score)
+                    ->getStateUsing(fn (Referral $record): int => $record->performance_score)
                     ->sortable()
                     ->toggleable()
                     ->badge()
-                    ->color(fn(int $state): string => match (true) {
+                    ->color(fn (int $state): string => match (true) {
                         $state >= 80 => 'success',
                         $state >= 60 => 'warning',
                         default => 'danger',
                     }),
                 Tables\Columns\IconColumn::make('is_about_to_expire')
                     ->label(__('referrals.about_to_expire'))
-                    ->getStateUsing(fn(Referral $record): bool =>
-                        $record->isAboutToExpire())
+                    ->getStateUsing(fn (Referral $record): bool => $record->isAboutToExpire())
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->color('warning'),
@@ -306,13 +300,13 @@ final class ReferralResource extends Resource
                     ]),
                 Filter::make('expired')
                     ->label(__('referrals.filter_expired'))
-                    ->query(fn(Builder $query): Builder => $query->expired()),
+                    ->query(fn (Builder $query): Builder => $query->expired()),
                 Filter::make('active')
                     ->label(__('referrals.filter_active'))
-                    ->query(fn(Builder $query): Builder => $query->active()),
+                    ->query(fn (Builder $query): Builder => $query->active()),
                 Filter::make('completed')
                     ->label(__('referrals.filter_completed'))
-                    ->query(fn(Builder $query): Builder => $query->completed()),
+                    ->query(fn (Builder $query): Builder => $query->completed()),
                 DateFilter::make('created_at')
                     ->label(__('referrals.created_at')),
                 DateFilter::make('completed_at')
@@ -320,30 +314,26 @@ final class ReferralResource extends Resource
                 TernaryFilter::make('has_rewards')
                     ->label(__('referrals.has_rewards'))
                     ->queries(
-                        true: fn(Builder $query) => $query->has('rewards'),
-                        false: fn(Builder $query) => $query->doesntHave('rewards'),
+                        true: fn (Builder $query) => $query->has('rewards'),
+                        false: fn (Builder $query) => $query->doesntHave('rewards'),
                     ),
                 SelectFilter::make('source')
                     ->label(__('referrals.source'))
-                    ->options(fn(): array =>
-                        Referral::distinct()->pluck('source')->filter()->mapWithKeys(fn($source) => [$source => $source])->toArray()),
+                    ->options(fn (): array => Referral::distinct()->pluck('source')->filter()->mapWithKeys(fn ($source) => [$source => $source])->toArray()),
                 SelectFilter::make('campaign')
                     ->label(__('referrals.campaign'))
-                    ->options(fn(): array =>
-                        Referral::distinct()->pluck('campaign')->filter()->mapWithKeys(fn($campaign) => [$campaign => $campaign])->toArray()),
+                    ->options(fn (): array => Referral::distinct()->pluck('campaign')->filter()->mapWithKeys(fn ($campaign) => [$campaign => $campaign])->toArray()),
                 Filter::make('about_to_expire')
                     ->label(__('referrals.about_to_expire'))
-                    ->query(fn(Builder $query): Builder =>
-                        $query
-                            ->where('expires_at', '<=', now()->addDays(7))
-                            ->where('expires_at', '>', now())
-                            ->where('status', 'pending')),
+                    ->query(fn (Builder $query): Builder => $query
+                        ->where('expires_at', '<=', now()->addDays(7))
+                        ->where('expires_at', '>', now())
+                        ->where('status', 'pending')),
                 Filter::make('high_performance')
                     ->label(__('referrals.high_performance'))
-                    ->query(fn(Builder $query): Builder =>
-                        $query
-                            ->where('status', 'completed')
-                            ->has('rewards')),
+                    ->query(fn (Builder $query): Builder => $query
+                        ->where('status', 'completed')
+                        ->has('rewards')),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
@@ -353,7 +343,7 @@ final class ReferralResource extends Resource
                     ->label(__('referrals.mark_completed'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn(Referral $record): bool => $record->status === 'pending')
+                    ->visible(fn (Referral $record): bool => $record->status === 'pending')
                     ->action(function (Referral $record): void {
                         $record->markAsCompleted();
                         Notification::make()
@@ -366,7 +356,7 @@ final class ReferralResource extends Resource
                     ->label(__('referrals.mark_expired'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn(Referral $record): bool => $record->status === 'pending')
+                    ->visible(fn (Referral $record): bool => $record->status === 'pending')
                     ->action(function (Referral $record): void {
                         $record->markAsExpired();
                         Notification::make()
@@ -414,18 +404,18 @@ final class ReferralResource extends Resource
             ->poll('30s');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $form): Schema
     {
-        return $schema
+        return $form
             ->components([
                 Infolists\Components\Section::make(__('referrals.referral_details'))
                     ->components([
                         Infolists\Components\TextEntry::make('referrer.name')
                             ->label(__('referrals.referrer'))
-                            ->url(fn(Referral $record): string => route('filament.admin.resources.users.view', $record->referrer_id)),
+                            ->url(fn (Referral $record): string => route('filament.admin.resources.users.view', $record->referrer_id)),
                         Infolists\Components\TextEntry::make('referred.name')
                             ->label(__('referrals.referred_user'))
-                            ->url(fn(Referral $record): string => route('filament.admin.resources.users.view', $record->referred_id)),
+                            ->url(fn (Referral $record): string => route('filament.admin.resources.users.view', $record->referred_id)),
                         Infolists\Components\TextEntry::make('referral_code')
                             ->label(__('referrals.referral_code'))
                             ->copyable()
@@ -434,7 +424,7 @@ final class ReferralResource extends Resource
                         Infolists\Components\TextEntry::make('status')
                             ->label(__('referrals.status'))
                             ->badge()
-                            ->color(fn(string $state): string => match ($state) {
+                            ->color(fn (string $state): string => match ($state) {
                                 'pending' => 'warning',
                                 'completed' => 'success',
                                 'expired' => 'danger',
@@ -452,8 +442,7 @@ final class ReferralResource extends Resource
                             ->placeholder(__('referrals.never_expires')),
                         Infolists\Components\TextEntry::make('days_since_created')
                             ->label(__('referrals.days_since_created'))
-                            ->getStateUsing(fn(Referral $record): int =>
-                                $record->created_at->diffInDays(now())),
+                            ->getStateUsing(fn (Referral $record): int => $record->created_at->diffInDays(now())),
                     ])
                     ->columns(2),
                 Infolists\Components\Section::make(__('referrals.rewards_section'))
@@ -463,7 +452,7 @@ final class ReferralResource extends Resource
                                 Infolists\Components\TextEntry::make('type')
                                     ->label(__('referrals.type'))
                                     ->badge()
-                                    ->color(fn(string $state): string => match ($state) {
+                                    ->color(fn (string $state): string => match ($state) {
                                         'referrer_bonus' => 'success',
                                         'referred_discount' => 'info',
                                         default => 'gray',
@@ -474,7 +463,7 @@ final class ReferralResource extends Resource
                                 Infolists\Components\TextEntry::make('status')
                                     ->label(__('referrals.status'))
                                     ->badge()
-                                    ->color(fn(string $state): string => match ($state) {
+                                    ->color(fn (string $state): string => match ($state) {
                                         'pending' => 'warning',
                                         'applied' => 'success',
                                         'expired' => 'danger',
@@ -535,7 +524,7 @@ final class ReferralResource extends Resource
 
     public static function getGlobalSearchResultTitle($record): string
     {
-        return $record->referral_code . ' - ' . $record->referrer->name . ' → ' . $record->referred->name;
+        return $record->referral_code.' - '.$record->referrer->name.' → '.$record->referred->name;
     }
 
     public static function getGlobalSearchResultDetails($record): array

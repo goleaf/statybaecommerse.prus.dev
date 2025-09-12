@@ -1,18 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
 final class ReferralReward extends Model
 {
-    use HasFactory, SoftDeletes, HasTranslations;
+    use HasFactory, HasTranslations, SoftDeletes;
 
     protected $fillable = [
         'referral_id',
@@ -219,7 +221,7 @@ final class ReferralReward extends Model
      */
     public function getFormattedAmountAttribute(): string
     {
-        return number_format($this->amount, 2) . ' ' . $this->currency_code;
+        return number_format($this->amount, 2).' '.$this->currency_code;
     }
 
     /**
@@ -264,7 +266,7 @@ final class ReferralReward extends Model
         }
 
         foreach ($this->conditions as $condition) {
-            if (!$this->evaluateCondition($condition, $context)) {
+            if (! $this->evaluateCondition($condition, $context)) {
                 return false;
             }
         }
@@ -281,7 +283,7 @@ final class ReferralReward extends Model
         $operator = $condition['operator'] ?? '=';
         $value = $condition['value'] ?? null;
 
-        if (!$field || !isset($context[$field])) {
+        if (! $field || ! isset($context[$field])) {
             return false;
         }
 
@@ -295,7 +297,7 @@ final class ReferralReward extends Model
             '<' => $contextValue < $value,
             '<=' => $contextValue <= $value,
             'in' => in_array($contextValue, (array) $value),
-            'not_in' => !in_array($contextValue, (array) $value),
+            'not_in' => ! in_array($contextValue, (array) $value),
             default => false,
         };
     }
@@ -332,4 +334,3 @@ final class ReferralReward extends Model
         ]);
     }
 }
-

@@ -1,15 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use App\Models\Collection;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CollectionsRelationManager extends RelationManager
 {
@@ -27,7 +26,7 @@ class CollectionsRelationManager extends RelationManager
                     ->searchable()
                     ->preload()
                     ->required(),
-                
+
                 Forms\Components\TextInput::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->numeric()
@@ -44,7 +43,7 @@ class CollectionsRelationManager extends RelationManager
                     ->label(__('translations.collection_name'))
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('description')
                     ->label(__('translations.description'))
                     ->limit(50)
@@ -53,17 +52,18 @@ class CollectionsRelationManager extends RelationManager
                         if (strlen($state) <= 50) {
                             return null;
                         }
+
                         return $state;
                     }),
-                
+
                 Tables\Columns\IconColumn::make('is_visible')
                     ->label(__('translations.is_visible'))
                     ->boolean(),
-                
+
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('translations.created_at'))
                     ->dateTime()
@@ -85,7 +85,7 @@ class CollectionsRelationManager extends RelationManager
                         $action->getRecordSelect()
                             ->searchable()
                             ->preload(),
-                        
+
                         Forms\Components\TextInput::make('sort_order')
                             ->label(__('translations.sort_order'))
                             ->numeric()
@@ -102,5 +102,3 @@ class CollectionsRelationManager extends RelationManager
             ]);
     }
 }
-
-

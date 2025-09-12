@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Shared;
 
@@ -60,6 +62,7 @@ final class ShoppingCart extends Component
     {
         if ($quantity <= 0) {
             $this->removeItem($cartItemId);
+
             return;
         }
 
@@ -87,7 +90,7 @@ final class ShoppingCart extends Component
 
     public function toggleCart(): void
     {
-        $this->isOpen = !$this->isOpen;
+        $this->isOpen = ! $this->isOpen;
     }
 
     #[On('cart-updated')]

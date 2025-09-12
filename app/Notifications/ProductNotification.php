@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Notifications;
 
@@ -31,16 +33,7 @@ final class ProductNotification extends Notification implements ShouldQueue
             ->subject($this->data['title'])
             ->line($this->data['message'])
             ->when(isset($this->data['product_name']), function ($mail) {
-                return $mail->line('Produktas: ' . $this->data['product_name']);
+                return $mail->line('Produktas: '.$this->data['product_name']);
             });
     }
 }
-
-
-
-
-
-
-
-
-

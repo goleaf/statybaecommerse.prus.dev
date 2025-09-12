@@ -1,21 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
 final class Order extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity, HasTranslations;
+    use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
 
     public array $translatable = [
         'notes',
@@ -67,7 +69,7 @@ final class Order extends Model
             ->logOnly(['number', 'status', 'total', 'notes', 'tracking_number', 'fulfillment_status'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Order {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Order {$eventName}")
             ->useLogName('order');
     }
 
@@ -169,6 +171,6 @@ final class Order extends Model
 
     public function getFormattedTotalAttribute(): string
     {
-        return number_format((float) $this->total, 2) . ' ' . $this->currency;
+        return number_format((float) $this->total, 2).' '.$this->currency;
     }
 }

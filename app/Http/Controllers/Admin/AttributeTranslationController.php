@@ -6,7 +6,4 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-final class AttributeTranslationController extends Controller
-{
-}
-
+final class AttributeTranslationController extends Controller {}

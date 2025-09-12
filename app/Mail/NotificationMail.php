@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Mail;
 
@@ -24,9 +26,9 @@ final class NotificationMail extends Mailable
     {
         $title = $this->notification->data['title'] ?? 'Notification';
         $urgent = $this->notification->data['urgent'] ?? false;
-        
+
         return new Envelope(
-            subject: $urgent ? '[URGENT] ' . $title : $title,
+            subject: $urgent ? '[URGENT] '.$title : $title,
         );
     }
 

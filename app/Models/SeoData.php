@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Builder;
 
 final class SeoData extends Model
 {
@@ -100,47 +102,51 @@ final class SeoData extends Model
     public function getMetaTagsHtmlAttribute(): string
     {
         $html = '';
-        
+
         if ($this->title) {
-            $html .= '<title>' . e($this->title) . '</title>' . PHP_EOL;
-            $html .= '<meta property="og:title" content="' . e($this->title) . '">' . PHP_EOL;
+            $html .= '<title>'.e($this->title).'</title>'.PHP_EOL;
+            $html .= '<meta property="og:title" content="'.e($this->title).'">'.PHP_EOL;
         }
-        
+
         if ($this->description) {
-            $html .= '<meta name="description" content="' . e($this->description) . '">' . PHP_EOL;
-            $html .= '<meta property="og:description" content="' . e($this->description) . '">' . PHP_EOL;
+            $html .= '<meta name="description" content="'.e($this->description).'">'.PHP_EOL;
+            $html .= '<meta property="og:description" content="'.e($this->description).'">'.PHP_EOL;
         }
-        
+
         if ($this->keywords) {
-            $html .= '<meta name="keywords" content="' . e($this->keywords) . '">' . PHP_EOL;
+            $html .= '<meta name="keywords" content="'.e($this->keywords).'">'.PHP_EOL;
         }
-        
+
         if ($this->canonical_url) {
-            $html .= '<link rel="canonical" href="' . e($this->canonical_url) . '">' . PHP_EOL;
+            $html .= '<link rel="canonical" href="'.e($this->canonical_url).'">'.PHP_EOL;
         }
-        
+
         if ($this->no_index || $this->no_follow) {
             $robots = [];
-            if ($this->no_index) $robots[] = 'noindex';
-            if ($this->no_follow) $robots[] = 'nofollow';
-            $html .= '<meta name="robots" content="' . implode(', ', $robots) . '">' . PHP_EOL;
+            if ($this->no_index) {
+                $robots[] = 'noindex';
+            }
+            if ($this->no_follow) {
+                $robots[] = 'nofollow';
+            }
+            $html .= '<meta name="robots" content="'.implode(', ', $robots).'">'.PHP_EOL;
         }
-        
+
         if ($this->meta_tags) {
             foreach ($this->meta_tags as $name => $content) {
-                $html .= '<meta name="' . e($name) . '" content="' . e($content) . '">' . PHP_EOL;
+                $html .= '<meta name="'.e($name).'" content="'.e($content).'">'.PHP_EOL;
             }
         }
-        
+
         return $html;
     }
 
     public function getStructuredDataJsonAttribute(): ?string
     {
-        if (!$this->structured_data) {
+        if (! $this->structured_data) {
             return null;
         }
-        
+
         return json_encode($this->structured_data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
@@ -171,15 +177,15 @@ final class SeoData extends Model
     public function getRobotsAttribute(): string
     {
         $robots = [];
-        
+
         if ($this->no_index) {
             $robots[] = 'noindex';
         }
-        
+
         if ($this->no_follow) {
             $robots[] = 'nofollow';
         }
-        
+
         return empty($robots) ? 'index, follow' : implode(', ', $robots);
     }
 
@@ -195,29 +201,31 @@ final class SeoData extends Model
 
     public function getKeywordsCountAttribute(): int
     {
-        if (!$this->keywords) {
+        if (! $this->keywords) {
             return 0;
         }
-        
+
         return count(array_filter(explode(',', $this->keywords)));
     }
 
     public function isTitleOptimal(): bool
     {
         $length = $this->title_length;
+
         return $length >= 30 && $length <= 60;
     }
 
     public function isDescriptionOptimal(): bool
     {
         $length = $this->description_length;
+
         return $length >= 120 && $length <= 160;
     }
 
     public function getSeoScoreAttribute(): int
     {
         $score = 0;
-        
+
         // Title score (40 points max)
         if ($this->title) {
             $score += 20; // Has title
@@ -225,7 +233,7 @@ final class SeoData extends Model
                 $score += 20; // Optimal length
             }
         }
-        
+
         // Description score (30 points max)
         if ($this->description) {
             $score += 15; // Has description
@@ -233,7 +241,7 @@ final class SeoData extends Model
                 $score += 15; // Optimal length
             }
         }
-        
+
         // Keywords score (15 points max)
         if ($this->keywords) {
             $score += 10; // Has keywords
@@ -241,17 +249,17 @@ final class SeoData extends Model
                 $score += 5; // Optimal count
             }
         }
-        
+
         // Canonical URL score (10 points max)
         if ($this->canonical_url) {
             $score += 10;
         }
-        
+
         // Structured data score (5 points max)
         if ($this->structured_data) {
             $score += 5;
         }
-        
+
         return min($score, 100);
     }
 

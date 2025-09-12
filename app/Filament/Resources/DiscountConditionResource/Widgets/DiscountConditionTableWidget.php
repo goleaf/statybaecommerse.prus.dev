@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountConditionResource\Widgets;
 
@@ -13,7 +15,7 @@ final class DiscountConditionTableWidget extends BaseWidget
 
     protected static ?int $sort = 3;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -59,6 +61,7 @@ final class DiscountConditionTableWidget extends BaseWidget
                         if (is_array($state)) {
                             return implode(', ', $state);
                         }
+
                         return $state;
                     }),
 

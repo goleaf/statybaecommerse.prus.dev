@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -37,6 +39,7 @@ class Navigation extends Component
                 } else {
                     $query->where('is_enabled', true);
                 }
+
                 return $query->orderBy('position')->get();
             });
         }

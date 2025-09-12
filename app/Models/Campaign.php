@@ -1,19 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Traits\HasTranslations;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 
 final class Campaign extends Model
 {
@@ -263,7 +263,7 @@ final class Campaign extends Model
 
     public function isWithinBudget(): bool
     {
-        if (!$this->budget_limit) {
+        if (! $this->budget_limit) {
             return true;
         }
 
@@ -297,7 +297,7 @@ final class Campaign extends Model
         return round((($this->total_revenue - $this->budget_limit) / $this->budget_limit) * 100, 2);
     }
 
-    public function recordView(string $sessionId = null, string $ipAddress = null, string $userAgent = null, string $referer = null, int $customerId = null): void
+    public function recordView(?string $sessionId = null, ?string $ipAddress = null, ?string $userAgent = null, ?string $referer = null, ?int $customerId = null): void
     {
         $this->views()->create([
             'session_id' => $sessionId,
@@ -311,7 +311,7 @@ final class Campaign extends Model
         $this->increment('total_views');
     }
 
-    public function recordClick(string $clickType = 'cta', string $clickedUrl = null, string $sessionId = null, string $ipAddress = null, string $userAgent = null, int $customerId = null): void
+    public function recordClick(string $clickType = 'cta', ?string $clickedUrl = null, ?string $sessionId = null, ?string $ipAddress = null, ?string $userAgent = null, ?int $customerId = null): void
     {
         $this->clicks()->create([
             'session_id' => $sessionId,
@@ -326,7 +326,7 @@ final class Campaign extends Model
         $this->increment('total_clicks');
     }
 
-    public function recordConversion(string $conversionType = 'purchase', float $conversionValue = 0, int $orderId = null, int $customerId = null, string $sessionId = null, array $conversionData = []): void
+    public function recordConversion(string $conversionType = 'purchase', float $conversionValue = 0, ?int $orderId = null, ?int $customerId = null, ?string $sessionId = null, array $conversionData = []): void
     {
         $this->conversions()->create([
             'order_id' => $orderId,
@@ -345,11 +345,11 @@ final class Campaign extends Model
 
     public function getBannerUrl(): ?string
     {
-        if (!$this->banner_image) {
+        if (! $this->banner_image) {
             return null;
         }
 
-        return asset('storage/campaigns/' . $this->banner_image);
+        return asset('storage/campaigns/'.$this->banner_image);
     }
 
     public function getStatusBadgeColor(): string
@@ -393,7 +393,7 @@ final class Campaign extends Model
             ->acceptsMimeTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this
             ->addMediaConversion('thumb')
@@ -420,6 +420,7 @@ final class Campaign extends Model
     public function getImageUrl(string $conversion = ''): ?string
     {
         $media = $this->getFirstMedia('images');
+
         return $media ? $media->getUrl($conversion) : null;
     }
 }

@@ -1,19 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\StockResource\Widgets;
 
 use App\Models\VariantInventory;
-use Filament\Tables;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
 
 class StockMovementsWidget extends BaseWidget
 {
     public ?VariantInventory $record = null;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?string $heading = 'inventory.recent_stock_movements';
 
@@ -44,8 +45,7 @@ class StockMovementsWidget extends BaseWidget
                         'success' => 'in',
                         'danger' => 'out',
                     ])
-                    ->formatStateUsing(fn (string $state): string => 
-                        __('inventory.' . $state)
+                    ->formatStateUsing(fn (string $state): string => __('inventory.'.$state)
                     ),
 
                 TextColumn::make('quantity')
@@ -53,8 +53,7 @@ class StockMovementsWidget extends BaseWidget
                     ->sortable()
                     ->alignEnd()
                     ->weight('bold')
-                    ->color(fn ($record): string => 
-                        $record->type === 'in' ? 'success' : 'danger'
+                    ->color(fn ($record): string => $record->type === 'in' ? 'success' : 'danger'
                     ),
 
                 BadgeColumn::make('reason')
@@ -69,8 +68,7 @@ class StockMovementsWidget extends BaseWidget
                         'danger' => 'theft',
                         'info' => 'transfer',
                     ])
-                    ->formatStateUsing(fn (string $state): string => 
-                        __('inventory.reason_' . $state)
+                    ->formatStateUsing(fn (string $state): string => __('inventory.reason_'.$state)
                     ),
 
                 TextColumn::make('reference')

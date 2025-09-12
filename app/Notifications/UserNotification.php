@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Notifications;
 
@@ -53,21 +55,17 @@ final class UserNotification extends Notification
     private function getMessage(): string
     {
         $userName = $this->userData['name'] ?? $this->userData['email'] ?? 'Unknown User';
-        
+
         return match ($this->action) {
-            'registered' => __('notifications.user.registered') . ": {$userName}",
-            'profile_updated' => __('notifications.user.profile_updated') . ": {$userName}",
-            'password_changed' => __('notifications.user.password_changed') . ": {$userName}",
-            'email_verified' => __('notifications.user.email_verified') . ": {$userName}",
-            'login' => __('notifications.user.login') . ": {$userName}",
-            'logout' => __('notifications.user.logout') . ": {$userName}",
-            'account_suspended' => __('notifications.user.account_suspended') . ": {$userName}",
-            'account_activated' => __('notifications.user.account_activated') . ": {$userName}",
-            default => __('notifications.user.profile_updated') . ": {$userName}",
+            'registered' => __('notifications.user.registered').": {$userName}",
+            'profile_updated' => __('notifications.user.profile_updated').": {$userName}",
+            'password_changed' => __('notifications.user.password_changed').": {$userName}",
+            'email_verified' => __('notifications.user.email_verified').": {$userName}",
+            'login' => __('notifications.user.login').": {$userName}",
+            'logout' => __('notifications.user.logout').": {$userName}",
+            'account_suspended' => __('notifications.user.account_suspended').": {$userName}",
+            'account_activated' => __('notifications.user.account_activated').": {$userName}",
+            default => __('notifications.user.profile_updated').": {$userName}",
         };
     }
 }
-
-
-
-

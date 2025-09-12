@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -13,14 +15,16 @@ use Livewire\Component;
 final class NavigationMenu extends Component
 {
     public bool $mobileMenuOpen = false;
+
     public bool $searchOpen = false;
+
     public string $searchQuery = '';
 
     #[Computed]
     public function headerMenu()
     {
         return \Cache::remember(
-            'nav:header_menu:' . app()->getLocale(),
+            'nav:header_menu:'.app()->getLocale(),
             now()->addMinutes(30),
             function () {
                 /** @var Menu|null $menu */
@@ -28,9 +32,10 @@ final class NavigationMenu extends Component
                     ->where('key', 'main_header')
                     ->where('is_active', true)
                     ->first();
-                if (!$menu) {
+                if (! $menu) {
                     return collect();
                 }
+
                 return $menu->items()->with('children')->where('is_visible', true)->get();
             }
         );
@@ -40,7 +45,7 @@ final class NavigationMenu extends Component
     public function mainCategories()
     {
         return \Cache::remember(
-            'nav:main_categories:' . app()->getLocale(),
+            'nav:main_categories:'.app()->getLocale(),
             now()->addHour(),
             function () {
                 return Category::query()
@@ -62,7 +67,7 @@ final class NavigationMenu extends Component
     public function featuredBrands()
     {
         return \Cache::remember(
-            'nav:featured_brands:' . app()->getLocale(),
+            'nav:featured_brands:'.app()->getLocale(),
             now()->addHour(),
             function () {
                 return Brand::query()
@@ -82,7 +87,7 @@ final class NavigationMenu extends Component
     public function featuredCollections()
     {
         return \Cache::remember(
-            'nav:featured_collections:' . app()->getLocale(),
+            'nav:featured_collections:'.app()->getLocale(),
             now()->addHour(),
             function () {
                 return Collection::query()
@@ -100,12 +105,12 @@ final class NavigationMenu extends Component
 
     public function toggleMobileMenu(): void
     {
-        $this->mobileMenuOpen = !$this->mobileMenuOpen;
+        $this->mobileMenuOpen = ! $this->mobileMenuOpen;
     }
 
     public function toggleSearch(): void
     {
-        $this->searchOpen = !$this->searchOpen;
+        $this->searchOpen = ! $this->searchOpen;
         if ($this->searchOpen) {
             $this->dispatch('focus-search');
         }

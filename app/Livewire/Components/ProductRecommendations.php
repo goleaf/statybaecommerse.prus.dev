@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use App\Models\Order;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
@@ -13,8 +15,11 @@ use Livewire\Component;
 final class ProductRecommendations extends Component
 {
     public ?int $productId = null;
+
     public ?int $userId = null;
+
     public string $type = 'related'; // related, popular, personalized
+
     public int $limit = 4;
 
     public function mount(?int $productId = null, ?int $userId = null, string $type = 'related'): void
@@ -42,18 +47,18 @@ final class ProductRecommendations extends Component
 
     private function getRelatedProducts(): Collection
     {
-        if (!$this->productId) {
+        if (! $this->productId) {
             return collect();
         }
 
         $product = Product::find($this->productId);
-        if (!$product) {
+        if (! $product) {
             return collect();
         }
 
         // Find products in same categories
         $categoryIds = $product->categories->pluck('id');
-        
+
         return Product::query()
             ->with(['media', 'brand'])
             ->where('is_visible', true)
@@ -74,7 +79,7 @@ final class ProductRecommendations extends Component
             ->withCount(['orderItems' => function ($query) {
                 $query->whereHas('order', function ($orderQuery) {
                     $orderQuery->where('status', 'completed')
-                             ->where('created_at', '>=', now()->subMonths(3));
+                        ->where('created_at', '>=', now()->subMonths(3));
                 });
             }])
             ->orderByDesc('order_items_count')
@@ -84,12 +89,12 @@ final class ProductRecommendations extends Component
 
     private function getPersonalizedRecommendations(): Collection
     {
-        if (!$this->userId) {
+        if (! $this->userId) {
             return $this->getPopularProducts();
         }
 
         $user = User::find($this->userId);
-        if (!$user) {
+        if (! $user) {
             return $this->getPopularProducts();
         }
 
@@ -134,7 +139,7 @@ final class ProductRecommendations extends Component
     private function getRecentlyViewedProducts(): Collection
     {
         $viewedProductIds = session('recently_viewed', []);
-        
+
         if (empty($viewedProductIds)) {
             return $this->getPopularProducts();
         }
@@ -148,12 +153,12 @@ final class ProductRecommendations extends Component
 
     private function getCrossSellProducts(): Collection
     {
-        if (!$this->productId) {
+        if (! $this->productId) {
             return collect();
         }
 
         $product = Product::find($this->productId);
-        if (!$product) {
+        if (! $product) {
             return collect();
         }
 
@@ -165,17 +170,17 @@ final class ProductRecommendations extends Component
             ->whereHas('orderItems', function ($query) {
                 $query->whereHas('order', function ($orderQuery) {
                     $orderQuery->whereIn('status', ['completed', 'delivered'])
-                              ->whereHas('items', function ($itemQuery) {
-                                  $itemQuery->where('product_id', $this->productId);
-                              });
+                        ->whereHas('items', function ($itemQuery) {
+                            $itemQuery->where('product_id', $this->productId);
+                        });
                 });
             })
             ->withCount(['orderItems' => function ($query) {
                 $query->whereHas('order', function ($orderQuery) {
                     $orderQuery->whereIn('status', ['completed', 'delivered'])
-                              ->whereHas('items', function ($itemQuery) {
-                                  $itemQuery->where('product_id', $this->productId);
-                              });
+                        ->whereHas('items', function ($itemQuery) {
+                            $itemQuery->where('product_id', $this->productId);
+                        });
                 });
             }])
             ->orderByDesc('order_items_count')
@@ -187,18 +192,18 @@ final class ProductRecommendations extends Component
 
     private function getUpSellProducts(): Collection
     {
-        if (!$this->productId) {
+        if (! $this->productId) {
             return collect();
         }
 
         $product = Product::find($this->productId);
-        if (!$product) {
+        if (! $product) {
             return collect();
         }
 
         // Find higher-priced products in same categories
         $categoryIds = $product->categories->pluck('id');
-        
+
         return Product::query()
             ->with(['media', 'brand'])
             ->where('is_visible', true)
@@ -215,7 +220,7 @@ final class ProductRecommendations extends Component
 
     private function getCustomersAlsoBoughtProducts(): Collection
     {
-        if (!$this->productId) {
+        if (! $this->productId) {
             return collect();
         }
 
@@ -223,8 +228,8 @@ final class ProductRecommendations extends Component
         $orderIds = Order::whereHas('items', function ($query) {
             $query->where('product_id', $this->productId);
         })
-        ->whereIn('status', ['completed', 'delivered'])
-        ->pluck('id');
+            ->whereIn('status', ['completed', 'delivered'])
+            ->pluck('id');
 
         if ($orderIds->isEmpty()) {
             return $this->getRelatedProducts();
@@ -255,13 +260,13 @@ final class ProductRecommendations extends Component
             ->whereHas('orderItems', function ($query) {
                 $query->whereHas('order', function ($orderQuery) {
                     $orderQuery->whereIn('status', ['completed', 'delivered'])
-                              ->where('created_at', '>=', now()->subDays(30));
+                        ->where('created_at', '>=', now()->subDays(30));
                 });
             })
             ->withCount(['orderItems' => function ($query) {
                 $query->whereHas('order', function ($orderQuery) {
                     $orderQuery->whereIn('status', ['completed', 'delivered'])
-                              ->where('created_at', '>=', now()->subDays(30));
+                        ->where('created_at', '>=', now()->subDays(30));
                 });
             }])
             ->orderByDesc('order_items_count')
@@ -272,17 +277,19 @@ final class ProductRecommendations extends Component
     public function addToCart(int $productId): void
     {
         $product = Product::findOrFail($productId);
-        
+
         if ($product->shouldHideAddToCart()) {
             $this->addError('cart', __('frontend.product.cannot_add_to_cart'));
+
             return;
         }
-        
+
         if ($product->availableQuantity() < 1) {
             $this->addError('cart', __('frontend.product.not_enough_stock'));
+
             return;
         }
-        
+
         // Create or update cart item in database
         $cartItem = \App\Models\CartItem::updateOrCreate(
             [
@@ -303,12 +310,12 @@ final class ProductRecommendations extends Component
                 ],
             ]
         );
-        
+
         $cartItem->updateTotalPrice();
-        
+
         // Track recommendation click
         $this->trackRecommendationClick($productId, 'add_to_cart');
-        
+
         $this->dispatch('cart-updated');
         $this->dispatch('show-success-message', message: __('frontend.cart.product_added'));
     }
@@ -338,14 +345,14 @@ final class ProductRecommendations extends Component
     {
         if ($this->productId) {
             $viewedProducts = session('recently_viewed', []);
-            
+
             // Remove if already exists and add to front
-            $viewedProducts = array_filter($viewedProducts, fn($id) => $id !== $this->productId);
+            $viewedProducts = array_filter($viewedProducts, fn ($id) => $id !== $this->productId);
             array_unshift($viewedProducts, $this->productId);
-            
+
             // Keep only last 10 viewed products
             $viewedProducts = array_slice($viewedProducts, 0, 10);
-            
+
             session(['recently_viewed' => $viewedProducts]);
         }
     }
@@ -355,6 +362,3 @@ final class ProductRecommendations extends Component
         return view('livewire.components.product-recommendations');
     }
 }
-
-
-

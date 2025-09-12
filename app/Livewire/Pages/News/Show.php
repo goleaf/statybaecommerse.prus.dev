@@ -1,11 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages\News;
 
 use App\Models\News;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\DB;
-use Livewire\Attributes\Url;
 use Livewire\Component;
 
 final class Show extends Component

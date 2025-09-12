@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
@@ -25,7 +27,7 @@ final class CampaignController extends Controller
                 });
             })
             ->when($request->filled('search'), function ($query) use ($request) {
-                return $query->where('name', 'like', '%' . $request->get('search') . '%');
+                return $query->where('name', 'like', '%'.$request->get('search').'%');
             })
             ->paginate(12);
 
@@ -49,7 +51,7 @@ final class CampaignController extends Controller
             'targetCustomerGroups',
             'channel',
             'zone',
-            'discounts'
+            'discounts',
         ]);
 
         // Get related campaigns
@@ -81,7 +83,7 @@ final class CampaignController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('campaigns.messages.click_recorded')
+            'message' => __('campaigns.messages.click_recorded'),
         ]);
     }
 
@@ -103,7 +105,7 @@ final class CampaignController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('campaigns.messages.conversion_recorded')
+            'message' => __('campaigns.messages.conversion_recorded'),
         ]);
     }
 
@@ -140,8 +142,8 @@ final class CampaignController extends Controller
             ->active()
             ->when($query, function ($q) use ($query) {
                 return $q
-                    ->where('name', 'like', '%' . $query . '%')
-                    ->orWhere('description', 'like', '%' . $query . '%');
+                    ->where('name', 'like', '%'.$query.'%')
+                    ->orWhere('description', 'like', '%'.$query.'%');
             })
             ->byPriority()
             ->with(['targetCategories', 'channel'])

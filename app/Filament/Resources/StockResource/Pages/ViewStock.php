@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\StockResource\Pages;
 
 use App\Filament\Resources\StockResource;
+use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Actions;
 
 class ViewStock extends ViewRecord
 {
@@ -55,7 +57,7 @@ class ViewStock extends ViewRecord
                         ->title(__('inventory.stock_adjusted'))
                         ->body(__('inventory.stock_adjusted_message', [
                             'quantity' => $data['quantity'],
-                            'product' => $record->display_name
+                            'product' => $record->display_name,
                         ]))
                         ->success()
                         ->send();
@@ -69,7 +71,7 @@ class ViewStock extends ViewRecord
                         ->label(__('inventory.reserve_quantity'))
                         ->numeric()
                         ->required()
-                        ->maxValue(fn(): int => $this->getRecord()->available_stock),
+                        ->maxValue(fn (): int => $this->getRecord()->available_stock),
                     \Filament\Forms\Components\Textarea::make('notes')
                         ->label(__('inventory.reserve_notes'))
                         ->rows(3),
@@ -82,7 +84,7 @@ class ViewStock extends ViewRecord
                             ->title(__('inventory.stock_reserved'))
                             ->body(__('inventory.stock_reserved_message', [
                                 'quantity' => $data['quantity'],
-                                'product' => $record->display_name
+                                'product' => $record->display_name,
                             ]))
                             ->success()
                             ->send();
@@ -98,13 +100,13 @@ class ViewStock extends ViewRecord
                 ->label(__('inventory.unreserve_stock'))
                 ->icon('heroicon-o-lock-open')
                 ->color('gray')
-                ->visible(fn(): bool => $this->getRecord()->reserved > 0)
+                ->visible(fn (): bool => $this->getRecord()->reserved > 0)
                 ->form([
                     \Filament\Forms\Components\TextInput::make('quantity')
                         ->label(__('inventory.unreserve_quantity'))
                         ->numeric()
                         ->required()
-                        ->maxValue(fn(): int => $this->getRecord()->reserved),
+                        ->maxValue(fn (): int => $this->getRecord()->reserved),
                     \Filament\Forms\Components\Textarea::make('notes')
                         ->label(__('inventory.unreserve_notes'))
                         ->rows(3),
@@ -117,7 +119,7 @@ class ViewStock extends ViewRecord
                         ->title(__('inventory.stock_unreserved'))
                         ->body(__('inventory.stock_unreserved_message', [
                             'quantity' => $data['quantity'],
-                            'product' => $record->display_name
+                            'product' => $record->display_name,
                         ]))
                         ->success()
                         ->send();

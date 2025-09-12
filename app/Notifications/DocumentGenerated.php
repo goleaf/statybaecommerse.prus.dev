@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Notifications;
 
@@ -34,11 +36,11 @@ final class DocumentGenerated extends Notification
             ->greeting(__('documents.email.greeting', ['name' => $notifiable->name], $locale))
             ->line(__('documents.email.generated', [
                 'title' => $this->document->title,
-                'type' => __('documents.types.' . $this->document->template->type, [], $locale)
+                'type' => __('documents.types.'.$this->document->template->type, [], $locale),
             ], $locale))
             ->line(__('documents.email.details', [
                 'date' => $this->document->generated_at?->format('Y-m-d H:i'),
-                'status' => __('documents.statuses.' . $this->document->status, [], $locale)
+                'status' => __('documents.statuses.'.$this->document->status, [], $locale),
             ], $locale));
 
         // Add view action if user has access
@@ -54,7 +56,7 @@ final class DocumentGenerated extends Notification
             if (Storage::disk('public')->exists($this->document->file_path)) {
                 $message->attach(
                     Attachment::fromStorageDisk('public', $this->document->file_path)
-                        ->as($this->document->title . '.pdf')
+                        ->as($this->document->title.'.pdf')
                         ->withMime('application/pdf')
                 );
             }
@@ -74,7 +76,7 @@ final class DocumentGenerated extends Notification
             'document_status' => $this->document->status,
             'generated_at' => $this->document->generated_at,
             'message' => __('documents.notification.generated', [
-                'title' => $this->document->title
+                'title' => $this->document->title,
             ]),
         ];
     }

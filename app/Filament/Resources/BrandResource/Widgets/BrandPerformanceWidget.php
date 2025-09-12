@@ -1,16 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\Widgets;
 
 use App\Models\Brand;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Database\Eloquent\Builder;
 
 final class BrandPerformanceWidget extends ChartWidget
 {
     protected static ?string $heading = 'admin.brands.widgets.performance_heading';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {

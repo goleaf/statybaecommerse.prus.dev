@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components\Product;
 
 use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -35,7 +36,7 @@ class ReviewForm extends Component
         $user = Auth::user();
 
         Review::query()->create([
-            'reviewrateable_type' => (new Product())->getMorphClass(),
+            'reviewrateable_type' => (new Product)->getMorphClass(),
             'reviewrateable_id' => $this->productId,
             'author_type' => get_class($user),
             'author_id' => $user->id,

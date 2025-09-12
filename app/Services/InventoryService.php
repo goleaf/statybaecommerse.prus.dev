@@ -1,12 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Inventory;
-use App\Models\VariantInventory;
-use App\Models\Location;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -14,7 +13,7 @@ final class InventoryService
 {
     public function adjustProductStock(Product $product, int $quantity, string $reason = 'adjustment', ?string $notes = null): bool
     {
-        if (!$product->manage_stock) {
+        if (! $product->manage_stock) {
             return true;
         }
 
@@ -23,13 +22,14 @@ final class InventoryService
 
             $oldQuantity = $product->stock_quantity;
             $newQuantity = max(0, $oldQuantity + $quantity);
-            
+
             $product->update(['stock_quantity' => $newQuantity]);
 
             // Log the adjustment
             $this->logStockAdjustment($product, $oldQuantity, $newQuantity, $reason, $notes);
 
             DB::commit();
+
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -38,13 +38,14 @@ final class InventoryService
                 'quantity' => $quantity,
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
 
     public function adjustVariantStock(ProductVariant $variant, int $quantity, string $reason = 'adjustment', ?string $notes = null): bool
     {
-        if (!$variant->is_tracked) {
+        if (! $variant->is_tracked) {
             return true;
         }
 
@@ -53,13 +54,14 @@ final class InventoryService
 
             $oldQuantity = $variant->stock;
             $newQuantity = max(0, $oldQuantity + $quantity);
-            
+
             $variant->update(['stock' => $newQuantity]);
 
             // Log the adjustment
             $this->logVariantStockAdjustment($variant, $oldQuantity, $newQuantity, $reason, $notes);
 
             DB::commit();
+
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -68,13 +70,14 @@ final class InventoryService
                 'quantity' => $quantity,
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
 
     public function reserveProductStock(Product $product, int $quantity): bool
     {
-        if (!$product->manage_stock) {
+        if (! $product->manage_stock) {
             return true;
         }
 
@@ -89,7 +92,7 @@ final class InventoryService
 
     public function releaseProductStock(Product $product, int $quantity): void
     {
-        if (!$product->manage_stock) {
+        if (! $product->manage_stock) {
             return;
         }
 
@@ -146,29 +149,31 @@ final class InventoryService
     public function bulkAdjustStock(array $adjustments): array
     {
         $results = [];
-        
+
         foreach ($adjustments as $adjustment) {
             $productId = $adjustment['product_id'] ?? null;
             $quantity = $adjustment['quantity'] ?? 0;
             $reason = $adjustment['reason'] ?? 'bulk_adjustment';
             $notes = $adjustment['notes'] ?? null;
 
-            if (!$productId) {
+            if (! $productId) {
                 $results[] = [
                     'product_id' => $productId,
                     'success' => false,
                     'error' => 'Product ID is required',
                 ];
+
                 continue;
             }
 
             $product = Product::find($productId);
-            if (!$product) {
+            if (! $product) {
                 $results[] = [
                     'product_id' => $productId,
                     'success' => false,
                     'error' => 'Product not found',
                 ];
+
                 continue;
             }
 

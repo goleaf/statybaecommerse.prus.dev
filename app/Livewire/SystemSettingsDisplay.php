@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire;
 
@@ -8,7 +10,9 @@ use Livewire\Component;
 final class SystemSettingsDisplay extends Component
 {
     public string $group = 'general';
+
     public bool $showPublicOnly = false;
+
     public string $search = '';
 
     protected $queryString = [
@@ -20,15 +24,15 @@ final class SystemSettingsDisplay extends Component
     public function render()
     {
         $settingsService = app(SystemSettingsService::class);
-        
-        $settings = $this->showPublicOnly 
+
+        $settings = $this->showPublicOnly
             ? $settingsService->getPublicSettings()
             : $settingsService->getSettingsByGroup($this->group);
 
         // Filter by search if provided
         if ($this->search) {
             $settings = array_filter($settings, function ($value, $key) {
-                return stripos($key, $this->search) !== false || 
+                return stripos($key, $this->search) !== false ||
                        stripos($value, $this->search) !== false;
             }, ARRAY_FILTER_USE_BOTH);
         }

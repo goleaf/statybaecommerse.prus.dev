@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -8,15 +10,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class SystemSetting extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes, LogsActivity, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'category_id',
@@ -97,14 +99,17 @@ final class SystemSetting extends Model implements HasMedia
                 }
                 if (is_string($value)) {
                     $decoded = json_decode($value, true);
+
                     return $decoded !== null ? $decoded : [];
                 }
+
                 return $value;
             },
             set: function ($value) {
                 if (is_array($value) || is_object($value)) {
                     return json_encode($value);
                 }
+
                 return $value;
             }
         );
@@ -119,14 +124,17 @@ final class SystemSetting extends Model implements HasMedia
                 }
                 if (is_string($value)) {
                     $decoded = json_decode($value, true);
+
                     return $decoded !== null ? $decoded : [];
                 }
+
                 return $value;
             },
             set: function ($value) {
                 if (is_array($value) || is_object($value)) {
                     return json_encode($value);
                 }
+
                 return $value;
             }
         );
@@ -138,7 +146,7 @@ final class SystemSetting extends Model implements HasMedia
             ->logOnly(['key', 'name', 'value', 'type', 'group', 'is_active'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "System Setting {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "System Setting {$eventName}")
             ->useLogName('system_settings');
     }
 
@@ -203,14 +211,15 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $query->where(function ($q) use ($search) {
             $q->where('key', 'like', "%{$search}%")
-              ->orWhere('name', 'like', "%{$search}%")
-              ->orWhere('description', 'like', "%{$search}%");
+                ->orWhere('name', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
         });
     }
 
     public static function getValue(string $key, $default = null)
     {
-        $setting = static::where('key', $key)->active()->first();
+        $setting = self::where('key', $key)->active()->first();
+
         return $setting ? $setting->value : $default;
     }
 
@@ -232,7 +241,7 @@ final class SystemSetting extends Model implements HasMedia
             'updated_by' => auth()->id(),
         ]);
 
-        static::updateOrCreate(
+        self::updateOrCreate(
             ['key' => $key],
             $data
         );
@@ -240,28 +249,32 @@ final class SystemSetting extends Model implements HasMedia
 
     public static function getPublic(string $key, $default = null)
     {
-        $setting = static::where('key', $key)->public()->active()->first();
+        $setting = self::where('key', $key)->public()->active()->first();
+
         return $setting ? $setting->value : $default;
     }
 
-    public function getTranslatedName(string $locale = null): string
+    public function getTranslatedName(?string $locale = null): string
     {
         $locale = $locale ?? app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
+
         return $translation?->name ?? $this->name;
     }
 
-    public function getTranslatedDescription(string $locale = null): ?string
+    public function getTranslatedDescription(?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
+
         return $translation?->description ?? $this->description;
     }
 
-    public function getTranslatedHelpText(string $locale = null): ?string
+    public function getTranslatedHelpText(?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
+
         return $translation?->help_text ?? $this->help_text;
     }
 
@@ -276,7 +289,7 @@ final class SystemSetting extends Model implements HasMedia
             ->singleFile();
     }
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('thumb')
             ->width(150)
@@ -294,7 +307,7 @@ final class SystemSetting extends Model implements HasMedia
     public function getValidationRulesArray(): array
     {
         $rules = $this->validation_rules;
-        
+
         if ($this->is_required) {
             $rules['required'] = true;
         }
@@ -319,7 +332,7 @@ final class SystemSetting extends Model implements HasMedia
 
     public function canBeModified(): bool
     {
-        return !$this->is_readonly;
+        return ! $this->is_readonly;
     }
 
     public function getFormattedValue(): string
@@ -342,7 +355,7 @@ final class SystemSetting extends Model implements HasMedia
             'boolean' => $this->value ? __('admin.yes') : __('admin.no'),
             'array', 'json' => json_encode($this->value, JSON_PRETTY_PRINT),
             'file', 'image' => $this->value ? basename($this->value) : __('admin.not_set'),
-            'color' => $this->value ? '<span style="background-color: ' . $this->value . '; width: 20px; height: 20px; display: inline-block; border-radius: 3px;"></span> ' . $this->value : __('admin.not_set'),
+            'color' => $this->value ? '<span style="background-color: '.$this->value.'; width: 20px; height: 20px; display: inline-block; border-radius: 3px;"></span> '.$this->value : __('admin.not_set'),
             default => (string) $this->value,
         };
     }
@@ -381,23 +394,23 @@ final class SystemSetting extends Model implements HasMedia
     public function getBadgeForStatus(): string
     {
         $badges = [];
-        
+
         if ($this->is_public) {
             $badges[] = __('admin.system_settings.public');
         }
-        
+
         if ($this->is_encrypted) {
             $badges[] = __('admin.system_settings.encrypted');
         }
-        
+
         if ($this->is_required) {
             $badges[] = __('admin.system_settings.required');
         }
-        
+
         if ($this->is_readonly) {
             $badges[] = __('admin.system_settings.readonly');
         }
-        
+
         return implode(', ', $badges);
     }
 
@@ -415,9 +428,9 @@ final class SystemSetting extends Model implements HasMedia
     {
         $chain = [];
         $visited = [];
-        
+
         $this->buildDependencyChain($this, $chain, $visited);
-        
+
         return $chain;
     }
 
@@ -426,10 +439,10 @@ final class SystemSetting extends Model implements HasMedia
         if (in_array($setting->id, $visited)) {
             return; // Prevent circular dependencies
         }
-        
+
         $visited[] = $setting->id;
         $chain[] = $setting;
-        
+
         foreach ($setting->dependencies as $dependency) {
             $this->buildDependencyChain($dependency->dependsOn, $chain, $visited);
         }
@@ -438,37 +451,37 @@ final class SystemSetting extends Model implements HasMedia
     public function validateValue($value): bool
     {
         $rules = $this->getValidationRulesArray();
-        
+
         if (empty($rules)) {
             return true;
         }
-        
+
         $validator = validator([$this->key => $value], [$this->key => $rules]);
-        
-        return !$validator->fails();
+
+        return ! $validator->fails();
     }
 
     public function getValidationErrors($value): array
     {
         $rules = $this->getValidationRulesArray();
-        
+
         if (empty($rules)) {
             return [];
         }
-        
+
         $validator = validator([$this->key => $value], [$this->key => $rules]);
-        
+
         return $validator->fails() ? $validator->errors()->all() : [];
     }
 
     public function getCacheKey(): string
     {
-        return 'system_setting_' . $this->key;
+        return 'system_setting_'.$this->key;
     }
 
     public function getCacheTags(): array
     {
-        return ['system_settings', 'system_setting_' . $this->id, 'group_' . $this->group];
+        return ['system_settings', 'system_setting_'.$this->id, 'group_'.$this->group];
     }
 
     public static function clearCache(): void
@@ -504,17 +517,17 @@ final class SystemSetting extends Model implements HasMedia
     protected static function boot(): void
     {
         parent::boot();
-        
-        static::creating(function (SystemSetting $setting) {
+
+        self::creating(function (SystemSetting $setting) {
             $setting->updated_by = auth()->id();
         });
-        
-        static::updating(function (SystemSetting $setting) {
+
+        self::updating(function (SystemSetting $setting) {
             $setting->updated_by = auth()->id();
             $setting->clearCache();
         });
-        
-        static::deleting(function (SystemSetting $setting) {
+
+        self::deleting(function (SystemSetting $setting) {
             $setting->clearCache();
         });
     }
@@ -532,13 +545,13 @@ final class SystemSetting extends Model implements HasMedia
     public function canBeEnabled(): bool
     {
         $dependencies = $this->getActiveDependencies();
-        
+
         foreach ($dependencies as $dependency) {
-            if (!$dependency->isConditionMet()) {
+            if (! $dependency->isConditionMet()) {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -563,7 +576,7 @@ final class SystemSetting extends Model implements HasMedia
         return $status;
     }
 
-    public function addToHistory(string $oldValue = null, string $newValue = null, string $reason = null): void
+    public function addToHistory(?string $oldValue = null, ?string $newValue = null, ?string $reason = null): void
     {
         $this->history()->create([
             'old_value' => $oldValue,
@@ -582,7 +595,7 @@ final class SystemSetting extends Model implements HasMedia
             ->get();
     }
 
-    public function getTranslatedValue(string $locale = null): mixed
+    public function getTranslatedValue(?string $locale = null): mixed
     {
         // For now, return the regular value
         // In the future, this could be extended to support translated values
@@ -592,7 +605,7 @@ final class SystemSetting extends Model implements HasMedia
     public function getValidationRulesForForm(): array
     {
         $rules = [];
-        
+
         if ($this->is_required) {
             $rules[] = 'required';
         }
@@ -601,7 +614,7 @@ final class SystemSetting extends Model implements HasMedia
         foreach ($validationRules as $rule => $value) {
             if (is_bool($value) && $value) {
                 $rules[] = $rule;
-            } elseif (!is_bool($value)) {
+            } elseif (! is_bool($value)) {
                 $rules[] = "{$rule}:{$value}";
             }
         }

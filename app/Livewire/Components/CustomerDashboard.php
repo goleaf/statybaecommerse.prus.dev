@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
-use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
@@ -14,6 +15,7 @@ final class CustomerDashboard extends Component
     use WithPagination;
 
     public User $user;
+
     public array $stats = [];
 
     public function mount(): void
@@ -89,18 +91,18 @@ final class CustomerDashboard extends Component
     {
         $this->user->wishlist()->detach($productId);
         $this->loadStats();
-        
+
         $this->dispatch('wishlist-updated');
         $this->dispatch('notify', [
             'type' => 'success',
-            'message' => __('ecommerce.removed_from_wishlist')
+            'message' => __('ecommerce.removed_from_wishlist'),
         ]);
     }
 
     public function addToCart(int $productId): void
     {
         $product = Product::findOrFail($productId);
-        
+
         // Add to cart logic here
         session()->push('cart', [
             'id' => $product->id,
@@ -108,11 +110,11 @@ final class CustomerDashboard extends Component
             'price' => $product->price,
             'quantity' => 1,
         ]);
-        
+
         $this->dispatch('cart-updated');
         $this->dispatch('notify', [
             'type' => 'success',
-            'message' => __('ecommerce.added_to_cart')
+            'message' => __('ecommerce.added_to_cart'),
         ]);
     }
 
@@ -121,6 +123,3 @@ final class CustomerDashboard extends Component
         return view('livewire.components.customer-dashboard');
     }
 }
-
-
-

@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
-use Spatie\Image\Image;
 use Spatie\Image\Enums\Fit;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Image\Image;
 use Spatie\MediaLibrary\Conversions\Conversion;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class ImageConversionService
 {
@@ -44,7 +46,7 @@ final class ImageConversionService
         $basePath = dirname($originalPath);
         $filename = pathinfo($media->file_name, PATHINFO_FILENAME);
 
-        $sizes = match($collection) {
+        $sizes = match ($collection) {
             'logo' => [
                 'xs' => ['width' => 64, 'height' => 64],
                 'sm' => ['width' => 128, 'height' => 128],
@@ -60,15 +62,15 @@ final class ImageConversionService
         };
 
         foreach ($sizes as $size => $dimensions) {
-            $outputPath = $basePath . "/conversions/{$filename}-{$collection}-{$size}.webp";
-            
+            $outputPath = $basePath."/conversions/{$filename}-{$collection}-{$size}.webp";
+
             try {
                 Image::load($originalPath)
                     ->fit(Fit::Contain, $dimensions['width'], $dimensions['height'])
                     ->quality(85)
                     ->save($outputPath);
             } catch (\Exception $e) {
-                logger()->warning("Failed to generate WebP conversion for {$media->name}: " . $e->getMessage());
+                logger()->warning("Failed to generate WebP conversion for {$media->name}: ".$e->getMessage());
             }
         }
     }

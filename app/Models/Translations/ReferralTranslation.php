@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
@@ -8,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class ReferralTranslation extends Model
 {
     protected $table = 'referral_translations';
-    
+
     protected $fillable = [
         'referral_id',
         'locale',
@@ -34,6 +36,3 @@ final class ReferralTranslation extends Model
         return $this->belongsTo(\App\Models\Referral::class);
     }
 }
-
-
-

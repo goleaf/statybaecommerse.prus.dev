@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire;
 
@@ -8,6 +10,7 @@ use Livewire\Component;
 final class InventoryStatus extends Component
 {
     public Product $product;
+
     public bool $showDetails = false;
 
     public function mount(Product $product): void
@@ -17,7 +20,7 @@ final class InventoryStatus extends Component
 
     public function toggleDetails(): void
     {
-        $this->showDetails = !$this->showDetails;
+        $this->showDetails = ! $this->showDetails;
     }
 
     public function render()

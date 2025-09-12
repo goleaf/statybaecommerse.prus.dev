@@ -1,18 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
 final class Referral extends Model
 {
-    use HasFactory, SoftDeletes, HasTranslations;
+    use HasFactory, HasTranslations, SoftDeletes;
 
     protected $fillable = [
         'referrer_id',
@@ -182,7 +184,7 @@ final class Referral extends Model
      */
     public static function findByCode(string $code): ?self
     {
-        return static::where('referral_code', $code)->first();
+        return self::where('referral_code', $code)->first();
     }
 
     /**
@@ -190,7 +192,7 @@ final class Referral extends Model
      */
     public static function userAlreadyReferred(int $userId): bool
     {
-        return static::where('referred_id', $userId)->exists();
+        return self::where('referred_id', $userId)->exists();
     }
 
     /**
@@ -198,7 +200,7 @@ final class Referral extends Model
      */
     public static function canUserRefer(int $userId): bool
     {
-        $activeReferrals = static::where('referrer_id', $userId)
+        $activeReferrals = self::where('referrer_id', $userId)
             ->active()
             ->count();
 
@@ -252,6 +254,7 @@ final class Referral extends Model
     public function getConversionRateAttribute(): float
     {
         $totalOrders = $this->referredOrders()->count();
+
         return $totalOrders > 0 ? 100.0 : 0.0;
     }
 
@@ -268,7 +271,7 @@ final class Referral extends Model
      */
     public function isAboutToExpire(): bool
     {
-        if (!$this->expires_at) {
+        if (! $this->expires_at) {
             return false;
         }
 
@@ -281,26 +284,26 @@ final class Referral extends Model
     public function getPerformanceScoreAttribute(): int
     {
         $score = 0;
-        
+
         // Base score for completion
         if ($this->status === 'completed') {
             $score += 50;
         }
-        
+
         // Bonus for having rewards
         if ($this->rewards()->exists()) {
             $score += 20;
         }
-        
+
         // Bonus for recent completion
         if ($this->completed_at && $this->completed_at->isAfter(now()->subDays(30))) {
             $score += 20;
         }
-        
+
         // Bonus for orders from referred user
         $orderCount = $this->referredOrders()->count();
         $score += min($orderCount * 5, 10);
-        
+
         return min($score, 100);
     }
 
@@ -311,7 +314,7 @@ final class Referral extends Model
     {
         do {
             $code = strtoupper(substr(md5(uniqid()), 0, 8));
-        } while (static::where('referral_code', $code)->exists());
+        } while (self::where('referral_code', $code)->exists());
 
         return $code;
     }
@@ -321,11 +324,10 @@ final class Referral extends Model
      */
     public static function createWithCode(array $attributes): self
     {
-        if (!isset($attributes['referral_code'])) {
-            $attributes['referral_code'] = static::generateUniqueCode();
+        if (! isset($attributes['referral_code'])) {
+            $attributes['referral_code'] = self::generateUniqueCode();
         }
 
-        return static::create($attributes);
+        return self::create($attributes);
     }
 }
-

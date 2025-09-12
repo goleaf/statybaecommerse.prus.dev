@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\StockResource\Pages;
 
 use App\Filament\Resources\StockResource;
+use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Actions;
 
 class EditStock extends EditRecord
 {
@@ -58,7 +60,7 @@ class EditStock extends EditRecord
             ->title(__('inventory.stock_item_updated'))
             ->body(__('inventory.stock_item_updated_message', [
                 'product' => $record->display_name,
-                'location' => $record->location->name
+                'location' => $record->location->name,
             ]))
             ->success()
             ->send();

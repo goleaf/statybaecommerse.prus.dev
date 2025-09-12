@@ -1,18 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Modals\Account;
 
 use App\Actions\CountriesWithZone;
 use App\Actions\ZoneSessionManager;
-use Filament\Notifications\Notification;
-use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Collection;
-use Livewire\Attributes\Validate;
-use LivewireUI\Modal\ModalComponent;
-// Legacy Shopper\Core\Enum\AddressType removed - using custom enum
 use App\Models\Address;
 use App\Models\Country;
+use Filament\Notifications\Notification;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+// Legacy Shopper\Core\Enum\AddressType removed - using custom enum
+use Livewire\Attributes\Validate;
+use LivewireUI\Modal\ModalComponent;
 
 class AddressForm extends ModalComponent
 {
@@ -62,7 +64,7 @@ class AddressForm extends ModalComponent
                     ->pluck('countryId')
             )
             ->pluck('name', 'id')
-            ->filter(fn($label) => filled($label));
+            ->filter(fn ($label) => filled($label));
 
         if ($addressId && $this->address->id) {
             $this->fill(array_merge($this->address->toArray(), ['type' => $this->address->type]));

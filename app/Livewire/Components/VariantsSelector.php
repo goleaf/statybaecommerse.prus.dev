@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -7,8 +9,8 @@ use App\Models\ProductVariant;
 use Darryldecode\Cart\Facades\CartFacade;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -37,10 +39,11 @@ class VariantsSelector extends Component
                 ->body(__('frontend.product.request_required'))
                 ->warning()
                 ->send();
+
             return;
         }
 
-        if (!$model->getPrice()) {
+        if (! $model->getPrice()) {
             Notification::make()
                 ->title(__('Cart Error'))
                 ->body(__('You cannot add product without price in you cart'))
@@ -58,6 +61,7 @@ class VariantsSelector extends Component
                 ->body(__('frontend.product.minimum_quantity_description'))
                 ->warning()
                 ->send();
+
             return;
         }
 
@@ -86,9 +90,9 @@ class VariantsSelector extends Component
     public function variants(): Collection
     {
         return Cache::remember(
-            key: 'product.' . $this->product->id . '.variants',
+            key: 'product.'.$this->product->id.'.variants',
             ttl: now()->addWeek(),
-            callback: fn() => $this
+            callback: fn () => $this
                 ->product
                 ->variants
                 ->load([
@@ -141,14 +145,14 @@ class VariantsSelector extends Component
 
     protected function selectVariantUsingOption(): ?ProductVariant
     {
-        if (!count($this->selectedOptionValues)) {
+        if (! count($this->selectedOptionValues)) {
             return null;
         }
 
         $variant = $this
             ->variants
             ->first(
-                fn($variant) => !$variant
+                fn ($variant) => ! $variant
                     ->values
                     ->pluck('id')
                     ->diff(collect($this->selectedOptionValues)->values())
@@ -171,15 +175,15 @@ class VariantsSelector extends Component
             $valueIds = $this->variant->values->pluck('id')->unique()->all();
 
             $attrTranslations = collect(\Illuminate\Support\Facades\DB::table('sh_attribute_translations')
-                    ->whereIn('attribute_id', $attributeIds)
-                    ->where('locale', $locale)
-                    ->get())
+                ->whereIn('attribute_id', $attributeIds)
+                ->where('locale', $locale)
+                ->get())
                 ->keyBy('attribute_id');
 
             $valTranslations = collect(\Illuminate\Support\Facades\DB::table('sh_attribute_value_translations')
-                    ->whereIn('attribute_value_id', $valueIds)
-                    ->where('locale', $locale)
-                    ->get())
+                ->whereIn('attribute_value_id', $valueIds)
+                ->where('locale', $locale)
+                ->get())
                 ->keyBy('attribute_value_id');
 
             return $this->variant->values->mapWithKeys(function ($value): array {

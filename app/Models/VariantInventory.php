@@ -1,18 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 final class VariantInventory extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $table = 'variant_inventories';
 
@@ -59,7 +61,7 @@ final class VariantInventory extends Model
             ->logOnly(['stock', 'reserved', 'incoming', 'threshold', 'is_tracked', 'notes', 'status'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Variant Inventory {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Variant Inventory {$eventName}")
             ->useLogName('variant_inventory');
     }
 
@@ -106,7 +108,7 @@ final class VariantInventory extends Model
     public function scopeExpiringSoon($query, int $days = 30)
     {
         return $query->whereNotNull('expiry_date')
-                    ->where('expiry_date', '<=', now()->addDays($days));
+            ->where('expiry_date', '<=', now()->addDays($days));
     }
 
     public function scopeByStatus($query, string $status)
@@ -146,7 +148,7 @@ final class VariantInventory extends Model
 
     public function getStockStatusAttribute(): string
     {
-        if (!$this->is_tracked) {
+        if (! $this->is_tracked) {
             return 'not_tracked';
         }
 
@@ -209,11 +211,12 @@ final class VariantInventory extends Model
 
     public function reserve(int $quantity): bool
     {
-        if (!$this->canReserve($quantity)) {
+        if (! $this->canReserve($quantity)) {
             return false;
         }
 
         $this->increment('reserved', $quantity);
+
         return true;
     }
 
@@ -225,7 +228,7 @@ final class VariantInventory extends Model
     public function adjustStock(int $quantity, string $reason = 'manual_adjustment'): void
     {
         $this->increment('stock', $quantity);
-        
+
         // Log the stock movement
         $this->stockMovements()->create([
             'quantity' => $quantity,
@@ -238,7 +241,7 @@ final class VariantInventory extends Model
 
     public function getDisplayNameAttribute(): string
     {
-        return $this->variant->display_name . ' - ' . $this->location->name;
+        return $this->variant->display_name.' - '.$this->location->name;
     }
 
     public function getProductNameAttribute(): string

@@ -1,10 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exceptions\CodeStyleException;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 
 final class CodeStyleService
 {
@@ -16,15 +16,18 @@ final class CodeStyleService
     ];
 
     private const UNION_TYPE_PATTERN = '/\|\s*([a-zA-Z\\\\]+)/';
+
     private const CLOSURE_PATTERN = '/fn\s*\(\s*([^)]*)\s*\)/';
+
     private const TRAILING_WHITESPACE_PATTERN = '/\s+$/m';
+
     private const NUMERIC_PATTERN = '/(\d+\.0+)(?![0-9])/';
 
     public function fixFile(string $filePath): array
     {
         $fixes = [];
-        
-        if (!File::exists($filePath)) {
+
+        if (! File::exists($filePath)) {
             return $fixes;
         }
 
@@ -58,7 +61,7 @@ final class CodeStyleService
             $fixes[] = [
                 'type' => 'file_updated',
                 'file' => $filePath,
-                'message' => 'File updated with code style fixes'
+                'message' => 'File updated with code style fixes',
             ];
         }
 
@@ -72,7 +75,7 @@ final class CodeStyleService
 
         foreach ($files as $file) {
             $extension = $file->getExtension();
-            
+
             if (in_array($extension, $extensions)) {
                 $fixes = $this->fixFile($file->getPathname());
                 $allFixes = array_merge($allFixes, $fixes);
@@ -86,7 +89,7 @@ final class CodeStyleService
     {
         $violations = [];
 
-        if (!File::exists($filePath)) {
+        if (! File::exists($filePath)) {
             return $violations;
         }
 
@@ -127,7 +130,7 @@ final class CodeStyleService
                 $useStatements[] = $line;
             } elseif ($inUseSection && trim($line) === '') {
                 $useStatements[] = $line;
-            } elseif ($inUseSection && !preg_match('/^use\s+/', $line) && trim($line) !== '') {
+            } elseif ($inUseSection && ! preg_match('/^use\s+/', $line) && trim($line) !== '') {
                 $inUseSection = false;
                 $otherLines[] = $line;
             } else {
@@ -135,14 +138,14 @@ final class CodeStyleService
             }
         }
 
-        if (!empty($useStatements)) {
+        if (! empty($useStatements)) {
             $sortedUseStatements = $this->sortUseStatements($useStatements);
-            
+
             if ($useStatements !== $sortedUseStatements) {
                 $fixes[] = [
                     'type' => 'import_order',
                     'file' => $filePath,
-                    'message' => 'Fixed import order'
+                    'message' => 'Fixed import order',
                 ];
             }
 
@@ -154,37 +157,41 @@ final class CodeStyleService
 
     private function sortUseStatements(array $useStatements): array
     {
-        $nonEmptyUseStatements = array_filter($useStatements, fn($line) => trim($line) !== '');
-        $emptyLines = array_filter($useStatements, fn($line) => trim($line) === '');
+        $nonEmptyUseStatements = array_filter($useStatements, fn ($line) => trim($line) !== '');
+        $emptyLines = array_filter($useStatements, fn ($line) => trim($line) === '');
 
         usort($nonEmptyUseStatements, function ($a, $b) {
             $aPattern = $this->getImportPattern($a);
             $bPattern = $this->getImportPattern($b);
-            
+
             $aIndex = array_search($aPattern, self::IMPORT_ORDER_PATTERNS);
             $bIndex = array_search($bPattern, self::IMPORT_ORDER_PATTERNS);
-            
-            if ($aIndex === false) $aIndex = 999;
-            if ($bIndex === false) $bIndex = 999;
-            
+
+            if ($aIndex === false) {
+                $aIndex = 999;
+            }
+            if ($bIndex === false) {
+                $bIndex = 999;
+            }
+
             if ($aIndex === $bIndex) {
                 return strcmp($a, $b);
             }
-            
+
             return $aIndex - $bIndex;
         });
 
         // Add empty lines between different import groups
         $result = [];
         $lastPattern = null;
-        
+
         foreach ($nonEmptyUseStatements as $statement) {
             $currentPattern = $this->getImportPattern($statement);
-            
+
             if ($lastPattern !== null && $lastPattern !== $currentPattern) {
                 $result[] = '';
             }
-            
+
             $result[] = $statement;
             $lastPattern = $currentPattern;
         }
@@ -199,7 +206,7 @@ final class CodeStyleService
                 return $pattern;
             }
         }
-        
+
         return 'other';
     }
 
@@ -207,12 +214,12 @@ final class CodeStyleService
     {
         $originalContent = $content;
         $content = preg_replace('/\|\s*([a-zA-Z\\\\]+)/', '|$1', $content);
-        
+
         if ($content !== $originalContent) {
             $fixes[] = [
                 'type' => 'union_type_spacing',
                 'file' => $filePath,
-                'message' => 'Fixed union type spacing'
+                'message' => 'Fixed union type spacing',
             ];
         }
 
@@ -223,12 +230,12 @@ final class CodeStyleService
     {
         $originalContent = $content;
         $content = preg_replace('/fn\s*\(\s*([^)]*)\s*\)/', 'fn($1)', $content);
-        
+
         if ($content !== $originalContent) {
             $fixes[] = [
                 'type' => 'closure_spacing',
                 'file' => $filePath,
-                'message' => 'Fixed closure spacing'
+                'message' => 'Fixed closure spacing',
             ];
         }
 
@@ -239,12 +246,12 @@ final class CodeStyleService
     {
         $originalContent = $content;
         $content = preg_replace(self::TRAILING_WHITESPACE_PATTERN, '', $content);
-        
+
         if ($content !== $originalContent) {
             $fixes[] = [
                 'type' => 'trailing_whitespace',
                 'file' => $filePath,
-                'message' => 'Removed trailing whitespace'
+                'message' => 'Removed trailing whitespace',
             ];
         }
 
@@ -256,14 +263,15 @@ final class CodeStyleService
         $originalContent = $content;
         $content = preg_replace_callback(self::NUMERIC_PATTERN, function ($matches) {
             $number = floatval($matches[1]);
-            return $number == intval($number) ? (string)intval($number) : $matches[1];
+
+            return $number == intval($number) ? (string) intval($number) : $matches[1];
         }, $content);
-        
+
         if ($content !== $originalContent) {
             $fixes[] = [
                 'type' => 'numeric_formatting',
                 'file' => $filePath,
-                'message' => 'Fixed numeric formatting'
+                'message' => 'Fixed numeric formatting',
             ];
         }
 
@@ -272,12 +280,12 @@ final class CodeStyleService
 
     private function fixFinalNewline(string $content, array &$fixes, string $filePath): string
     {
-        if (!str_ends_with($content, "\n")) {
+        if (! str_ends_with($content, "\n")) {
             $content .= "\n";
             $fixes[] = [
                 'type' => 'final_newline',
                 'file' => $filePath,
-                'message' => 'Added final newline'
+                'message' => 'Added final newline',
             ];
         }
 
@@ -295,12 +303,12 @@ final class CodeStyleService
                 $indentation = $matches[1];
                 $tabs = substr_count($indentation, "\t");
                 $spaces = strlen($indentation) - $tabs;
-                
+
                 if ($spaces % 4 !== 0) {
                     $hasIndentationIssues = true;
                     $properSpaces = str_repeat(' ', floor($spaces / 4) * 4);
                     $properTabs = str_repeat("\t", $tabs);
-                    $line = $properTabs . $properSpaces . ltrim($line);
+                    $line = $properTabs.$properSpaces.ltrim($line);
                 }
             }
             $fixedLines[] = $line;
@@ -310,7 +318,7 @@ final class CodeStyleService
             $fixes[] = [
                 'type' => 'indentation',
                 'file' => $filePath,
-                'message' => 'Fixed indentation'
+                'message' => 'Fixed indentation',
             ];
         }
 
@@ -327,7 +335,7 @@ final class CodeStyleService
             if (preg_match('/^use\s+/', $line)) {
                 $inUseSection = true;
                 $useStatements[] = ['line' => $lineNumber + 1, 'statement' => $line];
-            } elseif ($inUseSection && trim($line) !== '' && !preg_match('/^use\s+/', $line)) {
+            } elseif ($inUseSection && trim($line) !== '' && ! preg_match('/^use\s+/', $line)) {
                 break;
             }
         }
@@ -335,13 +343,13 @@ final class CodeStyleService
         if (count($useStatements) > 1) {
             $sortedStatements = $this->sortUseStatements(array_column($useStatements, 'statement'));
             $currentStatements = array_column($useStatements, 'statement');
-            
+
             if ($currentStatements !== $sortedStatements) {
                 $violations[] = [
                     'type' => 'import_order',
                     'file' => $filePath,
                     'line' => $useStatements[0]['line'],
-                    'message' => 'Import statements are not in correct order'
+                    'message' => 'Import statements are not in correct order',
                 ];
             }
         }
@@ -350,14 +358,14 @@ final class CodeStyleService
     private function validateUnionTypeSpacing(string $content, array &$violations, string $filePath): void
     {
         $lines = explode("\n", $content);
-        
+
         foreach ($lines as $lineNumber => $line) {
             if (preg_match('/\|\s+([a-zA-Z\\\\]+)/', $line)) {
                 $violations[] = [
                     'type' => 'union_type_spacing',
                     'file' => $filePath,
                     'line' => $lineNumber + 1,
-                    'message' => 'Union type should not have space after |'
+                    'message' => 'Union type should not have space after |',
                 ];
             }
         }
@@ -366,14 +374,14 @@ final class CodeStyleService
     private function validateClosureSpacing(string $content, array &$violations, string $filePath): void
     {
         $lines = explode("\n", $content);
-        
+
         foreach ($lines as $lineNumber => $line) {
             if (preg_match('/fn\s+\(\s+([^)]*)\s+\)/', $line)) {
                 $violations[] = [
                     'type' => 'closure_spacing',
                     'file' => $filePath,
                     'line' => $lineNumber + 1,
-                    'message' => 'Closure should not have spaces around parentheses'
+                    'message' => 'Closure should not have spaces around parentheses',
                 ];
             }
         }
@@ -387,7 +395,7 @@ final class CodeStyleService
                     'type' => 'trailing_whitespace',
                     'file' => $filePath,
                     'line' => $lineNumber + 1,
-                    'message' => 'Line has trailing whitespace'
+                    'message' => 'Line has trailing whitespace',
                 ];
             }
         }
@@ -396,14 +404,14 @@ final class CodeStyleService
     private function validateNumericFormatting(string $content, array &$violations, string $filePath): void
     {
         $lines = explode("\n", $content);
-        
+
         foreach ($lines as $lineNumber => $line) {
             if (preg_match(self::NUMERIC_PATTERN, $line, $matches)) {
                 $violations[] = [
                     'type' => 'numeric_formatting',
                     'file' => $filePath,
                     'line' => $lineNumber + 1,
-                    'message' => 'Numeric value should be formatted without unnecessary decimal places: ' . $matches[1]
+                    'message' => 'Numeric value should be formatted without unnecessary decimal places: '.$matches[1],
                 ];
             }
         }
@@ -411,14 +419,13 @@ final class CodeStyleService
 
     private function validateFinalNewline(string $content, array &$violations, string $filePath): void
     {
-        if (!str_ends_with($content, "\n")) {
+        if (! str_ends_with($content, "\n")) {
             $violations[] = [
                 'type' => 'final_newline',
                 'file' => $filePath,
                 'line' => count(explode("\n", $content)),
-                'message' => 'File should end with a newline'
+                'message' => 'File should end with a newline',
             ];
         }
     }
 }
-

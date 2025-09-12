@@ -4,10 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Discount;
 use App\Models\Product;
-use App\Services\Discounts\DiscountEngine;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Session;
 
 class TestDebugbarCommand extends Command
 {
@@ -87,10 +84,10 @@ class TestDebugbarCommand extends Command
         $environment = app()->environment();
 
         $this->line("Environment: <comment>$environment</comment>");
-        $this->line('Debug Mode: ' . ($debugEnabled ? '✅ Enabled' : '❌ Disabled'));
-        $this->line('Debugbar: ' . ($debugbarEnabled ? '✅ Enabled' : '❌ Disabled'));
+        $this->line('Debug Mode: '.($debugEnabled ? '✅ Enabled' : '❌ Disabled'));
+        $this->line('Debugbar: '.($debugbarEnabled ? '✅ Enabled' : '❌ Disabled'));
 
-        if (!$debugEnabled || !$debugbarEnabled) {
+        if (! $debugEnabled || ! $debugbarEnabled) {
             $this->warn('⚠️  Debugbar may not be visible. Check APP_DEBUG and DEBUGBAR_ENABLED in .env');
         }
 
@@ -101,8 +98,9 @@ class TestDebugbarCommand extends Command
     {
         $this->info('💰 Testing Discount Collector:');
 
-        if (!app()->bound('debugbar.discount')) {
+        if (! app()->bound('debugbar.discount')) {
             $this->error('❌ Discount collector not available');
+
             return;
         }
 
@@ -130,8 +128,9 @@ class TestDebugbarCommand extends Command
     {
         $this->info('🌐 Testing Translation Collector:');
 
-        if (!app()->bound('debugbar.translation')) {
+        if (! app()->bound('debugbar.translation')) {
             $this->error('❌ Translation collector not available');
+
             return;
         }
 
@@ -160,8 +159,9 @@ class TestDebugbarCommand extends Command
     {
         $this->info('⚡ Testing Livewire Collector:');
 
-        if (!app()->bound('debugbar.livewire')) {
+        if (! app()->bound('debugbar.livewire')) {
             $this->error('❌ Livewire collector not available');
+
             return;
         }
 
@@ -192,8 +192,9 @@ class TestDebugbarCommand extends Command
     {
         $this->info('🛒 Testing E-commerce Collector:');
 
-        if (!app()->bound('debugbar.ecommerce')) {
+        if (! app()->bound('debugbar.ecommerce')) {
             $this->error('❌ E-commerce collector not available');
+
             return;
         }
 

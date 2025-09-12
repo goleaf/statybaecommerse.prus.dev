@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
@@ -8,8 +10,6 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DocumentsRelationManager extends RelationManager
 {
@@ -25,15 +25,15 @@ class DocumentsRelationManager extends RelationManager
                     ->label(__('translations.document_name'))
                     ->required()
                     ->maxLength(255),
-                
+
                 Forms\Components\TextInput::make('title')
                     ->label(__('translations.document_title'))
                     ->maxLength(255),
-                
+
                 Forms\Components\Textarea::make('description')
                     ->label(__('translations.document_description'))
                     ->rows(3),
-                
+
                 Forms\Components\FileUpload::make('file_path')
                     ->label(__('translations.document_file'))
                     ->required()
@@ -41,7 +41,7 @@ class DocumentsRelationManager extends RelationManager
                     ->directory('documents')
                     ->visibility('public')
                     ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']),
-                
+
                 Forms\Components\Select::make('type')
                     ->label(__('translations.document_type'))
                     ->options([
@@ -52,12 +52,12 @@ class DocumentsRelationManager extends RelationManager
                         'other' => __('translations.other'),
                     ])
                     ->required(),
-                
+
                 Forms\Components\TextInput::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->numeric()
                     ->default(0),
-                
+
                 Forms\Components\Toggle::make('is_public')
                     ->label(__('translations.is_public'))
                     ->default(true),
@@ -73,12 +73,12 @@ class DocumentsRelationManager extends RelationManager
                     ->label(__('translations.document_name'))
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('translations.document_title'))
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('translations.document_type'))
                     ->badge()
@@ -90,19 +90,19 @@ class DocumentsRelationManager extends RelationManager
                         'other' => 'gray',
                         default => 'gray',
                     }),
-                
+
                 Tables\Columns\TextColumn::make('file_size')
                     ->label(__('translations.file_size'))
-                    ->formatStateUsing(fn (?int $state): string => $state ? number_format($state / 1024, 2) . ' KB' : '-'),
-                
+                    ->formatStateUsing(fn (?int $state): string => $state ? number_format($state / 1024, 2).' KB' : '-'),
+
                 Tables\Columns\IconColumn::make('is_public')
                     ->label(__('translations.is_public'))
                     ->boolean(),
-                
+
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('translations.created_at'))
                     ->dateTime()
@@ -119,7 +119,7 @@ class DocumentsRelationManager extends RelationManager
                         'certificate' => __('translations.certificate'),
                         'other' => __('translations.other'),
                     ]),
-                
+
                 Tables\Filters\SelectFilter::make('is_public')
                     ->label(__('translations.is_public'))
                     ->options([
@@ -133,11 +133,11 @@ class DocumentsRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-                
+
                 Tables\Actions\Action::make('download')
                     ->label(__('translations.download'))
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (Document $record): string => asset('storage/' . $record->file_path))
+                    ->url(fn (Document $record): string => asset('storage/'.$record->file_path))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
@@ -148,5 +148,3 @@ class DocumentsRelationManager extends RelationManager
             ->defaultSort('sort_order');
     }
 }
-
-

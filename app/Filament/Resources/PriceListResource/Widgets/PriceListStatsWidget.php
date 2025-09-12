@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\PriceListResource\Widgets;
 
@@ -6,7 +8,6 @@ use App\Models\PriceList;
 use App\Models\PriceListItem;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class PriceListStatsWidget extends BaseWidget
 {

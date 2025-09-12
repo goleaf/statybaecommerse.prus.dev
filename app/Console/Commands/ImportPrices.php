@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -9,24 +11,27 @@ use Illuminate\Support\Facades\Bus;
 class ImportPrices extends Command
 {
     protected $signature = 'import:prices {path : CSV path} {--chunk=500}';
+
     protected $description = 'Import prices from CSV in queued chunks';
 
     public function handle(): int
     {
         $path = (string) $this->argument('path');
-        if (!is_file($path)) {
+        if (! is_file($path)) {
             $this->error("File not found: {$path}");
+
             return 1;
         }
         $chunkSize = max(50, (int) $this->option('chunk'));
 
         $fh = fopen($path, 'rb');
-        if (!$fh) {
+        if (! $fh) {
             $this->error('Cannot open file');
+
             return 1;
         }
         $headers = fgetcsv($fh) ?: [];
-        $headers = array_map(fn($h) => strtolower(trim((string) $h)), $headers);
+        $headers = array_map(fn ($h) => strtolower(trim((string) $h)), $headers);
 
         $rows = [];
         $batch = [];
@@ -47,17 +52,18 @@ class ImportPrices extends Command
                 }
             }
         }
-        if (!empty($rows)) {
+        if (! empty($rows)) {
             $batch[] = new ImportPricesChunk($rows);
             $count += count($rows);
         }
-        if (!empty($batch)) {
+        if (! empty($batch)) {
             $pending = Bus::batch($batch)->name('Import Prices')->dispatch();
-            $this->info('Batch ID: ' . $pending->id);
+            $this->info('Batch ID: '.$pending->id);
         }
         fclose($fh);
 
         $this->info("Queued import for {$count} rows");
+
         return 0;
     }
 }

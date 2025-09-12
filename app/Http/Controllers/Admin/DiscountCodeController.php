@@ -6,7 +6,4 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-final class DiscountCodeController extends Controller
-{
-}
-
+final class DiscountCodeController extends Controller {}

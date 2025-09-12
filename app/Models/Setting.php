@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -59,13 +61,14 @@ final class Setting extends Model
 
     public static function get(string $key, $default = null)
     {
-        $setting = static::where('key', $key)->first();
+        $setting = self::where('key', $key)->first();
+
         return $setting ? $setting->value : $default;
     }
 
     public static function set(string $key, $value, string $type = 'string', ?string $description = null): void
     {
-        static::updateOrCreate(
+        self::updateOrCreate(
             ['key' => $key],
             [
                 'value' => $value,
@@ -77,7 +80,8 @@ final class Setting extends Model
 
     public static function getPublic(string $key, $default = null)
     {
-        $setting = static::where('key', $key)->where('is_public', true)->first();
+        $setting = self::where('key', $key)->where('is_public', true)->first();
+
         return $setting ? $setting->value : $default;
     }
 }

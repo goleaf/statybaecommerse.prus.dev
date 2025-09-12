@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
@@ -9,7 +11,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class VariantsRelationManager extends RelationManager
 {
@@ -25,46 +26,46 @@ class VariantsRelationManager extends RelationManager
                     ->label(__('translations.variant_name'))
                     ->required()
                     ->maxLength(255),
-                
+
                 Forms\Components\TextInput::make('sku')
                     ->label(__('translations.variant_sku'))
                     ->required()
                     ->maxLength(255)
                     ->unique(ProductVariant::class, 'sku', ignoreRecord: true),
-                
+
                 Forms\Components\TextInput::make('price')
                     ->label(__('translations.variant_price'))
                     ->numeric()
                     ->prefix('€')
                     ->step(0.01),
-                
+
                 Forms\Components\TextInput::make('compare_price')
                     ->label(__('translations.variant_compare_price'))
                     ->numeric()
                     ->prefix('€')
                     ->step(0.01),
-                
+
                 Forms\Components\TextInput::make('cost_price')
                     ->label(__('translations.variant_cost_price'))
                     ->numeric()
                     ->prefix('€')
                     ->step(0.01),
-                
+
                 Forms\Components\TextInput::make('stock_quantity')
                     ->label(__('translations.variant_stock_quantity'))
                     ->numeric()
                     ->default(0),
-                
+
                 Forms\Components\TextInput::make('weight')
                     ->label(__('translations.variant_weight'))
                     ->numeric()
                     ->suffix('kg')
                     ->step(0.01),
-                
+
                 Forms\Components\Toggle::make('is_visible')
                     ->label(__('translations.is_visible'))
                     ->default(true),
-                
+
                 Forms\Components\TextInput::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->numeric()
@@ -81,18 +82,18 @@ class VariantsRelationManager extends RelationManager
                     ->label(__('translations.variant_name'))
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('sku')
                     ->label(__('translations.variant_sku'))
                     ->searchable()
                     ->sortable()
                     ->copyable(),
-                
+
                 Tables\Columns\TextColumn::make('price')
                     ->label(__('translations.variant_price'))
                     ->money('EUR')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('stock_quantity')
                     ->label(__('translations.variant_stock'))
                     ->numeric()
@@ -102,20 +103,20 @@ class VariantsRelationManager extends RelationManager
                         $record->stock_quantity <= 5 => 'warning',
                         default => 'success',
                     }),
-                
+
                 Tables\Columns\TextColumn::make('weight')
                     ->label(__('translations.variant_weight'))
                     ->suffix(' kg')
                     ->sortable(),
-                
+
                 Tables\Columns\IconColumn::make('is_visible')
                     ->label(__('translations.is_visible'))
                     ->boolean(),
-                
+
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('translations.created_at'))
                     ->dateTime()
@@ -129,11 +130,11 @@ class VariantsRelationManager extends RelationManager
                         true => __('translations.yes'),
                         false => __('translations.no'),
                     ]),
-                
+
                 Tables\Filters\Filter::make('low_stock')
                     ->label(__('translations.low_stock'))
                     ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 5)),
-                
+
                 Tables\Filters\Filter::make('out_of_stock')
                     ->label(__('translations.out_of_stock'))
                     ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
@@ -153,5 +154,3 @@ class VariantsRelationManager extends RelationManager
             ->defaultSort('sort_order');
     }
 }
-
-

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Jobs;
 
@@ -16,7 +18,7 @@ class ImportPricesChunk implements ShouldQueue
     private array $rows;
 
     /**
-     * @param array<int,array<string,mixed>> $rows
+     * @param  array<int,array<string,mixed>>  $rows
      */
     public function __construct(array $rows)
     {
@@ -36,7 +38,7 @@ class ImportPricesChunk implements ShouldQueue
 
             $productId = DB::table('products')->where('slug', $productSlug)->value('id');
             $currencyId = DB::table('currencies')->where('code', $currencyCode)->value('id');
-            if (!$productId || !$currencyId) {
+            if (! $productId || ! $currencyId) {
                 continue;
             }
 

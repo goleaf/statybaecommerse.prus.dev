@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -40,6 +42,7 @@ final class ReferralCodeService
     private function generateAlphanumericCode(): string
     {
         $length = config('referral.code_length', 8);
+
         return strtoupper(Str::random($length));
     }
 
@@ -51,7 +54,7 @@ final class ReferralCodeService
         $length = config('referral.code_length', 8);
         $min = pow(10, $length - 1);
         $max = pow(10, $length) - 1;
-        
+
         return (string) rand($min, $max);
     }
 
@@ -92,7 +95,7 @@ final class ReferralCodeService
      */
     public function isCodeAvailable(string $code): bool
     {
-        return !ReferralCode::where('code', $code)->exists();
+        return ! ReferralCode::where('code', $code)->exists();
     }
 
     /**
@@ -101,12 +104,12 @@ final class ReferralCodeService
     public function createCustomCode(int $userId, string $code): ?ReferralCode
     {
         // Validate format
-        if (!$this->validateCodeFormat($code)) {
+        if (! $this->validateCodeFormat($code)) {
             throw new \InvalidArgumentException('Invalid referral code format');
         }
 
         // Check availability
-        if (!$this->isCodeAvailable($code)) {
+        if (! $this->isCodeAvailable($code)) {
             throw new \InvalidArgumentException('Referral code already exists');
         }
 
@@ -126,7 +129,7 @@ final class ReferralCodeService
     {
         $referralCode = ReferralCode::findByCode($code);
 
-        if (!$referralCode) {
+        if (! $referralCode) {
             return false;
         }
 
@@ -142,8 +145,8 @@ final class ReferralCodeService
     {
         $baseUrl = config('app.url');
         $referralPath = config('referral.registration_path', '/register');
-        
-        return $baseUrl . $referralPath . '?ref=' . $code;
+
+        return $baseUrl.$referralPath.'?ref='.$code;
     }
 
     /**
@@ -152,8 +155,8 @@ final class ReferralCodeService
     public function extractCodeFromUrl(string $url): ?string
     {
         $parsedUrl = parse_url($url);
-        
-        if (!isset($parsedUrl['query'])) {
+
+        if (! isset($parsedUrl['query'])) {
             return null;
         }
 
@@ -169,7 +172,7 @@ final class ReferralCodeService
     {
         $referralCode = ReferralCode::findByCode($code);
 
-        if (!$referralCode) {
+        if (! $referralCode) {
             return [];
         }
 
@@ -189,4 +192,3 @@ final class ReferralCodeService
         ];
     }
 }
-

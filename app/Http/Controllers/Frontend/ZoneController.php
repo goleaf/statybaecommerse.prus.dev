@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Zone;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Http\JsonResponse;
 
 final class ZoneController extends Controller
 {
@@ -25,15 +27,15 @@ final class ZoneController extends Controller
     public function show(Zone $zone): View
     {
         $zone->load(['currency', 'countries', 'translations']);
-        
+
         return view('frontend.zones.show', compact('zone'));
     }
 
     public function getZonesByCountry(Request $request): JsonResponse
     {
         $countryId = $request->get('country_id');
-        
-        if (!$countryId) {
+
+        if (! $countryId) {
             return response()->json(['zones' => []]);
         }
 
@@ -58,7 +60,7 @@ final class ZoneController extends Controller
                     'free_shipping_threshold' => $zone->free_shipping_threshold,
                     'currency' => $zone->currency->code ?? 'EUR',
                 ];
-            })
+            }),
         ]);
     }
 
@@ -91,8 +93,8 @@ final class ZoneController extends Controller
     public function getDefaultZone(): JsonResponse
     {
         $zone = Zone::getDefaultZone();
-        
-        if (!$zone) {
+
+        if (! $zone) {
             return response()->json(['zone' => null]);
         }
 
@@ -106,7 +108,7 @@ final class ZoneController extends Controller
                 'shipping_rate' => $zone->shipping_rate,
                 'free_shipping_threshold' => $zone->free_shipping_threshold,
                 'currency' => $zone->currency->code ?? 'EUR',
-            ]
+            ],
         ]);
     }
 }

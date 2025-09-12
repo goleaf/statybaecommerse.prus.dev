@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -44,6 +46,7 @@ final class FixCodeStyleCommand extends Command
             $allFixes = array_merge($allFixes, $fixes);
         } else {
             $this->error("Path does not exist: {$path}");
+
             return 1;
         }
 
@@ -63,22 +66,23 @@ final class FixCodeStyleCommand extends Command
     private function processFile(CodeStyleService $codeStyleService, string $filePath, bool $dryRun): array
     {
         $fixes = $codeStyleService->validateFile($filePath);
-        
+
         if (empty($fixes)) {
             $this->line("✅ {$filePath} - No issues found");
+
             return [];
         }
 
-        $this->warn("⚠️  {$filePath} - Found " . count($fixes) . " issues:");
-        
+        $this->warn("⚠️  {$filePath} - Found ".count($fixes).' issues:');
+
         foreach ($fixes as $fix) {
             $this->line("   Line {$fix['line']}: {$fix['message']}");
         }
 
-        if (!$dryRun) {
+        if (! $dryRun) {
             $appliedFixes = $codeStyleService->fixFile($filePath);
-            if (!empty($appliedFixes)) {
-                $this->info("🔧 Applied " . count($appliedFixes) . " fixes");
+            if (! empty($appliedFixes)) {
+                $this->info('🔧 Applied '.count($appliedFixes).' fixes');
             }
         }
 
@@ -97,18 +101,18 @@ final class FixCodeStyleCommand extends Command
 
         foreach ($files as $file) {
             $extension = $file->getExtension();
-            
+
             if (in_array($extension, $extensions)) {
                 $fixes = $this->processFile($codeStyleService, $file->getPathname(), $dryRun);
                 $allFixes = array_merge($allFixes, $fixes);
-                
-                if (!empty($fixes)) {
+
+                if (! empty($fixes)) {
                     $filesWithIssues++;
                 }
-                
+
                 $processedFiles++;
             }
-            
+
             $progressBar->advance();
         }
 
@@ -130,14 +134,14 @@ final class FixCodeStyleCommand extends Command
             $issueTypes[$type] = ($issueTypes[$type] ?? 0) + 1;
         }
 
-        $this->info("📈 Summary:");
+        $this->info('📈 Summary:');
         $this->line("   Total issues found: {$totalIssues}");
         $this->line("   Execution time: {$executionTime}s");
 
-        if (!empty($issueTypes)) {
+        if (! empty($issueTypes)) {
             $this->newLine();
-            $this->info("📋 Issue types:");
-            
+            $this->info('📋 Issue types:');
+
             foreach ($issueTypes as $type => $count) {
                 $this->line("   {$type}: {$count}");
             }
@@ -145,7 +149,7 @@ final class FixCodeStyleCommand extends Command
 
         if ($totalIssues === 0) {
             $this->newLine();
-            $this->info("🎉 All files are following code style guidelines!");
+            $this->info('🎉 All files are following code style guidelines!');
         }
     }
 
@@ -157,13 +161,13 @@ final class FixCodeStyleCommand extends Command
             'total_issues' => count($allFixes),
             'issues_by_type' => [],
             'issues_by_file' => [],
-            'all_issues' => $allFixes
+            'all_issues' => $allFixes,
         ];
 
         foreach ($allFixes as $fix) {
             $type = $fix['type'];
             $file = $fix['file'];
-            
+
             $reportData['issues_by_type'][$type] = ($reportData['issues_by_type'][$type] ?? 0) + 1;
             $reportData['issues_by_file'][$file] = ($reportData['issues_by_file'][$file] ?? 0) + 1;
         }
@@ -172,4 +176,3 @@ final class FixCodeStyleCommand extends Command
         $this->info("📄 Detailed report saved to: {$reportPath}");
     }
 }
-

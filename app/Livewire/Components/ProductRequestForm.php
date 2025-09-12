@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -10,11 +12,17 @@ use Livewire\Component;
 final class ProductRequestForm extends Component
 {
     public Product $product;
+
     public string $name = '';
+
     public string $email = '';
+
     public string $phone = '';
+
     public string $message = '';
+
     public int $requested_quantity = 1;
+
     public bool $showForm = false;
 
     protected $rules = [
@@ -37,7 +45,7 @@ final class ProductRequestForm extends Component
     public function mount(Product $product): void
     {
         $this->product = $product;
-        
+
         // Pre-fill form if user is logged in
         if (Auth::check()) {
             $user = Auth::user();
@@ -49,9 +57,9 @@ final class ProductRequestForm extends Component
 
     public function toggleForm(): void
     {
-        $this->showForm = !$this->showForm;
-        
-        if (!$this->showForm) {
+        $this->showForm = ! $this->showForm;
+
+        if (! $this->showForm) {
             $this->resetForm();
         }
     }
@@ -81,7 +89,7 @@ final class ProductRequestForm extends Component
 
         // Show success message
         session()->flash('request_success', 'Jūsų užklausa sėkmingai išsiųsta. Susisieksime su jumis artimiausiu metu.');
-        
+
         // Dispatch event to refresh parent component
         $this->dispatch('request-submitted');
     }
@@ -101,4 +109,3 @@ final class ProductRequestForm extends Component
         return view('livewire.components.product-request-form');
     }
 }
-

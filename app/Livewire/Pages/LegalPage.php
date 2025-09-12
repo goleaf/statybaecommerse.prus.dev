@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
@@ -23,14 +25,14 @@ final class LegalPage extends Component
             ->where('locale', app()->getLocale())
             ->first();
 
-        if (!$translation) {
+        if (! $translation) {
             $translation = $this->legal->translations()->first();
         }
 
         return view('livewire.pages.legal', [
             'translation' => $translation,
         ])->layout('components.layouts.base', [
-            'title' => $translation?->title ?? $this->legal->key
+            'title' => $translation?->title ?? $this->legal->key,
         ]);
     }
 }

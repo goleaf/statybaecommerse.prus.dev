@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components\Product;
 
@@ -8,7 +10,9 @@ use Livewire\Component;
 class Images extends Component
 {
     public ?string $thumbnail = null;
+
     public array $images = [];
+
     public int $active = 0;
 
     public function setActive(int $index): void

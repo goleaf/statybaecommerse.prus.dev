@@ -1,19 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\DiscountRedemption;
 use App\Models\Discount;
 use App\Models\DiscountCode;
+use App\Models\DiscountRedemption;
 use App\Models\Order;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 
 final class DiscountRedemptionController extends Controller
 {
@@ -23,7 +25,7 @@ final class DiscountRedemptionController extends Controller
     public function index(Request $request): View
     {
         $user = Auth::user();
-        
+
         $query = DiscountRedemption::with(['discount', 'code', 'order'])
             ->where('user_id', $user->id);
 
@@ -94,7 +96,7 @@ final class DiscountRedemptionController extends Controller
     public function create(): View
     {
         $user = Auth::user();
-        
+
         $availableDiscounts = Discount::where('is_active', true)
             ->where('status', 'active')
             ->where(function ($query) {
@@ -154,7 +156,7 @@ final class DiscountRedemptionController extends Controller
 
         // Check if discount is valid and available
         $discount = Discount::findOrFail($request->discount_id);
-        if (!$discount->isValid()) {
+        if (! $discount->isValid()) {
             return redirect()->back()
                 ->with('error', __('frontend.discount_redemptions.errors.discount_not_valid'))
                 ->withInput();
@@ -162,7 +164,7 @@ final class DiscountRedemptionController extends Controller
 
         // Check if code is valid and available
         $code = DiscountCode::findOrFail($request->code_id);
-        if (!$code->is_active || $code->discount_id !== $discount->id) {
+        if (! $code->is_active || $code->discount_id !== $discount->id) {
             return redirect()->back()
                 ->with('error', __('frontend.discount_redemptions.errors.code_not_valid'))
                 ->withInput();
@@ -180,7 +182,7 @@ final class DiscountRedemptionController extends Controller
             $userUsageCount = DiscountRedemption::where('user_id', $user->id)
                 ->where('code_id', $code->id)
                 ->count();
-            
+
             if ($userUsageCount >= $code->usage_limit_per_user) {
                 return redirect()->back()
                     ->with('error', __('frontend.discount_redemptions.errors.user_limit_reached'))
@@ -220,7 +222,7 @@ final class DiscountRedemptionController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return redirect()->back()
                 ->with('error', __('frontend.discount_redemptions.errors.creation_failed'))
                 ->withInput();
@@ -233,8 +235,8 @@ final class DiscountRedemptionController extends Controller
     public function getDiscountCodes(Request $request): JsonResponse
     {
         $discountId = $request->input('discount_id');
-        
-        if (!$discountId) {
+
+        if (! $discountId) {
             return response()->json([]);
         }
 
@@ -263,7 +265,7 @@ final class DiscountRedemptionController extends Controller
     public function getStats(Request $request): JsonResponse
     {
         $user = Auth::user();
-        
+
         $stats = [
             'total_redemptions' => DiscountRedemption::where('user_id', $user->id)->count(),
             'total_saved' => DiscountRedemption::where('user_id', $user->id)->sum('amount_saved'),
@@ -286,7 +288,7 @@ final class DiscountRedemptionController extends Controller
     public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $user = Auth::user();
-        
+
         $query = DiscountRedemption::with(['discount', 'code', 'order'])
             ->where('user_id', $user->id);
 
@@ -309,11 +311,11 @@ final class DiscountRedemptionController extends Controller
 
         $redemptions = $query->orderBy('redeemed_at', 'desc')->get();
 
-        $filename = 'discount_redemptions_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        $filename = 'discount_redemptions_'.now()->format('Y-m-d_H-i-s').'.csv';
 
         return response()->streamDownload(function () use ($redemptions) {
             $handle = fopen('php://output', 'w');
-            
+
             // CSV headers
             fputcsv($handle, [
                 __('frontend.discount_redemptions.export.id'),
@@ -345,8 +347,7 @@ final class DiscountRedemptionController extends Controller
             fclose($handle);
         }, $filename, [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 }
-

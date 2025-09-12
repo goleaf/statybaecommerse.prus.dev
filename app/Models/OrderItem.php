@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -53,20 +55,20 @@ final class OrderItem extends Model
     {
         parent::boot();
 
-        static::creating(function (OrderItem $orderItem) {
+        self::creating(function (OrderItem $orderItem) {
             if (isset($orderItem->price) && empty($orderItem->unit_price)) {
                 $orderItem->unit_price = $orderItem->price;
             }
-            if (!$orderItem->total) {
+            if (! $orderItem->total) {
                 $orderItem->total = $orderItem->unit_price * $orderItem->quantity;
             }
         });
 
-        static::updating(function (OrderItem $orderItem) {
+        self::updating(function (OrderItem $orderItem) {
             if ($orderItem->isDirty(['unit_price', 'quantity'])) {
                 $orderItem->total = $orderItem->unit_price * $orderItem->quantity;
             }
-            if ($orderItem->isDirty('price') && !$orderItem->isDirty('unit_price')) {
+            if ($orderItem->isDirty('price') && ! $orderItem->isDirty('unit_price')) {
                 $orderItem->unit_price = $orderItem->price;
             }
         });

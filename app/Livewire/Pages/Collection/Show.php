@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages\Collection;
 
@@ -31,16 +33,16 @@ class Show extends Component
 
     public function mount(CollectionModel $collection): void
     {
-        abort_if(!app_feature_enabled('collection'), 404);
-        
+        abort_if(! app_feature_enabled('collection'), 404);
+
         // Ensure collection is enabled
-        if (!$collection->is_enabled) {
+        if (! $collection->is_enabled) {
             abort(404);
         }
-        
+
         $this->collection = $collection;
         $this->slug = $collection->slug;
-        
+
         // Handle translation redirects if needed
         $locale = app()->getLocale();
         $canonical = $this->collection->translations()->where('locale', $locale)->value('slug') ?: $this->collection->slug;
@@ -66,8 +68,8 @@ class Show extends Component
             ])
             ->withCount('variants');
 
-        $selectedBrandIds = collect($this->brandIds)->map(fn($v) => (int) $v)->filter()->values();
-        $selected = collect($this->selectedValues)->map(fn($v) => (int) $v)->filter()->values();
+        $selectedBrandIds = collect($this->brandIds)->map(fn ($v) => (int) $v)->filter()->values();
+        $selected = collect($this->selectedValues)->map(fn ($v) => (int) $v)->filter()->values();
         if ($selected->isNotEmpty()) {
             $query->whereHas('variants.values', function ($q) use ($selected) {
                 $q->whereIn('id', $selected->all());
@@ -85,14 +87,15 @@ class Show extends Component
 
             $query->where(function ($outer) use ($rules, $matchAll) {
                 // Group rules by type
-                $byType = $rules->groupBy(fn($r) => $r->rule->value ?? (string) $r->rule);
+                $byType = $rules->groupBy(fn ($r) => $r->rule->value ?? (string) $r->rule);
 
                 $applyRule = function ($q, $r) {
                     $op = $r->operator->value ?? (string) $r->operator;
                     $val = $r->value;
                     switch ($r->rule->value ?? (string) $r->rule) {
                         case 'product_title':
-                            $like = '%' . str_replace(['%', '_'], ['\%', '\_'], $val) . '%';
+                            $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $val).'%';
+
                             return $q->where(function ($w) use ($op, $like) {
                                 if (in_array($op, ['contains', 'starts_with', 'ends_with'])) {
                                     $w->where('name', 'like', $like);
@@ -117,9 +120,9 @@ class Show extends Component
                                 });
                             });
                         case 'product_brand':
-                            return $q->when(is_numeric($val), fn($bq) => $bq->where('brand_id', (int) $val));
+                            return $q->when(is_numeric($val), fn ($bq) => $bq->where('brand_id', (int) $val));
                         case 'product_category':
-                            return $q->whereHas('categories', fn($cq) => $cq->where('id', (int) $val));
+                            return $q->whereHas('categories', fn ($cq) => $cq->where('id', (int) $val));
                         default:
                             return $q;
                     }
@@ -127,18 +130,18 @@ class Show extends Component
 
                 if ($matchAll) {
                     foreach ($rules as $r) {
-                        $outer->where(fn($w) => $applyRule($w, $r));
+                        $outer->where(fn ($w) => $applyRule($w, $r));
                     }
                 } else {
                     $outer->where(function ($any) use ($rules, $applyRule) {
                         foreach ($rules as $r) {
-                            $any->orWhere(fn($w) => $applyRule($w, $r));
+                            $any->orWhere(fn ($w) => $applyRule($w, $r));
                         }
                     });
                 }
             });
         } else {
-            $query->whereHas('collections', fn($cq) => $cq->where('collections.id', $collection?->id));
+            $query->whereHas('collections', fn ($cq) => $cq->where('collections.id', $collection?->id));
         }
 
         $query
@@ -177,7 +180,8 @@ class Show extends Component
                     $val = $r->value;
                     switch ($r->rule->value ?? (string) $r->rule) {
                         case 'product_title':
-                            $like = '%' . str_replace(['%', '_'], ['\%', '\_'], $val) . '%';
+                            $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $val).'%';
+
                             return $q->where(function ($w) use ($op, $like) {
                                 if (in_array($op, ['contains', 'starts_with', 'ends_with'])) {
                                     $w->where('name', 'like', $like);
@@ -202,9 +206,9 @@ class Show extends Component
                                 });
                             });
                         case 'product_brand':
-                            return $q->when(is_numeric($val), fn($bq) => $bq->where('brand_id', (int) $val));
+                            return $q->when(is_numeric($val), fn ($bq) => $bq->where('brand_id', (int) $val));
                         case 'product_category':
-                            return $q->whereHas('categories', fn($cq) => $cq->where('id', (int) $val));
+                            return $q->whereHas('categories', fn ($cq) => $cq->where('id', (int) $val));
                         default:
                             return $q;
                     }
@@ -212,18 +216,18 @@ class Show extends Component
 
                 if ($matchAll) {
                     foreach ($rules as $r) {
-                        $outer->where(fn($w) => $applyRule($w, $r));
+                        $outer->where(fn ($w) => $applyRule($w, $r));
                     }
                 } else {
                     $outer->where(function ($any) use ($rules, $applyRule) {
                         foreach ($rules as $r) {
-                            $any->orWhere(fn($w) => $applyRule($w, $r));
+                            $any->orWhere(fn ($w) => $applyRule($w, $r));
                         }
                     });
                 }
             });
         } else {
-            $builder->whereHas('collections', fn($cq) => $cq->where('collections.id', $collection?->id));
+            $builder->whereHas('collections', fn ($cq) => $cq->where('collections.id', $collection?->id));
         }
 
         $products = $builder->with(['variants.values.attribute'])->limit(100)->get();
@@ -235,7 +239,7 @@ class Show extends Component
             ->flatten()
             ->unique('id')
             ->groupBy('attribute_id')
-            ->map(fn($values) => [
+            ->map(fn ($values) => [
                 'attribute' => $values->first()->attribute,
                 'values' => $values->sortBy('position')->values(),
             ]);
@@ -251,7 +255,7 @@ class Show extends Component
     {
         $this->selectedValues = array_values(array_filter(
             $this->selectedValues,
-            static fn($id) => (int) $id !== $valueId
+            static fn ($id) => (int) $id !== $valueId
         ));
         $this->page = 1;
     }
@@ -276,13 +280,14 @@ class Show extends Component
             $rules = $collection->rules()->get();
             $matchAll = ($collection->match_conditions->value ?? $collection->match_conditions ?? 'all') === 'all';
             $builder->where(function ($outer) use ($rules, $matchAll) {
-                $byType = $rules->groupBy(fn($r) => $r->rule->value ?? (string) $r->rule);
+                $byType = $rules->groupBy(fn ($r) => $r->rule->value ?? (string) $r->rule);
                 $applyRule = function ($q, $r) {
                     $op = $r->operator->value ?? (string) $r->operator;
                     $val = $r->value;
                     switch ($r->rule->value ?? (string) $r->rule) {
                         case 'product_title':
-                            $like = '%' . str_replace(['%', '_'], ['\%', '\_'], $val) . '%';
+                            $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $val).'%';
+
                             return $q->where(function ($w) use ($op, $like) {
                                 if (in_array($op, ['contains', 'starts_with', 'ends_with'])) {
                                     $w->where('name', 'like', $like);
@@ -307,9 +312,9 @@ class Show extends Component
                                 });
                             });
                         case 'product_brand':
-                            return $q->when(is_numeric($val), fn($bq) => $bq->where('brand_id', (int) $val));
+                            return $q->when(is_numeric($val), fn ($bq) => $bq->where('brand_id', (int) $val));
                         case 'product_category':
-                            return $q->whereHas('categories', fn($cq) => $cq->where('id', (int) $val));
+                            return $q->whereHas('categories', fn ($cq) => $cq->where('id', (int) $val));
                         default:
                             return $q;
                     }
@@ -317,18 +322,18 @@ class Show extends Component
 
                 if ($matchAll) {
                     foreach ($rules as $r) {
-                        $outer->where(fn($w) => $applyRule($w, $r));
+                        $outer->where(fn ($w) => $applyRule($w, $r));
                     }
                 } else {
                     $outer->where(function ($any) use ($rules, $applyRule) {
                         foreach ($rules as $r) {
-                            $any->orWhere(fn($w) => $applyRule($w, $r));
+                            $any->orWhere(fn ($w) => $applyRule($w, $r));
                         }
                     });
                 }
             });
         } else {
-            $builder->whereHas('collections', fn($cq) => $cq->where('collections.id', $collection?->id));
+            $builder->whereHas('collections', fn ($cq) => $cq->where('collections.id', $collection?->id));
         }
 
         return $builder
@@ -352,7 +357,7 @@ class Show extends Component
     {
         $this->brandIds = array_values(array_filter(
             $this->brandIds,
-            static fn($id) => (int) $id !== $brandId
+            static fn ($id) => (int) $id !== $brandId
         ));
         $this->page = 1;
     }

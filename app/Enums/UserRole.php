@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -203,22 +205,22 @@ enum UserRole: string
             self::SUPER_ADMIN => [
                 'manage_users', 'manage_products', 'manage_orders', 'manage_settings',
                 'view_analytics', 'manage_content', 'manage_inventory', 'manage_marketing',
-                'view_reports', 'manage_system', 'manage_referrals'
+                'view_reports', 'manage_system', 'manage_referrals',
             ],
             self::ADMIN => [
                 'manage_users', 'manage_products', 'manage_orders', 'manage_settings',
                 'view_analytics', 'manage_content', 'manage_inventory', 'manage_marketing',
-                'view_reports', 'manage_referrals'
+                'view_reports', 'manage_referrals',
             ],
             self::MANAGER => [
                 'manage_products', 'manage_orders', 'view_analytics', 'manage_content',
-                'manage_inventory', 'manage_marketing', 'view_reports', 'manage_referrals'
+                'manage_inventory', 'manage_marketing', 'view_reports', 'manage_referrals',
             ],
             self::EDITOR => [
-                'manage_products', 'manage_content'
+                'manage_products', 'manage_content',
             ],
             self::CUSTOMER => [
-                'view_own_orders', 'manage_own_profile', 'view_own_referrals'
+                'view_own_orders', 'manage_own_profile', 'view_own_referrals',
             ],
             self::GUEST => [],
         };
@@ -253,7 +255,7 @@ enum UserRole: string
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
             ->toArray();
     }
 
@@ -261,7 +263,7 @@ enum UserRole: string
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [
+            ->mapWithKeys(fn ($case) => [
                 $case->value => [
                     'label' => $case->label(),
                     'description' => $case->description(),
@@ -284,7 +286,7 @@ enum UserRole: string
                     'can_view_reports' => $case->canViewReports(),
                     'can_manage_system' => $case->canManageSystem(),
                     'permissions' => $case->permissions(),
-                ]
+                ],
             ])
             ->toArray();
     }
@@ -292,25 +294,25 @@ enum UserRole: string
     public static function admin(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isAdmin());
+            ->filter(fn ($case) => $case->isAdmin());
     }
 
     public static function staff(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isStaff());
+            ->filter(fn ($case) => $case->isStaff());
     }
 
     public static function customers(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isCustomer());
+            ->filter(fn ($case) => $case->isCustomer());
     }
 
     public static function withAdminAccess(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->canAccessAdmin());
+            ->filter(fn ($case) => $case->canAccessAdmin());
     }
 
     public static function ordered(): Collection
@@ -322,7 +324,7 @@ enum UserRole: string
     public static function fromLabel(string $label): ?self
     {
         return collect(self::cases())
-            ->first(fn($case) => $case->label() === $label);
+            ->first(fn ($case) => $case->label() === $label);
     }
 
     public static function values(): array
@@ -333,7 +335,7 @@ enum UserRole: string
     public static function labels(): array
     {
         return collect(self::cases())
-            ->map(fn($case) => $case->label())
+            ->map(fn ($case) => $case->label())
             ->toArray();
     }
 

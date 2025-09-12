@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class OrderShipping extends Model
 {
@@ -62,17 +64,17 @@ final class OrderShipping extends Model
 
     public function isShipped(): bool
     {
-        return !is_null($this->shipped_at);
+        return ! is_null($this->shipped_at);
     }
 
     public function isDelivered(): bool
     {
-        return !is_null($this->delivered_at);
+        return ! is_null($this->delivered_at);
     }
 
     public function isInTransit(): bool
     {
-        return $this->isShipped() && !$this->isDelivered();
+        return $this->isShipped() && ! $this->isDelivered();
     }
 
     public function getStatusAttribute(): string

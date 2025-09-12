@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -8,10 +10,15 @@ use Livewire\Component;
 final class AdvancedRelatedProducts extends Component
 {
     public Product $product;
+
     public int $limit = 4;
+
     public string $type = 'mixed'; // mixed, category, brand, price
+
     public string $title = '';
+
     public bool $showTitle = true;
+
     public string $class = '';
 
     public function mount(
@@ -32,7 +39,7 @@ final class AdvancedRelatedProducts extends Component
 
     public function getRelatedProductsProperty()
     {
-        return match($this->type) {
+        return match ($this->type) {
             'category' => $this->product->getRelatedProductsByCategory($this->limit),
             'brand' => $this->product->getRelatedProductsByBrand($this->limit),
             'price' => $this->product->getRelatedProductsByPriceRange(0.2, $this->limit),
@@ -46,7 +53,7 @@ final class AdvancedRelatedProducts extends Component
             return $this->title;
         }
 
-        return match($this->type) {
+        return match ($this->type) {
             'category' => __('ecommerce.similar_products'),
             'brand' => __('ecommerce.you_might_also_like'),
             'price' => __('ecommerce.recommended_for_you'),

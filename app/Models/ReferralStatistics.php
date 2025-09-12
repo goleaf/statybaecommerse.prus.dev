@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 
 final class ReferralStatistics extends Model
 {
@@ -66,7 +68,7 @@ final class ReferralStatistics extends Model
      */
     public static function getOrCreateForUserAndDate(int $userId, string $date): self
     {
-        return static::firstOrCreate(
+        return self::firstOrCreate(
             [
                 'user_id' => $userId,
                 'date' => $date,
@@ -120,7 +122,7 @@ final class ReferralStatistics extends Model
      */
     public static function getTotalForUser(int $userId): array
     {
-        $stats = static::where('user_id', $userId)
+        $stats = self::where('user_id', $userId)
             ->selectRaw('
                 SUM(total_referrals) as total_referrals,
                 SUM(completed_referrals) as completed_referrals,
@@ -139,4 +141,3 @@ final class ReferralStatistics extends Model
         ];
     }
 }
-

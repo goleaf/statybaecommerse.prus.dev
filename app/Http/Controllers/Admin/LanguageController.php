@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
@@ -20,7 +22,7 @@ final class LanguageController extends Controller
             : preg_split('/[\s,|]+/', (string) $supported, -1, PREG_SPLIT_NO_EMPTY);
         $supportedLocales = array_map('trim', $supportedLocales);
 
-        if (!in_array($locale, $supportedLocales, true)) {
+        if (! in_array($locale, $supportedLocales, true)) {
             $locale = (string) (config('app.locale', 'lt'));
         }
 

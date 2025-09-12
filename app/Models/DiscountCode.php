@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class DiscountCode extends Model
@@ -176,7 +178,7 @@ final class DiscountCode extends Model
      */
     public function isValid(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -223,6 +225,7 @@ final class DiscountCode extends Model
     public function getDescriptionAttribute(): string
     {
         $locale = app()->getLocale();
+
         return $this->{"description_{$locale}"} ?? $this->description_lt ?? '';
     }
 
@@ -257,7 +260,7 @@ final class DiscountCode extends Model
      */
     public function isExpiringSoon(): bool
     {
-        if (!$this->expires_at) {
+        if (! $this->expires_at) {
             return false;
         }
 
@@ -283,13 +286,13 @@ final class DiscountCode extends Model
     {
         parent::boot();
 
-        static::creating(function ($model) {
+        self::creating(function ($model) {
             if (auth()->check()) {
                 $model->created_by = auth()->id();
             }
         });
 
-        static::updating(function ($model) {
+        self::updating(function ($model) {
             if (auth()->check()) {
                 $model->updated_by = auth()->id();
             }

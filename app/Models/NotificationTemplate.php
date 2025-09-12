@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -24,31 +26,31 @@ final class NotificationTemplate extends Model
         'is_active' => 'boolean',
     ];
 
-    public function getLocalizedSubject(string $locale = null): ?string
+    public function getLocalizedSubject(?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
-        
+
         return $this->subject[$locale] ?? $this->subject[config('app.fallback_locale')] ?? null;
     }
 
-    public function getLocalizedContent(string $locale = null): ?string
+    public function getLocalizedContent(?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
-        
+
         return $this->content[$locale] ?? $this->content[config('app.fallback_locale')] ?? null;
     }
 
-    public function renderSubject(array $variables = [], string $locale = null): string
+    public function renderSubject(array $variables = [], ?string $locale = null): string
     {
         $template = $this->getLocalizedSubject($locale) ?? '';
-        
+
         return $this->replaceVariables($template, $variables);
     }
 
-    public function renderContent(array $variables = [], string $locale = null): string
+    public function renderContent(array $variables = [], ?string $locale = null): string
     {
         $template = $this->getLocalizedContent($locale) ?? '';
-        
+
         return $this->replaceVariables($template, $variables);
     }
 
@@ -57,7 +59,7 @@ final class NotificationTemplate extends Model
         foreach ($variables as $key => $value) {
             $template = str_replace("{{$key}}", (string) $value, $template);
         }
-        
+
         return $template;
     }
 
@@ -68,7 +70,7 @@ final class NotificationTemplate extends Model
 
     public static function getByEvent(string $event): ?self
     {
-        return static::where('event', $event)
+        return self::where('event', $event)
             ->where('is_active', true)
             ->first();
     }

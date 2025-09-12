@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -6,33 +8,32 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailNotification;
-use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Contracts\Translation\HasLocalePreference as HasLocalePreferenceContract;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Translatable\HasTranslations;
 
-final class User extends Authenticatable implements HasLocalePreferenceContract, FilamentUser
+final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
-    use HasFactory, HasRoles, Notifiable, LogsActivity, SoftDeletes, HasTranslations;
+    use HasFactory, HasRoles, HasTranslations, LogsActivity, Notifiable, SoftDeletes;
 
     protected static function booted(): void
     {
-        static::saving(function (self $user): void {
-            $computedName = trim(((string) ($user->first_name ?? '')) . ' ' . ((string) ($user->last_name ?? '')));
+        self::saving(function (self $user): void {
+            $computedName = trim(((string) ($user->first_name ?? '')).' '.((string) ($user->last_name ?? '')));
             if (empty($user->name) && $computedName !== '') {
                 $user->name = $computedName;
             }
-            if (empty($user->name) && !empty($user->email)) {
+            if (empty($user->name) && ! empty($user->email)) {
                 $user->name = (string) $user->email;
             }
         });
@@ -144,6 +145,7 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
     public function preferredLocale(): ?string
     {
         $locale = $this->getAttribute('preferred_locale');
+
         return $locale ? (string) $locale : null;
     }
 
@@ -156,7 +158,7 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
 
     public function sendEmailVerificationNotification(): void
     {
-        $notification = new VerifyEmailNotification();
+        $notification = new VerifyEmailNotification;
         $locale = $this->preferredLocale() ?? app()->getLocale();
         $this->notify($notification->locale($locale));
     }
@@ -168,7 +170,7 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
                 $roles = $this
                     ->roles()
                     ->pluck('name')
-                    ->filter(fn($value) => is_string($value) && $value !== '')
+                    ->filter(fn ($value) => is_string($value) && $value !== '')
                     ->values()
                     ->all();
 
@@ -176,7 +178,8 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
                     return 'N/A';
                 }
 
-                $labels = array_map(fn($item) => ucwords((string) $item), $roles);
+                $labels = array_map(fn ($item) => ucwords((string) $item), $roles);
+
                 return implode(', ', $labels);
             }
         );
@@ -188,11 +191,11 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
             ->logOnly([
                 'name', 'email', 'is_active', 'last_login_at', 'preferred_locale',
                 'first_name', 'last_name', 'phone_number', 'is_admin', 'accepts_marketing',
-                'two_factor_enabled', 'company', 'position', 'website'
+                'two_factor_enabled', 'company', 'position', 'website',
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "User {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "User {$eventName}")
             ->useLogName('user');
     }
 
@@ -289,6 +292,7 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
     public function getPartnerDiscountRateAttribute(): float
     {
         $partner = $this->active_partner;
+
         return $partner ? $partner->effective_discount_rate : 0;
     }
 
@@ -338,6 +342,7 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
     public function getReferralUrlAttribute(): ?string
     {
         $code = $this->activeReferralCode();
+
         return $code ? $code->referral_url : null;
     }
 
@@ -473,13 +478,13 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
     public function scopeOnTrial($query)
     {
         return $query->whereNotNull('trial_ends_at')
-                    ->where('trial_ends_at', '>', now());
+            ->where('trial_ends_at', '>', now());
     }
 
     // Helper methods
     public function getFullNameAttribute(): string
     {
-        return trim($this->first_name . ' ' . $this->last_name) ?: $this->name;
+        return trim($this->first_name.' '.$this->last_name) ?: $this->name;
     }
 
     public function getInitialsAttribute(): string
@@ -491,6 +496,7 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
         if ($this->last_name) {
             $initials .= strtoupper(substr($this->last_name, 0, 1));
         }
+
         return $initials ?: strtoupper(substr($this->name, 0, 2));
     }
 
@@ -502,12 +508,14 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
     public function getAverageOrderValueAttribute(): float
     {
         $completedOrders = $this->orders()->where('status', 'completed');
+
         return $completedOrders->count() > 0 ? $completedOrders->avg('total') : 0;
     }
 
     public function getLastOrderDateAttribute(): ?string
     {
         $lastOrder = $this->orders()->latest()->first();
+
         return $lastOrder ? $lastOrder->created_at->format('Y-m-d') : null;
     }
 
@@ -528,28 +536,28 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
 
     public function isEmailVerified(): bool
     {
-        return !is_null($this->email_verified_at);
+        return ! is_null($this->email_verified_at);
     }
 
     public function isPhoneVerified(): bool
     {
-        return !is_null($this->phone_verified_at);
+        return ! is_null($this->phone_verified_at);
     }
 
     public function hasTwoFactor(): bool
     {
-        return $this->two_factor_enabled && !is_null($this->two_factor_confirmed_at);
+        return $this->two_factor_enabled && ! is_null($this->two_factor_confirmed_at);
     }
 
     public function isOnTrial(): bool
     {
-        return !is_null($this->trial_ends_at) && $this->trial_ends_at->isFuture();
+        return ! is_null($this->trial_ends_at) && $this->trial_ends_at->isFuture();
     }
 
     public function hasActiveSubscription(): bool
     {
-        return !is_null($this->subscription_status) && 
-               !in_array($this->subscription_status, ['cancelled', 'expired']);
+        return ! is_null($this->subscription_status) &&
+               ! in_array($this->subscription_status, ['cancelled', 'expired']);
     }
 
     public function getSubscriptionStatusColorAttribute(): string
@@ -565,23 +573,36 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
 
     public function getStatusColorAttribute(): string
     {
-        if (!$this->is_active) return 'danger';
-        if ($this->is_admin) return 'warning';
+        if (! $this->is_active) {
+            return 'danger';
+        }
+        if ($this->is_admin) {
+            return 'warning';
+        }
+
         return 'success';
     }
 
     public function getStatusTextAttribute(): string
     {
-        if (!$this->is_active) return __('admin.user_status.inactive');
-        if ($this->is_admin) return __('admin.user_status.admin');
+        if (! $this->is_active) {
+            return __('admin.user_status.inactive');
+        }
+        if ($this->is_admin) {
+            return __('admin.user_status.admin');
+        }
+
         return __('admin.user_status.active');
     }
 
     public function getAgeAttribute(): ?int
     {
-        if (!$this->birth_date && !$this->date_of_birth) return null;
-        
+        if (! $this->birth_date && ! $this->date_of_birth) {
+            return null;
+        }
+
         $birthDate = $this->birth_date ?? $this->date_of_birth;
+
         return $birthDate->age;
     }
 
@@ -612,31 +633,35 @@ final class User extends Authenticatable implements HasLocalePreferenceContract,
     private function generateGravatarUrl(): string
     {
         $hash = md5(strtolower(trim($this->email)));
+
         return "https://www.gravatar.com/avatar/{$hash}?d=identicon&s=200";
     }
 
     public function getSocialLinksAttribute(): array
     {
         $links = $this->attributes['social_links'] ?? [];
+
         return is_array($links) ? $links : [];
     }
 
     public function getNotificationPreferencesAttribute(): array
     {
         $preferences = $this->attributes['notification_preferences'] ?? [];
+
         return is_array($preferences) ? $preferences : [];
     }
 
     public function getPrivacySettingsAttribute(): array
     {
         $settings = $this->attributes['privacy_settings'] ?? [];
+
         return is_array($settings) ? $settings : [];
     }
 
     public function getMarketingPreferencesAttribute(): array
     {
         $preferences = $this->attributes['marketing_preferences'] ?? [];
+
         return is_array($preferences) ? $preferences : [];
     }
-
 }

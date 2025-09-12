@@ -7,11 +7,11 @@ namespace App\Livewire\Components\Checkout;
 use App\Actions\CreateOrder;
 use App\Actions\Payment\PayWithCash;
 use App\Enums\PaymentType;
+use App\Models\Country;
+use App\Models\Zone;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Validate;
-use App\Models\Country;
-use App\Models\Zone;
 use Spatie\LivewireWizard\Components\StepComponent;
 
 class Payment extends StepComponent

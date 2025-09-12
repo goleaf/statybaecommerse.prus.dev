@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
 use Filament\Forms\Components\RichEditor;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Support\Collection;
+use Filament\Schemas\Components\Section;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 use SolutionForest\TabLayoutPlugin\Schemas\SimpleTabSchema;
 
@@ -92,7 +93,7 @@ final class MultiLanguageTabService
                         ->label($config['label'] ?? ucfirst($field))
                         ->required($config['required'] ?? false)
                         ->toolbarButtons($config['toolbar'] ?? [
-                            'bold', 'italic', 'link', 'bulletList', 'orderedList'
+                            'bold', 'italic', 'link', 'bulletList', 'orderedList',
                         ]),
 
                     default => TextInput::make("{$field}_{$language['code']}")
@@ -167,7 +168,7 @@ final class MultiLanguageTabService
                             ->label($config['label'] ?? ucfirst($field))
                             ->required($config['required'] ?? false)
                             ->toolbarButtons($config['toolbar'] ?? [
-                                'bold', 'italic', 'link', 'bulletList', 'orderedList', 'h2', 'h3'
+                                'bold', 'italic', 'link', 'bulletList', 'orderedList', 'h2', 'h3',
                             ]),
 
                         default => TextInput::make("{$field}_{$language['code']}")
@@ -260,7 +261,7 @@ final class MultiLanguageTabService
      */
     public static function populateFormWithTranslations($record, array $translatableFields): array
     {
-        if (!$record || !method_exists($record, 'translations')) {
+        if (! $record || ! method_exists($record, 'translations')) {
             return [];
         }
 

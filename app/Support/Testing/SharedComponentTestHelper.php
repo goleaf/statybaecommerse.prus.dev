@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Support\Testing;
 
@@ -8,7 +10,7 @@ final class SharedComponentTestHelper
 {
     public static function assertButtonHasVariant(TestView $view, string $variant): void
     {
-        $variantClasses = match($variant) {
+        $variantClasses = match ($variant) {
             'primary' => 'bg-blue-600',
             'secondary' => 'bg-gray-200',
             'danger' => 'bg-red-600',
@@ -23,7 +25,7 @@ final class SharedComponentTestHelper
 
     public static function assertButtonHasSize(TestView $view, string $size): void
     {
-        $sizeClasses = match($size) {
+        $sizeClasses = match ($size) {
             'sm' => 'px-3 py-2 text-sm',
             'md' => 'px-4 py-2 text-sm',
             'lg' => 'px-6 py-3 text-base',
@@ -43,7 +45,7 @@ final class SharedComponentTestHelper
 
     public static function assertBadgeHasVariant(TestView $view, string $variant): void
     {
-        $variantClasses = match($variant) {
+        $variantClasses = match ($variant) {
             'primary' => 'bg-blue-100 text-blue-800',
             'secondary' => 'bg-gray-100 text-gray-800',
             'success' => 'bg-green-100 text-green-800',
@@ -117,7 +119,7 @@ final class SharedComponentTestHelper
         }
 
         $maxWidth = $config['maxWidth'] ?? 'md';
-        $widthClasses = match($maxWidth) {
+        $widthClasses = match ($maxWidth) {
             'sm' => 'sm:max-w-sm',
             'md' => 'sm:max-w-md',
             'lg' => 'sm:max-w-lg',
@@ -131,7 +133,7 @@ final class SharedComponentTestHelper
 
     public static function assertNotificationHasType(TestView $view, string $type): void
     {
-        $typeClasses = match($type) {
+        $typeClasses = match ($type) {
             'success' => 'bg-green-50 border-green-200 text-green-800',
             'error' => 'bg-red-50 border-red-200 text-red-800',
             'warning' => 'bg-yellow-50 border-yellow-200 text-yellow-800',
@@ -175,10 +177,10 @@ final class SharedComponentTestHelper
     {
         // Check for ARIA labels
         $view->assertSeeInOrder(['aria-label', 'role'], false);
-        
+
         // Check for proper heading structure
         $view->assertSee(['<h1', '<h2', '<h3'], false);
-        
+
         // Check for alt text on images
         $view->assertSee('alt=', false);
     }
@@ -188,7 +190,7 @@ final class SharedComponentTestHelper
         // Check for responsive classes
         $responsiveClasses = [
             'sm:', 'md:', 'lg:', 'xl:', '2xl:',
-            'grid-cols-1', 'sm:grid-cols-2', 'lg:grid-cols-3'
+            'grid-cols-1', 'sm:grid-cols-2', 'lg:grid-cols-3',
         ];
 
         foreach ($responsiveClasses as $class) {
@@ -200,7 +202,7 @@ final class SharedComponentTestHelper
     {
         // Check for dark mode classes
         $darkClasses = [
-            'dark:bg-', 'dark:text-', 'dark:border-', 'dark:hover:'
+            'dark:bg-', 'dark:text-', 'dark:border-', 'dark:hover:',
         ];
 
         $hasDarkMode = false;
@@ -211,7 +213,7 @@ final class SharedComponentTestHelper
             }
         }
 
-        if (!$hasDarkMode) {
+        if (! $hasDarkMode) {
             throw new \Exception('Component does not support dark mode');
         }
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -11,24 +13,26 @@ use Livewire\Component;
 final class CategoryAccordionMenu extends Component
 {
     public ?int $activeCategoryId = null;
+
     public int $maxDepth = 4;
 
     #[Computed]
     public function categoryTree()
     {
         $locale = app()->getLocale();
+
         return Cache::remember("category_accordion_tree:{$locale}", now()->addMinutes(30), function () {
             $roots = Category::query()
                 ->withProductCounts()
                 ->with([
-                    'translations' => fn($q) => $q->where('locale', app()->getLocale()),
+                    'translations' => fn ($q) => $q->where('locale', app()->getLocale()),
                     'children' => function ($q) {
                         $q
                             ->withProductCounts()
-                            ->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])
+                            ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
                             ->visible()
                             ->ordered();
-                    }
+                    },
                 ])
                 ->visible()
                 ->roots()

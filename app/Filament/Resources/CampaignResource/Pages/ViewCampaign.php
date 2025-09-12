@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\Pages;
 
 use App\Filament\Resources\CampaignResource;
-use Filament\Resources\Pages\ViewRecord\Concerns\Translatable;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
+use Filament\Resources\Pages\ViewRecord\Concerns\Translatable;
 
 final class ViewCampaign extends ViewRecord
 {

@@ -1,15 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use App\Models\Attribute;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AttributesRelationManager extends RelationManager
 {
@@ -27,12 +26,12 @@ class AttributesRelationManager extends RelationManager
                     ->searchable()
                     ->preload()
                     ->required(),
-                
+
                 Forms\Components\TextInput::make('value')
                     ->label(__('translations.attribute_value'))
                     ->required()
                     ->maxLength(255),
-                
+
                 Forms\Components\TextInput::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->numeric()
@@ -49,12 +48,12 @@ class AttributesRelationManager extends RelationManager
                     ->label(__('translations.attribute_name'))
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('translations.attribute_value'))
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('translations.attribute_type'))
                     ->badge()
@@ -66,15 +65,15 @@ class AttributesRelationManager extends RelationManager
                         'select' => 'purple',
                         default => 'gray',
                     }),
-                
+
                 Tables\Columns\IconColumn::make('is_required')
                     ->label(__('translations.is_required'))
                     ->boolean(),
-                
+
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('translations.created_at'))
                     ->dateTime()
@@ -91,7 +90,7 @@ class AttributesRelationManager extends RelationManager
                         'date' => __('translations.date'),
                         'select' => __('translations.select'),
                     ]),
-                
+
                 Tables\Filters\SelectFilter::make('is_required')
                     ->label(__('translations.is_required'))
                     ->options([
@@ -106,12 +105,12 @@ class AttributesRelationManager extends RelationManager
                         $action->getRecordSelect()
                             ->searchable()
                             ->preload(),
-                        
+
                         Forms\Components\TextInput::make('value')
                             ->label(__('translations.attribute_value'))
                             ->required()
                             ->maxLength(255),
-                        
+
                         Forms\Components\TextInput::make('sort_order')
                             ->label(__('translations.sort_order'))
                             ->numeric()
@@ -130,5 +129,3 @@ class AttributesRelationManager extends RelationManager
             ->defaultSort('sort_order');
     }
 }
-
-

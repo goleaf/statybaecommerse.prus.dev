@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -6,7 +8,6 @@ use App\Http\Requests\StoreNewsCommentRequest;
 use App\Models\News;
 use App\Models\NewsComment;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 final class NewsCommentController extends Controller
 {

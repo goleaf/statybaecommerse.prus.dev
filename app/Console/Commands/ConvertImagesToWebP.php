@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class ConvertImagesToWebP extends Command
 {
@@ -19,8 +20,9 @@ final class ConvertImagesToWebP extends Command
     {
         $this->info('🔄 Converting all product images to WebP format...');
 
-        if (!function_exists('imagewebp')) {
+        if (! function_exists('imagewebp')) {
             $this->error('❌ WebP support is not available in GD extension.');
+
             return self::FAILURE;
         }
 
@@ -29,8 +31,8 @@ final class ConvertImagesToWebP extends Command
         $quality = (int) $this->option('quality');
 
         $query = Media::where('collection_name', $collection);
-        
-        if (!$force) {
+
+        if (! $force) {
             $query->where('mime_type', '!=', 'image/webp');
         }
 
@@ -38,6 +40,7 @@ final class ConvertImagesToWebP extends Command
 
         if ($mediaItems->isEmpty()) {
             $this->info('✅ No images need conversion.');
+
             return self::SUCCESS;
         }
 
@@ -56,7 +59,7 @@ final class ConvertImagesToWebP extends Command
                     $errorCount++;
                 }
             } catch (\Throwable $e) {
-                $this->error("Failed to convert {$media->name}: " . $e->getMessage());
+                $this->error("Failed to convert {$media->name}: ".$e->getMessage());
                 $errorCount++;
             }
 
@@ -66,7 +69,7 @@ final class ConvertImagesToWebP extends Command
         $progressBar->finish();
         $this->newLine(2);
 
-        $this->info("✅ Conversion completed!");
+        $this->info('✅ Conversion completed!');
         $this->info("   Success: {$successCount}");
         if ($errorCount > 0) {
             $this->warn("   Errors: {$errorCount}");
@@ -78,21 +81,23 @@ final class ConvertImagesToWebP extends Command
     private function convertMediaToWebP(Media $media, int $quality): bool
     {
         $originalPath = $media->getPath();
-        
-        if (!file_exists($originalPath)) {
+
+        if (! file_exists($originalPath)) {
             $this->warn("Original file not found: {$media->file_name}");
+
             return false;
         }
 
         // Skip if already WebP and not forcing
-        if ($media->mime_type === 'image/webp' && !$this->option('force')) {
+        if ($media->mime_type === 'image/webp' && ! $this->option('force')) {
             return true;
         }
 
         // Get image info
         $imageInfo = getimagesize($originalPath);
-        if (!$imageInfo) {
+        if (! $imageInfo) {
             $this->warn("Invalid image file: {$media->file_name}");
+
             return false;
         }
 
@@ -105,8 +110,9 @@ final class ConvertImagesToWebP extends Command
             default => null,
         };
 
-        if (!$image) {
+        if (! $image) {
             $this->warn("Cannot create image resource for: {$media->file_name}");
+
             return false;
         }
 
@@ -118,10 +124,11 @@ final class ConvertImagesToWebP extends Command
 
         // Create WebP version
         $webpPath = preg_replace('/\.[^.]+$/', '.webp', $originalPath);
-        
-        if (!imagewebp($image, $webpPath, $quality)) {
+
+        if (! imagewebp($image, $webpPath, $quality)) {
             imagedestroy($image);
             $this->warn("Failed to save WebP for: {$media->file_name}");
+
             return false;
         }
 

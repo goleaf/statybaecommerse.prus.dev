@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -11,7 +13,9 @@ use Livewire\Component;
 final class WishlistWidget extends Component
 {
     public array $wishlistItems = [];
+
     public bool $showWishlist = false;
+
     public int $totalItems = 0;
 
     public function mount(): void
@@ -22,36 +26,36 @@ final class WishlistWidget extends Component
     #[On('wishlist-updated')]
     public function loadWishlist(): void
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             $this->wishlistItems = session('wishlist', []);
         } else {
             /** @var User $user */
             $user = auth()->user();
             $this->wishlistItems = $user->wishlist()->with(['media', 'brand'])->get()->toArray();
         }
-        
+
         $this->totalItems = count($this->wishlistItems);
     }
 
     public function toggleWishlist(int $productId): void
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             $wishlist = session('wishlist', []);
-            
+
             if (in_array($productId, $wishlist)) {
-                $wishlist = array_filter($wishlist, fn($id) => $id !== $productId);
+                $wishlist = array_filter($wishlist, fn ($id) => $id !== $productId);
                 $this->dispatch('wishlist-removed', productId: $productId);
             } else {
                 $wishlist[] = $productId;
                 $this->dispatch('wishlist-added', productId: $productId);
             }
-            
+
             session(['wishlist' => array_values($wishlist)]);
         } else {
             /** @var User $user */
             $user = auth()->user();
             $product = Product::findOrFail($productId);
-            
+
             if ($user->wishlist()->where('product_id', $productId)->exists()) {
                 $user->wishlist()->detach($productId);
                 $this->dispatch('wishlist-removed', productId: $productId);
@@ -60,7 +64,7 @@ final class WishlistWidget extends Component
                 $this->dispatch('wishlist-added', productId: $productId);
             }
         }
-        
+
         $this->loadWishlist();
         $this->dispatch('wishlist-updated');
     }
@@ -72,29 +76,29 @@ final class WishlistWidget extends Component
 
     public function clearWishlist(): void
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             session()->forget('wishlist');
         } else {
             /** @var User $user */
             $user = auth()->user();
             $user->wishlist()->detach();
         }
-        
+
         $this->loadWishlist();
         $this->dispatch('wishlist-cleared');
     }
 
     public function toggleWishlistModal(): void
     {
-        $this->showWishlist = !$this->showWishlist;
+        $this->showWishlist = ! $this->showWishlist;
     }
 
     public function isInWishlist(int $productId): bool
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return in_array($productId, session('wishlist', []));
         }
-        
+
         return collect($this->wishlistItems)->contains('id', $productId);
     }
 

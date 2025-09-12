@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Livewire\Components\Checkout;
 
 use App\Actions\ZoneSessionManager;
+use App\Models\Address;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
-use App\Models\Address;
 use Spatie\LivewireWizard\Components\StepComponent;
 
 class Shipping extends StepComponent

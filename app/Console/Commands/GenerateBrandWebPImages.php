@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
 use App\Models\Brand;
 use Illuminate\Console\Command;
-use Spatie\Image\Image;
 use Spatie\Image\Enums\Fit;
+use Spatie\Image\Image;
 
 final class GenerateBrandWebPImages extends Command
 {
@@ -29,14 +31,15 @@ final class GenerateBrandWebPImages extends Command
     public function handle(): int
     {
         $brands = Brand::whereHas('media')->get();
-        
+
         if ($brands->isEmpty()) {
             $this->info('No brands with media found.');
+
             return self::SUCCESS;
         }
 
         $this->info("Processing {$brands->count()} brands...");
-        
+
         $progressBar = $this->output->createProgressBar($brands->count());
         $progressBar->start();
 
@@ -76,16 +79,16 @@ final class GenerateBrandWebPImages extends Command
     private function generateWebPConversions($media, string $collection): void
     {
         $originalPath = $media->getPath();
-        $conversionsPath = dirname($originalPath) . '/conversions';
-        
+        $conversionsPath = dirname($originalPath).'/conversions';
+
         // Ensure conversions directory exists
-        if (!is_dir($conversionsPath)) {
+        if (! is_dir($conversionsPath)) {
             mkdir($conversionsPath, 0755, true);
         }
 
         $filename = pathinfo($media->file_name, PATHINFO_FILENAME);
 
-        $sizes = match($collection) {
+        $sizes = match ($collection) {
             'logo' => [
                 'xs' => ['width' => 64, 'height' => 64],
                 'sm' => ['width' => 128, 'height' => 128],
@@ -102,19 +105,19 @@ final class GenerateBrandWebPImages extends Command
 
         foreach ($sizes as $size => $dimensions) {
             $webpPath = "{$conversionsPath}/{$filename}-{$collection}-{$size}.webp";
-            
+
             // Skip if file exists and not forcing
-            if (file_exists($webpPath) && !$this->option('force')) {
+            if (file_exists($webpPath) && ! $this->option('force')) {
                 continue;
             }
-            
+
             try {
                 Image::load($originalPath)
                     ->fit(Fit::Contain, $dimensions['width'], $dimensions['height'])
                     ->quality(85)
                     ->save($webpPath);
             } catch (\Exception $e) {
-                $this->warn("Failed to generate {$size} WebP for {$media->name}: " . $e->getMessage());
+                $this->warn("Failed to generate {$size} WebP for {$media->name}: ".$e->getMessage());
             }
         }
     }

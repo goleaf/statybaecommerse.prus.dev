@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Shared;
 
@@ -8,6 +10,7 @@ use Illuminate\Support\Facades\File;
 final class TranslationService
 {
     private const CACHE_TTL = 3600; // 1 hour
+
     private const SUPPORTED_LOCALES = ['lt', 'en', 'de'];
 
     public function getTranslation(string $key, mixed $localeOrReplace = null, array $replace = []): string
@@ -19,14 +22,14 @@ final class TranslationService
         } else {
             $locale = $localeOrReplace ?? app()->getLocale();
         }
-        
+
         $cacheKey = "translation.{$locale}.{$key}";
-        
+
         $translation = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($key, $locale) {
             return $this->loadTranslationFromFiles($key, $locale);
         });
 
-        if (!empty($replace) && is_string($translation)) {
+        if (! empty($replace) && is_string($translation)) {
             foreach ($replace as $search => $replacement) {
                 $translation = str_replace(":{$search}", $replacement, $translation);
             }
@@ -35,15 +38,15 @@ final class TranslationService
         return is_string($translation) && $translation !== '' ? $translation : $key;
     }
 
-    public function getAllTranslations(string $locale = null): array
+    public function getAllTranslations(?string $locale = null): array
     {
         $locale = $locale ?? app()->getLocale();
-        
+
         $cacheKey = "translations.all.{$locale}";
-        
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($locale) {
             $translations = [];
-            
+
             // Load from JSON files
             $jsonFile = lang_path("{$locale}.json");
             if (File::exists($jsonFile)) {
@@ -98,8 +101,8 @@ final class TranslationService
     public function getCurrentCurrency(): string
     {
         $locale = app()->getLocale();
-        
-        return match($locale) {
+
+        return match ($locale) {
             'lt' => 'EUR',
             'en' => 'EUR', // Euro for all locales per rules
             'de' => 'EUR',
@@ -122,9 +125,10 @@ final class TranslationService
         if (str_contains($key, '.')) {
             [$group, $item] = explode('.', $key, 2);
             $phpFile = lang_path("{$locale}/{$group}.php");
-            
+
             if (File::exists($phpFile)) {
                 $translations = include $phpFile;
+
                 return data_get($translations, $item);
             }
         }

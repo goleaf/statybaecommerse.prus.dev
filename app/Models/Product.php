@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -7,19 +9,17 @@ use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[ObservedBy([ProductObserver::class])]
 final class Product extends Model implements HasMedia
@@ -27,8 +27,8 @@ final class Product extends Model implements HasMedia
     use HasFactory, SoftDeletes;
     use HasProductPricing;
     use HasTranslations;
-    use LogsActivity;
     use InteractsWithMedia;
+    use LogsActivity;
 
     protected $fillable = [
         'name',
@@ -102,12 +102,13 @@ final class Product extends Model implements HasMedia
     ];
 
     protected $table = 'products';
+
     protected string $translationModel = \App\Models\Translations\ProductTranslation::class;
-    
+
     // Translation fields that should be handled by the translation system
     protected array $translatable = [
         'name',
-        'slug', 
+        'slug',
         'description',
         'short_description',
         'seo_title',
@@ -120,7 +121,7 @@ final class Product extends Model implements HasMedia
             ->logOnly(['name', 'slug', 'description', 'sku', 'price', 'sale_price', 'stock_quantity', 'is_visible'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Product {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Product {$eventName}")
             ->useLogName('product');
     }
 
@@ -142,50 +143,51 @@ final class Product extends Model implements HasMedia
 
     public function isInStock(): bool
     {
-        if (!$this->manage_stock) {
+        if (! $this->manage_stock) {
             return true; // Always in stock if not tracking
         }
-        
+
         return $this->availableQuantity() > 0;
     }
 
     public function isLowStock(): bool
     {
-        if (!$this->manage_stock) {
+        if (! $this->manage_stock) {
             return false; // Never low stock if not tracking
         }
-        
+
         return $this->stock_quantity <= $this->low_stock_threshold;
     }
 
     public function getStockStatus(): string
     {
-        if (!$this->manage_stock) {
+        if (! $this->manage_stock) {
             return 'not_tracked';
         }
-        
+
         if ($this->isOutOfStock()) {
             return 'out_of_stock';
         }
-        
+
         if ($this->isLowStock()) {
             return 'low_stock';
         }
-        
+
         return 'in_stock';
     }
 
     public function decreaseStock(int $quantity): bool
     {
-        if (!$this->manage_stock) {
+        if (! $this->manage_stock) {
             return true; // Always allow if not tracking
         }
-        
+
         if ($this->availableQuantity() < $quantity) {
             return false; // Not enough stock
         }
-        
+
         $this->decrement('stock_quantity', $quantity);
+
         return true;
     }
 
@@ -198,7 +200,7 @@ final class Product extends Model implements HasMedia
 
     public function availableQuantity(): int
     {
-        if (!$this->manage_stock) {
+        if (! $this->manage_stock) {
             return 999;  // Unlimited when not managing stock
         }
 
@@ -356,7 +358,7 @@ final class Product extends Model implements HasMedia
     public function scopeNeedsRestocking($query)
     {
         return $query->where('manage_stock', true)
-                    ->whereRaw('stock_quantity < minimum_quantity');
+            ->whereRaw('stock_quantity < minimum_quantity');
     }
 
     public function scopeWithRequests($query)
@@ -411,10 +413,10 @@ final class Product extends Model implements HasMedia
 
     public function isBelowMinimumQuantity(): bool
     {
-        if (!$this->manage_stock) {
+        if (! $this->manage_stock) {
             return false;
         }
-        
+
         return $this->stock_quantity < $this->minimum_quantity;
     }
 
@@ -426,18 +428,21 @@ final class Product extends Model implements HasMedia
     public function getMainImageAttribute(): ?string
     {
         $img = $this->images()->orderBy('sort_order')->first();
+
         return $img ? $this->resolvePublicUrl($img->path) : null;
     }
 
     public function getThumbnailAttribute(): ?string
     {
         $img = $this->images()->orderBy('sort_order')->first();
+
         return $img ? $this->resolvePublicUrl($img->path) : null;
     }
 
     public function getImageUrl(?string $size = null): ?string
     {
         $img = $this->images()->orderBy('sort_order')->first();
+
         return $img ? $this->resolvePublicUrl($img->path) : null;
     }
 
@@ -445,6 +450,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->images()->orderBy('sort_order')->get()->map(function (ProductImage $img) {
             $url = $this->resolvePublicUrl($img->path);
+
             return [
                 'original' => $url,
                 'xl' => $url,
@@ -467,10 +473,11 @@ final class Product extends Model implements HasMedia
     public function getAllImageSizes(): array
     {
         $img = $this->images()->orderBy('sort_order')->first();
-        if (!$img) {
+        if (! $img) {
             return [];
         }
         $url = $this->resolvePublicUrl($img->path);
+
         return [
             'original' => $url,
             'xl' => $url,
@@ -495,11 +502,11 @@ final class Product extends Model implements HasMedia
         }
 
         $srcset = [
-            ($images['xs'] ?? null) ? ($images['xs'] . ' 150w') : null,
-            ($images['sm'] ?? null) ? ($images['sm'] . ' 300w') : null,
-            ($images['md'] ?? null) ? ($images['md'] . ' 500w') : null,
-            ($images['lg'] ?? null) ? ($images['lg'] . ' 800w') : null,
-            ($images['xl'] ?? null) ? ($images['xl'] . ' 1200w') : null,
+            ($images['xs'] ?? null) ? ($images['xs'].' 150w') : null,
+            ($images['sm'] ?? null) ? ($images['sm'].' 300w') : null,
+            ($images['md'] ?? null) ? ($images['md'].' 500w') : null,
+            ($images['lg'] ?? null) ? ($images['lg'].' 800w') : null,
+            ($images['xl'] ?? null) ? ($images['xl'].' 1200w') : null,
         ];
 
         return [
@@ -533,6 +540,7 @@ final class Product extends Model implements HasMedia
                 return $path;
             }
         }
+
         return asset(trim($path, '/'));
     }
 
@@ -571,6 +579,7 @@ final class Product extends Model implements HasMedia
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
+
         return $query->with(['translations' => function ($q) use ($locale) {
             $q->where('locale', $locale);
         }]);
@@ -608,6 +617,7 @@ final class Product extends Model implements HasMedia
     public function updateTranslation(string $locale, array $data): bool
     {
         $translation = $this->getOrCreateTranslation($locale);
+
         return $translation->update($data);
     }
 
@@ -623,7 +633,7 @@ final class Product extends Model implements HasMedia
         $categoryIds = $this->categories->pluck('id')->toArray();
         $brandId = $this->brand_id;
 
-        if (empty($categoryIds) && !$brandId) {
+        if (empty($categoryIds) && ! $brandId) {
             return collect();
         }
 
@@ -632,7 +642,7 @@ final class Product extends Model implements HasMedia
             ->with(['media', 'brand', 'categories', 'translations']);
 
         // First try to get products from same categories
-        if (!empty($categoryIds)) {
+        if (! empty($categoryIds)) {
             $query->whereHas('categories', function ($q) use ($categoryIds) {
                 $q->whereIn('category_id', $categoryIds);
             });
@@ -695,7 +705,7 @@ final class Product extends Model implements HasMedia
 
     public function getRelatedProductsByBrand(int $limit = 4): \Illuminate\Database\Eloquent\Collection
     {
-        if (!$this->brand_id) {
+        if (! $this->brand_id) {
             return collect();
         }
 
@@ -710,8 +720,8 @@ final class Product extends Model implements HasMedia
     public function getRelatedProductsByPriceRange(float $priceRange = 0.2, int $limit = 4): \Illuminate\Database\Eloquent\Collection
     {
         $currentPrice = $this->getPrice()?->value?->amount ?? $this->price;
-        
-        if (!$currentPrice) {
+
+        if (! $currentPrice) {
             return collect();
         }
 

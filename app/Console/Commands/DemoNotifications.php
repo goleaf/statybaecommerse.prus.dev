@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -8,6 +10,7 @@ use Illuminate\Console\Command;
 final class DemoNotifications extends Command
 {
     protected $signature = 'notifications:demo';
+
     protected $description = 'Create demo notifications to showcase the notification system';
 
     public function handle(): int
@@ -21,27 +24,27 @@ final class DemoNotifications extends Command
             [
                 'title' => 'Naujas užsakymas',
                 'message' => 'Gautas naujas užsakymas #12345 už 125.50 €',
-                'type' => 'success'
+                'type' => 'success',
             ],
             [
                 'title' => 'Mažos atsargos',
                 'message' => 'Prekė "Samsung Galaxy S24" turi mažiau nei 10 vienetų atsargų',
-                'type' => 'warning'
+                'type' => 'warning',
             ],
             [
                 'title' => 'Mokėjimo klaida',
                 'message' => 'Nepavyko apdoroti mokėjimo už užsakymą #12344',
-                'type' => 'error'
+                'type' => 'error',
             ],
             [
                 'title' => 'Sistemos atnaujinimas',
                 'message' => 'Sistema bus atnaujinta šį vakarą nuo 23:00 iki 01:00',
-                'type' => 'info'
+                'type' => 'info',
             ],
             [
                 'title' => 'Naujas klientas',
                 'message' => 'Registruotas naujas klientas: jonas.petras@example.com',
-                'type' => 'success'
+                'type' => 'success',
             ],
         ];
 
@@ -53,7 +56,7 @@ final class DemoNotifications extends Command
             );
         }
 
-        $this->info('Created ' . count($notifications) . ' demo notifications.');
+        $this->info('Created '.count($notifications).' demo notifications.');
         $this->info('Check the notification bell icon in the admin panel!');
 
         return 0;

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -29,11 +31,12 @@ final class ConvertAllImagesToWebP extends Command
 
         // Check WebP support
         $support = $this->conversionService->getWebPSupport();
-        
-        if (!$support['webp_support']) {
+
+        if (! $support['webp_support']) {
             $this->error('❌ WebP support is not available.');
-            $this->line('GD Extension: ' . ($support['gd_extension'] ? '✅' : '❌'));
-            $this->line('WebP Function: ' . ($support['webp_function'] ? '✅' : '❌'));
+            $this->line('GD Extension: '.($support['gd_extension'] ? '✅' : '❌'));
+            $this->line('WebP Function: '.($support['webp_function'] ? '✅' : '❌'));
+
             return self::FAILURE;
         }
 
@@ -41,7 +44,7 @@ final class ConvertAllImagesToWebP extends Command
 
         try {
             $collection = $this->option('collection');
-            
+
             if ($collection) {
                 $this->info("Converting {$collection} collection...");
                 $this->convertSpecificCollection($collection);
@@ -51,14 +54,16 @@ final class ConvertAllImagesToWebP extends Command
             }
 
             $this->info('✅ All images have been converted to WebP format!');
+
             return self::SUCCESS;
 
         } catch (\Exception $e) {
             $this->error("❌ Error during conversion: {$e->getMessage()}");
             Log::error('WebP conversion failed', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
+
             return self::FAILURE;
         }
     }
@@ -66,10 +71,11 @@ final class ConvertAllImagesToWebP extends Command
     private function convertSpecificCollection(string $collection): void
     {
         $collections = ['images', 'logo', 'banner', 'icon', 'gallery'];
-        
-        if (!in_array($collection, $collections)) {
+
+        if (! in_array($collection, $collections)) {
             $this->error("Invalid collection: {$collection}");
-            $this->line('Available collections: ' . implode(', ', $collections));
+            $this->line('Available collections: '.implode(', ', $collections));
+
             return;
         }
 

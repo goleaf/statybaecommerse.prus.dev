@@ -1,20 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
+
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 final class PriceListsRelationManager extends RelationManager
 {
     protected static string $relationship = 'priceLists';
+
     protected static ?string $title = 'customer_groups.relation_price_lists';
-    public function form(Schema $schema): Schema
+
+    public function form(Schema $form): Schema
     {
-        return $schema
+        return $form
             ->components([
                 Forms\Components\TextInput::make('name')
                     ->required()

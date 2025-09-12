@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -7,11 +9,11 @@ use App\Filament\Resources\CountryResource\RelationManagers;
 use App\Filament\Resources\CountryResource\Widgets;
 use App\Models\Country;
 use App\Services\MultiLanguageTabService;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
@@ -297,7 +299,7 @@ final class CountryResource extends Resource
                     ->defaultImageUrl(asset('images/no-flag.png')),
                 Tables\Columns\TextColumn::make('translated_name')
                     ->label(__('admin.countries.fields.name'))
-                    ->getStateUsing(fn(Country $record): string => $record->trans('name') ?: $record->name ?: '-')
+                    ->getStateUsing(fn (Country $record): string => $record->trans('name') ?: $record->name ?: '-')
                     ->searchable(['name'])
                     ->sortable()
                     ->weight('bold')
@@ -332,7 +334,7 @@ final class CountryResource extends Resource
                     ->color('warning'),
                 Tables\Columns\TextColumn::make('phone_calling_code')
                     ->label(__('admin.countries.fields.phone_calling_code'))
-                    ->formatStateUsing(fn(?string $state): string => $state ? "+{$state}" : '-')
+                    ->formatStateUsing(fn (?string $state): string => $state ? "+{$state}" : '-')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_active')
@@ -351,7 +353,7 @@ final class CountryResource extends Resource
                     ->falseColor('gray'),
                 Tables\Columns\TextColumn::make('vat_rate')
                     ->label(__('admin.countries.fields.vat_rate'))
-                    ->formatStateUsing(fn(?float $state): string => $state ? number_format($state, 2) . '%' : '-')
+                    ->formatStateUsing(fn (?float $state): string => $state ? number_format($state, 2).'%' : '-')
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('addresses_count')
@@ -385,15 +387,15 @@ final class CountryResource extends Resource
                     ->falseLabel(__('admin.countries.filters.no_vat')),
                 Tables\Filters\SelectFilter::make('region')
                     ->label(__('admin.countries.filters.region'))
-                    ->options(fn() => Country::distinct()->pluck('region', 'region')->filter())
+                    ->options(fn () => Country::distinct()->pluck('region', 'region')->filter())
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('currency_code')
                     ->label(__('admin.countries.filters.currency'))
-                    ->options(fn() => Country::distinct()->pluck('currency_code', 'currency_code')->filter())
+                    ->options(fn () => Country::distinct()->pluck('currency_code', 'currency_code')->filter())
                     ->searchable(),
                 Tables\Filters\Filter::make('has_vat_rate')
                     ->label(__('admin.countries.filters.has_vat_rate'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('vat_rate')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('vat_rate')),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
@@ -432,14 +434,14 @@ final class CountryResource extends Resource
                         ->label(__('admin.countries.actions.bulk_activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(fn($records) => $records->each->update(['is_active' => true]))
+                        ->action(fn ($records) => $records->each->update(['is_active' => true]))
                         ->requiresConfirmation()
                         ->modalHeading(__('admin.countries.confirmations.bulk_activate_heading')),
                     Tables\Actions\BulkAction::make('deactivate')
                         ->label(__('admin.countries.actions.bulk_deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(fn($records) => $records->each->update(['is_active' => false]))
+                        ->action(fn ($records) => $records->each->update(['is_active' => false]))
                         ->requiresConfirmation()
                         ->modalHeading(__('admin.countries.confirmations.bulk_deactivate_heading')),
                 ]),
@@ -495,7 +497,7 @@ final class CountryResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return self::getModel()::count();
     }
 
     public static function getNavigationBadgeColor(): ?string

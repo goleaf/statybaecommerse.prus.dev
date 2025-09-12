@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Traits;
 
@@ -20,7 +22,7 @@ trait EnumHelper
     public static function labels(): array
     {
         return collect(self::cases())
-            ->map(fn($case) => $case->label())
+            ->map(fn ($case) => $case->label())
             ->toArray();
     }
 
@@ -31,7 +33,7 @@ trait EnumHelper
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
             ->toArray();
     }
 
@@ -42,8 +44,8 @@ trait EnumHelper
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [
-                $case->value => $case->toArray()
+            ->mapWithKeys(fn ($case) => [
+                $case->value => $case->toArray(),
             ])
             ->toArray();
     }
@@ -71,7 +73,7 @@ trait EnumHelper
     public static function fromLabel(string $label): ?static
     {
         return collect(self::cases())
-            ->first(fn($case) => $case->label() === $label);
+            ->first(fn ($case) => $case->label() === $label);
     }
 
     /**
@@ -88,6 +90,7 @@ trait EnumHelper
     public static function random(): static
     {
         $cases = self::cases();
+
         return $cases[array_rand($cases)];
     }
 
@@ -105,6 +108,7 @@ trait EnumHelper
     public static function last(): static
     {
         $cases = self::cases();
+
         return end($cases);
     }
 
@@ -114,6 +118,7 @@ trait EnumHelper
     public static function at(int $index): ?static
     {
         $cases = self::cases();
+
         return $cases[$index] ?? null;
     }
 
@@ -175,7 +180,7 @@ trait EnumHelper
     public static function sortBy(string $property, bool $descending = false): Collection
     {
         $collection = collect(self::cases())->sortBy($property);
-        
+
         return $descending ? $collection->reverse() : $collection;
     }
 
@@ -186,7 +191,7 @@ trait EnumHelper
     {
         $cases = collect(self::cases());
         $offset = ($page - 1) * $perPage;
-        
+
         return [
             'data' => $cases->slice($offset, $perPage)->values()->toArray(),
             'current_page' => $page,
@@ -206,6 +211,7 @@ trait EnumHelper
         return collect(self::cases())
             ->filter(function ($case) use ($query) {
                 $query = strtolower($query);
+
                 return str_contains(strtolower($case->value), $query) ||
                        str_contains(strtolower($case->label()), $query);
             });
@@ -217,7 +223,7 @@ trait EnumHelper
     public static function forApi(): array
     {
         return collect(self::cases())
-            ->map(fn($case) => [
+            ->map(fn ($case) => [
                 'value' => $case->value,
                 'label' => $case->label(),
                 'description' => method_exists($case, 'description') ? $case->description() : null,
@@ -232,7 +238,7 @@ trait EnumHelper
      */
     public static function forValidation(): string
     {
-        return 'in:' . implode(',', self::values());
+        return 'in:'.implode(',', self::values());
     }
 
     /**
@@ -240,7 +246,7 @@ trait EnumHelper
      */
     public static function forDatabase(): string
     {
-        return "enum('" . implode("','", self::values()) . "')";
+        return "enum('".implode("','", self::values())."')";
     }
 
     /**
@@ -249,7 +255,7 @@ trait EnumHelper
     public static function forGraphQL(): array
     {
         return collect(self::cases())
-            ->map(fn($case) => [
+            ->map(fn ($case) => [
                 'name' => strtoupper($case->value),
                 'value' => $case->value,
                 'description' => method_exists($case, 'description') ? $case->description() : null,
@@ -262,13 +268,13 @@ trait EnumHelper
      */
     public static function forTypeScript(): string
     {
-        $enum = "export enum " . class_basename(static::class) . " {\n";
-        
+        $enum = 'export enum '.class_basename(static::class)." {\n";
+
         foreach (self::cases() as $case) {
-            $enum .= "  " . strtoupper($case->value) . " = '" . $case->value . "',\n";
+            $enum .= '  '.strtoupper($case->value)." = '".$case->value."',\n";
         }
-        
-        return $enum . "}";
+
+        return $enum.'}';
     }
 
     /**
@@ -276,13 +282,13 @@ trait EnumHelper
      */
     public static function forJavaScript(): string
     {
-        $object = "const " . class_basename(static::class) . " = {\n";
-        
+        $object = 'const '.class_basename(static::class)." = {\n";
+
         foreach (self::cases() as $case) {
-            $object .= "  " . strtoupper($case->value) . ": '" . $case->value . "',\n";
+            $object .= '  '.strtoupper($case->value).": '".$case->value."',\n";
         }
-        
-        return $object . "};";
+
+        return $object.'};';
     }
 
     /**
@@ -291,12 +297,12 @@ trait EnumHelper
     public static function forCss(): string
     {
         $css = ":root {\n";
-        
+
         foreach (self::cases() as $case) {
-            $css .= "  --" . str_replace('_', '-', $case->value) . ": '" . $case->value . "';\n";
+            $css .= '  --'.str_replace('_', '-', $case->value).": '".$case->value."';\n";
         }
-        
-        return $css . "}";
+
+        return $css.'}';
     }
 
     /**
@@ -305,7 +311,7 @@ trait EnumHelper
     public static function forDocumentation(): array
     {
         return collect(self::cases())
-            ->map(fn($case) => [
+            ->map(fn ($case) => [
                 'value' => $case->value,
                 'label' => $case->label(),
                 'description' => method_exists($case, 'description') ? $case->description() : null,
@@ -322,15 +328,15 @@ trait EnumHelper
     public static function statistics(): array
     {
         $cases = collect(self::cases());
-        
+
         return [
             'total' => $cases->count(),
-            'has_descriptions' => $cases->every(fn($case) => method_exists($case, 'description')),
-            'has_icons' => $cases->every(fn($case) => method_exists($case, 'icon')),
-            'has_colors' => $cases->every(fn($case) => method_exists($case, 'color')),
-            'has_priority' => $cases->every(fn($case) => method_exists($case, 'priority')),
-            'average_priority' => $cases->every(fn($case) => method_exists($case, 'priority')) 
-                ? $cases->avg('priority') 
+            'has_descriptions' => $cases->every(fn ($case) => method_exists($case, 'description')),
+            'has_icons' => $cases->every(fn ($case) => method_exists($case, 'icon')),
+            'has_colors' => $cases->every(fn ($case) => method_exists($case, 'color')),
+            'has_priority' => $cases->every(fn ($case) => method_exists($case, 'priority')),
+            'average_priority' => $cases->every(fn ($case) => method_exists($case, 'priority'))
+                ? $cases->avg('priority')
                 : null,
         ];
     }

@@ -1,14 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Images;
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 final class LocalImageGeneratorService
 {
     private const DEFAULT_WIDTH = 800;
+
     private const DEFAULT_HEIGHT = 600;
+
     private const WEBP_QUALITY = 90;
 
     /**
@@ -22,43 +25,43 @@ final class LocalImageGeneratorService
         ?string $textColor = null,
         ?string $filename = null
     ): string {
-        if (!extension_loaded('gd')) {
+        if (! extension_loaded('gd')) {
             throw new \RuntimeException('GD extension is required for image generation');
         }
 
         // Create image resource
         $image = imagecreatetruecolor($width, $height);
-        
+
         // Set background color
         $bgColor = $this->parseColor($backgroundColor ?? $this->getRandomColor());
         $background = imagecolorallocate($image, $bgColor['r'], $bgColor['g'], $bgColor['b']);
         imagefill($image, 0, 0, $background);
-        
+
         // Set text color
         $txtColor = $this->parseColor($textColor ?? '#FFFFFF');
         $textColorResource = imagecolorallocate($image, $txtColor['r'], $txtColor['g'], $txtColor['b']);
-        
+
         // Add text
         $this->addTextToImage($image, $text, $textColorResource, $width, $height);
-        
+
         // Generate filename if not provided
-        if (!$filename) {
-            $filename = Str::slug($text) . '_' . time() . '.webp';
-        } elseif (!str_ends_with($filename, '.webp')) {
+        if (! $filename) {
+            $filename = Str::slug($text).'_'.time().'.webp';
+        } elseif (! str_ends_with($filename, '.webp')) {
             $filename .= '.webp';
         }
-        
+
         // Save as WebP
-        $tempPath = storage_path('app/temp/' . $filename);
+        $tempPath = storage_path('app/temp/'.$filename);
         $this->ensureDirectoryExists(dirname($tempPath));
-        
+
         $success = imagewebp($image, $tempPath, self::WEBP_QUALITY);
         imagedestroy($image);
-        
-        if (!$success) {
+
+        if (! $success) {
             throw new \RuntimeException("Failed to save WebP image: {$tempPath}");
         }
-        
+
         return $tempPath;
     }
 
@@ -68,14 +71,14 @@ final class LocalImageGeneratorService
     public function generateProductImage(string $productName, string $categoryName): string
     {
         $colors = $this->getCategoryColors($categoryName);
-        
+
         return $this->generateWebPImage(
             text: $productName,
             width: 600,
             height: 600,
             backgroundColor: $colors['background'],
             textColor: $colors['text'],
-            filename: 'product_' . Str::slug($productName)
+            filename: 'product_'.Str::slug($productName)
         );
     }
 
@@ -85,14 +88,14 @@ final class LocalImageGeneratorService
     public function generateCategoryImage(string $categoryName): string
     {
         $colors = $this->getCategoryColors($categoryName);
-        
+
         return $this->generateWebPImage(
             text: $categoryName,
             width: 400,
             height: 300,
             backgroundColor: $colors['background'],
             textColor: $colors['text'],
-            filename: 'category_' . Str::slug($categoryName)
+            filename: 'category_'.Str::slug($categoryName)
         );
     }
 
@@ -107,7 +110,7 @@ final class LocalImageGeneratorService
             height: 200,
             backgroundColor: '#FFFFFF',
             textColor: '#333333',
-            filename: 'brand_logo_' . Str::slug($brandName)
+            filename: 'brand_logo_'.Str::slug($brandName)
         );
     }
 
@@ -122,7 +125,7 @@ final class LocalImageGeneratorService
             height: 400,
             backgroundColor: $this->getRandomGradientColor(),
             textColor: '#FFFFFF',
-            filename: 'brand_banner_' . Str::slug($brandName)
+            filename: 'brand_banner_'.Str::slug($brandName)
         );
     }
 
@@ -137,7 +140,7 @@ final class LocalImageGeneratorService
             height: 500,
             backgroundColor: $this->getRandomPastelColor(),
             textColor: '#333333',
-            filename: 'collection_' . Str::slug($collectionName)
+            filename: 'collection_'.Str::slug($collectionName)
         );
     }
 
@@ -146,19 +149,19 @@ final class LocalImageGeneratorService
      */
     public function convertToWebP(string $sourcePath, ?string $outputPath = null): string
     {
-        if (!file_exists($sourcePath)) {
+        if (! file_exists($sourcePath)) {
             throw new \InvalidArgumentException("Source file does not exist: {$sourcePath}");
         }
 
         $imageInfo = getimagesize($sourcePath);
-        if (!$imageInfo) {
+        if (! $imageInfo) {
             throw new \InvalidArgumentException("Invalid image file: {$sourcePath}");
         }
 
         $mimeType = $imageInfo['mime'];
-        
+
         // Create image resource based on type
-        $image = match($mimeType) {
+        $image = match ($mimeType) {
             'image/jpeg' => imagecreatefromjpeg($sourcePath),
             'image/png' => imagecreatefrompng($sourcePath),
             'image/gif' => imagecreatefromgif($sourcePath),
@@ -166,23 +169,23 @@ final class LocalImageGeneratorService
             default => throw new \InvalidArgumentException("Unsupported image type: {$mimeType}")
         };
 
-        if (!$image) {
+        if (! $image) {
             throw new \RuntimeException("Failed to create image resource from: {$sourcePath}");
         }
 
         // Generate output path if not provided
-        if (!$outputPath) {
+        if (! $outputPath) {
             $pathInfo = pathinfo($sourcePath);
-            $outputPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.webp';
+            $outputPath = $pathInfo['dirname'].'/'.$pathInfo['filename'].'.webp';
         }
 
         $this->ensureDirectoryExists(dirname($outputPath));
-        
+
         // Save as WebP
         $success = imagewebp($image, $outputPath, self::WEBP_QUALITY);
         imagedestroy($image);
-        
-        if (!$success) {
+
+        if (! $success) {
             throw new \RuntimeException("Failed to save WebP image: {$outputPath}");
         }
 
@@ -196,16 +199,16 @@ final class LocalImageGeneratorService
     {
         // Use built-in font for better compatibility
         $font = 5; // Largest built-in font
-        
+
         // Word wrap for long text
         $words = explode(' ', $text);
         $lines = [];
         $currentLine = '';
-        
+
         foreach ($words as $word) {
-            $testLine = $currentLine . ($currentLine ? ' ' : '') . $word;
+            $testLine = $currentLine.($currentLine ? ' ' : '').$word;
             $textWidth = imagefontwidth($font) * strlen($testLine);
-            
+
             if ($textWidth > $width * 0.8) {
                 if ($currentLine) {
                     $lines[] = $currentLine;
@@ -231,11 +234,10 @@ final class LocalImageGeneratorService
             $textWidth = imagefontwidth($font) * strlen($line);
             $x = ($width - $textWidth) / 2;
             $y = $startY + ($i * $lineHeight);
-            
-            imagestring($image, $font, (int)$x, (int)$y, $line, $textColor);
+
+            imagestring($image, $font, (int) $x, (int) $y, $line, $textColor);
         }
     }
-
 
     /**
      * Parse color string to RGB array
@@ -244,7 +246,7 @@ final class LocalImageGeneratorService
     {
         // Remove # if present
         $color = ltrim($color, '#');
-        
+
         // Convert to RGB
         if (strlen($color) === 6) {
             return [
@@ -253,7 +255,7 @@ final class LocalImageGeneratorService
                 'b' => hexdec(substr($color, 4, 2)),
             ];
         }
-        
+
         // Default to white if invalid
         return ['r' => 255, 'g' => 255, 'b' => 255];
     }
@@ -328,7 +330,7 @@ final class LocalImageGeneratorService
      */
     private function ensureDirectoryExists(string $directory): void
     {
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             mkdir($directory, 0755, true);
         }
     }

@@ -24,7 +24,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -72,9 +72,9 @@ final class PriceListItemResource extends Resource
         return __('admin.price_list_items.plural_model_label');
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
-        return $schema
+        return $form
             ->schema([
                 Tabs::make('Price List Item')
                     ->tabs([

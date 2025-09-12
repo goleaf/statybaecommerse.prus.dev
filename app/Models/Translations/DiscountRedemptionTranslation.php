@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
@@ -32,4 +34,3 @@ final class DiscountRedemptionTranslation extends Model
         return $this->belongsTo(\App\Models\DiscountRedemption::class);
     }
 }
-

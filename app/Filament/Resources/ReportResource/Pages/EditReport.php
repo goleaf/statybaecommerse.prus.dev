@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ReportResource\Pages;
 
 use App\Filament\Resources\ReportResource;
+use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Actions;
 
 final class EditReport extends EditRecord
 {
@@ -35,12 +37,12 @@ final class EditReport extends EditRecord
                         ->success()
                         ->send();
                 })
-                ->visible(fn(): bool => $this->record->is_active),
+                ->visible(fn (): bool => $this->record->is_active),
             Actions\Action::make('view')
                 ->label(__('admin.reports.actions.view'))
                 ->icon('heroicon-o-eye')
                 ->color('info')
-                ->url(fn(): string => route('reports.show', $this->record))
+                ->url(fn (): string => route('reports.show', $this->record))
                 ->openUrlInNewTab(),
             Actions\DeleteAction::make(),
         ];

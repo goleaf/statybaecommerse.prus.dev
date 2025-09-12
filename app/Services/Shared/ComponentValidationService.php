@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Shared;
 
@@ -19,7 +21,7 @@ final class ComponentValidationService
         foreach ($rules as $prop => $rule) {
             $value = $props[$prop] ?? null;
             $error = $this->validateProp($prop, $value, $rule);
-            
+
             if ($error) {
                 $errors[$prop] = $error;
             }
@@ -60,8 +62,9 @@ final class ComponentValidationService
 
         // Enum validation
         if (isset($rule['enum'])) {
-            if (!in_array($value, $rule['enum'])) {
+            if (! in_array($value, $rule['enum'])) {
                 $validOptions = implode(', ', $rule['enum']);
+
                 return "The {$prop} must be one of: {$validOptions}.";
             }
         }
@@ -85,7 +88,7 @@ final class ComponentValidationService
     private function validateType(string $prop, mixed $value, string $expectedType): ?string
     {
         $actualType = gettype($value);
-        
+
         $typeMap = [
             'string' => 'string',
             'int' => 'integer',
@@ -125,19 +128,19 @@ final class ComponentValidationService
                 'variant' => [
                     'type' => 'string',
                     'enum' => ['primary', 'secondary', 'danger', 'success', 'warning', 'ghost'],
-                    'default' => 'primary'
+                    'default' => 'primary',
                 ],
                 'size' => [
                     'type' => 'string',
                     'enum' => ['sm', 'md', 'lg', 'xl'],
-                    'default' => 'md'
+                    'default' => 'md',
                 ],
                 'href' => ['type' => 'string'],
                 'icon' => ['type' => 'string'],
                 'iconPosition' => [
                     'type' => 'string',
                     'enum' => ['left', 'right'],
-                    'default' => 'left'
+                    'default' => 'left',
                 ],
                 'loading' => ['type' => 'boolean', 'default' => false],
                 'disabled' => ['type' => 'boolean', 'default' => false],
@@ -147,17 +150,17 @@ final class ComponentValidationService
                 'padding' => [
                     'type' => 'string',
                     'enum' => ['p-4', 'p-6', 'p-8'],
-                    'default' => 'p-6'
+                    'default' => 'p-6',
                 ],
                 'shadow' => [
                     'type' => 'string',
                     'enum' => ['shadow-sm', 'shadow-md', 'shadow-lg', 'shadow-xl'],
-                    'default' => 'shadow-md'
+                    'default' => 'shadow-md',
                 ],
                 'rounded' => [
                     'type' => 'string',
                     'enum' => ['rounded-md', 'rounded-lg', 'rounded-xl'],
-                    'default' => 'rounded-lg'
+                    'default' => 'rounded-lg',
                 ],
                 'hover' => ['type' => 'boolean', 'default' => true],
                 'border' => ['type' => 'boolean', 'default' => true],
@@ -167,7 +170,7 @@ final class ComponentValidationService
                 'type' => [
                     'type' => 'string',
                     'enum' => ['text', 'email', 'password', 'search', 'number', 'tel', 'url'],
-                    'default' => 'text'
+                    'default' => 'text',
                 ],
                 'label' => ['type' => 'string'],
                 'placeholder' => ['type' => 'string'],
@@ -178,12 +181,12 @@ final class ComponentValidationService
                 'iconPosition' => [
                     'type' => 'string',
                     'enum' => ['left', 'right'],
-                    'default' => 'left'
+                    'default' => 'left',
                 ],
                 'size' => [
                     'type' => 'string',
                     'enum' => ['sm', 'md', 'lg'],
-                    'default' => 'md'
+                    'default' => 'md',
                 ],
             ],
 
@@ -191,17 +194,17 @@ final class ComponentValidationService
                 'variant' => [
                     'type' => 'string',
                     'enum' => ['primary', 'secondary', 'success', 'warning', 'danger', 'info', 'gray'],
-                    'default' => 'primary'
+                    'default' => 'primary',
                 ],
                 'size' => [
                     'type' => 'string',
                     'enum' => ['sm', 'md', 'lg'],
-                    'default' => 'md'
+                    'default' => 'md',
                 ],
                 'rounded' => [
                     'type' => 'string',
                     'enum' => ['rounded-md', 'rounded-lg', 'rounded-full'],
-                    'default' => 'rounded-full'
+                    'default' => 'rounded-full',
                 ],
             ],
 
@@ -215,7 +218,7 @@ final class ComponentValidationService
                 'layout' => [
                     'type' => 'string',
                     'enum' => ['grid', 'list'],
-                    'default' => 'grid'
+                    'default' => 'grid',
                 ],
             ],
 
@@ -227,7 +230,7 @@ final class ComponentValidationService
                 'titleSize' => [
                     'type' => 'string',
                     'enum' => ['text-lg', 'text-xl', 'text-2xl', 'text-3xl'],
-                    'default' => 'text-2xl'
+                    'default' => 'text-2xl',
                 ],
                 'centered' => ['type' => 'boolean', 'default' => false],
             ],

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -53,6 +55,7 @@ final class ProductSearchWidget extends Component
     public string $viewMode = 'grid';
 
     public int $perPage = 12;
+
     public bool $showFilters = false;
 
     public function mount(): void
@@ -125,7 +128,7 @@ final class ProductSearchWidget extends Component
 
     public function toggleFilters(): void
     {
-        $this->showFilters = !$this->showFilters;
+        $this->showFilters = ! $this->showFilters;
     }
 
     public function getProductsProperty()
@@ -138,31 +141,31 @@ final class ProductSearchWidget extends Component
         if ($this->search) {
             $query->where(function ($q) {
                 $q
-                    ->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('description', 'like', '%' . $this->search . '%')
-                    ->orWhere('sku', 'like', '%' . $this->search . '%')
+                    ->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhere('description', 'like', '%'.$this->search.'%')
+                    ->orWhere('sku', 'like', '%'.$this->search.'%')
                     ->orWhereHas('brand', function ($brandQuery) {
-                        $brandQuery->where('name', 'like', '%' . $this->search . '%');
+                        $brandQuery->where('name', 'like', '%'.$this->search.'%');
                     });
             });
         }
 
         // Category filter
-        if (!empty($this->categories)) {
+        if (! empty($this->categories)) {
             $query->whereHas('categories', function ($categoryQuery) {
                 $categoryQuery->whereIn('categories.id', $this->categories);
             });
         }
 
         // Brand filter
-        if (!empty($this->brands)) {
+        if (! empty($this->brands)) {
             $query->whereIn('brand_id', $this->brands);
         }
 
         // Attribute filter
-        if (!empty($this->selectedAttributes)) {
+        if (! empty($this->selectedAttributes)) {
             foreach ($this->selectedAttributes as $attributeId => $valueIds) {
-                if (!empty($valueIds)) {
+                if (! empty($valueIds)) {
                     $query->whereHas('variants.attributeValues', function ($attrQuery) use ($valueIds) {
                         $attrQuery->whereIn('attribute_values.id', $valueIds);
                     });

@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class Collection extends Model implements HasMedia
 {
@@ -48,10 +50,10 @@ final class Collection extends Model implements HasMedia
 
     protected static function booted(): void
     {
-        static::saved(function (): void {
+        self::saved(function (): void {
             self::flushCaches();
         });
-        static::deleted(function (): void {
+        self::deleted(function (): void {
             self::flushCaches();
         });
     }
@@ -64,8 +66,8 @@ final class Collection extends Model implements HasMedia
     public static function flushCaches(): void
     {
         $locales = collect(config('app.supported_locales', 'en'))
-            ->when(fn($v) => is_string($v), fn($c) => collect(explode(',', (string) $c)))
-            ->map(fn($v) => trim((string) $v))
+            ->when(fn ($v) => is_string($v), fn ($c) => collect(explode(',', (string) $c)))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->values();
         foreach ($locales as $loc) {
@@ -105,7 +107,7 @@ final class Collection extends Model implements HasMedia
 
     public function isManual(): bool
     {
-        return !$this->is_automatic;
+        return ! $this->is_automatic;
     }
 
     public function isAutomatic(): bool
@@ -125,23 +127,27 @@ final class Collection extends Model implements HasMedia
 
     public function getImageUrl(?string $size = null): ?string
     {
-        if (!$size) {
+        if (! $size) {
             $url = $this->getFirstMediaUrl('images');
+
             return $url ?: null;
         }
 
         $url = $this->getFirstMediaUrl('images', "image-{$size}") ?: $this->getFirstMediaUrl('images');
+
         return $url ?: '';
     }
 
     public function getBannerUrl(?string $size = null): ?string
     {
-        if (!$size) {
+        if (! $size) {
             $url = $this->getFirstMediaUrl('banner');
+
             return $url ?: null;
         }
 
         $url = $this->getFirstMediaUrl('banner', "banner-{$size}") ?: $this->getFirstMediaUrl('banner');
+
         return $url ?: '';
     }
 
@@ -158,7 +164,7 @@ final class Collection extends Model implements HasMedia
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         // Collection image conversions with multiple resolutions
         $this

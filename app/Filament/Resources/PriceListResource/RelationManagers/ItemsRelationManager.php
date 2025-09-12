@@ -1,26 +1,25 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
-use App\Models\PriceListItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use Filament\Schemas\Schema;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Table;
 
 final class ItemsRelationManager extends RelationManager
 {
@@ -33,9 +32,9 @@ final class ItemsRelationManager extends RelationManager
         return __('admin.price_lists.items');
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('admin.price_lists.item_information'))
                     ->schema([
@@ -113,10 +112,11 @@ final class ItemsRelationManager extends RelationManager
                 BadgeColumn::make('discount_percentage')
                     ->label(__('admin.price_lists.fields.discount_percentage'))
                     ->getStateUsing(function ($record) {
-                        if (!$record->compare_amount || $record->compare_amount <= $record->net_amount) {
+                        if (! $record->compare_amount || $record->compare_amount <= $record->net_amount) {
                             return null;
                         }
-                        return round((($record->compare_amount - $record->net_amount) / $record->compare_amount) * 100) . '%';
+
+                        return round((($record->compare_amount - $record->net_amount) / $record->compare_amount) * 100).'%';
                     })
                     ->color('success')
                     ->placeholder(__('admin.common.none')),
@@ -143,6 +143,7 @@ final class ItemsRelationManager extends RelationManager
                     ->label(__('admin.price_lists.create_item'))
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['price_list_id'] = $this->ownerRecord->id;
+
                         return $data;
                     }),
             ])

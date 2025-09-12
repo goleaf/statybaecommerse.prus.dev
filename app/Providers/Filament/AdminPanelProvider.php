@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Enums\NavigationGroup as NavEnum;
 use Awcodes\Overlook\OverlookPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use DutchCodingCompany\FilamentSocialite\FilamentSocialitePlugin;
@@ -11,11 +12,10 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
-use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
+use Filament\Widgets\AccountWidget;
 use FilipFonal\FilamentLogManager\FilamentLogManagerPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -99,11 +99,11 @@ final class AdminPanelProvider extends PanelProvider
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))
-                    ->url(fn(): string => '#')
+                    ->url(fn (): string => '#')
                     ->icon('heroicon-o-user-circle'),
                 'language' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.language'))
-                    ->url(fn(): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
+                    ->url(fn (): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
                     ->icon('heroicon-o-language'),
                 // 'settings' => \Filament\Navigation\MenuItem::make()
                 //     ->label(__('admin.navigation.settings'))
@@ -125,7 +125,7 @@ final class AdminPanelProvider extends PanelProvider
             // )
             ->renderHook(
                 'panels::body.end',
-                fn(): string => view('filament.layouts.live-notifications-script')->render()
+                fn (): string => view('filament.layouts.live-notifications-script')->render()
             );
     }
 }

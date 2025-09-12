@@ -1,9 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
 use App\Models\Attribute;
-use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -102,7 +103,7 @@ final class ProductFilterWidget extends Component
     {
         $this->reset([
             'search', 'categories', 'brands', 'attributes',
-            'inStock', 'onSale', 'sortBy', 'sortDirection'
+            'inStock', 'onSale', 'sortBy', 'sortDirection',
         ]);
         $this->updatePriceRange();
         $this->dispatch('filter-updated');
@@ -121,7 +122,7 @@ final class ProductFilterWidget extends Component
     public function getAvailableCategoriesProperty()
     {
         return Category::where('is_visible', true)
-            ->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])
+            ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
             ->orderBy('name')
             ->get();
     }
@@ -129,7 +130,7 @@ final class ProductFilterWidget extends Component
     public function getAvailableBrandsProperty()
     {
         return Brand::where('is_visible', true)
-            ->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])
+            ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
             ->orderBy('name')
             ->get();
     }
@@ -137,9 +138,9 @@ final class ProductFilterWidget extends Component
     public function getAvailableAttributesProperty()
     {
         return Attribute::with(['values' => function ($query) {
-            $query->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])->orderBy('sort_order');
+            $query->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])->orderBy('sort_order');
         }])
-            ->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])
+            ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
             ->where('is_filterable', true)
             ->orderBy('sort_order')
             ->get();
@@ -155,24 +156,24 @@ final class ProductFilterWidget extends Component
         if ($this->search) {
             $query->where(function ($q) {
                 $q
-                    ->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('description', 'like', '%' . $this->search . '%')
-                    ->orWhere('sku', 'like', '%' . $this->search . '%')
+                    ->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhere('description', 'like', '%'.$this->search.'%')
+                    ->orWhere('sku', 'like', '%'.$this->search.'%')
                     ->orWhereHas('brand', function ($brandQuery) {
-                        $brandQuery->where('name', 'like', '%' . $this->search . '%');
+                        $brandQuery->where('name', 'like', '%'.$this->search.'%');
                     });
             });
         }
 
         // Category filter
-        if (!empty($this->categories)) {
+        if (! empty($this->categories)) {
             $query->whereHas('categories', function ($q) {
                 $q->whereIn('categories.id', $this->categories);
             });
         }
 
         // Brand filter
-        if (!empty($this->brands)) {
+        if (! empty($this->brands)) {
             $query->whereIn('brand_id', $this->brands);
         }
 
@@ -192,9 +193,9 @@ final class ProductFilterWidget extends Component
         }
 
         // Attribute filters
-        if (!empty($this->selectedAttributes)) {
+        if (! empty($this->selectedAttributes)) {
             foreach ($this->selectedAttributes as $attributeId => $valueIds) {
-                if (!empty($valueIds)) {
+                if (! empty($valueIds)) {
                     $query->whereHas('attributes', function ($q) use ($attributeId, $valueIds) {
                         $q
                             ->where('attributes.id', $attributeId)

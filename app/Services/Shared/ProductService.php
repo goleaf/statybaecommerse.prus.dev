@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Shared;
 
-use App\Models\Product;
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -19,7 +21,7 @@ final class ProductService
     {
         $locale = app()->getLocale();
         $currency = current_currency();
-        
+
         return $this->cacheService->rememberDefault(
             "featured_products.{$locale}.{$currency}",
             function () use ($limit) {
@@ -39,7 +41,7 @@ final class ProductService
     {
         $locale = app()->getLocale();
         $currency = current_currency();
-        
+
         return $this->cacheService->rememberShort(
             "new_arrivals.{$locale}.{$currency}",
             function () use ($limit, $days) {
@@ -122,7 +124,7 @@ final class ProductService
     {
         $locale = app()->getLocale();
         $currency = current_currency();
-        
+
         return $this->cacheService->rememberDefault(
             "related_products.{$product->id}.{$locale}.{$currency}",
             function () use ($product, $limit) {
@@ -164,27 +166,27 @@ final class ProductService
             'categories:id,name,slug',
             'reviews' => function ($q) {
                 $q->where('is_approved', true);
-            }
+            },
         ];
     }
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['search'] . '%')
-                  ->orWhere('summary', 'like', '%' . $filters['search'] . '%')
-                  ->orWhere('description', 'like', '%' . $filters['search'] . '%');
+                $q->where('name', 'like', '%'.$filters['search'].'%')
+                    ->orWhere('summary', 'like', '%'.$filters['search'].'%')
+                    ->orWhere('description', 'like', '%'.$filters['search'].'%');
             });
         }
 
-        if (!empty($filters['categories'])) {
+        if (! empty($filters['categories'])) {
             $query->whereHas('categories', function ($q) use ($filters) {
                 $q->whereIn('categories.id', $filters['categories']);
             });
         }
 
-        if (!empty($filters['brands'])) {
+        if (! empty($filters['brands'])) {
             $query->whereIn('brand_id', $filters['brands']);
         }
 
@@ -203,13 +205,13 @@ final class ProductService
         if ($filters['in_stock'] ?? false) {
             $query->where(function ($q) {
                 $q->whereNull('stock_quantity')
-                  ->orWhere('stock_quantity', '>', 0);
+                    ->orWhere('stock_quantity', '>', 0);
             });
         }
 
         if ($filters['on_sale'] ?? false) {
             $query->whereNotNull('sale_price')
-                  ->where('sale_price', '>', 0);
+                ->where('sale_price', '>', 0);
         }
 
         return $query;

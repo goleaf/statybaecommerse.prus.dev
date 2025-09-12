@@ -1,20 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
 final class SystemSettingCategory extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity, HasSlug;
+    use HasFactory, HasSlug, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -47,7 +48,7 @@ final class SystemSettingCategory extends Model
             ->logOnly(['name', 'slug', 'description', 'is_active', 'sort_order'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "System Setting Category {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "System Setting Category {$eventName}")
             ->useLogName('system_setting_categories');
     }
 
@@ -93,17 +94,19 @@ final class SystemSettingCategory extends Model
         }]);
     }
 
-    public function getTranslatedName(string $locale = null): string
+    public function getTranslatedName(?string $locale = null): string
     {
         $locale = $locale ?? app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
+
         return $translation?->name ?? $this->name;
     }
 
-    public function getTranslatedDescription(string $locale = null): ?string
+    public function getTranslatedDescription(?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
+
         return $translation?->description ?? $this->description;
     }
 
@@ -185,12 +188,12 @@ final class SystemSettingCategory extends Model
     public function getAllChildren(): \Illuminate\Database\Eloquent\Collection
     {
         $children = collect();
-        
+
         foreach ($this->getChildren() as $child) {
             $children->push($child);
             $children = $children->merge($child->getAllChildren());
         }
-        
+
         return $children;
     }
 
@@ -198,12 +201,12 @@ final class SystemSettingCategory extends Model
     {
         $path = [$this->getTranslatedName()];
         $parent = $this->getParent();
-        
+
         while ($parent) {
             array_unshift($path, $parent->getTranslatedName());
             $parent = $parent->getParent();
         }
-        
+
         return implode(' > ', $path);
     }
 
@@ -211,12 +214,12 @@ final class SystemSettingCategory extends Model
     {
         $depth = 0;
         $parent = $this->getParent();
-        
+
         while ($parent) {
             $depth++;
             $parent = $parent->getParent();
         }
-        
+
         return $depth;
     }
 
@@ -234,7 +237,7 @@ final class SystemSettingCategory extends Model
     {
         $breadcrumb = [];
         $current = $this;
-        
+
         while ($current) {
             array_unshift($breadcrumb, [
                 'id' => $current->id,
@@ -243,7 +246,7 @@ final class SystemSettingCategory extends Model
             ]);
             $current = $current->getParent();
         }
-        
+
         return $breadcrumb;
     }
 

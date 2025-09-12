@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -8,6 +10,7 @@ use Illuminate\Notifications\DatabaseNotification;
 final class ClearNotifications extends Command
 {
     protected $signature = 'notifications:clear';
+
     protected $description = 'Clear all notifications from the database';
 
     public function handle(): int
@@ -16,6 +19,7 @@ final class ClearNotifications extends Command
 
         if ($count === 0) {
             $this->info('No notifications to clear.');
+
             return 0;
         }
 

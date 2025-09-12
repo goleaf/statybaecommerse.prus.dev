@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -8,13 +10,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
 final class Report extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity, HasTranslations;
+    use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -65,7 +67,7 @@ final class Report extends Model
             ->logOnly(['name', 'type', 'category', 'is_active', 'is_public'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Report {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Report {$eventName}")
             ->useLogName('report');
     }
 

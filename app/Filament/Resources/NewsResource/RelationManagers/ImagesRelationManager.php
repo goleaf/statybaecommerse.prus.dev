@@ -14,9 +14,9 @@ final class ImagesRelationManager extends RelationManager
 {
     protected static string $relationship = 'images';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
-        return $schema->components([
+        return $form->components([
                 Forms\Components\FileUpload::make('file_path')
                     ->label(__('admin.news.images.fields.file_path'))
                     ->required()

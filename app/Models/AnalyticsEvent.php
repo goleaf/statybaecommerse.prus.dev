@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Builder;
 
 final class AnalyticsEvent extends Model
 {
@@ -120,7 +122,7 @@ final class AnalyticsEvent extends Model
     // Accessors & Mutators
     public function getEventTypeLabelAttribute(): string
     {
-        return __('admin.analytics.event_types.' . $this->event_type, $this->event_type);
+        return __('admin.analytics.event_types.'.$this->event_type, $this->event_type);
     }
 
     public function getDeviceIconAttribute(): string
@@ -135,17 +137,18 @@ final class AnalyticsEvent extends Model
 
     public function getFormattedValueAttribute(): ?string
     {
-        if (!$this->value) {
+        if (! $this->value) {
             return null;
         }
 
         $currency = $this->currency ?? 'EUR';
-        return number_format($this->value, 2) . ' ' . $currency;
+
+        return number_format($this->value, 2).' '.$currency;
     }
 
     public function getIsRegisteredUserAttribute(): bool
     {
-        return !is_null($this->user_id);
+        return ! is_null($this->user_id);
     }
 
     public function getIsAnonymousUserAttribute(): bool

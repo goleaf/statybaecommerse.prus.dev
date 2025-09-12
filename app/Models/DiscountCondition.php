@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Translations\DiscountConditionTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 
 final class DiscountCondition extends Model
 {
@@ -108,7 +110,7 @@ final class DiscountCondition extends Model
      */
     public function matches($testValue): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -124,11 +126,11 @@ final class DiscountCondition extends Model
             'starts_with' => str_starts_with((string) $testValue, (string) $conditionValue),
             'ends_with' => str_ends_with((string) $testValue, (string) $conditionValue),
             'contains' => str_contains((string) $testValue, (string) $conditionValue),
-            'not_contains' => !str_contains((string) $testValue, (string) $conditionValue),
+            'not_contains' => ! str_contains((string) $testValue, (string) $conditionValue),
             'in_array' => is_array($conditionValue) && in_array($testValue, $conditionValue),
-            'not_in_array' => is_array($conditionValue) && !in_array($testValue, $conditionValue),
+            'not_in_array' => is_array($conditionValue) && ! in_array($testValue, $conditionValue),
             'regex' => preg_match($conditionValue, (string) $testValue),
-            'not_regex' => !preg_match($conditionValue, (string) $testValue),
+            'not_regex' => ! preg_match($conditionValue, (string) $testValue),
             default => false,
         };
     }
@@ -138,12 +140,12 @@ final class DiscountCondition extends Model
      */
     public function isValidForContext(array $context = []): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
         // Check if condition type is supported in context
-        if (!isset($context[$this->type])) {
+        if (! isset($context[$this->type])) {
             return false;
         }
 

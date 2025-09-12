@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Traits\HasTranslations;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class DiscountRedemption extends Model
 {
@@ -227,7 +229,7 @@ final class DiscountRedemption extends Model
      */
     public function getFormattedAmountSavedAttribute(): string
     {
-        return number_format($this->amount_saved, 2) . ' ' . ($this->currency_code ?? 'EUR');
+        return number_format($this->amount_saved, 2).' '.($this->currency_code ?? 'EUR');
     }
 
     /**

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ActivityLogResource\Widgets;
 
@@ -27,7 +29,7 @@ final class ActivityLogChartWidget extends ChartWidget
                     'borderWidth' => 2,
                 ],
             ],
-            'labels' => $data->pluck('date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('M d'))->toArray(),
+            'labels' => $data->pluck('date')->map(fn ($date) => \Carbon\Carbon::parse($date)->format('M d'))->toArray(),
         ];
     }
 

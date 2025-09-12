@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -201,7 +203,7 @@ enum ProductStatus: string
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
             ->toArray();
     }
 
@@ -209,7 +211,7 @@ enum ProductStatus: string
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [
+            ->mapWithKeys(fn ($case) => [
                 $case->value => [
                     'label' => $case->label(),
                     'description' => $case->description(),
@@ -228,7 +230,7 @@ enum ProductStatus: string
                     'next_statuses' => $case->nextStatuses(),
                     'previous_statuses' => $case->previousStatuses(),
                     'seo_impact' => $case->seoImpact(),
-                ]
+                ],
             ])
             ->toArray();
     }
@@ -236,25 +238,25 @@ enum ProductStatus: string
     public static function visible(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isVisible());
+            ->filter(fn ($case) => $case->isVisible());
     }
 
     public static function purchasable(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isPurchasable());
+            ->filter(fn ($case) => $case->isPurchasable());
     }
 
     public static function editable(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isEditable());
+            ->filter(fn ($case) => $case->isEditable());
     }
 
     public static function publishable(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isPublishable());
+            ->filter(fn ($case) => $case->isPublishable());
     }
 
     public static function ordered(): Collection
@@ -266,7 +268,7 @@ enum ProductStatus: string
     public static function fromLabel(string $label): ?self
     {
         return collect(self::cases())
-            ->first(fn($case) => $case->label() === $label);
+            ->first(fn ($case) => $case->label() === $label);
     }
 
     public static function values(): array
@@ -277,7 +279,7 @@ enum ProductStatus: string
     public static function labels(): array
     {
         return collect(self::cases())
-            ->map(fn($case) => $case->label())
+            ->map(fn ($case) => $case->label())
             ->toArray();
     }
 

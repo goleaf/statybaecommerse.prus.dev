@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\PriceResource\Pages;
 
@@ -30,9 +32,9 @@ final class CreatePrice extends CreateRecord
         // Save translations after creating the price
         if (isset($this->data['translations'])) {
             $translations = $this->data['translations'];
-            
+
             foreach ($translations as $locale => $translationData) {
-                if (!empty(array_filter($translationData))) {
+                if (! empty(array_filter($translationData))) {
                     $this->record->updateTranslation($locale, $translationData);
                 }
             }

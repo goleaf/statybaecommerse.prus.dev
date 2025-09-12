@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Requests;
 
@@ -66,7 +68,7 @@ class StoreCampaignClickRequest extends FormRequest
         ]);
 
         // If user is authenticated, set customer_id
-        if (auth()->check() && !$this->has('customer_id')) {
+        if (auth()->check() && ! $this->has('customer_id')) {
             $this->merge(['customer_id' => auth()->id()]);
         }
     }

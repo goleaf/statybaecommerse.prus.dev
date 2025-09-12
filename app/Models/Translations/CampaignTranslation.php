@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
@@ -8,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class CampaignTranslation extends Model
 {
     protected $table = 'campaign_translations';
-    
+
     protected $fillable = [
         'campaign_id',
         'locale',
@@ -26,7 +28,7 @@ final class CampaignTranslation extends Model
     protected $casts = [
         'campaign_id' => 'integer',
     ];
-    
+
     public $timestamps = true;
 
     public function campaign(): BelongsTo
@@ -34,5 +36,3 @@ final class CampaignTranslation extends Model
         return $this->belongsTo(\App\Models\Campaign::class);
     }
 }
-
-

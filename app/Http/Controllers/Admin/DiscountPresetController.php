@@ -6,7 +6,4 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-final class DiscountPresetController extends Controller
-{
-}
-
+final class DiscountPresetController extends Controller {}

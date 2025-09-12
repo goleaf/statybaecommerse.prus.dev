@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -6,33 +8,24 @@ use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Filament\Resources\CustomerGroupResource\RelationManagers;
 use App\Filament\Widgets\CustomerGroupStatsWidget;
 use App\Models\CustomerGroup;
-use App\Models\User;
-use App\Models\Discount;
-use App\Models\PriceList;
-use App\Models\Campaign;
-use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Grid;
-use Filament\Resources\Resource;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\DateFilter;
-use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 final class CustomerGroupResource extends Resource
@@ -78,8 +71,7 @@ final class CustomerGroupResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $operation, $state, callable $set) => 
-                                        $operation === 'create' ? $set('slug', \Str::slug($state)) : null
+                                    ->afterStateUpdated(fn (string $operation, $state, callable $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null
                                     ),
                                 TextInput::make('slug')
                                     ->label(__('customer_groups.slug'))
@@ -93,7 +85,7 @@ final class CustomerGroupResource extends Resource
                             ->rows(3)
                             ->columnSpanFull(),
                     ]),
-                    
+
                 Section::make(__('customer_groups.discount_percentage'))
                     ->schema([
                         Grid::make(2)
@@ -112,7 +104,7 @@ final class CustomerGroupResource extends Resource
                                     ->helperText(__('customer_groups.is_enabled')),
                             ]),
                     ]),
-                    
+
                 Section::make(__('customer_groups.conditions'))
                     ->schema([
                         KeyValue::make('conditions')
@@ -136,7 +128,7 @@ final class CustomerGroupResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->copyable(),
-                    
+
                 Tables\Columns\TextColumn::make('slug')
                     ->label(__('customer_groups.table_slug'))
                     ->searchable()
@@ -144,7 +136,7 @@ final class CustomerGroupResource extends Resource
                     ->copyable()
                     ->badge()
                     ->color('gray'),
-                    
+
                 Tables\Columns\TextColumn::make('description')
                     ->label(__('customer_groups.table_description'))
                     ->limit(50)
@@ -153,9 +145,10 @@ final class CustomerGroupResource extends Resource
                         if (strlen($state) <= 50) {
                             return null;
                         }
+
                         return $state;
                     }),
-                    
+
                 Tables\Columns\TextColumn::make('discount_percentage')
                     ->label(__('customer_groups.table_discount_percentage'))
                     ->numeric(decimalPlaces: 2)
@@ -163,26 +156,26 @@ final class CustomerGroupResource extends Resource
                     ->sortable()
                     ->color(fn ($state): string => $state > 0 ? 'success' : 'gray')
                     ->badge()
-                    ->formatStateUsing(fn ($state): string => $state > 0 ? $state . '%' : __('customer_groups.no_discount')),
-                    
+                    ->formatStateUsing(fn ($state): string => $state > 0 ? $state.'%' : __('customer_groups.no_discount')),
+
                 Tables\Columns\TextColumn::make('users_count')
                     ->label(__('customer_groups.table_users_count'))
                     ->counts('users')
                     ->sortable()
                     ->badge()
                     ->color('info'),
-                    
+
                 Tables\Columns\IconColumn::make('is_enabled')
                     ->label(__('customer_groups.table_is_enabled'))
                     ->boolean()
                     ->sortable(),
-                    
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('customer_groups.table_created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('customer_groups.table_updated_at'))
                     ->dateTime()
@@ -195,11 +188,11 @@ final class CustomerGroupResource extends Resource
                     ->placeholder(__('customer_groups.all_groups'))
                     ->trueLabel(__('customer_groups.enabled_only'))
                     ->falseLabel(__('customer_groups.disabled_only')),
-                    
+
                 Filter::make('with_discount')
                     ->label(__('customer_groups.filter_with_discount'))
                     ->query(fn (Builder $query): Builder => $query->where('discount_percentage', '>', 0)),
-                    
+
                 Filter::make('discount_range')
                     ->form([
                         TextInput::make('discount_from')
@@ -224,7 +217,7 @@ final class CustomerGroupResource extends Resource
                                 fn (Builder $query, $discount): Builder => $query->where('discount_percentage', '<=', $discount),
                             );
                     }),
-                    
+
                 Filter::make('users_count_range')
                     ->form([
                         TextInput::make('users_from')
@@ -247,7 +240,7 @@ final class CustomerGroupResource extends Resource
                                 fn (Builder $query, $users): Builder => $query->has('users', '<=', $users),
                             );
                     }),
-                    
+
                 DateFilter::make('created_at')
                     ->label(__('customer_groups.filter_created_date'))
                     ->displayFormat('d/m/Y'),

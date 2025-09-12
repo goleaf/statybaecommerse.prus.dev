@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Jobs;
 
@@ -20,18 +22,19 @@ final class CheckLowStockJob implements ShouldQueue
     public function handle(): void
     {
         Log::info('Starting low stock check...');
-        
+
         $lowStockProducts = Product::where('is_visible', true)
             ->where('manage_stock', true)
             ->where('stock_quantity', '<=', DB::raw('low_stock_threshold'))
             ->whereDoesntHave('notifications', function ($query) {
                 $query->where('type', LowStockAlert::class)
-                      ->where('created_at', '>=', now()->subHours(24));
+                    ->where('created_at', '>=', now()->subHours(24));
             })
             ->get();
 
         if ($lowStockProducts->isEmpty()) {
             Log::info('No low stock products found.');
+
             return;
         }
 
@@ -53,10 +56,10 @@ final class CheckLowStockJob implements ShouldQueue
             foreach ($adminUsers as $admin) {
                 $admin->notify(new LowStockAlert($product));
             }
-            
+
             Log::info("Low stock alert sent for product: {$product->name} (Stock: {$product->stock_quantity})");
         }
-        
+
         Log::info("Low stock check completed. Alerts sent for {$lowStockProducts->count()} products.");
     }
 }

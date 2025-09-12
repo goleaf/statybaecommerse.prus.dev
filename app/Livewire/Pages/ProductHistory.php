@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
@@ -12,6 +14,7 @@ final class ProductHistory extends Component
     use WithPagination;
 
     public Product $product;
+
     public int $perPage = 20;
 
     protected $listeners = ['refreshHistory' => '$refresh'];
@@ -44,4 +47,3 @@ final class ProductHistory extends Component
         ]);
     }
 }
-

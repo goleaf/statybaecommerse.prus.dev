@@ -1,19 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Traits\HasProductPricing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class ProductVariant extends Model implements HasMedia
 {
@@ -141,12 +143,12 @@ final class ProductVariant extends Model implements HasMedia
 
     public function getDisplayNameAttribute(): string
     {
-        return $this->name ?: $this->product->name . ' - ' . $this->sku;
+        return $this->name ?: $this->product->name.' - '.$this->sku;
     }
 
     public function getProfitMarginAttribute(): ?float
     {
-        if (!$this->cost_price || $this->cost_price <= 0) {
+        if (! $this->cost_price || $this->cost_price <= 0) {
             return null;
         }
 
@@ -160,7 +162,7 @@ final class ProductVariant extends Model implements HasMedia
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this
             ->addMediaConversion('thumb')

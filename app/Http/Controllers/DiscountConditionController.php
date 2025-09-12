@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\DiscountCondition;
 use App\Models\Discount;
-use Illuminate\Http\Request;
+use App\Models\DiscountCondition;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class DiscountConditionController extends Controller
@@ -46,7 +48,7 @@ final class DiscountConditionController extends Controller
     public function show(DiscountCondition $discountCondition): View
     {
         $discountCondition->load(['discount', 'translations']);
-        
+
         return view('discount-conditions.show', compact('discountCondition'));
     }
 
@@ -61,14 +63,14 @@ final class DiscountConditionController extends Controller
 
         $matches = $discountCondition->matches($request->get('test_value'));
         $isValid = $discountCondition->isValidForContext([
-            $discountCondition->type => $request->get('test_value')
+            $discountCondition->type => $request->get('test_value'),
         ]);
 
         return response()->json([
             'matches' => $matches,
             'is_valid' => $isValid,
             'condition_description' => $discountCondition->human_readable_condition,
-            'message' => $matches 
+            'message' => $matches
                 ? __('discount_conditions.messages.condition_matches')
                 : __('discount_conditions.messages.condition_does_not_match'),
         ]);
@@ -109,8 +111,8 @@ final class DiscountConditionController extends Controller
     public function operatorsForType(Request $request): JsonResponse
     {
         $type = $request->get('type');
-        
-        if (!$type) {
+
+        if (! $type) {
             return response()->json(['operators' => []]);
         }
 
@@ -141,4 +143,3 @@ final class DiscountConditionController extends Controller
         return response()->json($stats);
     }
 }
-

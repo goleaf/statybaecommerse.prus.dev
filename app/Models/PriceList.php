@@ -1,22 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Translations\PriceListTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 final class PriceList extends Model
 {
-    use HasFactory, SoftDeletes, HasTranslations, LogsActivity;
+    use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
 
     protected string $translationModel = PriceListTranslation::class;
 
@@ -129,16 +130,16 @@ final class PriceList extends Model
     {
         return $query->where(function ($q) use ($amount) {
             $q->whereNull('min_order_amount')
-              ->orWhere('min_order_amount', '<=', $amount);
+                ->orWhere('min_order_amount', '<=', $amount);
         })->where(function ($q) use ($amount) {
             $q->whereNull('max_order_amount')
-              ->orWhere('max_order_amount', '>=', $amount);
+                ->orWhere('max_order_amount', '>=', $amount);
         });
     }
 
     public function isActive(): bool
     {
-        if (!$this->is_enabled) {
+        if (! $this->is_enabled) {
             return false;
         }
 
@@ -168,12 +169,14 @@ final class PriceList extends Model
     public function getEffectivePriceForProduct(Product $product): ?float
     {
         $item = $this->items()->where('product_id', $product->id)->first();
+
         return $item ? $item->net_amount : null;
     }
 
     public function getEffectivePriceForVariant(ProductVariant $variant): ?float
     {
         $item = $this->items()->where('variant_id', $variant->id)->first();
+
         return $item ? $item->net_amount : null;
     }
 

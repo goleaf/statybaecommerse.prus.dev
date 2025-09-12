@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Region;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class RegionController extends Controller
@@ -38,7 +40,7 @@ final class RegionController extends Controller
     public function show(Region $region): View
     {
         $region->load(['country', 'zone', 'parent', 'children', 'cities', 'translations']);
-        
+
         return view('frontend.regions.show', compact('region'));
     }
 
@@ -60,14 +62,14 @@ final class RegionController extends Controller
                     'has_children' => $child->children()->count() > 0,
                     'cities_count' => $child->cities()->count(),
                 ];
-            })
+            }),
         ]);
     }
 
     public function search(Request $request): JsonResponse
     {
         $query = $request->get('q', '');
-        
+
         if (strlen($query) < 2) {
             return response()->json(['regions' => []]);
         }
@@ -90,15 +92,15 @@ final class RegionController extends Controller
                     'level' => $region->level,
                     'full_path' => $region->full_path,
                 ];
-            })
+            }),
         ]);
     }
 
     public function byCountry(Request $request): JsonResponse
     {
         $countryId = $request->get('country_id');
-        
-        if (!$countryId) {
+
+        if (! $countryId) {
             return response()->json(['regions' => []]);
         }
 
@@ -117,15 +119,15 @@ final class RegionController extends Controller
                     'level' => $region->level,
                     'has_children' => $region->children()->count() > 0,
                 ];
-            })
+            }),
         ]);
     }
 
     public function byZone(Request $request): JsonResponse
     {
         $zoneId = $request->get('zone_id');
-        
-        if (!$zoneId) {
+
+        if (! $zoneId) {
             return response()->json(['regions' => []]);
         }
 
@@ -144,7 +146,7 @@ final class RegionController extends Controller
                     'level' => $region->level,
                     'has_children' => $region->children()->count() > 0,
                 ];
-            })
+            }),
         ]);
     }
 
@@ -159,7 +161,7 @@ final class RegionController extends Controller
         return response()->json([
             'hierarchy' => $regions->map(function ($region) {
                 return $this->buildRegionTree($region);
-            })
+            }),
         ]);
     }
 
@@ -185,7 +187,7 @@ final class RegionController extends Controller
     public function stats(Region $region): JsonResponse
     {
         $region->load(['cities', 'addresses', 'users', 'orders', 'customers', 'warehouses', 'stores']);
-        
+
         return response()->json([
             'stats' => $region->stats,
             'hierarchy' => [
@@ -193,8 +195,7 @@ final class RegionController extends Controller
                 'is_leaf' => $region->is_leaf,
                 'depth' => $region->depth,
                 'breadcrumb' => $region->breadcrumb_string,
-            ]
+            ],
         ]);
     }
 }
-

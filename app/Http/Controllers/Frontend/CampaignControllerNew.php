@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
@@ -17,14 +19,14 @@ final class CampaignControllerNew extends Controller
     {
         $query = Campaign::active()
             ->with(['targetCategories', 'targetProducts', 'targetCustomerGroups'])
-            ->when($request->filled('type'), fn($q) => $q->where('type', $request->type))
-            ->when($request->filled('category'), fn($q) => $q->whereHas('targetCategories', fn($subQ) => $subQ->where('categories.id', $request->category)))
-            ->when($request->filled('product'), fn($q) => $q->whereHas('targetProducts', fn($subQ) => $subQ->where('products.id', $request->product)))
-            ->when($request->filled('customer_group'), fn($q) => $q->whereHas('targetCustomerGroups', fn($subQ) => $subQ->where('customer_groups.id', $request->customer_group)))
-            ->when($request->filled('search'), fn($q) => $q->where('name', 'like', '%' . $request->search . '%'))
-            ->when($request->filled('featured'), fn($q) => $q->featured())
-            ->when($request->filled('budget_min'), fn($q) => $q->where('budget', '>=', $request->budget_min))
-            ->when($request->filled('budget_max'), fn($q) => $q->where('budget', '<=', $request->budget_max));
+            ->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))
+            ->when($request->filled('category'), fn ($q) => $q->whereHas('targetCategories', fn ($subQ) => $subQ->where('categories.id', $request->category)))
+            ->when($request->filled('product'), fn ($q) => $q->whereHas('targetProducts', fn ($subQ) => $subQ->where('products.id', $request->product)))
+            ->when($request->filled('customer_group'), fn ($q) => $q->whereHas('targetCustomerGroups', fn ($subQ) => $subQ->where('customer_groups.id', $request->customer_group)))
+            ->when($request->filled('search'), fn ($q) => $q->where('name', 'like', '%'.$request->search.'%'))
+            ->when($request->filled('featured'), fn ($q) => $q->featured())
+            ->when($request->filled('budget_min'), fn ($q) => $q->where('budget', '>=', $request->budget_min))
+            ->when($request->filled('budget_max'), fn ($q) => $q->where('budget', '<=', $request->budget_max));
 
         $campaigns = $query
             ->orderBy('display_priority', 'desc')
@@ -41,7 +43,7 @@ final class CampaignControllerNew extends Controller
 
     public function show(Campaign $campaign): View
     {
-        if (!$campaign->isActive()) {
+        if (! $campaign->isActive()) {
             abort(404);
         }
 
@@ -59,8 +61,8 @@ final class CampaignControllerNew extends Controller
             ->where('id', '!=', $campaign->id)
             ->where(function ($q) use ($campaign) {
                 $q
-                    ->whereHas('targetCategories', fn($subQ) => $subQ->whereIn('categories.id', $campaign->targetCategories->pluck('id')))
-                    ->orWhereHas('targetProducts', fn($subQ) => $subQ->whereIn('products.id', $campaign->targetProducts->pluck('id')))
+                    ->whereHas('targetCategories', fn ($subQ) => $subQ->whereIn('categories.id', $campaign->targetCategories->pluck('id')))
+                    ->orWhereHas('targetProducts', fn ($subQ) => $subQ->whereIn('products.id', $campaign->targetProducts->pluck('id')))
                     ->orWhere('type', $campaign->type);
             })
             ->limit(4)
@@ -71,7 +73,7 @@ final class CampaignControllerNew extends Controller
 
     public function click(Campaign $campaign, Request $request): JsonResponse
     {
-        if (!$campaign->isActive()) {
+        if (! $campaign->isActive()) {
             abort(404);
         }
 
@@ -96,13 +98,13 @@ final class CampaignControllerNew extends Controller
                 'id' => $campaign->id,
                 'name' => $campaign->name,
                 'total_clicks' => $campaign->fresh()->total_clicks,
-            ]
+            ],
         ]);
     }
 
     public function conversion(Campaign $campaign, Request $request): JsonResponse
     {
-        if (!$campaign->isActive()) {
+        if (! $campaign->isActive()) {
             abort(404);
         }
 
@@ -130,7 +132,7 @@ final class CampaignControllerNew extends Controller
                 'name' => $campaign->name,
                 'total_conversions' => $campaign->fresh()->total_conversions,
                 'total_revenue' => $campaign->fresh()->total_revenue,
-            ]
+            ],
         ]);
     }
 
@@ -150,7 +152,7 @@ final class CampaignControllerNew extends Controller
     {
         $validTypes = ['email', 'sms', 'push', 'banner', 'popup', 'social'];
 
-        if (!in_array($type, $validTypes)) {
+        if (! in_array($type, $validTypes)) {
             abort(404);
         }
 
@@ -175,9 +177,9 @@ final class CampaignControllerNew extends Controller
         $campaigns = Campaign::active()
             ->where(function ($q) use ($query) {
                 $q
-                    ->where('name', 'like', '%' . $query . '%')
-                    ->orWhere('description', 'like', '%' . $query . '%')
-                    ->orWhere('content', 'like', '%' . $query . '%');
+                    ->where('name', 'like', '%'.$query.'%')
+                    ->orWhere('description', 'like', '%'.$query.'%')
+                    ->orWhere('content', 'like', '%'.$query.'%');
             })
             ->with(['targetCategories', 'targetProducts'])
             ->orderBy('display_priority', 'desc')
@@ -190,9 +192,9 @@ final class CampaignControllerNew extends Controller
     public function api(Request $request): JsonResponse
     {
         $campaigns = Campaign::active()
-            ->when($request->filled('type'), fn($q) => $q->where('type', $request->type))
-            ->when($request->filled('featured'), fn($q) => $q->featured())
-            ->when($request->filled('limit'), fn($q) => $q->limit($request->limit))
+            ->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))
+            ->when($request->filled('featured'), fn ($q) => $q->featured())
+            ->when($request->filled('limit'), fn ($q) => $q->limit($request->limit))
             ->orderBy('display_priority', 'desc')
             ->orderBy('created_at', 'desc')
             ->get()
@@ -224,13 +226,13 @@ final class CampaignControllerNew extends Controller
             'meta' => [
                 'total' => $campaigns->count(),
                 'types' => Campaign::active()->distinct()->pluck('type'),
-            ]
+            ],
         ]);
     }
 
     public function apiShow(Campaign $campaign): JsonResponse
     {
-        if (!$campaign->isActive()) {
+        if (! $campaign->isActive()) {
             abort(404);
         }
 
@@ -270,17 +272,17 @@ final class CampaignControllerNew extends Controller
                 'roi' => $campaign->getROI(),
                 'image_url' => $campaign->getImageUrl('large'),
                 'banner_url' => $campaign->getBannerUrl('large'),
-                'target_categories' => $campaign->targetCategories->map(fn($cat) => [
+                'target_categories' => $campaign->targetCategories->map(fn ($cat) => [
                     'id' => $cat->id,
                     'name' => $cat->name,
                     'slug' => $cat->slug,
                 ]),
-                'target_products' => $campaign->targetProducts->map(fn($prod) => [
+                'target_products' => $campaign->targetProducts->map(fn ($prod) => [
                     'id' => $prod->id,
                     'name' => $prod->name,
                     'slug' => $prod->slug,
                 ]),
-                'target_customer_groups' => $campaign->targetCustomerGroups->map(fn($group) => [
+                'target_customer_groups' => $campaign->targetCustomerGroups->map(fn ($group) => [
                     'id' => $group->id,
                     'name' => $group->name,
                 ]),
@@ -289,9 +291,7 @@ final class CampaignControllerNew extends Controller
                 'social_media_ready' => $campaign->social_media_ready,
                 'created_at' => $campaign->created_at->toISOString(),
                 'updated_at' => $campaign->updated_at->toISOString(),
-            ]
+            ],
         ]);
     }
 }
-
-

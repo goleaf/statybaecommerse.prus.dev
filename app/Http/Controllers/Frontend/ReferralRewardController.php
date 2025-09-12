@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\ReferralReward;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 final class ReferralRewardController extends Controller
 {
@@ -18,8 +20,8 @@ final class ReferralRewardController extends Controller
     public function index(): View
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             abort(401);
         }
 
@@ -47,8 +49,8 @@ final class ReferralRewardController extends Controller
     public function show(ReferralReward $reward): View
     {
         $user = Auth::user();
-        
-        if (!$user || $reward->user_id !== $user->id) {
+
+        if (! $user || $reward->user_id !== $user->id) {
             abort(403);
         }
 
@@ -63,8 +65,8 @@ final class ReferralRewardController extends Controller
     public function apiIndex(): JsonResponse
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -72,7 +74,7 @@ final class ReferralRewardController extends Controller
             ->with(['referral', 'order'])
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(fn($reward) => $reward->display_data);
+            ->map(fn ($reward) => $reward->display_data);
 
         return response()->json([
             'success' => true,
@@ -86,8 +88,8 @@ final class ReferralRewardController extends Controller
     public function apiStats(): JsonResponse
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -115,8 +117,8 @@ final class ReferralRewardController extends Controller
     public function apiPending(): JsonResponse
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -125,7 +127,7 @@ final class ReferralRewardController extends Controller
             ->with(['referral', 'order'])
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(fn($reward) => $reward->display_data);
+            ->map(fn ($reward) => $reward->display_data);
 
         return response()->json([
             'success' => true,
@@ -139,8 +141,8 @@ final class ReferralRewardController extends Controller
     public function apiApplied(): JsonResponse
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -149,7 +151,7 @@ final class ReferralRewardController extends Controller
             ->with(['referral', 'order'])
             ->orderBy('applied_at', 'desc')
             ->get()
-            ->map(fn($reward) => $reward->display_data);
+            ->map(fn ($reward) => $reward->display_data);
 
         return response()->json([
             'success' => true,
@@ -163,8 +165,8 @@ final class ReferralRewardController extends Controller
     public function apiByType(string $type): JsonResponse
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -181,7 +183,7 @@ final class ReferralRewardController extends Controller
         $rewards = $query->with(['referral', 'order'])
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(fn($reward) => $reward->display_data);
+            ->map(fn ($reward) => $reward->display_data);
 
         return response()->json([
             'success' => true,
@@ -195,8 +197,8 @@ final class ReferralRewardController extends Controller
     public function apiByDateRange(Request $request): JsonResponse
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -210,7 +212,7 @@ final class ReferralRewardController extends Controller
             ->with(['referral', 'order'])
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(fn($reward) => $reward->display_data);
+            ->map(fn ($reward) => $reward->display_data);
 
         return response()->json([
             'success' => true,

@@ -1,13 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\SeoDataResource\Widgets;
 
-use App\Models\SeoData;
-use App\Models\Product;
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\SeoData;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class SeoDataByTypeWidget extends ChartWidget
 {
@@ -26,9 +27,9 @@ final class SeoDataByTypeWidget extends ChartWidget
             END as object_type,
             COUNT(*) as count
         ', [Product::class, Category::class, Brand::class])
-        ->groupBy('object_type')
-        ->orderBy('count', 'desc')
-        ->get();
+            ->groupBy('object_type')
+            ->orderBy('count', 'desc')
+            ->get();
 
         $labels = $data->pluck('object_type')->toArray();
         $counts = $data->pluck('count')->toArray();

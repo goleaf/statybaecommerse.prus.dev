@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -14,19 +16,20 @@ final class MobileCategoryMenu extends Component
     public function categoryTree()
     {
         $locale = app()->getLocale();
+
         return Cache::remember("mobile_category_tree:{$locale}", now()->addMinutes(30), function () {
             $roots = Category::query()
                 ->withProductCounts()
                 ->with([
-                    'translations' => fn($q) => $q->where('locale', app()->getLocale()),
+                    'translations' => fn ($q) => $q->where('locale', app()->getLocale()),
                     'children' => function ($q) {
                         $q
                             ->withProductCounts()
-                            ->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])
+                            ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
                             ->visible()
                             ->ordered()
                             ->limit(10);  // Limit for mobile
-                    }
+                    },
                 ])
                 ->visible()
                 ->roots()

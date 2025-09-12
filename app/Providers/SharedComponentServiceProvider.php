@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Providers;
 
 use App\Services\Shared\CacheService;
 use App\Services\Shared\ProductService;
 use App\Services\Shared\TranslationService;
-use App\Support\Helpers\SharedHelpers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,7 +24,7 @@ final class SharedComponentServiceProvider extends ServiceProvider
     {
         // Register custom Blade directives
         $this->registerBladeDirectives();
-        
+
         // Register view composers
         $this->registerViewComposers();
     }
@@ -102,14 +103,15 @@ final class SharedComponentServiceProvider extends ServiceProvider
     private function getCartCount(): int
     {
         $cart = session('cart', []);
+
         return array_sum(array_column($cart, 'quantity'));
     }
 
     private function getTopCategories()
     {
         return app(CacheService::class)->rememberLong(
-            'navigation.top_categories.' . app()->getLocale(),
-            fn() => \App\Models\Category::query()
+            'navigation.top_categories.'.app()->getLocale(),
+            fn () => \App\Models\Category::query()
                 ->with(['translations' => function ($q) {
                     $q->where('locale', app()->getLocale());
                 }])
@@ -124,8 +126,8 @@ final class SharedComponentServiceProvider extends ServiceProvider
     private function getFeaturedBrands()
     {
         return app(CacheService::class)->rememberLong(
-            'navigation.featured_brands.' . app()->getLocale(),
-            fn() => \App\Models\Brand::query()
+            'navigation.featured_brands.'.app()->getLocale(),
+            fn () => \App\Models\Brand::query()
                 ->with(['translations' => function ($q) {
                     $q->where('locale', app()->getLocale());
                 }])

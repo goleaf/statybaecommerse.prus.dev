@@ -7,7 +7,7 @@ use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
@@ -39,9 +39,9 @@ final class SystemSettingResource extends Resource
 
     protected static ?string $pluralModelLabel = 'System Settings';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Section::make(__('admin.system_settings.setting_information'))
                     ->schema([

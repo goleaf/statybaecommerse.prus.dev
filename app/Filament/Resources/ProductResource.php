@@ -1,21 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
-use App\Models\Attribute;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Collection;
 use App\Models\Product;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
@@ -24,6 +19,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -35,11 +31,8 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use UnitEnum;
 
@@ -76,8 +69,7 @@ class ProductResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) =>
-                                        $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                                    ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
                                 TextInput::make('slug')
                                     ->label(__('translations.product_slug'))
                                     ->required()
@@ -137,7 +129,7 @@ class ProductResource extends Resource
                                     ->live(),
                                 Toggle::make('track_stock')
                                     ->label(__('translations.product_track_stock'))
-                                    ->visible(fn(Forms\Get $get) => $get('manage_stock')),
+                                    ->visible(fn (Forms\Get $get) => $get('manage_stock')),
                             ]),
                         Grid::make(2)
                             ->schema([
@@ -145,12 +137,12 @@ class ProductResource extends Resource
                                     ->label(__('translations.product_stock_quantity'))
                                     ->numeric()
                                     ->default(0)
-                                    ->visible(fn(Forms\Get $get) => $get('manage_stock')),
+                                    ->visible(fn (Forms\Get $get) => $get('manage_stock')),
                                 TextInput::make('low_stock_threshold')
                                     ->label(__('translations.product_low_stock_threshold'))
                                     ->numeric()
                                     ->default(0)
-                                    ->visible(fn(Forms\Get $get) => $get('manage_stock')),
+                                    ->visible(fn (Forms\Get $get) => $get('manage_stock')),
                             ]),
                     ])
                     ->columns(1),
@@ -336,7 +328,7 @@ class ProductResource extends Resource
                     ->label(__('translations.product_stock'))
                     ->numeric()
                     ->sortable()
-                    ->color(fn(Product $record) => match (true) {
+                    ->color(fn (Product $record) => match (true) {
                         $record->stock_quantity <= 0 => 'danger',
                         $record->stock_quantity <= $record->low_stock_threshold => 'warning',
                         default => 'success',
@@ -392,13 +384,13 @@ class ProductResource extends Resource
                     ->label(__('translations.product_manage_stock')),
                 Filter::make('low_stock')
                     ->label(__('translations.product_low_stock'))
-                    ->query(fn(Builder $query): Builder => $query->whereRaw('stock_quantity <= low_stock_threshold')),
+                    ->query(fn (Builder $query): Builder => $query->whereRaw('stock_quantity <= low_stock_threshold')),
                 Filter::make('out_of_stock')
                     ->label(__('translations.product_out_of_stock'))
-                    ->query(fn(Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
+                    ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
                 Filter::make('published')
                     ->label(__('translations.product_published'))
-                    ->query(fn(Builder $query): Builder => $query
+                    ->query(fn (Builder $query): Builder => $query
                         ->where('is_visible', true)
                         ->where('status', 'published')
                         ->whereNotNull('published_at')
@@ -413,9 +405,9 @@ class ProductResource extends Resource
                     ->icon('heroicon-o-document-duplicate')
                     ->action(function (Product $record) {
                         $newProduct = $record->replicate();
-                        $newProduct->name = $record->name . ' (Copy)';
-                        $newProduct->sku = $record->sku . '-copy';
-                        $newProduct->slug = $record->slug . '-copy';
+                        $newProduct->name = $record->name.' (Copy)';
+                        $newProduct->sku = $record->sku.'-copy';
+                        $newProduct->slug = $record->slug.'-copy';
                         $newProduct->status = 'draft';
                         $newProduct->save();
 
@@ -433,7 +425,7 @@ class ProductResource extends Resource
                     BulkAction::make('publish')
                         ->label(__('translations.publish'))
                         ->icon('heroicon-o-check-circle')
-                        ->action(fn($records) => $records->each->update([
+                        ->action(fn ($records) => $records->each->update([
                             'status' => 'published',
                             'is_visible' => true,
                             'published_at' => now(),
@@ -441,18 +433,18 @@ class ProductResource extends Resource
                     BulkAction::make('unpublish')
                         ->label(__('translations.unpublish'))
                         ->icon('heroicon-o-x-circle')
-                        ->action(fn($records) => $records->each->update([
+                        ->action(fn ($records) => $records->each->update([
                             'status' => 'draft',
                             'is_visible' => false,
                         ])),
                     BulkAction::make('feature')
                         ->label(__('translations.feature'))
                         ->icon('heroicon-o-star')
-                        ->action(fn($records) => $records->each->update(['is_featured' => true])),
+                        ->action(fn ($records) => $records->each->update(['is_featured' => true])),
                     BulkAction::make('unfeature')
                         ->label(__('translations.unfeature'))
                         ->icon('heroicon-o-star')
-                        ->action(fn($records) => $records->each->update(['is_featured' => false])),
+                        ->action(fn ($records) => $records->each->update(['is_featured' => false])),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

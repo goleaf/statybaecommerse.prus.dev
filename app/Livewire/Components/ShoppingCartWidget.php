@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
 use App\Models\CartItem;
-use App\Models\Product;
 use App\Models\Discount;
 use App\Models\DiscountCode;
+use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\On;
@@ -15,12 +17,12 @@ use Livewire\Component;
 final class ShoppingCartWidget extends Component
 {
     public bool $isOpen = false;
-    
+
     #[Validate('nullable|string|max:50')]
     public string $discountCode = '';
-    
+
     public ?DiscountCode $appliedDiscount = null;
-    
+
     public array $cartSummary = [];
 
     public function mount(): void
@@ -37,7 +39,7 @@ final class ShoppingCartWidget extends Component
     #[On('toggle-cart')]
     public function toggleCart(): void
     {
-        $this->isOpen = !$this->isOpen;
+        $this->isOpen = ! $this->isOpen;
     }
 
     public function addToCart(int $productId, int $quantity = 1, array $options = []): void
@@ -51,6 +53,7 @@ final class ShoppingCartWidget extends Component
                 'type' => 'error',
                 'message' => __('translations.insufficient_stock'),
             ]);
+
             return;
         }
 
@@ -60,16 +63,17 @@ final class ShoppingCartWidget extends Component
 
         if ($cartItem) {
             $newQuantity = $cartItem->quantity + $quantity;
-            
+
             // Check stock for updated quantity
             if ($product->manage_stock && $product->availableQuantity() < $newQuantity) {
                 $this->dispatch('notify', [
                     'type' => 'error',
                     'message' => __('translations.insufficient_stock_for_quantity'),
                 ]);
+
                 return;
             }
-            
+
             $cartItem->update([
                 'quantity' => $newQuantity,
                 'options' => array_merge($cartItem->options ?? [], $options),
@@ -97,6 +101,7 @@ final class ShoppingCartWidget extends Component
     {
         if ($quantity <= 0) {
             $this->removeItem($cartItemId);
+
             return;
         }
 
@@ -104,7 +109,7 @@ final class ShoppingCartWidget extends Component
             ->where('session_id', Session::getId())
             ->first();
 
-        if (!$cartItem) {
+        if (! $cartItem) {
             return;
         }
 
@@ -115,6 +120,7 @@ final class ShoppingCartWidget extends Component
                 'type' => 'error',
                 'message' => __('translations.insufficient_stock_for_quantity'),
             ]);
+
             return;
         }
 
@@ -163,18 +169,20 @@ final class ShoppingCartWidget extends Component
             ->where('usage_limit', '>', 'used_count')
             ->where(function ($query) {
                 $query->whereNull('expires_at')
-                      ->orWhere('expires_at', '>', now());
+                    ->orWhere('expires_at', '>', now());
             })
             ->first();
 
-        if (!$discount) {
+        if (! $discount) {
             $this->addError('discountCode', __('translations.invalid_discount_code'));
+
             return;
         }
 
         // Check if discount is applicable to current cart
-        if (!$this->isDiscountApplicable($discount)) {
+        if (! $this->isDiscountApplicable($discount)) {
             $this->addError('discountCode', __('translations.discount_not_applicable'));
+
             return;
         }
 
@@ -200,7 +208,7 @@ final class ShoppingCartWidget extends Component
     protected function isDiscountApplicable(DiscountCode $discount): bool
     {
         $cartTotal = $this->getCartSubtotal();
-        
+
         // Check minimum amount
         if ($discount->minimum_amount && $cartTotal < $discount->minimum_amount) {
             return false;
@@ -218,7 +226,7 @@ final class ShoppingCartWidget extends Component
     protected function calculateCartSummary(): void
     {
         $cartItems = $this->getCartItems();
-        $subtotal = $cartItems->sum(fn($item) => $item->price * $item->quantity);
+        $subtotal = $cartItems->sum(fn ($item) => $item->price * $item->quantity);
         $discountAmount = 0;
         $taxAmount = 0;
         $shippingAmount = 0;
@@ -249,7 +257,7 @@ final class ShoppingCartWidget extends Component
 
     protected function calculateDiscountAmount(float $subtotal): float
     {
-        if (!$this->appliedDiscount) {
+        if (! $this->appliedDiscount) {
             return 0;
         }
 
@@ -262,7 +270,7 @@ final class ShoppingCartWidget extends Component
 
     protected function getCartSubtotal(): float
     {
-        return $this->getCartItems()->sum(fn($item) => $item->price * $item->quantity);
+        return $this->getCartItems()->sum(fn ($item) => $item->price * $item->quantity);
     }
 
     public function getCartItemsProperty()
@@ -284,6 +292,7 @@ final class ShoppingCartWidget extends Component
                 'type' => 'error',
                 'message' => __('translations.cart_is_empty'),
             ]);
+
             return;
         }
 

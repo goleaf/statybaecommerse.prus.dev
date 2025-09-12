@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -87,7 +89,7 @@ enum AddressType: string
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
             ->toArray();
     }
 
@@ -95,7 +97,7 @@ enum AddressType: string
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [
+            ->mapWithKeys(fn ($case) => [
                 $case->value => [
                     'label' => $case->label(),
                     'description' => $case->description(),
@@ -103,7 +105,7 @@ enum AddressType: string
                     'color' => $case->color(),
                     'is_primary' => $case->isPrimary(),
                     'is_required' => $case->isRequired(),
-                ]
+                ],
             ])
             ->toArray();
     }
@@ -111,19 +113,19 @@ enum AddressType: string
     public static function primary(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isPrimary());
+            ->filter(fn ($case) => $case->isPrimary());
     }
 
     public static function required(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isRequired());
+            ->filter(fn ($case) => $case->isRequired());
     }
 
     public static function optional(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => !$case->isRequired());
+            ->filter(fn ($case) => ! $case->isRequired());
     }
 
     public static function ordered(): Collection
@@ -135,7 +137,7 @@ enum AddressType: string
     public static function fromLabel(string $label): ?self
     {
         return collect(self::cases())
-            ->first(fn($case) => $case->label() === $label);
+            ->first(fn ($case) => $case->label() === $label);
     }
 
     public static function values(): array
@@ -146,7 +148,7 @@ enum AddressType: string
     public static function labels(): array
     {
         return collect(self::cases())
-            ->map(fn($case) => $case->label())
+            ->map(fn ($case) => $case->label())
             ->toArray();
     }
 

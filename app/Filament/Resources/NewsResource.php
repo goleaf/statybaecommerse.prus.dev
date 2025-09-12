@@ -8,7 +8,7 @@ use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\NewsTag;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Actions;
 use Filament\Forms;
@@ -48,9 +48,9 @@ final class NewsResource extends Resource
         return __('admin.news.title');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Section::make(__('admin.news.fields.title'))
                     ->schema([

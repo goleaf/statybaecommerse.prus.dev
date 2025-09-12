@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
-use Spatie\Translatable\HasTranslations;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Translatable\HasTranslations;
 
 final class ReferralCode extends Model
 {
@@ -177,7 +179,7 @@ final class ReferralCode extends Model
      */
     public function isValid(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -205,7 +207,7 @@ final class ReferralCode extends Model
      */
     public function getRemainingUsageAttribute(): ?int
     {
-        if (!$this->usage_limit) {
+        if (! $this->usage_limit) {
             return null;
         }
 
@@ -217,7 +219,7 @@ final class ReferralCode extends Model
      */
     public function getUsagePercentageAttribute(): ?float
     {
-        if (!$this->usage_limit) {
+        if (! $this->usage_limit) {
             return null;
         }
 
@@ -237,7 +239,7 @@ final class ReferralCode extends Model
      */
     public static function findByCode(string $code): ?self
     {
-        return static::where('code', $code)->first();
+        return self::where('code', $code)->first();
     }
 
     /**
@@ -247,7 +249,7 @@ final class ReferralCode extends Model
     {
         do {
             $code = strtoupper(substr(md5(uniqid()), 0, 8));
-        } while (static::where('code', $code)->exists());
+        } while (self::where('code', $code)->exists());
 
         return $code;
     }
@@ -257,7 +259,7 @@ final class ReferralCode extends Model
      */
     public function getReferralUrlAttribute(): string
     {
-        return url('/register?ref=' . $this->code);
+        return url('/register?ref='.$this->code);
     }
 
     /**
@@ -266,7 +268,7 @@ final class ReferralCode extends Model
     public function incrementUsage(): void
     {
         $this->increment('usage_count');
-        
+
         // Log the usage
         $this->usageLogs()->create([
             'user_id' => auth()->id(),
@@ -297,11 +299,11 @@ final class ReferralCode extends Model
      */
     public function getFormattedRewardAmountAttribute(): ?string
     {
-        if (!$this->reward_amount) {
+        if (! $this->reward_amount) {
             return null;
         }
 
-        return number_format($this->reward_amount, 2) . ' EUR';
+        return number_format($this->reward_amount, 2).' EUR';
     }
 
     /**
@@ -314,7 +316,7 @@ final class ReferralCode extends Model
         }
 
         foreach ($this->conditions as $condition) {
-            if (!$this->evaluateCondition($condition, $context)) {
+            if (! $this->evaluateCondition($condition, $context)) {
                 return false;
             }
         }
@@ -331,7 +333,7 @@ final class ReferralCode extends Model
         $operator = $condition['operator'] ?? '=';
         $value = $condition['value'] ?? null;
 
-        if (!$field || !isset($context[$field])) {
+        if (! $field || ! isset($context[$field])) {
             return false;
         }
 
@@ -345,7 +347,7 @@ final class ReferralCode extends Model
             '<' => $contextValue < $value,
             '<=' => $contextValue <= $value,
             'in' => in_array($contextValue, (array) $value),
-            'not_in' => !in_array($contextValue, (array) $value),
+            'not_in' => ! in_array($contextValue, (array) $value),
             default => false,
         };
     }
@@ -394,4 +396,3 @@ final class ReferralCode extends Model
         ];
     }
 }
-

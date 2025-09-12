@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -45,15 +47,15 @@ final class InventoryController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
         // Apply sorting
         $sortBy = $request->get('sort', 'name');
         $sortDirection = $request->get('direction', 'asc');
-        
+
         $allowedSorts = ['name', 'sku', 'price', 'stock_quantity', 'created_at'];
         if (in_array($sortBy, $allowedSorts)) {
             $query->orderBy($sortBy, $sortDirection);
@@ -69,7 +71,7 @@ final class InventoryController extends Controller
     public function show(Product $product): View
     {
         $product->load(['brand', 'categories', 'reviews', 'variants']);
-        
+
         return view('products.show', compact('product'));
     }
 }

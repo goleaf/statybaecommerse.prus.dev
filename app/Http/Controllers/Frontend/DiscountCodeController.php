@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
@@ -11,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 final class DiscountCodeController extends Controller
 {
@@ -30,18 +31,18 @@ final class DiscountCodeController extends Controller
 
         $code = DiscountCode::where('code', $request->code)->first();
 
-        if (!$code) {
+        if (! $code) {
             return response()->json([
                 'valid' => false,
                 'message' => __('discount_code_invalid'),
             ], 422);
         }
 
-        if (!$code->isValid()) {
+        if (! $code->isValid()) {
             $message = match (true) {
                 $code->hasReachedLimit() => __('discount_code_limit_reached'),
                 $code->expires_at && $code->expires_at->lt(now()) => __('discount_code_expired_message'),
-                !$code->is_active => __('discount_code_inactive'),
+                ! $code->is_active => __('discount_code_inactive'),
                 default => __('discount_code_invalid'),
             };
 
@@ -91,7 +92,7 @@ final class DiscountCodeController extends Controller
 
         $code = DiscountCode::where('code', $request->code)->first();
 
-        if (!$code || !$code->isValid()) {
+        if (! $code || ! $code->isValid()) {
             return response()->json([
                 'success' => false,
                 'message' => __('discount_code_invalid'),
@@ -125,7 +126,7 @@ final class DiscountCodeController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return response()->json([
                 'success' => false,
                 'message' => __('Something went wrong. Please try again.'),
@@ -144,7 +145,7 @@ final class DiscountCodeController extends Controller
 
         $code = DiscountCode::where('code', $request->code)->first();
 
-        if (!$code) {
+        if (! $code) {
             return response()->json([
                 'success' => false,
                 'message' => __('discount_code_invalid'),
@@ -159,7 +160,7 @@ final class DiscountCodeController extends Controller
 
         if ($redemption) {
             $redemption->delete();
-            
+
             // Decrement usage count
             $code->decrement('usage_count');
         }
@@ -192,10 +193,10 @@ final class DiscountCodeController extends Controller
                     $userUsage = DiscountRedemption::where('code_id', $code->id)
                         ->where('user_id', Auth::id())
                         ->count();
-                    
+
                     return $userUsage < $code->usage_limit_per_user;
                 }
-                
+
                 return true;
             })
             ->map(function ($code) {
@@ -250,7 +251,7 @@ final class DiscountCodeController extends Controller
             );
 
             if ($request->format === 'pdf') {
-                return response()->download($document->file_path, $document->title . '.pdf');
+                return response()->download($document->file_path, $document->title.'.pdf');
             }
 
             return response($document->content, 200, [
@@ -265,4 +266,3 @@ final class DiscountCodeController extends Controller
         }
     }
 }
-

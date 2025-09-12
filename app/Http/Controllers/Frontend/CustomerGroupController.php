@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
@@ -29,7 +31,7 @@ final class CustomerGroupController extends Controller
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
                 $q->whereRaw("JSON_EXTRACT(name, '$.lt') LIKE ?", ["%{$search}%"])
-                  ->orWhereRaw("JSON_EXTRACT(name, '$.en') LIKE ?", ["%{$search}%"]);
+                    ->orWhereRaw("JSON_EXTRACT(name, '$.en') LIKE ?", ["%{$search}%"]);
             });
         }
 
@@ -41,7 +43,7 @@ final class CustomerGroupController extends Controller
     public function show(CustomerGroup $customerGroup): View
     {
         // Only show enabled customer groups
-        if (!$customerGroup->is_enabled) {
+        if (! $customerGroup->is_enabled) {
             abort(404);
         }
 
@@ -53,12 +55,12 @@ final class CustomerGroupController extends Controller
     public function join(Request $request, CustomerGroup $customerGroup)
     {
         $user = auth()->user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return redirect()->route('login')->with('error', __('customer_groups.login_required'));
         }
 
-        if (!$customerGroup->is_enabled) {
+        if (! $customerGroup->is_enabled) {
             return redirect()->back()->with('error', __('customer_groups.group_not_available'));
         }
 
@@ -76,13 +78,13 @@ final class CustomerGroupController extends Controller
     public function leave(Request $request, CustomerGroup $customerGroup)
     {
         $user = auth()->user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return redirect()->route('login')->with('error', __('customer_groups.login_required'));
         }
 
         // Check if user is in the group
-        if (!$customerGroup->users()->where('user_id', $user->id)->exists()) {
+        if (! $customerGroup->users()->where('user_id', $user->id)->exists()) {
             return redirect()->back()->with('error', __('customer_groups.not_member'));
         }
 

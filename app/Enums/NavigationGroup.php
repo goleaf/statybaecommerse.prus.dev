@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -143,7 +145,7 @@ enum NavigationGroup: string
             self::System => 'manage_system',
             self::Analytics => 'view_analytics',
             self::Reports => 'view_reports',
-            default => 'view_' . strtolower($this->value),
+            default => 'view_'.strtolower($this->value),
         };
     }
 
@@ -151,7 +153,7 @@ enum NavigationGroup: string
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
             ->toArray();
     }
 
@@ -159,7 +161,7 @@ enum NavigationGroup: string
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [
+            ->mapWithKeys(fn ($case) => [
                 $case->value => [
                     'label' => $case->label(),
                     'description' => $case->description(),
@@ -170,7 +172,7 @@ enum NavigationGroup: string
                     'is_public' => $case->isPublic(),
                     'requires_permission' => $case->requiresPermission(),
                     'permission' => $case->getPermission(),
-                ]
+                ],
             ])
             ->toArray();
     }
@@ -178,25 +180,25 @@ enum NavigationGroup: string
     public static function core(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isCore());
+            ->filter(fn ($case) => $case->isCore());
     }
 
     public static function adminOnly(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isAdminOnly());
+            ->filter(fn ($case) => $case->isAdminOnly());
     }
 
     public static function public(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isPublic());
+            ->filter(fn ($case) => $case->isPublic());
     }
 
     public static function withPermissions(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->requiresPermission());
+            ->filter(fn ($case) => $case->requiresPermission());
     }
 
     public static function ordered(): Collection
@@ -208,7 +210,7 @@ enum NavigationGroup: string
     public static function fromLabel(string $label): ?self
     {
         return collect(self::cases())
-            ->first(fn($case) => $case->label() === $label);
+            ->first(fn ($case) => $case->label() === $label);
     }
 
     public static function values(): array
@@ -219,7 +221,7 @@ enum NavigationGroup: string
     public static function labels(): array
     {
         return collect(self::cases())
-            ->map(fn($case) => $case->label())
+            ->map(fn ($case) => $case->label())
             ->toArray();
     }
 

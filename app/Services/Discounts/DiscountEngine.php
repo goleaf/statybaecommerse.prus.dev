@@ -2,9 +2,9 @@
 
 namespace App\Services\Discounts;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
 
 class DiscountEngine
 {
@@ -56,7 +56,7 @@ class DiscountEngine
             app('debugbar.discount')->logCacheOperation($cacheKey, $isHit, $cached);
         }
 
-        return Cache::tags(['discounts'])->remember($cacheKey, now()->addMinutes(3), function () use ($context, $now) {
+        return Cache::tags(['discounts'])->remember($cacheKey, now()->addMinutes(3), function () use ($now) {
             return collect(DB::table('discounts')
                 ->where('status', 'active')
                 ->where(function ($q) use ($now) {
@@ -76,27 +76,28 @@ class DiscountEngine
         $channelId = data_get($context, 'channel_id');
         $zoneId = data_get($context, 'zone_id');
         $userId = data_get($context, 'user_id');
-        $groupIds = collect(data_get($context, 'group_ids', []))->map(fn($v) => (int) $v)->filter()->values();
+        $groupIds = collect(data_get($context, 'group_ids', []))->map(fn ($v) => (int) $v)->filter()->values();
         if ($groupIds->isEmpty() && $userId) {
             $groupIds = DB::table('customer_group_user')->where('user_id', $userId)->pluck('group_id');
         }
         $partnerTier = data_get($context, 'partner_tier');
-        if (!$partnerTier && $userId) {
+        if (! $partnerTier && $userId) {
             $partnerTier = DB::table('partner_users as pu')
                 ->join('partners as p', 'p.id', '=', 'pu.partner_id')
                 ->where('pu.user_id', $userId)
                 ->value('p.tier');
         }
+
         // Honor weekday/time windows, currency/channel/zone restrictions; first order; customer groups; per-day limit
         return $discounts->filter(function ($d) use ($now, $currency, $channelId, $zoneId, $userId, $groupIds, $partnerTier) {
-            if (!empty($d->weekday_mask)) {
-                $allowed = collect(explode(',', $d->weekday_mask))->filter()->map(fn($v) => (int) $v);
-                if (!$allowed->contains((int) $now->dayOfWeekIso)) {
+            if (! empty($d->weekday_mask)) {
+                $allowed = collect(explode(',', $d->weekday_mask))->filter()->map(fn ($v) => (int) $v);
+                if (! $allowed->contains((int) $now->dayOfWeekIso)) {
                     return false;
                 }
             }
             // Per-day throttling
-            if (!empty($d->per_day_limit)) {
+            if (! empty($d->per_day_limit)) {
                 $start = $now->copy()->startOfDay();
                 $end = $now->copy()->endOfDay();
                 $countToday = DB::table('discount_redemptions')
@@ -107,9 +108,9 @@ class DiscountEngine
                     return false;
                 }
             }
-            if (!empty($d->time_window)) {
+            if (! empty($d->time_window)) {
                 $tw = is_string($d->time_window) ? json_decode($d->time_window, true) : (array) $d->time_window;
-                if (!empty($tw['start']) && !empty($tw['end'])) {
+                if (! empty($tw['start']) && ! empty($tw['end'])) {
                     $tz = $tw['tz'] ?? 'UTC';
                     $start = $now->copy()->setTimezone($tz)->format('H:i');
                     if ($start < $tw['start'] || $start > $tw['end']) {
@@ -117,19 +118,19 @@ class DiscountEngine
                     }
                 }
             }
-            if (!empty($d->currency_restrictions)) {
+            if (! empty($d->currency_restrictions)) {
                 $list = is_string($d->currency_restrictions) ? json_decode($d->currency_restrictions, true) : (array) $d->currency_restrictions;
-                if ($currency && !in_array($currency, $list, true)) {
+                if ($currency && ! in_array($currency, $list, true)) {
                     return false;
                 }
             }
-            if (!empty($d->channel_restrictions)) {
+            if (! empty($d->channel_restrictions)) {
                 $list = is_string($d->channel_restrictions) ? json_decode($d->channel_restrictions, true) : (array) $d->channel_restrictions;
-                if ($channelId && !in_array($channelId, $list, true)) {
+                if ($channelId && ! in_array($channelId, $list, true)) {
                     return false;
                 }
             }
-            if (!empty($d->first_order_only) && $userId) {
+            if (! empty($d->first_order_only) && $userId) {
                 $hasOrder = DB::table('orders')->where('customer_id', $userId)->whereIn('status', ['placed', 'paid', 'fulfilled', 'completed'])->exists();
                 if ($hasOrder) {
                     return false;
@@ -141,7 +142,8 @@ class DiscountEngine
                 $values = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'customer_group')->pluck('value');
                 $allowed = collect($values)->map(function ($v) {
                     $arr = is_string($v) ? json_decode($v, true) : (array) $v;
-                    return collect($arr)->map(fn($x) => (int) $x);
+
+                    return collect($arr)->map(fn ($x) => (int) $x);
                 })->flatten()->filter()->values();
                 if ($allowed->isNotEmpty() && $groupIds->intersect($allowed)->isEmpty()) {
                     return false;
@@ -153,9 +155,10 @@ class DiscountEngine
                 $values = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'zone')->pluck('value');
                 $allowedZoneIds = collect($values)->map(function ($v) {
                     $arr = is_string($v) ? json_decode($v, true) : (array) $v;
-                    return collect($arr)->map(fn($x) => (int) $x);
+
+                    return collect($arr)->map(fn ($x) => (int) $x);
                 })->flatten()->filter()->values();
-                if ($allowedZoneIds->isNotEmpty() && $zoneId && !$allowedZoneIds->contains((int) $zoneId)) {
+                if ($allowedZoneIds->isNotEmpty() && $zoneId && ! $allowedZoneIds->contains((int) $zoneId)) {
                     return false;
                 }
             }
@@ -165,9 +168,10 @@ class DiscountEngine
                 $values = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'user')->pluck('value');
                 $allowedUserIds = collect($values)->map(function ($v) {
                     $arr = is_string($v) ? json_decode($v, true) : (array) $v;
-                    return collect($arr)->map(fn($x) => (int) $x);
+
+                    return collect($arr)->map(fn ($x) => (int) $x);
                 })->flatten()->filter()->values();
-                if ($allowedUserIds->isNotEmpty() && !$allowedUserIds->contains((int) $userId)) {
+                if ($allowedUserIds->isNotEmpty() && ! $allowedUserIds->contains((int) $userId)) {
                     return false;
                 }
             }
@@ -177,12 +181,14 @@ class DiscountEngine
                 $values = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'partner_tier')->pluck('value');
                 $allowedTiers = collect($values)->map(function ($v) {
                     $arr = is_string($v) ? json_decode($v, true) : (array) $v;
-                    return collect($arr)->map(fn($x) => (string) $x);
-                })->flatten()->filter()->values()->map(fn($v) => strtolower($v));
-                if ($allowedTiers->isNotEmpty() && strtolower((string) $partnerTier) !== '' && !$allowedTiers->contains(strtolower((string) $partnerTier))) {
+
+                    return collect($arr)->map(fn ($x) => (string) $x);
+                })->flatten()->filter()->values()->map(fn ($v) => strtolower($v));
+                if ($allowedTiers->isNotEmpty() && strtolower((string) $partnerTier) !== '' && ! $allowedTiers->contains(strtolower((string) $partnerTier))) {
                     return false;
                 }
             }
+
             // zone-based via scope json in scope or via explicit pivot (out of scope here)
             return true;
         });
@@ -198,7 +204,7 @@ class DiscountEngine
         // Preload product attributes for scoping
         $productIds = $items->pluck('product_id')->filter()->unique()->values();
         $productToBrand = DB::table('products')->whereIn('id', $productIds)->pluck('brand_id', 'id');
-        $productToCategories = DB::table('product_categories')->whereIn('product_id', $productIds)->get()->groupBy('product_id')->map(fn($rows) => collect($rows)->pluck('category_id')->values());
+        $productToCategories = DB::table('product_categories')->whereIn('product_id', $productIds)->get()->groupBy('product_id')->map(fn ($rows) => collect($rows)->pluck('category_id')->values());
 
         $discountAmount = 0.0;
         $shippingDiscount = 0.0;
@@ -213,7 +219,7 @@ class DiscountEngine
                     ->where('discount_id', $d->id)
                     ->whereRaw('UPPER(code) = ?', [$code])
                     ->exists();
-                if (!$hasCode) {
+                if (! $hasCode) {
                     continue;
                 }
             }
@@ -226,11 +232,11 @@ class DiscountEngine
             $itemQtyCond = $conditions->firstWhere('type', 'item_qty');
 
             // Threshold checks
-            if ($cartTotalCond && !$this->compareOperator($subtotal, $cartTotalCond->operator, $cartTotalCond->value)) {
+            if ($cartTotalCond && ! $this->compareOperator($subtotal, $cartTotalCond->operator, $cartTotalCond->value)) {
                 continue;
             }
             $totalQty = (int) $items->sum('quantity');
-            if ($itemQtyCond && !$this->compareOperator($totalQty, $itemQtyCond->operator, $itemQtyCond->value)) {
+            if ($itemQtyCond && ! $this->compareOperator($totalQty, $itemQtyCond->operator, $itemQtyCond->value)) {
                 continue;
             }
 
@@ -240,7 +246,7 @@ class DiscountEngine
                 $matchedAny = false;
                 foreach ($items as $idx => $it) {
                     $matches = $this->itemMatches($it, $conditions, $productToBrand, $productToCategories);
-                    if (!$matches) {
+                    if (! $matches) {
                         continue;
                     }
                     $matchedAny = true;
@@ -270,7 +276,7 @@ class DiscountEngine
                     $unitPrices = [];
                     foreach ($items as $it) {
                         $matches = $this->itemMatches($it, $conditions, $productToBrand, $productToCategories);
-                        if (!$matches) {
+                        if (! $matches) {
                             continue;
                         }
                         $q = (int) $it['quantity'];
@@ -278,7 +284,7 @@ class DiscountEngine
                             $unitPrices[] = (float) $it['unit_price'];
                         }
                     }
-                    if (!empty($unitPrices)) {
+                    if (! empty($unitPrices)) {
                         sort($unitPrices);  // ascending for cheapest free
                         $setSize = $buyQty + $getQty;
                         $freeUnits = intdiv(count($unitPrices), $setSize) * $getQty;
@@ -293,7 +299,7 @@ class DiscountEngine
                         }
                     }
                 }
-                if (!$matchedAny) {
+                if (! $matchedAny) {
                     continue;
                 }
             } else {
@@ -315,7 +321,7 @@ class DiscountEngine
                             $unitPrices[] = (float) $it['unit_price'];
                         }
                     }
-                    if (!empty($unitPrices)) {
+                    if (! empty($unitPrices)) {
                         sort($unitPrices);
                         $freeUnits = intdiv(count($unitPrices), $buyQty + $getQty) * $getQty;
                         $bogoAmount = 0.0;
@@ -335,11 +341,11 @@ class DiscountEngine
                 $applied[] = ['id' => $d->id, 'amount' => $amount];
             }
 
-            if (!empty($d->free_shipping) || !empty($d->applies_to_shipping)) {
+            if (! empty($d->free_shipping) || ! empty($d->applies_to_shipping)) {
                 // Optional cap from metadata: {"shipping_cap_amount": 4.99}
                 $meta = is_string($d->metadata ?? null) ? json_decode($d->metadata, true) : (array) ($d->metadata ?? []);
                 $cap = isset($meta['shipping_cap_amount']) ? (float) $meta['shipping_cap_amount'] : null;
-                if (!empty($d->free_shipping)) {
+                if (! empty($d->free_shipping)) {
                     $shippingDiscount = max($shippingDiscount, $shippingBase);
                 } else {
                     if ($cap !== null) {
@@ -373,6 +379,7 @@ class DiscountEngine
     protected function compareOperator($left, string $operator, $rawValue): bool
     {
         $value = is_numeric($rawValue) ? (float) $rawValue : (float) (is_string($rawValue) ? json_decode($rawValue, true) : $rawValue);
+
         return match ($operator) {
             'equals_to' => (float) $left == $value,
             'not_equals_to' => (float) $left != $value,
@@ -388,7 +395,7 @@ class DiscountEngine
         // Evaluate basic ANY semantics across provided scope conditions
         $productId = (int) ($item['product_id'] ?? 0);
         $brandId = (int) ($productToBrand[$productId] ?? 0);
-        $categoryIds = collect($productToCategories[$productId] ?? [])->map(fn($v) => (int) $v);
+        $categoryIds = collect($productToCategories[$productId] ?? [])->map(fn ($v) => (int) $v);
 
         foreach ($conditions as $cond) {
             $values = is_string($cond->value) ? json_decode($cond->value, true) : (array) $cond->value;
@@ -404,7 +411,7 @@ class DiscountEngine
                     }
                     break;
                 case 'category':
-                    if ($categoryIds->intersect(collect($values)->map(fn($v) => (int) $v))->isNotEmpty()) {
+                    if ($categoryIds->intersect(collect($values)->map(fn ($v) => (int) $v))->isNotEmpty()) {
                         return true;
                     }
                     break;
@@ -420,6 +427,7 @@ class DiscountEngine
                     break;
             }
         }
+
         return false;
     }
 
@@ -434,6 +442,7 @@ class DiscountEngine
         // (requires discount record; re-fetch minimal info)
         $appliedWithFlags = $applied->map(function ($a) {
             $d = DB::table('discounts')->select('id', 'exclusive', 'stacking_policy')->where('id', (int) $a['id'])->first();
+
             return array_merge($a, [
                 'exclusive' => (bool) data_get($d, 'exclusive', false),
                 'stacking_policy' => data_get($d, 'stacking_policy', 'stack'),
@@ -444,14 +453,16 @@ class DiscountEngine
             $best = $appliedWithFlags->sortByDesc('amount')->first();
             $calculated['applied'] = [$best];
             $calculated['discount_total_amount'] = round((float) $best['amount'], 2);
+
             return $calculated;
         }
         // If single_best policy anywhere, keep only max amount
-        if ($appliedWithFlags->contains(fn($a) => ($a['stacking_policy'] ?? 'stack') === 'single_best')) {
+        if ($appliedWithFlags->contains(fn ($a) => ($a['stacking_policy'] ?? 'stack') === 'single_best')) {
             $best = $appliedWithFlags->sortByDesc('amount')->first();
             $calculated['applied'] = [$best];
             $calculated['discount_total_amount'] = round((float) $best['amount'], 2);
         }
+
         return $calculated;
     }
 }

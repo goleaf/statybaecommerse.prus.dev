@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -23,7 +25,7 @@ final class LiveNotificationService
     public function sendToUser(User $user, string $title, string $message, string $type = 'info'): void
     {
         $user->notify(new TestNotification($title, $message, $type));
-        
+
         // Dispatch event for real-time updates
         Event::dispatch('notification.sent', [
             'user_id' => $user->id,
@@ -63,7 +65,7 @@ final class LiveNotificationService
     {
         $title = 'Mokėjimo atnaujinimas';
         $message = "Užsakymo #{$orderId} mokėjimas: {$status}";
-        $type = match($status) {
+        $type = match ($status) {
             'Sėkmingas' => 'success',
             'Nepavyko' => 'error',
             'Laukiama' => 'warning',

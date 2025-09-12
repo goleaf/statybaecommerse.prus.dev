@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Review;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 
 final class ReviewController extends Controller
 {
@@ -24,7 +26,7 @@ final class ReviewController extends Controller
 
     public function show(Review $review): View
     {
-        if (!$review->is_approved) {
+        if (! $review->is_approved) {
             abort(404);
         }
 
@@ -151,4 +153,3 @@ final class ReviewController extends Controller
         return view('reviews.product', compact('product', 'reviews', 'ratingStats'));
     }
 }
-

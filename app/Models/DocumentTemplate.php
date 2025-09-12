@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 final class DocumentTemplate extends Model
@@ -33,13 +35,13 @@ final class DocumentTemplate extends Model
     {
         parent::boot();
 
-        static::creating(function (DocumentTemplate $template): void {
+        self::creating(function (DocumentTemplate $template): void {
             if (empty($template->slug)) {
                 $template->slug = Str::slug($template->name);
             }
         });
 
-        static::updating(function (DocumentTemplate $template): void {
+        self::updating(function (DocumentTemplate $template): void {
             if ($template->isDirty('name') && empty($template->slug)) {
                 $template->slug = Str::slug($template->name);
             }
@@ -76,7 +78,7 @@ final class DocumentTemplate extends Model
         $content = $this->content;
 
         foreach ($variables as $key => $value) {
-            $content = str_replace('{{' . $key . '}}', (string) $value, $content);
+            $content = str_replace('{{'.$key.'}}', (string) $value, $content);
         }
 
         return $content;

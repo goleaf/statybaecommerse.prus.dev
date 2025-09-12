@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
-use Closure;
 
 final class SetLocale
 {
@@ -32,7 +34,7 @@ final class SetLocale
             : preg_split('/[\s,|]+/', (string) $supported, -1, PREG_SPLIT_NO_EMPTY);
         $supportedLocales = array_map('trim', $supportedLocales);
 
-        if (!in_array($locale, $supportedLocales, true)) {
+        if (! in_array($locale, $supportedLocales, true)) {
             $locale = (string) (config('app.locale', 'lt'));
         }
 

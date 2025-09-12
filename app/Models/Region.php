@@ -1,19 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Translations\RegionTranslation;
 use App\Traits\HasTranslations;
-use App\Models\User;
-use App\Models\Order;
-use App\Models\Customer;
-use App\Models\Warehouse;
-use App\Models\Store;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Region extends Model
@@ -169,8 +165,8 @@ final class Region extends Model
     {
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'like', "%{$search}%")
-              ->orWhere('code', 'like', "%{$search}%")
-              ->orWhere('description', 'like', "%{$search}%");
+                ->orWhere('code', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
         });
     }
 
@@ -188,12 +184,12 @@ final class Region extends Model
     {
         $path = collect([$this->translated_name]);
         $parent = $this->parent;
-        
+
         while ($parent) {
             $path->prepend($parent->translated_name);
             $parent = $parent->parent;
         }
-        
+
         return $path->implode(' > ');
     }
 
@@ -201,24 +197,24 @@ final class Region extends Model
     {
         $ancestors = collect();
         $parent = $this->parent;
-        
+
         while ($parent) {
             $ancestors->prepend($parent);
             $parent = $parent->parent;
         }
-        
+
         return $ancestors;
     }
 
     public function getDescendantsAttribute()
     {
         $descendants = collect();
-        
+
         foreach ($this->children as $child) {
             $descendants->push($child);
             $descendants = $descendants->merge($child->descendants);
         }
-        
+
         return $descendants;
     }
 
@@ -236,12 +232,12 @@ final class Region extends Model
     {
         $depth = 0;
         $parent = $this->parent;
-        
+
         while ($parent) {
             $depth++;
             $parent = $parent->parent;
         }
-        
+
         return $depth;
     }
 
@@ -249,12 +245,12 @@ final class Region extends Model
     {
         $breadcrumb = [$this];
         $parent = $this->parent;
-        
+
         while ($parent) {
             array_unshift($breadcrumb, $parent);
             $parent = $parent->parent;
         }
-        
+
         return $breadcrumb;
     }
 
@@ -265,37 +261,37 @@ final class Region extends Model
 
     public function getTotalCitiesCountAttribute(): int
     {
-        return $this->cities()->count() + $this->descendants->sum(fn($region) => $region->cities()->count());
+        return $this->cities()->count() + $this->descendants->sum(fn ($region) => $region->cities()->count());
     }
 
     public function getTotalAddressesCountAttribute(): int
     {
-        return $this->addresses()->count() + $this->descendants->sum(fn($region) => $region->addresses()->count());
+        return $this->addresses()->count() + $this->descendants->sum(fn ($region) => $region->addresses()->count());
     }
 
     public function getTotalUsersCountAttribute(): int
     {
-        return $this->users()->count() + $this->descendants->sum(fn($region) => $region->users()->count());
+        return $this->users()->count() + $this->descendants->sum(fn ($region) => $region->users()->count());
     }
 
     public function getTotalOrdersCountAttribute(): int
     {
-        return $this->orders()->count() + $this->descendants->sum(fn($region) => $region->orders()->count());
+        return $this->orders()->count() + $this->descendants->sum(fn ($region) => $region->orders()->count());
     }
 
     public function getTotalCustomersCountAttribute(): int
     {
-        return $this->customers()->count() + $this->descendants->sum(fn($region) => $region->customers()->count());
+        return $this->customers()->count() + $this->descendants->sum(fn ($region) => $region->customers()->count());
     }
 
     public function getTotalWarehousesCountAttribute(): int
     {
-        return $this->warehouses()->count() + $this->descendants->sum(fn($region) => $region->warehouses()->count());
+        return $this->warehouses()->count() + $this->descendants->sum(fn ($region) => $region->warehouses()->count());
     }
 
     public function getTotalStoresCountAttribute(): int
     {
-        return $this->stores()->count() + $this->descendants->sum(fn($region) => $region->stores()->count());
+        return $this->stores()->count() + $this->descendants->sum(fn ($region) => $region->stores()->count());
     }
 
     public function getStatsAttribute(): array
@@ -311,5 +307,3 @@ final class Region extends Model
         ];
     }
 }
-
-

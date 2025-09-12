@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
@@ -76,7 +78,7 @@ final class CheckoutProcess extends Component
     public function nextStep(): void
     {
         $this->validateCurrentStep();
-        
+
         if ($this->currentStep < 3) {
             $this->currentStep++;
         }
@@ -115,11 +117,12 @@ final class CheckoutProcess extends Component
     public function placeOrder(): void
     {
         $this->validate();
-        
+
         $cartItems = $this->getCartItems();
-        
+
         if ($cartItems->isEmpty()) {
             $this->addError('cart', 'Jūsų krepšelis tuščias');
+
             return;
         }
 
@@ -127,7 +130,7 @@ final class CheckoutProcess extends Component
             $order = $this->createOrder($cartItems);
             $this->createOrderItems($order, $cartItems);
             $this->clearCart();
-            
+
             session()->flash('order_number', $order->number);
             $this->redirect(route('order.confirmation', $order->number));
         });
@@ -135,13 +138,13 @@ final class CheckoutProcess extends Component
 
     private function createOrder($cartItems): Order
     {
-        $subtotal = $cartItems->sum(fn($item) => $item->price * $item->quantity);
+        $subtotal = $cartItems->sum(fn ($item) => $item->price * $item->quantity);
         $taxAmount = $subtotal * 0.21; // Lithuanian VAT
         $shippingAmount = $subtotal > 100 ? 0 : 5.99; // Free shipping over €100
         $total = $subtotal + $taxAmount + $shippingAmount;
 
         return Order::create([
-            'number' => 'LT-' . strtoupper(uniqid()),
+            'number' => 'LT-'.strtoupper(uniqid()),
             'user_id' => auth()->id(),
             'status' => 'pending',
             'subtotal' => $subtotal,
@@ -219,7 +222,7 @@ final class CheckoutProcess extends Component
     {
         return view('livewire.pages.checkout-process', [
             'cartItems' => $this->getCartItems(),
-            'subtotal' => $this->getCartItems()->sum(fn($item) => $item->price * $item->quantity),
+            'subtotal' => $this->getCartItems()->sum(fn ($item) => $item->price * $item->quantity),
         ]);
     }
 }

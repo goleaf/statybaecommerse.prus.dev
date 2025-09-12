@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Traits\HasTranslations;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class CampaignConversion extends Model
 {
@@ -174,17 +176,17 @@ final class CampaignConversion extends Model
     // Accessors
     public function getFormattedConversionValueAttribute(): string
     {
-        return '€' . number_format($this->conversion_value, 2);
+        return '€'.number_format($this->conversion_value, 2);
     }
 
     public function getFormattedRoiAttribute(): string
     {
-        return number_format($this->roi * 100, 2) . '%';
+        return number_format($this->roi * 100, 2).'%';
     }
 
     public function getFormattedConversionRateAttribute(): string
     {
-        return number_format($this->conversion_rate * 100, 2) . '%';
+        return number_format($this->conversion_rate * 100, 2).'%';
     }
 
     public function getDeviceTypeDisplayAttribute(): string
@@ -199,12 +201,12 @@ final class CampaignConversion extends Model
 
     public function getConversionTypeDisplayAttribute(): string
     {
-        return __('campaign_conversions.conversion_types.' . $this->conversion_type);
+        return __('campaign_conversions.conversion_types.'.$this->conversion_type);
     }
 
     public function getStatusDisplayAttribute(): string
     {
-        return __('campaign_conversions.statuses.' . $this->status);
+        return __('campaign_conversions.statuses.'.$this->status);
     }
 
     // Methods

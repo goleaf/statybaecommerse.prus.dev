@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Providers;
 
@@ -9,7 +11,6 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
@@ -63,7 +64,7 @@ class AppServiceProvider extends ServiceProvider
                     'inventory.csv' => 'import:inventory',
                 ];
                 foreach ($map as $file => $cmd) {
-                    $path = $base . DIRECTORY_SEPARATOR . $file;
+                    $path = $base.DIRECTORY_SEPARATOR.$file;
                     if (is_file($path)) {
                         \Artisan::call($cmd, ['path' => $path, '--chunk' => 500]);
                     }
@@ -87,7 +88,7 @@ class AppServiceProvider extends ServiceProvider
         // Use localized Markdown templates for auth notifications
         ResetPassword::toMailUsing(function ($notifiable, string $url) {
             $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
-            $minutes = (int) config('auth.passwords.' . config('auth.defaults.passwords') . '.expire');
+            $minutes = (int) config('auth.passwords.'.config('auth.defaults.passwords').'.expire');
 
             return (new MailMessage)
                 ->locale($locale)
@@ -179,7 +180,7 @@ class AppServiceProvider extends ServiceProvider
                 '$BRAND_DESCRIPTION' => 'Brand Description',
                 '$CATEGORY_NAME' => 'Category Name',
                 '$CATEGORY_DESCRIPTION' => 'Category Description',
-            ])
+            ]),
         ]);
     }
 
@@ -194,8 +195,8 @@ class AppServiceProvider extends ServiceProvider
         foreach ($classes as $class) {
             if ($model instanceof $class) {
                 $locales = collect(config('app.supported_locales', 'en'))
-                    ->when(fn($v) => is_string($v), fn($c) => collect(explode(',', (string) $c)))
-                    ->map(fn($v) => trim((string) $v))
+                    ->when(fn ($v) => is_string($v), fn ($c) => collect(explode(',', (string) $c)))
+                    ->map(fn ($v) => trim((string) $v))
                     ->filter()
                     ->values();
                 foreach ($locales as $loc) {

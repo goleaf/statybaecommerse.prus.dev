@@ -1,18 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 final class ProductRequest extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'product_id',
@@ -41,7 +42,7 @@ final class ProductRequest extends Model
             ->logOnly(['status', 'admin_notes', 'responded_at', 'responded_by'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Product Request {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Product Request {$eventName}")
             ->useLogName('product_request');
     }
 
@@ -141,7 +142,7 @@ final class ProductRequest extends Model
 
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => __('translations.status_pending'),
             'in_progress' => __('translations.status_in_progress'),
             'completed' => __('translations.status_completed'),
@@ -152,7 +153,7 @@ final class ProductRequest extends Model
 
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'warning',
             'in_progress' => 'info',
             'completed' => 'success',
@@ -161,4 +162,3 @@ final class ProductRequest extends Model
         };
     }
 }
-

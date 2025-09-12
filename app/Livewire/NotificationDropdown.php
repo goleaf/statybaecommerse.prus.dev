@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire;
 
@@ -8,6 +10,7 @@ use Livewire\Component;
 final class NotificationDropdown extends Component
 {
     public int $unreadCount = 0;
+
     public $recentNotifications = [];
 
     protected $listeners = ['notificationReceived' => 'loadNotifications'];
@@ -19,12 +22,12 @@ final class NotificationDropdown extends Component
 
     public function loadNotifications(): void
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return;
         }
 
         $this->unreadCount = auth()->user()->unreadNotifications->count();
-        
+
         $this->recentNotifications = auth()->user()->notifications()
             ->latest()
             ->limit(5)
@@ -44,7 +47,7 @@ final class NotificationDropdown extends Component
     public function markAsRead(string $notificationId): void
     {
         $notification = DatabaseNotification::find($notificationId);
-        
+
         if ($notification && $notification->notifiable_id === auth()->id()) {
             $notification->markAsRead();
             $this->loadNotifications();

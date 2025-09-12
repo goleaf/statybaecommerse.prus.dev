@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ActivityLogResource\Pages;
 
 use App\Filament\Resources\ActivityLogResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
 
 final class ViewActivityLog extends ViewRecord
 {
@@ -23,7 +25,7 @@ final class ViewActivityLog extends ViewRecord
                 ->label(__('admin.activity_logs.actions.view_subject'))
                 ->icon('heroicon-o-eye')
                 ->color('info')
-                ->url(fn(): string => match ($this->record->subject_type) {
+                ->url(fn (): string => match ($this->record->subject_type) {
                     'App\Models\User' => route('filament.admin.resources.users.view', $this->record->subject_id),
                     'App\Models\Product' => route('filament.admin.resources.products.view', $this->record->subject_id),
                     'App\Models\Order' => route('filament.admin.resources.orders.view', $this->record->subject_id),
@@ -32,7 +34,7 @@ final class ViewActivityLog extends ViewRecord
                     default => '#',
                 })
                 ->openUrlInNewTab()
-                ->visible(fn(): bool => $this->record->subject_id !== null),
+                ->visible(fn (): bool => $this->record->subject_id !== null),
         ];
     }
 }

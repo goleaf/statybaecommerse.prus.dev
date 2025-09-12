@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Admin\Categories;
 
@@ -12,8 +14,11 @@ final class Index extends Component
     use WithPagination;
 
     public string $search = '';
+
     public string $sortBy = 'name';
+
     public string $sortDirection = 'asc';
+
     public int $perPage = 10;
 
     protected $queryString = [
@@ -43,8 +48,8 @@ final class Index extends Component
         $categories = Category::query()
             ->when($this->search, function ($query) {
                 $query
-                    ->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('description', 'like', '%' . $this->search . '%');
+                    ->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhere('description', 'like', '%'.$this->search.'%');
             })
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->perPage);

@@ -6,7 +6,7 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\ZoneResource\Pages;
 use App\Models\Zone;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
@@ -39,9 +39,9 @@ class ZoneResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Zones';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Forms\Components\Section::make('Basic Information')
                     ->components([

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
@@ -7,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 final class DiscountConditionTranslation extends Model
 {
     protected $table = 'discount_condition_translations';
-    
+
     protected $fillable = [
         'discount_condition_id',
         'locale',
@@ -25,4 +27,3 @@ final class DiscountConditionTranslation extends Model
 
     public $timestamps = true;
 }
-

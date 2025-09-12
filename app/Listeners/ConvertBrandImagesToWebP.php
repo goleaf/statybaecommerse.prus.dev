@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Listeners;
 
@@ -17,12 +19,12 @@ final class ConvertBrandImagesToWebP
         $media = $event->media;
 
         // Only process Brand model images
-        if (!$media->model instanceof Brand) {
+        if (! $media->model instanceof Brand) {
             return;
         }
 
         // Only process logo and banner collections
-        if (!in_array($media->collection_name, ['logo', 'banner'])) {
+        if (! in_array($media->collection_name, ['logo', 'banner'])) {
             return;
         }
 
@@ -35,10 +37,10 @@ final class ConvertBrandImagesToWebP
     private function generateWebPConversions($media): void
     {
         $originalPath = $media->getPath();
-        $conversionsPath = dirname($originalPath) . '/conversions';
+        $conversionsPath = dirname($originalPath).'/conversions';
 
         // Ensure conversions directory exists
-        if (!is_dir($conversionsPath)) {
+        if (! is_dir($conversionsPath)) {
             mkdir($conversionsPath, 0755, true);
         }
 
@@ -71,7 +73,7 @@ final class ConvertBrandImagesToWebP
 
                 logger()->info("Generated WebP conversion: {$webpPath}");
             } catch (\Exception $e) {
-                logger()->warning("Failed to generate WebP conversion for {$media->name}: " . $e->getMessage());
+                logger()->warning("Failed to generate WebP conversion for {$media->name}: ".$e->getMessage());
             }
         }
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -7,6 +9,7 @@ use Livewire\Component;
 final class ShoppingCartButton extends Component
 {
     public int $cartTotalItems = 0;
+
     public string $sessionKey = '';
 
     protected $listeners = [
@@ -35,6 +38,7 @@ final class ShoppingCartButton extends Component
         }
 
         $cart = (array) session('cart', []);
+
         return array_sum(array_map(static function ($item) {
             return (int) ($item['quantity'] ?? 0);
         }, $cart));
@@ -45,4 +49,3 @@ final class ShoppingCartButton extends Component
         return view('livewire.components.shopping-cart-button');
     }
 }
-

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -10,9 +12,9 @@ use Livewire\Component;
 final class ProductComparison extends Component
 {
     public array $compareProducts = [];
-    
+
     public bool $isOpen = false;
-    
+
     public int $maxProducts = 4;
 
     public function mount(): void
@@ -28,6 +30,7 @@ final class ProductComparison extends Component
                 'type' => 'warning',
                 'message' => __('translations.compare_limit_reached', ['max' => $this->maxProducts]),
             ]);
+
             return;
         }
 
@@ -36,6 +39,7 @@ final class ProductComparison extends Component
                 'type' => 'info',
                 'message' => __('translations.product_already_in_comparison'),
             ]);
+
             return;
         }
 
@@ -46,20 +50,20 @@ final class ProductComparison extends Component
             'type' => 'success',
             'message' => __('translations.product_added_to_comparison'),
         ]);
-        
+
         $this->dispatch('compare-updated');
     }
 
     public function removeFromCompare(int $productId): void
     {
-        $this->compareProducts = array_values(array_filter($this->compareProducts, fn($id) => $id !== $productId));
+        $this->compareProducts = array_values(array_filter($this->compareProducts, fn ($id) => $id !== $productId));
         session(['compare_products' => $this->compareProducts]);
 
         $this->dispatch('notify', [
             'type' => 'success',
             'message' => __('translations.product_removed_from_comparison'),
         ]);
-        
+
         $this->dispatch('compare-updated');
     }
 
@@ -67,18 +71,18 @@ final class ProductComparison extends Component
     {
         $this->compareProducts = [];
         session()->forget('compare_products');
-        
+
         $this->dispatch('notify', [
             'type' => 'success',
             'message' => __('translations.comparison_cleared'),
         ]);
-        
+
         $this->dispatch('compare-updated');
     }
 
     public function toggleComparisonPanel(): void
     {
-        $this->isOpen = !$this->isOpen;
+        $this->isOpen = ! $this->isOpen;
     }
 
     public function getCompareProductsDataProperty()
@@ -100,10 +104,10 @@ final class ProductComparison extends Component
 
         // Get all unique attributes from compared products
         $attributes = collect();
-        
+
         foreach ($this->compareProductsData as $product) {
             foreach ($product->attributes as $attribute) {
-                if (!$attributes->contains('id', $attribute->id)) {
+                if (! $attributes->contains('id', $attribute->id)) {
                     $attributes->push($attribute);
                 }
             }
@@ -115,8 +119,8 @@ final class ProductComparison extends Component
     public function getProductAttributeValue(Product $product, $attributeId): string
     {
         $attribute = $product->attributes->where('id', $attributeId)->first();
-        
-        if (!$attribute || !$attribute->pivot) {
+
+        if (! $attribute || ! $attribute->pivot) {
             return '-';
         }
 
@@ -127,7 +131,7 @@ final class ProductComparison extends Component
     {
         $this->redirect(route('products.compare', [
             'locale' => app()->getLocale(),
-            'products' => implode(',', $this->compareProducts)
+            'products' => implode(',', $this->compareProducts),
         ]));
     }
 

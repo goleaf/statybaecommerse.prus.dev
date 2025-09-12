@@ -1,16 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
 use App\Models\Product;
-use Livewire\Component;
 use Livewire\Attributes\Computed;
+use Livewire\Component;
 
 final class ProductImageGallery extends Component
 {
     public Product $product;
+
     public int $currentImageIndex = 0;
+
     public bool $showLightbox = false;
+
     public string $imageSize = 'lg';
 
     public function mount(Product $product, string $imageSize = 'lg'): void
@@ -39,15 +44,15 @@ final class ProductImageGallery extends Component
 
     public function nextImage(): void
     {
-        $this->currentImageIndex = $this->currentImageIndex < count($this->images) - 1 
-            ? $this->currentImageIndex + 1 
+        $this->currentImageIndex = $this->currentImageIndex < count($this->images) - 1
+            ? $this->currentImageIndex + 1
             : 0;
     }
 
     public function previousImage(): void
     {
-        $this->currentImageIndex = $this->currentImageIndex > 0 
-            ? $this->currentImageIndex - 1 
+        $this->currentImageIndex = $this->currentImageIndex > 0
+            ? $this->currentImageIndex - 1
             : count($this->images) - 1;
     }
 
@@ -60,7 +65,7 @@ final class ProductImageGallery extends Component
 
     public function toggleLightbox(): void
     {
-        $this->showLightbox = !$this->showLightbox;
+        $this->showLightbox = ! $this->showLightbox;
     }
 
     public function render()

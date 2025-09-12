@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
 use App\Models\Report;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\View\View;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 final class ReportController extends Controller
 {
@@ -29,8 +31,8 @@ final class ReportController extends Controller
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
-                $q->where('name->' . app()->getLocale(), 'like', "%{$search}%")
-                  ->orWhere('description->' . app()->getLocale(), 'like', "%{$search}%");
+                $q->where('name->'.app()->getLocale(), 'like', "%{$search}%")
+                    ->orWhere('description->'.app()->getLocale(), 'like', "%{$search}%");
             });
         }
 
@@ -65,7 +67,7 @@ final class ReportController extends Controller
     public function show(Report $report): View
     {
         // Check if report is public or user has access
-        if (!$report->is_public && !auth()->check()) {
+        if (! $report->is_public && ! auth()->check()) {
             abort(403, __('reports.messages.access_denied'));
         }
 
@@ -78,7 +80,7 @@ final class ReportController extends Controller
             ->where('id', '!=', $report->id)
             ->where(function ($query) use ($report) {
                 $query->where('type', $report->type)
-                      ->orWhere('category', $report->category);
+                    ->orWhere('category', $report->category);
             })
             ->limit(4)
             ->get();
@@ -89,7 +91,7 @@ final class ReportController extends Controller
     public function download(Report $report): Response
     {
         // Check if report is public or user has access
-        if (!$report->is_public && !auth()->check()) {
+        if (! $report->is_public && ! auth()->check()) {
             abort(403, __('reports.messages.access_denied'));
         }
 
@@ -98,18 +100,18 @@ final class ReportController extends Controller
 
         // Generate PDF or return content based on report type
         $content = $this->generateReportContent($report);
-        
-        $filename = Str::slug($report->name) . '_' . now()->format('Y-m-d') . '.pdf';
+
+        $filename = Str::slug($report->name).'_'.now()->format('Y-m-d').'.pdf';
 
         return response($content)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+            ->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
     }
 
     public function generate(Report $report): RedirectResponse
     {
         // Check if user has permission to generate reports
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             abort(403, __('reports.messages.access_denied'));
         }
 
@@ -128,7 +130,7 @@ final class ReportController extends Controller
         // This is a placeholder for actual report generation logic
         // In a real application, you would generate actual report content
         // based on the report type, filters, and data
-        
+
         $data = [
             'report' => $report,
             'generated_at' => now(),
@@ -138,8 +140,7 @@ final class ReportController extends Controller
         // For now, return a simple HTML content
         // In production, you would use a PDF generation library like DomPDF
         $html = view('reports.pdf', $data)->render();
-        
+
         return $html;
     }
 }
-

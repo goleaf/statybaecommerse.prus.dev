@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
@@ -116,13 +118,15 @@ final class Home extends Component
     {
         $product = Product::find($productId);
 
-        if (!$product || !$product->is_visible) {
+        if (! $product || ! $product->is_visible) {
             $this->notifyError(__('Product not found or not available'));
+
             return;
         }
 
         if ($product->stock_quantity <= 0) {
             $this->notifyError(__('Product is out of stock'));
+
             return;
         }
 
@@ -157,7 +161,7 @@ final class Home extends Component
             'latestReviews' => $this->latestReviews,
             'stats' => $this->stats,
         ])->layout('components.layouts.base', [
-            'title' => __('Home') . ' - ' . config('app.name')
+            'title' => __('Home').' - '.config('app.name'),
         ]);
     }
 }

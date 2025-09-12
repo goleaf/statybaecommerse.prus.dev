@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages\Brand;
 
@@ -39,7 +41,7 @@ final class Index extends AbstractPageComponent implements HasSchemas
                     ->label(__('Search brands'))
                     ->placeholder(__('Search brands...'))
                     ->live(debounce: 300)
-                    ->afterStateUpdated(fn() => $this->resetPage()),
+                    ->afterStateUpdated(fn () => $this->resetPage()),
 
                 Select::make('sortBy')
                     ->label(__('Sort by'))
@@ -49,7 +51,7 @@ final class Index extends AbstractPageComponent implements HasSchemas
                         'created_at' => __('Newest'),
                     ])
                     ->live()
-                    ->afterStateUpdated(fn() => $this->resetPage()),
+                    ->afterStateUpdated(fn () => $this->resetPage()),
             ]);
     }
 
@@ -61,7 +63,7 @@ final class Index extends AbstractPageComponent implements HasSchemas
                 'translations' => function ($q) {
                     $q->where('locale', app()->getLocale());
                 },
-                'media'
+                'media',
             ])
             ->where('is_enabled', true)
             ->withCount('products');
@@ -69,15 +71,15 @@ final class Index extends AbstractPageComponent implements HasSchemas
         // Apply search filter
         if ($this->search !== '') {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%')
-                  ->orWhereHas('translations', function ($translationQuery) {
-                      $translationQuery->where('locale', app()->getLocale())
-                          ->where(function ($tq) {
-                              $tq->where('name', 'like', '%' . $this->search . '%')
-                                ->orWhere('description', 'like', '%' . $this->search . '%');
-                          });
-                  });
+                $q->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhere('description', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('translations', function ($translationQuery) {
+                        $translationQuery->where('locale', app()->getLocale())
+                            ->where(function ($tq) {
+                                $tq->where('name', 'like', '%'.$this->search.'%')
+                                    ->orWhere('description', 'like', '%'.$this->search.'%');
+                            });
+                    });
             });
         }
 
@@ -105,6 +107,6 @@ final class Index extends AbstractPageComponent implements HasSchemas
     public function render(): View
     {
         return view('livewire.pages.brand.index')
-            ->title(__('translations.brands') . ' - ' . config('app.name'));
+            ->title(__('translations.brands').' - '.config('app.name'));
     }
 }

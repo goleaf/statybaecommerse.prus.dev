@@ -6,7 +6,4 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-final class LegalTranslationController extends Controller
-{
-}
-
+final class LegalTranslationController extends Controller {}

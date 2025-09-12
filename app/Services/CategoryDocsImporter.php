@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -14,7 +16,7 @@ final class CategoryDocsImporter
         $updated = 0;
 
         $normalizedBasePath = rtrim($basePath, DIRECTORY_SEPARATOR);
-        if (!is_dir($normalizedBasePath)) {
+        if (! is_dir($normalizedBasePath)) {
             return ['created' => 0, 'updated' => 0];
         }
 
@@ -27,7 +29,7 @@ final class CategoryDocsImporter
                     continue;
                 }
 
-                $fullPath = $path . DIRECTORY_SEPARATOR . $item;
+                $fullPath = $path.DIRECTORY_SEPARATOR.$item;
                 if (is_dir($fullPath)) {
                     $name = Str::of($item)->replace(['_', '-'], ' ')->title()->value();
                     $slug = $this->buildSlugFromPath($fullPath, $normalizedBasePath);
@@ -56,10 +58,11 @@ final class CategoryDocsImporter
 
                     $currentParentId = Category::query()->where('slug', $slug)->value('id');
                     $walker($fullPath, is_int($currentParentId) ? $currentParentId : null);
+
                     continue;
                 }
 
-                if (!$importFiles || !Str::of($item)->lower()->endsWith('.md')) {
+                if (! $importFiles || ! Str::of($item)->lower()->endsWith('.md')) {
                     continue;
                 }
 
@@ -103,7 +106,7 @@ final class CategoryDocsImporter
 
     private function buildSlugFromPath(string $path, string $basePath): string
     {
-        $relative = Str::of($path)->replaceFirst(rtrim($basePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR, '')->value();
+        $relative = Str::of($path)->replaceFirst(rtrim($basePath, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR, '')->value();
         $relative = Str::of($relative)->replace(['\\', '/'], '-')->value();
         $relative = Str::of($relative)->replace('.md', '')->value();
         $slug = Str::slug($relative);
@@ -112,15 +115,16 @@ final class CategoryDocsImporter
         $original = $slug;
         $i = 2;
         while (Category::query()->where('slug', $slug)->exists()) {
-            $slug = $original . '-' . $i;
+            $slug = $original.'-'.$i;
             $i++;
         }
+
         return $slug;
     }
 
     private function importHeadingsAsChildren(string $markdownFile, ?int $parentId, array &$positionCounterByParent, int &$created, int &$updated): void
     {
-        if (!is_file($markdownFile)) {
+        if (! is_file($markdownFile)) {
             return;
         }
         $content = file_get_contents($markdownFile);
@@ -131,12 +135,12 @@ final class CategoryDocsImporter
         $lines = preg_split('/\r\n|\r|\n/', $content) ?: [];
         foreach ($lines as $line) {
             $line = trim($line);
-            if ($line === '' || !Str::startsWith($line, ['# ', '## ', '### '])) {
+            if ($line === '' || ! Str::startsWith($line, ['# ', '## ', '### '])) {
                 continue;
             }
             $plain = ltrim($line, '# ');
             $name = Str::of($plain)->trim()->value();
-            $slug = Str::slug(($parentId ?? 0) . '-' . $name);
+            $slug = Str::slug(($parentId ?? 0).'-'.$name);
 
             $category = Category::query()->where('slug', $slug)->first();
             if ($category) {
@@ -166,14 +170,15 @@ final class CategoryDocsImporter
     {
         $filtered = [];
         foreach ($payload as $key => $value) {
-            if ($key === 'parent_id' && !Schema::hasColumn($table, 'parent_id')) {
+            if ($key === 'parent_id' && ! Schema::hasColumn($table, 'parent_id')) {
                 continue;
             }
-            if ($key === 'position' && !Schema::hasColumn($table, 'position')) {
+            if ($key === 'position' && ! Schema::hasColumn($table, 'position')) {
                 continue;
             }
             $filtered[$key] = $value;
         }
+
         return $filtered;
     }
 }

@@ -1,15 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeResource\RelationManagers;
 
-use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class ProductsRelationManager extends RelationManager
 {
@@ -111,15 +111,15 @@ final class ProductsRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\Filter::make('enabled')
                     ->label(__('products.enabled_only'))
-                    ->query(fn(Builder $query): Builder => $query->where('is_enabled', true)),
+                    ->query(fn (Builder $query): Builder => $query->where('is_enabled', true)),
 
                 Tables\Filters\Filter::make('featured')
                     ->label(__('products.featured_only'))
-                    ->query(fn(Builder $query): Builder => $query->where('is_featured', true)),
+                    ->query(fn (Builder $query): Builder => $query->where('is_featured', true)),
 
                 Tables\Filters\Filter::make('in_stock')
                     ->label(__('products.in_stock_only'))
-                    ->query(fn(Builder $query): Builder => $query->where('stock_quantity', '>', 0)),
+                    ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '>', 0)),
 
                 Tables\Filters\TrashedFilter::make(),
             ])

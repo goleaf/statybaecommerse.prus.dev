@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -9,7 +11,6 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentType;
 use App\Enums\ProductStatus;
 use App\Enums\UserRole;
-use Illuminate\Support\Collection;
 
 final class EnumService
 {
@@ -42,8 +43,8 @@ final class EnumService
     public function getEnumOptions(string $name): array
     {
         $enumClass = $this->getEnum($name);
-        
-        if (!$enumClass || !class_exists($enumClass)) {
+
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
@@ -56,8 +57,8 @@ final class EnumService
     public function getEnumOptionsWithDescriptions(string $name): array
     {
         $enumClass = $this->getEnum($name);
-        
-        if (!$enumClass || !class_exists($enumClass)) {
+
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
@@ -70,8 +71,8 @@ final class EnumService
     public function getEnumCase(string $name, string $value): ?EnumInterface
     {
         $enumClass = $this->getEnum($name);
-        
-        if (!$enumClass || !class_exists($enumClass)) {
+
+        if (! $enumClass || ! class_exists($enumClass)) {
             return null;
         }
 
@@ -88,8 +89,8 @@ final class EnumService
     public function getEnumCaseByLabel(string $name, string $label): ?EnumInterface
     {
         $enumClass = $this->getEnum($name);
-        
-        if (!$enumClass || !class_exists($enumClass)) {
+
+        if (! $enumClass || ! class_exists($enumClass)) {
             return null;
         }
 
@@ -102,13 +103,13 @@ final class EnumService
     public function getAllEnumData(): array
     {
         $data = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $data[$name] = $enumClass::optionsWithDescriptions();
             }
         }
-        
+
         return $data;
     }
 
@@ -118,15 +119,15 @@ final class EnumService
     public function getEnumData(array $names): array
     {
         $data = [];
-        
+
         foreach ($names as $name) {
             $enumClass = $this->getEnum($name);
-            
+
             if ($enumClass && class_exists($enumClass)) {
                 $data[$name] = $enumClass::optionsWithDescriptions();
             }
         }
-        
+
         return $data;
     }
 
@@ -136,7 +137,7 @@ final class EnumService
     public function getEnumStatistics(): array
     {
         $statistics = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $statistics[$name] = [
@@ -146,7 +147,7 @@ final class EnumService
                 ];
             }
         }
-        
+
         return $statistics;
     }
 
@@ -156,13 +157,13 @@ final class EnumService
     public function getValidationRules(): array
     {
         $rules = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $rules[$name] = $enumClass::forValidation();
             }
         }
-        
+
         return $rules;
     }
 
@@ -172,13 +173,13 @@ final class EnumService
     public function getDatabaseEnums(): array
     {
         $enums = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $enums[$name] = $enumClass::forDatabase();
             }
         }
-        
+
         return $enums;
     }
 
@@ -188,13 +189,13 @@ final class EnumService
     public function getTypeScriptEnums(): array
     {
         $enums = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $enums[$name] = $enumClass::forTypeScript();
             }
         }
-        
+
         return $enums;
     }
 
@@ -204,13 +205,13 @@ final class EnumService
     public function getJavaScriptEnums(): array
     {
         $enums = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $enums[$name] = $enumClass::forJavaScript();
             }
         }
-        
+
         return $enums;
     }
 
@@ -220,13 +221,13 @@ final class EnumService
     public function getCssEnums(): array
     {
         $enums = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $enums[$name] = $enumClass::forCss();
             }
         }
-        
+
         return $enums;
     }
 
@@ -236,13 +237,13 @@ final class EnumService
     public function getDocumentation(): array
     {
         $documentation = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $documentation[$name] = $enumClass::forDocumentation();
             }
         }
-        
+
         return $documentation;
     }
 
@@ -252,17 +253,17 @@ final class EnumService
     public function search(string $query): array
     {
         $results = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $searchResults = $enumClass::search($query);
-                
+
                 if ($searchResults->isNotEmpty()) {
-                    $results[$name] = $searchResults->map(fn($case) => $case->toArray())->toArray();
+                    $results[$name] = $searchResults->map(fn ($case) => $case->toArray())->toArray();
                 }
             }
         }
-        
+
         return $results;
     }
 
@@ -272,13 +273,13 @@ final class EnumService
     public function groupBy(string $property): array
     {
         $grouped = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $grouped[$name] = $enumClass::groupBy($property)->toArray();
             }
         }
-        
+
         return $grouped;
     }
 
@@ -288,13 +289,13 @@ final class EnumService
     public function sortBy(string $property, bool $descending = false): array
     {
         $sorted = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $sorted[$name] = $enumClass::sortBy($property, $descending)->toArray();
             }
         }
-        
+
         return $sorted;
     }
 
@@ -304,8 +305,8 @@ final class EnumService
     public function paginate(string $name, int $perPage, int $page = 1): array
     {
         $enumClass = $this->getEnum($name);
-        
-        if (!$enumClass || !class_exists($enumClass)) {
+
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
@@ -318,13 +319,13 @@ final class EnumService
     public function getApiData(): array
     {
         $data = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $data[$name] = $enumClass::forApi();
             }
         }
-        
+
         return $data;
     }
 
@@ -334,13 +335,13 @@ final class EnumService
     public function getGraphQLData(): array
     {
         $data = [];
-        
+
         foreach ($this->getAllEnums() as $name => $enumClass) {
             if (class_exists($enumClass)) {
                 $data[$name] = $enumClass::forGraphQL();
             }
         }
-        
+
         return $data;
     }
 
@@ -368,10 +369,10 @@ final class EnumService
     public function getForUseCaseAndEnums(string $useCase, array $names): array
     {
         $data = [];
-        
+
         foreach ($names as $name) {
             $enumClass = $this->getEnum($name);
-            
+
             if ($enumClass && class_exists($enumClass)) {
                 $data[$name] = match ($useCase) {
                     'api' => $enumClass::forApi(),
@@ -386,7 +387,7 @@ final class EnumService
                 };
             }
         }
-        
+
         return $data;
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -20,7 +22,7 @@ final class GenerateProductImages extends Command
 
     public function handle(): int
     {
-        $this->info('🎨 ' . __('translations.generate_images') . '...');
+        $this->info('🎨 '.__('translations.generate_images').'...');
 
         if ($this->option('convert-existing')) {
             $this->convertExistingImages();
@@ -28,17 +30,18 @@ final class GenerateProductImages extends Command
 
         $this->generateNewImages();
 
-        $this->info('✅ ' . __('translations.image_generated') . '!');
+        $this->info('✅ '.__('translations.image_generated').'!');
+
         return self::SUCCESS;
     }
 
     private function convertExistingImages(): void
     {
         $this->info('🔄 Converting existing images to WebP...');
-        
+
         $conversionService = app(WebPConversionService::class);
         $conversionService->convertExistingImages();
-        
+
         $this->info('✅ WebP conversion completed!');
     }
 
@@ -53,7 +56,7 @@ final class GenerateProductImages extends Command
 
         if ($productId) {
             $query->where('id', $productId);
-        } elseif (!$force) {
+        } elseif (! $force) {
             $query->whereDoesntHave('media', function ($q) {
                 $q->where('collection_name', 'images');
             });
@@ -63,6 +66,7 @@ final class GenerateProductImages extends Command
 
         if ($products->isEmpty()) {
             $this->warn('No products found for image generation.');
+
             return;
         }
 
@@ -84,10 +88,10 @@ final class GenerateProductImages extends Command
 
                     // Generate random number of images (2 to $count)
                     $imageCount = random_int(2, $count);
-                    
+
                     for ($i = 0; $i < $imageCount; $i++) {
                         $imagePath = $imageService->generateProductImage($product);
-                        
+
                         $product
                             ->addMedia($imagePath)
                             ->withCustomProperties([
@@ -97,19 +101,19 @@ final class GenerateProductImages extends Command
                                 'alt_text' => __('translations.product_image_alt', ['name' => $product->name, 'number' => $i + 1]),
                                 'generated_at' => now()->toISOString(),
                             ])
-                            ->usingName($product->name . ' - ' . __('translations.image') . ' ' . ($i + 1))
-                            ->usingFileName('product_' . $product->id . '_cmd_' . ($i + 1) . '.webp')
+                            ->usingName($product->name.' - '.__('translations.image').' '.($i + 1))
+                            ->usingFileName('product_'.$product->id.'_cmd_'.($i + 1).'.webp')
                             ->toMediaCollection('images');
-                        
+
                         if (file_exists($imagePath)) {
                             unlink($imagePath);
                         }
                     }
-                    
+
                     $successCount++;
                 } catch (\Throwable $e) {
                     $errorCount++;
-                    $this->error("Failed to generate images for product {$product->id}: " . $e->getMessage());
+                    $this->error("Failed to generate images for product {$product->id}: ".$e->getMessage());
                 }
 
                 $progressBar->advance();

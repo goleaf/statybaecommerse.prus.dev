@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeResource\RelationManagers;
 
-use App\Models\AttributeValue;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
@@ -10,7 +11,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class ValuesRelationManager extends RelationManager
 {
@@ -94,7 +94,7 @@ final class ValuesRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\Filter::make('enabled')
                     ->label(__('attributes.enabled_only'))
-                    ->query(fn(Builder $query): Builder => $query->where('is_enabled', true)),
+                    ->query(fn (Builder $query): Builder => $query->where('is_enabled', true)),
 
                 Tables\Filters\TrashedFilter::make(),
             ])

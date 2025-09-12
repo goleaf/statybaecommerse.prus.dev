@@ -1,17 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
 use App\Models\Product;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Computed;
 
 final class ProductGallery extends Component
 {
     use WithPagination;
 
     public string $search = '';
+
     public string $filter = 'all'; // all, with_images, generated_only
 
     protected $queryString = [
@@ -36,7 +39,7 @@ final class ProductGallery extends Component
             ->with(['media', 'brand'])
             ->where('is_visible', true)
             ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%');
+                $query->where('name', 'like', '%'.$this->search.'%');
             })
             ->when($this->filter === 'with_images', function ($query) {
                 $query->whereHas('media', function ($q) {
@@ -46,7 +49,7 @@ final class ProductGallery extends Component
             ->when($this->filter === 'generated_only', function ($query) {
                 $query->whereHas('media', function ($q) {
                     $q->where('collection_name', 'images')
-                      ->whereJsonContains('custom_properties->generated', true);
+                        ->whereJsonContains('custom_properties->generated', true);
                 });
             })
             ->orderBy('created_at', 'desc')
@@ -80,7 +83,7 @@ final class ProductGallery extends Component
     {
         return view('livewire.pages.product-gallery')
             ->layout('components.layouts.base', [
-                'title' => __('translations.product_images')
+                'title' => __('translations.product_images'),
             ]);
     }
 }

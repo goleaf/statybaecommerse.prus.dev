@@ -1,21 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\ReferralCode;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 final class ReferralCodeController extends Controller
 {
     public function index(Request $request): View
     {
         $user = auth()->user();
-        
+
         $referralCodes = $user->referralCodes()
             ->with(['campaign', 'user'])
             ->orderBy('created_at', 'desc')
@@ -135,12 +136,12 @@ final class ReferralCodeController extends Controller
     {
         $this->authorize('update', $referralCode);
 
-        $referralCode->update(['is_active' => !$referralCode->is_active]);
+        $referralCode->update(['is_active' => ! $referralCode->is_active]);
 
         return response()->json([
             'success' => true,
             'is_active' => $referralCode->is_active,
-            'message' => $referralCode->is_active 
+            'message' => $referralCode->is_active
                 ? __('referral_codes.messages.activated_successfully')
                 : __('referral_codes.messages.deactivated_successfully'),
         ]);

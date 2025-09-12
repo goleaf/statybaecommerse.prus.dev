@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Jobs;
 
@@ -17,7 +19,7 @@ class ImportProductsChunk implements ShouldQueue
     private array $rows;
 
     /**
-     * @param array<int,array<string,mixed>> $rows
+     * @param  array<int,array<string,mixed>>  $rows
      */
     public function __construct(array $rows)
     {
@@ -43,7 +45,7 @@ class ImportProductsChunk implements ShouldQueue
             }
 
             $publishedAt = null;
-            if (!empty($row['published_at'])) {
+            if (! empty($row['published_at'])) {
                 try {
                     $publishedAt = now()->parse((string) $row['published_at']);
                 } catch (\Throwable $e) {

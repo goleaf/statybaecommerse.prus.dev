@@ -1,10 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceResource\Pages;
-use App\Filament\Resources\PriceResource\RelationManagers;
-use App\Models\Currency;
 use App\Models\Price;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
@@ -16,8 +16,8 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -30,8 +30,6 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
@@ -68,9 +66,9 @@ final class PriceResource extends Resource
         return __('admin.prices.plural_model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Tabs::make('Price Information')
                     ->tabs([
@@ -90,15 +88,16 @@ final class PriceResource extends Resource
                                                     ])
                                                     ->required()
                                                     ->live()
-                                                    ->afterStateUpdated(fn(callable $set) => $set('priceable_id', null)),
+                                                    ->afterStateUpdated(fn (callable $set) => $set('priceable_id', null)),
                                                 Select::make('priceable_id')
                                                     ->label(__('admin.prices.fields.priceable_item'))
                                                     ->searchable()
                                                     ->preload()
                                                     ->options(function (callable $get) {
                                                         $type = $get('priceable_type');
-                                                        if (!$type)
+                                                        if (! $type) {
                                                             return [];
+                                                        }
 
                                                         return match ($type) {
                                                             'App\Models\Product' => \App\Models\Product::pluck('name', 'id'),
@@ -234,14 +233,14 @@ final class PriceResource extends Resource
             ->columns([
                 TextColumn::make('priceable_type')
                     ->label(__('admin.prices.fields.priceable_type'))
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'App\Models\Product' => __('admin.prices.types.product'),
                         'App\Models\ProductVariant' => __('admin.prices.types.variant'),
                         'App\Models\Service' => __('admin.prices.types.service'),
                         default => $state,
                     })
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'App\Models\Product' => 'success',
                         'App\Models\ProductVariant' => 'info',
                         'App\Models\Service' => 'warning',
@@ -255,6 +254,7 @@ final class PriceResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('currency.code')
@@ -283,7 +283,7 @@ final class PriceResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 BadgeColumn::make('type')
                     ->label(__('admin.prices.fields.type'))
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'retail' => __('admin.prices.types.retail'),
                         'wholesale' => __('admin.prices.types.wholesale'),
                         'special' => __('admin.prices.types.special'),
@@ -320,7 +320,7 @@ final class PriceResource extends Resource
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn($record) => $record->created_at?->format('d/m/Y H:i:s')),
+                    ->tooltip(fn ($record) => $record->created_at?->format('d/m/Y H:i:s')),
             ])
             ->filters([
                 SelectFilter::make('priceable_type')
@@ -410,7 +410,7 @@ final class PriceResource extends Resource
         return [
             __('admin.prices.fields.currency') => $record->currency->code,
             __('admin.prices.fields.type') => $record->type,
-            __('admin.prices.fields.amount') => '€' . number_format($record->amount, 2),
+            __('admin.prices.fields.amount') => '€'.number_format($record->amount, 2),
         ];
     }
 }

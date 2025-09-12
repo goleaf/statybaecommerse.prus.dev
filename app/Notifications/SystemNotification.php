@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Notifications;
 
@@ -33,12 +35,3 @@ final class SystemNotification extends Notification implements ShouldQueue
             ->line('Šis pranešimas išsiųstas iš sistemos administracijos.');
     }
 }
-
-
-
-
-
-
-
-
-

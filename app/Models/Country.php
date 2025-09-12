@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Translations\CountryTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Country extends Model
@@ -116,6 +118,7 @@ final class Country extends Model
     public function getDisplayNameAttribute(): string
     {
         $name = $this->trans('name') ?: $this->getOriginal('name');
+
         return $this->phone_calling_code ? "{$name} (+{$this->phone_calling_code})" : $name;
     }
 
@@ -198,7 +201,7 @@ final class Country extends Model
 
     public function getFormattedVatRate(): string
     {
-        return $this->vat_rate ? number_format($this->vat_rate, 2) . '%' : 'N/A';
+        return $this->vat_rate ? number_format($this->vat_rate, 2).'%' : 'N/A';
     }
 
     public function getFullAddress(): string
@@ -206,27 +209,27 @@ final class Country extends Model
         $parts = array_filter([
             $this->translated_name,
             $this->region,
-            $this->subregion
+            $this->subregion,
         ]);
-        
+
         return implode(', ', $parts);
     }
 
     public function getFlagUrl(): ?string
     {
         if ($this->flag) {
-            return asset('flags/' . $this->flag);
+            return asset('flags/'.$this->flag);
         }
-        
+
         return null;
     }
 
     public function getSvgFlagUrl(): ?string
     {
         if ($this->svg_flag) {
-            return asset('flags/svg/' . $this->svg_flag);
+            return asset('flags/svg/'.$this->svg_flag);
         }
-        
+
         return null;
     }
 }

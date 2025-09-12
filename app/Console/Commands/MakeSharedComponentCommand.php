@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -9,7 +11,7 @@ use Illuminate\Support\Str;
 final class MakeSharedComponentCommand extends Command
 {
     protected $signature = 'make:shared-component {name} {--type=ui} {--force}';
-    
+
     protected $description = 'Create a new shared component';
 
     public function handle(): int
@@ -20,20 +22,21 @@ final class MakeSharedComponentCommand extends Command
 
         $componentName = Str::kebab($name);
         $className = Str::studly($name);
-        
+
         $viewPath = resource_path("views/components/shared/{$componentName}.blade.php");
-        
-        if (File::exists($viewPath) && !$force) {
+
+        if (File::exists($viewPath) && ! $force) {
             $this->error("Component {$componentName} already exists. Use --force to overwrite.");
+
             return 1;
         }
 
         $template = $this->getComponentTemplate($type, $className, $componentName);
-        
+
         File::ensureDirectoryExists(dirname($viewPath));
         File::put($viewPath, $template);
 
-        $this->info("Shared component created successfully:");
+        $this->info('Shared component created successfully:');
         $this->line("View: {$viewPath}");
         $this->line("Usage: <x-shared.{$componentName} />");
 
@@ -57,40 +60,40 @@ final class MakeSharedComponentCommand extends Command
 
     private function getUiComponentTemplate(string $className, string $componentName): string
     {
-        return <<<BLADE
+        return <<<'BLADE'
 @props([
     'variant' => 'primary',
     'size' => 'md',
 ])
 
 @php
-\$baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
+$baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
 
-\$variantClasses = match(\$variant) {
+$variantClasses = match($variant) {
     'primary' => 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
     'secondary' => 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
     default => 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
 };
 
-\$sizeClasses = match(\$size) {
+$sizeClasses = match($size) {
     'sm' => 'px-3 py-2 text-sm rounded-md',
     'md' => 'px-4 py-2 text-sm rounded-lg',
     'lg' => 'px-6 py-3 text-base rounded-lg',
     default => 'px-4 py-2 text-sm rounded-lg',
 };
 
-\$classes = \$baseClasses . ' ' . \$variantClasses . ' ' . \$sizeClasses;
+$classes = $baseClasses . ' ' . $variantClasses . ' ' . $sizeClasses;
 @endphp
 
-<div {{ \$attributes->merge(['class' => \$classes]) }}>
-    {{ \$slot }}
+<div {{ $attributes->merge(['class' => $classes]) }}>
+    {{ $slot }}
 </div>
 BLADE;
     }
 
     private function getFormComponentTemplate(string $className, string $componentName): string
     {
-        return <<<BLADE
+        return <<<'BLADE'
 @props([
     'label' => null,
     'required' => false,
@@ -99,34 +102,34 @@ BLADE;
 ])
 
 @php
-\$inputId = \$attributes->get('id', 'input-' . uniqid());
-\$classes = 'block w-full rounded-lg border-gray-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white';
+$inputId = $attributes->get('id', 'input-' . uniqid());
+$classes = 'block w-full rounded-lg border-gray-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white';
 
-if (\$error) {
-    \$classes .= ' border-red-500 focus:border-red-500 focus:ring-red-500';
+if ($error) {
+    $classes .= ' border-red-500 focus:border-red-500 focus:ring-red-500';
 }
 @endphp
 
 <div class="space-y-2">
-    @if(\$label)
-        <label for="{{ \$inputId }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            {{ \$label }}
-            @if(\$required)
+    @if($label)
+        <label for="{{ $inputId }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {{ $label }}
+            @if($required)
                 <span class="text-red-500">*</span>
             @endif
         </label>
     @endif
     
-    <div {{ \$attributes->merge(['class' => \$classes, 'id' => \$inputId]) }}>
-        {{ \$slot }}
+    <div {{ $attributes->merge(['class' => $classes, 'id' => $inputId]) }}>
+        {{ $slot }}
     </div>
     
-    @if(\$error)
-        <p class="text-sm text-red-600 dark:text-red-400">{{ \$error }}</p>
+    @if($error)
+        <p class="text-sm text-red-600 dark:text-red-400">{{ $error }}</p>
     @endif
     
-    @if(\$helpText)
-        <p class="text-sm text-gray-500 dark:text-gray-400">{{ \$helpText }}</p>
+    @if($helpText)
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $helpText }}</p>
     @endif
 </div>
 BLADE;
@@ -134,30 +137,30 @@ BLADE;
 
     private function getLayoutComponentTemplate(string $className, string $componentName): string
     {
-        return <<<BLADE
+        return <<<'BLADE'
 @props([
     'title' => null,
     'description' => null,
 ])
 
-<div {{ \$attributes->merge(['class' => 'bg-white rounded-lg shadow-md p-6 dark:bg-gray-800']) }}>
-    @if(\$title)
+<div {{ $attributes->merge(['class' => 'bg-white rounded-lg shadow-md p-6 dark:bg-gray-800']) }}>
+    @if($title)
         <div class="mb-4">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ \$title }}</h2>
-            @if(\$description)
-                <p class="mt-1 text-gray-600 dark:text-gray-300">{{ \$description }}</p>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $title }}</h2>
+            @if($description)
+                <p class="mt-1 text-gray-600 dark:text-gray-300">{{ $description }}</p>
             @endif
         </div>
     @endif
     
-    {{ \$slot }}
+    {{ $slot }}
 </div>
 BLADE;
     }
 
     private function getEcommerceComponentTemplate(string $className, string $componentName): string
     {
-        return <<<BLADE
+        return <<<'BLADE'
 @props([
     'product',
     'showActions' => true,
@@ -166,10 +169,10 @@ BLADE;
 <div class="group relative overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-gray-200 transition-all duration-300 hover:shadow-lg hover:ring-gray-300 dark:bg-gray-800 dark:ring-gray-700">
     {{-- Product Image --}}
     <div class="aspect-w-1 aspect-h-1 overflow-hidden">
-        @if(\$product->getFirstMediaUrl('gallery'))
+        @if($product->getFirstMediaUrl('gallery'))
             <img 
-                src="{{ \$product->getFirstMediaUrl('gallery') }}" 
-                alt="{{ \$product->name }}"
+                src="{{ $product->getFirstMediaUrl('gallery') }}" 
+                alt="{{ $product->name }}"
                 class="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
             />
@@ -185,13 +188,13 @@ BLADE;
     {{-- Product Info --}}
     <div class="p-4">
         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-            {{ \$product->name }}
+            {{ $product->name }}
         </h3>
         
-        @if(\$showActions)
+        @if($showActions)
             <div class="mt-4">
                 <x-shared.button 
-                    wire:click="addToCart({{ \$product->id }})"
+                    wire:click="addToCart({{ $product->id }})"
                     variant="primary"
                     size="sm"
                 >
@@ -207,7 +210,7 @@ BLADE;
     private function updateComponentRegistry(string $componentName, string $type): void
     {
         $registryPath = app_path('Services/Shared/ComponentRegistryService.php');
-        
+
         if (File::exists($registryPath)) {
             $this->info("Don't forget to update the ComponentRegistryService with the new component!");
             $this->line("Component: shared.{$componentName}");

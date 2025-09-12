@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -34,14 +36,3 @@ final class CampaignSchedule extends Model
         return $this->belongsTo(Campaign::class);
     }
 }
-
-
-
-
-
-
-
-
-
-
-

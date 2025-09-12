@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Translations\CityTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class City extends Model
@@ -138,15 +140,15 @@ final class City extends Model
     public function getFullPathAttribute(): string
     {
         $path = collect([$this->translated_name]);
-        
+
         if ($this->region) {
             $path->prepend($this->region->translated_name);
         }
-        
+
         if ($this->country) {
             $path->prepend($this->country->translated_name);
         }
-        
+
         return $path->implode(' > ');
     }
 
@@ -154,24 +156,24 @@ final class City extends Model
     {
         $ancestors = collect();
         $parent = $this->parent;
-        
+
         while ($parent) {
             $ancestors->prepend($parent);
             $parent = $parent->parent;
         }
-        
+
         return $ancestors;
     }
 
     public function getDescendantsAttribute()
     {
         $descendants = collect();
-        
+
         foreach ($this->children as $child) {
             $descendants->push($child);
             $descendants = $descendants->merge($child->descendants);
         }
-        
+
         return $descendants;
     }
 
@@ -183,5 +185,3 @@ final class City extends Model
         ];
     }
 }
-
-

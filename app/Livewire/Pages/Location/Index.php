@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages\Location;
 
@@ -20,7 +22,7 @@ final class Index extends Component
         return view('livewire.pages.location.index', [
             'locations' => $this->locations,
         ])->layout('components.layouts.base', [
-            'title' => __('translations.locations')
+            'title' => __('translations.locations'),
         ]);
     }
 }

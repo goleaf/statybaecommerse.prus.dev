@@ -20,7 +20,7 @@ class Cart extends Component
 
     private function getCartSession(): mixed
     {
-        if (!class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
+        if (! class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
             return null;
         }
 
@@ -57,7 +57,7 @@ class Cart extends Component
     {
         $quantity = max(0, $quantity);
         $cart = $this->getCartSession();
-        if (!$cart) {
+        if (! $cart) {
             return;
         }
 
@@ -84,7 +84,7 @@ class Cart extends Component
     public function incrementItem(int $id): void
     {
         $cart = $this->getCartSession();
-        if (!$cart) {
+        if (! $cart) {
             return;
         }
         try {
@@ -101,7 +101,7 @@ class Cart extends Component
     public function decrementItem(int $id): void
     {
         $cart = $this->getCartSession();
-        if (!$cart) {
+        if (! $cart) {
             return;
         }
         try {
@@ -141,4 +141,3 @@ class Cart extends Component
         ])->title(__('Your cart'));
     }
 }
-

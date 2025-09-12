@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages\Account;
 
@@ -13,7 +15,9 @@ final class Notifications extends Component
     use WithPagination;
 
     public array $notifications = [];
+
     public string $filter = 'all';
+
     public bool $showUnreadOnly = false;
 
     protected $listeners = ['refreshNotifications' => 'loadNotifications'];
@@ -26,8 +30,9 @@ final class Notifications extends Component
     public function loadNotifications(): void
     {
         $user = auth()->user();
-        if (!$user || !method_exists($user, 'notifications') || !Schema::hasTable('notifications')) {
+        if (! $user || ! method_exists($user, 'notifications') || ! Schema::hasTable('notifications')) {
             $this->notifications = [];
+
             return;
         }
 
@@ -46,6 +51,7 @@ final class Notifications extends Component
             ->get(['id', 'type', 'data', 'read_at', 'created_at'])
             ->map(function ($n) {
                 $data = $n->data ?? [];
+
                 return [
                     'id' => $n->id,
                     'type' => $data['type'] ?? 'info',
@@ -65,8 +71,8 @@ final class Notifications extends Component
     {
         $user = auth()->user();
         $notification = $user->notifications()->find($notificationId);
-        
-        if ($notification && !$notification->read_at) {
+
+        if ($notification && ! $notification->read_at) {
             $notification->markAsRead();
             $this->loadNotifications();
             $this->dispatch('notification-marked-read');
@@ -85,7 +91,7 @@ final class Notifications extends Component
     {
         $user = auth()->user();
         $deleted = app(NotificationService::class)->deleteNotification($user, $notificationId);
-        
+
         if ($deleted) {
             $this->loadNotifications();
             $this->dispatch('notification-deleted');
@@ -121,18 +127,23 @@ final class Notifications extends Component
             return __('notifications.time.minutes_ago', ['count' => $diff]);
         } elseif ($diff < 1440) {
             $hours = floor($diff / 60);
+
             return __('notifications.time.hours_ago', ['count' => $hours]);
         } elseif ($diff < 10080) {
             $days = floor($diff / 1440);
+
             return __('notifications.time.days_ago', ['count' => $days]);
         } elseif ($diff < 43200) {
             $weeks = floor($diff / 10080);
+
             return __('notifications.time.weeks_ago', ['count' => $weeks]);
         } elseif ($diff < 525600) {
             $months = floor($diff / 43200);
+
             return __('notifications.time.months_ago', ['count' => $months]);
         } else {
             $years = floor($diff / 525600);
+
             return __('notifications.time.years_ago', ['count' => $years]);
         }
     }
@@ -140,6 +151,7 @@ final class Notifications extends Component
     public function getUnreadCount(): int
     {
         $user = auth()->user();
+
         return $user ? app(NotificationService::class)->getUnreadCount($user) : 0;
     }
 

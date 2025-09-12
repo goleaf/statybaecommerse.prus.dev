@@ -25,7 +25,7 @@ class CouponForm extends Component
         if ($this->code) {
             $raw = strtoupper(trim($this->code));
             $row = DB::table('sh_discount_codes')
-                ->select('id','discount_id','expires_at','max_uses','usage_count')
+                ->select('id', 'discount_id', 'expires_at', 'max_uses', 'usage_count')
                 ->whereRaw('UPPER(code) = ?', [$raw])
                 ->first();
             if ($row) {

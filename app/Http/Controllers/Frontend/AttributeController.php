@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
@@ -36,7 +38,7 @@ final class AttributeController extends Controller
 
         // Search by name
         if ($request->has('search') && $request->search) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         $attributes = $query->paginate(20);
@@ -45,13 +47,13 @@ final class AttributeController extends Controller
         $types = Attribute::enabled()
             ->distinct()
             ->pluck('type')
-            ->mapWithKeys(fn($type) => [$type => __('attributes.' . $type)]);
+            ->mapWithKeys(fn ($type) => [$type => __('attributes.'.$type)]);
 
         $groups = Attribute::enabled()
             ->whereNotNull('group_name')
             ->distinct()
             ->pluck('group_name')
-            ->mapWithKeys(fn($group) => [$group => __('attributes.' . $group)]);
+            ->mapWithKeys(fn ($group) => [$group => __('attributes.'.$group)]);
 
         return view('frontend.attributes.index', compact('attributes', 'types', 'groups'));
     }
@@ -67,7 +69,7 @@ final class AttributeController extends Controller
                     ->where('is_published', true)
                     ->with(['media', 'brand', 'category'])
                     ->orderBy('name');
-            }
+            },
         ]);
 
         // Get related attributes from the same group
@@ -97,7 +99,7 @@ final class AttributeController extends Controller
         // Apply attribute filters
         if ($request->has('attributes') && is_array($request->attributes)) {
             foreach ($request->attributes as $attributeId => $values) {
-                if (!empty($values)) {
+                if (! empty($values)) {
                     $query->whereHas('attributes', function ($q) use ($attributeId, $values) {
                         $q->where('attribute_id', $attributeId)
                             ->whereIn('attribute_value_id', (array) $values);
@@ -117,9 +119,9 @@ final class AttributeController extends Controller
         // Apply search
         if ($request->has('search') && $request->search) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('description', 'like', '%' . $request->search . '%')
-                    ->orWhere('sku', 'like', '%' . $request->search . '%');
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%')
+                    ->orWhere('sku', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -140,14 +142,14 @@ final class AttributeController extends Controller
     public function getAttributeValues(Request $request)
     {
         $attributeId = $request->get('attribute_id');
-        
-        if (!$attributeId) {
+
+        if (! $attributeId) {
             return response()->json([]);
         }
 
         $attribute = Attribute::find($attributeId);
-        
-        if (!$attribute) {
+
+        if (! $attribute) {
             return response()->json([]);
         }
 

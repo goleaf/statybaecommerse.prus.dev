@@ -33,9 +33,9 @@ final class CartItemsRelationManager extends RelationManager
         return __('admin.customers.cart_items');
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
-        return $schema->components([
+        return $form->components([
                 Section::make(__('admin.cart_items.cart_information'))
                     ->schema([
                         Grid::make(2)

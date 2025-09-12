@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\SeoDataResource\Widgets;
 
 use App\Models\SeoData;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class SeoScoreDistributionWidget extends ChartWidget
 {
@@ -50,9 +51,9 @@ final class SeoScoreDistributionWidget extends ChartWidget
             END as score_range,
             COUNT(*) as count
         ')
-        ->groupBy('score_range')
-        ->orderBy('count', 'desc')
-        ->get();
+            ->groupBy('score_range')
+            ->orderBy('count', 'desc')
+            ->get();
 
         $labels = $scores->pluck('score_range')->toArray();
         $data = $scores->pluck('count')->toArray();

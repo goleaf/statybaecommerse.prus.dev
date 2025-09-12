@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Requests;
 
@@ -9,11 +11,12 @@ class UpdateCampaignClickRequest extends FormRequest
     public function authorize(): bool
     {
         // Allow updates only for authenticated users and only for their own clicks
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return false;
         }
 
         $campaignClick = $this->route('campaignClick');
+
         return $campaignClick && $campaignClick->customer_id === auth()->id();
     }
 

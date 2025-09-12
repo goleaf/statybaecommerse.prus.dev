@@ -1,15 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CategoriesRelationManager extends RelationManager
 {
@@ -27,12 +26,12 @@ class CategoriesRelationManager extends RelationManager
                     ->searchable()
                     ->preload()
                     ->required(),
-                
+
                 Forms\Components\TextInput::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->numeric()
                     ->default(0),
-                
+
                 Forms\Components\Toggle::make('is_primary')
                     ->label(__('translations.is_primary'))
                     ->default(false),
@@ -48,7 +47,7 @@ class CategoriesRelationManager extends RelationManager
                     ->label(__('translations.category_name'))
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('description')
                     ->label(__('translations.description'))
                     ->limit(50)
@@ -57,17 +56,18 @@ class CategoriesRelationManager extends RelationManager
                         if (strlen($state) <= 50) {
                             return null;
                         }
+
                         return $state;
                     }),
-                
+
                 Tables\Columns\IconColumn::make('is_visible')
                     ->label(__('translations.is_visible'))
                     ->boolean(),
-                
+
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('translations.created_at'))
                     ->dateTime()
@@ -89,12 +89,12 @@ class CategoriesRelationManager extends RelationManager
                         $action->getRecordSelect()
                             ->searchable()
                             ->preload(),
-                        
+
                         Forms\Components\TextInput::make('sort_order')
                             ->label(__('translations.sort_order'))
                             ->numeric()
                             ->default(0),
-                        
+
                         Forms\Components\Toggle::make('is_primary')
                             ->label(__('translations.is_primary'))
                             ->default(false),
@@ -110,5 +110,3 @@ class CategoriesRelationManager extends RelationManager
             ]);
     }
 }
-
-

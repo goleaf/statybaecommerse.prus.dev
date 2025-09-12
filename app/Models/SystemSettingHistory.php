@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -51,7 +53,7 @@ final class SystemSettingHistory extends Model
         if (is_array($value) || is_object($value)) {
             return json_encode($value, JSON_PRETTY_PRINT);
         }
-        
+
         return (string) $value;
     }
 }

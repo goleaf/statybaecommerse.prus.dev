@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
@@ -26,5 +28,3 @@ final class RegionTranslation extends Model
         return $this->belongsTo(Region::class);
     }
 }
-
-

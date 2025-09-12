@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -18,7 +20,7 @@ final class BrandController extends Controller
             ->where('is_enabled', true)
             ->first();
 
-        if (!$brand) {
+        if (! $brand) {
             // Try to find by translated slug
             $brand = Brand::query()
                 ->with(['translations', 'media'])
@@ -31,7 +33,7 @@ final class BrandController extends Controller
                 ->first();
         }
 
-        if (!$brand) {
+        if (! $brand) {
             abort(404);
         }
 
@@ -53,7 +55,7 @@ final class BrandController extends Controller
             ->get();
 
         // Get SEO data
-        $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName() . ' - ' . config('app.name');
+        $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName().' - '.config('app.name');
         $seoDescription = $brand->getTranslatedSeoDescription() ?: $brand->getTranslatedDescription();
 
         return view('brands.show', [

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -32,14 +34,3 @@ final class CampaignProductTarget extends Model
         return $this->belongsTo(Category::class);
     }
 }
-
-
-
-
-
-
-
-
-
-
-

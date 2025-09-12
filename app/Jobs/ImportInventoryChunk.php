@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Jobs;
 
@@ -16,7 +18,7 @@ class ImportInventoryChunk implements ShouldQueue
     private array $rows;
 
     /**
-     * @param array<int,array<string,mixed>> $rows
+     * @param  array<int,array<string,mixed>>  $rows
      */
     public function __construct(array $rows)
     {
@@ -34,7 +36,7 @@ class ImportInventoryChunk implements ShouldQueue
             }
 
             $variantId = DB::table('sh_product_variants')->where('sku', $sku)->value('id');
-            if (!$variantId) {
+            if (! $variantId) {
                 $variantId = DB::table('sh_products')->where('sku', $sku)->value('id');
                 if ($variantId) {
                     // Interpret as product-level inventory if variant not found

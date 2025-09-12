@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages\Location;
 
@@ -23,7 +25,7 @@ final class Show extends Component
         return view('livewire.pages.location.show', [
             'location' => $this->location,
         ])->layout('components.layouts.base', [
-            'title' => $this->location->name . ' - ' . __('translations.locations')
+            'title' => $this->location->name.' - '.__('translations.locations'),
         ]);
     }
 }

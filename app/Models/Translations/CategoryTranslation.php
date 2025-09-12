@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
@@ -7,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 final class CategoryTranslation extends Model
 {
     protected $table = 'category_translations';
-    
+
     protected $fillable = [
         'category_id',
         'locale',

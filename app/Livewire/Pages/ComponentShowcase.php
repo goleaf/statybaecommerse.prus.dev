@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
 use App\Livewire\Concerns\WithNotifications;
-use App\Models\Product;
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -16,12 +18,14 @@ final class ComponentShowcase extends Component
     use WithNotifications;
 
     public string $testInput = '';
+
     public string $testSelect = '';
+
     public bool $showModal = false;
 
     public function testNotification(string $type): void
     {
-        match($type) {
+        match ($type) {
             'success' => $this->notifySuccess('Success notification!', 'Success'),
             'error' => $this->notifyError('Error notification!', 'Error'),
             'warning' => $this->notifyWarning('Warning notification!', 'Warning'),
@@ -31,7 +35,7 @@ final class ComponentShowcase extends Component
 
     public function toggleModal(): void
     {
-        $this->showModal = !$this->showModal;
+        $this->showModal = ! $this->showModal;
     }
 
     public function getFeaturedProductsProperty()

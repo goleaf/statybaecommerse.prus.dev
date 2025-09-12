@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire;
 
-use App\Models\User;
 use Illuminate\Notifications\DatabaseNotification;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -12,6 +13,7 @@ final class NotificationCenter extends Component
     use WithPagination;
 
     public string $filter = 'all';
+
     public bool $showUnreadOnly = false;
 
     protected $listeners = ['notificationReceived' => '$refresh'];
@@ -34,7 +36,7 @@ final class NotificationCenter extends Component
     public function markAsRead(string $notificationId): void
     {
         $notification = DatabaseNotification::find($notificationId);
-        
+
         if ($notification && $notification->notifiable_id === auth()->id()) {
             $notification->markAsRead();
             $this->dispatch('notificationRead', $notificationId);
@@ -44,7 +46,7 @@ final class NotificationCenter extends Component
     public function markAsUnread(string $notificationId): void
     {
         $notification = DatabaseNotification::find($notificationId);
-        
+
         if ($notification && $notification->notifiable_id === auth()->id()) {
             $notification->markAsUnread();
             $this->dispatch('notificationUnread', $notificationId);
@@ -60,7 +62,7 @@ final class NotificationCenter extends Component
     public function deleteNotification(string $notificationId): void
     {
         $notification = DatabaseNotification::find($notificationId);
-        
+
         if ($notification && $notification->notifiable_id === auth()->id()) {
             $notification->delete();
             $this->dispatch('notificationDeleted', $notificationId);
@@ -101,6 +103,7 @@ final class NotificationCenter extends Component
             ->pluck('type')
             ->mapWithKeys(function ($type) {
                 $shortType = class_basename($type);
+
                 return [$type => $shortType];
             })
             ->toArray();

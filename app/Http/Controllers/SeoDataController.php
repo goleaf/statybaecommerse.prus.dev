@@ -30,8 +30,8 @@ final class SeoDataController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('keywords', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('keywords', 'like', "%{$search}%");
             });
         }
 
@@ -63,8 +63,8 @@ final class SeoDataController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('keywords', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('keywords', 'like', "%{$search}%");
             });
         }
 
@@ -90,8 +90,8 @@ final class SeoDataController extends Controller
                 ->count(),
             'needs_optimization' => SeoData::where(function ($q) {
                 $q->whereNull('title')
-                  ->orWhereNull('description')
-                  ->orWhereNull('keywords');
+                    ->orWhereNull('description')
+                    ->orWhereNull('keywords');
             })->count(),
         ];
 

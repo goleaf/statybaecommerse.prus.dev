@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\StockResource\Widgets;
 
@@ -10,7 +12,7 @@ class StockValueWidget extends ChartWidget
 {
     protected static ?string $heading = 'inventory.stock_value_by_location';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?int $sort = 2;
 
@@ -39,11 +41,11 @@ class StockValueWidget extends ChartWidget
                     'data' => $stockValues->map(fn ($item) => $item->total_value - $item->reserved_value)->toArray(),
                     'backgroundColor' => [
                         '#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444',
-                        '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1'
+                        '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1',
                     ],
                     'borderColor' => [
                         '#059669', '#2563EB', '#7C3AED', '#D97706', '#DC2626',
-                        '#0891B2', '#65A30D', '#EA580C', '#DB2777', '#4F46E5'
+                        '#0891B2', '#65A30D', '#EA580C', '#DB2777', '#4F46E5',
                     ],
                     'borderWidth' => 2,
                 ],
@@ -52,11 +54,11 @@ class StockValueWidget extends ChartWidget
                     'data' => $stockValues->map(fn ($item) => $item->reserved_value)->toArray(),
                     'backgroundColor' => [
                         '#FCD34D', '#93C5FD', '#C4B5FD', '#FDE68A', '#FCA5A5',
-                        '#67E8F9', '#BEF264', '#FDBA74', '#F9A8D4', '#A5B4FC'
+                        '#67E8F9', '#BEF264', '#FDBA74', '#F9A8D4', '#A5B4FC',
                     ],
                     'borderColor' => [
                         '#F59E0B', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444',
-                        '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1'
+                        '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1',
                     ],
                     'borderWidth' => 2,
                 ],

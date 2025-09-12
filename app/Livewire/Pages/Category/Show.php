@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages\Category;
 
@@ -11,13 +13,15 @@ final class Show extends Component
     use WithPagination;
 
     public Category $category;
+
     public string $sortBy = 'created_at';
+
     public string $sortDirection = 'desc';
 
     public function mount(Category $category): void
     {
         // Ensure category is visible and load media and translations
-        if (!$category->is_visible) {
+        if (! $category->is_visible) {
             abort(404);
         }
 
@@ -41,7 +45,7 @@ final class Show extends Component
         return view('livewire.pages.category.show', [
             'products' => $this->products,
         ])->layout('components.layouts.base', [
-            'title' => $this->category->name
+            'title' => $this->category->name,
         ]);
     }
 }

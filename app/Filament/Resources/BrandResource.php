@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -17,16 +19,14 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Actions as Actions;
-use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use BackedEnum;
 use UnitEnum;
 
 final class BrandResource extends Resource
@@ -61,9 +61,9 @@ final class BrandResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->components([
             Section::make(__('admin.brands.sections.basic_information'))
                 ->components([
                     Forms\Components\TextInput::make('name')
@@ -146,7 +146,7 @@ final class BrandResource extends Resource
                         ->columns(2)
                         ->addActionLabel(__('admin.brands.actions.add_translation'))
                         ->collapsible()
-                        ->itemLabel(fn(array $state): ?string => $state['locale'] ?? null),
+                        ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
                 ])
                 ->collapsible(),
         ]);
@@ -161,17 +161,17 @@ final class BrandResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('medium')
-                    ->description(fn($record): string => $record->slug ?? '')
-                    ->formatStateUsing(fn($record): string => $record->trans('name') ?: $record->name),
+                    ->description(fn ($record): string => $record->slug ?? '')
+                    ->formatStateUsing(fn ($record): string => $record->trans('name') ?: $record->name),
                 Tables\Columns\TextColumn::make('translations_count')
                     ->label(__('admin.brands.fields.translations_count'))
                     ->counts('translations')
                     ->badge()
-                    ->color(fn($state): string => $state > 0 ? 'success' : 'gray')
-                    ->formatStateUsing(fn($state): string => $state . ' ' . __('admin.brands.fields.translations')),
+                    ->color(fn ($state): string => $state > 0 ? 'success' : 'gray')
+                    ->formatStateUsing(fn ($state): string => $state.' '.__('admin.brands.fields.translations')),
                 Tables\Columns\TextColumn::make('website')
                     ->label(__('admin.brands.fields.website'))
-                    ->url(fn($record) => $record->website)
+                    ->url(fn ($record) => $record->website)
                     ->openUrlInNewTab()
                     ->toggleable()
                     ->icon('heroicon-m-globe-alt')
@@ -203,15 +203,15 @@ final class BrandResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\Filter::make('enabled')
                     ->label(__('admin.brands.filters.enabled_only'))
-                    ->query(fn($query) => $query->where('is_enabled', true))
+                    ->query(fn ($query) => $query->where('is_enabled', true))
                     ->toggle(),
                 Tables\Filters\Filter::make('has_products')
                     ->label(__('admin.brands.filters.has_products'))
-                    ->query(fn($query) => $query->has('products'))
+                    ->query(fn ($query) => $query->has('products'))
                     ->toggle(),
                 Tables\Filters\Filter::make('has_translations')
                     ->label(__('admin.brands.filters.has_translations'))
-                    ->query(fn($query) => $query->has('translations'))
+                    ->query(fn ($query) => $query->has('translations'))
                     ->toggle(),
                 Tables\Filters\SelectFilter::make('translation_locale')
                     ->label(__('admin.brands.filters.translation_locale'))
@@ -223,7 +223,7 @@ final class BrandResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['value'],
-                            fn(Builder $query, $locale): Builder => $query->whereHas('translations', fn(Builder $query) => $query->where('locale', $locale))
+                            fn (Builder $query, $locale): Builder => $query->whereHas('translations', fn (Builder $query) => $query->where('locale', $locale))
                         );
                     }),
             ])
@@ -231,16 +231,16 @@ final class BrandResource extends Resource
                 ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_status')
-                    ->label(fn($record) => $record->is_enabled ? __('admin.brands.actions.disable') : __('admin.brands.actions.enable'))
-                    ->icon(fn($record) => $record->is_enabled ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn($record) => $record->is_enabled ? 'warning' : 'success')
-                    ->action(fn($record) => $record->update(['is_enabled' => !$record->is_enabled]))
+                    ->label(fn ($record) => $record->is_enabled ? __('admin.brands.actions.disable') : __('admin.brands.actions.enable'))
+                    ->icon(fn ($record) => $record->is_enabled ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn ($record) => $record->is_enabled ? 'warning' : 'success')
+                    ->action(fn ($record) => $record->update(['is_enabled' => ! $record->is_enabled]))
                     ->requiresConfirmation(),
                 Action::make('manage_translations')
                     ->label(__('admin.brands.actions.manage_translations'))
                     ->icon('heroicon-o-language')
                     ->color('info')
-                    ->url(fn($record) => route('filament.admin.resources.brands.edit', ['record' => $record, 'activeTab' => 'translations'])),
+                    ->url(fn ($record) => route('filament.admin.resources.brands.edit', ['record' => $record, 'activeTab' => 'translations'])),
                 DeleteAction::make(),
             ])
             ->bulkActions([
@@ -249,13 +249,13 @@ final class BrandResource extends Resource
                         ->label(__('admin.brands.actions.enable_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
-                        ->action(fn($records) => $records->each->update(['is_enabled' => true]))
+                        ->action(fn ($records) => $records->each->update(['is_enabled' => true]))
                         ->requiresConfirmation(),
                     BulkAction::make('disable')
                         ->label(__('admin.brands.actions.disable_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
-                        ->action(fn($records) => $records->each->update(['is_enabled' => false]))
+                        ->action(fn ($records) => $records->each->update(['is_enabled' => false]))
                         ->requiresConfirmation(),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),

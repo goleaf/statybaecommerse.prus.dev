@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Translations\ZoneTranslation;
 use App\Traits\HasTranslations;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
 
 final class Zone extends Model
 {
@@ -185,42 +187,42 @@ final class Zone extends Model
     // Accessor Methods
     public function getFormattedTaxRateAttribute(): string
     {
-        return number_format($this->tax_rate, 2) . '%';
+        return number_format($this->tax_rate, 2).'%';
     }
 
     public function getFormattedShippingRateAttribute(): string
     {
-        return '€' . number_format($this->shipping_rate, 2);
+        return '€'.number_format($this->shipping_rate, 2);
     }
 
     public function getFormattedMinOrderAmountAttribute(): string
     {
-        return $this->min_order_amount ? '€' . number_format($this->min_order_amount, 2) : 'N/A';
+        return $this->min_order_amount ? '€'.number_format($this->min_order_amount, 2) : 'N/A';
     }
 
     public function getFormattedMaxOrderAmountAttribute(): string
     {
-        return $this->max_order_amount ? '€' . number_format($this->max_order_amount, 2) : 'N/A';
+        return $this->max_order_amount ? '€'.number_format($this->max_order_amount, 2) : 'N/A';
     }
 
     public function getFormattedFreeShippingThresholdAttribute(): string
     {
-        return $this->free_shipping_threshold ? '€' . number_format($this->free_shipping_threshold, 2) : 'N/A';
+        return $this->free_shipping_threshold ? '€'.number_format($this->free_shipping_threshold, 2) : 'N/A';
     }
 
     // Static Methods
     public static function getDefaultZone(): ?self
     {
-        return static::default()->first();
+        return self::default()->first();
     }
 
     public static function getActiveZones(): Builder
     {
-        return static::active()->enabled()->ordered();
+        return self::active()->enabled()->ordered();
     }
 
     public static function getZonesByCurrency(int $currencyId): Builder
     {
-        return static::byCurrency($currencyId)->active()->enabled()->ordered();
+        return self::byCurrency($currencyId)->active()->enabled()->ordered();
     }
 }

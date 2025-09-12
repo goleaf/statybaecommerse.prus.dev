@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -40,11 +42,11 @@ final class WishlistItem extends Model
     public function getDisplayNameAttribute(): string
     {
         $name = $this->product->name;
-        
+
         if ($this->variant) {
-            $name .= ' - ' . $this->variant->name;
+            $name .= ' - '.$this->variant->name;
         }
-        
+
         return $name;
     }
 
@@ -53,7 +55,7 @@ final class WishlistItem extends Model
         if ($this->variant) {
             return $this->variant->price;
         }
-        
+
         return $this->product->price;
     }
 

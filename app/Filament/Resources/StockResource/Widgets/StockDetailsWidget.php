@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\StockResource\Widgets;
 
@@ -12,7 +14,7 @@ class StockDetailsWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        if (!$this->record) {
+        if (! $this->record) {
             return [];
         }
 
@@ -39,12 +41,12 @@ class StockDetailsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-arrow-down')
                 ->color('info'),
 
-            Stat::make(__('inventory.stock_value'), '€' . number_format($record->stock_value, 2))
+            Stat::make(__('inventory.stock_value'), '€'.number_format($record->stock_value, 2))
                 ->description(__('inventory.stock_value_description'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('success'),
 
-            Stat::make(__('inventory.total_value'), '€' . number_format($record->total_value, 2))
+            Stat::make(__('inventory.total_value'), '€'.number_format($record->total_value, 2))
                 ->description(__('inventory.total_value_description'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('primary'),

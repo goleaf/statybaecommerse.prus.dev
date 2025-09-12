@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Shared;
 
@@ -16,6 +18,7 @@ abstract class BasePageComponent extends Component
     use WithCart, WithNotifications;
 
     protected CacheService $cacheService;
+
     protected TranslationService $translationService;
 
     public function boot(): void
@@ -53,7 +56,7 @@ abstract class BasePageComponent extends Component
         $class = class_basename(static::class);
         $locale = app()->getLocale();
         $currency = current_currency();
-        
+
         return strtolower("{$class}.{$locale}.{$currency}.{$suffix}");
     }
 
@@ -78,8 +81,9 @@ abstract class BasePageComponent extends Component
      */
     public function toggleWishlist(int $productId): void
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             $this->redirect(route('login'));
+
             return;
         }
 
@@ -87,7 +91,7 @@ abstract class BasePageComponent extends Component
         $wishlist = $user->wishlist ?? [];
 
         if (in_array($productId, $wishlist)) {
-            $wishlist = array_values(array_filter($wishlist, fn($id) => $id !== $productId));
+            $wishlist = array_values(array_filter($wishlist, fn ($id) => $id !== $productId));
             $this->notifySuccess($this->trans('shared.product_removed_from_wishlist'));
         } else {
             $wishlist[] = $productId;
@@ -104,14 +108,16 @@ abstract class BasePageComponent extends Component
     public function addToCompare(int $productId): void
     {
         $compareProducts = session('compare_products', []);
-        
+
         if (count($compareProducts) >= 4) {
             $this->notifyWarning($this->trans('shared.compare_limit_reached', ['max' => 4]));
+
             return;
         }
 
         if (in_array($productId, $compareProducts)) {
             $this->notifyInfo($this->trans('shared.product_already_in_comparison'));
+
             return;
         }
 

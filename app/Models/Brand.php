@@ -1,18 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class Brand extends Model implements HasMedia
 {
@@ -39,11 +41,12 @@ final class Brand extends Model implements HasMedia
     }
 
     protected $table = 'brands';
+
     protected string $translationModel = \App\Models\Translations\BrandTranslation::class;
-    
+
     protected $translatable = [
         'name',
-        'slug', 
+        'slug',
         'description',
         'seo_title',
         'seo_description',
@@ -51,10 +54,10 @@ final class Brand extends Model implements HasMedia
 
     protected static function booted(): void
     {
-        static::saved(function (): void {
+        self::saved(function (): void {
             self::flushCaches();
         });
-        static::deleted(function (): void {
+        self::deleted(function (): void {
             self::flushCaches();
         });
     }
@@ -70,15 +73,15 @@ final class Brand extends Model implements HasMedia
             ->logOnly(['name', 'slug', 'description', 'website', 'is_enabled'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Brand {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Brand {$eventName}")
             ->useLogName('brand');
     }
 
     public static function flushCaches(): void
     {
         $locales = collect(config('app.supported_locales', 'en'))
-            ->when(fn($v) => is_string($v), fn($c) => collect(explode(',', (string) $c)))
-            ->map(fn($v) => trim((string) $v))
+            ->when(fn ($v) => is_string($v), fn ($c) => collect(explode(',', (string) $c)))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->values();
         foreach ($locales as $loc) {
@@ -113,7 +116,7 @@ final class Brand extends Model implements HasMedia
 
     public function getLogoUrl(?string $size = null): ?string
     {
-        if (!$size) {
+        if (! $size) {
             return $this->getFirstMediaUrl('logo') ?: null;
         }
 
@@ -122,7 +125,7 @@ final class Brand extends Model implements HasMedia
 
     public function getBannerUrl(?string $size = null): ?string
     {
-        if (!$size) {
+        if (! $size) {
             return $this->getFirstMediaUrl('banner') ?: null;
         }
 
@@ -177,7 +180,7 @@ final class Brand extends Model implements HasMedia
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         // Logo conversions in WebP format with multiple resolutions
         $this

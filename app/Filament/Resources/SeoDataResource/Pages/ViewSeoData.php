@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\SeoDataResource\Pages;
 
-use App\Filament\Resources\SeoDataResource\Widgets;
 use App\Filament\Resources\SeoDataResource;
-use Filament\Resources\Pages\ViewRecord;
+use App\Filament\Resources\SeoDataResource\Widgets;
 use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
 
 final class ViewSeoData extends ViewRecord
 {

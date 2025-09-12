@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Shared;
 
@@ -8,13 +10,14 @@ use Illuminate\Support\Facades\Log;
 final class ComponentPerformanceService
 {
     private const METRICS_CACHE_KEY = 'component_performance_metrics';
+
     private const METRICS_TTL = 3600; // 1 hour
 
     public function trackComponentRender(string $component, float $renderTime): void
     {
         $metrics = $this->getMetrics();
-        
-        if (!isset($metrics[$component])) {
+
+        if (! isset($metrics[$component])) {
             $metrics[$component] = [
                 'total_renders' => 0,
                 'total_time' => 0,
@@ -36,7 +39,7 @@ final class ComponentPerformanceService
 
         // Log slow components
         if ($renderTime > 100) { // 100ms threshold
-            Log::warning("Slow component render detected", [
+            Log::warning('Slow component render detected', [
                 'component' => $component,
                 'render_time' => $renderTime,
                 'avg_time' => $metrics[$component]['avg_time'],
@@ -47,6 +50,7 @@ final class ComponentPerformanceService
     public function getComponentMetrics(string $component): ?array
     {
         $metrics = $this->getMetrics();
+
         return $metrics[$component] ?? null;
     }
 
@@ -58,25 +62,25 @@ final class ComponentPerformanceService
     public function getSlowestComponents(int $limit = 10): array
     {
         $metrics = $this->getMetrics();
-        
-        uasort($metrics, fn($a, $b) => $b['avg_time'] <=> $a['avg_time']);
-        
+
+        uasort($metrics, fn ($a, $b) => $b['avg_time'] <=> $a['avg_time']);
+
         return array_slice($metrics, 0, $limit, true);
     }
 
     public function getMostUsedComponents(int $limit = 10): array
     {
         $metrics = $this->getMetrics();
-        
-        uasort($metrics, fn($a, $b) => $b['total_renders'] <=> $a['total_renders']);
-        
+
+        uasort($metrics, fn ($a, $b) => $b['total_renders'] <=> $a['total_renders']);
+
         return array_slice($metrics, 0, $limit, true);
     }
 
     public function getPerformanceReport(): array
     {
         $metrics = $this->getMetrics();
-        
+
         if (empty($metrics)) {
             return [
                 'total_components' => 0,
@@ -98,10 +102,10 @@ final class ComponentPerformanceService
             'total_components' => count($metrics),
             'total_renders' => $totalRenders,
             'avg_render_time' => round($avgRenderTime, 2),
-            'slowest_component' => !empty($slowest) ? array_key_first($slowest) : null,
-            'slowest_time' => !empty($slowest) ? round(array_values($slowest)[0]['avg_time'], 2) : 0,
-            'most_used_component' => !empty($mostUsed) ? array_key_first($mostUsed) : null,
-            'most_used_count' => !empty($mostUsed) ? array_values($mostUsed)[0]['total_renders'] : 0,
+            'slowest_component' => ! empty($slowest) ? array_key_first($slowest) : null,
+            'slowest_time' => ! empty($slowest) ? round(array_values($slowest)[0]['avg_time'], 2) : 0,
+            'most_used_component' => ! empty($mostUsed) ? array_key_first($mostUsed) : null,
+            'most_used_count' => ! empty($mostUsed) ? array_values($mostUsed)[0]['total_renders'] : 0,
             'performance_score' => $this->calculatePerformanceScore($metrics),
         ];
     }
@@ -115,7 +119,7 @@ final class ComponentPerformanceService
     {
         $metrics = $this->getMetrics();
         $report = $this->getPerformanceReport();
-        
+
         $export = [
             'generated_at' => now()->toISOString(),
             'summary' => $report,
@@ -132,7 +136,7 @@ final class ComponentPerformanceService
 
         foreach ($slowComponents as $component => $metrics) {
             $avgTime = $metrics['avg_time'];
-            
+
             if ($avgTime > 200) {
                 $recommendations[$component] = [
                     'severity' => 'high',
@@ -192,7 +196,7 @@ final class ComponentPerformanceService
         foreach ($metrics as $metric) {
             $avgTime = $metric['avg_time'];
             $totalAvgTime += $avgTime;
-            
+
             if ($avgTime > 100) {
                 $slowComponents++;
             }

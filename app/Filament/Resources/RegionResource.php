@@ -10,7 +10,7 @@ use App\Models\Country;
 use App\Models\Region;
 use App\Models\Zone;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
@@ -37,9 +37,9 @@ class RegionResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Regions';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Section::make(__('regions.basic_information'))
                     ->schema([

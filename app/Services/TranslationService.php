@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -13,7 +15,7 @@ final class TranslationService
     {
         $locale = $locale ?: App::getLocale();
         $normalizedKey = self::normalizeKey($key);
-        
+
         return __($normalizedKey, $params, $locale);
     }
 
@@ -24,7 +26,7 @@ final class TranslationService
     {
         $locale = $locale ?: App::getLocale();
         $normalizedKey = self::normalizeKey($key);
-        
+
         return trans_choice($normalizedKey, $count, $params, $locale);
     }
 
@@ -42,11 +44,11 @@ final class TranslationService
     public static function getAvailableLocales(): array
     {
         $supported = config('app.supported_locales', 'lt,en');
-        
+
         if (is_array($supported)) {
             return $supported;
         }
-        
+
         return array_map('trim', explode(',', $supported));
     }
 

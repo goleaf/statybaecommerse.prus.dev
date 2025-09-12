@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -11,11 +13,13 @@ use Illuminate\Support\Facades\Log;
 final class SystemSettingsService
 {
     private const CACHE_KEY = 'system_settings';
+
     private const CACHE_TTL = 3600; // 1 hour
 
     public function get(string $key, $default = null)
     {
         $settings = $this->getAllSettings();
+
         return $settings[$key] ?? $default;
     }
 
@@ -67,6 +71,7 @@ final class SystemSettingsService
     public function getPublic(string $key, $default = null)
     {
         $publicSettings = $this->getPublicSettings();
+
         return $publicSettings[$key] ?? $default;
     }
 
@@ -82,7 +87,7 @@ final class SystemSettingsService
 
     public function getPublicSettings(): array
     {
-        return Cache::remember(self::CACHE_KEY . '_public', self::CACHE_TTL, function () {
+        return Cache::remember(self::CACHE_KEY.'_public', self::CACHE_TTL, function () {
             return SystemSetting::active()
                 ->public()
                 ->get()
@@ -93,7 +98,7 @@ final class SystemSettingsService
 
     public function getSettingsByGroup(string $group): array
     {
-        return Cache::remember(self::CACHE_KEY . "_group_{$group}", self::CACHE_TTL, function () use ($group) {
+        return Cache::remember(self::CACHE_KEY."_group_{$group}", self::CACHE_TTL, function () use ($group) {
             return SystemSetting::active()
                 ->byGroup($group)
                 ->get()
@@ -104,7 +109,7 @@ final class SystemSettingsService
 
     public function getSettingsByCategory(string $category): array
     {
-        return Cache::remember(self::CACHE_KEY . "_category_{$category}", self::CACHE_TTL, function () use ($category) {
+        return Cache::remember(self::CACHE_KEY."_category_{$category}", self::CACHE_TTL, function () use ($category) {
             return SystemSetting::active()
                 ->byCategory($category)
                 ->get()
@@ -240,27 +245,27 @@ final class SystemSettingsService
     public function validateSetting(string $key, $value): bool
     {
         $setting = SystemSetting::where('key', $key)->first();
-        
-        if (!$setting) {
+
+        if (! $setting) {
             return false;
         }
 
         $rules = $setting->getValidationRulesArray();
-        
+
         if (empty($rules)) {
             return true;
         }
 
         $validator = validator([$key => $value], [$key => $rules]);
-        
-        return !$validator->fails();
+
+        return ! $validator->fails();
     }
 
     public function getSettingMetadata(string $key): ?array
     {
         $setting = SystemSetting::where('key', $key)->first();
-        
-        if (!$setting) {
+
+        if (! $setting) {
             return null;
         }
 
@@ -283,7 +288,7 @@ final class SystemSettingsService
 
     public function getCategoriesWithSettings(): array
     {
-        return Cache::remember(self::CACHE_KEY . '_categories', self::CACHE_TTL, function () {
+        return Cache::remember(self::CACHE_KEY.'_categories', self::CACHE_TTL, function () {
             return SystemSettingCategory::with(['settings' => function ($query) {
                 $query->active()->ordered();
             }])->active()->ordered()->get()->toArray();
@@ -293,21 +298,21 @@ final class SystemSettingsService
     public function clearCache(): void
     {
         Cache::forget(self::CACHE_KEY);
-        Cache::forget(self::CACHE_KEY . '_public');
-        
+        Cache::forget(self::CACHE_KEY.'_public');
+
         // Clear group-specific caches
         $groups = SystemSetting::distinct()->pluck('group');
         foreach ($groups as $group) {
-            Cache::forget(self::CACHE_KEY . "_group_{$group}");
+            Cache::forget(self::CACHE_KEY."_group_{$group}");
         }
-        
+
         // Clear category-specific caches
         $categories = SystemSettingCategory::pluck('slug');
         foreach ($categories as $category) {
-            Cache::forget(self::CACHE_KEY . "_category_{$category}");
+            Cache::forget(self::CACHE_KEY."_category_{$category}");
         }
-        
-        Cache::forget(self::CACHE_KEY . '_categories');
+
+        Cache::forget(self::CACHE_KEY.'_categories');
     }
 
     public function getSettingsStats(): array

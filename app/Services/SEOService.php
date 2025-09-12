@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -11,7 +13,7 @@ final class SEOService
 {
     public static function getProductSEO(Product $product): array
     {
-        $title = $product->meta_title ?? $product->name . ' - ' . config('app.name');
+        $title = $product->meta_title ?? $product->name.' - '.config('app.name');
         $description = $product->meta_description ?? Str::limit(strip_tags($product->description), 160);
         $keywords = $product->meta_keywords ?? self::generateProductKeywords($product);
 
@@ -32,7 +34,7 @@ final class SEOService
 
     public static function getCategorySEO(Category $category): array
     {
-        $title = $category->meta_title ?? $category->name . ' - ' . config('app.name');
+        $title = $category->meta_title ?? $category->name.' - '.config('app.name');
         $description = $category->meta_description ?? Str::limit(strip_tags($category->description), 160);
 
         return [
@@ -48,7 +50,7 @@ final class SEOService
 
     public static function getBrandSEO(Brand $brand): array
     {
-        $title = $brand->meta_title ?? $brand->name . ' Products - ' . config('app.name');
+        $title = $brand->meta_title ?? $brand->name.' Products - '.config('app.name');
         $description = $brand->meta_description ?? Str::limit(strip_tags($brand->description), 160);
 
         return [
@@ -71,7 +73,7 @@ final class SEOService
             $product->sku,
         ])
             ->filter()
-            ->map(fn($keyword) => Str::slug($keyword, ' '))
+            ->map(fn ($keyword) => Str::slug($keyword, ' '))
             ->implode(', ');
 
         return $keywords;

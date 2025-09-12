@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -179,18 +181,18 @@ enum PaymentType: string
     public static function options(): array
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isEnabled())
+            ->filter(fn ($case) => $case->isEnabled())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
             ->toArray();
     }
 
     public static function optionsWithDescriptions(): array
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isEnabled())
+            ->filter(fn ($case) => $case->isEnabled())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [
+            ->mapWithKeys(fn ($case) => [
                 $case->value => [
                     'label' => $case->label(),
                     'description' => $case->description(),
@@ -207,7 +209,7 @@ enum PaymentType: string
                     'minimum_amount' => $case->minimumAmount(),
                     'maximum_amount' => $case->maximumAmount(),
                     'supported_currencies' => $case->supportedCurrencies(),
-                ]
+                ],
             ])
             ->toArray();
     }
@@ -215,38 +217,38 @@ enum PaymentType: string
     public static function online(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isOnline() && $case->isEnabled());
+            ->filter(fn ($case) => $case->isOnline() && $case->isEnabled());
     }
 
     public static function offline(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isOffline() && $case->isEnabled());
+            ->filter(fn ($case) => $case->isOffline() && $case->isEnabled());
     }
 
     public static function enabled(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isEnabled());
+            ->filter(fn ($case) => $case->isEnabled());
     }
 
     public static function withRefunds(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->supportsRefunds() && $case->isEnabled());
+            ->filter(fn ($case) => $case->supportsRefunds() && $case->isEnabled());
     }
 
     public static function ordered(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isEnabled())
+            ->filter(fn ($case) => $case->isEnabled())
             ->sortBy('priority');
     }
 
     public static function fromLabel(string $label): ?self
     {
         return collect(self::cases())
-            ->first(fn($case) => $case->label() === $label);
+            ->first(fn ($case) => $case->label() === $label);
     }
 
     public static function values(): array
@@ -257,7 +259,7 @@ enum PaymentType: string
     public static function labels(): array
     {
         return collect(self::cases())
-            ->map(fn($case) => $case->label())
+            ->map(fn ($case) => $case->label())
             ->toArray();
     }
 

@@ -13,7 +13,7 @@ use Filament\Forms\Components\Section;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -49,9 +49,9 @@ final class AttributeResource extends Resource
         return __('attributes.attribute');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 // Attribute Settings (Non-translatable)
                 Section::make(__('attributes.attribute_settings'))
@@ -225,9 +225,9 @@ final class AttributeResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $form): Schema
     {
-        return $schema
+        return $form
             ->components([
                 Section::make(__('attributes.attribute_information'))
                     ->components([

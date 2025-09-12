@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
@@ -13,7 +15,7 @@ use Livewire\Component;
 
 final class ProductCatalog extends Component
 {
-    use WithFilters, WithCart, WithNotifications;
+    use WithCart, WithFilters, WithNotifications;
 
     public function mount(): void
     {
@@ -62,7 +64,7 @@ final class ProductCatalog extends Component
             'categories' => $this->categories,
             'brands' => $this->brands,
         ])->layout('components.layouts.base', [
-            'title' => __('Products')
+            'title' => __('Products'),
         ]);
     }
 }

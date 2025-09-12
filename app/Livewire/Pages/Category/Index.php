@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages\Category;
 
@@ -75,31 +77,31 @@ final class Index extends Component implements HasSchemas
                     ->label(__('Search'))
                     ->placeholder(__('Search categories...'))
                     ->live(debounce: 400)
-                    ->afterStateUpdated(fn() => $this->resetPage()),
+                    ->afterStateUpdated(fn () => $this->resetPage()),
                 Select::make('brandId')
                     ->label(__('Brand'))
                     ->placeholder(__('All brands'))
                     ->options($this->getBrandOptions())
                     ->live()
-                    ->afterStateUpdated(fn() => $this->resetPage()),
+                    ->afterStateUpdated(fn () => $this->resetPage()),
                 TextInput::make('priceMin')
                     ->label(__('Min price'))
                     ->numeric()
                     ->step(0.01)
                     ->minValue(0)
                     ->live(debounce: 500)
-                    ->afterStateUpdated(fn() => $this->resetPage()),
+                    ->afterStateUpdated(fn () => $this->resetPage()),
                 TextInput::make('priceMax')
                     ->label(__('Max price'))
                     ->numeric()
                     ->step(0.01)
                     ->minValue(0)
                     ->live(debounce: 500)
-                    ->afterStateUpdated(fn() => $this->resetPage()),
+                    ->afterStateUpdated(fn () => $this->resetPage()),
                 Checkbox::make('hasProducts')
                     ->label(__('Only categories with products'))
                     ->live()
-                    ->afterStateUpdated(fn() => $this->resetPage()),
+                    ->afterStateUpdated(fn () => $this->resetPage()),
                 Select::make('sort')
                     ->label(__('Sort by'))
                     ->options([
@@ -109,7 +111,7 @@ final class Index extends Component implements HasSchemas
                         'products_asc' => __('Fewest products'),
                     ])
                     ->live()
-                    ->afterStateUpdated(fn() => $this->resetPage()),
+                    ->afterStateUpdated(fn () => $this->resetPage()),
             ]);
     }
 
@@ -124,7 +126,7 @@ final class Index extends Component implements HasSchemas
 
     private function getBrandOptions(): array
     {
-        return $this->brands->pluck('name', 'id')->filter(fn($label) => filled($label))->toArray();
+        return $this->brands->pluck('name', 'id')->filter(fn ($label) => filled($label))->toArray();
     }
 
     #[Computed]
@@ -149,7 +151,7 @@ final class Index extends Component implements HasSchemas
                 ->count();
         }
 
-        return $brands->map(fn($b) => [
+        return $brands->map(fn ($b) => [
             'id' => (int) $b->id,
             'name' => (string) $b->name,
             'count' => (int) ($countsByBrand[$b->id] ?? 0),
@@ -165,11 +167,11 @@ final class Index extends Component implements HasSchemas
         foreach ($collections as $col) {
             $countsByCollection[$col->id] = $this
                 ->baseProductQuery()
-                ->whereHas('collections', fn(Builder $q) => $q->where('collections.id', $col->id))
+                ->whereHas('collections', fn (Builder $q) => $q->where('collections.id', $col->id))
                 ->count();
         }
 
-        return $collections->map(fn($c) => [
+        return $collections->map(fn ($c) => [
             'id' => (int) $c->id,
             'name' => (string) $c->name,
             'count' => (int) ($countsByCollection[$c->id] ?? 0),
@@ -185,11 +187,11 @@ final class Index extends Component implements HasSchemas
         foreach ($categories as $cat) {
             $counts[$cat->id] = $this
                 ->baseProductQuery()
-                ->whereHas('categories', fn(Builder $q) => $q->where('categories.id', $cat->id))
+                ->whereHas('categories', fn (Builder $q) => $q->where('categories.id', $cat->id))
                 ->count();
         }
 
-        return $categories->map(fn($c) => [
+        return $categories->map(fn ($c) => [
             'id' => (int) $c->id,
             'name' => (string) $c->name,
             'count' => (int) ($counts[$c->id] ?? 0),
@@ -202,18 +204,18 @@ final class Index extends Component implements HasSchemas
             ->visible()
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
-            ->when(!empty($this->selectedBrandIds), fn(Builder $q) => $q->whereIn('brand_id', $this->selectedBrandIds))
-            ->when(!empty($this->selectedCollectionIds), fn(Builder $q) => $q->whereHas('collections', fn(Builder $qq) => $qq->whereIn('collections.id', $this->selectedCollectionIds)))
-            ->when($this->priceMin !== null, fn(Builder $q) => $q->where('price', '>=', (float) $this->priceMin))
-            ->when($this->priceMax !== null, fn(Builder $q) => $q->where('price', '<=', (float) $this->priceMax))
-            ->when($this->inStock, fn(Builder $q) => $q->where('stock_quantity', '>', 0))
-            ->when($this->onSale, fn(Builder $q) => $q->whereNotNull('sale_price'))
+            ->when(! empty($this->selectedBrandIds), fn (Builder $q) => $q->whereIn('brand_id', $this->selectedBrandIds))
+            ->when(! empty($this->selectedCollectionIds), fn (Builder $q) => $q->whereHas('collections', fn (Builder $qq) => $qq->whereIn('collections.id', $this->selectedCollectionIds)))
+            ->when($this->priceMin !== null, fn (Builder $q) => $q->where('price', '>=', (float) $this->priceMin))
+            ->when($this->priceMax !== null, fn (Builder $q) => $q->where('price', '<=', (float) $this->priceMax))
+            ->when($this->inStock, fn (Builder $q) => $q->where('stock_quantity', '>', 0))
+            ->when($this->onSale, fn (Builder $q) => $q->whereNotNull('sale_price'))
             ->when($this->search !== '', function (Builder $q) {
                 $q->where(function (Builder $qq) {
                     $qq
-                        ->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('description', 'like', '%' . $this->search . '%')
-                        ->orWhere('sku', 'like', '%' . $this->search . '%');
+                        ->where('name', 'like', '%'.$this->search.'%')
+                        ->orWhere('description', 'like', '%'.$this->search.'%')
+                        ->orWhere('sku', 'like', '%'.$this->search.'%');
                 });
             });
     }
@@ -226,20 +228,20 @@ final class Index extends Component implements HasSchemas
             ->withCount(['products' => function (Builder $q) {
                 $q
                     ->where('is_visible', true)
-                    ->when(!empty($this->selectedBrandIds), fn(Builder $qq) => $qq->whereIn('brand_id', $this->selectedBrandIds))
-                    ->when(!empty($this->selectedCollectionIds), fn(Builder $qq) => $qq->whereHas('collections', fn(Builder $c) => $c->whereIn('collections.id', $this->selectedCollectionIds)))
-                    ->when($this->priceMin !== null, fn(Builder $qq) => $qq->where('price', '>=', (float) $this->priceMin))
-                    ->when($this->priceMax !== null, fn(Builder $qq) => $qq->where('price', '<=', (float) $this->priceMax))
-                    ->when($this->inStock, fn(Builder $qq) => $qq->where('stock_quantity', '>', 0))
-                    ->when($this->onSale, fn(Builder $qq) => $qq->whereNotNull('sale_price'));
+                    ->when(! empty($this->selectedBrandIds), fn (Builder $qq) => $qq->whereIn('brand_id', $this->selectedBrandIds))
+                    ->when(! empty($this->selectedCollectionIds), fn (Builder $qq) => $qq->whereHas('collections', fn (Builder $c) => $c->whereIn('collections.id', $this->selectedCollectionIds)))
+                    ->when($this->priceMin !== null, fn (Builder $qq) => $qq->where('price', '>=', (float) $this->priceMin))
+                    ->when($this->priceMax !== null, fn (Builder $qq) => $qq->where('price', '<=', (float) $this->priceMax))
+                    ->when($this->inStock, fn (Builder $qq) => $qq->where('stock_quantity', '>', 0))
+                    ->when($this->onSale, fn (Builder $qq) => $qq->whereNotNull('sale_price'));
             }])
             ->where('is_visible', true);
 
         if ($this->search !== '') {
             $query->where(function ($q) {
                 $q
-                    ->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('description', 'like', '%' . $this->search . '%');
+                    ->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhere('description', 'like', '%'.$this->search.'%');
             });
         }
 
@@ -247,7 +249,7 @@ final class Index extends Component implements HasSchemas
             $query->has('products');
         }
 
-        if (!empty($this->selectedCategoryIds)) {
+        if (! empty($this->selectedCategoryIds)) {
             $query->where(function (Builder $q) {
                 $q
                     ->whereIn('id', $this->selectedCategoryIds)
@@ -256,11 +258,11 @@ final class Index extends Component implements HasSchemas
         }
 
         $query
-            ->when($this->sort === 'name_asc', fn($q) => $q->orderBy('name'))
-            ->when($this->sort === 'name_desc', fn($q) => $q->orderByDesc('name'))
-            ->when($this->sort === 'products_desc', fn($q) => $q->orderByDesc('products_count'))
-            ->when($this->sort === 'products_asc', fn($q) => $q->orderBy('products_count'))
-            ->when(!in_array($this->sort, ['name_asc', 'name_desc', 'products_desc', 'products_asc']), fn($q) => $q->orderBy('name'));
+            ->when($this->sort === 'name_asc', fn ($q) => $q->orderBy('name'))
+            ->when($this->sort === 'name_desc', fn ($q) => $q->orderByDesc('name'))
+            ->when($this->sort === 'products_desc', fn ($q) => $q->orderByDesc('products_count'))
+            ->when($this->sort === 'products_asc', fn ($q) => $q->orderBy('products_count'))
+            ->when(! in_array($this->sort, ['name_asc', 'name_desc', 'products_desc', 'products_asc']), fn ($q) => $q->orderBy('name'));
 
         return $query->paginate($this->perPage);
     }
@@ -269,7 +271,7 @@ final class Index extends Component implements HasSchemas
     {
         return view('livewire.pages.category.index')
             ->layout('components.layouts.base', [
-                'title' => __('Categories')
+                'title' => __('Categories'),
             ]);
     }
 }

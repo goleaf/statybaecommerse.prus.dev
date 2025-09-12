@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Concerns;
 
@@ -45,11 +47,11 @@ trait WithValidation
     {
         try {
             $this->validate($rules, $this->getValidationMessages(), $this->getValidationAttributes());
-            
+
             if ($saveCallback) {
                 $saveCallback();
             }
-            
+
             return true;
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->notifyError(__('Please fix the validation errors'));
@@ -68,19 +70,20 @@ trait WithValidation
     public function validatePhone(string $phone): bool
     {
         $cleaned = preg_replace('/[^0-9+]/', '', $phone);
+
         return preg_match('/^(\+370|370|8)[0-9]{8}$/', $cleaned);
     }
 
     public function validateRequired(mixed $value): bool
     {
         if (is_string($value)) {
-            return !empty(trim($value));
+            return ! empty(trim($value));
         }
-        
+
         if (is_array($value)) {
-            return !empty($value);
+            return ! empty($value);
         }
-        
+
         return $value !== null;
     }
 }

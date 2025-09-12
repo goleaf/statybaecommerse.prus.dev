@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Concerns;
 
 trait WithNotifications
 {
-    public function notifySuccess(string $message, string $title = null): void
+    public function notifySuccess(string $message, ?string $title = null): void
     {
         $this->dispatch('notify', [
             'type' => 'success',
@@ -13,7 +15,7 @@ trait WithNotifications
         ]);
     }
 
-    public function notifyError(string $message, string $title = null): void
+    public function notifyError(string $message, ?string $title = null): void
     {
         $this->dispatch('notify', [
             'type' => 'error',
@@ -22,7 +24,7 @@ trait WithNotifications
         ]);
     }
 
-    public function notifyWarning(string $message, string $title = null): void
+    public function notifyWarning(string $message, ?string $title = null): void
     {
         $this->dispatch('notify', [
             'type' => 'warning',
@@ -31,7 +33,7 @@ trait WithNotifications
         ]);
     }
 
-    public function notifyInfo(string $message, string $title = null): void
+    public function notifyInfo(string $message, ?string $title = null): void
     {
         $this->dispatch('notify', [
             'type' => 'info',

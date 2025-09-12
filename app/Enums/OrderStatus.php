@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -203,7 +205,7 @@ enum OrderStatus: string
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
             ->toArray();
     }
 
@@ -211,7 +213,7 @@ enum OrderStatus: string
     {
         return collect(self::cases())
             ->sortBy('priority')
-            ->mapWithKeys(fn($case) => [
+            ->mapWithKeys(fn ($case) => [
                 $case->value => [
                     'label' => $case->label(),
                     'description' => $case->description(),
@@ -229,7 +231,7 @@ enum OrderStatus: string
                     'next_statuses' => $case->nextStatuses(),
                     'previous_statuses' => $case->previousStatuses(),
                     'estimated_days' => $case->estimatedDays(),
-                ]
+                ],
             ])
             ->toArray();
     }
@@ -237,25 +239,25 @@ enum OrderStatus: string
     public static function active(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isActive());
+            ->filter(fn ($case) => $case->isActive());
     }
 
     public static function completed(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isCompleted());
+            ->filter(fn ($case) => $case->isCompleted());
     }
 
     public static function cancelled(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isCancelled());
+            ->filter(fn ($case) => $case->isCancelled());
     }
 
     public static function refunded(): Collection
     {
         return collect(self::cases())
-            ->filter(fn($case) => $case->isRefunded());
+            ->filter(fn ($case) => $case->isRefunded());
     }
 
     public static function ordered(): Collection
@@ -267,7 +269,7 @@ enum OrderStatus: string
     public static function fromLabel(string $label): ?self
     {
         return collect(self::cases())
-            ->first(fn($case) => $case->label() === $label);
+            ->first(fn ($case) => $case->label() === $label);
     }
 
     public static function values(): array
@@ -278,7 +280,7 @@ enum OrderStatus: string
     public static function labels(): array
     {
         return collect(self::cases())
-            ->map(fn($case) => $case->label())
+            ->map(fn ($case) => $case->label())
             ->toArray();
     }
 

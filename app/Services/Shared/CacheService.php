@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Shared;
 
@@ -7,7 +9,9 @@ use Illuminate\Support\Facades\Cache;
 final class CacheService
 {
     private const DEFAULT_TTL = 3600; // 1 hour
+
     private const SHORT_TTL = 900; // 15 minutes
+
     private const LONG_TTL = 86400; // 24 hours
 
     public function rememberShort(string $key, callable $callback, ?int $ttl = null): mixed
@@ -28,7 +32,7 @@ final class CacheService
     public function forgetPattern(string $pattern): void
     {
         $keys = Cache::getRedis()->keys($pattern);
-        if (!empty($keys)) {
+        if (! empty($keys)) {
             Cache::deleteMultiple($keys);
         }
     }
@@ -59,33 +63,34 @@ final class CacheService
         if ($currency) {
             $key .= ".{$currency}";
         }
+
         return $key;
     }
 
     public function invalidateProductCache(int $productId): void
     {
         $this->forgetPattern("product.{$productId}.*");
-        $this->forgetPattern("home.*"); // Home page caches products
-        $this->forgetPattern("category.*"); // Categories cache product counts
-        $this->forgetPattern("brand.*"); // Brands cache product counts
+        $this->forgetPattern('home.*'); // Home page caches products
+        $this->forgetPattern('category.*'); // Categories cache product counts
+        $this->forgetPattern('brand.*'); // Brands cache product counts
     }
 
     public function invalidateCategoryCache(int $categoryId): void
     {
         $this->forgetPattern("category.{$categoryId}.*");
-        $this->forgetPattern("home.top_categories.*");
+        $this->forgetPattern('home.top_categories.*');
     }
 
     public function invalidateBrandCache(int $brandId): void
     {
         $this->forgetPattern("brand.{$brandId}.*");
-        $this->forgetPattern("home.top_brands.*");
+        $this->forgetPattern('home.top_brands.*');
     }
 
     public function invalidateCollectionCache(int $collectionId): void
     {
         $this->forgetPattern("collection.{$collectionId}.*");
-        $this->forgetPattern("home.featured_collections.*");
+        $this->forgetPattern('home.featured_collections.*');
     }
 
     public function warmupHomeCache(): void
@@ -96,11 +101,11 @@ final class CacheService
         foreach ($locales as $locale) {
             foreach ($currencies as $currency) {
                 app()->setLocale($locale);
-                
+
                 // Warm up featured products
                 $this->rememberDefault(
                     $this->generateHomeKey('featured_products', $locale, $currency),
-                    fn() => \App\Models\Product::query()
+                    fn () => \App\Models\Product::query()
                         ->with(['translations', 'brand', 'media', 'prices'])
                         ->where('is_visible', true)
                         ->where('is_featured', true)
@@ -111,7 +116,7 @@ final class CacheService
                 // Warm up top categories
                 $this->rememberLong(
                     $this->generateHomeKey('top_categories', $locale),
-                    fn() => \App\Models\Category::query()
+                    fn () => \App\Models\Category::query()
                         ->with(['translations', 'media'])
                         ->where('is_visible', true)
                         ->whereNull('parent_id')

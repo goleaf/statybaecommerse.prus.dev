@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -50,18 +52,19 @@ final class ProductCard extends Component
 
     public function toggleWishlist(): void
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             $this->dispatch('notify', [
                 'type' => 'warning',
                 'message' => 'Norėdami pridėti produktą į pageidavimų sąrašą, turite prisijungti.',
             ]);
+
             return;
         }
 
         $user = auth()->user();
         $wishlist = $user->wishlists()->where('is_default', true)->first();
 
-        if (!$wishlist) {
+        if (! $wishlist) {
             $wishlist = $user->wishlists()->create([
                 'name' => 'My Wishlist',
                 'is_default' => true,
@@ -156,6 +159,7 @@ final class ProductCard extends Component
     public function getCurrentPriceProperty(): float
     {
         $price = $this->product->sale_price ?? $this->product->price ?? 0.0;
+
         return (float) $price;
     }
 
@@ -164,19 +168,20 @@ final class ProductCard extends Component
         if ($this->product->sale_price) {
             return (float) $this->product->price;
         }
+
         return null;
     }
 
     public function getIsInWishlistProperty(): bool
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return false;
         }
 
         $user = auth()->user();
         $wishlist = $user->wishlists()->where('is_default', true)->first();
 
-        if (!$wishlist) {
+        if (! $wishlist) {
             return false;
         }
 
@@ -186,6 +191,7 @@ final class ProductCard extends Component
     public function getIsInComparisonProperty(): bool
     {
         $sessionId = session()->getId();
+
         return \App\Models\ProductComparison::where('session_id', $sessionId)
             ->where('product_id', $this->product->id)
             ->exists();
@@ -208,7 +214,7 @@ final class ProductCard extends Component
 
     public function getStockStatusProperty(): string
     {
-        if (!$this->product->track_inventory) {
+        if (! $this->product->track_inventory) {
             return __('translations.in_stock');
         }
 
@@ -217,7 +223,7 @@ final class ProductCard extends Component
         }
 
         if ($this->product->low_stock_threshold && $this->product->stock_quantity <= $this->product->low_stock_threshold) {
-            return $this->product->stock_quantity . ' ' . __('translations.left');
+            return $this->product->stock_quantity.' '.__('translations.left');
         }
 
         return __('translations.in_stock');

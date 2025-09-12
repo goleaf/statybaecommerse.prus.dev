@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -15,7 +17,9 @@ final class LiveSearch extends Component
     public string $query = '';
 
     public array $results = [];
+
     public bool $showResults = false;
+
     public int $maxResults = 8;
 
     public function updatedQuery(): void
@@ -36,9 +40,9 @@ final class LiveSearch extends Component
             ->where('is_visible', true)
             ->where(function ($q) {
                 $q
-                    ->where('name', 'like', '%' . $this->query . '%')
-                    ->orWhere('description', 'like', '%' . $this->query . '%')
-                    ->orWhere('sku', 'like', '%' . $this->query . '%');
+                    ->where('name', 'like', '%'.$this->query.'%')
+                    ->orWhere('description', 'like', '%'.$this->query.'%')
+                    ->orWhere('sku', 'like', '%'.$this->query.'%');
             })
             ->limit($this->maxResults)
             ->get()
@@ -57,7 +61,7 @@ final class LiveSearch extends Component
 
         $categories = Category::query()
             ->where('is_visible', true)
-            ->where('name', 'like', '%' . $this->query . '%')
+            ->where('name', 'like', '%'.$this->query.'%')
             ->limit(3)
             ->get()
             ->map(function (Category $category) {
@@ -66,14 +70,14 @@ final class LiveSearch extends Component
                     'type' => 'category',
                     'title' => $category->name,
                     'subtitle' => __('ecommerce.category'),
-                    'description' => $category->products_count . ' ' . __('ecommerce.products'),
+                    'description' => $category->products_count.' '.__('ecommerce.products'),
                     'url' => route('category.show', ['category' => $category->slug]),
                 ];
             });
 
         $brands = Brand::query()
             ->where('is_enabled', true)
-            ->where('name', 'like', '%' . $this->query . '%')
+            ->where('name', 'like', '%'.$this->query.'%')
             ->limit(3)
             ->get()
             ->map(function (Brand $brand) {
@@ -82,7 +86,7 @@ final class LiveSearch extends Component
                     'type' => 'brand',
                     'title' => $brand->name,
                     'subtitle' => __('ecommerce.brand'),
-                    'description' => $brand->products_count . ' ' . __('ecommerce.products'),
+                    'description' => $brand->products_count.' '.__('ecommerce.products'),
                     'url' => route('brands.show', $brand->slug),
                 ];
             });
@@ -116,4 +120,3 @@ final class LiveSearch extends Component
         return view('livewire.components.live-search');
     }
 }
-

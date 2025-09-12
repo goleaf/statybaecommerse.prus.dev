@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Taxes;
 
@@ -14,6 +16,7 @@ final class TaxCalculator
         if ($rate <= 0 || $amount <= 0) {
             return 0.0;
         }
+
         return round($amount * ($rate / 100), 2);
     }
 }

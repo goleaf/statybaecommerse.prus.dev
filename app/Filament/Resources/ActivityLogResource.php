@@ -1,18 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Filament\Resources\ActivityLogResource\RelationManagers;
 use App\Filament\Resources\ActivityLogResource\Widgets;
-use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Tables;
+use BackedEnum;
 use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Activitylog\Models\Activity;
-use BackedEnum;
 
 final class ActivityLogResource extends Resource
 {
@@ -44,9 +46,9 @@ final class ActivityLogResource extends Resource
         return __('admin.models.activity_logs');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Section::make(__('admin.activity_logs.sections.activity_information'))
                     ->schema([
@@ -135,6 +137,7 @@ final class ActivityLogResource extends Resource
                         if (strlen($state) <= 50) {
                             return null;
                         }
+
                         return $state;
                     }),
                 Tables\Columns\TextColumn::make('event')
@@ -142,7 +145,7 @@ final class ActivityLogResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'created' => 'success',
                         'updated' => 'warning',
                         'deleted' => 'danger',
@@ -151,7 +154,7 @@ final class ActivityLogResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('subject_type')
                     ->label(__('admin.activity_logs.fields.subject_type'))
-                    ->formatStateUsing(fn($state) => class_basename($state))
+                    ->formatStateUsing(fn ($state) => class_basename($state))
                     ->searchable()
                     ->sortable()
                     ->badge()
@@ -230,25 +233,25 @@ final class ActivityLogResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
                 Tables\Filters\Filter::make('today')
                     ->label(__('admin.activity_logs.filters.today'))
-                    ->query(fn(Builder $query): Builder => $query->whereDate('created_at', today())),
+                    ->query(fn (Builder $query): Builder => $query->whereDate('created_at', today())),
                 Tables\Filters\Filter::make('this_week')
                     ->label(__('admin.activity_logs.filters.this_week'))
-                    ->query(fn(Builder $query): Builder => $query->whereBetween('created_at', [
+                    ->query(fn (Builder $query): Builder => $query->whereBetween('created_at', [
                         now()->startOfWeek(),
                         now()->endOfWeek(),
                     ])),
                 Tables\Filters\Filter::make('this_month')
                     ->label(__('admin.activity_logs.filters.this_month'))
-                    ->query(fn(Builder $query): Builder => $query
+                    ->query(fn (Builder $query): Builder => $query
                         ->whereMonth('created_at', now()->month)
                         ->whereYear('created_at', now()->year)),
             ])
@@ -258,7 +261,7 @@ final class ActivityLogResource extends Resource
                     ->label(__('admin.activity_logs.actions.view_subject'))
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->url(fn(Activity $record): string => match ($record->subject_type) {
+                    ->url(fn (Activity $record): string => match ($record->subject_type) {
                         'App\Models\User' => route('filament.admin.resources.users.view', $record->subject_id),
                         'App\Models\Product' => route('filament.admin.resources.products.view', $record->subject_id),
                         'App\Models\Order' => route('filament.admin.resources.orders.view', $record->subject_id),
@@ -267,7 +270,7 @@ final class ActivityLogResource extends Resource
                         default => '#',
                     })
                     ->openUrlInNewTab()
-                    ->visible(fn(Activity $record): bool => $record->subject_id !== null),
+                    ->visible(fn (Activity $record): bool => $record->subject_id !== null),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

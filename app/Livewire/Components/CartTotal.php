@@ -11,8 +11,11 @@ use Livewire\Component;
 class CartTotal extends Component
 {
     public float $subtotal = 0.0;
+
     public float $discount = 0.0;
+
     public float $shippingDiscount = 0.0;
+
     public float $total = 0.0;
 
     #[On('cartUpdated')]

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Shared;
 
@@ -20,7 +22,7 @@ final class ComponentRegistryService
     {
         return array_filter(
             $this->componentRegistry,
-            fn($component) => $component['category'] === $category
+            fn ($component) => $component['category'] === $category
         );
     }
 
@@ -189,60 +191,60 @@ final class ComponentRegistryService
     public function generateComponentDocumentation(): string
     {
         $docs = "# Shared Components Reference\n\n";
-        
+
         $categories = array_unique(array_column($this->componentRegistry, 'category'));
-        
+
         foreach ($categories as $category) {
-            $docs .= "## " . ucfirst($category) . " Components\n\n";
-            
+            $docs .= '## '.ucfirst($category)." Components\n\n";
+
             $categoryComponents = $this->getComponentsByCategory($category);
-            
+
             foreach ($categoryComponents as $name => $component) {
                 $docs .= "### {$component['name']}\n";
                 $docs .= "{$component['description']}\n\n";
-                $docs .= "**Props:** " . implode(', ', $component['props']) . "\n\n";
-                
+                $docs .= '**Props:** '.implode(', ', $component['props'])."\n\n";
+
                 if (isset($component['variants'])) {
-                    $docs .= "**Variants:** " . implode(', ', $component['variants']) . "\n\n";
+                    $docs .= '**Variants:** '.implode(', ', $component['variants'])."\n\n";
                 }
-                
+
                 if (isset($component['sizes'])) {
-                    $docs .= "**Sizes:** " . implode(', ', $component['sizes']) . "\n\n";
+                    $docs .= '**Sizes:** '.implode(', ', $component['sizes'])."\n\n";
                 }
-                
+
                 $docs .= "**Example:**\n```blade\n{$component['example']}\n```\n\n";
             }
         }
-        
+
         return $docs;
     }
 
     public function validateComponentUsage(string $componentName, array $props): array
     {
         $component = $this->getComponentInfo($componentName);
-        
-        if (!$component) {
+
+        if (! $component) {
             return ['valid' => false, 'errors' => ["Component '{$componentName}' not found"]];
         }
 
         $errors = [];
         $requiredProps = $component['required_props'] ?? [];
-        
+
         foreach ($requiredProps as $prop) {
-            if (!isset($props[$prop])) {
+            if (! isset($props[$prop])) {
                 $errors[] = "Required prop '{$prop}' is missing";
             }
         }
 
         if (isset($component['variants']) && isset($props['variant'])) {
-            if (!in_array($props['variant'], $component['variants'])) {
-                $errors[] = "Invalid variant '{$props['variant']}'. Valid options: " . implode(', ', $component['variants']);
+            if (! in_array($props['variant'], $component['variants'])) {
+                $errors[] = "Invalid variant '{$props['variant']}'. Valid options: ".implode(', ', $component['variants']);
             }
         }
 
         if (isset($component['sizes']) && isset($props['size'])) {
-            if (!in_array($props['size'], $component['sizes'])) {
-                $errors[] = "Invalid size '{$props['size']}'. Valid options: " . implode(', ', $component['sizes']);
+            if (! in_array($props['size'], $component['sizes'])) {
+                $errors[] = "Invalid size '{$props['size']}'. Valid options: ".implode(', ', $component['sizes']);
             }
         }
 

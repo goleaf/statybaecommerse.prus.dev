@@ -1,27 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
-use App\Models\CustomerGroup;
-use Filament\Schemas\Schema;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 final class CustomerGroupsRelationManager extends RelationManager
@@ -35,9 +32,9 @@ final class CustomerGroupsRelationManager extends RelationManager
         return __('admin.price_lists.customer_groups');
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('admin.customer_groups.basic_information'))
                     ->schema([
@@ -48,8 +45,7 @@ final class CustomerGroupsRelationManager extends RelationManager
                                     ->required()
                                     ->maxLength(255)
                                     ->live()
-                                    ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
-                                        $operation === 'create' ? $set('slug', \Str::slug($state)) : null
+                                    ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null
                                     ),
                                 TextInput::make('slug')
                                     ->label(__('admin.customer_groups.fields.slug'))

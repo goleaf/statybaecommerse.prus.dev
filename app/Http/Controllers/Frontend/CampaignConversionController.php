@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\CampaignConversion;
 use App\Models\Campaign;
-use Illuminate\Http\Request;
+use App\Models\CampaignConversion;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class CampaignConversionController extends Controller
@@ -159,7 +161,7 @@ final class CampaignConversionController extends Controller
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="campaign_conversions_' . now()->format('Y-m-d_H-i-s') . '.csv"',
+            'Content-Disposition' => 'attachment; filename="campaign_conversions_'.now()->format('Y-m-d_H-i-s').'.csv"',
         ];
 
         return response()->stream(function () use ($conversions) {
@@ -337,4 +339,3 @@ final class CampaignConversionController extends Controller
             ->with('success', __('campaign_conversions.messages.deleted_successfully'));
     }
 }
-

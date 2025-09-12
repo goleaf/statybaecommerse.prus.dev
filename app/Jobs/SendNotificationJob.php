@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Jobs;
 
@@ -29,12 +31,13 @@ final class SendNotificationJob implements ShouldQueue
     {
         try {
             $user = $this->notification->notifiable;
-            
-            if (!$user instanceof User) {
+
+            if (! $user instanceof User) {
                 Log::warning('Notification notifiable is not a User', [
                     'notification_id' => $this->notification->id,
                     'notifiable_type' => $this->notification->notifiable_type,
                 ]);
+
                 return;
             }
 
@@ -91,20 +94,22 @@ final class SendNotificationJob implements ShouldQueue
      */
     private function sendViaMail(User $user): void
     {
-        if (!$user->email) {
+        if (! $user->email) {
             Log::warning('User has no email address', ['user_id' => $user->id]);
+
             return;
         }
 
         // Check if user wants email notifications
-        if (!$this->shouldSendEmail($user)) {
+        if (! $this->shouldSendEmail($user)) {
             Log::info('User opted out of email notifications', ['user_id' => $user->id]);
+
             return;
         }
 
         try {
             Mail::to($user->email)->send(new \App\Mail\NotificationMail($this->notification));
-            
+
             Log::info('Email notification sent', [
                 'notification_id' => $this->notification->id,
                 'user_id' => $user->id,
@@ -124,14 +129,16 @@ final class SendNotificationJob implements ShouldQueue
      */
     private function sendViaSms(User $user): void
     {
-        if (!$user->phone_number) {
+        if (! $user->phone_number) {
             Log::warning('User has no phone number', ['user_id' => $user->id]);
+
             return;
         }
 
         // Check if user wants SMS notifications
-        if (!$this->shouldSendSms($user)) {
+        if (! $this->shouldSendSms($user)) {
             Log::info('User opted out of SMS notifications', ['user_id' => $user->id]);
+
             return;
         }
 
@@ -149,8 +156,9 @@ final class SendNotificationJob implements ShouldQueue
     private function sendViaPush(User $user): void
     {
         // Check if user wants push notifications
-        if (!$this->shouldSendPush($user)) {
+        if (! $this->shouldSendPush($user)) {
             Log::info('User opted out of push notifications', ['user_id' => $user->id]);
+
             return;
         }
 
@@ -169,10 +177,10 @@ final class SendNotificationJob implements ShouldQueue
         // Check user preferences
         $preferences = $user->preferences ?? [];
         $emailNotifications = $preferences['email_notifications'] ?? true;
-        
+
         // Don't send email for non-urgent notifications if user prefers
         $urgentOnly = $preferences['email_urgent_only'] ?? false;
-        if ($urgentOnly && !($this->notification->data['urgent'] ?? false)) {
+        if ($urgentOnly && ! ($this->notification->data['urgent'] ?? false)) {
             return false;
         }
 
@@ -186,10 +194,10 @@ final class SendNotificationJob implements ShouldQueue
     {
         $preferences = $user->preferences ?? [];
         $smsNotifications = $preferences['sms_notifications'] ?? false;
-        
+
         // Only send SMS for urgent notifications
         $urgent = $this->notification->data['urgent'] ?? false;
-        
+
         return $smsNotifications && $urgent;
     }
 
@@ -199,6 +207,7 @@ final class SendNotificationJob implements ShouldQueue
     private function shouldSendPush(User $user): bool
     {
         $preferences = $user->preferences ?? [];
+
         return $preferences['push_notifications'] ?? true;
     }
 

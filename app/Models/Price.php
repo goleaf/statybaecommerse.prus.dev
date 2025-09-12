@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Price extends Model
@@ -87,7 +89,7 @@ final class Price extends Model
 
     public function isActive(): bool
     {
-        if (!$this->is_enabled) {
+        if (! $this->is_enabled) {
             return false;
         }
 
@@ -106,7 +108,7 @@ final class Price extends Model
 
     public function getDiscountPercentageAttribute(): ?int
     {
-        if (!$this->compare_amount || $this->compare_amount <= $this->amount) {
+        if (! $this->compare_amount || $this->compare_amount <= $this->amount) {
             return null;
         }
 
@@ -118,6 +120,7 @@ final class Price extends Model
     {
         $locale = $locale ?: app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
+
         return $translation?->name;
     }
 
@@ -125,6 +128,7 @@ final class Price extends Model
     {
         $locale = $locale ?: app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
+
         return $translation?->description;
     }
 
@@ -132,6 +136,7 @@ final class Price extends Model
     {
         $locale = $locale ?: app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
+
         return $translation?->notes;
     }
 
@@ -139,6 +144,7 @@ final class Price extends Model
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
+
         return $query->with(['translations' => function ($q) use ($locale) {
             $q->where('locale', $locale);
         }]);
@@ -173,6 +179,7 @@ final class Price extends Model
     public function updateTranslation(string $locale, array $data): bool
     {
         $translation = $this->getOrCreateTranslation($locale);
+
         return $translation->update($data);
     }
 

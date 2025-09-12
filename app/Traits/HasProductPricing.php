@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Traits;
 
 use Illuminate\Support\Facades\DB;
+
 // Using native Laravel helpers and custom PriceData DTO
 
 trait HasProductPricing
@@ -13,10 +16,10 @@ trait HasProductPricing
         $basePrice = $this
             ->loadMissing('prices', 'prices.currency')
             ->prices
-            ->reject(fn($price) => $price->currency->code !== $currencyCode)
+            ->reject(fn ($price) => $price->currency->code !== $currencyCode)
             ->first();
 
-        if (!$basePrice) {
+        if (! $basePrice) {
             return null;
         }
 
@@ -32,7 +35,7 @@ trait HasProductPricing
             $candidate = DB::table('price_lists as pl')
                 ->where('pl.is_enabled', true)
                 ->where('pl.currency_id', $currencyId)
-                ->when($zoneId, fn($q) => $q->where(function ($qq) use ($zoneId) {
+                ->when($zoneId, fn ($q) => $q->where(function ($qq) use ($zoneId) {
                     $qq->whereNull('pl.zone_id')->orWhere('pl.zone_id', $zoneId);
                 }))
                 ->where(function ($q) use ($userId) {

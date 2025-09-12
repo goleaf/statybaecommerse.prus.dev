@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\Widgets;
 
@@ -6,11 +8,10 @@ use App\Models\Brand;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Illuminate\Database\Eloquent\Builder;
 
 final class BrandOverviewWidget extends BaseWidget
 {
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?string $heading = 'admin.brands.widgets.overview_heading';
 
@@ -28,7 +29,7 @@ final class BrandOverviewWidget extends BaseWidget
                     ->label(__('admin.brands.fields.name'))
                     ->searchable()
                     ->sortable()
-                    ->formatStateUsing(fn($record): string => $record->trans('name') ?: $record->name),
+                    ->formatStateUsing(fn ($record): string => $record->trans('name') ?: $record->name),
                 Tables\Columns\TextColumn::make('products_count')
                     ->counts('products')
                     ->label(__('admin.brands.fields.products_count'))
@@ -38,7 +39,7 @@ final class BrandOverviewWidget extends BaseWidget
                     ->counts('translations')
                     ->label(__('admin.brands.fields.translations_count'))
                     ->badge()
-                    ->color(fn($state): string => $state > 0 ? 'success' : 'gray'),
+                    ->color(fn ($state): string => $state > 0 ? 'success' : 'gray'),
                 Tables\Columns\IconColumn::make('is_enabled')
                     ->label(__('admin.brands.fields.is_enabled'))
                     ->boolean()

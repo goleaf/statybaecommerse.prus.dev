@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Providers;
 
 use App\Services\CodeStyleService;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\ServiceProvider;
 
 final class CodeStyleServiceProvider extends ServiceProvider
 {
@@ -28,8 +30,8 @@ final class CodeStyleServiceProvider extends ServiceProvider
             if ($this->shouldAutoFix($filePath)) {
                 $codeStyleService = app(CodeStyleService::class);
                 $fixes = $codeStyleService->fixFile($filePath);
-                
-                if (!empty($fixes)) {
+
+                if (! empty($fixes)) {
                     logger()->info("Auto-fixed code style issues in {$filePath}", $fixes);
                 }
             }
@@ -39,8 +41,7 @@ final class CodeStyleServiceProvider extends ServiceProvider
     private function shouldAutoFix(string $filePath): bool
     {
         // Only auto-fix PHP files in app/ directory
-        return str_ends_with($filePath, '.php') && 
+        return str_ends_with($filePath, '.php') &&
                str_starts_with($filePath, app_path());
     }
 }
-

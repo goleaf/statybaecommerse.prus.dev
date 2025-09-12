@@ -1,21 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
+use BackedEnum;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Infolists;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Infolists;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
 use UnitEnum;
 
 final class ReferralRewardResource extends Resource
@@ -37,9 +39,9 @@ final class ReferralRewardResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Forms\Components\Section::make(__('referrals.forms.reward_information'))
                     ->components([
@@ -109,7 +111,7 @@ final class ReferralRewardResource extends Resource
                         Forms\Components\DateTimePicker::make('applied_at')
                             ->label(__('referrals.forms.applied_at'))
                             ->nullable()
-                            ->disabled(fn(Forms\Get $get) => $get('status') !== 'applied'),
+                            ->disabled(fn (Forms\Get $get) => $get('status') !== 'applied'),
                         Forms\Components\DateTimePicker::make('expires_at')
                             ->label(__('referrals.forms.expires_at'))
                             ->nullable(),
@@ -182,11 +184,11 @@ final class ReferralRewardResource extends Resource
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('referrals.forms.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'referrer_bonus' => 'success',
                         'referred_discount' => 'info',
                     })
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'referrer_bonus' => __('referrals.types.referrer_bonus'),
                         'referred_discount' => __('referrals.types.referred_discount'),
                     })
@@ -198,12 +200,12 @@ final class ReferralRewardResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('referrals.forms.status'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'applied' => 'success',
                         'expired' => 'danger',
                     })
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'pending' => __('referrals.status.pending'),
                         'applied' => __('referrals.status.applied'),
                         'expired' => __('referrals.status.expired'),
@@ -255,22 +257,22 @@ final class ReferralRewardResource extends Resource
                     ]),
                 Filter::make('pending')
                     ->label(__('referrals.filters.pending'))
-                    ->query(fn(Builder $query): Builder => $query->pending()),
+                    ->query(fn (Builder $query): Builder => $query->pending()),
                 Filter::make('applied')
                     ->label(__('referrals.filters.applied'))
-                    ->query(fn(Builder $query): Builder => $query->applied()),
+                    ->query(fn (Builder $query): Builder => $query->applied()),
                 Filter::make('expired')
                     ->label(__('referrals.filters.expired'))
-                    ->query(fn(Builder $query): Builder => $query->expired()),
+                    ->query(fn (Builder $query): Builder => $query->expired()),
                 Filter::make('referrer_bonus')
                     ->label(__('referrals.filters.referrer_bonus'))
-                    ->query(fn(Builder $query): Builder => $query->referrerBonus()),
+                    ->query(fn (Builder $query): Builder => $query->referrerBonus()),
                 Filter::make('referred_discount')
                     ->label(__('referrals.filters.referred_discount'))
-                    ->query(fn(Builder $query): Builder => $query->referredDiscount()),
+                    ->query(fn (Builder $query): Builder => $query->referredDiscount()),
                 Filter::make('active')
                     ->label(__('referrals.filters.active'))
-                    ->query(fn(Builder $query): Builder => $query->active()),
+                    ->query(fn (Builder $query): Builder => $query->active()),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
@@ -280,7 +282,7 @@ final class ReferralRewardResource extends Resource
                     ->label(__('referrals.actions.apply_reward'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn(ReferralReward $record): bool => $record->status === 'pending')
+                    ->visible(fn (ReferralReward $record): bool => $record->status === 'pending')
                     ->requiresConfirmation()
                     ->action(function (ReferralReward $record): void {
                         $record->apply();
@@ -290,7 +292,7 @@ final class ReferralRewardResource extends Resource
                     ->label(__('referrals.actions.mark_expired'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn(ReferralReward $record): bool => $record->status === 'pending')
+                    ->visible(fn (ReferralReward $record): bool => $record->status === 'pending')
                     ->requiresConfirmation()
                     ->action(function (ReferralReward $record): void {
                         $record->markAsExpired();
@@ -336,9 +338,9 @@ final class ReferralRewardResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $form): Schema
     {
-        return $schema
+        return $form
             ->components([
                 Infolists\Components\Section::make(__('referrals.forms.reward_details'))
                     ->components([
@@ -359,11 +361,11 @@ final class ReferralRewardResource extends Resource
                         Infolists\Components\TextEntry::make('type')
                             ->label(__('referrals.forms.type'))
                             ->badge()
-                            ->color(fn(string $state): string => match ($state) {
+                            ->color(fn (string $state): string => match ($state) {
                                 'referrer_bonus' => 'success',
                                 'referred_discount' => 'info',
                             })
-                            ->formatStateUsing(fn(string $state): string => match ($state) {
+                            ->formatStateUsing(fn (string $state): string => match ($state) {
                                 'referrer_bonus' => __('referrals.types.referrer_bonus'),
                                 'referred_discount' => __('referrals.types.referred_discount'),
                             }),
@@ -373,12 +375,12 @@ final class ReferralRewardResource extends Resource
                         Infolists\Components\TextEntry::make('status')
                             ->label(__('referrals.forms.status'))
                             ->badge()
-                            ->color(fn(string $state): string => match ($state) {
+                            ->color(fn (string $state): string => match ($state) {
                                 'pending' => 'warning',
                                 'applied' => 'success',
                                 'expired' => 'danger',
                             })
-                            ->formatStateUsing(fn(string $state): string => match ($state) {
+                            ->formatStateUsing(fn (string $state): string => match ($state) {
                                 'pending' => __('referrals.status.pending'),
                                 'applied' => __('referrals.status.applied'),
                                 'expired' => __('referrals.status.expired'),
@@ -405,7 +407,7 @@ final class ReferralRewardResource extends Resource
                     ->components([
                         Infolists\Components\TextEntry::make('conditions')
                             ->label(__('referrals.forms.conditions'))
-                            ->formatStateUsing(fn($state) => $state ? json_encode($state, JSON_PRETTY_PRINT) : __('referrals.forms.no_conditions'))
+                            ->formatStateUsing(fn ($state) => $state ? json_encode($state, JSON_PRETTY_PRINT) : __('referrals.forms.no_conditions'))
                             ->placeholder(__('referrals.forms.no_conditions')),
                     ])
                     ->collapsible(),
@@ -413,11 +415,11 @@ final class ReferralRewardResource extends Resource
                     ->components([
                         Infolists\Components\TextEntry::make('metadata')
                             ->label(__('referrals.forms.additional_data'))
-                            ->formatStateUsing(fn($state) => $state ? json_encode($state, JSON_PRETTY_PRINT) : __('referrals.forms.no_metadata'))
+                            ->formatStateUsing(fn ($state) => $state ? json_encode($state, JSON_PRETTY_PRINT) : __('referrals.forms.no_metadata'))
                             ->placeholder(__('referrals.forms.no_metadata')),
                         Infolists\Components\TextEntry::make('reward_data')
                             ->label(__('referrals.forms.reward_data'))
-                            ->formatStateUsing(fn($state) => $state ? json_encode($state, JSON_PRETTY_PRINT) : __('referrals.forms.no_reward_data'))
+                            ->formatStateUsing(fn ($state) => $state ? json_encode($state, JSON_PRETTY_PRINT) : __('referrals.forms.no_reward_data'))
                             ->placeholder(__('referrals.forms.no_reward_data')),
                     ])
                     ->collapsible(),

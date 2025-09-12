@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\ReferralReward;
-use App\Models\Referral;
 use App\Models\Discount;
 use App\Models\Order;
-use Illuminate\Support\Facades\DB;
+use App\Models\Referral;
+use App\Models\ReferralReward;
 use Illuminate\Support\Facades\Log;
 
 final class ReferralRewardService
@@ -20,7 +21,7 @@ final class ReferralRewardService
             // Create the discount in the system
             $discount = $this->createReferralDiscount($userId, $percentage);
 
-            if (!$discount) {
+            if (! $discount) {
                 throw new \Exception('Failed to create referral discount');
             }
 
@@ -112,8 +113,8 @@ final class ReferralRewardService
     {
         try {
             $discount = Discount::create([
-                'name' => 'Referral Discount - ' . $percentage . '%',
-                'code' => 'REFERRAL_' . $userId . '_' . now()->format('Ymd'),
+                'name' => 'Referral Discount - '.$percentage.'%',
+                'code' => 'REFERRAL_'.$userId.'_'.now()->format('Ymd'),
                 'type' => 'percentage',
                 'value' => $percentage,
                 'usage_limit' => 1, // First order only
@@ -157,7 +158,7 @@ final class ReferralRewardService
         try {
             $reward = ReferralReward::findOrFail($rewardId);
 
-            if (!$reward->isValid()) {
+            if (! $reward->isValid()) {
                 throw new \Exception('Reward is not valid or has expired');
             }
 
@@ -261,7 +262,7 @@ final class ReferralRewardService
             ->where('status', 'completed')
             ->first();
 
-        if (!$referral) {
+        if (! $referral) {
             return false;
         }
 
@@ -271,7 +272,7 @@ final class ReferralRewardService
             ->where('status', 'applied')
             ->exists();
 
-        return !$usedDiscount;
+        return ! $usedDiscount;
     }
 
     /**
@@ -285,4 +286,3 @@ final class ReferralRewardService
             ->first();
     }
 }
-

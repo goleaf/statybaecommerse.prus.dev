@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
@@ -15,23 +17,23 @@ class EditProduct extends EditRecord
         return [
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
-            
+
             Actions\Action::make('duplicate')
                 ->label(__('translations.duplicate'))
                 ->icon('heroicon-o-document-duplicate')
                 ->action(function () {
                     $newProduct = $this->record->replicate();
-                    $newProduct->name = $this->record->name . ' (Copy)';
-                    $newProduct->sku = $this->record->sku . '-copy';
-                    $newProduct->slug = $this->record->slug . '-copy';
+                    $newProduct->name = $this->record->name.' (Copy)';
+                    $newProduct->sku = $this->record->sku.'-copy';
+                    $newProduct->slug = $this->record->slug.'-copy';
                     $newProduct->status = 'draft';
                     $newProduct->save();
-                    
+
                     // Copy relationships
                     $newProduct->categories()->sync($this->record->categories->pluck('id'));
                     $newProduct->collections()->sync($this->record->collections->pluck('id'));
                     $newProduct->attributes()->sync($this->record->attributes->pluck('id'));
-                    
+
                     return redirect()->to(static::getResource()::getUrl('edit', ['record' => $newProduct]));
                 }),
         ];
@@ -42,5 +44,3 @@ class EditProduct extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 }
-
-

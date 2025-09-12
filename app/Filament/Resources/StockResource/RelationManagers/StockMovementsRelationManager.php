@@ -1,24 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\StockResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class StockMovementsRelationManager extends RelationManager
 {
@@ -45,9 +43,9 @@ class StockMovementsRelationManager extends RelationManager
         return __('inventory.stock_movements');
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
-        return $schema
+        return $form
             ->schema([
                 TextInput::make('quantity')
                     ->label(__('inventory.quantity'))
@@ -113,8 +111,7 @@ class StockMovementsRelationManager extends RelationManager
                         'success' => 'in',
                         'danger' => 'out',
                     ])
-                    ->formatStateUsing(fn (string $state): string => 
-                        __('inventory.' . $state)
+                    ->formatStateUsing(fn (string $state): string => __('inventory.'.$state)
                     ),
 
                 TextColumn::make('quantity')
@@ -122,8 +119,7 @@ class StockMovementsRelationManager extends RelationManager
                     ->sortable()
                     ->alignEnd()
                     ->weight('bold')
-                    ->color(fn ($record): string => 
-                        $record->type === 'in' ? 'success' : 'danger'
+                    ->color(fn ($record): string => $record->type === 'in' ? 'success' : 'danger'
                     ),
 
                 BadgeColumn::make('reason')
@@ -138,8 +134,7 @@ class StockMovementsRelationManager extends RelationManager
                         'danger' => 'theft',
                         'info' => 'transfer',
                     ])
-                    ->formatStateUsing(fn (string $state): string => 
-                        __('inventory.reason_' . $state)
+                    ->formatStateUsing(fn (string $state): string => __('inventory.reason_'.$state)
                     ),
 
                 TextColumn::make('reference')
@@ -190,33 +185,32 @@ class StockMovementsRelationManager extends RelationManager
 
                 Filter::make('this_month')
                     ->label(__('inventory.this_month'))
-                    ->query(fn (Builder $query): Builder => 
-                        $query->where('moved_at', '>=', now()->startOfMonth())
+                    ->query(fn (Builder $query): Builder => $query->where('moved_at', '>=', now()->startOfMonth())
                     ),
 
                 Filter::make('this_year')
                     ->label(__('inventory.this_year'))
-                    ->query(fn (Builder $query): Builder => 
-                        $query->where('moved_at', '>=', now()->startOfYear())
+                    ->query(fn (Builder $query): Builder => $query->where('moved_at', '>=', now()->startOfYear())
                     ),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['user_id'] = auth()->id();
+
                         return $data;
                     })
                     ->after(function ($record) {
                         // Update the variant inventory stock based on movement
                         $variantInventory = $this->ownerRecord;
                         $quantity = $record->quantity;
-                        
+
                         if ($record->type === 'in') {
                             $variantInventory->increment('stock', $quantity);
                         } else {
                             $variantInventory->decrement('stock', $quantity);
                         }
-                        
+
                         // Update last restocked/sold timestamps
                         if ($record->type === 'in' && in_array($record->reason, ['restock', 'return'])) {
                             $variantInventory->update(['last_restocked_at' => $record->moved_at]);
@@ -233,7 +227,7 @@ class StockMovementsRelationManager extends RelationManager
                         // Reverse the stock movement when deleting
                         $variantInventory = $this->ownerRecord;
                         $quantity = $record->quantity;
-                        
+
                         if ($record->type === 'in') {
                             $variantInventory->decrement('stock', $quantity);
                         } else {
@@ -247,10 +241,10 @@ class StockMovementsRelationManager extends RelationManager
                         ->after(function ($records) {
                             // Reverse all stock movements when bulk deleting
                             $variantInventory = $this->ownerRecord;
-                            
+
                             foreach ($records as $record) {
                                 $quantity = $record->quantity;
-                                
+
                                 if ($record->type === 'in') {
                                     $variantInventory->decrement('stock', $quantity);
                                 } else {
@@ -264,11 +258,11 @@ class StockMovementsRelationManager extends RelationManager
                 Group::make('type')
                     ->label(__('inventory.group_by_type'))
                     ->collapsible(),
-                
+
                 Group::make('reason')
                     ->label(__('inventory.group_by_reason'))
                     ->collapsible(),
-                
+
                 Group::make('moved_at')
                     ->label(__('inventory.group_by_date'))
                     ->date()

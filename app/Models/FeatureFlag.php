@@ -1,9 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
 
 final class FeatureFlag extends Model
 {
@@ -29,7 +30,7 @@ final class FeatureFlag extends Model
 
     public function isEnabled(?User $user = null): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -52,9 +53,9 @@ final class FeatureFlag extends Model
         if ($this->rollout_percentage) {
             $percentage = $this->rollout_percentage['percentage'] ?? 100;
             if ($percentage < 100) {
-                $hash = hash('sha256', $this->key . ($user?->id ?? session()->getId()));
+                $hash = hash('sha256', $this->key.($user?->id ?? session()->getId()));
                 $userPercentile = hexdec(substr($hash, 0, 8)) / 0xFFFFFFFF * 100;
-                
+
                 if ($userPercentile > $percentage) {
                     return false;
                 }
@@ -77,25 +78,25 @@ final class FeatureFlag extends Model
 
             switch ($type) {
                 case 'user_id':
-                    if (!in_array($user->id, (array) $value)) {
+                    if (! in_array($user->id, (array) $value)) {
                         return false;
                     }
                     break;
 
                 case 'user_email':
-                    if (!in_array($user->email, (array) $value)) {
+                    if (! in_array($user->email, (array) $value)) {
                         return false;
                     }
                     break;
 
                 case 'user_role':
-                    if (!$user->hasAnyRole((array) $value)) {
+                    if (! $user->hasAnyRole((array) $value)) {
                         return false;
                     }
                     break;
 
                 case 'user_group':
-                    if (!$user->customerGroups()->whereIn('name', (array) $value)->exists()) {
+                    if (! $user->customerGroups()->whereIn('name', (array) $value)->exists()) {
                         return false;
                     }
                     break;
@@ -111,8 +112,8 @@ final class FeatureFlag extends Model
 
     public static function isFeatureEnabled(string $key, ?User $user = null): bool
     {
-        $flag = static::where('key', $key)->first();
-        
+        $flag = self::where('key', $key)->first();
+
         return $flag?->isEnabled($user) ?? false;
     }
 

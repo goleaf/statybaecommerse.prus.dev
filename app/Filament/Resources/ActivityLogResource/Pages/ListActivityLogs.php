@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ActivityLogResource\Pages;
 
 use App\Filament\Resources\ActivityLogResource;
+use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListActivityLogs extends ListRecords
@@ -41,16 +43,16 @@ final class ListActivityLogs extends ListRecords
             'all' => Tab::make(__('admin.activity_logs.tabs.all'))
                 ->icon('heroicon-o-clipboard-document-list'),
             'today' => Tab::make(__('admin.activity_logs.tabs.today'))
-                ->modifyQueryUsing(fn(Builder $query) => $query->whereDate('created_at', today()))
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereDate('created_at', today()))
                 ->icon('heroicon-o-calendar-days'),
             'this_week' => Tab::make(__('admin.activity_logs.tabs.this_week'))
-                ->modifyQueryUsing(fn(Builder $query) => $query->whereBetween('created_at', [
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereBetween('created_at', [
                     now()->startOfWeek(),
                     now()->endOfWeek(),
                 ]))
                 ->icon('heroicon-o-calendar'),
             'this_month' => Tab::make(__('admin.activity_logs.tabs.this_month'))
-                ->modifyQueryUsing(fn(Builder $query) => $query
+                ->modifyQueryUsing(fn (Builder $query) => $query
                     ->whereMonth('created_at', now()->month)
                     ->whereYear('created_at', now()->year))
                 ->icon('heroicon-o-calendar-days'),

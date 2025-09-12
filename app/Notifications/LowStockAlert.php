@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Notifications;
 
 use App\Models\Product;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Filament\Notifications\Notification as FilamentNotification;
 
 final class LowStockAlert extends Notification implements ShouldQueue
 {
@@ -51,7 +53,7 @@ final class LowStockAlert extends Notification implements ShouldQueue
             ->title(__('Low Stock Alert'))
             ->body(__('Product :name is running low on stock (:stock units remaining)', [
                 'name' => $this->product->name,
-                'stock' => $this->product->stock_quantity
+                'stock' => $this->product->stock_quantity,
             ]))
             ->icon('heroicon-o-exclamation-triangle')
             ->iconColor('warning')

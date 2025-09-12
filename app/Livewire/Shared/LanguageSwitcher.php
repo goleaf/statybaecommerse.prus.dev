@@ -1,9 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Shared;
 
 use Illuminate\Contracts\View\View;
-use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 class LanguageSwitcher extends Component
@@ -23,7 +24,7 @@ class LanguageSwitcher extends Component
         $full = url()->full();
         $path = parse_url($full, PHP_URL_PATH) ?? '/';
         $qs = parse_url($full, PHP_URL_QUERY);
-        $query = $qs ? '?' . $qs : '';
+        $query = $qs ? '?'.$qs : '';
 
         $parts = explode('/', ltrim($path, '/'));
         if (isset($parts[0]) && in_array($parts[0], $this->locales, true)) {
@@ -34,7 +35,7 @@ class LanguageSwitcher extends Component
         $this->links = [];
         foreach ($this->locales as $loc) {
             $href = $rest === '' ? url("/$loc") : url("/$loc/$rest");
-            $this->links[$loc] = $href . $query;
+            $this->links[$loc] = $href.$query;
         }
     }
 

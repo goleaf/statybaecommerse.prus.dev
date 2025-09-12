@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -17,7 +19,7 @@ final class CacheService
         return Cache::remember(
             "featured_products_{$limit}",
             self::TTL,
-            fn() => Product::where('is_featured', true)
+            fn () => Product::where('is_featured', true)
                 ->where('is_visible', true)
                 ->with(['brand', 'categories', 'media'])
                 ->limit($limit)
@@ -30,7 +32,7 @@ final class CacheService
         return Cache::remember(
             "popular_categories_{$limit}",
             self::TTL,
-            fn() => Category::where('is_visible', true)
+            fn () => Category::where('is_visible', true)
                 ->where('is_featured', true)
                 ->with(['media'])
                 ->withCount('products')
@@ -45,7 +47,7 @@ final class CacheService
         return Cache::remember(
             "top_brands_{$limit}",
             self::TTL,
-            fn() => Brand::where('is_visible', true)
+            fn () => Brand::where('is_visible', true)
                 ->where('is_featured', true)
                 ->with(['media'])
                 ->withCount('products')
@@ -60,7 +62,7 @@ final class CacheService
         return Cache::remember(
             'navigation_categories',
             self::TTL * 24,  // 24 hours
-            fn() => Category::where('is_visible', true)
+            fn () => Category::where('is_visible', true)
                 ->whereNull('parent_id')
                 ->with(['children' => function ($query) {
                     $query

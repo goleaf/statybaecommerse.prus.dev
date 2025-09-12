@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -17,7 +19,7 @@ final class DocumentService
         DocumentTemplate $template,
         Model $relatedModel,
         array $variables = [],
-        string $title = null,
+        ?string $title = null,
         bool $sendNotification = false
     ): Document {
         // Validate template content for security
@@ -30,7 +32,7 @@ final class DocumentService
 
         $document = Document::create([
             'document_template_id' => $template->id,
-            'title' => $title ?? $template->name . ' - ' . $relatedModel->id,
+            'title' => $title ?? $template->name.' - '.$relatedModel->id,
             'content' => $processedContent,
             'variables' => $variables,
             'status' => 'draft',
@@ -60,7 +62,7 @@ final class DocumentService
         $pdf->setPaper($settings['page_size'] ?? 'A4', $settings['orientation'] ?? 'portrait');
 
         // Generate filename
-        $filename = 'documents/' . $document->id . '_' . now()->format('Y-m-d_H-i-s') . '.pdf';
+        $filename = 'documents/'.$document->id.'_'.now()->format('Y-m-d_H-i-s').'.pdf';
 
         // Save to storage
         Storage::disk('public')->put($filename, $pdf->output());
@@ -102,7 +104,7 @@ final class DocumentService
 
     public function getAvailableVariables(): array
     {
-        return Cache::remember('document_variables_' . app()->getLocale(), 3600, function () {
+        return Cache::remember('document_variables_'.app()->getLocale(), 3600, function () {
             return [
                 // Global variables
                 '$COMPANY_NAME' => config('app.name'),
@@ -133,8 +135,8 @@ final class DocumentService
         $attributes = $model->getAttributes();
 
         foreach ($attributes as $key => $value) {
-            if (!is_null($value)) {
-                $variableName = '$' . strtoupper($prefix . $key);
+            if (! is_null($value)) {
+                $variableName = '$'.strtoupper($prefix.$key);
                 $variables[$variableName] = $value;
             }
         }
@@ -161,7 +163,7 @@ final class DocumentService
         DocumentTemplate $template,
         Model $relatedModel,
         array $variables = [],
-        string $title = null
+        ?string $title = null
     ): void {
         dispatch(function () use ($template, $relatedModel, $variables, $title) {
             $this->generateDocument($template, $relatedModel, $variables, $title, true);
@@ -171,6 +173,7 @@ final class DocumentService
     public function previewTemplate(DocumentTemplate $template, array $sampleVariables = []): string
     {
         $variables = array_merge($this->getSampleVariables(), $sampleVariables);
+
         return $this->processTemplate($template->content, $variables);
     }
 
@@ -216,6 +219,7 @@ final class DocumentService
             if (is_string($value)) {
                 return strip_tags($value);
             }
+
             return $value;
         }, $variables);
     }

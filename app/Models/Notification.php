@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Notifications\DatabaseNotification;
-use Carbon\Carbon;
 
 final class Notification extends DatabaseNotification
 {
@@ -69,7 +71,7 @@ final class Notification extends DatabaseNotification
     {
         return $query->where(function ($q) {
             $q->whereJsonDoesntContain('data->urgent', true)
-              ->orWhereNull('data->urgent');
+                ->orWhereNull('data->urgent');
         });
     }
 
@@ -117,7 +119,7 @@ final class Notification extends DatabaseNotification
     protected function isRead(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => !is_null($this->read_at),
+            get: fn (): bool => ! is_null($this->read_at),
         );
     }
 
@@ -272,10 +274,12 @@ final class Notification extends DatabaseNotification
     public function addTag(string $tag): bool
     {
         $tags = $this->tags;
-        if (!in_array($tag, $tags)) {
+        if (! in_array($tag, $tags)) {
             $tags[] = $tag;
+
             return $this->update(['data' => array_merge($this->data, ['tags' => $tags])]);
         }
+
         return false;
     }
 
@@ -285,8 +289,10 @@ final class Notification extends DatabaseNotification
         $key = array_search($tag, $tags);
         if ($key !== false) {
             unset($tags[$key]);
+
             return $this->update(['data' => array_merge($this->data, ['tags' => array_values($tags)])]);
         }
+
         return false;
     }
 
@@ -309,13 +315,13 @@ final class Notification extends DatabaseNotification
     public static function getStats(): array
     {
         return [
-            'total' => static::count(),
-            'unread' => static::unread()->count(),
-            'read' => static::read()->count(),
-            'urgent' => static::urgent()->count(),
-            'today' => static::whereDate('created_at', today())->count(),
-            'this_week' => static::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
-            'this_month' => static::whereMonth('created_at', now()->month)->count(),
+            'total' => self::count(),
+            'unread' => self::unread()->count(),
+            'read' => self::read()->count(),
+            'urgent' => self::urgent()->count(),
+            'today' => self::whereDate('created_at', today())->count(),
+            'this_week' => self::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'this_month' => self::whereMonth('created_at', now()->month)->count(),
         ];
     }
 
@@ -325,7 +331,7 @@ final class Notification extends DatabaseNotification
         $stats = [];
 
         foreach ($types as $type) {
-            $stats[$type] = static::byType($type)->count();
+            $stats[$type] = self::byType($type)->count();
         }
 
         return $stats;
@@ -333,16 +339,16 @@ final class Notification extends DatabaseNotification
 
     public static function cleanupOld(int $days = 30): int
     {
-        return static::old($days)->delete();
+        return self::old($days)->delete();
     }
 
     public static function markAllAsReadForUser(int $userId): int
     {
-        return static::forUser($userId)->unread()->update(['read_at' => now()]);
+        return self::forUser($userId)->unread()->update(['read_at' => now()]);
     }
 
     public static function markAllAsUnreadForUser(int $userId): int
     {
-        return static::forUser($userId)->read()->update(['read_at' => null]);
+        return self::forUser($userId)->read()->update(['read_at' => null]);
     }
 }

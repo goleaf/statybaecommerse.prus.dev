@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -11,6 +13,7 @@ use Illuminate\Console\Command;
 final class CreateTestNotifications extends Command
 {
     protected $signature = 'notifications:create-test';
+
     protected $description = 'Create test notifications for the admin panel';
 
     public function handle(): int
@@ -24,6 +27,7 @@ final class CreateTestNotifications extends Command
 
         if ($adminUsers->isEmpty()) {
             $this->error('No admin users found. Please create admin users first.');
+
             return 1;
         }
 
@@ -32,22 +36,22 @@ final class CreateTestNotifications extends Command
             [
                 'title' => 'Sveiki atvykę į valdymo skydą',
                 'message' => 'Jūsų e-komercijos sistema sėkmingai sukonfigūruota ir paruošta naudojimui.',
-                'type' => 'success'
+                'type' => 'success',
             ],
             [
                 'title' => 'Sistemos atnaujinimas',
                 'message' => 'Sistema buvo sėkmingai atnaujinta iki naujausios versijos.',
-                'type' => 'info'
+                'type' => 'info',
             ],
             [
                 'title' => 'Priežiūros režimas',
                 'message' => 'Sistema bus nepasiekiama dėl planuotos priežiūros nuo 02:00 iki 04:00.',
-                'type' => 'warning'
+                'type' => 'warning',
             ],
             [
                 'title' => 'Saugumo įspėjimas',
                 'message' => 'Aptiktas įtartinas veiksmas. Prašome patikrinti savo paskyrą.',
-                'type' => 'error'
+                'type' => 'error',
             ],
         ];
 
@@ -72,7 +76,7 @@ final class CreateTestNotifications extends Command
 
         $totalNotifications = $adminUsers->count() * count($notifications) + ($lowStockProducts->count() * $adminUsers->count());
 
-        $this->info("Created {$totalNotifications} test notifications for " . $adminUsers->count() . ' admin users.');
+        $this->info("Created {$totalNotifications} test notifications for ".$adminUsers->count().' admin users.');
         $this->info('Check the notification bell icon in the admin panel!');
 
         return 0;

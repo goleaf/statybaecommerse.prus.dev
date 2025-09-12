@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Providers;
 
@@ -13,10 +15,10 @@ class DebugServiceProvider extends ServiceProvider
     public function register(): void
     {
         if ($this->app->environment('local', 'staging')) {
-            $this->app->singleton('debugbar.discount', fn() => new DiscountDebugCollector());
-            $this->app->singleton('debugbar.translation', fn() => new TranslationDebugCollector());
-            $this->app->singleton('debugbar.livewire', fn() => new LivewireDebugCollector());
-            $this->app->singleton('debugbar.ecommerce', fn() => new EcommerceDebugCollector());
+            $this->app->singleton('debugbar.discount', fn () => new DiscountDebugCollector);
+            $this->app->singleton('debugbar.translation', fn () => new TranslationDebugCollector);
+            $this->app->singleton('debugbar.livewire', fn () => new LivewireDebugCollector);
+            $this->app->singleton('debugbar.ecommerce', fn () => new EcommerceDebugCollector);
         }
     }
 

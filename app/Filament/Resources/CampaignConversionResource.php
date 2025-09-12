@@ -1,17 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignConversionResource\Pages;
-use App\Filament\Resources\CampaignConversionResource\RelationManagers;
-use App\Models\Campaign;
 use App\Models\CampaignConversion;
-use App\Models\Customer;
-use App\Models\Order;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
@@ -20,30 +17,24 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\KeyValueEntry;
-use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
+use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Infolists;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\HtmlString;
 use UnitEnum;
 
 class CampaignConversionResource extends Resource
@@ -370,14 +361,14 @@ class CampaignConversionResource extends Resource
                 TextColumn::make('conversion_type')
                     ->label(__('campaign_conversions.table.conversion_type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'purchase' => 'success',
                         'signup' => 'info',
                         'download' => 'warning',
                         'lead' => 'primary',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn(string $state): string => __("campaign_conversions.conversion_types.{$state}")),
+                    ->formatStateUsing(fn (string $state): string => __("campaign_conversions.conversion_types.{$state}")),
                 TextColumn::make('conversion_value')
                     ->label(__('campaign_conversions.table.conversion_value'))
                     ->money('EUR')
@@ -391,7 +382,7 @@ class CampaignConversionResource extends Resource
                         'danger' => 'cancelled',
                         'secondary' => 'refunded',
                     ])
-                    ->formatStateUsing(fn(string $state): string => __("campaign_conversions.statuses.{$state}")),
+                    ->formatStateUsing(fn (string $state): string => __("campaign_conversions.statuses.{$state}")),
                 TextColumn::make('customer.email')
                     ->label(__('campaign_conversions.table.customer'))
                     ->sortable()
@@ -410,13 +401,13 @@ class CampaignConversionResource extends Resource
                 TextColumn::make('device_type')
                     ->label(__('campaign_conversions.table.device_type'))
                     ->badge()
-                    ->color(fn(?string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'mobile' => 'info',
                         'tablet' => 'warning',
                         'desktop' => 'success',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("campaign_conversions.device_types.{$state}") : '-'),
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("campaign_conversions.device_types.{$state}") : '-'),
                 TextColumn::make('country')
                     ->label(__('campaign_conversions.table.country'))
                     ->sortable()
@@ -424,8 +415,8 @@ class CampaignConversionResource extends Resource
                     ->limit(15),
                 TextColumn::make('roi')
                     ->label(__('campaign_conversions.table.roi'))
-                    ->formatStateUsing(fn(?float $state): string => $state ? number_format($state * 100, 2) . '%' : '-')
-                    ->color(fn(?float $state): string => $state && $state > 0 ? 'success' : ($state && $state < 0 ? 'danger' : 'gray'))
+                    ->formatStateUsing(fn (?float $state): string => $state ? number_format($state * 100, 2).'%' : '-')
+                    ->color(fn (?float $state): string => $state && $state > 0 ? 'success' : ($state && $state < 0 ? 'danger' : 'gray'))
                     ->sortable(),
                 TextColumn::make('converted_at')
                     ->label(__('campaign_conversions.table.converted_at'))
@@ -467,18 +458,18 @@ class CampaignConversionResource extends Resource
                     ]),
                 SelectFilter::make('source')
                     ->label(__('campaign_conversions.filters.source'))
-                    ->options(fn(): array => CampaignConversion::distinct()->pluck('source', 'source')->filter()->toArray()),
+                    ->options(fn (): array => CampaignConversion::distinct()->pluck('source', 'source')->filter()->toArray()),
                 SelectFilter::make('medium')
                     ->label(__('campaign_conversions.filters.medium'))
-                    ->options(fn(): array => CampaignConversion::distinct()->pluck('medium', 'medium')->filter()->toArray()),
+                    ->options(fn (): array => CampaignConversion::distinct()->pluck('medium', 'medium')->filter()->toArray()),
                 DateFilter::make('converted_at')
                     ->label(__('campaign_conversions.filters.converted_at')),
                 Filter::make('high_value')
                     ->label(__('campaign_conversions.filters.high_value'))
-                    ->query(fn(Builder $query): Builder => $query->where('conversion_value', '>=', 100)),
+                    ->query(fn (Builder $query): Builder => $query->where('conversion_value', '>=', 100)),
                 Filter::make('recent')
                     ->label(__('campaign_conversions.filters.recent'))
-                    ->query(fn(Builder $query): Builder => $query->where('converted_at', '>=', now()->subDays(7))),
+                    ->query(fn (Builder $query): Builder => $query->where('converted_at', '>=', now()->subDays(7))),
                 TernaryFilter::make('is_mobile')
                     ->label(__('campaign_conversions.filters.mobile')),
                 TernaryFilter::make('is_tablet')
@@ -513,7 +504,7 @@ class CampaignConversionResource extends Resource
                         ->label(__('campaign_conversions.actions.mark_completed'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(fn(Collection $records) => $records->each->update(['status' => 'completed'])),
+                        ->action(fn (Collection $records) => $records->each->update(['status' => 'completed'])),
                     BulkAction::make('export')
                         ->label(__('campaign_conversions.actions.export'))
                         ->icon('heroicon-o-arrow-down-tray')
@@ -539,14 +530,14 @@ class CampaignConversionResource extends Resource
                         TextEntry::make('conversion_type')
                             ->label(__('campaign_conversions.infolist.conversion_type'))
                             ->badge()
-                            ->color(fn(string $state): string => match ($state) {
+                            ->color(fn (string $state): string => match ($state) {
                                 'purchase' => 'success',
                                 'signup' => 'info',
                                 'download' => 'warning',
                                 'lead' => 'primary',
                                 default => 'gray',
                             })
-                            ->formatStateUsing(fn(string $state): string => __("campaign_conversions.conversion_types.{$state}")),
+                            ->formatStateUsing(fn (string $state): string => __("campaign_conversions.conversion_types.{$state}")),
                         TextEntry::make('conversion_value')
                             ->label(__('campaign_conversions.infolist.conversion_value'))
                             ->money('EUR')
@@ -560,7 +551,7 @@ class CampaignConversionResource extends Resource
                                 'danger' => 'cancelled',
                                 'secondary' => 'refunded',
                             ])
-                            ->formatStateUsing(fn(string $state): string => __("campaign_conversions.statuses.{$state}")),
+                            ->formatStateUsing(fn (string $state): string => __("campaign_conversions.statuses.{$state}")),
                         TextEntry::make('converted_at')
                             ->label(__('campaign_conversions.infolist.converted_at'))
                             ->dateTime(),
@@ -600,13 +591,13 @@ class CampaignConversionResource extends Resource
                         TextEntry::make('device_type')
                             ->label(__('campaign_conversions.infolist.device_type'))
                             ->badge()
-                            ->color(fn(?string $state): string => match ($state) {
+                            ->color(fn (?string $state): string => match ($state) {
                                 'mobile' => 'info',
                                 'tablet' => 'warning',
                                 'desktop' => 'success',
                                 default => 'gray',
                             })
-                            ->formatStateUsing(fn(?string $state): string => $state ? __("campaign_conversions.device_types.{$state}") : '-'),
+                            ->formatStateUsing(fn (?string $state): string => $state ? __("campaign_conversions.device_types.{$state}") : '-'),
                         TextEntry::make('browser')
                             ->label(__('campaign_conversions.infolist.browser')),
                         TextEntry::make('os')
@@ -623,11 +614,11 @@ class CampaignConversionResource extends Resource
                     ->schema([
                         TextEntry::make('roi')
                             ->label(__('campaign_conversions.infolist.roi'))
-                            ->formatStateUsing(fn(?float $state): string => $state ? number_format($state * 100, 2) . '%' : '-')
-                            ->color(fn(?float $state): string => $state && $state > 0 ? 'success' : ($state && $state < 0 ? 'danger' : 'gray')),
+                            ->formatStateUsing(fn (?float $state): string => $state ? number_format($state * 100, 2).'%' : '-')
+                            ->color(fn (?float $state): string => $state && $state > 0 ? 'success' : ($state && $state < 0 ? 'danger' : 'gray')),
                         TextEntry::make('roas')
                             ->label(__('campaign_conversions.infolist.roas'))
-                            ->formatStateUsing(fn(?float $state): string => $state ? number_format($state * 100, 2) . '%' : '-'),
+                            ->formatStateUsing(fn (?float $state): string => $state ? number_format($state * 100, 2).'%' : '-'),
                         TextEntry::make('cost_per_conversion')
                             ->label(__('campaign_conversions.infolist.cost_per_conversion'))
                             ->money('EUR'),
@@ -639,7 +630,7 @@ class CampaignConversionResource extends Resource
                             ->money('EUR'),
                         TextEntry::make('conversion_rate')
                             ->label(__('campaign_conversions.infolist.conversion_rate'))
-                            ->formatStateUsing(fn(?float $state): string => $state ? number_format($state * 100, 2) . '%' : '-'),
+                            ->formatStateUsing(fn (?float $state): string => $state ? number_format($state * 100, 2).'%' : '-'),
                     ])
                     ->columns(3),
                 InfolistSection::make(__('campaign_conversions.infolist.additional_information'))

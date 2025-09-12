@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\StockResource\Widgets;
 
@@ -39,12 +41,12 @@ class StockOverviewWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color($needsReorderItems > 0 ? 'info' : 'success'),
 
-            Stat::make(__('inventory.total_stock_value'), '€' . number_format($totalStockValue, 2))
+            Stat::make(__('inventory.total_stock_value'), '€'.number_format($totalStockValue, 2))
                 ->description(__('inventory.total_stock_value_description'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('success'),
 
-            Stat::make(__('inventory.reserved_stock_value'), '€' . number_format($totalReservedValue, 2))
+            Stat::make(__('inventory.reserved_stock_value'), '€'.number_format($totalReservedValue, 2))
                 ->description(__('inventory.reserved_stock_value_description'))
                 ->descriptionIcon('heroicon-m-lock-closed')
                 ->color('warning'),

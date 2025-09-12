@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Filament\Components\LiveNotificationFeed;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Facades\FilamentView;

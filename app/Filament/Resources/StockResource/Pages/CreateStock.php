@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\StockResource\Pages;
 
 use App\Filament\Resources\StockResource;
+use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use Filament\Actions;
 
 class CreateStock extends CreateRecord
 {
@@ -69,7 +71,7 @@ class CreateStock extends CreateRecord
             ->body(__('inventory.stock_item_created_message', [
                 'product' => $record->display_name,
                 'location' => $record->location->name,
-                'stock' => $record->stock
+                'stock' => $record->stock,
             ]))
             ->success()
             ->send();

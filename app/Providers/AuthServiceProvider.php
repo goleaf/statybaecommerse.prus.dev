@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Providers;
 
@@ -13,7 +15,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Allow administrators to bypass all authorization checks
-        Gate::before(function ($user, string $ability = null) {
+        Gate::before(function ($user, ?string $ability = null) {
             if (method_exists($user, 'hasRole') && ($user->hasRole('administrator') || $user->hasRole('super_admin'))) {
                 return true;
             }

@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Translatable\HasTranslations;
 
 final class PriceListItem extends Model
@@ -67,7 +69,7 @@ final class PriceListItem extends Model
 
     public function getDiscountPercentageAttribute(): ?int
     {
-        if (!$this->compare_amount || $this->compare_amount <= $this->net_amount) {
+        if (! $this->compare_amount || $this->compare_amount <= $this->net_amount) {
             return null;
         }
 
@@ -88,7 +90,7 @@ final class PriceListItem extends Model
             return $this->product->trans('name') ?: $this->product->name;
         }
 
-        return 'Price List Item #' . $this->id;
+        return 'Price List Item #'.$this->id;
     }
 
     public function getEffectivePriceAttribute(): float
@@ -98,7 +100,7 @@ final class PriceListItem extends Model
 
     public function getSavingsAmountAttribute(): ?float
     {
-        if (!$this->compare_amount || $this->compare_amount <= $this->net_amount) {
+        if (! $this->compare_amount || $this->compare_amount <= $this->net_amount) {
             return null;
         }
 
@@ -107,7 +109,7 @@ final class PriceListItem extends Model
 
     public function isActive(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -146,14 +148,15 @@ final class PriceListItem extends Model
     public function scopeValid($query)
     {
         $now = now();
+
         return $query->where('is_active', true)
             ->where(function ($q) use ($now) {
                 $q->whereNull('valid_from')
-                  ->orWhere('valid_from', '<=', $now);
+                    ->orWhere('valid_from', '<=', $now);
             })
             ->where(function ($q) use ($now) {
                 $q->whereNull('valid_until')
-                  ->orWhere('valid_until', '>=', $now);
+                    ->orWhere('valid_until', '>=', $now);
             });
     }
 

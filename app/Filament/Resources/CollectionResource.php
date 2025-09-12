@@ -16,7 +16,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\DeleteAction;
@@ -62,9 +62,9 @@ final class CollectionResource extends Resource
         return __('admin.models.collections');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 // Basic Information Section
                 SchemaSection::make(__('admin.collections.sections.basic_information'))

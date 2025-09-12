@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ReportResource\Pages;
 
-use App\Filament\Resources\ReportResource\Widgets;
 use App\Filament\Resources\ReportResource;
+use App\Filament\Resources\ReportResource\Widgets;
+use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListReports extends ListRecords
@@ -48,19 +50,19 @@ final class ListReports extends ListRecords
                 ->icon('heroicon-o-document-chart-bar'),
             'active' => Tab::make(__('admin.reports.tabs.active'))
                 ->icon('heroicon-o-check-circle')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('is_active', true)),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true)),
             'public' => Tab::make(__('admin.reports.tabs.public'))
                 ->icon('heroicon-o-globe-alt')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('is_public', true)),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_public', true)),
             'scheduled' => Tab::make(__('admin.reports.tabs.scheduled'))
                 ->icon('heroicon-o-clock')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('is_scheduled', true)),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_scheduled', true)),
             'popular' => Tab::make(__('admin.reports.tabs.popular'))
                 ->icon('heroicon-o-star')
-                ->modifyQueryUsing(fn(Builder $query) => $query->orderBy('view_count', 'desc')),
+                ->modifyQueryUsing(fn (Builder $query) => $query->orderBy('view_count', 'desc')),
             'recent' => Tab::make(__('admin.reports.tabs.recent'))
                 ->icon('heroicon-o-clock')
-                ->modifyQueryUsing(fn(Builder $query) => $query->latest()),
+                ->modifyQueryUsing(fn (Builder $query) => $query->latest()),
         ];
     }
 }

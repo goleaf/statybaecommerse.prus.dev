@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -16,7 +18,7 @@ final class ProductRequestController extends Controller
      */
     public function create(Product $product): View
     {
-        if (!$product->isRequestable()) {
+        if (! $product->isRequestable()) {
             abort(404, __('translations.product_not_requestable'));
         }
 
@@ -30,7 +32,7 @@ final class ProductRequestController extends Controller
     {
         $product = Product::findOrFail($request->product_id);
 
-        if (!$product->isRequestable()) {
+        if (! $product->isRequestable()) {
             return redirect()->back()
                 ->withErrors(['error' => __('translations.product_not_requestable')]);
         }
@@ -69,7 +71,7 @@ final class ProductRequestController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
-        
+
         $productRequests = ProductRequest::with(['product', 'respondedBy'])
             ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
@@ -96,4 +98,3 @@ final class ProductRequestController extends Controller
             ->with('success', __('translations.product_request_cancelled'));
     }
 }
-

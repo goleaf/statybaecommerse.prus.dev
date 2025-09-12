@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Translations;
 
@@ -35,5 +37,3 @@ final class ZoneTranslation extends Model
         return $this->belongsTo(Zone::class);
     }
 }
-
-

@@ -1,14 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\VariantInventory;
-use App\Models\ProductVariant;
 use App\Models\Location;
+use App\Models\VariantInventory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Http\JsonResponse;
 
 final class VariantStockController extends Controller
 {
@@ -40,7 +41,7 @@ final class VariantStockController extends Controller
                 $q->where('name', 'like', "%{$search}%");
             })->orWhereHas('variant', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%");
+                    ->orWhere('sku', 'like', "%{$search}%");
             });
         }
 
@@ -53,7 +54,7 @@ final class VariantStockController extends Controller
     public function show(VariantInventory $variantStock): View
     {
         $variantStock->load(['variant.product', 'location', 'supplier', 'stockMovements.user']);
-        
+
         return view('frontend.variant-stock.show', compact('variantStock'));
     }
 
@@ -66,14 +67,14 @@ final class VariantStockController extends Controller
         ]);
 
         $query = VariantInventory::where('variant_id', $request->variant_id);
-        
+
         if ($request->filled('location_id')) {
             $query->where('location_id', $request->location_id);
         }
 
         $inventory = $query->first();
 
-        if (!$inventory) {
+        if (! $inventory) {
             return response()->json([
                 'available' => false,
                 'message' => __('inventory.not_available_at_location'),
@@ -85,7 +86,7 @@ final class VariantStockController extends Controller
         return response()->json([
             'available' => $available,
             'available_stock' => $inventory->available_stock,
-            'message' => $available 
+            'message' => $available
                 ? __('inventory.available_for_reservation')
                 : __('inventory.insufficient_stock'),
         ]);
@@ -138,4 +139,3 @@ final class VariantStockController extends Controller
         return response()->json($lowStockItems);
     }
 }
-

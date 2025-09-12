@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Actions;
 
-use App\Actions\ZoneSessionManager;
 use App\Mail\OrderPlaced;
 use App\Models\Country;
 use App\Models\Order;
@@ -36,7 +37,7 @@ class CreateOrder
                     ->name,
             ]);
             /** @var OrderAddress $billingAddress */
-            $billingAddress = !data_get($checkout, 'same_as_shipping')
+            $billingAddress = ! data_get($checkout, 'same_as_shipping')
                 ? OrderAddress::query()->create([
                     'customer_id' => data_get($checkout, 'billing_address.user_id'),
                     'last_name' => data_get($checkout, 'billing_address.last_name'),
@@ -182,7 +183,7 @@ class CreateOrder
             // Queue order confirmation email with user's preferred locale
             try {
                 $mailable = new OrderPlaced($order);
-                if (!empty($customer->preferred_locale)) {
+                if (! empty($customer->preferred_locale)) {
                     $mailable->locale($customer->preferred_locale);
                 }
                 Mail::to($customer->email)->queue($mailable);

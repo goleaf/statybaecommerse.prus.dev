@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Concerns;
 
@@ -99,7 +101,7 @@ trait WithFilters
 
     public function toggleFilters(): void
     {
-        $this->showFilters = !$this->showFilters;
+        $this->showFilters = ! $this->showFilters;
     }
 
     protected function applySearchFilters(Builder $query): Builder
@@ -108,11 +110,11 @@ trait WithFilters
             ->when($this->search, function (Builder $q) {
                 $q->where(function (Builder $subQuery) {
                     $subQuery
-                        ->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('description', 'like', '%' . $this->search . '%')
-                        ->orWhere('sku', 'like', '%' . $this->search . '%')
+                        ->where('name', 'like', '%'.$this->search.'%')
+                        ->orWhere('description', 'like', '%'.$this->search.'%')
+                        ->orWhere('sku', 'like', '%'.$this->search.'%')
                         ->orWhereHas('brand', function (Builder $brandQuery) {
-                            $brandQuery->where('name', 'like', '%' . $this->search . '%');
+                            $brandQuery->where('name', 'like', '%'.$this->search.'%');
                         });
                 });
             })
@@ -161,6 +163,7 @@ trait WithFilters
         }
 
         $column = $whitelist[$sortKey] ?? 'created_at';
+
         return $query->orderBy($column, $direction);
     }
 }
