@@ -35,10 +35,17 @@ return new class extends Migration {
                 $table->string('name');
                 $table->string('slug');
                 $table->text('description')->nullable();
+                $table->string('subject')->nullable();
+                $table->longText('content')->nullable();
+                $table->string('cta_text')->nullable();
+                $table->string('banner_alt_text')->nullable();
+                $table->string('meta_title')->nullable();
+                $table->text('meta_description')->nullable();
                 $table->timestamps();
 
                 $table->unique(['campaign_id', 'locale']);
                 $table->index(['locale']);
+                $table->index(['slug']);
             });
         }
     }

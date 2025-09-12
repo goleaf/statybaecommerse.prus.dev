@@ -1,0 +1,11 @@
+<?php declare(strict_types=1);
+
+namespace App\Filament\Resources\AddressResource\Pages;
+
+use App\Filament\Resources\AddressResource;
+use Filament\Resources\Pages\CreateRecord;
+
+final class CreateAddress extends CreateRecord
+{
+    protected static string $resource = AddressResource::class;
+}

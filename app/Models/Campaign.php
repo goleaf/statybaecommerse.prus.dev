@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\HasTranslations;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 final class Campaign extends Model
 {
@@ -19,8 +25,15 @@ final class Campaign extends Model
     protected $fillable = [
         'name',
         'slug',
+        'description',
+        'type',
+        'subject',
+        'content',
         'starts_at',
         'ends_at',
+        'start_date',
+        'end_date',
+        'budget',
         'channel_id',
         'zone_id',
         'status',
@@ -39,6 +52,7 @@ final class Campaign extends Model
         'target_categories',
         'target_products',
         'target_customer_groups',
+        'target_segments',
         'display_priority',
         'banner_image',
         'banner_alt_text',
@@ -57,6 +71,9 @@ final class Campaign extends Model
         return [
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
+            'start_date' => 'datetime',
+            'end_date' => 'datetime',
+            'budget' => 'decimal:2',
             'metadata' => 'array',
             'is_featured' => 'boolean',
             'send_notifications' => 'boolean',
@@ -72,6 +89,7 @@ final class Campaign extends Model
             'target_categories' => 'array',
             'target_products' => 'array',
             'target_customer_groups' => 'array',
+            'target_segments' => 'array',
             'display_priority' => 'integer',
             'auto_start' => 'boolean',
             'auto_end' => 'boolean',
@@ -81,6 +99,11 @@ final class Campaign extends Model
     }
 
     protected string $translationModel = \App\Models\Translations\CampaignTranslation::class;
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 
     public function discounts(): BelongsToMany
     {
@@ -97,42 +120,57 @@ final class Campaign extends Model
         return $this->belongsTo(Zone::class);
     }
 
-    public function views()
+    public function views(): HasMany
     {
         return $this->hasMany(CampaignView::class);
     }
 
-    public function clicks()
+    public function clicks(): HasMany
     {
         return $this->hasMany(CampaignClick::class);
     }
 
-    public function conversions()
+    public function conversions(): HasMany
     {
         return $this->hasMany(CampaignConversion::class);
     }
 
-    public function customerSegments()
+    public function customerSegments(): HasMany
     {
         return $this->hasMany(CampaignCustomerSegment::class);
     }
 
-    public function productTargets()
+    public function productTargets(): HasMany
     {
         return $this->hasMany(CampaignProductTarget::class);
     }
 
-    public function schedules()
+    public function schedules(): HasMany
     {
         return $this->hasMany(CampaignSchedule::class);
     }
 
-    public function orders()
+    public function orders(): HasManyThrough
     {
         return $this->hasManyThrough(Order::class, CampaignConversion::class);
     }
 
-    public function scopeActive($query)
+    public function targetCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'campaign_categories');
+    }
+
+    public function targetProducts(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'campaign_products');
+    }
+
+    public function targetCustomerGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(CustomerGroup::class, 'campaign_customer_groups');
+    }
+
+    public function scopeActive(Builder $query): Builder
     {
         return $query
             ->where('status', 'active')
@@ -148,12 +186,12 @@ final class Campaign extends Model
             });
     }
 
-    public function scopeScheduled($query)
+    public function scopeScheduled(Builder $query): Builder
     {
         return $query->where('status', 'scheduled');
     }
 
-    public function scopeExpired($query)
+    public function scopeExpired(Builder $query): Builder
     {
         return $query
             ->where('status', 'expired')
@@ -164,32 +202,32 @@ final class Campaign extends Model
             });
     }
 
-    public function scopeFeatured($query)
+    public function scopeFeatured(Builder $query): Builder
     {
         return $query->where('is_featured', true);
     }
 
-    public function scopeByPriority($query)
+    public function scopeByPriority(Builder $query): Builder
     {
         return $query->orderBy('display_priority', 'desc');
     }
 
-    public function scopeForChannel($query, $channelId)
+    public function scopeForChannel(Builder $query, int $channelId): Builder
     {
         return $query->where('channel_id', $channelId);
     }
 
-    public function scopeForZone($query, $zoneId)
+    public function scopeForZone(Builder $query, int $zoneId): Builder
     {
         return $query->where('zone_id', $zoneId);
     }
 
-    public function scopeWithAnalytics($query)
+    public function scopeWithAnalytics(Builder $query): Builder
     {
         return $query->where('track_conversions', true);
     }
 
-    public function scopeSocialMediaReady($query)
+    public function scopeSocialMediaReady(Builder $query): Builder
     {
         return $query->where('social_media_ready', true);
     }
@@ -336,5 +374,52 @@ final class Campaign extends Model
             'draft' => __('campaigns.status.draft'),
             default => __('campaigns.status.unknown'),
         };
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection('images')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+            ->singleFile();
+
+        $this
+            ->addMediaCollection('banners')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+            ->singleFile();
+
+        $this
+            ->addMediaCollection('attachments')
+            ->acceptsMimeTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+    }
+
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this
+            ->addMediaConversion('thumb')
+            ->width(150)
+            ->height(150)
+            ->sharpen(10)
+            ->performOnCollections('images', 'banners');
+
+        $this
+            ->addMediaConversion('medium')
+            ->width(400)
+            ->height(300)
+            ->sharpen(10)
+            ->performOnCollections('images', 'banners');
+
+        $this
+            ->addMediaConversion('large')
+            ->width(800)
+            ->height(600)
+            ->sharpen(10)
+            ->performOnCollections('images', 'banners');
+    }
+
+    public function getImageUrl(string $conversion = ''): ?string
+    {
+        $media = $this->getFirstMedia('images');
+        return $media ? $media->getUrl($conversion) : null;
     }
 }

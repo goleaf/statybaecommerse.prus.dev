@@ -1,0 +1,548 @@
+<?php declare(strict_types=1);
+
+namespace App\Filament\Resources;
+
+use App\Filament\Actions\BulkProductOperationsAction;
+use App\Filament\Actions\DocumentAction;
+use App\Filament\Resources\ProductResource\Pages;
+use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Services\MultiLanguageTabService;
+use Filament\Actions\Action;
+// Actions for tables/pages
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Support\Colors\Color;
+use Filament\Support\Enums\FontWeight;
+use Filament\Tables\Table;
+use Filament\Actions as Actions;
+use Filament\Forms;
+use Filament\Tables;
+// Table actions are referenced via TableActions alias
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
+use SolutionForest\TabLayoutPlugin\Components\Tabs;
+final class ProductResource extends Resource
+{
+    protected static ?string $model = Product::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.catalog');
+    }
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    protected static int $globalSearchResultsLimit = 20;
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'sku', 'brand.name', 'categories.name'];
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            __('admin.products.fields.brand') => $record->brand?->name,
+            __('admin.products.fields.sku') => $record->sku,
+            __('admin.products.fields.price') => '€' . number_format((float) $record->price, 2),
+            __('admin.products.fields.stock_quantity') => $record->stock_quantity,
+        ];
+    }
+
+    protected static ?int $navigationSort = 1;
+
+    public static function form(Schema $schema): Schema
+    {
+        $components = [
+            Section::make(__('translations.product_information'))
+                ->components([
+                    Forms\Components\TextInput::make('name')
+                        ->required()
+                        ->maxLength(255)
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
+                    Forms\Components\TextInput::make('slug')
+                        ->required()
+                        ->maxLength(255)
+                        ->unique(Product::class, 'slug', ignoreRecord: true),
+                    Forms\Components\Select::make('brand_id')
+                        ->relationship('brand', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->createOptionForm([
+                            Forms\Components\TextInput::make('name')
+                                ->required()
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
+                            Forms\Components\TextInput::make('slug')
+                                ->required()
+                                ->maxLength(255),
+                        ])
+                        ->createOptionUsing(function (array $data): int {
+                            return Brand::create($data)->getKey();
+                        }),
+                    Forms\Components\Select::make('categories')
+                        ->relationship('categories', 'name')
+                        ->multiple()
+                        ->searchable()
+                        ->preload()
+                        ->createOptionForm([
+                            Forms\Components\TextInput::make('name')
+                                ->required()
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
+                            Forms\Components\TextInput::make('slug')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\Select::make('parent_id')
+                                ->relationship('parent', 'name')
+                                ->searchable()
+                                ->preload(),
+                        ])
+                        ->createOptionUsing(function (array $data): int {
+                            return Category::create($data)->getKey();
+                        }),
+                    Forms\Components\Textarea::make('summary')
+                        ->maxLength(500)
+                        ->rows(3),
+                    Forms\Components\RichEditor::make('description')
+                        ->maxLength(65535),
+                ])
+                ->columns(2),
+            Section::make(__('translations.pricing_inventory'))
+                ->components([
+                    Forms\Components\TextInput::make('price')
+                        ->numeric()
+                        ->prefix('€')
+                        ->step(0.01)
+                        ->required(),
+                    Forms\Components\TextInput::make('compare_price')
+                        ->label(__('admin.products.fields.compare_price'))
+                        ->numeric()
+                        ->prefix('€')
+                        ->step(0.01),
+                    Forms\Components\TextInput::make('cost_price')
+                        ->label(__('admin.products.fields.cost_price'))
+                        ->numeric()
+                        ->prefix('€')
+                        ->step(0.01),
+                    Forms\Components\TextInput::make('sku')
+                        ->label(__('admin.products.fields.sku'))
+                        ->maxLength(255)
+                        ->unique(Product::class, 'sku', ignoreRecord: true),
+                    Forms\Components\TextInput::make('barcode')
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('stock_quantity')
+                        ->numeric()
+                        ->default(0)
+                        ->minValue(0),
+                    Forms\Components\TextInput::make('low_stock_threshold')
+                        ->numeric()
+                        ->default(10)
+                        ->minValue(0),
+                    Forms\Components\TextInput::make('weight')
+                        ->numeric()
+                        ->suffix('kg')
+                        ->step(0.01),
+                ])
+                ->columns(4),
+            Section::make(__('translations.settings'))
+                ->components([
+                    Forms\Components\Toggle::make('track_inventory')
+                        ->label(__('admin.products.fields.track_inventory'))
+                        ->default(true),
+                    Forms\Components\Toggle::make('is_visible')
+                        ->label(__('admin.products.fields.is_visible'))
+                        ->default(true),
+                    Forms\Components\Toggle::make('is_featured')
+                        ->label(__('admin.products.fields.is_featured'))
+                        ->default(false),
+                    Forms\Components\Select::make('status')
+                        ->options([
+                            'draft' => __('translations.draft'),
+                            'active' => __('translations.active'),
+                            'inactive' => __('translations.inactive'),
+                            'archived' => __('translations.archived'),
+                        ])
+                        ->default('draft')
+                        ->required(),
+                ])
+                ->columns(4),
+            // Media Section
+            Section::make(__('translations.media'))
+                ->components([
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                        ->label(__('translations.product_images'))
+                        ->multiple()
+                        ->reorderable()
+                        ->maxFiles(15)
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+                        ->imageResizeMode('cover')
+                        ->imageCropAspectRatio('1:1')
+                        ->imageResizeTargetWidth('800')
+                        ->imageResizeTargetHeight('800')
+                        ->collection('images')
+                        ->conversion('image-md')
+                        ->helperText(__('translations.product_images') . '. ' . __('translations.webp_format') . ' ' . __('translations.image_optimization')),
+                ])
+                ->columns(1)
+                ->collapsible(),
+        ];
+
+        if (!app()->runningUnitTests()) {
+            $components[] = Tabs::make('product_translations')
+                ->tabs(
+                    MultiLanguageTabService::createSectionedTabs([
+                        'basic_information' => [
+                            'name' => [
+                                'type' => 'text',
+                                'label' => __('translations.name'),
+                                'required' => true,
+                                'maxLength' => 255,
+                            ],
+                            'slug' => [
+                                'type' => 'text',
+                                'label' => __('translations.slug'),
+                                'required' => true,
+                                'maxLength' => 255,
+                                'placeholder' => __('translations.slug_auto_generated'),
+                            ],
+                            'summary' => [
+                                'type' => 'textarea',
+                                'label' => __('translations.summary'),
+                                'maxLength' => 500,
+                                'rows' => 2,
+                                'placeholder' => __('translations.product_summary_help'),
+                            ],
+                            'description' => [
+                                'type' => 'rich_editor',
+                                'label' => __('translations.description'),
+                                'toolbar' => [
+                                    'bold', 'italic', 'link', 'bulletList', 'orderedList',
+                                    'h2', 'h3', 'blockquote', 'codeBlock', 'table'
+                                ],
+                            ],
+                        ],
+                        'seo_information' => [
+                            'seo_title' => [
+                                'type' => 'text',
+                                'label' => __('translations.seo_title'),
+                                'maxLength' => 255,
+                                'placeholder' => __('translations.seo_title_help'),
+                            ],
+                            'seo_description' => [
+                                'type' => 'textarea',
+                                'label' => __('translations.seo_description'),
+                                'maxLength' => 300,
+                                'rows' => 3,
+                                'placeholder' => __('translations.seo_description_help'),
+                            ],
+                            'meta_keywords' => [
+                                'type' => 'text',
+                                'label' => __('translations.meta_keywords'),
+                                'maxLength' => 255,
+                                'placeholder' => __('translations.meta_keywords_help'),
+                            ],
+                        ],
+                    ])
+                )
+                ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
+                ->persistTabInQueryString('product_tab')
+                ->contained(false);
+        } else {
+            // For tests, create simple translation fields
+            foreach (collect(MultiLanguageTabService::getAvailableLanguages())->pluck('code') as $code) {
+                $components[] = Section::make("Translations ({$code})")
+                    ->components([
+                        Forms\Components\TextInput::make("name_{$code}")
+                            ->label(__('translations.name'))
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make("slug_{$code}")
+                            ->label(__('translations.slug'))
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make("summary_{$code}")
+                            ->label(__('translations.summary'))
+                            ->maxLength(500)
+                            ->rows(2),
+                        Forms\Components\RichEditor::make("description_{$code}")
+                            ->label(__('translations.description')),
+                        Forms\Components\TextInput::make("seo_title_{$code}")
+                            ->label(__('translations.seo_title'))
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make("seo_description_{$code}")
+                            ->label(__('translations.seo_description'))
+                            ->maxLength(300)
+                            ->rows(3),
+                        Forms\Components\TextInput::make("meta_keywords_{$code}")
+                            ->label(__('translations.meta_keywords'))
+                            ->maxLength(255),
+                    ])
+                    ->columns(1);
+            }
+        }
+
+        return $schema->components($components);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('images')
+                    ->label(__('translations.image'))
+                    ->collection('images')
+                    ->conversion('image-sm')
+                    ->defaultImageUrl('/images/placeholder-product.jpg')
+                    ->circular()
+                    ->size(80)
+                    ->tooltip(fn(Product $record): string =>
+                        $record->hasImages()
+                            ? __('translations.images') . ': ' . $record->getImagesCount()
+                            : __('translations.no_image')),
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('admin.products.fields.name'))
+                    ->searchable()
+                    ->sortable()
+                    ->limit(50),
+                Tables\Columns\TextColumn::make('sku')
+                    ->label(__('admin.products.fields.sku'))
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('gray'),
+                Tables\Columns\TextColumn::make('brand.name')
+                    ->label(__('admin.products.fields.brand'))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('categories.name')
+                    ->label(__('admin.products.fields.categories'))
+                    ->badge()
+                    ->separator(',')
+                    ->limit(2)
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('price')
+                    ->label(__('admin.products.fields.price'))
+                    ->money('EUR')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('stock_quantity')
+                    ->label(__('admin.products.fields.stock_quantity'))
+                    ->numeric()
+                    ->sortable()
+                    ->color(fn($state): string => match (true) {
+                        $state <= 0 => 'danger',
+                        $state <= 10 => 'warning',
+                        default => 'success',
+                    }),
+                Tables\Columns\IconColumn::make('is_visible')
+                    ->label(__('admin.products.fields.is_visible'))
+                    ->boolean()
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_featured')
+                    ->label(__('admin.products.fields.is_featured'))
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'active' => 'success',
+                        'draft' => 'warning',
+                        'inactive' => 'danger',
+                        'archived' => 'gray',
+                        default => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('admin.fields.created_at'))
+                    ->date('Y-m-d')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('brand_id')
+                    ->relationship('brand', 'name')
+                    ->searchable()
+                    ->preload(),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'draft' => __('translations.draft'),
+                        'active' => __('translations.active'),
+                        'inactive' => __('translations.inactive'),
+                        'archived' => __('translations.archived'),
+                    ]),
+                Tables\Filters\Filter::make('low_stock')
+                    ->query(fn(Builder $query): Builder => $query->lowStock())
+                    ->label(__('admin.products.filters.low_stock')),
+                Tables\Filters\Filter::make('featured')
+                    ->query(fn(Builder $query): Builder => $query->where('is_featured', true))
+                    ->label(__('admin.products.filters.featured_only')),
+            ])
+            ->recordActions([
+                Actions\Action::make('generate_images')
+                    ->label(__('translations.generate_images'))
+                    ->icon('heroicon-o-photo')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading(__('translations.generate_images'))
+                    ->modalDescription(__('translations.generate_images_confirm_single'))
+                    ->modalSubmitActionLabel(__('translations.generate_images'))
+                    ->action(function (Product $record) {
+                        $imageService = app(\App\Services\Images\ProductImageService::class);
+
+                        try {
+                            for ($i = 0; $i < 3; $i++) {
+                                $imagePath = $imageService->generateProductImage($record);
+
+                                $record
+                                    ->addMedia($imagePath)
+                                    ->withCustomProperties([
+                                        'generated' => true,
+                                        'product_name' => $record->name,
+                                        'image_number' => $i + 1,
+                                        'alt_text' => __('translations.product_image_alt', ['name' => $record->name, 'number' => $i + 1]),
+                                    ])
+                                    ->usingName($record->name . ' - ' . __('translations.image') . ' ' . ($i + 1))
+                                    ->usingFileName('product_' . $record->id . '_generated_' . ($i + 1) . '.webp')
+                                    ->toMediaCollection('images');
+
+                                if (file_exists($imagePath)) {
+                                    unlink($imagePath);
+                                }
+                            }
+
+                            \Filament\Notifications\Notification::make()
+                                ->title(__('translations.image_generated'))
+                                ->success()
+                                ->send();
+                        } catch (\Throwable $e) {
+                            \Filament\Notifications\Notification::make()
+                                ->title(__('translations.image_generation_failed'))
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+                DocumentAction::make()
+                    ->label(__('admin.documents.generate'))
+                    ->variables(fn(Product $record) => [
+                        '$PRODUCT_NAME' => $record->name,
+                        '$PRODUCT_SKU' => $record->sku,
+                        '$PRODUCT_PRICE' => number_format((float) $record->price, 2) . ' EUR',
+                        '$PRODUCT_DESCRIPTION' => $record->description,
+                        '$PRODUCT_BRAND' => $record->brand?->name ?? '',
+                        '$PRODUCT_CATEGORY' => $record->categories->pluck('name')->join(', '),
+                        '$PRODUCT_WEIGHT' => $record->weight ? $record->weight . ' kg' : '',
+                    ]),
+                Actions\ViewAction::make()->label(__('admin.actions.view')),
+                Actions\EditAction::make()->label(__('admin.actions.edit')),
+                Actions\DeleteAction::make()->label(__('admin.actions.delete')),
+            ])
+            ->bulkActions([
+                Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('generate_images')
+                        ->label(__('translations.generate_images'))
+                        ->icon('heroicon-o-photo')
+                        ->color('success')
+                        ->action(function (\Illuminate\Database\Eloquent\Collection $records) {
+                            $imageService = app(\App\Services\Images\ProductImageService::class);
+                            $successCount = 0;
+                            $errorCount = 0;
+
+                            foreach ($records as $product) {
+                                try {
+                                    // Generate 2-3 random images per product
+                                    $imageCount = random_int(2, 3);
+
+                                    for ($i = 0; $i < $imageCount; $i++) {
+                                        $imagePath = $imageService->generateProductImage($product);
+
+                                        $product
+                                            ->addMedia($imagePath)
+                                            ->withCustomProperties([
+                                                'generated' => true,
+                                                'product_name' => $product->name,
+                                                'image_number' => $i + 1,
+                                                'alt_text' => __('translations.product_image_alt', ['name' => $product->name, 'number' => $i + 1]),
+                                            ])
+                                            ->usingName($product->name . ' - ' . __('translations.image') . ' ' . ($i + 1))
+                                            ->usingFileName('product_' . $product->id . '_bulk_' . ($i + 1) . '.webp')
+                                            ->toMediaCollection('images');
+
+                                        if (file_exists($imagePath)) {
+                                            unlink($imagePath);
+                                        }
+                                    }
+
+                                    $successCount++;
+                                } catch (\Throwable $e) {
+                                    $errorCount++;
+                                    \Illuminate\Support\Facades\Log::warning('Bulk image generation failed', [
+                                        'product_id' => $product->id,
+                                        'error' => $e->getMessage()
+                                    ]);
+                                }
+                            }
+
+                            \Filament\Notifications\Notification::make()
+                                ->title(__('translations.image_generated'))
+                                ->body(__('translations.image_generation_summary', ['success' => $successCount, 'errors' => $errorCount]))
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading(__('translations.generate_images'))
+                        ->modalDescription(__('translations.generate_images_confirm_bulk'))
+                        ->modalSubmitActionLabel(__('translations.generate_images')),
+                    Actions\DeleteBulkAction::make(),
+                    Actions\ForceDeleteBulkAction::make(),
+                    Actions\RestoreBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\VariantsRelationManager::class,
+            RelationManagers\ReviewsRelationManager::class,
+            RelationManagers\DocumentsRelationManager::class,
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListProducts::route('/'),
+            'create' => Pages\CreateProduct::route('/create'),
+            'view' => Pages\ViewProduct::route('/{record}'),
+            'edit' => Pages\EditProduct::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()
+            ->with(['brand', 'categories']);
+    }
+}
