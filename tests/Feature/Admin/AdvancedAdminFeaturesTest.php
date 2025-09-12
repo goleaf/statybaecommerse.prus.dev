@@ -76,7 +76,8 @@ it('can impersonate users', function () {
 
     Livewire::actingAs($this->admin)
         ->test(\App\Filament\Pages\UserImpersonation::class)
-        ->callTableAction('impersonate', $customer);
+        ->mountTableAction('impersonate', $customer)
+        ->callMountedTableAction();
 
     expect(auth()->id())->toBe($customer->id);
     expect(session('impersonate.original_user_id'))->toBe($this->admin->id);
@@ -147,5 +148,6 @@ it('validates admin access to advanced features', function () {
     $response = $this->actingAs($regularUser)->get('/admin/user-impersonation');
     $response->assertForbidden();
 });
+
 
 

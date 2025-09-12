@@ -126,19 +126,23 @@ final class Collection extends Model implements HasMedia
     public function getImageUrl(?string $size = null): ?string
     {
         if (!$size) {
-            return $this->getFirstMediaUrl('images') ?: null;
+            $url = $this->getFirstMediaUrl('images');
+            return $url ?: null;
         }
 
-        return $this->getFirstMediaUrl('images', "image-{$size}") ?: $this->getFirstMediaUrl('images');
+        $url = $this->getFirstMediaUrl('images', "image-{$size}") ?: $this->getFirstMediaUrl('images');
+        return $url ?: '';
     }
 
     public function getBannerUrl(?string $size = null): ?string
     {
         if (!$size) {
-            return $this->getFirstMediaUrl('banner') ?: null;
+            $url = $this->getFirstMediaUrl('banner');
+            return $url ?: null;
         }
 
-        return $this->getFirstMediaUrl('banner', "banner-{$size}") ?: $this->getFirstMediaUrl('banner');
+        $url = $this->getFirstMediaUrl('banner', "banner-{$size}") ?: $this->getFirstMediaUrl('banner');
+        return $url ?: null;
     }
 
     public function registerMediaCollections(): void

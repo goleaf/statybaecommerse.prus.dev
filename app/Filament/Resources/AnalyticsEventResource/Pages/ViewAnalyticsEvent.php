@@ -16,4 +16,9 @@ final class ViewAnalyticsEvent extends ViewRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function getView(): string
+    {
+        return 'filament.resources.analytics-event-resource.pages.view-analytics-event';
+    }
 }

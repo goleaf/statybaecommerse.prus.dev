@@ -90,7 +90,9 @@ final class CollectionResource extends Resource
     public static function getPages(): array
     {
         return [
-            // Pages will be created when needed
+            'index' => Pages\ListCollections::route('/'),
+            'create' => Pages\CreateCollection::route('/create'),
+            'edit' => Pages\EditCollection::route('/{record}/edit'),
         ];
     }
 }

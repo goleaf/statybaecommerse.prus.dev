@@ -281,3 +281,4 @@ final class SecurityAudit extends Page implements HasTable
             ->send();
     }
 }
+

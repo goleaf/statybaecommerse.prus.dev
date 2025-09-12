@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CollectionResource\Pages;
 
 use App\Filament\Resources\CollectionResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
 
 final class ListCollections extends ListRecords
 {

@@ -153,7 +153,7 @@ final class AnalyticsEventResource extends Resource
                         );
                     })
                     ->label(__('admin.analytics.session')),
-                Tables\Filters\Filter::make('date_range')
+                Tables\Filters\Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('from')
                             ->label(__('admin.date_ranges.from')),
@@ -176,6 +176,16 @@ final class AnalyticsEventResource extends Resource
             ->recordActions([
                 Actions\ViewAction::make(),
                 Actions\DeleteAction::make(),
+            ])
+            ->headerActions([
+                Actions\Action::make('export')
+                    ->label(__('admin.actions.export'))
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->action(function () {
+                        // Export logic would go here
+                        return redirect()->back();
+                    }),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([

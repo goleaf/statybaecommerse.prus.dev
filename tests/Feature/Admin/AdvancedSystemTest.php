@@ -231,3 +231,4 @@ it('can perform comprehensive system monitoring', function () {
         ->test(\App\Filament\Pages\SystemMonitoring::class)
         ->assertOk();
 });
+

@@ -7,8 +7,8 @@ use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -229,9 +229,10 @@ final class ActivityLogResource extends Resource
 
                 Tables\Filters\SelectFilter::make('causer_id')
                     ->label(__('admin.activity_logs.filters.user'))
-                    ->relationship('causer', 'name')
-                    ->searchable()
-                    ->preload(),
+                    ->options(function () {
+                        return \App\Models\User::pluck('name', 'id')->toArray();
+                    })
+                    ->searchable(),
 
                 Tables\Filters\Filter::make('created_at')
                     ->form([

@@ -60,3 +60,4 @@ final class MarketingEmail extends Notification implements ShouldQueue
 }
 
 
+

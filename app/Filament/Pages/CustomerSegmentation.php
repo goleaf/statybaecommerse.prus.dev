@@ -342,3 +342,4 @@ final class CustomerSegmentation extends Page implements HasTable
         ];
     }
 }
+

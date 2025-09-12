@@ -438,3 +438,4 @@ final class SEOAnalytics extends Page implements HasTable
             ->send();
     }
 }
+
