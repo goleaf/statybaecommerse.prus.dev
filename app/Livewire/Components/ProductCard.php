@@ -43,12 +43,16 @@ final class ProductCard extends Component
 
     public function getCurrentPriceProperty(): float
     {
-        return $this->product->sale_price ?? $this->product->price ?? 0.0;
+        $price = $this->product->sale_price ?? $this->product->price ?? 0.0;
+        return (float) $price;
     }
 
     public function getOriginalPriceProperty(): ?float
     {
-        return $this->product->sale_price ? $this->product->price : null;
+        if ($this->product->sale_price) {
+            return (float) $this->product->price;
+        }
+        return null;
     }
 
     public function getDiscountPercentageProperty(): ?int

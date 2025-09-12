@@ -395,6 +395,10 @@ Route::get('/products/{product}/gallery', function ($product) {
     return redirect('/' . app()->getLocale() . '/products/' . $product . '/gallery');
 })->name('products.gallery');
 // Alias for legacy route names - handled by route model binding
+Route::get('/product/{product}', function ($product) {
+    return redirect()->route('products.show', $product);
+})->name('product.show');
+
 Route::get('/categories', function () {
     return redirect('/' . app()->getLocale() . '/categories');
 })->name('categories.index');
