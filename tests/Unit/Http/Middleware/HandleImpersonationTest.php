@@ -85,7 +85,7 @@ describe('HandleImpersonation Middleware', function () {
 
         session(['impersonate' => [
             'original_user_id' => $originalUser->id,
-            'impersonated_user_id' => 999, // Non-existent user
+            'impersonated_user_id' => 999,  // Non-existent user
             'started_at' => now()->toISOString(),
         ]]);
 
@@ -144,7 +144,7 @@ describe('HandleImpersonation Middleware', function () {
         });
 
         expect($response->getContent())->toBe('OK');
-        
+
         // Check if impersonation data is shared with view
         $sharedData = view()->shared('impersonating');
         expect($sharedData)->not()->toBeNull();

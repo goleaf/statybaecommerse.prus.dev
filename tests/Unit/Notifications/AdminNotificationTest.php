@@ -32,7 +32,7 @@ describe('AdminNotification', function () {
 
     it('implements ShouldQueue interface', function () {
         $notification = new AdminNotification('Test', 'Message');
-        
+
         expect($notification)->toBeInstanceOf(\Illuminate\Contracts\Queue\ShouldQueue::class);
     });
 
@@ -96,7 +96,7 @@ describe('AdminNotification', function () {
 
     it('can be sent to a user', function () {
         Notification::fake();
-        
+
         $user = User::factory()->create();
         $notification = new AdminNotification(
             'Test Title',
@@ -111,7 +111,7 @@ describe('AdminNotification', function () {
 
     it('can be sent to multiple users', function () {
         Notification::fake();
-        
+
         $users = User::factory()->count(3)->create();
         $notification = new AdminNotification(
             'Bulk Notification',
@@ -128,16 +128,16 @@ describe('AdminNotification', function () {
 
     it('handles different notification types correctly', function () {
         $types = ['info', 'success', 'warning', 'danger'];
-        
+
         foreach ($types as $type) {
             $notification = new AdminNotification(
                 "Test {$type}",
                 "Message for {$type}",
                 $type
             );
-            
+
             expect($notification->type)->toBe($type);
-            
+
             $data = $notification->toArray(User::factory()->create());
             expect($data['type'])->toBe($type);
         }
@@ -145,15 +145,15 @@ describe('AdminNotification', function () {
 
     it('includes timestamp in notification data', function () {
         $before = now();
-        
+
         $notification = new AdminNotification('Test', 'Message');
         $user = User::factory()->create();
-        
+
         $data = $notification->toDatabase($user);
         $after = now();
-        
+
         $sentAt = \Carbon\Carbon::parse($data['sent_at']);
-        
+
         expect($sentAt->gte($before))->toBeTrue();
         expect($sentAt->lte($after))->toBeTrue();
     });

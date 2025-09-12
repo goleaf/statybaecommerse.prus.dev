@@ -598,3 +598,9 @@ Type: Complex System
 - `app/Filament/Resources/NormalSettingResource.php` - Fixed type hints and component defaults
 - `database/factories/NormalSettingFactory.php` - Fixed validation_rules data
 - Multiple translation files in `lang/` and `resources/lang/` directories
+- 🔄 **CollectionResourceTest:** Persistent syntax error in CollectionResource form schema
+  - CollectionResource.php has syntax error: "Unclosed '[' on line 49 does not match ')'"
+  - Issue is in the form schema with MultiLanguageTabService integration
+  - File keeps getting corrupted/deleted due to syntax errors
+  - **Remaining Issue:** CollectionResource form schema has unclosed brackets causing parse errors
+  - **Status:** All CollectionResourceTest cases failing due to syntax errors in CollectionResource.php
