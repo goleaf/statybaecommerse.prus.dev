@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use App\Livewire\Components\EnhancedProductCard;
+use App\Livewire\Components\ProductCard;
 use App\Models\AnalyticsEvent;
 use App\Models\Product;
 use App\Models\ProductComparison;
@@ -19,7 +19,7 @@ beforeEach(function () {
 });
 
 it('can render enhanced product card', function () {
-    Livewire::test(EnhancedProductCard::class, ['product' => $this->product])
+    Livewire::test(ProductCard::class, ['product' => $this->product])
         ->assertSee('Test Product')
         ->assertSee('€99.99')
         ->assertStatus(200);

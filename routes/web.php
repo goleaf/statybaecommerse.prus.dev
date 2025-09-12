@@ -394,17 +394,12 @@ Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.sh
 Route::get('/products/{product}/gallery', function ($product) {
     return redirect('/' . app()->getLocale() . '/products/' . $product . '/gallery');
 })->name('products.gallery');
-// Aliases for legacy route names
-Route::get('/products/{product}', Pages\SingleProduct::class)->name('product.show');
 Route::get('/categories', function () {
     return redirect('/' . app()->getLocale() . '/categories');
 })->name('categories.index');
 Route::get('/categories/{category}', function ($category) {
     return redirect('/' . app()->getLocale() . '/categories/' . $category);
 })->name('categories.show');
-Route::get('/categories/{category}', function ($category) {
-    return redirect('/' . app()->getLocale() . '/categories/' . $category);
-})->name('category.show');
 // Brands
 Route::get('/brands', function () {
     return redirect('/' . app()->getLocale() . '/brands');

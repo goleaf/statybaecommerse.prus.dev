@@ -12,6 +12,8 @@ return new class extends Migration {
                 $table->id();
                 $table->string('name');
                 $table->string('slug')->unique();
+                $table->text('description')->nullable();
+                $table->string('timezone')->nullable();
                 $table->string('url')->nullable();
                 $table->boolean('is_enabled')->default(true);
                 $table->boolean('is_default')->default(false);
