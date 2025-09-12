@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 final class OrdersChartWidget extends ChartWidget
 {
-    protected static ?int $sort = 4;
+    public static ?int $sort = 4;
     protected int|string|array $columnSpan = 'full';
 
     public function getHeading(): string

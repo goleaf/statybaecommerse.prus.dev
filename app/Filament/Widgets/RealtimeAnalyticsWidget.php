@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 final class RealtimeAnalyticsWidget extends ChartWidget
 {
-    protected static ?int $sort = 2;
-    protected ?string $pollingInterval = '10s';
+    public static ?int $sort = 2;
+    public ?string $pollingInterval = '10s';
     protected int | string | array $columnSpan = 'full';
 
     public function getHeading(): ?string

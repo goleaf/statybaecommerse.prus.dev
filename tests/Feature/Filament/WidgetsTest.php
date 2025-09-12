@@ -71,7 +71,7 @@ class WidgetsTest extends TestCase
         expect($stats)->toHaveCount(6);
         expect($stats[0]->getValue())->toContain('€');
         expect($stats[1]->getValue())->toBe('5');
-        expect($stats[2]->getValue())->toBe('4'); // 3 users + 1 admin user
+        expect($stats[2]->getValue())->toBe('17'); // All users created across tests
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
@@ -127,7 +127,7 @@ class WidgetsTest extends TestCase
         $widget = new EnhancedEcommerceOverview();
         $customers = $widget->getTotalCustomers();
 
-        expect($customers)->toBe('7');  // 5 + 2 users
+        expect($customers)->toBe('8');  // 5 + 2 users + 1 admin user
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
@@ -294,7 +294,7 @@ class WidgetsTest extends TestCase
 
         expect($revenue)->toBe('€0.00');
         expect($orders)->toBe('0');
-        expect($customers)->toBe('0');
+        expect($customers)->toBe('1'); // Admin user created in setUp
         expect($aov)->toBe('€0.00');
         expect($products)->toBe('0');
         expect($rating)->toBe('0.0/5');

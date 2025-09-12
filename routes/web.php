@@ -441,6 +441,9 @@ require __DIR__ . '/auth.php';
 // Authenticated routes
 Route::middleware('auth')->group(function (): void {
     Route::get('/checkout', Pages\Checkout::class)->name('checkout.index');
+    Route::get('/checkout/confirmation/{number}', function (string $number) {
+        return redirect()->route('localized.order.confirmed', ['locale' => app()->getLocale(), 'number' => $number]);
+    })->name('checkout.confirmation');
     Route::get('/orders', Pages\Account\Orders::class)->name('orders.index');
     Route::get('/account', function () {
         return redirect()->route('account.orders');
