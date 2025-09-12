@@ -16,7 +16,6 @@ use FilamentTiptapEditor\TiptapEditor;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use UnitEnum;
 
 final class PostResource extends Resource
 {
