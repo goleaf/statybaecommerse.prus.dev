@@ -35,7 +35,7 @@ it('can access dashboard with proper permissions', function () {
     $response = $this->actingAs($this->admin)->get('/admin');
 
     $response->assertStatus(200);
-    $response->assertSee('Dashboard');
+    $response->assertSee(__('admin.navigation.dashboard'));
 });
 
 it('redirects unauthenticated users to login', function () {
@@ -74,13 +74,13 @@ it('dashboard class can check access permissions', function () {
 
 it('dashboard returns correct title', function () {
     $dashboard = new \App\Filament\Pages\Dashboard();
-    expect($dashboard->getTitle())->toBe(__('Dashboard'));
+    expect($dashboard->getTitle())->toBe(__('admin.navigation.dashboard'));
 });
 
 it('dashboard has navigation properties', function () {
     expect(\App\Filament\Pages\Dashboard::getNavigationIcon())->toBe('heroicon-o-home');
     expect(\App\Filament\Pages\Dashboard::getNavigationSort())->toBe(1);
-    expect(\App\Filament\Pages\Dashboard::getNavigationLabel())->toBe(__('Dashboard'));
+    expect(\App\Filament\Pages\Dashboard::getNavigationLabel())->toBe(__('admin.navigation.dashboard'));
 });
 
 it('dashboard has column configuration', function () {

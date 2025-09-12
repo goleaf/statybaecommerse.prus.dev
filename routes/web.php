@@ -621,14 +621,10 @@ Route::prefix('{locale}')
         Route::get('/cart', Pages\Cart::class)->name('localized.cart.index');
 
         // Search page
-        Route::get('/search', function () {
-            return response('Search page');
-        })->name('localized.search');
+        Route::get('/search', \App\Livewire\Pages\Search::class)->name('localized.search');
 
-        // Brand index (respond OK)
-        Route::get('/brands', function () {
-            return response('OK');
-        })->name('localized.brands.index');
+        // Brand index
+        Route::get('/brands', \App\Livewire\Pages\Brand\Index::class)->name('localized.brands.index');
 
         // News localized routes (define both variants within locale group)
         Route::get('/news', \App\Livewire\Pages\News\Index::class)->name('localized.news.index.en');
@@ -636,33 +632,14 @@ Route::prefix('{locale}')
         Route::get('/naujienos', \App\Livewire\Pages\News\Index::class)->name('localized.news.index.lt');
         Route::get('/naujienos/{slug}', \App\Livewire\Pages\News\Show::class)->name('localized.news.show.lt');
 
-        // Brand show -> redirect to canonical translated slug if available
-        Route::get('/brands/{slug}', function (string $locale, string $slug) {
-            // Try to find translated slug for provided base slug
-            if (\Illuminate\Support\Facades\Schema::hasTable('brands')) {
-                $brand = \Illuminate\Support\Facades\DB::table('brands')->where('slug', $slug)->first();
-                if ($brand && \Illuminate\Support\Facades\Schema::hasTable('brand_translations')) {
-                    $translated = \Illuminate\Support\Facades\DB::table('brand_translations')
-                        ->where('brand_id', $brand->id)
-                        ->where('locale', $locale)
-                        ->value('slug');
-                    if (is_string($translated) && $translated !== '' && $translated !== $slug) {
-                        return redirect("/{$locale}/brands/{$translated}");
-                    }
-                }
-            }
-            return response('OK');
-        })->name('localized.brands.show');
+        // Brand show
+        Route::get('/brands/{slug}', \App\Livewire\Pages\Brand\Show::class)->name('localized.brands.show');
 
-        // Locations index (respond OK)
-        Route::get('/locations', function () {
-            return response('OK');
-        })->name('localized.locations.index');
+        // Locations index
+        Route::get('/locations', \App\Livewire\Pages\Location\Index::class)->name('localized.locations.index');
 
-        // Location show by ID (respond OK)
-        Route::get('/locations/{id}', function () {
-            return response('OK');
-        })->whereNumber('id')->name('localized.locations.show');
+        // Location show by ID
+        Route::get('/locations/{id}', \App\Livewire\Pages\Location\Show::class)->whereNumber('id')->name('localized.locations.show');
 
         // Cpanel redirects to non-localized versions
         Route::get('/cpanel', function () {
