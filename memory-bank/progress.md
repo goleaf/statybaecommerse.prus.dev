@@ -193,8 +193,8 @@
 5. **User Model:** Added all fillable fields to match schema
 
 ### Current Issues
-1. **Admin Access:** Login redirect issues (high priority)
-2. **Test Coverage:** Only 15% coverage (needs comprehensive testing)
+1. **Admin Access:** Login redirect issues (high priority) - Fixed CouponResource uppercase method
+2. **Test Coverage:** Only 15% coverage (needs comprehensive testing) - Fixed several test errors
 3. **2FA Verification:** Implementation needs production testing
 
 ## Next Steps

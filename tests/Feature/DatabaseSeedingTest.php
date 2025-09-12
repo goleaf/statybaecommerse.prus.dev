@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
@@ -22,5 +20,3 @@ it('runs database seeder without errors and creates base users', function (): vo
     expect(User::where('email', 'admin@statybaecommerse.lt')->exists())->toBeTrue();
     expect(User::where('email', 'manager@statybaecommerse.lt')->exists())->toBeTrue();
 });
-
-

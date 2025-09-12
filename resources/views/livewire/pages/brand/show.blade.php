@@ -1,84 +1,121 @@
-@php($logo = $brand->getFirstMediaUrl('logo'))
+<div>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Brand Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                {{ $brand->name }}
+            </h1>
+            
+            @if($brand->description)
+                <div class="prose max-w-none text-gray-600 dark:text-gray-300">
+                    {!! nl2br(e($brand->description)) !!}
+                </div>
+            @endif
+        </div>
 
-<x-meta
-    :title="$brand->name . ' - ' . __('translations.brands')"
-    :description="$brand->description ?? ''"
-    :og-image="$logo ?: null"
-    canonical="{{ url()->current() }}" />
+        <!-- Brand Products -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
+                {{ __('Products by :brand', ['brand' => $brand->name]) }}
+            </h2>
 
-<div class="py-6 lg:py-8" x-data="{ showFilters: false }">
-    <x-container>
-        <x-breadcrumbs :items="[
-            ['label' => __('translations.brands'), 'url' => route('brands.index')],
-            ['label' => $brand->name, 'url' => url()->current()],
-        ]" />
-
-        <header class="mt-4 mb-6 flex items-start justify-between gap-4">
-            <div class="flex items-start gap-4">
-                @if($logo)
-                    <img src="{{ $logo }}" alt="{{ $brand->name }}" class="h-14 w-14 rounded bg-white object-contain ring-1 ring-gray-200 dark:ring-gray-700" />
+            @if($brand->products()->where('is_visible', true)->whereNotNull('published_at')->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    @foreach($brand->products()->where('is_visible', true)->whereNotNull('published_at')->latest()->limit(12)->get() as $product)
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
+                            @if($product->getFirstMediaUrl('images'))
+                                <img src="{{ $product->getFirstMediaUrl('images') }}" 
+                                     alt="{{ $product->name }}"
+                                     class="w-full h-48 object-cover">
+                            @else
+                                <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                            @endif
+                            
+                            <div class="p-4">
+                                <h3 class="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                                    <a href="{{ route('localized.products.show', $product->slug) }}" 
+                                       class="hover:text-blue-600 dark:hover:text-blue-400">
+                                        {{ $product->name }}
+                                    </a>
+                                </h3>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div class="text-lg font-bold text-gray-900 dark:text-white">
+                                        {{ number_format($product->price, 2) }} €
+                                    </div>
+                                    
+                                    @if($product->compare_price && $product->compare_price > $product->price)
+                                        <div class="text-sm text-gray-500 dark:text-gray-400 line-through">
+                                            {{ number_format($product->compare_price, 2) }} €
+                                        </div>
+                                    @endif
+                                </div>
+                                
+                                @if($product->compare_price && $product->compare_price > $product->price)
+                                    <div class="mt-2">
+                                        @php
+                                            $discount = round((($product->compare_price - $product->price) / $product->compare_price) * 100);
+                                        @endphp
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                                            -{{ $discount }}%
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                
+                @if($brand->products()->where('is_visible', true)->whereNotNull('published_at')->count() > 12)
+                    <div class="mt-8 text-center">
+                        <a href="{{ route('localized.products.index', ['brand' => $brand->slug]) }}" 
+                           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            {{ __('View all products by :brand', ['brand' => $brand->name]) }}
+                        </a>
+                    </div>
                 @endif
-                <div>
-                    <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">{{ $brand->name }}</h1>
-                    @if(!empty($brand->description))
-                        <p class="mt-1 text-gray-600 dark:text-gray-300 line-clamp-2">{{ $brand->description }}</p>
-                    @endif
-                    @if(!empty($brand->website))
-                        <p class="mt-2">
-                            <a href="{{ $brand->website }}" rel="noopener" target="_blank" class="text-sm text-blue-600 hover:text-blue-700 underline">
-                                {{ __('Visit website') }}
-                            </a>
-                        </p>
-                    @endif
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="text-sm text-gray-600 dark:text-gray-300 hidden sm:block">
-                    @if($products->total() > 0)
-                        {{ $products->firstItem() }}–{{ $products->lastItem() }} {{ __('translations.of_total') }} {{ $products->total() }}
-                    @else
-                        0 {{ __('translations.products') ?? __('Products') }}
-                    @endif
-                </div>
-                <select wire:model.live="sortBy"
-                        class="rounded-md border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                    <option value="latest">{{ __('translations.newest') }}</option>
-                    <option value="name">{{ __('translations.name') }}</option>
-                    <option value="oldest">{{ __('translations.oldest') }}</option>
-                    <option value="price_asc">{{ __('translations.price') }} ↑</option>
-                    <option value="price_desc">{{ __('translations.price') }} ↓</option>
-                </select>
-            </div>
-        </header>
-
-        @if ($products->count() > 0)
-            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-                @foreach ($products as $product)
-                    <x-product.card :product="$product" />
-                @endforeach
-            </div>
-
-            <div class="mt-8 flex justify-center">
-                <x-filament::pagination :paginator="$products" />
-            </div>
-        @else
-            <div class="rounded-lg border border-dashed border-gray-300 p-12 text-center dark:border-gray-700">
-                <div class="mx-auto mb-3 h-10 w-10 text-gray-400">
-                    <svg class="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M21 21l-4.35-4.35m1.1-4.4a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
+            @else
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                     </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('No products found') }}</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('No products are available for this brand yet.') }}</p>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('translations.no_products_found') }}</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('translations.try_different_search') }}</p>
-                <div class="mt-6 flex items-center justify-center gap-3">
-                    <a href="{{ route('brands.index') }}"
-                       class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200">{{ __('translations.browse_categories') ?? __('Back to brands') }}</a>
-                    <a href="{{ route('products.index') }}"
-                       class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">{{ __('translations.view_all_products') }}</a>
-                </div>
+            @endif
+        </div>
+
+        <!-- Brand Information -->
+        @if($brand->website || $brand->description)
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {{ __('About :brand', ['brand' => $brand->name]) }}
+                </h3>
+                
+                @if($brand->description)
+                    <div class="prose max-w-none text-gray-600 dark:text-gray-300 mb-4">
+                        {!! nl2br(e($brand->description)) !!}
+                    </div>
+                @endif
+                
+                @if($brand->website)
+                    <div>
+                        <a href="{{ $brand->website }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                            {{ __('Visit website') }}
+                        </a>
+                    </div>
+                @endif
             </div>
         @endif
-    </x-container>
+    </div>
 </div>
-

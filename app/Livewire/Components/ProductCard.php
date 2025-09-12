@@ -35,6 +35,11 @@ final class ProductCard extends Component
         ]);
     }
 
+    public function viewProduct(): void
+    {
+        $this->redirect(route('product.show', $this->product));
+    }
+
     public function getImageUrlProperty(): string
     {
         return $this->product->getFirstMediaUrl('images', 'thumb') 

@@ -3,84 +3,60 @@
 namespace App\Livewire\Pages\Brand;
 
 use App\Models\Brand;
-use App\Models\Product;
 use Illuminate\Contracts\View\View;
-use Livewire\Attributes\Layout;
 use Livewire\Component;
-use Livewire\WithPagination;
 
-#[Layout('layouts.templates.app')]
 final class Show extends Component
 {
-    use WithPagination;
-
     public Brand $brand;
-    public string $sortBy = 'latest';
-    public string $priceRange = 'all';
 
-    public function mount(Brand $brand): void
+    public function mount(string $slug)
     {
-        // Ensure brand is enabled and load relationships
-        if (!$brand->is_enabled) {
+        // Find brand by slug (check both main slug and translated slugs)
+        $brand = Brand::query()
+            ->where('slug', $slug)
+            ->where('is_enabled', true)
+            ->first();
+
+        if (!$brand) {
+            // Try to find by translated slug
+            $brand = Brand::query()
+                ->whereHas('translations', function ($query) use ($slug) {
+                    $query->where('slug', $slug)
+                        ->where('locale', app()->getLocale());
+                })
+                ->where('is_enabled', true)
+                ->first();
+        }
+
+        if (!$brand) {
             abort(404);
         }
-        
-        $brand->load(['translations' => function ($q) {
-            $q->where('locale', app()->getLocale());
-        }, 'media']);
+
+        // Check if we need to redirect to canonical slug
+        $canonicalSlug = $this->getCanonicalSlug($brand);
+        if ($canonicalSlug !== $slug) {
+            $this->redirect(route('localized.brands.show', $canonicalSlug), 301);
+            return;
+        }
+
         $this->brand = $brand;
     }
 
-    public function getProductsProperty()
+    private function getCanonicalSlug(Brand $brand): string
     {
-        $query = Product::query()
-            ->select(['id', 'slug', 'name', 'summary', 'brand_id', 'published_at'])
-            ->with([
-                'translations' => function ($q) {
-                    $q->where('locale', app()->getLocale());
-                },
-                'brand:id,slug,name',
-                'brand.translations' => function ($q) {
-                    $q->where('locale', app()->getLocale());
-                },
-                'media',
-                'prices' => function ($pq) {
-                    $pq->whereRelation('currency', 'code', current_currency());
-                },
-                'prices.currency:id,code',
-            ])
-            ->withCount('variants')
-            ->where('brand_id', $this->brand->id)
-            ->where('is_visible', true)
-            ->whereNotNull('published_at')
-            ->where('published_at', '<=', now());
+        // Get translated slug for current locale, fallback to main slug
+        $translation = $brand->translations()
+            ->where('locale', app()->getLocale())
+            ->first();
 
-        // Apply sorting
-        match ($this->sortBy) {
-            'price_asc' => $query->orderBy('price'),
-            'price_desc' => $query->orderByDesc('price'),
-            'name' => $query->orderBy('name'),
-            'oldest' => $query->orderBy('published_at'),
-            default => $query->orderByDesc('published_at'),
-        };
-
-        return $query->paginate(12);
-    }
-
-    public function updatedSortBy(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatedPriceRange(): void
-    {
-        $this->resetPage();
+        return $translation?->slug ?: $brand->slug;
     }
 
     public function render(): View
     {
         return view('livewire.pages.brand.show', [
-            'products' => $this->products,
-        ])->title($this->brand->name . ' - ' . __('translations.brands'));
+            'brand' => $this->brand,
+        ]);
     }
 }

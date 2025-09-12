@@ -46,7 +46,7 @@ final class CategoryNavigationTest extends TestCase
             'description' => 'Test child description',
         ]);
 
-        $response = $this->get('/');
+        $response = $this->get('/' . app()->getLocale());
 
         $response->assertStatus(200);
         $response->assertSee('Test Root');
@@ -69,11 +69,11 @@ final class CategoryNavigationTest extends TestCase
             'description' => 'Test description',
         ]);
 
-        $response = $this->get('/');
+        $response = $this->get('/' . app()->getLocale());
 
         $response->assertStatus(200);
         // Check that the link uses the correct route parameter
-        $response->assertSee('href="' . route('category.show', ['category' => 'test-category']) . '"', false);
+        $response->assertSee('href="' . route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => 'test-category']) . '"', false);
     }
 
     public function test_category_show_route_works_with_correct_parameter(): void
@@ -92,7 +92,7 @@ final class CategoryNavigationTest extends TestCase
             'description' => 'Test description',
         ]);
 
-        $response = $this->get(route('category.show', ['category' => 'test-category']));
+        $response = $this->get(route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => 'test-category']));
 
         $response->assertStatus(200);
         $response->assertSee('Test Category');
@@ -102,6 +102,6 @@ final class CategoryNavigationTest extends TestCase
     {
         $this->expectException(\Illuminate\Routing\Exceptions\UrlGenerationException::class);
         
-        route('category.show');
+        route('localized.categories.show', ['locale' => app()->getLocale()]);
     }
 }
