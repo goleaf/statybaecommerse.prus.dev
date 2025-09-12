@@ -118,13 +118,13 @@ final class SecurityAudit extends Page implements HasTable
                             ->orWhere('description', 'like', '%blocked%')),
             ])
             ->recordActions([
-                Actions\Action::make('view_details')
+                Action::make('view_details')
                     ->label(__('admin.actions.view_details'))
                     ->icon('heroicon-o-eye')
                     ->modalContent(fn($record) => view('filament.modals.activity-details', compact('record')))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel(__('admin.actions.close')),
-                Actions\Action::make('flag_suspicious')
+                Action::make('flag_suspicious')
                     ->label(__('admin.actions.flag_suspicious'))
                     ->icon('heroicon-o-flag')
                     ->color('danger')

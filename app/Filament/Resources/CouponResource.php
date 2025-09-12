@@ -45,7 +45,7 @@ final class CouponResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->unique(Coupon::class, 'code', ignoreRecord: true)
-                            ->uppercase()
+                            ->transform(fn(string $value): string => strtoupper($value))
                             ->helperText(__('translations.coupon_code_help')),
                         Forms\Components\Toggle::make('is_active')
                             ->label(__('translations.active'))

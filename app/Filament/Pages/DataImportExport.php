@@ -438,7 +438,7 @@ final class DataImportExport extends Page
         $csv = implode(',', $headers) . "\n";
 
         foreach ($data as $row) {
-            $values = array_map(fn($value) => '"' . str_replace('"', '""', $value) . '"', array_values($row));
+            $values = array_map(fn($value) => '"' . str_replace('"', '""', (string) $value) . '"', array_values($row));
             $csv .= implode(',', $values) . "\n";
         }
 

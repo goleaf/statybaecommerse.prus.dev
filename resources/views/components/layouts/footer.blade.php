@@ -243,20 +243,4 @@
             </div>
         </div>
     </x-container>
-    {{-- Organization JSON-LD for SEO --}}
-    <script type="application/ld+json">
-    {
-        "@@context": "https://schema.org",
-        "@@type": "Organization",
-        "name": "{{ $companyName }}",
-        "url": "{{ url('/') }}",
-        "email": {{ $companyEmail ? '"' . e($companyEmail) . '"' : 'null' }},
-        "telephone": {{ $companyPhone ? '"' . e($companyPhone) . '"' : 'null' }},
-        "address": {{ $companyAddress ? '"' . e($companyAddress) . '"' : 'null' }},
-        "sameAs": [
-            {{ $socialFacebook ? '"' . e($socialFacebook) . '"' : '' }}{{ ($socialFacebook && $socialInstagram) ? ',' : '' }}
-            {{ $socialInstagram ? '"' . e($socialInstagram) . '"' : '' }}
-        ]
-    }
-    </script>
 </footer>

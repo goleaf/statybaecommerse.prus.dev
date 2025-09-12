@@ -19,16 +19,24 @@ final class NormalSettingFactory extends Factory
      */
     public function definition(): array
     {
+        $type = $this->faker->randomElement(['text', 'number', 'boolean', 'json', 'array']);
+        $value = match($type) {
+            'json', 'array' => json_encode(['key1' => 'value1', 'key2' => 'value2']),
+            'number' => (string) $this->faker->numberBetween(1, 1000),
+            'boolean' => $this->faker->boolean() ? '1' : '0',
+            default => $this->faker->sentence(),
+        };
+
         return [
             'group' => $this->faker->randomElement(['general', 'admin', 'frontend', 'api', 'email']),
             'key' => $this->faker->unique()->slug(2),
             'locale' => $this->faker->randomElement(['en', 'lt']),
-            'value' => $this->faker->sentence(),
-            'type' => $this->faker->randomElement(['text', 'number', 'boolean', 'json', 'array']),
+            'value' => $value,
+            'type' => $type,
             'description' => $this->faker->sentence(),
             'is_public' => $this->faker->boolean(70),
             'is_encrypted' => $this->faker->boolean(20),
-            'validation_rules' => null,
+            'validation_rules' => json_encode(['required' => true]),
             'sort_order' => $this->faker->numberBetween(1, 100),
         ];
     }
@@ -38,7 +46,7 @@ final class NormalSettingFactory extends Factory
      */
     public function public(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_public' => true,
         ]);
     }
@@ -48,7 +56,7 @@ final class NormalSettingFactory extends Factory
      */
     public function private(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_public' => false,
         ]);
     }
@@ -58,7 +66,7 @@ final class NormalSettingFactory extends Factory
      */
     public function encrypted(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_encrypted' => true,
         ]);
     }
@@ -68,7 +76,7 @@ final class NormalSettingFactory extends Factory
      */
     public function notEncrypted(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_encrypted' => false,
         ]);
     }
@@ -78,7 +86,7 @@ final class NormalSettingFactory extends Factory
      */
     public function group(string $group): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'group' => $group,
         ]);
     }
@@ -88,7 +96,7 @@ final class NormalSettingFactory extends Factory
      */
     public function key(string $key): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'key' => $key,
         ]);
     }
@@ -98,7 +106,7 @@ final class NormalSettingFactory extends Factory
      */
     public function value(string $value): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'value' => $value,
         ]);
     }
@@ -108,7 +116,7 @@ final class NormalSettingFactory extends Factory
      */
     public function text(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'text',
             'value' => $this->faker->sentence(),
         ]);
@@ -119,7 +127,7 @@ final class NormalSettingFactory extends Factory
      */
     public function number(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'number',
             'value' => (string) $this->faker->numberBetween(1, 1000),
         ]);
@@ -130,7 +138,7 @@ final class NormalSettingFactory extends Factory
      */
     public function boolean(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'boolean',
             'value' => $this->faker->boolean() ? '1' : '0',
         ]);
@@ -141,7 +149,7 @@ final class NormalSettingFactory extends Factory
      */
     public function json(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'json',
             'value' => json_encode([
                 'option1' => $this->faker->word(),

@@ -23,7 +23,8 @@
                     <ul class="text-sm text-gray-500">
                         @foreach ($redemptions as $r)
                             <li>{{ strtoupper($r->code) }} — {{ ucfirst($r->type) }}:
-                                -{{ \Illuminate\Support\Number::currency($r->amount_saved, $order->currency_code, app()->getLocale()) }}</li>
+                                -{{ \Illuminate\Support\Number::currency($r->amount_saved, $order->currency_code, app()->getLocale()) }}
+                            </li>
                         @endforeach
                     </ul>
                 @endif

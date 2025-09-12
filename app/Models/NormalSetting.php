@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 
 final class NormalSetting extends Model
 {
@@ -27,7 +27,6 @@ final class NormalSetting extends Model
     ];
 
     protected $casts = [
-        'validation_rules' => 'json',
         'is_public' => 'boolean',
         'is_encrypted' => 'boolean',
         'sort_order' => 'integer',
@@ -43,7 +42,7 @@ final class NormalSetting extends Model
                             $decrypted = decrypt($value);
                             if (in_array($this->attributes['type'] ?? '', ['json', 'array']) && is_string($decrypted)) {
                                 $decoded = json_decode($decrypted, true);
-                                return $decoded !== null ? $decoded : $decrypted;
+                                return $decoded !== null ? $decoded : [];
                             }
                             return $decrypted;
                         } catch (\Exception $e) {
@@ -53,7 +52,7 @@ final class NormalSetting extends Model
 
                 if (in_array($this->attributes['type'] ?? '', ['json', 'array']) && is_string($value)) {
                     $decoded = json_decode($value, true);
-                    return $decoded !== null ? $decoded : $value;
+                    return $decoded !== null ? $decoded : [];
                 }
 
                 return $value;
@@ -71,6 +70,28 @@ final class NormalSetting extends Model
                     }
                 }
 
+                return $value;
+            }
+        );
+    }
+
+    protected function validationRules(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if ($value === null) {
+                    return [];
+                }
+                if (is_string($value)) {
+                    $decoded = json_decode($value, true);
+                    return $decoded !== null ? $decoded : [];
+                }
+                return $value;
+            },
+            set: function ($value) {
+                if (is_array($value) || is_object($value)) {
+                    return json_encode($value);
+                }
                 return $value;
             }
         );
@@ -100,7 +121,7 @@ final class NormalSetting extends Model
     public static function setValue(string $key, $value, string $group = 'general', string $locale = null): void
     {
         $locale = $locale ?? app()->getLocale();
-        
+
         static::updateOrCreate(
             ['key' => $key, 'locale' => $locale],
             [
@@ -161,4 +182,3 @@ final class NormalSetting extends Model
         });
     }
 }
-

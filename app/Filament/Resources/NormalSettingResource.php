@@ -9,12 +9,13 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Builder;
 use BackedEnum;
 use UnitEnum;
@@ -106,21 +107,21 @@ class NormalSettingResource extends Resource
                     ->components([
                         Forms\Components\TextInput::make('value')
                             ->label(__('Value'))
-                            ->visible(fn(Forms\Get $get) => in_array($get('type'), ['text', 'number']))
+                            ->visible(fn(Get $get) => in_array($get('type'), ['text', 'number']))
                             ->required()
                             ->maxLength(1000),
                         Forms\Components\Textarea::make('value')
                             ->label(__('Value'))
-                            ->visible(fn(Forms\Get $get) => $get('type') === 'textarea')
+                            ->visible(fn(Get $get) => $get('type') === 'textarea')
                             ->rows(3),
                         Forms\Components\KeyValue::make('value')
                             ->label(__('Value'))
-                            ->visible(fn(Forms\Get $get) => in_array($get('type'), ['json', 'array']))
+                            ->visible(fn(Get $get) => in_array($get('type'), ['json', 'array']))
                             ->keyLabel(__('Key'))
                             ->valueLabel(__('Value')),
                         Forms\Components\Select::make('value')
                             ->label(__('Value'))
-                            ->visible(fn(Forms\Get $get) => $get('type') === 'select')
+                            ->visible(fn(Get $get) => $get('type') === 'select')
                             ->options([
                                 'yes' => 'Yes',
                                 'no' => 'No',
@@ -147,7 +148,8 @@ class NormalSettingResource extends Resource
                             ->helperText(__('Sensitive settings will be encrypted in database')),
                         Forms\Components\KeyValue::make('validation_rules')
                             ->label(__('Validation Rules'))
-                            ->helperText(__('Laravel validation rules in key-value format')),
+                            ->helperText(__('Laravel validation rules in key-value format'))
+                            ->default([]),
                     ])
                     ->columns(2),
             ]);
