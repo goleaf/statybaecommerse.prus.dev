@@ -725,7 +725,6 @@ return [
             'is_default' => 'Default Status',
         ],
     ],
-    
     // System Monitoring
     'monitoring' => [
         'system_info' => 'System Info',

@@ -1,30 +1,41 @@
 <?php declare(strict_types=1);
 
-use App\Models\User;
-use App\Models\Product;
-use App\Models\Order;
 use App\Models\CustomerGroup;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use Spatie\Activitylog\Models\Activity;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
 use Livewire\Livewire;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
     // Create comprehensive permissions
     $permissions = [
-        'view_admin_panel', 'view_any_product', 'create_product', 'edit_product', 'delete_product',
-        'view_any_order', 'create_order', 'edit_order', 'view_any_user', 'impersonate_users',
-        'view_security_audit', 'view_seo_analytics', 'manage_imports', 'manage_customer_segments',
+        'view_admin_panel',
+        'view_any_product',
+        'create_product',
+        'edit_product',
+        'delete_product',
+        'view_any_order',
+        'create_order',
+        'edit_order',
+        'view_any_user',
+        'impersonate_users',
+        'view_security_audit',
+        'view_seo_analytics',
+        'manage_imports',
+        'manage_customer_segments',
     ];
-    
+
     foreach ($permissions as $permission) {
         Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
     }
-    
+
     // Create admin role with all permissions
     $adminRole = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web']);
     $adminRole->syncPermissions($permissions);
-    
+
     // Create admin user
     $this->admin = User::factory()->create([
         'name' => 'System Admin',
@@ -37,7 +48,7 @@ beforeEach(function () {
 it('can access all advanced admin pages', function () {
     $pages = [
         '/admin/data-import-export',
-        '/admin/customer-segmentation', 
+        '/admin/customer-segmentation',
         '/admin/seo-analytics',
         '/admin/security-audit',
         '/admin/user-impersonation',
@@ -98,13 +109,13 @@ it('can perform customer segmentation', function () {
     Order::factory()->create([
         'user_id' => $highValueCustomer->id,
         'status' => 'completed',
-        'total' => 1500.00,
+        'total' => 1500.0,
     ]);
 
     Order::factory()->create([
         'user_id' => $regularCustomer->id,
         'status' => 'completed',
-        'total' => 300.00,
+        'total' => 300.0,
     ]);
 
     Livewire::actingAs($this->admin)
@@ -179,10 +190,10 @@ it('can manage inventory with bulk operations', function () {
 it('can generate product recommendations', function () {
     $user = User::factory()->create();
     $category = \App\Models\Category::factory()->create();
-    
-    $product1 = Product::factory()->create(['price' => 100.00]);
-    $product2 = Product::factory()->create(['price' => 150.00]);
-    
+
+    $product1 = Product::factory()->create(['price' => 100.0]);
+    $product2 = Product::factory()->create(['price' => 150.0]);
+
     $product1->categories()->attach($category->id);
     $product2->categories()->attach($category->id);
 
@@ -191,7 +202,7 @@ it('can generate product recommendations', function () {
         'user_id' => $user->id,
         'status' => 'completed',
     ]);
-    
+
     \App\Models\OrderItem::factory()->create([
         'order_id' => $order->id,
         'product_id' => $product1->id,
@@ -202,7 +213,7 @@ it('can generate product recommendations', function () {
             'type' => 'personalized',
             'userId' => $user->id,
         ])
-        ->assertSee($product2->name); // Should recommend product2 based on category
+        ->assertSee($product2->name);  // Should recommend product2 based on category
 });
 
 it('can track recently viewed products', function () {
@@ -232,5 +243,3 @@ it('can perform comprehensive system monitoring', function () {
         ->test(\App\Filament\Pages\SystemMonitoring::class)
         ->assertOk();
 });
-
-

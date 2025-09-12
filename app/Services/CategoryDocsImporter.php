@@ -176,3 +176,4 @@ final class CategoryDocsImporter
         }
         return $filtered;
     }
+}

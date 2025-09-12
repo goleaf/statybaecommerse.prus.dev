@@ -118,7 +118,8 @@ class NormalSettingResource extends Resource
                             ->label(__('Value'))
                             ->visible(fn(Get $get) => in_array($get('type'), ['json', 'array']))
                             ->keyLabel(__('Key'))
-                            ->valueLabel(__('Value')),
+                            ->valueLabel(__('Value'))
+                            ->default([]),
                         Forms\Components\Select::make('value')
                             ->label(__('Value'))
                             ->visible(fn(Get $get) => $get('type') === 'select')
@@ -146,10 +147,11 @@ class NormalSettingResource extends Resource
                         Forms\Components\Toggle::make('is_encrypted')
                             ->label(__('Is Encrypted'))
                             ->helperText(__('Sensitive settings will be encrypted in database')),
-                        Forms\Components\KeyValue::make('validation_rules')
-                            ->label(__('Validation Rules'))
-                            ->helperText(__('Laravel validation rules in key-value format'))
-                            ->default([]),
+            Forms\Components\Textarea::make('validation_rules')
+                ->label(__('Validation Rules'))
+                ->helperText(__('Laravel validation rules in key-value format'))
+                ->formatStateUsing(fn ($state) => is_array($state) ? json_encode($state, JSON_PRETTY_PRINT) : $state)
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? json_decode($state, true) : $state),
                     ])
                     ->columns(2),
             ]);
