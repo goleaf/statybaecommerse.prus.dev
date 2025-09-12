@@ -33,7 +33,7 @@ beforeEach(function () {
     }
 
     // Create admin role with all permissions
-    $adminRole = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web']);
+    $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
     $adminRole->syncPermissions($permissions);
 
     // Create admin user
