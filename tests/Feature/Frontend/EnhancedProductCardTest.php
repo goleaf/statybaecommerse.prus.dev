@@ -107,7 +107,7 @@ it('can add product to comparison', function () {
         ->assertDispatched('comparison-updated');
 
     $this->assertDatabaseHas(ProductComparison::class, [
-        'productId' => $this->product->id,
+        'product_id' => $this->product->id,
         'session_id' => session()->getId(),
     ]);
 });

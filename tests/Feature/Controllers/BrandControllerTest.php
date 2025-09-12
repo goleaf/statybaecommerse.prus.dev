@@ -47,12 +47,13 @@ it('lists brands when feature enabled', function (): void {
 
 it('brand show redirects to canonical slug', function (): void {
     config()->set('app-features.features.brand', true);
-    config()->set('app.supported_locales', 'en');
+    config()->set('app.supported_locales', ['en']);
 
     $id = DB::table('brands')->insertGetId(['name' => 'Acme', 'slug' => 'acme', 'is_enabled' => true]);
     DB::table('brand_translations')->insert(['brand_id' => $id, 'locale' => 'en', 'name' => 'Acme Inc', 'slug' => 'acme-inc', 'created_at' => now(), 'updated_at' => now()]);
 
-    config()->set('app-features.features.brand', true);
+    // Set the locale for the application
+    app()->setLocale('en');
 
     $this->get('/en/brands/acme')->assertRedirect('/en/brands/acme-inc');
 });

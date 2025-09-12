@@ -104,7 +104,7 @@
                                 ? $category->trans('name') ?? $category->name
                                 : $category->name;
                         @endphp
-                        <x-nav.item :href="route('localized.categories.show', ['category' => $slug])">{{ $name }}</x-nav.item>
+                        <x-nav.item :href="route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $slug])">{{ $name }}</x-nav.item>
                     @endforeach
                 </nav>
             @endif

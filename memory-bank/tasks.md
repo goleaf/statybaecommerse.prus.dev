@@ -190,6 +190,7 @@ Type: Complex System
    - [x] Fixed CouponResource uppercase() method (replaced with transform)
    - [x] Fixed DocumentService renderTemplate method
    - [x] Fixed Document model missing ofStatus/ofFormat scopes
+   - [ ] EnhancedSettingTest KeyValue component array_key_first() error (complex Filament issue)
 
 3. **Security Verification**
    - [ ] Test 2FA enrollment and recovery flows
