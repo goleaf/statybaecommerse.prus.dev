@@ -4,156 +4,141 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CurrencyResource\Pages;
 use App\Models\Currency;
-use App\Services\MultiLanguageTabService;
-use Filament\Actions\Action;
+use App\Models\Zone;
+use App\Models\Price;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\TextEntry;
+use Filament\Actions\Action;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\KeyValue;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Table;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\DateFilter;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+
 final class CurrencyResource extends Resource
 {
     protected static ?string $model = Currency::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
-
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-banknotes';
 
     protected static ?int $navigationSort = 1;
 
-    public static function getModelLabel(): string
+    public static function getNavigationGroup(): ?string
     {
-        return __('admin.currency.singular');
+        return 'System Settings';
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function getNavigationLabel(): string
     {
-        return $schema
-            ->schema([
-                TextEntry::make('name')
-                    ->label(__('admin.currency.table.name')),
-                TextEntry::make('code')
-                    ->label(__('admin.currency.table.code')),
-                TextEntry::make('symbol')
-                    ->label(__('admin.currency.table.symbol')),
-                TextEntry::make('exchange_rate')
-                    ->label(__('admin.currency.table.exchange_rate')),
-                IconEntry::make('is_enabled')
-                    ->label(__('admin.currency.table.enabled'))
-                    ->boolean(),
-                IconEntry::make('is_default')
-                    ->label(__('admin.currency.table.is_default'))
-                    ->boolean(),
-                TextEntry::make('created_at')
-                    ->label(__('admin.currency.table.created_at'))
-                    ->date('Y-m-d'),
-            ]);
+        return __('currency_title');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('currency_single');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('admin.currency.plural');
+        return __('currency_title');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
-                // Currency Settings (Non-translatable)
-                Section::make(__('translations.currency_settings'))
-                    ->components([
-                        Forms\Components\TextInput::make('code')
-                            ->label(__('admin.currency.form.code'))
-                            ->required()
-                            ->maxLength(3)
-                            ->unique(Currency::class, 'code', ignoreRecord: true)
-                            ->helperText(__('admin.currency.form.code_help')),
-                        Forms\Components\TextInput::make('symbol')
-                            ->label(__('admin.currency.form.symbol'))
-                            ->required()
-                            ->maxLength(10),
-                        Forms\Components\TextInput::make('exchange_rate')
-                            ->label(__('admin.currency.form.exchange_rate'))
-                            ->numeric()
-                            ->step(0.0001)
-                            ->default(1.0)
-                            ->helperText(__('admin.currency.form.exchange_rate_help')),
-                        Forms\Components\TextInput::make('decimal_places')
-                            ->label(__('admin.currency.form.decimal_places'))
-                            ->numeric()
-                            ->default(2)
-                            ->minValue(0)
-                            ->maxValue(4),
-                        Forms\Components\Toggle::make('is_enabled')
-                            ->label(__('admin.currency.form.enabled'))
-                            ->default(true),
-                        Forms\Components\Toggle::make('is_default')
-                            ->label(__('admin.currency.form.is_default'))
-                            ->default(false)
-                            ->helperText(__('admin.currency.form.is_default_help')),
-                    ])
-                    ->columns(2),
-                // Multilanguage Tabs for Currency Content
-                ...(!app()->environment('testing')
-                    ? [
-                        Tabs::make('currency_translations')
-                            ->tabs(
-                                MultiLanguageTabService::createSectionedTabs([
-                                    'currency_information' => [
-                                        'name' => [
-                                            'type' => 'text',
-                                            'label' => __('translations.name'),
-                                            'required' => true,
-                                            'maxLength' => 255,
-                                            'placeholder' => __('translations.currency_name_help'),
-                                        ],
-                                    ],
-                                ])
-                            )
-                            ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
-                            ->persistTabInQueryString('currency_tab')
-                            ->contained(false),
-                    ]
-                    : [
-                        Section::make(__('translations.currency_information'))
-                            ->components([
-                                Forms\Components\TextInput::make('name')
-                                    ->label(__('translations.name'))
+            ->schema([
+                Section::make(__('currency_sections.basic_information'))
+                    ->description(__('currency_help.code'))
+                    ->icon('heroicon-o-currency-dollar')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label(__('currency_name'))
                                     ->required()
-                                    ->maxLength(255),
-                            ])
-                            ->columns(1),
+                                    ->maxLength(255)
+                                    ->translatable()
+                                    ->helperText(__('currency_help.code')),
+                                TextInput::make('code')
+                                    ->label(__('currency_code'))
+                                    ->required()
+                                    ->maxLength(3)
+                                    ->unique(ignoreRecord: true)
+                                    ->helperText(__('currency_help.code'))
+                                    ->placeholder('EUR')
+                                    ->rules(['regex:/^[A-Z]{3}$/']),
+                            ]),
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('symbol')
+                                    ->label(__('currency_symbol'))
+                                    ->maxLength(10)
+                                    ->helperText(__('currency_help.symbol'))
+                                    ->placeholder('€'),
+                                TextInput::make('decimal_places')
+                                    ->label(__('currency_decimal_places'))
+                                    ->numeric()
+                                    ->required()
+                                    ->default(2)
+                                    ->minValue(0)
+                                    ->maxValue(4)
+                                    ->helperText(__('currency_help.decimal_places')),
+                            ]),
                     ]),
-                Section::make(__('admin.currency.form.formatting'))
-                    ->components([
-                        Forms\Components\TextInput::make('thousands_separator')
-                            ->label(__('admin.currency.form.thousands_separator'))
-                            ->default(',')
-                            ->maxLength(1),
-                        Forms\Components\TextInput::make('decimal_separator')
-                            ->label(__('admin.currency.form.decimal_separator'))
-                            ->default('.')
-                            ->maxLength(1),
-                        Forms\Components\Select::make('symbol_position')
-                            ->label(__('admin.currency.form.symbol_position'))
-                            ->options([
-                                'before' => __('admin.currency.form.symbol_before'),
-                                'after' => __('admin.currency.form.symbol_after'),
-                            ])
-                            ->default('before'),
-                    ])
-                    ->columns(3),
+                
+                Section::make(__('currency_sections.settings'))
+                    ->description(__('currency_help.exchange_rate'))
+                    ->icon('heroicon-o-arrow-trending-up')
+                    ->schema([
+                        TextInput::make('exchange_rate')
+                            ->label(__('currency_exchange_rate'))
+                            ->numeric()
+                            ->required()
+                            ->default(1)
+                            ->step(0.000001)
+                            ->helperText(__('currency_help.exchange_rate')),
+                    ]),
+                
+                Section::make(__('currency_sections.settings'))
+                    ->description(__('currency_help.is_default'))
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Toggle::make('is_enabled')
+                                    ->label(__('currency_is_enabled'))
+                                    ->default(true)
+                                    ->helperText(__('currency_help.is_default')),
+                                Toggle::make('is_default')
+                                    ->label(__('currency_is_default'))
+                                    ->default(false)
+                                    ->helperText(__('currency_help.is_default')),
+                            ]),
+                    ]),
             ]);
     }
 
@@ -161,65 +146,261 @@ final class CurrencyResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->label(__('admin.currency.table.name'))
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('code')
-                    ->label(__('admin.currency.table.code'))
+                TextColumn::make('name')
+                    ->label(__('currency_name'))
                     ->searchable()
                     ->sortable()
-                    ->badge(),
-                Tables\Columns\TextColumn::make('symbol')
-                    ->label(__('admin.currency.table.symbol'))
+                    ->translatable(),
+                
+                TextColumn::make('code')
+                    ->label(__('currency_code'))
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('primary'),
+                
+                TextColumn::make('symbol')
+                    ->label(__('currency_symbol'))
+                    ->searchable()
+                    ->formatStateUsing(fn (string $state): string => $state ?: '-'),
+                
+                TextColumn::make('exchange_rate')
+                    ->label(__('currency_exchange_rate'))
+                    ->numeric(decimalPlaces: 6)
+                    ->sortable()
+                    ->alignEnd(),
+                
+                TextColumn::make('decimal_places')
+                    ->label(__('currency_decimal_places'))
+                    ->numeric()
+                    ->sortable()
+                    ->alignCenter(),
+                
+                TextColumn::make('zones_count')
+                    ->label(__('currency_zones_count'))
+                    ->counts('zones')
+                    ->sortable()
+                    ->alignCenter()
+                    ->badge()
+                    ->color('info'),
+                
+                TextColumn::make('prices_count')
+                    ->label(__('currency_prices_count'))
+                    ->counts('prices')
+                    ->sortable()
+                    ->alignCenter()
                     ->badge()
                     ->color('success'),
-                Tables\Columns\TextColumn::make('exchange_rate')
-                    ->label(__('admin.currency.table.exchange_rate'))
-                    ->numeric(decimalPlaces: 4)
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('is_enabled')
-                    ->label(__('admin.currency.table.enabled'))
+                
+                IconColumn::make('is_enabled')
+                    ->label(__('currency_is_enabled'))
                     ->boolean()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('is_default')
-                    ->label(__('admin.currency.table.is_default'))
+                
+                IconColumn::make('is_default')
+                    ->label(__('currency_is_default'))
                     ->boolean()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('admin.currency.table.created_at'))
-                    ->date('Y-m-d')
+                    ->sortable()
+                    ->color(fn (bool $state): string => $state ? 'warning' : 'gray'),
+                
+                TextColumn::make('created_at')
+                    ->label(__('currency_created_at'))
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->label(__('admin.currency.table.updated_at'))
-                    ->date('Y-m-d')
+                
+                TextColumn::make('updated_at')
+                    ->label(__('currency_updated_at'))
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('is_enabled')
-                    ->label(__('admin.currency.filters.enabled')),
-                Tables\Filters\TernaryFilter::make('is_default')
-                    ->label(__('admin.currency.filters.is_default')),
+                TernaryFilter::make('is_enabled')
+                    ->label(__('currency_filters.is_enabled'))
+                    ->placeholder(__('admin.common.all'))
+                    ->trueLabel(__('admin.common.enabled'))
+                    ->falseLabel(__('admin.common.disabled')),
+                
+                TernaryFilter::make('is_default')
+                    ->label(__('currency_filters.is_default'))
+                    ->placeholder(__('admin.common.all'))
+                    ->trueLabel(__('currency_is_default'))
+                    ->falseLabel(__('admin.common.not_default')),
+                
+                Filter::make('has_zones')
+                    ->label(__('currency_filters.has_zones'))
+                    ->query(fn (Builder $query): Builder => $query->whereHas('zones')),
+                
+                Filter::make('has_prices')
+                    ->label(__('currency_filters.has_prices'))
+                    ->query(fn (Builder $query): Builder => $query->whereHas('prices')),
+                
+                Filter::make('exchange_rate_range')
+                    ->label(__('currency_filters.exchange_rate_range'))
+                    ->form([
+                        TextInput::make('exchange_rate_from')
+                            ->label(__('admin.common.from'))
+                            ->numeric()
+                            ->step(0.000001),
+                        TextInput::make('exchange_rate_until')
+                            ->label(__('admin.common.until'))
+                            ->numeric()
+                            ->step(0.000001),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['exchange_rate_from'],
+                                fn (Builder $query, $rate): Builder => $query->where('exchange_rate', '>=', $rate),
+                            )
+                            ->when(
+                                $data['exchange_rate_until'],
+                                fn (Builder $query, $rate): Builder => $query->where('exchange_rate', '<=', $rate),
+                            );
+                    }),
+                
+                Filter::make('decimal_places_range')
+                    ->label(__('currency_filters.decimal_places_range'))
+                    ->form([
+                        Select::make('decimal_places_from')
+                            ->label(__('admin.common.from'))
+                            ->options([
+                                0 => '0',
+                                1 => '1',
+                                2 => '2',
+                                3 => '3',
+                                4 => '4',
+                            ]),
+                        Select::make('decimal_places_until')
+                            ->label(__('admin.common.until'))
+                            ->options([
+                                0 => '0',
+                                1 => '1',
+                                2 => '2',
+                                3 => '3',
+                                4 => '4',
+                            ]),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['decimal_places_from'],
+                                fn (Builder $query, $places): Builder => $query->where('decimal_places', '>=', $places),
+                            )
+                            ->when(
+                                $data['decimal_places_until'],
+                                fn (Builder $query, $places): Builder => $query->where('decimal_places', '<=', $places),
+                            );
+                    }),
+                
+                DateFilter::make('created_at')
+                    ->label(__('currency_filters.created_from')),
             ])
-            ->recordActions([
+            ->actions([
+                Action::make('set_default')
+                    ->label(__('currency_actions.set_default'))
+                    ->icon('heroicon-o-star')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading(__('currency_actions.set_default'))
+                    ->modalDescription(__('currency_help.is_default'))
+                    ->action(function (Currency $record): void {
+                        // Remove default from all currencies
+                        Currency::where('is_default', true)->update(['is_default' => false]);
+                        
+                        // Set this currency as default
+                        $record->update(['is_default' => true]);
+                        
+                        // Show notification
+                        \Filament\Notifications\Notification::make()
+                            ->title(__('currency_notifications.set_default'))
+                            ->body(__('currency_notifications.set_default_description', ['name' => $record->name]))
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn (Currency $record): bool => !$record->is_default),
+                
+                Action::make('enable')
+                    ->label(__('currency_actions.enable'))
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->action(function (Currency $record): void {
+                        $record->update(['is_enabled' => true]);
+                        
+                        \Filament\Notifications\Notification::make()
+                            ->title(__('currency_notifications.updated'))
+                            ->body(__('currency_notifications.updated_description', ['name' => $record->name]))
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn (Currency $record): bool => !$record->is_enabled),
+                
+                Action::make('disable')
+                    ->label(__('currency_actions.disable'))
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading(__('currency_actions.disable'))
+                    ->modalDescription(__('currency_help.is_default'))
+                    ->action(function (Currency $record): void {
+                        $record->update(['is_enabled' => false]);
+                        
+                        \Filament\Notifications\Notification::make()
+                            ->title(__('currency_notifications.updated'))
+                            ->body(__('currency_notifications.updated_description', ['name' => $record->name]))
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn (Currency $record): bool => $record->is_enabled),
+                
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    BulkAction::make('enable')
+                        ->label(__('currency_actions.enable'))
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function (Collection $records): void {
+                            $records->each->update(['is_enabled' => true]);
+                            
+                            \Filament\Notifications\Notification::make()
+                                ->title(__('currency_notifications.updated'))
+                                ->body(__('currency_notifications.updated_description', ['name' => 'Selected currencies']))
+                                ->success()
+                                ->send();
+                        }),
+                    
+                    BulkAction::make('disable')
+                        ->label(__('currency_actions.disable'))
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->action(function (Collection $records): void {
+                            $records->each->update(['is_enabled' => false]);
+                            
+                            \Filament\Notifications\Notification::make()
+                                ->title(__('currency_notifications.updated'))
+                                ->body(__('currency_notifications.updated_description', ['name' => 'Selected currencies']))
+                                ->success()
+                                ->send();
+                        }),
+                    
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('name');
+            ->defaultSort('is_default', 'desc')
+            ->poll('30s');
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            \App\Filament\Resources\CurrencyResource\RelationManagers\ZonesRelationManager::class,
+            \App\Filament\Resources\CurrencyResource\RelationManagers\PricesRelationManager::class,
         ];
     }
 
@@ -230,6 +411,15 @@ final class CurrencyResource extends Resource
             'create' => Pages\CreateCurrency::route('/create'),
             'view' => Pages\ViewCurrency::route('/{record}'),
             'edit' => Pages\EditCurrency::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\CurrencyOverviewWidget::class,
+            \App\Filament\Widgets\CurrencyExchangeRatesWidget::class,
+            \App\Filament\Widgets\CurrencyUsageWidget::class,
         ];
     }
 }

@@ -3,68 +3,38 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-final class OrderNotification extends Notification
+final class OrderNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public function __construct(
-        public readonly string $action,
-        public readonly array $orderData,
-        public readonly ?string $message = null
+        public array $data
     ) {}
 
-    public function via(object $notifiable): array
+    public function via($notifiable): array
     {
         return ['database'];
     }
 
-    public function toDatabase(object $notifiable): array
+    public function toDatabase($notifiable): array
     {
-        return [
-            'type' => 'order',
-            'action' => $this->action,
-            'order_id' => $this->orderData['id'] ?? null,
-            'order_number' => $this->orderData['order_number'] ?? null,
-            'title' => $this->getTitle(),
-            'message' => $this->message ?? $this->getMessage(),
-            'data' => $this->orderData,
-            'sent_at' => now()->toISOString(),
-        ];
+        return $this->data;
     }
 
-    private function getTitle(): string
+    public function toMail($notifiable): MailMessage
     {
-        return match ($this->action) {
-            'created' => __('notifications.order.created'),
-            'updated' => __('notifications.order.updated'),
-            'cancelled' => __('notifications.order.cancelled'),
-            'completed' => __('notifications.order.completed'),
-            'shipped' => __('notifications.order.shipped'),
-            'delivered' => __('notifications.order.delivered'),
-            'payment_received' => __('notifications.order.payment_received'),
-            'payment_failed' => __('notifications.order.payment_failed'),
-            'refund_processed' => __('notifications.order.refund_processed'),
-            default => __('notifications.order.updated'),
-        };
-    }
-
-    private function getMessage(): string
-    {
-        $orderNumber = $this->orderData['order_number'] ?? '#N/A';
-        
-        return match ($this->action) {
-            'created' => __('notifications.order.created') . " #{$orderNumber}",
-            'updated' => __('notifications.order.updated') . " #{$orderNumber}",
-            'cancelled' => __('notifications.order.cancelled') . " #{$orderNumber}",
-            'completed' => __('notifications.order.completed') . " #{$orderNumber}",
-            'shipped' => __('notifications.order.shipped') . " #{$orderNumber}",
-            'delivered' => __('notifications.order.delivered') . " #{$orderNumber}",
-            'payment_received' => __('notifications.order.payment_received') . " #{$orderNumber}",
-            'payment_failed' => __('notifications.order.payment_failed') . " #{$orderNumber}",
-            'refund_processed' => __('notifications.order.refund_processed') . " #{$orderNumber}",
-            default => __('notifications.order.updated') . " #{$orderNumber}",
-        };
+        return (new MailMessage)
+            ->subject($this->data['title'])
+            ->line($this->data['message'])
+            ->when(isset($this->data['order_number']), function ($mail) {
+                return $mail->line('Užsakymo numeris: ' . $this->data['order_number']);
+            });
     }
 }
+
+
+

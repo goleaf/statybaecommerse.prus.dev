@@ -3,35 +3,46 @@
 namespace App\Filament\Resources\NewsResource\Pages;
 
 use App\Filament\Resources\NewsResource;
-use App\Services\MultiLanguageTabService;
 use Filament\Resources\Pages\CreateRecord;
 
 final class CreateNews extends CreateRecord
 {
     protected static string $resource = NewsResource::class;
 
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $prepared = MultiLanguageTabService::prepareTranslationData($data, ['title', 'slug', 'summary', 'content', 'seo_title', 'seo_description']);
-        $this->data['translations'] = $prepared['translations'];
-        return $prepared['main_data'];
+        // Set default values
+        $data['is_visible'] = $data['is_visible'] ?? true;
+        $data['published_at'] = $data['published_at'] ?? now();
+
+        return $data;
     }
 
     protected function afterCreate(): void
     {
-        $translations = $this->data['translations'] ?? [];
-        foreach ($translations as $locale => $fields) {
-            $this->record->translations()->updateOrCreate(
-                ['locale' => $locale],
-                [
-                    'title' => $fields['title'] ?? null,
-                    'slug' => $fields['slug'] ?? null,
-                    'summary' => $fields['summary'] ?? null,
-                    'content' => $fields['content'] ?? null,
-                    'seo_title' => $fields['seo_title'] ?? null,
-                    'seo_description' => $fields['seo_description'] ?? null,
-                ]
-            );
+        // Create translation records if provided
+        if (isset($this->data['translations'])) {
+            $translations = $this->data['translations'];
+            $news = $this->record;
+
+            foreach ($translations as $locale => $translationData) {
+                if (!empty($translationData['title'])) {
+                    $news->translations()->create([
+                        'locale' => $locale,
+                        'title' => $translationData['title'],
+                        'slug' => $translationData['slug'] ?? \Str::slug($translationData['title']),
+                        'summary' => $translationData['summary'] ?? null,
+                        'content' => $translationData['content'] ?? null,
+                        'seo_title' => $translationData['seo_title'] ?? null,
+                        'seo_description' => $translationData['seo_description'] ?? null,
+                    ]);
+                }
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Translations\CurrencyTranslation;
 use App\Models\Currency;
 use Illuminate\Database\Seeder;
 
@@ -192,14 +193,42 @@ final class CurrencySeeder extends Seeder
             ],
         ];
 
+        $locales = $this->supportedLocales();
+
         foreach ($currencies as $currencyData) {
-            Currency::updateOrCreate(
+            $translations = $currencyData['name'] ?? [];
+            // Set a default name from translations or use code as fallback
+            $defaultName = $translations['en'] ?? $currencyData['code'];
+            unset($currencyData['name']); // Remove the translations array
+            $currencyData['name'] = $defaultName; // Set the default name
+
+            $currency = Currency::updateOrCreate(
                 ['code' => $currencyData['code']],
                 $currencyData
             );
+
+            // Create translations for each locale
+            foreach ($locales as $locale) {
+                CurrencyTranslation::updateOrCreate([
+                    'currency_id' => $currency->id,
+                    'locale' => $locale,
+                ], [
+                    'name' => $translations[$locale] ?? $currencyData['code'],
+                ]);
+            }
         }
 
         $this->command->info('Currency seeder completed successfully!');
-        $this->command->info('Created ' . count($currencies) . ' currencies with multilanguage support.');
+        $this->command->info('Created ' . count($currencies) . ' currencies with translations (locales: ' . implode(',', $locales) . ').');
+    }
+
+    private function supportedLocales(): array
+    {
+        return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
+            ->map(fn($v) => trim((string) $v))
+            ->filter()
+            ->unique()
+            ->values()
+            ->toArray();
     }
 }

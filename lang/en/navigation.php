@@ -16,4 +16,6 @@ return [
         'system' => 'System',
         'reports' => 'Reports',
     ],
+    'user_impersonation' => 'User Impersonation',
+    'user_management' => 'User Management',
 ];

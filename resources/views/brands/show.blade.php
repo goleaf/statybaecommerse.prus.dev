@@ -1,185 +1,182 @@
-@extends('components.layouts.templates.app', ['title' => $brand->trans('name') ?? $brand->name])
+@extends('layouts.app')
+
+@section('title', $seoTitle)
+@section('description', $seoDescription)
 
 @section('meta')
     <x-meta
-            :title="$brand->trans('name') ?? $brand->name"
-            :description="Str::limit(strip_tags($brand->trans('description') ?? ($brand->description ?? '')), 150)"
-            canonical="{{ url()->current() }}" />
+        :title="$seoTitle"
+        :description="$seoDescription"
+        canonical="{{ url()->current() }}" />
 @endsection
 
 @section('content')
-    <x-container class="py-8">
-        <a href="#results" class="sr-only focus:not-sr-only focus:underline">{{ __('skip_to_results') }}</a>
-        @if (session('status'))
-            <x-alert type="success" class="mb-4">{{ session('status') }}</x-alert>
-        @endif
-        @if (session('error'))
-            <x-alert type="error" class="mb-4">{{ session('error') }}</x-alert>
-        @endif
-        @if ($errors->any())
-            <x-alert type="error" class="mb-4">
-                <ul class="list-disc pl-5">
-                    @foreach ($errors->all() as $message)
-                        <li>{{ $message }}</li>
-                    @endforeach
-                </ul>
-            </x-alert>
-        @endif
-        <x-breadcrumbs>
-            <x-slot name="links">
-                <x-link :href="route('brands.index', ['locale' => app()->getLocale()])">{{ __('nav_brands') }}</x-link>
-            </x-slot>
-        </x-breadcrumbs>
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    {{-- Page Header --}}
+    <x-shared.page-header
+        :title="$brand->getTranslatedName()"
+        :description="$brand->getTranslatedDescription()"
+        icon="heroicon-o-tag"
+        :breadcrumbs="[
+            ['title' => __('shared.home'), 'url' => route('home')],
+            ['title' => __('shared.brands'), 'url' => route('localized.brands.index')],
+            ['title' => $brand->getTranslatedName()]
+        ]"
+    />
 
-        <!-- Brand Banner -->
-        @if ($brand->getBannerUrl('lg'))
-            <div class="w-full h-48 md:h-64 lg:h-80 mb-8 rounded-lg overflow-hidden bg-gray-50">
-                <img src="{{ $brand->getBannerUrl('md') }}"
-                     srcset="{{ $brand->getBannerUrl('sm') }} 800w, {{ $brand->getBannerUrl('md') }} 1200w, {{ $brand->getBannerUrl('lg') }} 1920w"
-                     sizes="(max-width: 768px) 800px, (max-width: 1024px) 1200px, 1920px"
-                     alt="{{ $brand->trans('name') ?? $brand->name }} banner"
-                     class="w-full h-full object-cover" />
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        {{-- Brand Information --}}
+        <div class="mb-12">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-8">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                        <div class="flex-1">
+                            @if($brand->getFirstMediaUrl('logo'))
+                                <div class="mb-6">
+                                    <img 
+                                        src="{{ $brand->getFirstMediaUrl('logo') }}" 
+                                        alt="{{ $brand->getTranslatedName() }}"
+                                        class="h-24 w-auto object-contain"
+                                    />
+                                </div>
+                            @endif
+                            
+                            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                                {{ $brand->getTranslatedName() }}
+                            </h1>
+                            
+                            @if($brand->getTranslatedDescription())
+                                <div class="prose max-w-none text-gray-600 dark:text-gray-300 mb-6">
+                                    {!! nl2br(e($brand->getTranslatedDescription())) !!}
+                                </div>
+                            @endif
+                            
+                            <div class="flex flex-wrap gap-4">
+                                @if($brand->website)
+                                    <a href="{{ $brand->website }}" 
+                                       target="_blank" 
+                                       rel="noopener noreferrer"
+                                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                        </svg>
+                                        {{ __('Visit Website') }}
+                                    </a>
+                                @endif
+                                
+                                <x-shared.badge variant="primary" size="lg">
+                                    {{ $products->count() }} {{ trans_choice('products', $products->count()) }}
+                                </x-shared.badge>
+                            </div>
+                        </div>
+                        
+                        @if($brand->getFirstMediaUrl('banner'))
+                            <div class="mt-8 lg:mt-0 lg:ml-8">
+                                <img 
+                                    src="{{ $brand->getFirstMediaUrl('banner') }}" 
+                                    alt="{{ $brand->getTranslatedName() }}"
+                                    class="h-48 w-full lg:h-64 lg:w-80 object-cover rounded-lg"
+                                />
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
-        @endif
-
-        <div class="flex items-center gap-4 mb-6">
-            @if ($brand->getLogoUrl('md'))
-                <img src="{{ $brand->getLogoUrl('md') }}"
-                     srcset="{{ $brand->getLogoUrl('sm') }} 128w, {{ $brand->getLogoUrl('md') }} 200w, {{ $brand->getLogoUrl('lg') }} 400w"
-                     sizes="200px"
-                     alt="{{ $brand->trans('name') ?? $brand->name }} logo"
-                     width="200" height="200"
-                     class="h-16 w-16 object-contain" />
-            @elseif ($brand->getLogoUrl())
-                <img src="{{ $brand->getLogoUrl() }}" alt="{{ $brand->trans('name') ?? $brand->name }}"
-                     class="h-12 w-12 object-contain" />
-            @endif
-            <h1 class="text-2xl font-semibold">{{ $brand->trans('name') ?? $brand->name }}</h1>
         </div>
 
-        <p class="text-sm text-gray-600 mb-2" aria-live="polite">
-            {{ trans_choice(':count result found|:count results found', $products->total() ?? $products->count(), ['count' => $products->total() ?? $products->count()]) }}
-        </p>
-        <div id="results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            @forelse($products as $product)
-                <x-product.card :product="$product" />
-            @empty
-                <p class="text-gray-500">{{ __('No products for this brand yet.') }}</p>
-            @endforelse
-        </div>
-
-        <nav class="mt-6" aria-label="{{ __('Pagination') }}">{{ $products->links() }}</nav>
-    </x-container>
-@endsection
-
-@section('meta')
-    @php($ogImage = $brand->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?: $brand->getFirstMediaUrl(config('media.storage.collection_name')))
-    <x-meta
-            :title="$brand->trans('seo_title') ?? ($brand->trans('name') ?? $brand->name)"
-            :description="Str::limit(strip_tags($brand->trans('seo_description') ?? ($brand->description ?? '')), 150)"
-            :og-image="$ogImage"
-            :preload-image="(string) ($products
-                ->first()
-                ?->getFirstMediaUrl(config('media.storage.collection_name'), 'medium') ?? '')"
-            :prev="$products instanceof \Illuminate\Contracts\Pagination\Paginator ||
-            $products instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator
-                ? $products->previousPageUrl()
-                : null"
-            :next="$products instanceof \Illuminate\Contracts\Pagination\Paginator ||
-            $products instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator
-                ? $products->nextPageUrl()
-                : null"
-            canonical="{{ url()->current() }}" />
-@endsection
-
-<x-dynamic-component :component="$layout">
-    <div class="container mx-auto px-4 py-8">
-        <x-breadcrumbs :items="[
-            ['label' => __('Brands'), 'url' => route('brands.index', ['locale' => app()->getLocale()])],
-            ['label' => $brand->trans('name') ?? $brand->name],
-        ]" />
-        <h1 class="text-2xl font-semibold mb-6">{{ $brand->trans('name') ?? $brand->name }}</h1>
-        @php($brandThumb = $brand->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: ($brand->getFirstMediaUrl(config('media.storage.collection_name'), 'small') ?: $brand->getFirstMediaUrl(config('media.storage.collection_name'))))
-        @if ($brandThumb)
-            <div class="mb-6">
-                <img loading="lazy" src="{{ $brandThumb }}" alt="{{ $brand->trans('name') ?? $brand->name }}"
-                     width="160" height="80"
-                     class="h-20 object-contain" />
-            </div>
-        @endif
-
-        @if (isset($products) && $products->isNotEmpty())
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                @foreach ($products as $product)
-                    <a href="{{ route('product.show', ['locale' => app()->getLocale(), 'slug' => $product->trans('slug') ?? $product->slug]) }}"
-                       class="block border rounded-lg p-4 hover:shadow-sm">
-                        <x-product.thumbnail :product="$product" containerClass="mb-3" />
-                        <div class="text-base font-medium">{{ $product->trans('name') ?? $product->name }}</div>
-                        <x-product.price :product="$product" class="mt-1" />
+        {{-- Products Section --}}
+        <div class="mb-12">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ __('Products by :brand', ['brand' => $brand->getTranslatedName()]) }}
+                </h2>
+                
+                @if($brand->products()->where('is_visible', true)->whereNotNull('published_at')->count() > 12)
+                    <a href="{{ route('localized.products.index', ['brand' => $brand->getTranslatedSlug()]) }}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        {{ __('View All Products') }}
+                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
                     </a>
-                @endforeach
+                @endif
             </div>
-            <nav class="mt-6" aria-label="{{ __('Pagination') }}">{{ $products->links() }}</nav>
-        @else
-            <div class="text-slate-500">{{ __('No products for this brand yet.') }}</div>
-        @endif
-    </div>
-</x-dynamic-component>
 
-@push('scripts')
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Brand",
-      "name": "{{ addslashes($brand->trans('name') ?? $brand->name) }}",
-      @php($logo = $brand->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: $brand->getFirstMediaUrl(config('media.storage.collection_name')))
-      @if ($logo)
-      "logo": "{{ $logo }}",
-      @endif
-      @if ($brand->website)
-      "url": "{{ $brand->website }}"
-      @endif
-    }
-    </script>
-    @php
-        $elements = [];
-        $position = 1;
-        foreach ($products as $p) {
-            $elements[] = [
-                '@type' => 'ListItem',
-                'position' => $position++,
-                'url' => route('product.show', [
-                    'locale' => app()->getLocale(),
-                    'slug' => $p->trans('slug') ?? $p->slug,
-                ]),
-                'name' => $p->trans('name') ?? $p->name,
-            ];
-        }
-    @endphp
-    @if (!empty($elements))
-        <script type="application/ld+json">
-        {!! json_encode(['@context' => 'https://schema.org', '@type' => 'ItemList', 'itemListElement' => $elements], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}
-        </script>
-    @endif
-@endpush
-
-@php($layout = 'layouts.templates.app')
-
-<x-dynamic-component :component="$layout">
-    <div class="container mx-auto px-4 py-8">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-semibold">{{ $brand->trans('name') ?? $brand->name }}</h1>
-            @if ($brand->website)
-                <a href="{{ $brand->website }}" target="_blank"
-                   class="text-blue-600 hover:underline text-sm">{{ __('Website') }}</a>
+            @if($products->count() > 0)
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    @foreach($products as $product)
+                        <x-shared.product-card :product="$product" />
+                    @endforeach
+                </div>
+            @else
+                <x-shared.empty-state
+                    title="{{ __('No products found') }}"
+                    description="{{ __('No products are available for this brand yet.') }}"
+                    icon="heroicon-o-cube"
+                />
             @endif
         </div>
 
-        @if ($brand->trans('description') ?? $brand->description)
-            <div class="prose max-w-none mb-8">{!! nl2br(e($brand->trans('description') ?? $brand->description)) !!}</div>
-        @endif
+        {{-- Related Brands --}}
+        @php
+            $relatedBrands = \App\Models\Brand::query()
+                ->where('is_enabled', true)
+                ->where('id', '!=', $brand->id)
+                ->withCount('products')
+                ->having('products_count', '>', 0)
+                ->inRandomOrder()
+                ->limit(4)
+                ->get();
+        @endphp
 
-        <h2 class="text-xl font-semibold mb-4">{{ __('Products') }}</h2>
-        <livewire:components.brand.products :brandId="$brand->id" />
+        @if($relatedBrands->count() > 0)
+            <div class="mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+                    {{ __('Other Brands') }}
+                </h2>
+                
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    @foreach($relatedBrands as $relatedBrand)
+                        <x-shared.card hover="true" class="group">
+                            <div class="aspect-w-16 aspect-h-9 overflow-hidden rounded-t-lg">
+                                @if($relatedBrand->getFirstMediaUrl('logo'))
+                                    <img 
+                                        src="{{ $relatedBrand->getFirstMediaUrl('logo') }}" 
+                                        alt="{{ $relatedBrand->getTranslatedName() }}"
+                                        loading="lazy"
+                                        class="h-32 w-full object-contain object-center transition-transform duration-300 group-hover:scale-105 p-4"
+                                    />
+                                @else
+                                    <div class="flex h-32 items-center justify-center bg-gray-100 dark:bg-gray-700" aria-hidden="true">
+                                        <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 p-4">
+                                <a href="{{ route('localized.brands.show', $relatedBrand->getTranslatedSlug()) }}" class="stretched-link">
+                                    {{ $relatedBrand->getTranslatedName() }}
+                                </a>
+                            </h3>
+                            
+                            <x-slot name="footer">
+                                <div class="flex items-center justify-between p-4 pt-0">
+                                    <x-shared.badge variant="primary" size="sm">
+                                        {{ $relatedBrand->products_count }} {{ trans_choice('products', $relatedBrand->products_count) }}
+                                    </x-shared.badge>
+                                    
+                                    <svg class="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </div>
+                            </x-slot>
+                        </x-shared.card>
+                    @endforeach
+                </div>
+            </div>
+        @endif
     </div>
-</x-dynamic-component>
+</div>
+@endsection

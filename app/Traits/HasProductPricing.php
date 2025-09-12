@@ -2,7 +2,6 @@
 
 namespace App\Traits;
 
-use App\DTO\PriceData;
 use Illuminate\Support\Facades\DB;
 // Using native Laravel helpers and custom PriceData DTO
 

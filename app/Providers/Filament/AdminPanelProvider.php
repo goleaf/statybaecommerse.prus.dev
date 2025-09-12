@@ -3,6 +3,9 @@
 namespace App\Providers\Filament;
 
 use App\Enums\NavigationGroup as NavEnum;
+use Awcodes\Overlook\OverlookPlugin;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use DutchCodingCompany\FilamentSocialite\FilamentSocialitePlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -13,12 +16,15 @@ use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Filament\Panel;
 use Filament\PanelProvider;
+use FilipFonal\FilamentLogManager\FilamentLogManagerPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Jacobtims\FilamentLogger\FilamentLoggerPlugin;
+use Kenepa\ResourceLock\ResourceLockPlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -41,13 +47,16 @@ final class AdminPanelProvider extends PanelProvider
                 'danger' => Color::Red,
                 'info' => Color::Sky,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            // ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->resources([
+                // \App\Filament\Resources\PostResource::class, // Temporarily disabled due to Filament v4 compatibility issues
+                // \App\Filament\Resources\SystemSettingsResource::class, // Disabled due to Filament v4 compatibility issues
+            ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\Filament\Clusters')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
-                \App\Filament\Widgets\RealtimeAnalyticsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -96,13 +105,18 @@ final class AdminPanelProvider extends PanelProvider
                     ->label(__('admin.navigation.language'))
                     ->url(fn(): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
                     ->icon('heroicon-o-language'),
-                'settings' => \Filament\Navigation\MenuItem::make()
-                    ->label(__('admin.navigation.settings'))
-                    ->url(fn(): string => \App\Filament\Resources\SystemSettingsResource::getUrl('index'))
-                    ->icon('heroicon-o-cog-6-tooth'),
+                // 'settings' => \Filament\Navigation\MenuItem::make()
+                //     ->label(__('admin.navigation.settings'))
+                //     ->url(fn(): string => \App\Filament\Resources\SystemSettingsResource::getUrl('index'))
+                //     ->icon('heroicon-o-cog-6-tooth'),
             ])
             ->plugins([
-                // Plugins temporarily disabled for upgrade
+                FilamentShieldPlugin::make(),
+                FilamentLoggerPlugin::make(),
+                OverlookPlugin::make(),
+                ResourceLockPlugin::make(),
+                FilamentSocialitePlugin::make(),
+                FilamentLogManagerPlugin::make(),
             ])
             ->spa()
             // ->renderHook(

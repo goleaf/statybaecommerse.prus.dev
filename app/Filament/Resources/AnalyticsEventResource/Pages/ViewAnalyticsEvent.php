@@ -13,12 +13,13 @@ final class ViewAnalyticsEvent extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\Action::make('back_to_list')
+                ->label(__('common.back_to_list'))
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url($this->getResource()::getUrl('index'))
+                ->tooltip(__('common.back_to_list_tooltip')),
+            Actions\EditAction::make(),
         ];
-    }
-
-    public function getView(): string
-    {
-        return 'filament.resources.analytics-event-resource.pages.view-analytics-event';
     }
 }

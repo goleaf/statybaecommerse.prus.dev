@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Components;
 
-use App\DTO\OptionData;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Darryldecode\Cart\Facades\CartFacade;
@@ -31,6 +30,16 @@ class VariantsSelector extends Component
     {
         $model = $this->variant ?? $this->product;
 
+        // Check if product should hide add to cart
+        if ($this->product->shouldHideAddToCart()) {
+            Notification::make()
+                ->title(__('frontend.product.cannot_add_to_cart'))
+                ->body(__('frontend.product.request_required'))
+                ->warning()
+                ->send();
+            return;
+        }
+
         if (!$model->getPrice()) {
             Notification::make()
                 ->title(__('Cart Error'))
@@ -41,14 +50,26 @@ class VariantsSelector extends Component
             return;
         }
 
+        // Check minimum quantity
+        $minimumQuantity = $this->product->getMinimumQuantity();
+        if ($minimumQuantity > 1) {
+            Notification::make()
+                ->title(__('frontend.product.minimum_quantity_required', ['min' => $minimumQuantity]))
+                ->body(__('frontend.product.minimum_quantity_description'))
+                ->warning()
+                ->send();
+            return;
+        }
+
         CartFacade::session(session()->getId())->add([
             'id' => $model->created_at->timestamp * $model->id,
             'name' => $this->product->trans('name') ?? $this->product->name,
             'price' => $model->getPrice()->value->amount,
             'quantity' => 1,
-            'attributes' => $this->variant
-                ? $this->getVariantAttributes()
-                : [],
+            'attributes' => array_merge(
+                $this->variant ? $this->getVariantAttributes() : [],
+                ['minimum_quantity' => $this->product->getMinimumQuantity()]
+            ),
             'associatedModel' => $model,
         ]);
 

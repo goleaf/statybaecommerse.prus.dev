@@ -16,4 +16,6 @@ return [
         'system' => 'Sistema',
         'reports' => 'Ataskaitos',
     ],
+    'user_impersonation' => 'Vartotojų apsimetimas',
+    'user_management' => 'Vartotojų valdymas',
 ];

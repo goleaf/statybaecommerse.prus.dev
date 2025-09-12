@@ -3,9 +3,8 @@
 namespace App\Filament\Resources\CampaignResource\Pages;
 
 use App\Filament\Resources\CampaignResource;
-use App\Services\MultiLanguageTabService;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
 
 final class EditCampaign extends EditRecord
 {
@@ -14,38 +13,24 @@ final class EditCampaign extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('back_to_view')
+                ->label(__('common.back_to_view'))
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url($this->getResource()::getUrl('view', ['record' => $this->getRecord()]))
+                ->tooltip(__('common.back_to_view_tooltip')),
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
     }
 
-    protected function mutateFormDataBeforeSave(array $data): array
+    protected function getRedirectUrl(): string
     {
-        $prepared = MultiLanguageTabService::prepareTranslationData($data, ['name', 'slug', 'description']);
-        $this->data['translations'] = $prepared['translations'];
-        $main = $prepared['main_data'];
-        $defaultLocale = config('app.locale', 'lt');
-        $tr = $prepared['translations'][$defaultLocale] ?? [];
-        $main['name'] = $main['name'] ?? ($tr['name'] ?? $this->record->name);
-        $main['slug'] = $main['slug'] ?? ($tr['slug'] ?? $this->record->slug);
-        $main['description'] = $main['description'] ?? ($tr['description'] ?? null);
-        return $main;
+        return $this->getResource()::getUrl('index');
     }
 
-    protected function afterSave(): void
+    protected function getSavedNotificationTitle(): ?string
     {
-        $translations = $this->data['translations'] ?? [];
-        if (!empty($translations)) {
-            foreach ($translations as $locale => $fields) {
-                $this->record->translations()->updateOrCreate(
-                    ['locale' => $locale],
-                    [
-                        'name' => $fields['name'] ?? $this->record->name,
-                        'slug' => $fields['slug'] ?? $this->record->slug,
-                        'description' => $fields['description'] ?? null,
-                    ]
-                );
-            }
-        }
+        return __('campaigns.notifications.updated');
     }
 }

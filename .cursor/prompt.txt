@@ -1,3 +1,8 @@
+make multitranslationable if need, make all labels translatable, add widgets, make all relations, show maximum information, make filtering, make all to frontend and make for admin all solutions using filament 4, make updates for models, and update existing migrations, update tests, update all for this  module, run tests for model, run test for resource file, and for all related files, check all relations, check all values, does crud is working, does all relations are working in test, try to create edit update and delete information via test and make it with all relations in test, check all in frontend, create for frontend or edit for frontend test, run tests and fix all errors, update git with this prompt changesd files. write in commit message what was changed and do not put in commit any another files what is not in git 
+
+
+
+
 # Cursor Prompt — Laravel/Filament fixer with MCP & full i18n pass
 
 ## Role

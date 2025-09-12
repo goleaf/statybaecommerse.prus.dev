@@ -3,72 +3,126 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerGroupResource\Pages;
+use App\Filament\Resources\CustomerGroupResource\RelationManagers;
+use App\Filament\Widgets\CustomerGroupStatsWidget;
 use App\Models\CustomerGroup;
-use App\Services\MultiLanguageTabService;
-use Filament\Actions\Action;
+use App\Models\User;
+use App\Models\Discount;
+use App\Models\PriceList;
+use App\Models\Campaign;
+use BackedEnum;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Grid;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Actions as Actions;
-use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Tables;
+use Filament\Tables\Table;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\DateFilter;
+use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
-use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
+
 final class CustomerGroupResource extends Resource
 {
     protected static ?string $model = CustomerGroup::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
-
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('admin.navigation.customers');
-    }
-
     public static function getNavigationLabel(): string
     {
-        return __('admin.navigation.customer_groups');
+        return __('customer_groups.navigation_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function getNavigationGroup(): ?string
     {
-        return $schema
-            ->components([
-                // Customer Group Settings (Non-translatable)
-                \Filament\Schemas\Components\Section::make(__('translations.customer_group_settings'))
-                    ->components([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('translations.name'))
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('slug')
-                            ->label(__('translations.slug'))
-                            ->required()
-                            ->unique(CustomerGroup::class, 'slug', ignoreRecord: true)
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('description')
-                            ->label(__('translations.description'))
-                            ->rows(3),
-                        Forms\Components\TextInput::make('discount_percentage')
-                            ->label(__('translations.discount_percentage'))
-                            ->numeric()
-                            ->suffix('%')
-                            ->minValue(0)
-                            ->maxValue(100)
-                            ->step(0.01),
-                        Forms\Components\Toggle::make('is_active')
-                            ->label(__('translations.active'))
-                            ->default(true),
+        return __('customer_groups.navigation_group');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('customer_groups.navigation_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('customer_groups.navigation_label');
+    }
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Section::make(__('customer_groups.navigation_label'))
+                    ->description(__('customer_groups.description'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label(__('customer_groups.name'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (string $operation, $state, callable $set) => 
+                                        $operation === 'create' ? $set('slug', \Str::slug($state)) : null
+                                    ),
+                                TextInput::make('slug')
+                                    ->label(__('customer_groups.slug'))
+                                    ->required()
+                                    ->maxLength(50)
+                                    ->unique(ignoreRecord: true)
+                                    ->rules(['alpha_dash']),
+                            ]),
+                        Textarea::make('description')
+                            ->label(__('customer_groups.description'))
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
+                    
+                Section::make(__('customer_groups.discount_percentage'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('discount_percentage')
+                                    ->label(__('customer_groups.discount_percentage'))
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->maxValue(100)
+                                    ->step(0.01)
+                                    ->suffix('%')
+                                    ->helperText(__('customer_groups.validation_discount_percentage_max')),
+                                Toggle::make('is_enabled')
+                                    ->label(__('customer_groups.is_enabled'))
+                                    ->default(true)
+                                    ->helperText(__('customer_groups.is_enabled')),
+                            ]),
+                    ]),
+                    
+                Section::make(__('customer_groups.conditions'))
+                    ->schema([
+                        KeyValue::make('conditions')
+                            ->label(__('customer_groups.conditions'))
+                            ->keyLabel(__('customer_groups.conditions'))
+                            ->valueLabel(__('customer_groups.conditions'))
+                            ->helperText(__('customer_groups.conditions'))
+                            ->columnSpanFull(),
                     ])
-                    ->columns(2),
-                // Note: Multilanguage tabs disabled for stability in tests
+                    ->collapsible(),
             ]);
     }
 
@@ -77,59 +131,159 @@ final class CustomerGroupResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('translations.name'))
+                    ->label(__('customer_groups.table_name'))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('bold')
+                    ->copyable(),
+                    
+                Tables\Columns\TextColumn::make('slug')
+                    ->label(__('customer_groups.table_slug'))
+                    ->searchable()
+                    ->sortable()
+                    ->copyable()
+                    ->badge()
+                    ->color('gray'),
+                    
                 Tables\Columns\TextColumn::make('description')
-                    ->label(__('translations.description'))
+                    ->label(__('customer_groups.table_description'))
                     ->limit(50)
-                    ->toggleable(),
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 50) {
+                            return null;
+                        }
+                        return $state;
+                    }),
+                    
                 Tables\Columns\TextColumn::make('discount_percentage')
-                    ->label(__('translations.discount_percentage'))
+                    ->label(__('customer_groups.table_discount_percentage'))
+                    ->numeric(decimalPlaces: 2)
                     ->suffix('%')
-                    ->sortable(),
+                    ->sortable()
+                    ->color(fn ($state): string => $state > 0 ? 'success' : 'gray')
+                    ->badge()
+                    ->formatStateUsing(fn ($state): string => $state > 0 ? $state . '%' : __('customer_groups.no_discount')),
+                    
                 Tables\Columns\TextColumn::make('users_count')
+                    ->label(__('customer_groups.table_users_count'))
                     ->counts('users')
-                    ->label(__('translations.customers'))
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label(__('translations.active'))
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
+                    
+                Tables\Columns\IconColumn::make('is_enabled')
+                    ->label(__('customer_groups.table_is_enabled'))
                     ->boolean()
                     ->sortable(),
+                    
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('translations.created_at'))
-                    ->date('Y-m-d')
+                    ->label(__('customer_groups.table_created_at'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                    
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('customer_groups.table_updated_at'))
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\Filter::make('active')
-                    ->label(__('translations.active_only'))
-                    ->query(fn(Builder $query): Builder => $query->where('is_enabled', true)),
+                TernaryFilter::make('is_enabled')
+                    ->label(__('customer_groups.filter_enabled'))
+                    ->placeholder(__('customer_groups.all_groups'))
+                    ->trueLabel(__('customer_groups.enabled_only'))
+                    ->falseLabel(__('customer_groups.disabled_only')),
+                    
+                Filter::make('with_discount')
+                    ->label(__('customer_groups.filter_with_discount'))
+                    ->query(fn (Builder $query): Builder => $query->where('discount_percentage', '>', 0)),
+                    
+                Filter::make('discount_range')
+                    ->form([
+                        TextInput::make('discount_from')
+                            ->label(__('customer_groups.discount_from'))
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100),
+                        TextInput::make('discount_to')
+                            ->label(__('customer_groups.discount_to'))
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['discount_from'],
+                                fn (Builder $query, $discount): Builder => $query->where('discount_percentage', '>=', $discount),
+                            )
+                            ->when(
+                                $data['discount_to'],
+                                fn (Builder $query, $discount): Builder => $query->where('discount_percentage', '<=', $discount),
+                            );
+                    }),
+                    
+                Filter::make('users_count_range')
+                    ->form([
+                        TextInput::make('users_from')
+                            ->label(__('customer_groups.users_from'))
+                            ->numeric()
+                            ->minValue(0),
+                        TextInput::make('users_to')
+                            ->label(__('customer_groups.users_to'))
+                            ->numeric()
+                            ->minValue(0),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['users_from'],
+                                fn (Builder $query, $users): Builder => $query->has('users', '>=', $users),
+                            )
+                            ->when(
+                                $data['users_to'],
+                                fn (Builder $query, $users): Builder => $query->has('users', '<=', $users),
+                            );
+                    }),
+                    
+                DateFilter::make('created_at')
+                    ->label(__('customer_groups.filter_created_date'))
+                    ->displayFormat('d/m/Y'),
             ])
-            ->modifyQueryUsing(function (Builder $query): void {
-                $active = request()->input('filter.active');
-                if ($active === '1' || $active === 1 || $active === true || $active === 'true') {
-                    $query->where('is_enabled', true);
-                }
-            })
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+            ->actions([
+                ViewAction::make()
+                    ->label(__('customer_groups.action_view')),
+                EditAction::make()
+                    ->label(__('customer_groups.action_edit')),
+                DeleteAction::make()
+                    ->label(__('customer_groups.action_delete')),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
+                        ->label(__('customer_groups.action_delete')),
                 ]),
             ])
-            ->defaultSort('name', 'asc');
+            ->defaultSort('created_at', 'desc')
+            ->poll('30s');
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\UsersRelationManager::class,
+            RelationManagers\DiscountsRelationManager::class,
+            RelationManagers\PriceListsRelationManager::class,
+            RelationManagers\CampaignsRelationManager::class,
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            CustomerGroupStatsWidget::class,
         ];
     }
 

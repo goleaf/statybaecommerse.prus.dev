@@ -2,32 +2,40 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use Filament\Actions\AttachAction;
-use Filament\Actions\Action;
-use Filament\Actions\DetachAction;
-use Filament\Actions\DetachBulkAction;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
-use Filament\Tables\Table;
+use App\Models\Category;
 use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-final class CategoriesRelationManager extends RelationManager
+class CategoriesRelationManager extends RelationManager
 {
     protected static string $relationship = 'categories';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $title = 'Categories';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\Select::make('category_id')
+                    ->label(__('translations.category'))
                     ->relationship('categories', 'name')
                     ->searchable()
                     ->preload()
                     ->required(),
+                
+                Forms\Components\TextInput::make('sort_order')
+                    ->label(__('translations.sort_order'))
+                    ->numeric()
+                    ->default(0),
+                
+                Forms\Components\Toggle::make('is_primary')
+                    ->label(__('translations.is_primary'))
+                    ->default(false),
             ]);
     }
 
@@ -36,37 +44,71 @@ final class CategoriesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\ImageColumn::make('image')
-                    ->defaultImageUrl('/images/placeholder-category.jpg')
-                    ->circular(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('translations.category_name'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->searchable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('products_count')
-                    ->counts('products')
-                    ->label('Products'),
+                
+                Tables\Columns\TextColumn::make('description')
+                    ->label(__('translations.description'))
+                    ->limit(50)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 50) {
+                            return null;
+                        }
+                        return $state;
+                    }),
+                
                 Tables\Columns\IconColumn::make('is_visible')
-                    ->boolean()
+                    ->label(__('translations.is_visible'))
+                    ->boolean(),
+                
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->label(__('translations.sort_order'))
                     ->sortable(),
+                
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('translations.created_at'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\Filter::make('visible')
-                    ->query(fn(Builder $query): Builder => $query->where('is_visible', true)),
+                Tables\Filters\SelectFilter::make('is_visible')
+                    ->label(__('translations.is_visible'))
+                    ->options([
+                        true => __('translations.yes'),
+                        false => __('translations.no'),
+                    ]),
             ])
             ->headerActions([
-                AttachAction::make()
-                    ->preloadRecordSelect(),
+                Tables\Actions\AttachAction::make()
+                    ->preloadRecordSelect()
+                    ->form(fn (Tables\Actions\AttachAction $action): array => [
+                        $action->getRecordSelect()
+                            ->searchable()
+                            ->preload(),
+                        
+                        Forms\Components\TextInput::make('sort_order')
+                            ->label(__('translations.sort_order'))
+                            ->numeric()
+                            ->default(0),
+                        
+                        Forms\Components\Toggle::make('is_primary')
+                            ->label(__('translations.is_primary'))
+                            ->default(false),
+                    ]),
             ])
-            ->recordActions([
-                DetachAction::make(),
+            ->actions([
+                Tables\Actions\DetachAction::make(),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DetachBulkAction::make(),
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DetachBulkAction::make(),
                 ]),
             ]);
     }
 }
+
+

@@ -17,6 +17,7 @@ final class CartItem extends Model
         'product_id',
         'variant_id',
         'quantity',
+        'minimum_quantity',
         'unit_price',
         'total_price',
         'product_snapshot',
@@ -24,6 +25,7 @@ final class CartItem extends Model
 
     protected $casts = [
         'quantity' => 'integer',
+        'minimum_quantity' => 'integer',
         'unit_price' => 'decimal:2',
         'total_price' => 'decimal:2',
         'product_snapshot' => 'array',
@@ -48,6 +50,16 @@ final class CartItem extends Model
     {
         $this->total_price = $this->unit_price * $this->quantity;
         $this->save();
+    }
+
+    public function needsRestocking(): bool
+    {
+        return $this->quantity < $this->minimum_quantity;
+    }
+
+    public function getMinimumQuantity(): int
+    {
+        return $this->minimum_quantity ?? 1;
     }
 
     public function getFormattedTotalPriceAttribute(): string

@@ -3,40 +3,101 @@
 namespace App\Filament\Resources\NewsResource\Pages;
 
 use App\Filament\Resources\NewsResource;
-use App\Services\MultiLanguageTabService;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 final class EditNews extends EditRecord
 {
     protected static string $resource = NewsResource::class;
 
-    protected function mutateFormDataBeforeFill(array $data): array
+    protected function getHeaderActions(): array
     {
-        return array_merge($data, MultiLanguageTabService::populateFormWithTranslations($this->record, ['title', 'slug', 'summary', 'content', 'seo_title', 'seo_description']));
+        return [
+            Actions\ViewAction::make(),
+            Actions\DeleteAction::make(),
+            Actions\Action::make('publish')
+                ->label(__('admin.news.actions.publish'))
+                ->icon('heroicon-o-check')
+                ->action(function () {
+                    $this->record->update([
+                        'is_visible' => true,
+                        'published_at' => now(),
+                    ]);
+                    $this->refreshFormData(['is_visible', 'published_at']);
+                })
+                ->visible(fn (): bool => !$this->record->isPublished()),
+            Actions\Action::make('unpublish')
+                ->label(__('admin.news.actions.unpublish'))
+                ->icon('heroicon-o-x-mark')
+                ->action(function () {
+                    $this->record->update([
+                        'is_visible' => false,
+                        'published_at' => null,
+                    ]);
+                    $this->refreshFormData(['is_visible', 'published_at']);
+                })
+                ->visible(fn (): bool => $this->record->isPublished()),
+            Actions\Action::make('feature')
+                ->label(__('admin.news.actions.feature'))
+                ->icon('heroicon-o-star')
+                ->action(function () {
+                    $this->record->update(['is_featured' => true]);
+                    $this->refreshFormData(['is_featured']);
+                })
+                ->visible(fn (): bool => !$this->record->is_featured),
+            Actions\Action::make('unfeature')
+                ->label(__('admin.news.actions.unfeature'))
+                ->icon('heroicon-o-star')
+                ->action(function () {
+                    $this->record->update(['is_featured' => false]);
+                    $this->refreshFormData(['is_featured']);
+                })
+                ->visible(fn (): bool => $this->record->is_featured),
+        ];
     }
 
-    protected function mutateFormDataBeforeSave(array $data): array
+    protected function mutateFormDataBeforeFill(array $data): array
     {
-        $prepared = MultiLanguageTabService::prepareTranslationData($data, ['title', 'slug', 'summary', 'content', 'seo_title', 'seo_description']);
-        $this->data['translations'] = $prepared['translations'];
-        return $prepared['main_data'];
+        // Load translations into form data
+        $news = $this->record;
+        $data['translations'] = [];
+
+        foreach ($news->translations as $translation) {
+            $data['translations'][$translation->locale] = [
+                'title' => $translation->title,
+                'slug' => $translation->slug,
+                'summary' => $translation->summary,
+                'content' => $translation->content,
+                'seo_title' => $translation->seo_title,
+                'seo_description' => $translation->seo_description,
+            ];
+        }
+
+        return $data;
     }
 
     protected function afterSave(): void
     {
-        $translations = $this->data['translations'] ?? [];
-        foreach ($translations as $locale => $fields) {
-            $this->record->translations()->updateOrCreate(
-                ['locale' => $locale],
-                [
-                    'title' => $fields['title'] ?? null,
-                    'slug' => $fields['slug'] ?? null,
-                    'summary' => $fields['summary'] ?? null,
-                    'content' => $fields['content'] ?? null,
-                    'seo_title' => $fields['seo_title'] ?? null,
-                    'seo_description' => $fields['seo_description'] ?? null,
-                ]
-            );
+        // Update translation records if provided
+        if (isset($this->data['translations'])) {
+            $translations = $this->data['translations'];
+            $news = $this->record;
+
+            foreach ($translations as $locale => $translationData) {
+                if (!empty($translationData['title'])) {
+                    $news->translations()->updateOrCreate(
+                        ['locale' => $locale],
+                        [
+                            'title' => $translationData['title'],
+                            'slug' => $translationData['slug'] ?? \Str::slug($translationData['title']),
+                            'summary' => $translationData['summary'] ?? null,
+                            'content' => $translationData['content'] ?? null,
+                            'seo_title' => $translationData['seo_title'] ?? null,
+                            'seo_description' => $translationData['seo_description'] ?? null,
+                        ]
+                    );
+                }
+            }
         }
     }
 }

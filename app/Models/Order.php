@@ -11,10 +11,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Translatable\HasTranslations;
 
 final class Order extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, SoftDeletes, LogsActivity, HasTranslations;
+
+    public array $translatable = [
+        'notes',
+        'billing_address',
+        'shipping_address',
+    ];
 
     protected $fillable = [
         'number',
@@ -102,6 +109,11 @@ final class Order extends Model
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
+    }
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(\App\Models\Translations\OrderTranslation::class);
     }
 
     public function scopeByStatus($query, string $status)

@@ -35,9 +35,10 @@ it('has attribute values relationship', function () {
 
 it('has products relationship through pivot', function () {
     $attribute = Attribute::factory()->create();
+    $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
     $product = Product::factory()->create();
     
-    $product->attributes()->attach($attribute->id);
+    $product->attributes()->attach($attribute->id, ['attribute_value_id' => $attributeValue->id]);
 
     expect($attribute->products)->toHaveCount(1);
     expect($attribute->products->first()->id)->toBe($product->id);

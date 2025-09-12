@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\AnalyticsEventResource\Pages;
 
 use App\Filament\Resources\AnalyticsEventResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
 
 final class ListAnalyticsEvents extends ListRecords
 {
@@ -13,12 +13,13 @@ final class ListAnalyticsEvents extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('export')
-                ->label(__('Export'))
-                ->icon('heroicon-o-arrow-down-tray')
-                ->action(function () {
-                    // Export logic here
-                }),
+            Actions\Action::make('back_to_dashboard')
+                ->label(__('common.back_to_dashboard'))
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url('/admin')
+                ->tooltip(__('common.back_to_dashboard_tooltip')),
+            Actions\CreateAction::make(),
         ];
     }
 }

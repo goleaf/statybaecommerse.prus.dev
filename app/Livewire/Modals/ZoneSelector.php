@@ -6,7 +6,7 @@ namespace App\Livewire\Modals;
 
 use App\Actions\CountriesWithZone;
 use App\Actions\ZoneSessionManager;
-use App\DTO\CountryByZoneData;
+use App\Actions\CountryByZoneData;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Laravelcm\LivewireSlideOvers\SlideOverComponent;

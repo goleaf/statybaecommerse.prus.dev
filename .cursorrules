@@ -1,146 +1,126 @@
-# Laravel E-commerce + Document Generation Cursor Rules
+# Laravel 11 + Filament v4 — РЕАЛТАЙМ АВТОФИКС СИСТЕМА
 
-## Core Laravel & Filament Standards
-- You are an expert in Laravel, PHP, and related web development technologies.
-- Write concise, technical responses with accurate PHP/Laravel examples.
-- Prioritize SOLID principles for object-oriented programming and clean architecture.
-- Follow PHP and Laravel best practices, ensuring consistency and readability.
-- Design for scalability and maintainability, ensuring the system can grow with ease.
-- Prefer iteration and modularization over duplication to promote code reuse.
-- Use consistent and descriptive names for variables, methods, and classes to improve readability.
+## ОСНОВНЫЕ ПРИНЦИПЫ
 
-## Dependencies & Versions
-- Composer for dependency management
-- PHP 8.3+
-- Laravel 12.0+
-- Filament v4 (latest)
-- DomPDF for document generation
+1. **АВТОМАТИЧЕСКОЕ ИСПРАВЛЕНИЕ** - Все ошибки исправляются автоматически
+2. **РЕАЛТАЙМ МОНИТОРИНГ** - Проверки выполняются при каждом изменении
+3. **ПРИОРИТЕТНОСТЬ** - Критические ошибки исправляются первыми
+4. **ПРОИЗВОДИТЕЛЬНОСТЬ** - Параллельные процессы и кэширование
 
-## PHP and Laravel Standards
-- Leverage PHP 8.3+ features when appropriate (e.g., typed properties, match expressions).
-- Adhere to PSR-12 coding standards for consistent code style.
-- Always use strict typing: declare(strict_types=1);
-- Utilize Laravel's built-in features and helpers to maximize efficiency.
-- Follow Laravel's directory structure and file naming conventions.
-- Implement robust error handling and logging using Laravel's exception handling and logging features.
-- Use Laravel's validation features for form and request data.
-- Implement middleware for request filtering and modification.
-- Utilize Laravel's Eloquent ORM for database interactions.
-- Use Laravel's query builder for complex database operations.
-- Create and maintain proper database migrations and seeders.
+## ТРИГГЕРЫ АКТИВАЦИИ
 
-## Document Generation Best Practices
+Система активируется при:
+- Наборе текста (каждые 2-3 символа)
+- Сохранении файла (Ctrl+S)
+- Вставке кода (Ctrl+V)
+- Автодополнении
+- Изменении импортов
+- Рефакторинге
 
-### Document Models & Structure
-- Use `DocumentTemplate` for reusable document templates with HTML content and variables
-- Use `Document` for generated documents with morphed relationships to any model
-- Store document variables as JSON arrays for flexibility
-- Include document metadata: status, format, file_path, generated_at
-- Support both HTML and PDF formats
+## АВТОМАТИЧЕСКИЕ КОМАНДЫ
 
-### Document Templates
-- Create templates with HTML content using placeholder variables (e.g., $CUSTOMER_NAME, $ORDER_TOTAL)
-- Categorize templates by type: invoice, receipt, contract, agreement, catalog, report, certificate
-- Organize templates by category: sales, marketing, legal, finance, operations, customer_service
-- Include template settings for print configuration (page size, orientation, margins)
-- Use descriptive slugs for template identification
+### При каждом изменении файла:
 
-### Document Variables
-- Use consistent variable naming: $ENTITY_ATTRIBUTE format (e.g., $ORDER_NUMBER, $CUSTOMER_EMAIL)
-- Register global variables in AppServiceProvider for company info, dates, and common e-commerce data
-- Extract model-specific variables dynamically using the DocumentService
-- Support complex data types (arrays, objects) with proper conversion to strings
-- Provide variable descriptions and help text for template creators
+1. **ПРОВЕРКА СИНТАКСИСА** (мгновенно)
+   ```bash
+   php -l {changedFile}
+   ```
 
-### Document Actions in Filament Resources
-- Add DocumentAction to relevant resources (Orders, Products, Customers)
-- Configure action variables using closures for dynamic data extraction
-- Provide meaningful default titles and descriptions
-- Support both table actions and page header actions
+2. **ИСПРАВЛЕНИЕ СТИЛЯ** (каждые 1с)
+   ```bash
+   vendor/bin/pint {changedFile} --test || vendor/bin/pint {changedFile}
+   ```
 
-### PDF Generation
-- Use DomPDF for reliable PDF generation from HTML templates
-- Apply print-specific CSS styles for proper formatting
-- Support custom page sizes, orientations, and margins
-- Include branded headers and footers with company information
-- Optimize for print with proper fonts, colors, and spacing
+3. **СТАТИЧЕСКИЙ АНАЛИЗ** (каждые 2с)
+   ```bash
+   vendor/bin/phpstan analyse {changedFile} -c phpstan.neon --memory-limit=1G --no-progress
+   ```
 
-### Print Styling
-- Create separate CSS for print media queries
-- Use web-safe fonts and fallbacks for PDF generation
-- Ensure proper table formatting with borders and spacing
-- Include page break controls for multi-page documents
-- Style headers and footers consistently across all documents
+4. **АВТОРЕФАКТОРИНГ** (каждые 3с)
+   ```bash
+   vendor/bin/rector process {changedFile} --ansi --no-progress-bar
+   ```
 
-### Document Service Architecture
-- Centralize document generation logic in DocumentService
-- Support variable processing and template rendering
-- Handle file storage and URL generation for PDFs
-- Provide methods for extracting variables from models
-- Include error handling and validation for template processing
+5. **ОБНОВЛЕНИЕ КЭШЕЙ** (при сохранении)
+   ```bash
+   php artisan config:clear && php artisan route:clear
+   php artisan config:cache && php artisan route:cache
+   ```
 
-### Filament Integration
-- Create dedicated Filament resources for DocumentTemplate and Document management
-- Use proper navigation groups and sorting for document-related resources
-- Include comprehensive form validation and field types
-- Support rich text editing for template content
-- Provide preview functionality for templates and generated documents
+6. **ЗАПУСК ТЕСТОВ** (при изменении тестов)
+   ```bash
+   php artisan test --filter={TestName} --stop-on-failure
+   ```
 
-### Translations & Localization
-- Support multilingual document templates and variables
-- Use Laravel's translation system for document-related text
-- Include translations for both Lithuanian and English
-- Localize date formats, currency symbols, and number formatting
-- Support locale-specific document layouts and content
+## АВТОМАТИЧЕСКИЕ ИСПРАВЛЕНИЯ
 
-### Security & Permissions
-- Implement proper access control for document templates and generated documents
-- Validate template content to prevent XSS attacks
-- Sanitize user input in document variables
-- Control document visibility based on user roles and permissions
-- Audit document generation and access
+### PHP Синтаксис:
+- Добавление отсутствующих точек с запятой
+- Исправление неправильных кавычек
+- Добавление отсутствующих скобок
+- Исправление namespace declarations
 
-### Performance Optimization
-- Cache frequently used templates and variables
-- Optimize PDF generation for large documents
-- Use queue jobs for bulk document generation
-- Implement efficient file storage and retrieval
-- Monitor document generation performance
+### Filament v4:
+- Удаление `use Filament\Schemas\Schema;`
+- Исправление `public static function form(Schema $schema): Schema` → `public static function form(Form $form): Form`
+- Исправление `public static function table(Table $table): Table`
+- Замена `$schema` → `$form` в теле методов
+- Добавление docblock для `$navigationIcon`
 
-### Testing Document Generation
-- Test template rendering with various variable combinations
-- Validate PDF generation and file storage
-- Test document actions in Filament resources
-- Verify proper variable extraction from models
-- Test multilingual document generation
+### Laravel:
+- Добавление `declare(strict_types=1);`
+- Исправление типов возвращаемых значений
+- Исправление типов параметров
+- Добавление отсутствующих импортов
 
-## File Organization
-- Place document models in `app/Models/`
-- Store document services in `app/Services/`
-- Create Filament resources in `app/Filament/Resources/`
-- Place document actions in `app/Filament/Actions/`
-- Store print templates in `resources/views/documents/`
-- Keep document CSS in `public/css/documents.css`
-- Place document translations in `lang/{locale}/documents.php`
+### Blade:
+- Исправление `@if` → добавление `@endif`
+- Исправление `@foreach` → добавление `@endforeach`
+- Исправление синтаксиса `{{ }}` и `{!! !!}`
 
-## Code Architecture
-- Make all classes final to prevent inheritance
-- Use explicit return type declarations
-- Implement proper error handling and logging
-- Follow Laravel's MVC architecture
-- Use service classes for complex business logic
-- Implement proper database relationships and constraints
+## ПРИОРИТЕТЫ ИСПРАВЛЕНИЙ
 
-## Translation Requirements
-- Create translations for all document-related strings
-- Support both Lithuanian (lt) and English (en) languages
-- Use snake_case for translation keys
-- Organize translations by feature and context
-- Default to Lithuanian language for the application
+1. **КРИТИЧЕСКИЕ** (0-100мс) - Синтаксические ошибки
+2. **ВЫСОКИЕ** (100-500мс) - Ошибки типов и импортов
+3. **СРЕДНИЕ** (500мс-1с) - Стиль кода и форматирование
+4. **НИЗКИЕ** (1-3с) - Предупреждения и рекомендации
 
-## After Code Changes
-- Run database migrations for new document tables
-- Seed document templates with sample data
-- Test document generation functionality
-- Update git with commit messages describing changes
-- Verify all document-related features work correctly
+## ЛОГИРОВАНИЕ
+
+После каждого цикла исправлений выводи:
+```
+🔄 Мониторинг: {файл}
+✅ Синтаксис: OK
+🔧 Стиль: Исправлено 2 ошибки
+📊 Анализ: 1 предупреждение
+🔄 Рефакторинг: Применено 1 правило
+```
+
+## ОСТАНОВКА ЦИКЛА
+
+Цикл исправлений останавливается когда:
+- Все ошибки исправлены
+- Достигнуто максимальное количество попыток (5)
+- Обнаружена критическая ошибка, требующая ручного вмешательства
+
+## ПРОИЗВОДИТЕЛЬНОСТЬ
+
+- Используй параллельные процессы где возможно
+- Кэшируй результаты анализа
+- Обрабатывай только изменённые файлы
+- Пропускай vendor/ и node_modules/
+
+## ИНТЕГРАЦИЯ С CURSOR
+
+- Автоматическое применение исправлений
+- Показ предупреждений в реальном времени
+- Предложение исправлений
+- Автоматическое сохранение исправленных файлов
+
+## НАСТРОЙКИ
+
+- Максимальное количество попыток: 5
+- Интервал проверки: 500мс - 3с
+- Параллельные процессы: включены
+- Кэширование: включено
+- Автосохранение: включено

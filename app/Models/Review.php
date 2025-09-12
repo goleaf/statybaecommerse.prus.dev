@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Review extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasTranslations;
 
     protected static function boot()
     {
@@ -54,20 +56,26 @@ final class Review extends Model
         'reviewer_email',
         'rating',
         'title',
-        'content',
+        'comment',
         'is_approved',
+        'is_featured',
         'locale',
         'approved_at',
         'rejected_at',
+        'metadata',
     ];
+
+    protected string $translationModel = \App\Models\Translations\ReviewTranslation::class;
 
     protected function casts(): array
     {
         return [
             'rating' => 'integer',
             'is_approved' => 'boolean',
+            'is_featured' => 'boolean',
             'approved_at' => 'datetime',
             'rejected_at' => 'datetime',
+            'metadata' => 'array',
         ];
     }
 
@@ -121,6 +129,51 @@ final class Review extends Model
         $this->rejected_at = now();
         $this->approved_at = null;
         return $this->save();
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    public function scopeRecent($query, int $days = 30)
+    {
+        return $query->where('created_at', '>=', now()->subDays($days));
+    }
+
+    public function scopeHighRated($query, int $minRating = 4)
+    {
+        return $query->where('rating', '>=', $minRating);
+    }
+
+    public function scopeLowRated($query, int $maxRating = 2)
+    {
+        return $query->where('rating', '<=', $maxRating);
+    }
+
+    public function getAverageRatingForProduct(int $productId): float
+    {
+        return static::where('product_id', $productId)
+            ->where('is_approved', true)
+            ->avg('rating') ?? 0;
+    }
+
+    public function getReviewCountForProduct(int $productId): int
+    {
+        return static::where('product_id', $productId)
+            ->where('is_approved', true)
+            ->count();
+    }
+
+    public function getRatingDistributionForProduct(int $productId): array
+    {
+        return static::where('product_id', $productId)
+            ->where('is_approved', true)
+            ->selectRaw('rating, COUNT(*) as count')
+            ->groupBy('rating')
+            ->orderBy('rating')
+            ->pluck('count', 'rating')
+            ->toArray();
     }
 }
 

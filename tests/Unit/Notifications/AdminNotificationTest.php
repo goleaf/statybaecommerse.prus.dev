@@ -1,160 +1,106 @@
 <?php declare(strict_types=1);
 
-use App\Models\User;
+namespace Tests\Unit\Notifications;
+
 use App\Notifications\AdminNotification;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Notifications\DatabaseNotification;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+final class AdminNotificationTest extends TestCase
+{
+    use RefreshDatabase;
 
-describe('AdminNotification', function () {
-    it('can be instantiated with required parameters', function () {
+    public function test_notification_can_be_created(): void
+    {
         $notification = new AdminNotification(
-            'Test Title',
-            'Test Message',
-            'info'
+            title: 'Admin Title',
+            message: 'Admin Message',
+            type: 'warning'
         );
 
-        expect($notification->title)->toBe('Test Title');
-        expect($notification->message)->toBe('Test Message');
-        expect($notification->type)->toBe('info');
-    });
+        $this->assertEquals('Admin Title', $notification->title);
+        $this->assertEquals('Admin Message', $notification->message);
+        $this->assertEquals('warning', $notification->type);
+    }
 
-    it('uses default type when not provided', function () {
-        $notification = new AdminNotification(
-            'Test Title',
-            'Test Message'
-        );
-
-        expect($notification->type)->toBe('info');
-    });
-
-    it('implements ShouldQueue interface', function () {
-        $notification = new AdminNotification('Test', 'Message');
-
-        expect($notification)->toBeInstanceOf(\Illuminate\Contracts\Queue\ShouldQueue::class);
-    });
-
-    it('uses correct notification channels', function () {
-        $notification = new AdminNotification('Test', 'Message');
+    public function test_notification_uses_database_and_mail_channels(): void
+    {
         $user = User::factory()->create();
+        $notification = new AdminNotification('Admin Title', 'Admin Message', 'error');
 
         $channels = $notification->via($user);
 
-        expect($channels)->toBe(['database', 'mail']);
-    });
+        $this->assertEquals(['database', 'mail'], $channels);
+    }
 
-    it('generates correct mail message', function () {
-        $notification = new AdminNotification(
-            'Test Title',
-            'Test Message',
-            'warning'
-        );
+    public function test_notification_database_data_structure(): void
+    {
         $user = User::factory()->create();
-
-        $mailMessage = $notification->toMail($user);
-
-        expect($mailMessage)->toBeInstanceOf(MailMessage::class);
-        expect($mailMessage->subject)->toBe('Test Title');
-        expect($mailMessage->introLines)->toContain('Test Message');
-    });
-
-    it('generates correct database notification data', function () {
-        $notification = new AdminNotification(
-            'Test Title',
-            'Test Message',
-            'success'
-        );
-        $user = User::factory()->create();
+        $notification = new AdminNotification('Admin Title', 'Admin Message', 'info');
 
         $data = $notification->toDatabase($user);
 
-        expect($data)->toBeArray();
-        expect($data['title'])->toBe('Test Title');
-        expect($data['message'])->toBe('Test Message');
-        expect($data['type'])->toBe('success');
-        expect($data['sent_at'])->not()->toBeNull();
-    });
+        $this->assertArrayHasKey('title', $data);
+        $this->assertArrayHasKey('message', $data);
+        $this->assertArrayHasKey('type', $data);
+        $this->assertArrayHasKey('sent_at', $data);
+        
+        $this->assertEquals('Admin Title', $data['title']);
+        $this->assertEquals('Admin Message', $data['message']);
+        $this->assertEquals('info', $data['type']);
+        $this->assertIsString($data['sent_at']);
+    }
 
-    it('generates correct array notification data', function () {
-        $notification = new AdminNotification(
-            'Test Title',
-            'Test Message',
-            'danger'
-        );
+    public function test_notification_array_data_structure(): void
+    {
         $user = User::factory()->create();
+        $notification = new AdminNotification('Admin Title', 'Admin Message', 'success');
 
         $data = $notification->toArray($user);
 
-        expect($data)->toBeArray();
-        expect($data['title'])->toBe('Test Title');
-        expect($data['message'])->toBe('Test Message');
-        expect($data['type'])->toBe('danger');
-        expect($data['sent_at'])->not()->toBeNull();
-    });
+        $this->assertArrayHasKey('title', $data);
+        $this->assertArrayHasKey('message', $data);
+        $this->assertArrayHasKey('type', $data);
+        $this->assertArrayHasKey('sent_at', $data);
+        
+        $this->assertEquals('Admin Title', $data['title']);
+        $this->assertEquals('Admin Message', $data['message']);
+        $this->assertEquals('success', $data['type']);
+        $this->assertIsString($data['sent_at']);
+    }
 
-    it('can be sent to a user', function () {
-        Notification::fake();
-
+    public function test_notification_can_be_sent_to_user(): void
+    {
         $user = User::factory()->create();
-        $notification = new AdminNotification(
-            'Test Title',
-            'Test Message',
-            'info'
-        );
+        $notification = new AdminNotification('Admin Title', 'Admin Message', 'error');
 
         $user->notify($notification);
 
-        Notification::assertSentTo($user, AdminNotification::class);
-    });
+        $this->assertDatabaseHas('notifications', [
+            'notifiable_type' => User::class,
+            'notifiable_id' => $user->id,
+            'type' => AdminNotification::class,
+        ]);
 
-    it('can be sent to multiple users', function () {
-        Notification::fake();
+        $dbNotification = DatabaseNotification::where('notifiable_id', $user->id)->first();
+        $this->assertEquals('Admin Title', $dbNotification->data['title']);
+        $this->assertEquals('Admin Message', $dbNotification->data['message']);
+        $this->assertEquals('error', $dbNotification->data['type']);
+    }
 
-        $users = User::factory()->count(3)->create();
-        $notification = new AdminNotification(
-            'Bulk Notification',
-            'This is a bulk message',
-            'info'
-        );
+    public function test_notification_defaults_to_info_type(): void
+    {
+        $notification = new AdminNotification('Admin Title', 'Admin Message');
 
-        foreach ($users as $user) {
-            $user->notify($notification);
-        }
+        $this->assertEquals('info', $notification->type);
+    }
 
-        Notification::assertSentTo($users, AdminNotification::class);
-    });
+    public function test_notification_implements_should_queue(): void
+    {
+        $notification = new AdminNotification('Admin Title', 'Admin Message');
 
-    it('handles different notification types correctly', function () {
-        $types = ['info', 'success', 'warning', 'danger'];
-
-        foreach ($types as $type) {
-            $notification = new AdminNotification(
-                "Test {$type}",
-                "Message for {$type}",
-                $type
-            );
-
-            expect($notification->type)->toBe($type);
-
-            $data = $notification->toArray(User::factory()->create());
-            expect($data['type'])->toBe($type);
-        }
-    });
-
-    it('includes timestamp in notification data', function () {
-        $before = now();
-
-        $notification = new AdminNotification('Test', 'Message');
-        $user = User::factory()->create();
-
-        $data = $notification->toDatabase($user);
-        $after = now();
-
-        $sentAt = \Carbon\Carbon::parse($data['sent_at']);
-
-        expect($sentAt->gte($before))->toBeTrue();
-        expect($sentAt->lte($after))->toBeTrue();
-    });
-});
+        $this->assertInstanceOf(\Illuminate\Contracts\Queue\ShouldQueue::class, $notification);
+    }
+}

@@ -130,7 +130,7 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <a 
-                            href="{{ route('profile.edit') }}"
+                            href="{{ route('account.profile') }}"
                             class="font-medium text-blue-600 hover:text-blue-500"
                         >
                             {{ __('Go to settings') }}

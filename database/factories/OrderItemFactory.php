@@ -8,41 +8,116 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-final class OrderItemFactory extends Factory
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\OrderItem>
+ */
+class OrderItemFactory extends Factory
 {
     protected $model = OrderItem::class;
 
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
-        $product = Product::factory()->create();
-        $unitPrice = $this->faker->randomFloat(2, 10, 500);
-        $quantity = $this->faker->numberBetween(1, 5);
+        $quantity = $this->faker->numberBetween(1, 10);
+        $unitPrice = $this->faker->randomFloat(2, 5, 500);
+        $total = $unitPrice * $quantity;
 
         return [
             'order_id' => Order::factory(),
-            'product_id' => $product->id,
-            'product_variant_id' => null,
-            'name' => $product->name,
-            'sku' => $product->sku,
+            'product_id' => Product::factory(),
+            'product_variant_id' => $this->faker->optional(0.3)->randomElement(ProductVariant::pluck('id')->toArray()),
+            'name' => $this->faker->words(3, true),
+            'sku' => $this->faker->bothify('SKU-####-???'),
             'quantity' => $quantity,
             'unit_price' => $unitPrice,
-            'total' => $unitPrice * $quantity,
+            'price' => $unitPrice,
+            'total' => $total,
         ];
     }
 
+    /**
+     * Indicate that the order item has a specific quantity.
+     */
+    public function quantity(int $quantity): static
+    {
+        return $this->state(function (array $attributes) use ($quantity) {
+            $unitPrice = $attributes['unit_price'] ?? $this->faker->randomFloat(2, 5, 500);
+            return [
+                'quantity' => $quantity,
+                'total' => $unitPrice * $quantity,
+            ];
+        });
+    }
+
+    /**
+     * Indicate that the order item has a specific unit price.
+     */
+    public function unitPrice(float $unitPrice): static
+    {
+        return $this->state(function (array $attributes) use ($unitPrice) {
+            $quantity = $attributes['quantity'] ?? $this->faker->numberBetween(1, 10);
+            return [
+                'unit_price' => $unitPrice,
+                'price' => $unitPrice,
+                'total' => $unitPrice * $quantity,
+            ];
+        });
+    }
+
+    /**
+     * Indicate that the order item has a high value.
+     */
+    public function highValue(): static
+    {
+        return $this->state(function (array $attributes) {
+            $quantity = $attributes['quantity'] ?? $this->faker->numberBetween(1, 5);
+            $unitPrice = $this->faker->randomFloat(2, 100, 1000);
+            return [
+                'unit_price' => $unitPrice,
+                'price' => $unitPrice,
+                'total' => $unitPrice * $quantity,
+            ];
+        });
+    }
+
+    /**
+     * Indicate that the order item has a low value.
+     */
+    public function lowValue(): static
+    {
+        return $this->state(function (array $attributes) {
+            $quantity = $attributes['quantity'] ?? $this->faker->numberBetween(1, 10);
+            $unitPrice = $this->faker->randomFloat(2, 1, 20);
+            return [
+                'unit_price' => $unitPrice,
+                'price' => $unitPrice,
+                'total' => $unitPrice * $quantity,
+            ];
+        });
+    }
+
+    /**
+     * Indicate that the order item has a product variant.
+     */
     public function withVariant(): static
     {
         return $this->state(function (array $attributes) {
-            $variant = ProductVariant::factory()->create();
+            $product = Product::factory()->create();
+            $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
+            
             return [
-                'product_id' => $variant->product_id,
+                'product_id' => $product->id,
                 'product_variant_id' => $variant->id,
-                'name' => $variant->product->name . ' - ' . $variant->name,
+                'name' => $product->name,
                 'sku' => $variant->sku,
+                'unit_price' => $variant->price,
+                'price' => $variant->price,
+                'total' => $variant->price * ($attributes['quantity'] ?? 1),
             ];
         });
     }
 }
-
-
-

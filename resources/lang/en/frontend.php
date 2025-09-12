@@ -234,4 +234,27 @@ return [
     'home_shop_by_collection' => 'Shop by Collection',
     'home_collections_desc' => 'Explore our curated collections of premium products',
     'home_trending_products' => 'Trending Products',
+
+    // Product section
+    'product' => [
+        'request_info_title' => 'Requestable Product',
+        'request_info_description' => 'This product requires a request before purchase. We will contact you regarding availability and pricing.',
+        'request_product' => 'Request Product',
+        'cancel_request' => 'Cancel Request',
+        'request_form_title' => 'Product Request Form',
+        'name' => 'Name',
+        'email' => 'Email',
+        'phone' => 'Phone',
+        'message' => 'Message',
+        'requested_quantity' => 'Requested Quantity',
+        'message_placeholder' => 'Additional information about your needs...',
+        'cancel' => 'Cancel',
+        'submit_request' => 'Submit Request',
+        'cannot_add_to_cart' => 'Cannot Add to Cart',
+        'request_required' => 'This product requires a request before purchase',
+        'cannot_add_to_cart_message' => 'This product requires a request before purchase. Use the request form below.',
+        'minimum_quantity_required' => 'Minimum quantity: :min pcs.',
+        'minimum_quantity_description' => 'This product has a minimum order quantity',
+        'not_enough_stock' => 'Not enough stock',
+    ],
 ];

@@ -2,297 +2,424 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\ZoneResource\Pages;
-use App\Models\Currency;
+use BackedEnum;
+use UnitEnum;
 use App\Models\Zone;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Resources\Resource;
-use Filament\Schemas\Components as Schemas;
-use Filament\Schemas\Schema;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-final class ZoneResource extends Resource
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class ZoneResource extends Resource
 {
     protected static ?string $model = Zone::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-globe-europe-africa';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-globe-alt';
 
+    /** @var string|\BackedEnum|null */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 1;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('admin.navigation.settings');
-    }
+    protected static ?string $navigationLabel = 'Zones';
 
-    public static function getNavigationLabel(): string
-    {
-        return __('admin.navigation.zones');
-    }
+    protected static ?string $modelLabel = 'Zone';
 
-    public static function getModelLabel(): string
-    {
-        return __('admin.models.zone');
-    }
-
-    public static function getPluralModelLabel(): string
-    {
-        return __('admin.models.zones');
-    }
+    protected static ?string $pluralModelLabel = 'Zones';
 
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
-                Schemas\Tabs::make('zone_tabs')
-                    ->tabs([
-                        Schemas\Tabs\Tab::make('general')
-                            ->label(__('admin.tabs.general'))
-                            ->icon('heroicon-m-cog-6-tooth')
+            ->components([
+                Forms\Components\Section::make('Basic Information')
+                    ->components([
+                        Forms\Components\TextInput::make('name')
+                            ->label(__('zones.name'))
+                            ->required()
+                            ->maxLength(255),
+                        
+                        Forms\Components\TextInput::make('slug')
+                            ->label(__('zones.slug'))
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
+                        
+                        Forms\Components\TextInput::make('code')
+                            ->label(__('zones.code'))
+                            ->required()
+                            ->maxLength(10)
+                            ->unique(ignoreRecord: true),
+                        
+                        Forms\Components\Textarea::make('description')
+                            ->label(__('zones.description'))
+                            ->rows(3),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Configuration')
+                    ->components([
+                        Forms\Components\Select::make('currency_id')
+                            ->label(__('zones.currency'))
+                            ->relationship('currency', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        
+                        Forms\Components\Select::make('type')
+                            ->label(__('zones.type'))
+                            ->options([
+                                'shipping' => __('zones.type_shipping'),
+                                'tax' => __('zones.type_tax'),
+                                'payment' => __('zones.type_payment'),
+                                'delivery' => __('zones.type_delivery'),
+                                'general' => __('zones.type_general'),
+                            ])
+                            ->required()
+                            ->default('shipping'),
+                        
+                        Forms\Components\TextInput::make('tax_rate')
+                            ->label(__('zones.tax_rate'))
+                            ->numeric()
+                            ->step(0.0001)
+                            ->suffix('%')
+                            ->default(0)
+                            ->helperText(__('zones.tax_rate_help')),
+                        
+                        Forms\Components\TextInput::make('shipping_rate')
+                            ->label(__('zones.shipping_rate'))
+                            ->numeric()
+                            ->step(0.01)
+                            ->prefix('€')
+                            ->default(0)
+                            ->helperText(__('zones.shipping_rate_help')),
+                        
+                        Forms\Components\TextInput::make('min_order_amount')
+                            ->label(__('zones.min_order_amount'))
+                            ->numeric()
+                            ->step(0.01)
+                            ->prefix('€')
+                            ->helperText(__('zones.min_order_amount_help')),
+                        
+                        Forms\Components\TextInput::make('max_order_amount')
+                            ->label(__('zones.max_order_amount'))
+                            ->numeric()
+                            ->step(0.01)
+                            ->prefix('€')
+                            ->helperText(__('zones.max_order_amount_help')),
+                        
+                        Forms\Components\TextInput::make('free_shipping_threshold')
+                            ->label(__('zones.free_shipping_threshold'))
+                            ->numeric()
+                            ->step(0.01)
+                            ->prefix('€')
+                            ->helperText(__('zones.free_shipping_threshold_help')),
+                        
+                        Forms\Components\TextInput::make('priority')
+                            ->label(__('zones.priority'))
+                            ->numeric()
+                            ->default(0)
+                            ->helperText(__('zones.priority_help')),
+                        
+                        Forms\Components\TextInput::make('sort_order')
+                            ->label(__('zones.sort_order'))
+                            ->numeric()
+                            ->default(0),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Status')
+                    ->components([
+                        Forms\Components\Toggle::make('is_enabled')
+                            ->label(__('zones.is_enabled'))
+                            ->default(true)
+                            ->helperText(__('zones.is_enabled_help')),
+                        
+                        Forms\Components\Toggle::make('is_active')
+                            ->label(__('zones.is_active'))
+                            ->default(true)
+                            ->helperText(__('zones.is_active_help')),
+                        
+                        Forms\Components\Toggle::make('is_default')
+                            ->label(__('zones.is_default'))
+                            ->default(false)
+                            ->helperText(__('zones.is_default_help')),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Countries')
+                    ->components([
+                        Forms\Components\Select::make('countries')
+                            ->label(__('zones.countries'))
+                            ->relationship('countries', 'name')
+                            ->multiple()
+                            ->searchable()
+                            ->preload(),
+                    ]),
+
+                Forms\Components\Section::make('Translations')
+                    ->components([
+                        Forms\Components\Repeater::make('translations')
+                            ->label(__('zones.translations'))
+                            ->relationship('translations')
                             ->schema([
-                                Schemas\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\TextInput::make('name.lt')
-                                            ->label(__('admin.fields.name_lt'))
-                                            ->required()
-                                            ->maxLength(255)
-                                            ->live(onBlur: true)
-                                            ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $state) {
-                                                if (!$get('slug') && $state) {
-                                                    $set('slug', str($state)->slug());
-                                                }
-                                            }),
-                                        Forms\Components\TextInput::make('name.en')
-                                            ->label(__('admin.fields.name_en'))
-                                            ->required()
-                                            ->maxLength(255),
-                                        Forms\Components\TextInput::make('slug')
-                                            ->label(__('admin.fields.slug'))
-                                            ->required()
-                                            ->unique(Zone::class, 'slug', ignoreRecord: true)
-                                            ->maxLength(255)
-                                            ->rules(['alpha_dash']),
-                                        Forms\Components\TextInput::make('code')
-                                            ->label(__('admin.fields.code'))
-                                            ->required()
-                                            ->unique(Zone::class, 'code', ignoreRecord: true)
-                                            ->maxLength(10)
-                                            ->rules(['alpha_dash'])
-                                            ->placeholder('EU, US, ASIA'),
-                                        Forms\Components\Select::make('currency_id')
-                                            ->label(__('admin.fields.currency'))
-                                            ->relationship('currency', 'name')
-                                            ->searchable()
-                                            ->preload()
-                                            ->createOptionForm([
-                                                Forms\Components\TextInput::make('name')
-                                                    ->label(__('admin.fields.name'))
-                                                    ->required(),
-                                                Forms\Components\TextInput::make('code')
-                                                    ->label(__('admin.fields.code'))
-                                                    ->required()
-                                                    ->length(3),
-                                                Forms\Components\TextInput::make('symbol')
-                                                    ->label(__('admin.fields.symbol'))
-                                                    ->required(),
-                                            ]),
-                                        Forms\Components\TextInput::make('sort_order')
-                                            ->label(__('admin.fields.sort_order'))
-                                            ->numeric()
-                                            ->default(0)
-                                            ->minValue(0),
-                                    ]),
-                                Schemas\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Textarea::make('description.lt')
-                                            ->label(__('admin.fields.description_lt'))
-                                            ->rows(3)
-                                            ->maxLength(500),
-                                        Forms\Components\Textarea::make('description.en')
-                                            ->label(__('admin.fields.description_en'))
-                                            ->rows(3)
-                                            ->maxLength(500),
-                                    ]),
-                            ]),
-                        Schemas\Tabs\Tab::make('settings')
-                            ->label(__('admin.tabs.settings'))
-                            ->icon('heroicon-m-adjustments-horizontal')
-                            ->schema([
-                                Schemas\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\TextInput::make('tax_rate')
-                                            ->label(__('admin.fields.tax_rate'))
-                                            ->numeric()
-                                            ->step(0.0001)
-                                            ->minValue(0)
-                                            ->maxValue(100)
-                                            ->default(0.0)
-                                            ->suffix('%')
-                                            ->helperText(__('admin.help.tax_rate')),
-                                        Forms\Components\TextInput::make('shipping_rate')
-                                            ->label(__('admin.fields.shipping_rate'))
-                                            ->numeric()
-                                            ->step(0.01)
-                                            ->minValue(0)
-                                            ->default(0.0)
-                                            ->prefix('€')
-                                            ->helperText(__('admin.help.shipping_rate')),
-                                    ]),
-                                Schemas\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Toggle::make('is_enabled')
-                                            ->label(__('admin.fields.is_enabled'))
-                                            ->default(true)
-                                            ->helperText(__('admin.help.zone_enabled')),
-                                        Forms\Components\Toggle::make('is_default')
-                                            ->label(__('admin.fields.is_default'))
-                                            ->default(false)
-                                            ->helperText(__('admin.help.zone_default')),
-                                    ]),
-                                Forms\Components\KeyValue::make('metadata')
-                                    ->label(__('admin.fields.metadata'))
-                                    ->keyLabel(__('admin.fields.key'))
-                                    ->valueLabel(__('admin.fields.value'))
-                                    ->addActionLabel(__('admin.actions.add_metadata'))
-                                    ->helperText(__('admin.help.zone_metadata')),
-                            ]),
-                        Schemas\Tabs\Tab::make('countries')
-                            ->label(__('admin.tabs.countries'))
-                            ->icon('heroicon-m-flag')
-                            ->schema([
-                                Forms\Components\CheckboxList::make('countries')
-                                    ->label(__('admin.fields.countries'))
-                                    ->relationship('countries', 'name')
-                                    ->getOptionLabelFromRecordUsing(fn($record): string => (string) ($record->name ?? $record->cca2 ?? $record->cca3 ?? $record->code ?? $record->id))
-                                    ->searchable()
-                                    ->bulkToggleable()
-                                    ->columns(3)
-                                    ->helperText(__('admin.help.zone_countries')),
-                            ]),
-                    ])
-                    ->columnSpanFull(),
+                                Forms\Components\Select::make('locale')
+                                    ->label(__('zones.locale'))
+                                    ->options([
+                                        'lt' => 'Lithuanian',
+                                        'en' => 'English',
+                                        'de' => 'German',
+                                        'ru' => 'Russian',
+                                    ])
+                                    ->required(),
+                                
+                                Forms\Components\TextInput::make('name')
+                                    ->label(__('zones.name'))
+                                    ->required()
+                                    ->maxLength(255),
+                                
+                                Forms\Components\Textarea::make('description')
+                                    ->label(__('zones.description'))
+                                    ->rows(2),
+                                
+                                Forms\Components\Textarea::make('short_description')
+                                    ->label(__('zones.short_description'))
+                                    ->rows(2),
+                                
+                                Forms\Components\RichEditor::make('long_description')
+                                    ->label(__('zones.long_description'))
+                                    ->rows(4),
+                                
+                                Forms\Components\TextInput::make('meta_title')
+                                    ->label(__('zones.meta_title'))
+                                    ->maxLength(255),
+                                
+                                Forms\Components\Textarea::make('meta_description')
+                                    ->label(__('zones.meta_description'))
+                                    ->rows(2)
+                                    ->maxLength(500),
+                                
+                                Forms\Components\TagsInput::make('meta_keywords')
+                                    ->label(__('zones.meta_keywords'))
+                                    ->helperText(__('zones.meta_keywords_help')),
+                            ])
+                            ->columns(2)
+                            ->addActionLabel(__('zones.add_translation'))
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
+                    ]),
+
+                Forms\Components\Section::make('Metadata')
+                    ->components([
+                        Forms\Components\KeyValue::make('metadata')
+                            ->label(__('zones.metadata'))
+                            ->keyLabel(__('zones.key'))
+                            ->valueLabel(__('zones.value')),
+                    ]),
             ]);
-    }
-
-    public static function canAccess(): bool
-    {
-        return true;
-    }
-
-    public static function canViewAny(): bool
-    {
-        return true;
-    }
-
-    public static function canCreate(): bool
-    {
-        return true;
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return true;
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return true;
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->label(__('admin.table.name'))
-                    ->searchable()
-                    ->sortable()
-                    ->formatStateUsing(fn(?string $state): string =>
-                        $state ? (is_array($state) ? ($state[app()->getLocale()] ?? $state['lt'] ?? 'N/A') : $state) : 'N/A'),
                 Tables\Columns\TextColumn::make('code')
-                    ->label(__('admin.table.code'))
+                    ->label(__('zones.code'))
                     ->searchable()
                     ->sortable()
+                    ->weight('bold'),
+                
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('zones.name'))
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
+                
+                Tables\Columns\TextColumn::make('type')
+                    ->label(__('zones.type'))
                     ->badge()
-                    ->color('primary'),
-                Tables\Columns\TextColumn::make('currency.code')
-                    ->label(__('admin.table.currency'))
-                    ->badge()
-                    ->color('info'),
+                    ->color(fn (string $state): string => match ($state) {
+                        'shipping' => 'info',
+                        'tax' => 'warning',
+                        'payment' => 'success',
+                        'delivery' => 'primary',
+                        'general' => 'gray',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'shipping' => __('zones.type_shipping'),
+                        'tax' => __('zones.type_tax'),
+                        'payment' => __('zones.type_payment'),
+                        'delivery' => __('zones.type_delivery'),
+                        'general' => __('zones.type_general'),
+                        default => $state,
+                    })
+                    ->sortable(),
+                
+                Tables\Columns\TextColumn::make('currency.name')
+                    ->label(__('zones.currency'))
+                    ->sortable(),
+                
                 Tables\Columns\TextColumn::make('tax_rate')
-                    ->label(__('admin.table.tax_rate'))
-                    ->numeric(decimalPlaces: 4)
-                    ->suffix('%')
-                    ->sortable(),
+                    ->label(__('zones.tax_rate'))
+                    ->formatStateUsing(fn (string $state): string => $state . '%')
+                    ->sortable()
+                    ->alignEnd(),
+                
                 Tables\Columns\TextColumn::make('shipping_rate')
-                    ->label(__('admin.table.shipping_rate'))
-                    ->money('EUR')
-                    ->sortable(),
+                    ->label(__('zones.shipping_rate'))
+                    ->formatStateUsing(fn (string $state): string => '€' . $state)
+                    ->sortable()
+                    ->alignEnd(),
+                
+                Tables\Columns\TextColumn::make('free_shipping_threshold')
+                    ->label(__('zones.free_shipping_threshold'))
+                    ->formatStateUsing(fn (?string $state): string => $state ? '€' . $state : '-')
+                    ->sortable()
+                    ->alignEnd(),
+                
                 Tables\Columns\TextColumn::make('countries_count')
-                    ->label(__('admin.table.countries'))
+                    ->label(__('zones.countries_count'))
                     ->counts('countries')
-                    ->badge()
-                    ->color('success'),
+                    ->sortable()
+                    ->alignCenter(),
+                
+                Tables\Columns\TextColumn::make('priority')
+                    ->label(__('zones.priority'))
+                    ->sortable()
+                    ->alignCenter(),
+                
                 Tables\Columns\IconColumn::make('is_enabled')
-                    ->label(__('admin.table.enabled'))
-                    ->boolean(),
+                    ->label(__('zones.is_enabled'))
+                    ->boolean()
+                    ->alignCenter(),
+                
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label(__('zones.is_active'))
+                    ->boolean()
+                    ->alignCenter(),
+                
                 Tables\Columns\IconColumn::make('is_default')
-                    ->label(__('admin.table.default'))
-                    ->boolean(),
+                    ->label(__('zones.is_default'))
+                    ->boolean()
+                    ->alignCenter(),
+                
                 Tables\Columns\TextColumn::make('sort_order')
-                    ->label(__('admin.table.sort'))
+                    ->label(__('zones.sort_order'))
+                    ->sortable()
+                    ->alignCenter(),
+                
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('zones.created_at'))
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('admin.table.created_at'))
-                    ->date('Y-m-d')
+                
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('zones.updated_at'))
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_enabled')
-                    ->label(__('admin.filters.enabled')),
+                    ->label(__('zones.is_enabled')),
+                
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label(__('zones.is_active')),
+                
                 Tables\Filters\TernaryFilter::make('is_default')
-                    ->label(__('admin.filters.default')),
-                Tables\Filters\SelectFilter::make('currency_id')
-                    ->label(__('admin.filters.currency'))
-                    ->relationship('currency', 'name')
-                    ->searchable()
-                    ->preload(),
+                    ->label(__('zones.is_default')),
+                
+                Tables\Filters\SelectFilter::make('type')
+                    ->label(__('zones.type'))
+                    ->options([
+                        'shipping' => __('zones.type_shipping'),
+                        'tax' => __('zones.type_tax'),
+                        'payment' => __('zones.type_payment'),
+                        'delivery' => __('zones.type_delivery'),
+                        'general' => __('zones.type_general'),
+                    ]),
+                
+                Tables\Filters\SelectFilter::make('currency')
+                    ->label(__('zones.currency'))
+                    ->relationship('currency', 'name'),
+                
+                Tables\Filters\Filter::make('has_countries')
+                    ->label(__('zones.has_countries'))
+                    ->query(fn (Builder $query): Builder => $query->has('countries')),
+                
+                Tables\Filters\Filter::make('free_shipping_available')
+                    ->label(__('zones.free_shipping_available'))
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('free_shipping_threshold')),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('duplicate')
+                    ->label(__('zones.duplicate_zone'))
+                    ->icon('heroicon-o-document-duplicate')
+                    ->action(function (Zone $record) {
+                        $newZone = $record->replicate();
+                        $newZone->name = $record->name . ' (Copy)';
+                        $newZone->code = $record->code . '_copy';
+                        $newZone->is_default = false;
+                        $newZone->save();
+                        
+                        // Copy translations
+                        foreach ($record->translations as $translation) {
+                            $newTranslation = $translation->replicate();
+                            $newTranslation->zone_id = $newZone->id;
+                            $newTranslation->save();
+                        }
+                        
+                        // Copy countries
+                        $newZone->countries()->attach($record->countries->pluck('id'));
+                        
+                        return redirect()->route('filament.admin.resources.zones.edit', $newZone);
+                    })
+                    ->requiresConfirmation(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    BulkAction::make('enable')
-                        ->label(__('admin.actions.enable'))
-                        ->icon('heroicon-m-check-circle')
-                        ->color('success')
-                        ->action(fn($records) => $records->each(fn($record) => $record->update(['is_enabled' => true])))
-                        ->deselectRecordsAfterCompletion(),
-                    BulkAction::make('disable')
-                        ->label(__('admin.actions.disable'))
-                        ->icon('heroicon-m-x-circle')
-                        ->color('danger')
-                        ->action(fn($records) => $records->each(fn($record) => $record->update(['is_enabled' => false])))
-                        ->deselectRecordsAfterCompletion(),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('enable')
+                        ->label(__('zones.bulk_enable'))
+                        ->icon('heroicon-o-check-circle')
+                        ->action(fn ($records) => $records->each->update(['is_enabled' => true]))
+                        ->requiresConfirmation(),
+                    Tables\Actions\BulkAction::make('disable')
+                        ->label(__('zones.bulk_disable'))
+                        ->icon('heroicon-o-x-circle')
+                        ->action(fn ($records) => $records->each->update(['is_enabled' => false]))
+                        ->requiresConfirmation(),
+                    Tables\Actions\BulkAction::make('activate')
+                        ->label(__('zones.bulk_activate'))
+                        ->icon('heroicon-o-play')
+                        ->action(fn ($records) => $records->each->update(['is_active' => true]))
+                        ->requiresConfirmation(),
+                    Tables\Actions\BulkAction::make('deactivate')
+                        ->label(__('zones.bulk_deactivate'))
+                        ->icon('heroicon-o-pause')
+                        ->action(fn ($records) => $records->each->update(['is_active' => false]))
+                        ->requiresConfirmation(),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order')
-            ->reorderable('sort_order');
+            ->poll('30s');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\CountriesRelationManager::class,
+            RelationManagers\OrdersRelationManager::class,
+            RelationManagers\PriceListsRelationManager::class,
+            RelationManagers\DiscountsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
@@ -300,13 +427,16 @@ final class ZoneResource extends Resource
         return [
             'index' => Pages\ListZones::route('/'),
             'create' => Pages\CreateZone::route('/create'),
-            'edit' => Pages\EditZone::route('/{record}/edit'),
             'view' => Pages\ViewZone::route('/{record}'),
+            'edit' => Pages\EditZone::route('/{record}/edit'),
         ];
     }
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with(['currency', 'countries']);
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 }

@@ -3,26 +3,51 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DiscountCodeResource\Pages;
+use App\Filament\Resources\DiscountCodeResource\RelationManagers;
 use App\Models\DiscountCode;
+use App\Models\Discount;
+use App\Models\User;
 use App\Services\MultiLanguageTabService;
+use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Grid;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Actions as Actions;
-use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Table;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\ProgressEntry;
+use Filament\Support\Enums\FontWeight;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
-use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
+
 final class DiscountCodeResource extends Resource
 {
     protected static ?string $model = DiscountCode::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-ticket';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-ticket';
 
-
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     public static function getNavigationGroup(): ?string
     {
@@ -31,142 +56,110 @@ final class DiscountCodeResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('admin.navigation.discount_codes');
+        return __('discount_codes');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('discount_code');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('discount_codes');
     }
 
     public static function form(Schema $schema): Schema
     {
-        $components = [
-            \Filament\Schemas\Components\Section::make(__('Discount Code Information'))
-                ->components([
-                    Forms\Components\TextInput::make('code')
-                        ->label(__('Code'))
-                        ->required()
-                        ->maxLength(255)
-                        ->unique(DiscountCode::class, 'code', ignoreRecord: true),
-                    Forms\Components\Select::make('discount_id')
-                        ->label(__('Discount'))
-                        ->relationship('discount', 'name')
-                        ->required()
-                        ->searchable()
-                        ->preload(),
-                    // Multilanguage description will be in tabs below (conditionally added)
-                    Forms\Components\Select::make('status')
-                        ->label(__('Status'))
-                        ->options([
-                            'active' => __('Active'),
-                            'inactive' => __('Inactive'),
-                            'expired' => __('Expired'),
-                            'used_up' => __('Used Up'),
-                        ])
-                        ->default('active')
-                        ->required(),
-                ])
-                ->columns(2),
-            \Filament\Schemas\Components\Section::make(__('Usage Limits'))
-                ->components([
-                    Forms\Components\TextInput::make('max_uses')
-                        ->label(__('Maximum Uses'))
-                        ->numeric()
-                        ->minValue(1)
-                        ->helperText(__('Leave empty for unlimited uses')),
-                    Forms\Components\TextInput::make('max_uses_per_customer')
-                        ->label(__('Max Uses Per Customer'))
-                        ->numeric()
-                        ->minValue(1)
-                        ->helperText(__('Leave empty for unlimited uses per customer')),
-                    Forms\Components\TextInput::make('current_uses')
-                        ->label(__('Current Uses'))
-                        ->numeric()
-                        ->default(0)
-                        ->disabled(),
-                    Forms\Components\TextInput::make('minimum_order_amount')
-                        ->label(__('Minimum Order Amount'))
-                        ->numeric()
-                        ->prefix('€')
-                        ->step(0.01)
-                        ->helperText(__('Minimum order amount required to use this code')),
-                ])
-                ->columns(2),
-            \Filament\Schemas\Components\Section::make(__('Validity Period'))
-                ->components([
-                    Forms\Components\DateTimePicker::make('valid_from')
-                        ->label(__('Valid From'))
-                        ->native(false)
-                        ->default(now()),
-                    Forms\Components\DateTimePicker::make('valid_until')
-                        ->label(__('Valid Until'))
-                        ->native(false)
-                        ->after('valid_from'),
-                    Forms\Components\Toggle::make('is_unlimited_validity')
-                        ->label(__('Unlimited Validity'))
-                        ->default(false)
-                        ->live()
-                        ->afterStateUpdated(fn($state, Forms\Set $set) => $state ? $set('valid_until', null) : null),
-                ])
-                ->columns(2),
-            \Filament\Schemas\Components\Section::make(__('Settings'))
-                ->components([
-                    Forms\Components\Toggle::make('is_single_use')
-                        ->label(__('Single Use Only'))
-                        ->default(false)
-                        ->helperText(__('Code becomes invalid after first use')),
-                    Forms\Components\Toggle::make('is_public')
-                        ->label(__('Public Code'))
-                        ->default(false)
-                        ->helperText(__('Can be shared publicly')),
-                    Forms\Components\Toggle::make('track_usage')
-                        ->label(__('Track Usage'))
-                        ->default(true),
-                ])
-                ->columns(3),
-        ];
-
-        if (!app()->environment('testing')) {
-            $components = array_merge($components, [
-                // Multilanguage Tabs for Discount Code Content
-                Tabs::make('discount_code_translations')
-                    ->tabs(
-                        MultiLanguageTabService::createSectionedTabs([
-                            'discount_code_information' => [
-                                'description' => [
-                                    'type' => 'textarea',
-                                    'label' => __('translations.description'),
-                                    'maxLength' => 500,
-                                    'rows' => 3,
-                                    'placeholder' => __('translations.discount_code_description_help'),
-                                ],
+        return $schema
+            ->schema([
+                Section::make(__('admin.tabs.general'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('code')
+                                    ->label(__('discount_code_code'))
+                                    ->required()
+                                    ->maxLength(50)
+                                    ->unique(ignoreRecord: true)
+                                    ->suffixAction(
+                                        \Filament\Forms\Components\Actions\Action::make('generate')
+                                            ->icon('heroicon-m-sparkles')
+                                            ->action(function ($state, $set) {
+                                                $set('code', DiscountCode::generateUniqueCode());
+                                            })
+                                    ),
+                                Select::make('discount_id')
+                                    ->label(__('discount_code_discount'))
+                                    ->relationship('discount', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required()
+                                    ->createOptionForm([
+                                        TextInput::make('name')
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('slug')
+                                            ->required()
+                                            ->maxLength(255),
+                                    ]),
+                            ]),
+                        
+                        ...MultiLanguageTabService::createSimpleTabs([
+                            'description' => [
+                                'type' => 'textarea',
+                                'label' => __('discount_code_description'),
+                                'required' => false,
+                                'rows' => 3,
                             ],
-                        ])
-                    )
-                    ->activeTab(MultiLanguageTabService::getDefaultActiveTab())
-                    ->persistTabInQueryString('discount_code_tab')
-                    ->contained(false),
-                \Filament\Schemas\Components\Section::make(__('Targeting'))
-                    ->components([
-                        Forms\Components\Select::make('customer_groups')
-                            ->label(__('Customer Groups'))
-                            ->relationship('customerGroups', 'name')
-                            ->multiple()
-                            ->searchable()
-                            ->preload()
-                            ->helperText(__('Leave empty to allow all customer groups')),
-                        Forms\Components\Select::make('zones')
-                            ->label(__('Zones'))
-                            ->relationship('zones', 'name')
-                            ->multiple()
-                            ->searchable()
-                            ->preload()
-                            ->helperText(__('Leave empty to allow all zones')),
-                        Forms\Components\TagsInput::make('allowed_emails')
-                            ->label(__('Allowed Emails'))
-                            ->helperText(__('Specific email addresses that can use this code')),
-                    ])
-                    ->columns(2),
-            ]);
-        }
+                        ]),
+                    ]),
 
-        return $schema->components($components);
+                Section::make(__('admin.tabs.settings'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                DateTimePicker::make('starts_at')
+                                    ->label(__('discount_code_starts_at'))
+                                    ->native(false)
+                                    ->displayFormat('d/m/Y H:i'),
+                                DateTimePicker::make('expires_at')
+                                    ->label(__('discount_code_expires_at'))
+                                    ->native(false)
+                                    ->displayFormat('d/m/Y H:i')
+                                    ->after('starts_at'),
+                            ]),
+                        
+                        Grid::make(3)
+                            ->schema([
+                                TextInput::make('usage_limit')
+                                    ->label(__('discount_code_usage_limit'))
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->helperText(__('admin.help.usage_limit')),
+                                TextInput::make('usage_limit_per_user')
+                                    ->label(__('discount_code_usage_limit_per_user'))
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->helperText(__('admin.help.usage_limit_per_user')),
+                                Select::make('status')
+                                    ->label(__('discount_code_status'))
+                                    ->options([
+                                        'active' => __('discount_code_active'),
+                                        'inactive' => __('discount_code_inactive'),
+                                        'scheduled' => __('discount_code_scheduled'),
+                                        'expired' => __('discount_code_expired'),
+                                    ])
+                                    ->default('active')
+                                    ->required(),
+                            ]),
+                        
+                        Toggle::make('is_active')
+                            ->label(__('discount_code_is_active'))
+                            ->default(true)
+                            ->helperText(__('admin.help.is_active')),
+                    ]),
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -174,103 +167,289 @@ final class DiscountCodeResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('code')
-                    ->label(__('Code'))
+                    ->label(__('discount_code_code'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
-                    ->weight('bold'),
+                    ->weight(FontWeight::Bold)
+                    ->color('primary'),
+                
                 Tables\Columns\TextColumn::make('discount.name')
-                    ->label(__('Discount'))
+                    ->label(__('discount_code_discount'))
                     ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->label(__('Status'))
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'active' => 'success',
-                        'inactive' => 'warning',
-                        'expired' => 'danger',
-                        'used_up' => 'gray',
-                        default => 'gray',
+                    ->sortable()
+                    ->limit(30),
+                
+                Tables\Columns\TextColumn::make('description')
+                    ->label(__('discount_code_description'))
+                    ->limit(50)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                        return strlen($state) > 50 ? $state : null;
                     }),
-                Tables\Columns\TextColumn::make('current_uses')
-                    ->label(__('Uses'))
+                
+                Tables\Columns\TextColumn::make('usage_count')
+                    ->label(__('discount_code_usage_count'))
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn($state, $record) =>
-                        $record->max_uses ? "{$state}/{$record->max_uses}" : (string) $state),
-                Tables\Columns\TextColumn::make('minimum_order_amount')
-                    ->label(__('Min. Order'))
-                    ->money('EUR')
+                    ->badge()
+                    ->color(fn ($state, $record) => $record->hasReachedLimit() ? 'danger' : 'success'),
+                
+                Tables\Columns\TextColumn::make('usage_limit')
+                    ->label(__('discount_code_usage_limit'))
+                    ->numeric()
                     ->sortable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('valid_from')
-                    ->label(__('Valid From'))
-                    ->date('Y-m-d')
+                    ->placeholder(__('Unlimited')),
+                
+                Tables\Columns\TextColumn::make('remaining_uses')
+                    ->label(__('discount_code_remaining_uses'))
+                    ->numeric()
                     ->sortable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('valid_until')
-                    ->label(__('Valid Until'))
-                    ->date('Y-m-d')
+                    ->placeholder(__('Unlimited'))
+                    ->color(fn ($state) => $state && $state <= 5 ? 'warning' : 'success'),
+                
+                Tables\Columns\ProgressColumn::make('usage_percentage')
+                    ->label(__('discount_code_usage_percentage'))
+                    ->color(fn ($state) => match (true) {
+                        $state >= 90 => 'danger',
+                        $state >= 70 => 'warning',
+                        default => 'success',
+                    }),
+                
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label(__('discount_code_is_active'))
+                    ->boolean()
+                    ->sortable(),
+                
+                Tables\Columns\TextColumn::make('status')
+                    ->label(__('discount_code_status'))
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'active' => 'success',
+                        'inactive' => 'gray',
+                        'expired' => 'danger',
+                        'scheduled' => 'warning',
+                        default => 'gray',
+                    }),
+                
+                Tables\Columns\TextColumn::make('starts_at')
+                    ->label(__('discount_code_starts_at'))
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->placeholder(__('Immediately')),
+                
+                Tables\Columns\TextColumn::make('expires_at')
+                    ->label(__('discount_code_expires_at'))
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->placeholder(__('Never'))
-                    ->toggleable(),
-                Tables\Columns\IconColumn::make('is_single_use')
-                    ->label(__('Single Use'))
-                    ->boolean()
-                    ->toggleable(),
-                Tables\Columns\IconColumn::make('is_public')
-                    ->label(__('Public'))
-                    ->boolean()
-                    ->toggleable(),
+                    ->color(fn ($state) => $state && $state < now()->addDays(7) ? 'warning' : null),
+                
+                Tables\Columns\TextColumn::make('creator.name')
+                    ->label(__('discount_code_created_by'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Created'))
-                    ->date('Y-m-d')
+                    ->label(__('admin.table.created_at'))
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->options([
-                        'active' => __('Active'),
-                        'inactive' => __('Inactive'),
-                        'expired' => __('Expired'),
-                        'used_up' => __('Used Up'),
-                    ]),
-                Tables\Filters\SelectFilter::make('discount_id')
+                SelectFilter::make('discount_id')
+                    ->label(__('discount_code_discount'))
                     ->relationship('discount', 'name')
                     ->searchable()
                     ->preload(),
-                Tables\Filters\Filter::make('single_use')
-                    ->query(fn(Builder $query): Builder => $query->where('is_single_use', true)),
-                Tables\Filters\Filter::make('public')
-                    ->query(fn(Builder $query): Builder => $query->where('is_public', true)),
-                Tables\Filters\Filter::make('expires_soon')
-                    ->query(fn(Builder $query): Builder =>
-                        $query->whereBetween('valid_until', [now(), now()->addDays(7)])),
+                
+                SelectFilter::make('status')
+                    ->label(__('discount_code_status'))
+                    ->options([
+                        'active' => __('discount_code_active'),
+                        'inactive' => __('discount_code_inactive'),
+                        'scheduled' => __('discount_code_scheduled'),
+                        'expired' => __('discount_code_expired'),
+                    ]),
+                
+                TernaryFilter::make('is_active')
+                    ->label(__('discount_code_is_active')),
+                
+                Filter::make('expiring_soon')
+                    ->label(__('discount_code_expiring_soon'))
+                    ->query(fn (Builder $query): Builder => $query->where('expires_at', '<=', now()->addDays(7))),
+                
+                Filter::make('usage_limit_reached')
+                    ->label(__('admin.filters.usage_limit_reached'))
+                    ->query(fn (Builder $query): Builder => $query->usageLimitReached()),
+                
+                Filter::make('created_today')
+                    ->label(__('admin.filters.created_today'))
+                    ->query(fn (Builder $query): Builder => $query->whereDate('created_at', today())),
             ])
-            ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
-                Actions\Action::make('duplicate')
-                    ->label(__('Duplicate'))
-                    ->icon('heroicon-o-document-duplicate')
+            ->actions([
+                Action::make('copy')
+                    ->label(__('discount_code_copy'))
+                    ->icon('heroicon-m-clipboard')
                     ->action(function (DiscountCode $record) {
-                        $newCode = $record->replicate();
-                        $newCode->code = $record->code . '-COPY-' . strtoupper(\Illuminate\Support\Str::random(4));
-                        $newCode->current_uses = 0;
-                        $newCode->save();
-
-                        return redirect()->to(static::getUrl('edit', ['record' => $newCode]));
+                        return $record->code;
+                    })
+                    ->requiresConfirmation(false),
+                
+                Action::make('validate')
+                    ->label(__('discount_code_validate'))
+                    ->icon('heroicon-m-check-circle')
+                    ->color(fn (DiscountCode $record) => $record->isValid() ? 'success' : 'danger')
+                    ->action(function (DiscountCode $record) {
+                        return $record->isValid() 
+                            ? __('discount_code_success')
+                            : __('discount_code_invalid');
                     }),
-                Actions\DeleteAction::make(),
+                
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    BulkAction::make('activate')
+                        ->label(__('admin.actions.enable'))
+                        ->icon('heroicon-m-check')
+                        ->color('success')
+                        ->action(function (Collection $records) {
+                            $records->each->update(['is_active' => true, 'status' => 'active']);
+                        }),
+                    
+                    BulkAction::make('deactivate')
+                        ->label(__('admin.actions.disable'))
+                        ->icon('heroicon-m-x-mark')
+                        ->color('danger')
+                        ->action(function (Collection $records) {
+                            $records->each->update(['is_active' => false, 'status' => 'inactive']);
+                        }),
+                    
+                    DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('created_at', 'desc')
+            ->poll('30s');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\RedemptionsRelationManager::class,
+            RelationManagers\OrdersRelationManager::class,
+            RelationManagers\UsersRelationManager::class,
+            RelationManagers\DocumentsRelationManager::class,
+        ];
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                InfolistSection::make(__('admin.tabs.general'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextEntry::make('code')
+                                    ->label(__('discount_code_code'))
+                                    ->weight(FontWeight::Bold)
+                                    ->color('primary')
+                                    ->copyable(),
+                                
+                                TextEntry::make('discount.name')
+                                    ->label(__('discount_code_discount')),
+                            ]),
+                        
+                        TextEntry::make('description')
+                            ->label(__('discount_code_description'))
+                            ->columnSpanFull(),
+                    ]),
+
+                InfolistSection::make(__('admin.tabs.settings'))
+                    ->schema([
+                        Grid::make(3)
+                            ->schema([
+                                TextEntry::make('status')
+                                    ->label(__('discount_code_status'))
+                                    ->badge()
+                                    ->color(fn ($state) => match ($state) {
+                                        'active' => 'success',
+                                        'inactive' => 'gray',
+                                        'expired' => 'danger',
+                                        'scheduled' => 'warning',
+                                        default => 'gray',
+                                    }),
+                                
+                                IconEntry::make('is_active')
+                                    ->label(__('discount_code_is_active'))
+                                    ->boolean(),
+                                
+                                TextEntry::make('usage_count')
+                                    ->label(__('discount_code_usage_count'))
+                                    ->badge()
+                                    ->color(fn ($state, $record) => $record->hasReachedLimit() ? 'danger' : 'success'),
+                            ]),
+                        
+                        Grid::make(2)
+                            ->schema([
+                                TextEntry::make('starts_at')
+                                    ->label(__('discount_code_starts_at'))
+                                    ->dateTime('d/m/Y H:i')
+                                    ->placeholder(__('Immediately')),
+                                
+                                TextEntry::make('expires_at')
+                                    ->label(__('discount_code_expires_at'))
+                                    ->dateTime('d/m/Y H:i')
+                                    ->placeholder(__('Never'))
+                                    ->color(fn ($state) => $state && $state < now()->addDays(7) ? 'warning' : null),
+                            ]),
+                        
+                        Grid::make(3)
+                            ->schema([
+                                TextEntry::make('usage_limit')
+                                    ->label(__('discount_code_usage_limit'))
+                                    ->placeholder(__('Unlimited')),
+                                
+                                TextEntry::make('usage_limit_per_user')
+                                    ->label(__('discount_code_usage_limit_per_user'))
+                                    ->placeholder(__('Unlimited')),
+                                
+                                TextEntry::make('remaining_uses')
+                                    ->label(__('discount_code_remaining_uses'))
+                                    ->placeholder(__('Unlimited'))
+                                    ->color(fn ($state) => $state && $state <= 5 ? 'warning' : 'success'),
+                            ]),
+                        
+                        ProgressEntry::make('usage_percentage')
+                            ->label(__('discount_code_usage_percentage'))
+                            ->color(fn ($state) => match (true) {
+                                $state >= 90 => 'danger',
+                                $state >= 70 => 'warning',
+                                default => 'success',
+                            }),
+                    ]),
+
+                InfolistSection::make(__('admin.tabs.metadata'))
+                    ->schema([
+                        TextEntry::make('creator.name')
+                            ->label(__('discount_code_created_by')),
+                        
+                        TextEntry::make('updater.name')
+                            ->label(__('discount_code_updated_by')),
+                        
+                        TextEntry::make('created_at')
+                            ->label(__('admin.table.created_at'))
+                            ->dateTime('d/m/Y H:i'),
+                        
+                        TextEntry::make('updated_at')
+                            ->label(__('admin.table.updated_at'))
+                            ->dateTime('d/m/Y H:i'),
+                    ])
+                    ->collapsible(),
+            ]);
     }
 
     public static function getPages(): array
@@ -280,6 +459,15 @@ final class DiscountCodeResource extends Resource
             'create' => Pages\CreateDiscountCode::route('/create'),
             'view' => Pages\ViewDiscountCode::route('/{record}'),
             'edit' => Pages\EditDiscountCode::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\DiscountCodeStatsWidget::class,
+            \App\Filament\Widgets\DiscountCodeUsageChartWidget::class,
+            \App\Filament\Widgets\RecentDiscountCodeActivityWidget::class,
         ];
     }
 }

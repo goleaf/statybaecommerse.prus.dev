@@ -1,5 +1,5 @@
 {{-- Enhanced Header with Modern Navigation --}}
-<header class="sticky top-0 z-20 border-b border-gray-200 bg-white/90 backdrop-blur-xl" role="banner"
+<header class="sticky top-0 z-30 border-b border-gray-200/50 bg-white/95 backdrop-blur-xl shadow-soft" role="banner"
         aria-label="{{ __('nav_toggle') }}">
     <x-banner />
 

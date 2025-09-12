@@ -1,10 +1,10 @@
 <div>
     <x-container class="px-4">
         {{-- Top bar: Logo, Search, Actions --}}
-        <div class="flex items-center justify-between gap-3 py-3">
+        <div class="flex items-center justify-between gap-4 py-4">
             {{-- Left: Brand / Logo --}}
-            <div class="flex items-center gap-3">
-                <button class="lg:hidden inline-flex items-center justify-center rounded-md p-2 text-gray-700 hover:bg-gray-100"
+            <div class="flex items-center gap-4">
+                <button class="lg:hidden inline-flex items-center justify-center rounded-lg p-2.5 text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                         type="button"
                         wire:click="toggleMobileMenu"
                         aria-label="{{ __('nav_toggle') }}">
@@ -20,23 +20,28 @@
                             ? route('home')
                             : url('/'));
                 @endphp
-                <a href="{{ $homeUrl }}" class="flex items-center gap-2">
-                    <img src="{{ asset('images/hero.png') }}" alt="{{ config('app.name') }}" class="h-8 w-8 rounded" />
-                    <span class="hidden sm:inline text-base font-semibold text-gray-900">{{ config('app.name') }}</span>
+                <a href="{{ $homeUrl }}" class="flex items-center gap-3 group" aria-label="{{ __('nav_home') }}">
+                    <div class="relative">
+                        <img src="{{ asset('images/hero.png') }}" alt="{{ config('app.name') }}" class="h-10 w-10 rounded-xl shadow-soft group-hover:shadow-medium transition-all duration-300 group-hover:scale-105" width="40" height="40" />
+                        <div class="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    <span class="hidden sm:inline text-lg font-heading font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">{{ config('app.name') }}</span>
                 </a>
             </div>
 
             {{-- Center: Search --}}
             <div class="flex-1 max-w-2xl hidden md:block">
                 <form wire:submit.prevent="search" role="search" aria-label="{{ __('nav_search') }}">
-                    <div class="relative">
+                    <div class="relative group">
                         <input
                                type="search"
                                wire:model.live.debounce.300ms="searchQuery"
                                placeholder="{{ __('search_placeholder') }}"
-                               class="block w-full rounded-md border border-gray-300 bg-white pl-10 pr-10 py-2 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                               aria-label="{{ __('search_placeholder') }}" />
-                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"
+                               class="block w-full rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm pl-12 pr-12 py-3 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200 shadow-soft focus:shadow-medium"
+                               aria-label="{{ __('search_placeholder') }}"
+                               autocomplete="off"
+                               spellcheck="false" />
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200"
                              aria-hidden="true">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -44,7 +49,7 @@
                             </svg>
                         </div>
                         <button type="submit"
-                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 hover:text-gray-800"
+                                class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-blue-600 transition-colors duration-200"
                                 aria-label="{{ __('nav_search') }}">
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                 <path fill-rule="evenodd"
@@ -62,15 +67,15 @@
                 @auth
                     @if (Route::has('account.index'))
                         <x-link :href="route('account.index')"
-                                class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('nav_account') }}</x-link>
+                                class="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-gray-50">{{ __('nav_account') }}</x-link>
                     @else
                         <x-link href="/account"
-                                class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('nav_account') }}</x-link>
+                                class="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-gray-50">{{ __('nav_account') }}</x-link>
                     @endif
                 @else
                     @if (Route::has('login'))
                         <x-link :href="route('login')"
-                                class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('auth_login') }}</x-link>
+                                class="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-gray-50">{{ __('auth_login') }}</x-link>
                     @endif
                 @endauth
                 <livewire:components.shopping-cart-button />

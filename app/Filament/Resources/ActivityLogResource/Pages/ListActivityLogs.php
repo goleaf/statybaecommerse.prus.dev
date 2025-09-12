@@ -3,10 +3,10 @@
 namespace App\Filament\Resources\ActivityLogResource\Pages;
 
 use App\Filament\Resources\ActivityLogResource;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Actions\Action;
-use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\DB;
+use Filament\Actions;
+use Illuminate\Database\Eloquent\Builder;
 
 final class ListActivityLogs extends ListRecords
 {
@@ -15,48 +15,45 @@ final class ListActivityLogs extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('refresh')
-                ->label(__('admin.activity_logs.actions.refresh'))
-                ->icon('heroicon-o-arrow-path')
-                ->action(function () {
-                    $this->redirect(request()->url());
-                }),
-
-            Action::make('export')
-                ->label(__('admin.activity_logs.actions.export'))
-                ->icon('heroicon-o-arrow-down-tray')
-                ->action(function () {
-                    // Export logic would go here
-                    Notification::make()
-                        ->title(__('admin.activity_logs.messages.export_success'))
-                        ->success()
-                        ->send();
-                }),
-
-            Action::make('clear_old_logs')
-                ->label(__('admin.clear_old_logs'))
+            Actions\Action::make('back_to_dashboard')
+                ->label(__('common.back_to_dashboard'))
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url('/admin')
+                ->tooltip(__('common.back_to_dashboard_tooltip')),
+            Actions\Action::make('clear_old_logs')
+                ->label(__('admin.activity_logs.actions.clear_old_logs'))
                 ->icon('heroicon-o-trash')
                 ->color('danger')
                 ->requiresConfirmation()
-                ->modalHeading(__('admin.clear_old_logs_confirm'))
-                ->modalDescription(__('admin.clear_old_logs_description'))
+                ->modalHeading(__('admin.activity_logs.actions.clear_old_logs'))
+                ->modalDescription(__('admin.activity_logs.actions.clear_old_logs_description'))
                 ->action(function () {
-                    $deletedCount = DB::table('activity_log')
-                        ->where('created_at', '<', now()->subDays(30))
-                        ->delete();
-
-                    Notification::make()
-                        ->title(__('admin.logs_cleared', ['count' => $deletedCount]))
-                        ->success()
-                        ->send();
+                    $deletedCount = \Spatie\Activitylog\Models\Activity::where('created_at', '<', now()->subDays(30))->delete();
+                    $this->notify('success', __('admin.activity_logs.notifications.logs_cleared', ['count' => $deletedCount]));
                 }),
         ];
     }
 
-    protected function getHeaderWidgets(): array
+    public function getTabs(): array
     {
         return [
-            ActivityLogResource\Widgets\ActivityLogStatsWidget::class,
+            'all' => Tab::make(__('admin.activity_logs.tabs.all'))
+                ->icon('heroicon-o-clipboard-document-list'),
+            'today' => Tab::make(__('admin.activity_logs.tabs.today'))
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereDate('created_at', today()))
+                ->icon('heroicon-o-calendar-days'),
+            'this_week' => Tab::make(__('admin.activity_logs.tabs.this_week'))
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereBetween('created_at', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek(),
+                ]))
+                ->icon('heroicon-o-calendar'),
+            'this_month' => Tab::make(__('admin.activity_logs.tabs.this_month'))
+                ->modifyQueryUsing(fn(Builder $query) => $query
+                    ->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year))
+                ->icon('heroicon-o-calendar-days'),
         ];
     }
 }

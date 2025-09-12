@@ -1,0 +1,32 @@
+includes:
+  - vendor/larastan/larastan/extension.neon
+
+parameters:
+  level: 9
+  paths:
+    - app
+    - database
+    - config
+  checkMissingIterableValueType: true
+  checkGenericClassInNonGenericObjectType: false
+  treatPhpDocTypesAsCertain: true
+  reportUnmatchedIgnoredErrors: true
+  tmpDir: storage/framework/cache/phpstan
+  universalObjectCratesClasses:
+    - Illuminate\Support\Fluent
+
+# Filament v4 specific ignores
+ignoreErrors:
+  - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder::(.*)#'
+  - '#Call to an undefined method Filament\\Forms\\Components\\(.*)#'
+  - '#Call to an undefined method Filament\\Tables\\Columns\\(.*)#'
+  - '#Call to an undefined method Filament\\Actions\\(.*)#'
+  - '#Property App\\Filament\\.*::\$navigationIcon \(string\) does not accept BackedEnum#'
+
+# Livewire specific ignores
+  - '#Call to an undefined method Livewire\\Component::(.*)#'
+  - '#Property .*::\$rules \(array\) does not accept array#'
+
+# Laravel specific ignores
+  - '#Call to an undefined method Illuminate\\Support\\Collection::(.*)#'
+  - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Collection::(.*)#'

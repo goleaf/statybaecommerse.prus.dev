@@ -70,7 +70,14 @@ final class Index extends AbstractPageComponent implements HasSchemas
         if ($this->search !== '') {
             $query->where(function ($q) {
                 $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%');
+                  ->orWhere('description', 'like', '%' . $this->search . '%')
+                  ->orWhereHas('translations', function ($translationQuery) {
+                      $translationQuery->where('locale', app()->getLocale())
+                          ->where(function ($tq) {
+                              $tq->where('name', 'like', '%' . $this->search . '%')
+                                ->orWhere('description', 'like', '%' . $this->search . '%');
+                          });
+                  });
             });
         }
 

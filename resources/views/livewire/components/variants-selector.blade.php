@@ -78,33 +78,51 @@
             </div>
         @endif
 
-        <x-buttons.primary
-                           type="submit"
-                           class="w-full px-8 py-3 text-base"
-                           wire:loading.attr="disabled"
-                           wire:target="addToCart"
-                           :disabled="($product->isVariant() && !$this->variant) ||
-                               ($product->isVariant() && $this->variant && $this->variant->stock < 1) ||
-                               (!$product->isVariant() && $product->stock < 1)">
-            <span class="absolute left-0 top-0 pl-2">
-                <x-phosphor-shopping-bag-duotone class="size-6 text-white" aria-hidden="true" wire:loading.remove />
-                <x-loading-dots class="bg-white hidden" aria-hidden="true" wire:loading.class="block" />
-            </span>
-            @if ($product->isVariant())
-                @if (!$this->variant)
-                    {{ __('Select options') }}
-                @elseif($this->variant && $this->variant->isOutOfStock())
-                    {{ __('Out of stock') }}
+        @if ($product->shouldHideAddToCart())
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div class="flex items-center">
+                    <x-heroicon-o-exclamation-triangle class="h-5 w-5 text-yellow-400 mr-2" />
+                    <p class="text-yellow-800 text-sm">
+                        {{ __('frontend.product.cannot_add_to_cart_message') }}
+                    </p>
+                </div>
+            </div>
+        @else
+            <x-buttons.primary
+                               type="submit"
+                               class="w-full px-8 py-3 text-base"
+                               wire:loading.attr="disabled"
+                               wire:target="addToCart"
+                               :disabled="($product->isVariant() && !$this->variant) ||
+                                   ($product->isVariant() && $this->variant && $this->variant->stock < 1) ||
+                                   (!$product->isVariant() && $product->stock < 1)">
+                <span class="absolute left-0 top-0 pl-2">
+                    <x-phosphor-shopping-bag-duotone class="size-6 text-white" aria-hidden="true" wire:loading.remove />
+                    <x-loading-dots class="bg-white hidden" aria-hidden="true" wire:loading.class="block" />
+                </span>
+                @if ($product->isVariant())
+                    @if (!$this->variant)
+                        {{ __('Select options') }}
+                    @elseif($this->variant && $this->variant->isOutOfStock())
+                        {{ __('Out of stock') }}
+                    @else
+                        {{ __('Add to cart') }}
+                    @endif
                 @else
-                    {{ __('Add to cart') }}
+                    @if ($product->isOutOfStock())
+                        {{ __('Out of stock') }}
+                    @else
+                        {{ __('Add to cart') }}
+                    @endif
                 @endif
-            @else
-                @if ($product->isOutOfStock())
-                    {{ __('Out of stock') }}
-                @else
-                    {{ __('Add to cart') }}
-                @endif
-            @endif
-        </x-buttons.primary>
+            </x-buttons.primary>
+        @endif
     </form>
+
+    <!-- Product Request Form -->
+    @if ($product->is_requestable)
+        <div class="mt-6">
+            <livewire:components.product-request-form :product="$product" />
+        </div>
+    @endif
 </div>

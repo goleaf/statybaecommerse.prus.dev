@@ -3,15 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
-class BrandController extends Controller
+final class BrandController extends Controller
 {
-    public function show(Request $request, string $locale, string $slug): RedirectResponse
+    public function show(Request $request, string $locale, string $slug): View|RedirectResponse
     {
         // Find brand by slug (check both main slug and translated slugs)
         $brand = Brand::query()
+            ->with(['translations', 'media'])
             ->where('slug', $slug)
             ->where('is_enabled', true)
             ->first();
@@ -19,6 +21,7 @@ class BrandController extends Controller
         if (!$brand) {
             // Try to find by translated slug
             $brand = Brand::query()
+                ->with(['translations', 'media'])
                 ->whereHas('translations', function ($query) use ($slug) {
                     $query
                         ->where('slug', $slug)
@@ -40,9 +43,25 @@ class BrandController extends Controller
             return redirect()->route('localized.brands.show', ['locale' => $locale, 'slug' => $canonicalSlug], 301);
         }
 
-        // If we reach here, the slug is canonical, but we still need to redirect
-        // to the localized route to maintain consistency
-        return redirect()->route('localized.brands.show', ['locale' => $locale, 'slug' => $canonicalSlug], 301);
+        // Load products for this brand
+        $products = $brand->products()
+            ->with(['media', 'translations'])
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->latest()
+            ->limit(12)
+            ->get();
+
+        // Get SEO data
+        $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName() . ' - ' . config('app.name');
+        $seoDescription = $brand->getTranslatedSeoDescription() ?: $brand->getTranslatedDescription();
+
+        return view('brands.show', [
+            'brand' => $brand,
+            'products' => $products,
+            'seoTitle' => $seoTitle,
+            'seoDescription' => $seoDescription,
+        ]);
     }
 
     private function getCanonicalSlug(Brand $brand): string

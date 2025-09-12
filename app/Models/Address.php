@@ -25,6 +25,10 @@ final class Address extends Model
         'state',
         'postal_code',
         'country_code',
+        'country_id',
+        'zone_id',
+        'region_id',
+        'city_id',
         'phone',
         'is_default',
     ];
@@ -44,6 +48,26 @@ final class Address extends Model
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class, 'country_code', 'cca2');
+    }
+
+    public function countryById(): BelongsTo
+    {
+        return $this->belongsTo(Country::class, 'country_id');
+    }
+
+    public function zone(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class);
+    }
+
+    public function region(): BelongsTo
+    {
+        return $this->belongsTo(Region::class);
+    }
+
+    public function cityById(): BelongsTo
+    {
+        return $this->belongsTo(City::class, 'city_id');
     }
 
     public function scopeDefault($query)

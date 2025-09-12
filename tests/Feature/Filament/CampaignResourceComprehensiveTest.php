@@ -646,3 +646,4 @@ it('can handle campaign with all tracking settings', function (): void {
     expect($campaign->social_media_ready)->toBeTrue();
 });
 
+

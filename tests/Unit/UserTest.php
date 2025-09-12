@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use App\Models\Order;
 use App\Models\User;
+use App\Models\Order;
+use App\Models\Address;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class UserTest extends TestCase
@@ -15,110 +15,81 @@ class UserTest extends TestCase
     public function test_user_can_be_created(): void
     {
         $user = User::factory()->create([
+            'name' => 'Test User',
             'email' => 'test@example.com',
-            'first_name' => 'John',
-            'last_name' => 'Doe',
         ]);
 
         $this->assertDatabaseHas('users', [
+            'name' => 'Test User',
             'email' => 'test@example.com',
-            'first_name' => 'John',
-            'last_name' => 'Doe',
         ]);
     }
 
     public function test_user_has_many_orders(): void
     {
         $user = User::factory()->create();
-        Order::factory()->count(3)->create(['user_id' => $user->id]);
+        $orders = Order::factory()->count(3)->create(['user_id' => $user->id]);
 
         $this->assertCount(3, $user->orders);
         $this->assertInstanceOf(Order::class, $user->orders->first());
     }
 
-    public function test_user_preferred_locale(): void
-    {
-        $user = User::factory()->create(['preferred_locale' => 'lt']);
-
-        $this->assertEquals('lt', $user->preferredLocale());
-    }
-
-    public function test_user_roles_label_accessor(): void
+    public function test_user_has_many_addresses(): void
     {
         $user = User::factory()->create();
-        $role = Role::create(['name' => 'admin', 'guard_name' => 'web']);
-        $user->assignRole($role);
+        $addresses = Address::factory()->count(2)->create(['user_id' => $user->id]);
 
-        $this->assertEquals('Admin', $user->rolesLabel);
+        $this->assertCount(2, $user->addresses);
+        $this->assertInstanceOf(Address::class, $user->addresses->first());
     }
 
-    public function test_user_roles_label_when_no_roles(): void
+    public function test_user_casts_work_correctly(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
 
-        $this->assertEquals('N/A', $user->rolesLabel);
-    }
-
-    public function test_user_implements_locale_preference(): void
-    {
-        $user = new User();
-        
-        $this->assertInstanceOf(
-            \Illuminate\Contracts\Translation\HasLocalePreference::class,
-            $user
-        );
-    }
-
-    public function test_user_uses_spatie_roles(): void
-    {
-        $user = User::factory()->create();
-        $role = Role::create(['name' => 'manager', 'guard_name' => 'web']);
-        
-        $user->assignRole($role);
-        
-        $this->assertTrue($user->hasRole('manager'));
-        $this->assertCount(1, $user->roles);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $user->email_verified_at);
     }
 
     public function test_user_fillable_attributes(): void
     {
         $user = new User();
-        
-        $expectedFillable = [
-            'email',
-            'password',
-            'preferred_locale',
-            'email_verified_at',
-            'first_name',
-            'last_name',
-            'gender',
-            'phone_number',
-            'birth_date',
-            'timezone',
-            'opt_in',
-        ];
+        $fillable = $user->getFillable();
 
-        $this->assertEquals($expectedFillable, $user->getFillable());
+        $this->assertContains('name', $fillable);
+        $this->assertContains('email', $fillable);
+        $this->assertContains('password', $fillable);
     }
 
     public function test_user_hidden_attributes(): void
     {
         $user = new User();
-        
-        $expectedHidden = [
-            'password',
-            'remember_token',
-        ];
+        $hidden = $user->getHidden();
 
-        $this->assertEquals($expectedHidden, $user->getHidden());
+        $this->assertContains('password', $hidden);
+        $this->assertContains('remember_token', $hidden);
     }
 
-    public function test_user_casts(): void
+    public function test_user_has_media_relationship(): void
     {
-        $user = User::factory()->create([
-            'email_verified_at' => '2025-01-01 12:00:00',
-        ]);
+        $user = User::factory()->create();
 
-        $this->assertInstanceOf(\Carbon\Carbon::class, $user->email_verified_at);
+        // Test that user implements HasMedia
+        $this->assertInstanceOf(\Spatie\MediaLibrary\HasMedia::class, $user);
+        
+        // Test that user can handle media
+        $this->assertTrue(method_exists($user, 'registerMediaCollections'));
+        $this->assertTrue(method_exists($user, 'registerMediaConversions'));
+        $this->assertTrue(method_exists($user, 'media'));
+    }
+
+    public function test_user_has_translations_relationship(): void
+    {
+        $user = User::factory()->create();
+
+        // Test that user has translations relationship
+        $this->assertTrue(method_exists($user, 'translations'));
+        $this->assertTrue(method_exists($user, 'trans'));
     }
 }

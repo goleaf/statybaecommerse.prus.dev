@@ -239,3 +239,7 @@ final class GenerateSampleNotifications extends Command
         return $promotions[array_rand($promotions)];
     }
 }
+
+
+
+

@@ -3,164 +3,150 @@
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\Document;
-use App\Services\DocumentService;
 use Filament\Forms;
-use Filament\Actions as Actions;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-final class DocumentsRelationManager extends RelationManager
+class DocumentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'documents';
 
-    protected static ?string $recordTitleAttribute = 'title';
+    protected static ?string $title = 'Documents';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
-                Section::make(__('documents.document_information'))
-                    ->components([
-                        Forms\Components\TextInput::make('title')
-                            ->label(__('documents.title'))
-                            ->required()
-                            ->maxLength(255),
-                        
-                        Forms\Components\Select::make('document_template_id')
-                            ->label(__('documents.template'))
-                            ->relationship('template', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                        
-                        Forms\Components\Select::make('status')
-                            ->label(__('documents.status'))
-                            ->options([
-                                'draft' => __('documents.statuses.draft'),
-                                'published' => __('documents.statuses.published'),
-                                'archived' => __('documents.statuses.archived'),
-                            ])
-                            ->required()
-                            ->default('draft'),
-
-                        Forms\Components\Textarea::make('notes')
-                            ->label(__('documents.notes'))
-                            ->maxLength(1000)
-                            ->rows(3),
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('name')
+                    ->label(__('translations.document_name'))
+                    ->required()
+                    ->maxLength(255),
+                
+                Forms\Components\TextInput::make('title')
+                    ->label(__('translations.document_title'))
+                    ->maxLength(255),
+                
+                Forms\Components\Textarea::make('description')
+                    ->label(__('translations.document_description'))
+                    ->rows(3),
+                
+                Forms\Components\FileUpload::make('file_path')
+                    ->label(__('translations.document_file'))
+                    ->required()
+                    ->disk('public')
+                    ->directory('documents')
+                    ->visibility('public')
+                    ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']),
+                
+                Forms\Components\Select::make('type')
+                    ->label(__('translations.document_type'))
+                    ->options([
+                        'manual' => __('translations.manual'),
+                        'specification' => __('translations.specification'),
+                        'warranty' => __('translations.warranty'),
+                        'certificate' => __('translations.certificate'),
+                        'other' => __('translations.other'),
                     ])
-                    ->columns(2),
+                    ->required(),
+                
+                Forms\Components\TextInput::make('sort_order')
+                    ->label(__('translations.sort_order'))
+                    ->numeric()
+                    ->default(0),
+                
+                Forms\Components\Toggle::make('is_public')
+                    ->label(__('translations.is_public'))
+                    ->default(true),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('title')
+            ->recordTitleAttribute('name')
             ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('translations.document_name'))
+                    ->searchable()
+                    ->sortable(),
+                
                 Tables\Columns\TextColumn::make('title')
-                    ->label(__('documents.title'))
+                    ->label(__('translations.document_title'))
                     ->searchable()
                     ->sortable(),
-
-                Tables\Columns\TextColumn::make('template.name')
-                    ->label(__('documents.template'))
-                    ->searchable()
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('template.type')
-                    ->label(__('documents.type'))
+                
+                Tables\Columns\TextColumn::make('type')
+                    ->label(__('translations.document_type'))
                     ->badge()
-                    ->colors([
-                        'success' => 'invoice',
-                        'warning' => 'receipt',
-                        'danger' => 'contract',
-                        'info' => 'catalog',
-                    ])
+                    ->color(fn (string $state): string => match ($state) {
+                        'manual' => 'blue',
+                        'specification' => 'green',
+                        'warranty' => 'yellow',
+                        'certificate' => 'purple',
+                        'other' => 'gray',
+                        default => 'gray',
+                    }),
+                
+                Tables\Columns\TextColumn::make('file_size')
+                    ->label(__('translations.file_size'))
+                    ->formatStateUsing(fn (?int $state): string => $state ? number_format($state / 1024, 2) . ' KB' : '-'),
+                
+                Tables\Columns\IconColumn::make('is_public')
+                    ->label(__('translations.is_public'))
+                    ->boolean(),
+                
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->label(__('translations.sort_order'))
                     ->sortable(),
-
-                Tables\Columns\TextColumn::make('status')
-                    ->label(__('documents.status'))
-                    ->badge()
-                    ->colors([
-                        'warning' => 'draft',
-                        'success' => 'published',
-                        'danger' => 'archived',
-                    ])
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('format')
-                    ->label(__('documents.format'))
-                    ->badge()
-                    ->colors([
-                        'info' => 'html',
-                        'success' => 'pdf',
-                    ])
-                    ->sortable(),
-
+                
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('documents.created_at'))
-                    ->date('Y-m-d')
-                    ->sortable(),
+                    ->label(__('translations.created_at'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('template.type')
-                    ->label(__('documents.type'))
-                    ->relationship('template', 'type')
+                Tables\Filters\SelectFilter::make('type')
+                    ->label(__('translations.document_type'))
                     ->options([
-                        'catalog' => __('documents.types.catalog'),
-                        'certificate' => __('documents.types.certificate'),
-                        'report' => __('documents.types.report'),
+                        'manual' => __('translations.manual'),
+                        'specification' => __('translations.specification'),
+                        'warranty' => __('translations.warranty'),
+                        'certificate' => __('translations.certificate'),
+                        'other' => __('translations.other'),
                     ]),
-
-                Tables\Filters\SelectFilter::make('status')
-                    ->label(__('documents.status'))
+                
+                Tables\Filters\SelectFilter::make('is_public')
+                    ->label(__('translations.is_public'))
                     ->options([
-                        'draft' => __('documents.statuses.draft'),
-                        'published' => __('documents.statuses.published'),
-                        'archived' => __('documents.statuses.archived'),
+                        true => __('translations.yes'),
+                        false => __('translations.no'),
                     ]),
             ])
             ->headerActions([
-                Actions\CreateAction::make()
-                    ->mutateFormDataUsing(function (array $data): array {
-                        $data['documentable_type'] = $this->getOwnerRecord()::class;
-                        $data['documentable_id'] = $this->getOwnerRecord()->getKey();
-                        $data['created_by'] = auth()->id();
-                        $data['generated_at'] = now();
-                        return $data;
-                    }),
+                Tables\Actions\CreateAction::make(),
             ])
-            ->recordActions([
-                Actions\Action::make('generate_pdf')
-                    ->label(__('documents.generate_pdf'))
-                    ->icon('heroicon-o-document-arrow-down')
-                    ->color('success')
-                    ->visible(fn (Document $record): bool => $record->format === 'html')
-                    ->action(function (Document $record) {
-                        $service = app(DocumentService::class);
-                        $url = $service->generatePdf($record);
-                        
-                        return redirect($url);
-                    }),
-
-                Actions\Action::make('download')
-                    ->label(__('documents.download'))
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                
+                Tables\Actions\Action::make('download')
+                    ->label(__('translations.download'))
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->color('primary')
-                    ->visible(fn (Document $record): bool => $record->isPdf() && $record->file_path)
                     ->url(fn (Document $record): string => asset('storage/' . $record->file_path))
                     ->openUrlInNewTab(),
-
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
-                Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('sort_order');
     }
 }
+
+

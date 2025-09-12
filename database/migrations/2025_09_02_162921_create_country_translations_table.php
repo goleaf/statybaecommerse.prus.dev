@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('locale', 5);
             $table->string('name');
             $table->string('name_official')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
 
             $table->unique(['country_id', 'locale']);

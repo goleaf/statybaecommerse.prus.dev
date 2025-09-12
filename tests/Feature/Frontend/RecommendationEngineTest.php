@@ -156,6 +156,68 @@ it('can track recently viewed products', function () {
     expect(session('recently_viewed')[0])->toBe($product2->id); // Most recent first
 });
 
+it('can generate customers also bought recommendations', function () {
+    $mainProduct = Product::factory()->create(['name' => 'Main Product']);
+    $alsoBoughtProduct = Product::factory()->create(['name' => 'Also Bought Product']);
+
+    // Create completed orders where both products were bought together
+    for ($i = 0; $i < 3; $i++) {
+        $order = Order::factory()->create(['status' => 'completed']);
+        
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_id' => $mainProduct->id,
+        ]);
+        
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_id' => $alsoBoughtProduct->id,
+        ]);
+    }
+
+    Livewire::test(\App\Livewire\Components\ProductRecommendations::class, [
+        'productId' => $mainProduct->id,
+        'type' => 'customers_also_bought',
+    ])
+        ->assertSee('Also Bought Product');
+});
+
+it('can generate trending product recommendations', function () {
+    $trendingProduct = Product::factory()->create(['name' => 'Trending Product']);
+    $oldProduct = Product::factory()->create(['name' => 'Old Product']);
+
+    // Create recent orders for trending product (last 30 days)
+    for ($i = 0; $i < 5; $i++) {
+        $order = Order::factory()->create([
+            'status' => 'completed',
+            'created_at' => now()->subDays(rand(1, 30)),
+        ]);
+        
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_id' => $trendingProduct->id,
+        ]);
+    }
+
+    // Create old orders for old product (more than 30 days ago)
+    for ($i = 0; $i < 5; $i++) {
+        $order = Order::factory()->create([
+            'status' => 'completed',
+            'created_at' => now()->subDays(rand(35, 60)),
+        ]);
+        
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_id' => $oldProduct->id,
+        ]);
+    }
+
+    Livewire::test(\App\Livewire\Components\ProductRecommendations::class, [
+        'type' => 'trending',
+    ])
+        ->assertSee('Trending Product');
+});
+
 it('can handle recommendation fallbacks', function () {
     // Test when no data is available for personalized recommendations
     $user = User::factory()->create();

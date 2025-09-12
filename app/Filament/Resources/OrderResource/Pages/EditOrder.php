@@ -1,30 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Filament\Resources\OrderResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
 class EditOrder extends EditRecord
 {
     protected static string $resource = OrderResource::class;
 
-    public function getTitle(): string
-    {
-        return __('admin.orders.edit');
-    }
-
-    public function getSubheading(): ?string
-    {
-        return __('admin.orders.description');
-    }
-
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->label(__('admin.actions.view')),
-            Actions\DeleteAction::make()->label(__('admin.actions.delete')),
+            Actions\ViewAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
+

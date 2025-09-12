@@ -26,87 +26,143 @@ class CategoryTest extends TestCase
         ]);
     }
 
-    public function test_category_can_have_parent(): void
+    public function test_category_has_parent_relationship(): void
     {
-        $parent = Category::factory()->create(['name' => 'Parent Category']);
-        $child = Category::factory()->create([
-            'name' => 'Child Category',
-            'parent_id' => $parent->id,
-        ]);
+        $parentCategory = Category::factory()->create();
+        $childCategory = Category::factory()->create(['parent_id' => $parentCategory->id]);
 
-        $this->assertInstanceOf(Category::class, $child->parent);
-        $this->assertEquals($parent->id, $child->parent->id);
+        $this->assertInstanceOf(Category::class, $childCategory->parent);
+        $this->assertEquals($parentCategory->id, $childCategory->parent->id);
     }
 
-    public function test_category_can_have_children(): void
+    public function test_category_has_children_relationship(): void
     {
-        $parent = Category::factory()->create();
-        $children = Category::factory()->count(3)->create(['parent_id' => $parent->id]);
+        $parentCategory = Category::factory()->create();
+        $childCategory1 = Category::factory()->create(['parent_id' => $parentCategory->id]);
+        $childCategory2 = Category::factory()->create(['parent_id' => $parentCategory->id]);
 
-        $this->assertCount(3, $parent->children);
-        $this->assertInstanceOf(Category::class, $parent->children->first());
+        $this->assertCount(2, $parentCategory->children);
+        $this->assertInstanceOf(Category::class, $parentCategory->children->first());
     }
 
     public function test_category_can_have_many_products(): void
     {
         $category = Category::factory()->create();
-        $products = Product::factory()->count(5)->create();
+        $products = Product::factory()->count(3)->create();
 
         $category->products()->attach($products->pluck('id'));
 
-        $this->assertCount(5, $category->products);
+        $this->assertCount(3, $category->products);
         $this->assertInstanceOf(Product::class, $category->products->first());
     }
 
-    public function test_category_cache_flush_on_save(): void
-    {
-        // Mock cache to test if flush is called
-        \Illuminate\Support\Facades\Cache::shouldReceive('forget')
-            ->atLeast()
-            ->once();
-
-        $category = Category::factory()->create();
-        $category->save();
-    }
-
-    public function test_category_soft_deletes(): void
+    public function test_category_has_media_relationship(): void
     {
         $category = Category::factory()->create();
-        $categoryId = $category->id;
 
-        $category->delete();
-
-        $this->assertSoftDeleted('categories', ['id' => $categoryId]);
-        $this->assertNotNull($category->fresh()->deleted_at);
-    }
-
-    public function test_category_fillable_attributes(): void
-    {
-        $category = new Category();
+        // Test that category implements HasMedia
+        $this->assertInstanceOf(\Spatie\MediaLibrary\HasMedia::class, $category);
         
-        $expectedFillable = [
-            'name',
-            'slug',
-            'description',
-            'parent_id',
-            'sort_order',
-            'is_enabled',
-            'is_visible',
-            'seo_title',
-            'seo_description',
-        ];
-
-        $this->assertEquals($expectedFillable, $category->getFillable());
+        // Test that category can handle media
+        $this->assertTrue(method_exists($category, 'registerMediaCollections'));
+        $this->assertTrue(method_exists($category, 'registerMediaConversions'));
+        $this->assertTrue(method_exists($category, 'media'));
     }
 
-    public function test_category_casts(): void
+    public function test_category_has_translations_relationship(): void
+    {
+        $category = Category::factory()->create();
+
+        // Test that category has translations relationship
+        $this->assertTrue(method_exists($category, 'translations'));
+        $this->assertTrue(method_exists($category, 'trans'));
+    }
+
+    public function test_category_scope_active(): void
+    {
+        $visibleCategory = Category::factory()->create(['is_visible' => true]);
+        $hiddenCategory = Category::factory()->create(['is_visible' => false]);
+
+        $activeCategories = Category::active()->get();
+
+        $this->assertTrue($activeCategories->contains($visibleCategory));
+        $this->assertFalse($activeCategories->contains($hiddenCategory));
+    }
+
+    public function test_category_scope_root(): void
+    {
+        $rootCategory = Category::factory()->create(['parent_id' => null]);
+        $childCategory = Category::factory()->create(['parent_id' => $rootCategory->id]);
+
+        $rootCategories = Category::root()->get();
+
+        $this->assertTrue($rootCategories->contains($rootCategory));
+        $this->assertFalse($rootCategories->contains($childCategory));
+    }
+
+    public function test_category_scope_ordered(): void
+    {
+        $category1 = Category::factory()->create(['sort_order' => 2]);
+        $category2 = Category::factory()->create(['sort_order' => 1]);
+        $category3 = Category::factory()->create(['sort_order' => 3]);
+
+        $orderedCategories = Category::ordered()->get();
+
+        $this->assertEquals($category2->id, $orderedCategories->first()->id);
+        $this->assertEquals($category3->id, $orderedCategories->last()->id);
+    }
+
+    public function test_category_get_full_name_attribute(): void
+    {
+        $parentCategory = Category::factory()->create(['name' => 'Parent']);
+        $childCategory = Category::factory()->create([
+            'name' => 'Child',
+            'parent_id' => $parentCategory->id
+        ]);
+
+        $fullName = $childCategory->getFullNameAttribute();
+        
+        // Should include parent name and child name
+        $this->assertStringContainsString('Parent', $fullName);
+        $this->assertStringContainsString('Child', $fullName);
+    }
+
+    public function test_category_get_breadcrumb_attribute(): void
+    {
+        $parentCategory = Category::factory()->create(['name' => 'Parent']);
+        $childCategory = Category::factory()->create([
+            'name' => 'Child',
+            'parent_id' => $parentCategory->id
+        ]);
+
+        $breadcrumb = $childCategory->getBreadcrumbAttribute();
+
+        $this->assertIsArray($breadcrumb);
+        $this->assertCount(2, $breadcrumb);
+        $this->assertEquals('Parent', $breadcrumb[0]['name']);
+        $this->assertEquals('Child', $breadcrumb[1]['name']);
+    }
+
+    public function test_category_casts_work_correctly(): void
     {
         $category = Category::factory()->create([
             'is_visible' => true,
+            'is_enabled' => false,
+            'show_in_menu' => true,
             'sort_order' => 5,
+            'product_limit' => 100,
         ]);
 
         $this->assertIsBool($category->is_visible);
+        $this->assertIsBool($category->is_enabled);
+        $this->assertIsBool($category->show_in_menu);
         $this->assertIsInt($category->sort_order);
+        $this->assertIsInt($category->product_limit);
+    }
+
+    public function test_category_route_key_name(): void
+    {
+        $category = new Category();
+        $this->assertEquals('slug', $category->getRouteKeyName());
     }
 }

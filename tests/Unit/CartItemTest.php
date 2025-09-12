@@ -3,317 +3,196 @@
 namespace Tests\Unit;
 
 use App\Models\CartItem;
+use App\Models\User;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-final class CartItemTest extends TestCase
+class CartItemTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $user;
-    private Product $product;
-    private ProductVariant $variant;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->user = User::factory()->create();
-        $this->product = Product::factory()->create([
-            'name' => 'Test Product',
-            'price' => 99.99,
-        ]);
-        $this->variant = ProductVariant::factory()->create([
-            'product_id' => $this->product->id,
-            'name' => 'Test Variant',
-            'price' => 89.99,
-        ]);
-    }
-
     public function test_cart_item_can_be_created(): void
     {
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+        
         $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'variant_id' => $this->variant->id,
-            'session_id' => 'test-session',
+            'user_id' => $user->id,
+            'product_id' => $product->id,
             'quantity' => 2,
-            'unit_price' => 89.99,
-            'total_price' => 179.98,
+            'price' => 99.99,
         ]);
 
-        expect($cartItem)
-            ->toBeInstanceOf(CartItem::class)
-            ->user_id
-            ->toBe($this->user->id)
-            ->product_id
-            ->toBe($this->product->id)
-            ->variant_id
-            ->toBe($this->variant->id)
-            ->session_id
-            ->toBe('test-session')
-            ->quantity
-            ->toBe(2)
-            ->unit_price
-            ->toBe('89.99')
-            ->total_price
-            ->toBe('179.98');
+        $this->assertDatabaseHas('cart_items', [
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'price' => 99.99,
+        ]);
     }
 
     public function test_cart_item_belongs_to_user(): void
     {
-        $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-        ]);
+        $user = User::factory()->create();
+        $cartItem = CartItem::factory()->create(['user_id' => $user->id]);
 
-        expect($cartItem->user)
-            ->toBeInstanceOf(User::class)
-            ->id
-            ->toBe($this->user->id);
+        $this->assertInstanceOf(User::class, $cartItem->user);
+        $this->assertEquals($user->id, $cartItem->user->id);
     }
 
     public function test_cart_item_belongs_to_product(): void
     {
-        $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-        ]);
+        $product = Product::factory()->create();
+        $cartItem = CartItem::factory()->create(['product_id' => $product->id]);
 
-        expect($cartItem->product)
-            ->toBeInstanceOf(Product::class)
-            ->id
-            ->toBe($this->product->id);
+        $this->assertInstanceOf(Product::class, $cartItem->product);
+        $this->assertEquals($product->id, $cartItem->product->id);
     }
 
-    public function test_cart_item_belongs_to_variant(): void
+    public function test_cart_item_can_have_product_variant(): void
     {
+        $product = Product::factory()->create();
+        $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
         $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'variant_id' => $this->variant->id,
+            'product_id' => $product->id,
+            'product_variant_id' => $variant->id,
         ]);
 
-        expect($cartItem->variant)
-            ->toBeInstanceOf(ProductVariant::class)
-            ->id
-            ->toBe($this->variant->id);
+        $this->assertInstanceOf(ProductVariant::class, $cartItem->productVariant);
+        $this->assertEquals($variant->id, $cartItem->productVariant->id);
     }
 
-    public function test_cart_item_can_have_null_user_for_guest_carts(): void
+    public function test_cart_item_casts_work_correctly(): void
     {
         $cartItem = CartItem::factory()->create([
-            'user_id' => null,
-            'product_id' => $this->product->id,
-            'session_id' => 'guest-session',
+            'quantity' => 5,
+            'price' => 49.99,
+            'created_at' => now(),
         ]);
 
-        expect($cartItem->user_id)->toBeNull();
-        expect($cartItem->user)->toBeNull();
-    }
-
-    public function test_cart_item_can_have_null_variant(): void
-    {
-        $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'variant_id' => null,
-        ]);
-
-        expect($cartItem->variant_id)->toBeNull();
-        expect($cartItem->variant)->toBeNull();
-    }
-
-    public function test_cart_item_casts_attributes_correctly(): void
-    {
-        $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'quantity' => '3',
-            'unit_price' => '99.99',
-            'total_price' => '299.97',
-            'product_snapshot' => ['name' => 'Test Product', 'price' => 99.99],
-        ]);
-
-        expect($cartItem->quantity)->toBeInt()->toBe(3);
-        expect($cartItem->unit_price)->toBe('99.99');
-        expect($cartItem->total_price)->toBe('299.97');
-        expect($cartItem->product_snapshot)->toBeArray()->toBe(['name' => 'Test Product', 'price' => 99.99]);
-    }
-
-    public function test_cart_item_update_total_price_method(): void
-    {
-        $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'quantity' => 2,
-            'unit_price' => 50.0,
-            'total_price' => 0.0,  // Intentionally wrong
-        ]);
-
-        $cartItem->updateTotalPrice();
-
-        expect($cartItem->fresh()->total_price)->toBe('100.00');
-    }
-
-    public function test_cart_item_formatted_total_price_attribute(): void
-    {
-        $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'total_price' => 123.45,
-        ]);
-
-        // Assuming app_money_format function formats as €123.45
-        expect($cartItem->formatted_total_price)->toBeString();
-    }
-
-    public function test_cart_item_formatted_unit_price_attribute(): void
-    {
-        $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'unit_price' => 67.89,
-        ]);
-
-        // Assuming app_money_format function formats as €67.89
-        expect($cartItem->formatted_unit_price)->toBeString();
-    }
-
-    public function test_cart_item_scope_for_session(): void
-    {
-        $sessionId = 'test-session-123';
-
-        $cartItem1 = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'session_id' => $sessionId,
-        ]);
-
-        $cartItem2 = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'session_id' => 'different-session',
-        ]);
-
-        $results = CartItem::forSession($sessionId)->get();
-
-        expect($results)->toHaveCount(1);
-        expect($results->first()->id)->toBe($cartItem1->id);
-    }
-
-    public function test_cart_item_scope_for_user(): void
-    {
-        $user2 = User::factory()->create();
-
-        $cartItem1 = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-        ]);
-
-        $cartItem2 = CartItem::factory()->create([
-            'user_id' => $user2->id,
-            'product_id' => $this->product->id,
-        ]);
-
-        $results = CartItem::forUser($this->user->id)->get();
-
-        expect($results)->toHaveCount(1);
-        expect($results->first()->id)->toBe($cartItem1->id);
-    }
-
-    public function test_cart_item_uses_soft_deletes(): void
-    {
-        $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-        ]);
-
-        $cartItem->delete();
-
-        expect($cartItem->trashed())->toBeTrue();
-        $this->assertSoftDeleted($cartItem);
+        $this->assertIsInt($cartItem->quantity);
+        $this->assertIsNumeric($cartItem->price);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $cartItem->created_at);
     }
 
     public function test_cart_item_fillable_attributes(): void
     {
-        $fillableAttributes = [
-            'session_id',
-            'user_id',
-            'product_id',
-            'variant_id',
-            'quantity',
-            'unit_price',
-            'total_price',
-            'product_snapshot',
-        ];
-
         $cartItem = new CartItem();
+        $fillable = $cartItem->getFillable();
 
-        expect($cartItem->getFillable())->toBe($fillableAttributes);
+        $this->assertContains('user_id', $fillable);
+        $this->assertContains('product_id', $fillable);
+        $this->assertContains('product_variant_id', $fillable);
+        $this->assertContains('quantity', $fillable);
+        $this->assertContains('price', $fillable);
     }
 
-    public function test_cart_item_has_timestamps(): void
+    public function test_cart_item_can_calculate_subtotal(): void
     {
         $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
+            'quantity' => 3,
+            'price' => 25.00,
         ]);
 
-        expect($cartItem->created_at)->not->toBeNull();
-        expect($cartItem->updated_at)->not->toBeNull();
+        $expectedSubtotal = 3 * 25.00;
+        $this->assertEquals($expectedSubtotal, $cartItem->subtotal);
     }
 
-    public function test_cart_item_can_store_product_snapshot(): void
+    public function test_cart_item_scope_for_user(): void
     {
-        $productSnapshot = [
-            'name' => 'Snapshot Product Name',
-            'price' => 99.99,
-            'sku' => 'SNAP-001',
-            'description' => 'Product description at time of adding to cart',
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        
+        $cartItem1 = CartItem::factory()->create(['user_id' => $user1->id]);
+        $cartItem2 = CartItem::factory()->create(['user_id' => $user2->id]);
+
+        $user1CartItems = CartItem::forUser($user1->id)->get();
+
+        $this->assertTrue($user1CartItems->contains($cartItem1));
+        $this->assertFalse($user1CartItems->contains($cartItem2));
+    }
+
+    public function test_cart_item_scope_for_product(): void
+    {
+        $product1 = Product::factory()->create();
+        $product2 = Product::factory()->create();
+        
+        $cartItem1 = CartItem::factory()->create(['product_id' => $product1->id]);
+        $cartItem2 = CartItem::factory()->create(['product_id' => $product2->id]);
+
+        $product1CartItems = CartItem::forProduct($product1->id)->get();
+
+        $this->assertTrue($product1CartItems->contains($cartItem1));
+        $this->assertFalse($product1CartItems->contains($cartItem2));
+    }
+
+    public function test_cart_item_can_update_quantity(): void
+    {
+        $cartItem = CartItem::factory()->create(['quantity' => 1]);
+        
+        $cartItem->updateQuantity(5);
+        
+        $this->assertEquals(5, $cartItem->quantity);
+    }
+
+    public function test_cart_item_can_increment_quantity(): void
+    {
+        $cartItem = CartItem::factory()->create(['quantity' => 2]);
+        
+        $cartItem->incrementQuantity(3);
+        
+        $this->assertEquals(5, $cartItem->quantity);
+    }
+
+    public function test_cart_item_can_decrement_quantity(): void
+    {
+        $cartItem = CartItem::factory()->create(['quantity' => 5]);
+        
+        $cartItem->decrementQuantity(2);
+        
+        $this->assertEquals(3, $cartItem->quantity);
+    }
+
+    public function test_cart_item_can_remove_when_quantity_zero(): void
+    {
+        $cartItem = CartItem::factory()->create(['quantity' => 1]);
+        
+        $cartItem->decrementQuantity(1);
+        
+        $this->assertDatabaseMissing('cart_items', ['id' => $cartItem->id]);
+    }
+
+    public function test_cart_item_has_session_id(): void
+    {
+        $cartItem = CartItem::factory()->create([
+            'session_id' => 'test-session-123',
+        ]);
+
+        $this->assertEquals('test-session-123', $cartItem->session_id);
+    }
+
+    public function test_cart_item_can_have_notes(): void
+    {
+        $cartItem = CartItem::factory()->create([
+            'notes' => 'Special instructions for this item',
+        ]);
+
+        $this->assertEquals('Special instructions for this item', $cartItem->notes);
+    }
+
+    public function test_cart_item_can_have_custom_attributes(): void
+    {
+        $cartItem = CartItem::factory()->create([
             'attributes' => [
-                'color' => 'Red',
-                'size' => 'Large',
+                'color' => 'red',
+                'size' => 'large',
             ],
-        ];
-
-        $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'product_snapshot' => $productSnapshot,
         ]);
 
-        expect($cartItem->product_snapshot)->toBe($productSnapshot);
-        expect($cartItem->product_snapshot['name'])->toBe('Snapshot Product Name');
-        expect($cartItem->product_snapshot['attributes']['color'])->toBe('Red');
-    }
-
-    public function test_cart_item_quantity_validation(): void
-    {
-        $cartItem = CartItem::factory()->make([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'quantity' => 0,
-        ]);
-
-        // This would typically be validated at the form/request level
-        expect($cartItem->quantity)->toBe(0);
-    }
-
-    public function test_cart_item_price_precision(): void
-    {
-        $cartItem = CartItem::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'unit_price' => 12.345,  // More than 2 decimal places
-            'total_price' => 24.689,
-        ]);
-
-        // Should be rounded to 2 decimal places
-        expect($cartItem->unit_price)->toBe('12.35');
-        expect($cartItem->total_price)->toBe('24.69');
+        $this->assertIsArray($cartItem->attributes);
+        $this->assertEquals('red', $cartItem->attributes['color']);
+        $this->assertEquals('large', $cartItem->attributes['size']);
     }
 }

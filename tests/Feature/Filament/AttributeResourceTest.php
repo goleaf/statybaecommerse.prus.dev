@@ -3,9 +3,10 @@
 use App\Filament\Resources\AttributeResource;
 use App\Models\Attribute;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 use Filament\Actions\DeleteAction;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
+
 use function Pest\Laravel\{actingAs, assertDatabaseHas, assertDatabaseMissing};
 
 beforeEach(function () {
@@ -34,6 +35,10 @@ it('can create attribute', function () {
         'is_required' => false,
         'is_filterable' => true,
         'is_searchable' => false,
+        'is_visible' => true,
+        'is_editable' => true,
+        'is_sortable' => true,
+        'is_enabled' => true,
         'sort_order' => 0,
     ];
 
@@ -70,6 +75,10 @@ it('can update attribute', function () {
         'is_required' => true,
         'is_filterable' => false,
         'is_searchable' => true,
+        'is_visible' => true,
+        'is_editable' => true,
+        'is_sortable' => true,
+        'is_enabled' => true,
         'sort_order' => 10,
     ];
 

@@ -50,14 +50,14 @@
                         </div>
                         
                         <h3 class="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
-                            <a href="{{ route('brands.show', $brand) }}" class="stretched-link">
-                                {{ $brand->name }}
+                            <a href="{{ route('localized.brands.show', $brand->getTranslatedSlug()) }}" class="stretched-link">
+                                {{ $brand->getTranslatedName() }}
                             </a>
                         </h3>
                         
-                        @if($brand->description)
+                        @if($brand->getTranslatedDescription())
                             <p class="mt-2 text-gray-600 dark:text-gray-300 line-clamp-2">
-                                {{ $brand->description }}
+                                {{ $brand->getTranslatedDescription() }}
                             </p>
                         @endif
                         

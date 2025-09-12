@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Translations\CollectionTranslation;
 use App\Models\Collection;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
@@ -21,51 +22,89 @@ class CollectionSeeder extends Seeder
      */
     public function run(): void
     {
+        $locales = $this->supportedLocales();
+
         $collections = [
             [
-                'name' => 'New Home Essentials',
                 'slug' => 'new-home-essentials',
-                'description' => 'Everything you need to get started with your new home construction project.',
+                'name' => [
+                    'lt' => 'Naujo namo esmės',
+                    'en' => 'New Home Essentials'
+                ],
+                'description' => [
+                    'lt' => 'Viskas, ko reikia pradėti naujo namo statybos projektą.',
+                    'en' => 'Everything you need to get started with your new home construction project.'
+                ],
                 'sort_order' => 1,
                 'image_url' => 'https://picsum.photos/600/600?random=201',
                 'banner_url' => 'https://picsum.photos/1200/600?random=201',
             ],
             [
-                'name' => 'Professional Contractor Tools',
                 'slug' => 'professional-contractor-tools',
-                'description' => 'High-quality tools trusted by professional contractors and builders.',
+                'name' => [
+                    'lt' => 'Profesionalūs rangovo įrankiai',
+                    'en' => 'Professional Contractor Tools'
+                ],
+                'description' => [
+                    'lt' => 'Aukštos kokybės įrankiai, kuriais pasitiki profesionalūs rangovai ir statybininkai.',
+                    'en' => 'High-quality tools trusted by professional contractors and builders.'
+                ],
                 'sort_order' => 2,
                 'image_url' => 'https://picsum.photos/600/600?random=202',
                 'banner_url' => 'https://picsum.photos/1200/600?random=202',
             ],
             [
-                'name' => 'DIY Home Improvement',
                 'slug' => 'diy-home-improvement',
-                'description' => 'Tools and materials perfect for weekend DIY projects and home improvements.',
+                'name' => [
+                    'lt' => 'DIY namų gerinimas',
+                    'en' => 'DIY Home Improvement'
+                ],
+                'description' => [
+                    'lt' => 'Įrankiai ir medžiagos, puikiai tinkantys savaitgalio DIY projektams ir namų gerinimui.',
+                    'en' => 'Tools and materials perfect for weekend DIY projects and home improvements.'
+                ],
                 'sort_order' => 3,
                 'image_url' => 'https://picsum.photos/600/600?random=203',
                 'banner_url' => 'https://picsum.photos/1200/600?random=203',
             ],
             [
-                'name' => 'Outdoor & Landscaping',
                 'slug' => 'outdoor-landscaping',
-                'description' => 'Tools and equipment for outdoor construction and landscaping projects.',
+                'name' => [
+                    'lt' => 'Lauko ir želdinių dizainas',
+                    'en' => 'Outdoor & Landscaping'
+                ],
+                'description' => [
+                    'lt' => 'Įrankiai ir įranga lauko statyboms ir želdinių dizaino projektams.',
+                    'en' => 'Tools and equipment for outdoor construction and landscaping projects.'
+                ],
                 'sort_order' => 4,
                 'image_url' => 'https://picsum.photos/600/600?random=204',
                 'banner_url' => 'https://picsum.photos/1200/600?random=204',
             ],
             [
-                'name' => 'Renovation Specialists',
                 'slug' => 'renovation-specialists',
-                'description' => 'Specialized tools and materials for home renovation and remodeling.',
+                'name' => [
+                    'lt' => 'Rekonstrukcijos specialistai',
+                    'en' => 'Renovation Specialists'
+                ],
+                'description' => [
+                    'lt' => 'Specializuoti įrankiai ir medžiagos namų rekonstrukcijai ir perplanavimui.',
+                    'en' => 'Specialized tools and materials for home renovation and remodeling.'
+                ],
                 'sort_order' => 5,
                 'image_url' => 'https://picsum.photos/600/600?random=205',
                 'banner_url' => 'https://picsum.photos/1200/600?random=205',
             ],
             [
-                'name' => 'Energy Efficient Solutions',
                 'slug' => 'energy-efficient-solutions',
-                'description' => 'Eco-friendly building materials and energy-saving construction solutions.',
+                'name' => [
+                    'lt' => 'Energijos taupymo sprendimai',
+                    'en' => 'Energy Efficient Solutions'
+                ],
+                'description' => [
+                    'lt' => 'Ekologiškos statybos medžiagos ir energijos taupymo statybos sprendimai.',
+                    'en' => 'Eco-friendly building materials and energy-saving construction solutions.'
+                ],
                 'sort_order' => 6,
                 'image_url' => 'https://picsum.photos/600/600?random=206',
                 'banner_url' => 'https://picsum.photos/1200/600?random=206',
@@ -73,27 +112,48 @@ class CollectionSeeder extends Seeder
         ];
 
         foreach ($collections as $collectionData) {
+            // Extract translations and set default name
+            $translations = [
+                'name' => $collectionData['name'] ?? [],
+                'description' => $collectionData['description'] ?? [],
+            ];
+            $defaultName = $collectionData['name']['en'] ?? $collectionData['slug'];
+            
             $collection = Collection::firstOrCreate(
                 ['slug' => $collectionData['slug']],
                 [
-                    'name' => $collectionData['name'],
-                    'description' => $collectionData['description'],
+                    'name' => $defaultName,
                     'sort_order' => $collectionData['sort_order'],
                     'is_visible' => true,
                     'is_automatic' => false,
                 ]
             );
 
+            // Create translations for each locale
+            foreach ($locales as $locale) {
+                CollectionTranslation::updateOrCreate([
+                    'collection_id' => $collection->id,
+                    'locale' => $locale,
+                ], [
+                    'name' => $translations['name'][$locale] ?? $translations['name']['en'] ?? $collectionData['slug'],
+                    'description' => $translations['description'][$locale] ?? $translations['description']['en'] ?? '',
+                    'slug' => $collectionData['slug'] . ($locale !== 'lt' ? '-' . $locale : ''),
+                ]);
+            }
+
             // Add main image if collection was created and doesn't have one
+            $collectionName = $translations['name']['en'] ?? $collectionData['slug'];
             if (($collection->wasRecentlyCreated || !$collection->hasMedia('images')) && isset($collectionData['image_url'])) {
-                $this->downloadAndAttachImage($collection, $collectionData['image_url'], 'images', $collectionData['name'] . ' Image');
+                $this->downloadAndAttachImage($collection, $collectionData['image_url'], 'images', $collectionName . ' Image');
             }
 
             // Add banner if collection was created and doesn't have one
             if (($collection->wasRecentlyCreated || !$collection->hasMedia('banner')) && isset($collectionData['banner_url'])) {
-                $this->downloadAndAttachImage($collection, $collectionData['banner_url'], 'banner', $collectionData['name'] . ' Banner');
+                $this->downloadAndAttachImage($collection, $collectionData['banner_url'], 'banner', $collectionName . ' Banner');
             }
         }
+
+        $this->command?->info('CollectionSeeder: seeded collections with translations (locales: ' . implode(',', $locales) . ').');
     }
 
     /**
@@ -128,5 +188,15 @@ class CollectionSeeder extends Seeder
         } catch (\Exception $e) {
             $this->command->warn("✗ Failed to generate {$collectionName} image for {$collection->name}: " . $e->getMessage());
         }
+    }
+
+    private function supportedLocales(): array
+    {
+        return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
+            ->map(fn($v) => trim((string) $v))
+            ->filter()
+            ->unique()
+            ->values()
+            ->toArray();
     }
 }

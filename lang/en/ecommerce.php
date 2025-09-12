@@ -82,6 +82,12 @@ return [
     'products_found' => 'products found',
     'no_products_found' => 'No products found',
     'try_adjusting_filters' => 'Try adjusting your search or filter criteria.',
+    // Related Products
+    'related_products' => 'Related Products',
+    'related_products_description' => 'Discover similar products that might interest you',
+    'you_might_also_like' => 'You might also like',
+    'similar_products' => 'Similar Products',
+    'recommended_for_you' => 'Recommended for you',
     // User Account
     'account' => 'Account',
     'profile' => 'Profile',

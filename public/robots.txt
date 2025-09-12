@@ -1,2 +1,25 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemaps
+Sitemap: {{ url('/sitemap.xml') }}
+
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /filament/
+Disallow: /livewire/
+Disallow: /_livewire/
+
+# Disallow private areas
+Disallow: /storage/
+Disallow: /vendor/
+Disallow: /node_modules/
+
+# Allow important files
+Allow: /css/
+Allow: /js/
+Allow: /images/
+Allow: /fonts/
+
+# Crawl delay (optional)
+Crawl-delay: 1

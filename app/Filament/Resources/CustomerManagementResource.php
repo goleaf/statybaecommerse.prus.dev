@@ -3,29 +3,58 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerManagementResource\Pages;
-use App\Filament\Resources\OrderResource;
-use App\Models\Order;
+use App\Filament\Resources\CustomerManagementResource\RelationManagers;
+use App\Filament\Resources\CustomerManagementResource\Widgets;
 use App\Models\User;
-use Filament\Actions\BulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tab;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
+use Filament\Tables\Filters\DateFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\QueryBuilder;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use BackedEnum;
+
 final class CustomerManagementResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-users';
 
+    /**
+     * @var string|\BackedEnum|null
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Customer Management';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function getNavigationLabel(): string
     {
@@ -34,100 +63,242 @@ final class CustomerManagementResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('Customer');
+        return __('admin.customers.customer');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Customers');
+        return __('admin.customers.customers');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.customer_management');
     }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('is_admin', false)
-            ->withCount(['orders'])
-            ->withSum('orders', 'total');
+            ->with(['customerGroups', 'partners', 'addresses'])
+            ->withCount(['orders', 'cartItems', 'reviews', 'addresses']);
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make(__('Customer Information'))
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('Full Name'))
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('email')
-                            ->label(__('Email Address'))
-                            ->email()
-                            ->required()
-                            ->unique(User::class, 'email', ignoreRecord: true),
-                        Forms\Components\DateTimePicker::make('email_verified_at')
-                            ->label(__('Email Verified At'))
-                            ->nullable(),
-                        Forms\Components\Select::make('preferred_locale')
-                            ->label(__('Preferred Language'))
-                            ->options([
-                                'en' => __('English'),
-                                'lt' => __('Lithuanian'),
-                                'de' => __('German'),
-                            ])
-                            ->default('lt'),
+                Tabs::make(__('admin.customers.customer_information'))
+                    ->tabs([
+                        Tab::make(__('admin.customers.personal_information'))
+                            ->icon('heroicon-o-user')
+                            ->schema([
+                                Section::make(__('admin.customers.basic_information'))
+                                    ->schema([
+                                        Grid::make(2)
+                                            ->schema([
+                                                TextInput::make('name')
+                                                    ->label(__('admin.customers.name'))
+                                                    ->required()
+                                                    ->maxLength(255)
+                                                    ->live()
+                                                    ->afterStateUpdated(fn(callable $set, ?string $state) =>
+                                                        $set('slug', \Str::slug($state ?? ''))),
+                                                TextInput::make('email')
+                                                    ->label(__('admin.customers.email'))
+                                                    ->email()
+                                                    ->required()
+                                                    ->unique(ignoreRecord: true)
+                                                    ->maxLength(255),
+                                                TextInput::make('phone')
+                                                    ->label(__('admin.customers.phone'))
+                                                    ->tel()
+                                                    ->maxLength(20),
+                                                Select::make('preferred_locale')
+                                                    ->label(__('admin.customers.preferred_language'))
+                                                    ->options([
+                                                        'lt' => __('admin.locales.lithuanian'),
+                                                        'en' => __('admin.locales.english'),
+                                                        'de' => __('admin.locales.german'),
+                                                    ])
+                                                    ->default('lt')
+                                                    ->required(),
+                                                DateTimePicker::make('email_verified_at')
+                                                    ->label(__('admin.customers.email_verified_at'))
+                                                    ->displayFormat('d/m/Y H:i'),
+                                                DateTimePicker::make('last_login_at')
+                                                    ->label(__('admin.customers.last_login_at'))
+                                                    ->displayFormat('d/m/Y H:i')
+                                                    ->disabled(),
+                                            ]),
+                                    ]),
+                                Section::make(__('admin.customers.account_status'))
+                                    ->schema([
+                                        Grid::make(2)
+                                            ->schema([
+                                                Toggle::make('is_active')
+                                                    ->label(__('admin.customers.is_active'))
+                                                    ->default(true)
+                                                    ->helperText(__('admin.customers.is_active_help')),
+                                                Toggle::make('email_notifications')
+                                                    ->label(__('admin.customers.email_notifications'))
+                                                    ->default(true)
+                                                    ->helperText(__('admin.customers.email_notifications_help')),
+                                                Toggle::make('sms_notifications')
+                                                    ->label(__('admin.customers.sms_notifications'))
+                                                    ->default(false)
+                                                    ->helperText(__('admin.customers.sms_notifications_help')),
+                                                Toggle::make('marketing_consent')
+                                                    ->label(__('admin.customers.marketing_consent'))
+                                                    ->default(false)
+                                                    ->helperText(__('admin.customers.marketing_consent_help')),
+                                            ]),
+                                    ]),
+                            ]),
+                        Tab::make(__('admin.customers.customer_groups'))
+                            ->icon('heroicon-o-user-group')
+                            ->schema([
+                                Section::make(__('admin.customers.group_membership'))
+                                    ->schema([
+                                        Select::make('customerGroups')
+                                            ->label(__('admin.customers.customer_groups'))
+                                            ->relationship('customerGroups', 'name')
+                                            ->multiple()
+                                            ->preload()
+                                            ->searchable()
+                                            ->createOptionForm([
+                                                TextInput::make('name')
+                                                    ->label(__('admin.customer_groups.name'))
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                TextInput::make('slug')
+                                                    ->label(__('admin.customer_groups.slug'))
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                TextInput::make('description')
+                                                    ->label(__('admin.customer_groups.description'))
+                                                    ->maxLength(1000),
+                                                TextInput::make('discount_percentage')
+                                                    ->label(__('admin.customer_groups.discount_percentage'))
+                                                    ->numeric()
+                                                    ->minValue(0)
+                                                    ->maxValue(100)
+                                                    ->suffix('%'),
+                                                Toggle::make('is_enabled')
+                                                    ->label(__('admin.customer_groups.is_enabled'))
+                                                    ->default(true),
+                                            ])
+                                            ->helperText(__('admin.customers.customer_groups_help')),
+                                    ]),
+                            ]),
+                        Tab::make(__('admin.customers.partner_information'))
+                            ->icon('heroicon-o-building-office')
+                            ->schema([
+                                Section::make(__('admin.customers.partner_details'))
+                                    ->schema([
+                                        Select::make('partners')
+                                            ->label(__('admin.customers.partners'))
+                                            ->relationship('partners', 'name')
+                                            ->multiple()
+                                            ->preload()
+                                            ->searchable()
+                                            ->helperText(__('admin.customers.partners_help')),
+                                        Placeholder::make('partner_discount_rate')
+                                            ->label(__('admin.customers.partner_discount_rate'))
+                                            ->content(fn($record) => $record?->partner_discount_rate
+                                                ? number_format($record->partner_discount_rate, 2) . '%'
+                                                : __('admin.customers.no_partner_discount')),
+                                    ]),
+                            ]),
+                        Tab::make(__('admin.customers.addresses'))
+                            ->icon('heroicon-o-map-pin')
+                            ->schema([
+                                Section::make(__('admin.customers.address_information'))
+                                    ->schema([
+                                        Placeholder::make('addresses_count')
+                                            ->label(__('admin.customers.total_addresses'))
+                                            ->content(fn($record) => $record?->addresses_count ?? 0),
+                                        Placeholder::make('default_address')
+                                            ->label(__('admin.customers.default_address'))
+                                            ->content(fn($record) => $record?->default_address
+                                                ? $record->default_address->full_address
+                                                : __('admin.customers.no_default_address')),
+                                        Placeholder::make('billing_address')
+                                            ->label(__('admin.customers.billing_address'))
+                                            ->content(fn($record) => $record?->billing_address
+                                                ? $record->billing_address->full_address
+                                                : __('admin.customers.no_billing_address')),
+                                        Placeholder::make('shipping_address')
+                                            ->label(__('admin.customers.shipping_address'))
+                                            ->content(fn($record) => $record?->shipping_address
+                                                ? $record->shipping_address->full_address
+                                                : __('admin.customers.no_shipping_address')),
+                                    ]),
+                            ]),
+                        Tab::make(__('admin.customers.activity_summary'))
+                            ->icon('heroicon-o-chart-bar')
+                            ->schema([
+                                Section::make(__('admin.customers.order_statistics'))
+                                    ->schema([
+                                        Grid::make(3)
+                                            ->schema([
+                                                Placeholder::make('orders_count')
+                                                    ->label(__('admin.customers.total_orders'))
+                                                    ->content(fn($record) => $record?->orders_count ?? 0),
+                                                Placeholder::make('total_spent')
+                                                    ->label(__('admin.customers.total_spent'))
+                                                    ->content(fn($record) => $record?->orders()->sum('total')
+                                                        ? '€' . number_format($record->orders()->sum('total'), 2)
+                                                        : '€0.00'),
+                                                Placeholder::make('average_order_value')
+                                                    ->label(__('admin.customers.average_order_value'))
+                                                    ->content(fn($record) => $record?->orders()->avg('total')
+                                                        ? '€' . number_format($record->orders()->avg('total'), 2)
+                                                        : '€0.00'),
+                                            ]),
+                                    ]),
+                                Section::make(__('admin.customers.engagement_metrics'))
+                                    ->schema([
+                                        Grid::make(3)
+                                            ->schema([
+                                                Placeholder::make('cart_items_count')
+                                                    ->label(__('admin.customers.cart_items'))
+                                                    ->content(fn($record) => $record?->cart_items_count ?? 0),
+                                                Placeholder::make('reviews_count')
+                                                    ->label(__('admin.customers.reviews_written'))
+                                                    ->content(fn($record) => $record?->reviews_count ?? 0),
+                                                Placeholder::make('wishlist_count')
+                                                    ->label(__('admin.customers.wishlist_items'))
+                                                    ->content(fn($record) => $record?->wishlist()->count() ?? 0),
+                                            ]),
+                                    ]),
+                            ]),
+                        Tab::make(__('admin.customers.additional_information'))
+                            ->icon('heroicon-o-information-circle')
+                            ->schema([
+                                Section::make(__('admin.customers.metadata'))
+                                    ->schema([
+                                        KeyValue::make('metadata')
+                                            ->label(__('admin.customers.metadata'))
+                                            ->keyLabel(__('admin.customers.key'))
+                                            ->valueLabel(__('admin.customers.value'))
+                                            ->addActionLabel(__('admin.customers.add_metadata'))
+                                            ->helperText(__('admin.customers.metadata_help')),
+                                    ]),
+                                Section::make(__('admin.customers.system_information'))
+                                    ->schema([
+                                        Grid::make(2)
+                                            ->schema([
+                                                Placeholder::make('created_at')
+                                                    ->label(__('admin.customers.created_at'))
+                                                    ->content(fn($record) => $record?->created_at?->format('d/m/Y H:i')),
+                                                Placeholder::make('updated_at')
+                                                    ->label(__('admin.customers.updated_at'))
+                                                    ->content(fn($record) => $record?->updated_at?->format('d/m/Y H:i')),
+                                            ]),
+                                    ]),
+                            ]),
                     ])
-                    ->columns(2),
-                Section::make(__('Account Status'))
-                    ->schema([
-                        Forms\Components\Toggle::make('is_active')
-                            ->label(__('Active Account'))
-                            ->helperText(__('Inactive accounts cannot place orders'))
-                            ->default(true),
-                        Forms\Components\Select::make('timezone')
-                            ->label(__('Timezone'))
-                            ->options([
-                                'UTC' => 'UTC',
-                                'Europe/Vilnius' => 'Europe/Vilnius',
-                                'Europe/London' => 'Europe/London',
-                                'America/New_York' => 'America/New_York',
-                            ])
-                            ->default('Europe/Vilnius')
-                            ->searchable(),
-                        Forms\Components\DateTimePicker::make('last_login_at')
-                            ->label(__('Last Login'))
-                            ->disabled()
-                            ->dehydrated(false),
-                        Forms\Components\TextInput::make('last_login_ip')
-                            ->label(__('Last Login IP'))
-                            ->disabled()
-                            ->dehydrated(false),
-                    ])
-                    ->columns(2),
-                Section::make(__('Customer Preferences'))
-                    ->schema([
-                        Forms\Components\KeyValue::make('preferences')
-                            ->label(__('Preferences'))
-                            ->keyLabel(__('Setting'))
-                            ->valueLabel(__('Value'))
-                            ->helperText(__('Customer preferences and settings')),
-                    ]),
-                Section::make(__('Password Management'))
-                    ->schema([
-                        Forms\Components\TextInput::make('password')
-                            ->label(__('New Password'))
-                            ->password()
-                            ->dehydrateStateUsing(fn($state) => Hash::make($state))
-                            ->dehydrated(fn($state) => filled($state))
-                            ->helperText(__('Leave blank to keep current password')),
-                        Forms\Components\TextInput::make('password_confirmation')
-                            ->label(__('Confirm Password'))
-                            ->password()
-                            ->same('password')
-                            ->dehydrated(false),
-                    ])
-                    ->columns(2)
-                    ->hiddenOn('view'),
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -135,186 +306,264 @@ final class CustomerManagementResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('avatar_url')
-                    ->label(__('Avatar'))
-                    ->circular()
-                    ->defaultImageUrl(fn(User $record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->name) . '&background=6366f1&color=fff')
-                    ->size(50),
-                Tables\Columns\TextColumn::make('name')
-                    ->label(__('Name'))
+                TextColumn::make('name')
+                    ->label(__('admin.customers.name'))
                     ->searchable()
                     ->sortable()
-                    ->weight('medium'),
-                Tables\Columns\TextColumn::make('email')
-                    ->label(__('Email'))
-                    ->searchable()
+                    ->weight('bold')
                     ->copyable()
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('email_verified_at')
-                    ->label(__('Verified'))
-                    ->boolean()
-                    ->getStateUsing(fn(User $record): bool => !is_null($record->email_verified_at))
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('orders_count')
-                    ->label(__('Orders'))
+                    ->copyMessage(__('admin.customers.name_copied')),
+                TextColumn::make('email')
+                    ->label(__('admin.customers.email'))
+                    ->searchable()
+                    ->sortable()
+                    ->copyable()
+                    ->copyMessage(__('admin.customers.email_copied'))
+                    ->icon('heroicon-m-envelope'),
+                TextColumn::make('phone')
+                    ->label(__('admin.customers.phone'))
+                    ->searchable()
+                    ->sortable()
+                    ->placeholder(__('admin.customers.no_phone'))
+                    ->icon('heroicon-m-phone'),
+                BadgeColumn::make('preferred_locale')
+                    ->label(__('admin.customers.language'))
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'lt' => __('admin.locales.lithuanian'),
+                        'en' => __('admin.locales.english'),
+                        'de' => __('admin.locales.german'),
+                        default => $state,
+                    })
+                    ->colors([
+                        'primary' => 'lt',
+                        'success' => 'en',
+                        'warning' => 'de',
+                    ]),
+                TextColumn::make('customerGroups.name')
+                    ->label(__('admin.customers.customer_groups'))
+                    ->badge()
+                    ->separator(', ')
+                    ->color('info')
+                    ->limit(2)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (count($state) <= 2) {
+                            return null;
+                        }
+                        return collect($state)->pluck('name')->join(', ');
+                    }),
+                TextColumn::make('orders_count')
+                    ->label(__('admin.customers.orders'))
                     ->numeric()
                     ->sortable()
-                    ->badge()
-                    ->color('primary'),
-                Tables\Columns\TextColumn::make('orders_sum_total')
-                    ->label(__('Total Spent'))
-                    ->money('EUR')
-                    ->sortable()
-                    ->summarize([
-                        Tables\Columns\Summarizers\Sum::make()
-                            ->money('EUR')
-                            ->label(__('Total Customer Value')),
-                    ]),
-                Tables\Columns\TextColumn::make('last_order_date')
-                    ->label(__('Last Order'))
-                    ->getStateUsing(fn(User $record): ?string => $record->orders()->latest()->first()?->created_at?->diffForHumans())
-                    ->placeholder(__('No orders'))
+                    ->alignCenter()
+                    ->icon('heroicon-m-shopping-bag'),
+                TextColumn::make('total_spent')
+                    ->label(__('admin.customers.total_spent'))
+                    ->getStateUsing(function ($record) {
+                        $total = $record->orders()->sum('total');
+                        return $total ? '€' . number_format($total, 2) : '€0.00';
+                    })
                     ->sortable(query: function (Builder $query, string $direction): Builder {
-                        return $query->withMax('orders', 'created_at')->orderBy('orders_max_created_at', $direction);
-                    }),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label(__('Active'))
+                        return $query
+                            ->withSum('orders', 'total')
+                            ->orderBy('orders_sum_total', $direction);
+                    })
+                    ->alignEnd()
+                    ->color('success'),
+                IconColumn::make('is_active')
+                    ->label(__('admin.customers.status'))
                     ->boolean()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('preferred_locale')
-                    ->label(__('Language'))
-                    ->badge()
-                    ->color('secondary')
-                    ->formatStateUsing(fn(string $state): string => strtoupper($state))
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Registered'))
-                    ->date('Y-m-d')
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
+                IconColumn::make('email_verified_at')
+                    ->label(__('admin.customers.email_verified'))
+                    ->boolean()
+                    ->getStateUsing(fn($record) => !is_null($record->email_verified_at))
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-exclamation-triangle')
+                    ->trueColor('success')
+                    ->falseColor('warning'),
+                TextColumn::make('last_login_at')
+                    ->label(__('admin.customers.last_login'))
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->placeholder(__('admin.customers.never_logged_in'))
+                    ->since()
+                    ->tooltip(fn($record) => $record->last_login_at?->format('d/m/Y H:i:s')),
+                TextColumn::make('created_at')
+                    ->label(__('admin.customers.created_at'))
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->label(__('admin.customers.updated_at'))
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('email_verified_at')
-                    ->label(__('Email Verified'))
-                    ->placeholder(__('All'))
-                    ->trueLabel(__('Verified'))
-                    ->falseLabel(__('Unverified'))
+                SelectFilter::make('is_active')
+                    ->label(__('admin.customers.status'))
+                    ->options([
+                        1 => __('admin.customers.active'),
+                        0 => __('admin.customers.inactive'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['value'] !== null,
+                            fn(Builder $query, $value): Builder => $query->where('is_active', $value),
+                        );
+                    }),
+                SelectFilter::make('preferred_locale')
+                    ->label(__('admin.customers.language'))
+                    ->options([
+                        'lt' => __('admin.locales.lithuanian'),
+                        'en' => __('admin.locales.english'),
+                        'de' => __('admin.locales.german'),
+                    ]),
+                SelectFilter::make('customerGroups')
+                    ->label(__('admin.customers.customer_groups'))
+                    ->relationship('customerGroups', 'name')
+                    ->multiple()
+                    ->preload(),
+                TernaryFilter::make('email_verified_at')
+                    ->label(__('admin.customers.email_verified'))
+                    ->nullable()
+                    ->trueLabel(__('admin.customers.verified'))
+                    ->falseLabel(__('admin.customers.unverified'))
                     ->queries(
                         true: fn(Builder $query) => $query->whereNotNull('email_verified_at'),
                         false: fn(Builder $query) => $query->whereNull('email_verified_at'),
+                        blank: fn(Builder $query) => $query,
                     ),
-                Tables\Filters\TernaryFilter::make('is_active')
-                    ->label(__('Account Status'))
-                    ->placeholder(__('All'))
-                    ->trueLabel(__('Active'))
-                    ->falseLabel(__('Inactive')),
-                Tables\Filters\SelectFilter::make('preferred_locale')
-                    ->label(__('Language'))
-                    ->options([
-                        'en' => __('English'),
-                        'lt' => __('Lithuanian'),
-                        'de' => __('German'),
+                TernaryFilter::make('has_orders')
+                    ->label(__('admin.customers.has_orders'))
+                    ->nullable()
+                    ->trueLabel(__('admin.customers.with_orders'))
+                    ->falseLabel(__('admin.customers.without_orders'))
+                    ->queries(
+                        true: fn(Builder $query) => $query->has('orders'),
+                        false: fn(Builder $query) => $query->doesntHave('orders'),
+                        blank: fn(Builder $query) => $query,
+                    ),
+                TernaryFilter::make('has_partners')
+                    ->label(__('admin.customers.has_partners'))
+                    ->nullable()
+                    ->trueLabel(__('admin.customers.with_partners'))
+                    ->falseLabel(__('admin.customers.without_partners'))
+                    ->queries(
+                        true: fn(Builder $query) => $query->has('partners'),
+                        false: fn(Builder $query) => $query->doesntHave('partners'),
+                        blank: fn(Builder $query) => $query,
+                    ),
+                DateFilter::make('created_at')
+                    ->label(__('admin.customers.created_at'))
+                    ->displayFormat('d/m/Y'),
+                DateFilter::make('last_login_at')
+                    ->label(__('admin.customers.last_login_at'))
+                    ->displayFormat('d/m/Y'),
+                Filter::make('high_value_customers')
+                    ->label(__('admin.customers.high_value_customers'))
+                    ->query(fn(Builder $query): Builder => $query
+                        ->withSum('orders', 'total')
+                        ->having('orders_sum_total', '>', 1000)),
+                Filter::make('recent_customers')
+                    ->label(__('admin.customers.recent_customers'))
+                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
+                QueryBuilder::make()
+                    ->constraints([
+                        TextConstraint::make('name')
+                            ->label(__('admin.customers.name')),
+                        TextConstraint::make('email')
+                            ->label(__('admin.customers.email')),
+                        TextConstraint::make('phone')
+                            ->label(__('admin.customers.phone')),
+                        RelationshipConstraint::make('customerGroups')
+                            ->label(__('admin.customers.customer_groups'))
+                            ->multiple(),
+                        DateConstraint::make('created_at')
+                            ->label(__('admin.customers.created_at')),
+                        DateConstraint::make('last_login_at')
+                            ->label(__('admin.customers.last_login_at')),
+                        NumberConstraint::make('orders_count')
+                            ->label(__('admin.customers.orders_count')),
                     ]),
-                Tables\Filters\Filter::make('has_orders')
-                    ->label(__('Has Orders'))
-                    ->query(fn(Builder $query): Builder => $query->has('orders'))
-                    ->toggle(),
-                Tables\Filters\Filter::make('high_value_customers')
-                    ->label(__('High Value Customers'))
-                    ->query(fn(Builder $query): Builder => $query->whereHas('orders', function (Builder $subQuery) {
-                        $subQuery->havingRaw('SUM(total) > 1000');
-                    }))
-                    ->toggle(),
             ])
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                Actions\Action::make('view_orders')
-                    ->label(__('View Orders'))
-                    ->icon('heroicon-o-shopping-bag')
-                    ->url(fn(User $record): string => OrderResource::getUrl('index', ['tableFilters' => ['user' => ['value' => $record->id]]])),
-                Actions\Action::make('send_email')
-                    ->label(__('Send Email'))
-                    ->icon('heroicon-o-envelope')
-                    ->color('primary')
-                    ->form([
-                        Forms\Components\TextInput::make('subject')
-                            ->label(__('Subject'))
-                            ->required(),
-                        Forms\Components\Textarea::make('message')
-                            ->label(__('Message'))
-                            ->required()
-                            ->rows(5),
-                    ])
-                    ->action(function (User $record, array $data): void {
-                        // Send email logic here
-                        // Mail::to($record->email)->send(new CustomerEmail($data['subject'], $data['message']));
-                    })
-                    ->requiresConfirmation(),
+            ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->label(__('admin.actions.view')),
+                Tables\Actions\EditAction::make()
+                    ->label(__('admin.actions.edit')),
+                Tables\Actions\DeleteAction::make()
+                    ->label(__('admin.actions.delete')),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
-                    BulkAction::make('activate_accounts')
-                        ->label(__('Activate Accounts'))
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->action(fn($records) => $records->each(fn(User $record) => $record->update(['is_active' => true])))
-                        ->requiresConfirmation(),
-                    BulkAction::make('deactivate_accounts')
-                        ->label(__('Deactivate Accounts'))
-                        ->icon('heroicon-o-x-circle')
-                        ->color('danger')
-                        ->action(fn($records) => $records->each(fn(User $record) => $record->update(['is_active' => false])))
-                        ->requiresConfirmation(),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label(__('admin.actions.delete_selected')),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label(__('admin.actions.force_delete_selected')),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->label(__('admin.actions.restore_selected')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
-            ->groups([
-                Tables\Grouping\Group::make('preferred_locale')
-                    ->label(__('Language'))
-                    ->collapsible(),
-                Tables\Grouping\Group::make('is_active')
-                    ->label(__('Status'))
-                    ->getDescriptionFromRecordUsing(fn(User $record): string => $record->is_active ? __('Active') : __('Inactive'))
-                    ->collapsible(),
-            ])
-            ->poll('120s');
+            ->striped()
+            ->paginated([10, 25, 50, 100])
+            ->poll('60s');
     }
 
     public static function getRelations(): array
     {
         return [
-            // You can add relation managers here for orders, addresses, etc.
+            RelationManagers\OrdersRelationManager::class,
+            RelationManagers\AddressesRelationManager::class,
+            RelationManagers\CartItemsRelationManager::class,
+            RelationManagers\ReviewsRelationManager::class,
+            RelationManagers\WishlistRelationManager::class,
+            RelationManagers\DocumentsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCustomerManagement::route('/'),
-            'create' => Pages\CreateCustomerManagement::route('/create'),
-            'view' => Pages\ViewCustomerManagement::route('/{record}'),
-            'edit' => Pages\EditCustomerManagement::route('/{record}/edit'),
+            'index' => Pages\ListCustomers::route('/'),
+            'create' => Pages\CreateCustomer::route('/create'),
+            'view' => Pages\ViewCustomer::route('/{record}'),
+            'edit' => Pages\EditCustomer::route('/{record}/edit'),
         ];
     }
 
-    public static function canAccess(): bool
+    public static function getWidgets(): array
     {
-        return (bool) (auth()->user()?->is_admin ?? false);
+        return [
+            Widgets\CustomerStatsWidget::class,
+            Widgets\CustomerActivityWidget::class,
+            Widgets\CustomerSegmentationWidget::class,
+            Widgets\RecentCustomersWidget::class,
+        ];
     }
 
-    public static function getNavigationBadge(): ?string
+    public static function getGlobalSearchResultTitle($record): string
     {
-        $newCustomers = User::where('is_admin', false)
-            ->where('created_at', '>=', now()->subWeek())
-            ->count();
-
-        return $newCustomers > 0 ? (string) $newCustomers : null;
+        return $record->name . ' (' . $record->email . ')';
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    public static function getGlobalSearchResultDetails($record): array
     {
-        return 'success';
+        return [
+            __('admin.customers.email') => $record->email,
+            __('admin.customers.phone') => $record->phone ?? __('admin.customers.no_phone'),
+            __('admin.customers.customer_groups') => $record->customerGroups->pluck('name')->join(', ') ?: __('admin.customers.no_groups'),
+        ];
+    }
+
+    public static function getGlobalSearchResultUrl($record): string
+    {
+        return self::getUrl('view', ['record' => $record]);
     }
 }

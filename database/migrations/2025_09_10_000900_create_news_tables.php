@@ -11,8 +11,12 @@ return new class extends Migration {
             Schema::create('news', function (Blueprint $table): void {
                 $table->id();
                 $table->boolean('is_visible')->default(true);
+                $table->boolean('is_featured')->default(false);
                 $table->timestamp('published_at')->nullable();
                 $table->string('author_name')->nullable();
+                $table->string('author_email')->nullable();
+                $table->integer('view_count')->default(0);
+                $table->json('meta_data')->nullable();
                 $table->timestamps();
             });
         }

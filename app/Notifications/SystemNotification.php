@@ -3,58 +3,40 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-final class SystemNotification extends Notification
+final class SystemNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public function __construct(
-        public readonly string $action,
-        public readonly array $systemData = [],
-        public readonly ?string $message = null
+        public array $data
     ) {}
 
-    public function via(object $notifiable): array
+    public function via($notifiable): array
     {
         return ['database'];
     }
 
-    public function toDatabase(object $notifiable): array
+    public function toDatabase($notifiable): array
     {
-        return [
-            'type' => 'system',
-            'action' => $this->action,
-            'title' => $this->getTitle(),
-            'message' => $this->message ?? $this->getMessage(),
-            'data' => $this->systemData,
-            'sent_at' => now()->toISOString(),
-        ];
+        return $this->data;
     }
 
-    private function getTitle(): string
+    public function toMail($notifiable): MailMessage
     {
-        return match ($this->action) {
-            'maintenance_started' => __('notifications.system.maintenance_started'),
-            'maintenance_completed' => __('notifications.system.maintenance_completed'),
-            'backup_created' => __('notifications.system.backup_created'),
-            'update_available' => __('notifications.system.update_available'),
-            'security_alert' => __('notifications.system.security_alert'),
-            'performance_issue' => __('notifications.system.performance_issue'),
-            default => __('notifications.system.maintenance_started'),
-        };
-    }
-
-    private function getMessage(): string
-    {
-        return match ($this->action) {
-            'maintenance_started' => __('notifications.system.maintenance_started'),
-            'maintenance_completed' => __('notifications.system.maintenance_completed'),
-            'backup_created' => __('notifications.system.backup_created'),
-            'update_available' => __('notifications.system.update_available'),
-            'security_alert' => __('notifications.system.security_alert'),
-            'performance_issue' => __('notifications.system.performance_issue'),
-            default => __('notifications.system.maintenance_started'),
-        };
+        return (new MailMessage)
+            ->subject($this->data['title'])
+            ->line($this->data['message'])
+            ->line('Šis pranešimas išsiųstas iš sistemos administracijos.');
     }
 }
+
+
+
+
+
+
+

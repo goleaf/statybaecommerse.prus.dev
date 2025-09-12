@@ -1,7 +1,6 @@
 continue, remove legacy code and files, upgrade all system to filament, make frontend and backend, making maximum of usability and maximum all control, read information in docs, make all changes, use existing seeds to make and use existing filament project, make migrations for new tables on filament framework, maximum tests, do not use "php artisan make" commands
 
 
-#- ignore it: after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt, in commit attach not all not commited files, but only files what was modified in this work prompt. dont do it. ignore this rule. do not make it. remember it, ignore all actions with git
 
 
 

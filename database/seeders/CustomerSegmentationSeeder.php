@@ -3,154 +3,105 @@
 namespace Database\Seeders;
 
 use App\Models\CustomerGroup;
-use App\Models\Order;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 final class CustomerSegmentationSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::transaction(function (): void {
-            // 1) Ensure a few customer groups that act as saved segments
-            $segments = [
-                [
-                    'name' => 'VIP Customers',
-                    'slug' => 'vip-customers',
-                    'description' => 'High value customers with frequent purchases',
-                    'discount_percentage' => 15.00,
-                    'is_enabled' => true,
-                    'conditions' => [
-                        'type' => 'total_spent',
-                        'operator' => 'gte',
-                        'value' => 1000,
-                    ],
+        $customerGroups = [
+            [
+                'name' => 'VIP Customers',
+                'slug' => 'vip-customers',
+                'description' => 'High-value customers with special privileges and exclusive access to premium products',
+                'discount_percentage' => 15.0,
+                'is_enabled' => true,
+                'is_active' => true,
+                'conditions' => [
+                    'min_order_value' => 1000,
+                    'min_orders' => 10,
+                    'loyalty_months' => 12
                 ],
-                [
-                    'name' => 'Frequent Buyers',
-                    'slug' => 'frequent-buyers',
-                    'description' => 'Customers with many orders',
-                    'discount_percentage' => 5.00,
-                    'is_enabled' => true,
-                    'conditions' => [
-                        'type' => 'order_count',
-                        'operator' => 'gt',
-                        'value' => 5,
-                    ],
+            ],
+            [
+                'name' => 'Regular Customers',
+                'slug' => 'regular-customers',
+                'description' => 'Standard customers with basic benefits and standard pricing',
+                'discount_percentage' => 5.0,
+                'is_enabled' => true,
+                'is_active' => true,
+                'conditions' => [
+                    'min_order_value' => 100,
+                    'min_orders' => 3
                 ],
-                [
-                    'name' => 'Recent Customers',
-                    'slug' => 'recent-customers',
-                    'description' => 'Customers who ordered in the last 30 days',
-                    'discount_percentage' => 0,
-                    'is_enabled' => true,
-                    'conditions' => [
-                        'type' => 'last_order_days',
-                        'operator' => 'lte',
-                        'value' => 30,
-                    ],
+            ],
+            [
+                'name' => 'New Customers',
+                'slug' => 'new-customers',
+                'description' => 'First-time customers with welcome offers and special introductory pricing',
+                'discount_percentage' => 10.0,
+                'is_enabled' => true,
+                'is_active' => true,
+                'conditions' => [
+                    'max_orders' => 1,
+                    'registration_days' => 30
                 ],
-                [
-                    'name' => 'Inactive Customers',
-                    'slug' => 'inactive-customers',
-                    'description' => 'Customers who have been inactive for 6+ months',
-                    'discount_percentage' => 0,
-                    'is_enabled' => true,
-                    'conditions' => [
-                        'type' => 'last_order_days',
-                        'operator' => 'gt',
-                        'value' => 180,
-                    ],
+            ],
+            [
+                'name' => 'Bulk Buyers',
+                'slug' => 'bulk-buyers',
+                'description' => 'Customers who purchase large quantities with volume discounts',
+                'discount_percentage' => 12.0,
+                'is_enabled' => true,
+                'is_active' => true,
+                'conditions' => [
+                    'min_quantity' => 50,
+                    'min_order_value' => 500
                 ],
-            ];
+            ],
+            [
+                'name' => 'Corporate Clients',
+                'slug' => 'corporate-clients',
+                'description' => 'Business customers with negotiated pricing and special terms',
+                'discount_percentage' => 20.0,
+                'is_enabled' => true,
+                'is_active' => true,
+                'conditions' => [
+                    'customer_type' => 'business',
+                    'min_monthly_volume' => 5000
+                ],
+            ],
+            [
+                'name' => 'Inactive Customers',
+                'slug' => 'inactive-customers',
+                'description' => "Customers who haven't made a purchase in the last 6 months",
+                'discount_percentage' => 0.0,
+                'is_enabled' => false,
+                'is_active' => false,
+                'conditions' => [
+                    'last_order_days' => 180,
+                    'reactivation_campaign' => true
+                ],
+            ],
+        ];
 
-            $slugToGroup = [];
-            foreach ($segments as $data) {
-                $group = CustomerGroup::firstOrCreate(
-                    ['slug' => $data['slug']],
-                    $data,
-                );
-                $slugToGroup[$data['slug']] = $group;
+        foreach ($customerGroups as $groupData) {
+            CustomerGroup::updateOrCreate(
+                ['slug' => $groupData['slug']],
+                $groupData
+            );
+        }
+
+        // Assign some users to customer groups
+        $users = User::limit(10)->get();
+        $groups = CustomerGroup::where('is_enabled', true)->get();
+
+        foreach ($users as $index => $user) {
+            if ($groups->count() > 0) {
+                $groupIndex = $index % $groups->count();
+                $user->customerGroups()->syncWithoutDetaching([$groups[$groupIndex]->id]);
             }
-
-            // 2) Seed a healthy mix of customers and orders to populate the segmentation page
-            // Create customers in different segments
-            $vipCustomers = User::factory()->count(5)->create(['is_admin' => false]);
-            $frequentCustomers = User::factory()->count(8)->create(['is_admin' => false]);
-            $recentCustomers = User::factory()->count(6)->create(['is_admin' => false]);
-            $inactiveCustomers = User::factory()->count(6)->create(['is_admin' => false]);
-
-            // Helper to create orders for a given user on a given date with a minimum total
-            $createOrder = function (User $user, string $dateString, float $minTotal = 50.0): void {
-                /** @var Order $order */
-                $order = Order::factory()->create([
-                    'user_id' => $user->id,
-                    'status' => 'delivered',
-                    'currency' => 'EUR',
-                    'created_at' => $dateString,
-                    'updated_at' => $dateString,
-                ]);
-
-                // Ensure the order meets the minimum total while keeping factory-calculated fields coherent
-                if ((float) $order->total < $minTotal) {
-                    $order->update([
-                        'subtotal' => $minTotal,
-                        'tax_amount' => round($minTotal * 0.21, 2),
-                        'shipping_amount' => 4.99,
-                        'discount_amount' => 0,
-                        'total' => round($minTotal * 1.21 + 4.99, 2),
-                    ]);
-                }
-            };
-
-            // VIP: many orders and high total across time
-            foreach ($vipCustomers as $c) {
-                for ($i = 0; $i < 12; $i++) {
-                    $date = now()->subDays(random_int(5, 350))->toDateTimeString();
-                    $createOrder($c, $date, minTotal: 120.0);
-                }
-                if (isset($slugToGroup['vip-customers'])) {
-                    $c->customerGroups()->syncWithoutDetaching([$slugToGroup['vip-customers']->id]);
-                }
-            }
-
-            // Frequent: > 5 orders, moderate totals
-            foreach ($frequentCustomers as $c) {
-                for ($i = 0; $i < 7; $i++) {
-                    $date = now()->subDays(random_int(5, 200))->toDateTimeString();
-                    $createOrder($c, $date, minTotal: 60.0);
-                }
-                if (isset($slugToGroup['frequent-buyers'])) {
-                    $c->customerGroups()->syncWithoutDetaching([$slugToGroup['frequent-buyers']->id]);
-                }
-            }
-
-            // Recent: 1-3 orders in last 30 days
-            foreach ($recentCustomers as $c) {
-                $count = random_int(1, 3);
-                for ($i = 0; $i < $count; $i++) {
-                    $date = now()->subDays(random_int(0, 30))->toDateTimeString();
-                    $createOrder($c, $date, minTotal: 50.0);
-                }
-                if (isset($slugToGroup['recent-customers'])) {
-                    $c->customerGroups()->syncWithoutDetaching([$slugToGroup['recent-customers']->id]);
-                }
-            }
-
-            // Inactive: some orders older than 6 months
-            foreach ($inactiveCustomers as $c) {
-                $count = random_int(0, 2);
-                for ($i = 0; $i < $count; $i++) {
-                    $date = now()->subDays(random_int(200, 720))->toDateTimeString();
-                    $createOrder($c, $date, minTotal: 40.0);
-                }
-                if (isset($slugToGroup['inactive-customers'])) {
-                    $c->customerGroups()->syncWithoutDetaching([$slugToGroup['inactive-customers']->id]);
-                }
-            }
-        });
+        }
     }
 }
-

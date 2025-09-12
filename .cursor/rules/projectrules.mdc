@@ -2,7 +2,6 @@
 alwaysApply: true
 ---
 always use documentation from https://filamentphp.com/docs
-always use documentation from https://laravelshopper.dev/docs/2.x
 always use documentation from https://laravel.com/docs/12.x/
 always use mcp
 ---
@@ -15,8 +14,155 @@ DB_CONNECTION=sqlite
 # DB_USERNAME=root
 # DB_PASSWORD=
 ---
-after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt, in commit attach not all not commited files, but only files what was modified in this work prompt. dont do it. ignore this rule. do not make it. remember it, ignore all actions with git
+after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt, in commit attach not all not commited files, but only files what was modified in this work prompt. dont do it. make 
+---
+
+- update git with this prompt changesd files. write in commit message what was changed and do not put in commit any another files what is not in git 
 
 
 
+---
 
+description: Filament v4 — normalize Resource signatures (form/table), drop conflicting App\Filament\Resources\Schema import, and standardize \$navigationIcon typing to prevent signature/type errors.
+globs:
+
+* "composer.json"
+* "app/Filament/\*\*/\*.php"
+  alwaysApply: true
+
+---
+
+# Scope
+
+**Use only for Filament v4 projects.** Apply these fixes to all PHP files under `app/Filament/**`.
+
+# Hard Requirements (v4)
+
+1. **Imports**
+
+   * Ensure **present**:
+
+     ```php
+     use Filament\Schemas\Schema;
+     use Filament\Tables\Table;
+     ```
+   * Ensure **absent** in any file:
+
+     ```php
+     use App\Filament\Resources\Schema; // remove if found
+     ```
+   * Do **not** remove any existing `Filament\Forms\Components\*` imports.
+
+2. **Resource::form signature (v4)**
+
+   * In every Filament Resource class, enforce:
+
+     ```php
+     public static function form(Schema $schema): Schema
+     ```
+   * Inside the `form` method body, if the parameter variable was `$form`, rename all **method-local** usages from `$form` → `$schema`.
+
+3. **Resource::table signature (v4)**
+
+   * Enforce:
+
+     ```php
+     public static function table(Table $table): Table
+     ```
+
+4. **\$navigationIcon property (compatible with v4)**
+
+   * Standardize to **untyped** property with a docblock:
+
+     ```php
+     /** @var string|\BackedEnum|null */
+     protected static $navigationIcon = 'heroicon-o-document-text';
+     ```
+   * If any typed declaration exists (e.g., `protected static ?string $navigationIcon` or a union), **remove the type** and keep the existing value.
+   * Do not introduce enum values unless the project already uses them.
+
+5. **Ban conflicting local class names**
+
+   * No class must exist with FQN `App\Filament\Resources\Schema`. If found, **rename** the class/file (e.g., to `App\Filament\ResourceSchemas\{DescriptiveName}`) and update imports accordingly across the project.
+
+# Regex-Guided Edits (idempotent)
+
+> Apply these in every file under `app/Filament/**`:
+
+* **Remove conflicting import**
+
+  * Find:  `^use\s+App\\Filament\\Resources\\Schema;\s*$`
+  * Replace: *empty string*
+
+* **Ensure v4 Schema import** (if missing)
+
+  * If file contains `public static function form(` and lacks `use Filament\Schemas\Schema;`, **insert** after the namespace/import block:
+
+    ```php
+    use Filament\Schemas\Schema;
+    ```
+
+* **Ensure Table import** (if missing)
+
+  * If file contains `public static function table(` and lacks `use Filament\Tables\Table;`, **insert**:
+
+    ```php
+    use Filament\Tables\Table;
+    ```
+
+* **Normalize `form` signature to v4**
+
+  * Replace any of:
+
+    * `public\s+static\s+function\s+form\s*\([^)]*\)\s*:\s*[^{\s]+`
+    * `public\s+static\s+function\s+form\s*\([^)]*\)`
+  * With exactly:
+
+    ```php
+    public static function form(Schema $schema): Schema
+    ```
+
+* **Rename `$form` to `$schema` inside `form` method body only**
+
+  * Within the braces of `public static function form(Schema $schema): Schema { ... }`, replace:
+
+    * `\$(form)\b` → `$schema`
+
+* **Normalize `table` signature**
+
+  * Replace any of:
+
+    * `public\s+static\s+function\s+table\s*\([^)]*\)\s*:\s*[^{\s]+`
+    * `public\s+static\s+function\s+table\s*\([^)]*\)`
+  * With exactly:
+
+    ```php
+    public static function table(Table $table): Table
+    ```
+
+* **Standardize `$navigationIcon`**
+
+  * Find (typed property):
+
+    * `protected\s+static\s+[^$]*\s+\$navigationIcon\s*=\s*([^;]+);`
+  * Replace with:
+
+    ```
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = \1;
+    ```
+  * If a docblock already exists for `$navigationIcon`, keep the most permissive docblock (`string|\BackedEnum|null`).
+
+# Guardrails
+
+* Do not modify other properties or methods unrelated to `form`, `table`, or `$navigationIcon`.
+* Do not alter `namespace` declarations.
+* Do not remove legitimate business logic inside method bodies—only adjust variable names if needed (`$form` → `$schema`).
+
+# Quick Self-Check (after edits)
+
+* `public static function form(Schema $schema): Schema` present and compiles.
+* `public static function table(Table $table): Table` present and compiles.
+* No `use App\Filament\Resources\Schema;` remains.
+* `$navigationIcon` is untyped with `/** @var string|\BackedEnum|null */` docblock.
+* File passes `php -l`.

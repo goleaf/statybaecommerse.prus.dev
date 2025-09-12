@@ -14,3 +14,12 @@ Route::prefix('campaigns')->name('campaigns.')->group(function () {
     Route::post('/{campaign}/click', [CampaignController::class, 'click'])->name('click');
     Route::post('/{campaign}/conversion', [CampaignController::class, 'conversion'])->name('conversion');
 });
+
+
+
+
+
+
+
+
+

@@ -49,6 +49,18 @@
                             <div class="prose prose-sm mt-4 text-gray-500">
                                 {!! $product->trans('description') ?? $product->description !!}
                             </div>
+                            
+                            <!-- Product History Link -->
+                            <div class="mt-4">
+                                <a href="{{ route('localized.products.history', [
+                                    'locale' => app()->getLocale(),
+                                    'product' => $product->trans('slug') ?? $product->slug,
+                                ]) }}" 
+                                   class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500">
+                                    <x-heroicon-s-clock class="mr-1 h-4 w-4" />
+                                    {{ __('frontend.products.view_history') }}
+                                </a>
+                            </div>
                         </div>
 
                         <x-product.additionnal-infos
@@ -115,6 +127,27 @@
             </div>
         </x-container>
     </div>
+
+    {{-- Related Products Section --}}
+    <livewire:components.related-products :product="$product" />
+
+    {{-- Additional Product Recommendations --}}
+    @if($product->brand)
+        <div class="bg-gray-50">
+            <livewire:components.advanced-related-products 
+                :product="$product" 
+                type="brand" 
+                :limit="4" 
+                class="bg-gray-50" />
+        </div>
+    @endif
+
+    @if($product->categories->isNotEmpty())
+        <livewire:components.advanced-related-products 
+            :product="$product" 
+            type="category" 
+            :limit="4" />
+    @endif
 </div>
 
 @push('scripts')

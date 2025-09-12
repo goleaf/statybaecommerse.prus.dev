@@ -40,6 +40,14 @@ final class Brand extends Model implements HasMedia
 
     protected $table = 'brands';
     protected string $translationModel = \App\Models\Translations\BrandTranslation::class;
+    
+    protected $translatable = [
+        'name',
+        'slug', 
+        'description',
+        'seo_title',
+        'seo_description',
+    ];
 
     protected static function booted(): void
     {
@@ -109,7 +117,7 @@ final class Brand extends Model implements HasMedia
             return $this->getFirstMediaUrl('logo') ?: null;
         }
 
-        return $this->getFirstMediaUrl('logo', "logo-{$size}") ?: $this->getFirstMediaUrl('logo');
+        return $this->getFirstMediaUrl('logo', "logo-{$size}") ?: $this->getFirstMediaUrl('logo') ?: null;
     }
 
     public function getBannerUrl(?string $size = null): ?string
@@ -118,7 +126,42 @@ final class Brand extends Model implements HasMedia
             return $this->getFirstMediaUrl('banner') ?: null;
         }
 
-        return $this->getFirstMediaUrl('banner', "banner-{$size}") ?: $this->getFirstMediaUrl('banner');
+        return $this->getFirstMediaUrl('banner', "banner-{$size}") ?: $this->getFirstMediaUrl('banner') ?: null;
+    }
+
+    public function getTranslatedName(?string $locale = null): string
+    {
+        return $this->trans('name', $locale) ?: $this->name;
+    }
+
+    public function getTranslatedSlug(?string $locale = null): string
+    {
+        return $this->trans('slug', $locale) ?: $this->slug;
+    }
+
+    public function getTranslatedDescription(?string $locale = null): ?string
+    {
+        return $this->trans('description', $locale) ?: $this->description;
+    }
+
+    public function getTranslatedSeoTitle(?string $locale = null): ?string
+    {
+        return $this->trans('seo_title', $locale) ?: $this->seo_title;
+    }
+
+    public function getTranslatedSeoDescription(?string $locale = null): ?string
+    {
+        return $this->trans('seo_description', $locale) ?: $this->seo_description;
+    }
+
+    public function hasTranslation(string $locale): bool
+    {
+        return $this->translations()->where('locale', $locale)->exists();
+    }
+
+    public function getAvailableLocales(): array
+    {
+        return $this->translations()->pluck('locale')->toArray();
     }
 
     public function registerMediaCollections(): void

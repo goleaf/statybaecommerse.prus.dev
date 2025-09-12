@@ -1,328 +1,128 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Page;
+use App\Models\Product;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Route;
 
-class SitemapController extends Controller
+final class SitemapController extends Controller
 {
     public function index(): Response
     {
-        // Resolve table names (supports sh_* prefixed fallback for tests)
-        $tables = $this->resolveTables();
-        $locales = collect(explode(',', (string) config('app.supported_locales', 'en')))
-            ->map(fn($v) => trim($v))
-            ->filter()
-            ->values();
-        $urls = [];
-        foreach ($locales as $loc) {
-            $cached = Cache::get("sitemap:urls:{$loc}");
-            if (is_array($cached)) {
-                $urls = array_merge($urls, $cached);
+        $sitemap = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $sitemap .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
-                continue;
-            }
+        $supportedLocales = config('app.supported_locales', ['lt', 'en', 'de', 'ru']);
 
-            // Home & index pages per locale
-            $urls[] = url('/' . $loc);
-            $urls[] = url('/' . $loc . '/categories');
-            $urls[] = url('/' . $loc . '/collections');
-            $urls[] = url('/' . $loc . '/brands');
-
-            // Categories with translated slugs fallback to base slug
-            if (!Schema::hasTable($tables['categories'])) {
-                continue;  // Skip dynamic sections when tables are missing in testing
-            }
-            $categoryQuery = DB::table($tables['categories'] . ' as c')
-                ->leftJoin($tables['category_translations'] . ' as t', function ($join) use ($loc) {
-                    $join->on('t.category_id', '=', 'c.id')->where('t.locale', '=', $loc);
-                })
-                ->limit(1000)
-                ->selectRaw('COALESCE(t.slug, c.slug) as slug');
-            if (Schema::hasColumn($tables['categories'], 'is_enabled')) {
-                $categoryQuery->where('c.is_enabled', true);
-            }
-            $categorySlugs = $categoryQuery->pluck('slug');
-            foreach ($categorySlugs as $slug) {
-                $urls[] = url('/' . $loc . '/categories/' . $slug);
-            }
-
-            // Collections
-            if (!Schema::hasTable($tables['collections'])) {
-                continue;
-            }
-            $collectionQuery = DB::table($tables['collections'] . ' as c')
-                ->leftJoin($tables['collection_translations'] . ' as t', function ($join) use ($loc) {
-                    $join->on('t.collection_id', '=', 'c.id')->where('t.locale', '=', $loc);
-                })
-                ->limit(1000)
-                ->selectRaw('COALESCE(t.slug, c.slug) as slug');
-            if (Schema::hasColumn($tables['collections'], 'is_enabled')) {
-                $collectionQuery->where('c.is_enabled', true);
-            }
-            $collectionSlugs = $collectionQuery->pluck('slug');
-            foreach ($collectionSlugs as $slug) {
-                $urls[] = url('/' . $loc . '/collections/' . $slug);
-            }
-
-            // Brands
-            if (!Schema::hasTable($tables['brands'])) {
-                continue;
-            }
-            $brandQuery = DB::table($tables['brands'] . ' as b')
-                ->leftJoin($tables['brand_translations'] . ' as t', function ($join) use ($loc) {
-                    $join->on('t.brand_id', '=', 'b.id')->where('t.locale', '=', $loc);
-                })
-                ->limit(1000)
-                ->selectRaw('COALESCE(t.slug, b.slug) as slug');
-            if (Schema::hasColumn($tables['brands'], 'is_enabled')) {
-                $brandQuery->where('b.is_enabled', true);
-            }
-            $brandSlugs = $brandQuery->pluck('slug');
-            foreach ($brandSlugs as $slug) {
-                $urls[] = url('/' . $loc . '/brands/' . $slug);
-            }
-
-            // Products (visible & published)
-            if (!Schema::hasTable($tables['products'])) {
-                continue;
-            }
-            $productQuery = DB::table($tables['products'] . ' as p')
-                ->leftJoin($tables['product_translations'] . ' as t', function ($join) use ($loc) {
-                    $join->on('t.product_id', '=', 'p.id')->where('t.locale', '=', $loc);
-                })
-                ->limit(5000)
-                ->selectRaw('COALESCE(t.slug, p.slug) as slug');
-            if (Schema::hasColumn($tables['products'], 'is_visible')) {
-                $productQuery->where('p.is_visible', true);
-            }
-            if (Schema::hasColumn($tables['products'], 'published_at')) {
-                $productQuery->whereNotNull('p.published_at')->where('p.published_at', '<=', now());
-            }
-            $productSlugs = $productQuery->pluck('slug');
-            foreach ($productSlugs as $slug) {
-                $urls[] = url('/' . $loc . '/products/' . $slug);
-            }
-
-            // Legal pages (enabled) with translated slugs
-            if (!Schema::hasTable($tables['legals'])) {
-                continue;
-            }
-            $legalQuery = DB::table($tables['legals'] . ' as l')
-                ->leftJoin($tables['legal_translations'] . ' as t', function ($join) use ($loc) {
-                    $join->on('t.legal_id', '=', 'l.id')->where('t.locale', '=', $loc);
-                })
-                ->selectRaw('COALESCE(t.slug, l.slug) as slug');
-            if (Schema::hasColumn($tables['legals'], 'is_enabled')) {
-                $legalQuery->where('l.is_enabled', true);
-            }
-            $legalSlugs = $legalQuery->pluck('slug');
-            foreach ($legalSlugs as $slug) {
-                $urls[] = url('/' . $loc . '/legal/' . $slug);
-            }
-
-            // Cache per-locale URLs for 1 day
-            $perLocale = array_values(array_filter($urls, fn($u) => str_starts_with($u, url('/' . $loc))));
-            Cache::put("sitemap:urls:{$loc}", $perLocale, now()->addDay());
+        foreach ($supportedLocales as $locale) {
+            $sitemap .= '  <sitemap>' . "\n";
+            $sitemap .= '    <loc>' . route('sitemap.locale', ['locale' => $locale]) . '</loc>' . "\n";
+            $sitemap .= '    <lastmod>' . now()->toISOString() . '</lastmod>' . "\n";
+            $sitemap .= '  </sitemap>' . "\n";
         }
 
-        // Generate XML directly to avoid Blade compilation issues with XML declaration
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        $sitemap .= '</sitemapindex>';
 
-        foreach ($urls as $url) {
-            $xml .= '    <url>' . "\n";
-            $xml .= '        <loc>' . htmlspecialchars($url) . '</loc>' . "\n";
-            $xml .= '    </url>' . "\n";
-        }
-
-        $xml .= '</urlset>';
-
-        return response($xml, 200)->header('Content-Type', 'application/xml');
-    }
-
-    /**
-     * Generate XML sitemap from URLs array
-     */
-    private function generateXmlSitemap(array $urls): string
-    {
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-
-        foreach ($urls as $url) {
-            $xml .= '    <url>' . "\n";
-            $xml .= '        <loc>' . htmlspecialchars($url) . '</loc>' . "\n";
-            $xml .= '    </url>' . "\n";
-        }
-
-        $xml .= '</urlset>';
-
-        return $xml;
+        return response($sitemap, 200, [
+            'Content-Type' => 'application/xml; charset=utf-8'
+        ]);
     }
 
     public function locale(string $locale): Response
     {
-        $tables = $this->resolveTables();
-        $supported = collect(explode(',', (string) config('app.supported_locales', 'en')))
-            ->map(fn($v) => trim($v))
-            ->filter()
-            ->values();
+        $sitemap = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n";
 
-        if (!$supported->contains($locale)) {
-            $locale = (string) config('app.locale', 'en');
+        // Homepage
+        $sitemap .= $this->generateUrl(
+            route('localized.home', ['locale' => $locale]),
+            now()->toISOString(),
+            'daily',
+            1.0
+        );
+
+        // Categories
+        $categories = Category::where('is_active', true)->get();
+        foreach ($categories as $category) {
+            $sitemap .= $this->generateUrl(
+                route('localized.categories.show', ['locale' => $locale, 'category' => $category->slug]),
+                $category->updated_at->toISOString(),
+                'weekly',
+                0.8
+            );
         }
 
-        if ($cached = Cache::get("sitemap:urls:{$locale}")) {
-            $xml = $this->generateXmlSitemap($cached);
-
-            return response($xml, 200)->header('Content-Type', 'application/xml');
-        }
-
-        $urls = [];
-
-        // Home & index pages per locale
-        $urls[] = url('/' . $locale);
-        $urls[] = url('/' . $locale . '/categories');
-        $urls[] = url('/' . $locale . '/collections');
-        $urls[] = url('/' . $locale . '/brands');
-
-        // Categories with translated slugs fallback to base slug
-        if (!Schema::hasTable($tables['categories'])) {
-            $xml = $this->generateXmlSitemap($urls);
-
-            return response($xml, 200)->header('Content-Type', 'application/xml');
-        }
-        $categoryQuery = DB::table($tables['categories'] . ' as c')
-            ->leftJoin($tables['category_translations'] . ' as t', function ($join) use ($locale) {
-                $join->on('t.category_id', '=', 'c.id')->where('t.locale', '=', $locale);
-            })
-            ->limit(1000)
-            ->selectRaw('COALESCE(t.slug, c.slug) as slug');
-        if (Schema::hasColumn($tables['categories'], 'is_enabled')) {
-            $categoryQuery->where('c.is_enabled', true);
-        }
-        $categorySlugs = $categoryQuery->pluck('slug');
-        foreach ($categorySlugs as $slug) {
-            $urls[] = url('/' . $locale . '/categories/' . $slug);
-        }
-
-        // Collections
-        if (!Schema::hasTable($tables['collections'])) {
-            $xml = $this->generateXmlSitemap($urls);
-
-            return response($xml, 200)->header('Content-Type', 'application/xml');
-        }
-        $collectionQuery = DB::table($tables['collections'] . ' as c')
-            ->leftJoin($tables['collection_translations'] . ' as t', function ($join) use ($locale) {
-                $join->on('t.collection_id', '=', 'c.id')->where('t.locale', '=', $locale);
-            })
-            ->limit(1000)
-            ->selectRaw('COALESCE(t.slug, c.slug) as slug');
-        if (Schema::hasColumn($tables['collections'], 'is_enabled')) {
-            $collectionQuery->where('c.is_enabled', true);
-        }
-        $collectionSlugs = $collectionQuery->pluck('slug');
-        foreach ($collectionSlugs as $slug) {
-            $urls[] = url('/' . $locale . '/collections/' . $slug);
+        // Products
+        $products = Product::where('is_active', true)->get();
+        foreach ($products as $product) {
+            $sitemap .= $this->generateUrl(
+                route('product.show', $product->slug),
+                $product->updated_at->toISOString(),
+                'weekly',
+                0.7
+            );
         }
 
         // Brands
-        if (!Schema::hasTable($tables['brands'])) {
-            $xml = $this->generateXmlSitemap($urls);
-
-            return response($xml, 200)->header('Content-Type', 'application/xml');
-        }
-        $brandQuery = DB::table($tables['brands'] . ' as b')
-            ->leftJoin($tables['brand_translations'] . ' as t', function ($join) use ($locale) {
-                $join->on('t.brand_id', '=', 'b.id')->where('t.locale', '=', $locale);
-            })
-            ->limit(1000)
-            ->selectRaw('COALESCE(t.slug, b.slug) as slug');
-        if (Schema::hasColumn($tables['brands'], 'is_enabled')) {
-            $brandQuery->where('b.is_enabled', true);
-        }
-        $brandSlugs = $brandQuery->pluck('slug');
-        foreach ($brandSlugs as $slug) {
-            $urls[] = url('/' . $locale . '/brands/' . $slug);
+        $brands = Brand::where('is_active', true)->get();
+        foreach ($brands as $brand) {
+            $sitemap .= $this->generateUrl(
+                route('brands.show', $brand->slug),
+                $brand->updated_at->toISOString(),
+                'monthly',
+                0.6
+            );
         }
 
-        // Products (visible & published)
-        if (!Schema::hasTable($tables['products'])) {
-            $xml = $this->generateXmlSitemap($urls);
-
-            return response($xml, 200)->header('Content-Type', 'application/xml');
-        }
-        $productQuery = DB::table($tables['products'] . ' as p')
-            ->leftJoin($tables['product_translations'] . ' as t', function ($join) use ($locale) {
-                $join->on('t.product_id', '=', 'p.id')->where('t.locale', '=', $locale);
-            })
-            ->limit(5000)
-            ->selectRaw('COALESCE(t.slug, p.slug) as slug');
-        if (Schema::hasColumn($tables['products'], 'is_visible')) {
-            $productQuery->where('p.is_visible', true);
-        }
-        if (Schema::hasColumn($tables['products'], 'published_at')) {
-            $productQuery->whereNotNull('p.published_at')->where('p.published_at', '<=', now());
-        }
-        $productSlugs = $productQuery->pluck('slug');
-        foreach ($productSlugs as $slug) {
-            $urls[] = url('/' . $locale . '/products/' . $slug);
-        }
-
-        // Legal pages (enabled) with translated slugs
-        if (!Schema::hasTable($tables['legals'])) {
-            $xml = $this->generateXmlSitemap($urls);
-
-            return response($xml, 200)->header('Content-Type', 'application/xml');
-        }
-        $legalQuery = DB::table($tables['legals'] . ' as l')
-            ->leftJoin($tables['legal_translations'] . ' as t', function ($join) use ($locale) {
-                $join->on('t.legal_id', '=', 'l.id')->where('t.locale', '=', $locale);
-            })
-            ->selectRaw('COALESCE(t.slug, l.slug) as slug');
-        if (Schema::hasColumn($tables['legals'], 'is_enabled')) {
-            $legalQuery->where('l.is_enabled', true);
-        }
-        $legalSlugs = $legalQuery->pluck('slug');
-        foreach ($legalSlugs as $slug) {
-            $urls[] = url('/' . $locale . '/legal/' . $slug);
-        }
-
-        Cache::put("sitemap:urls:{$locale}", $urls, now()->addDay());
-        $xml = $this->generateXmlSitemap($urls);
-
-        return response($xml, 200)->header('Content-Type', 'application/xml');
-    }
-
-    private function resolveTables(): array
-    {
-        // Map of base table names and their sh_* fallbacks used in tests
-        $map = [
-            'categories' => 'sh_categories',
-            'category_translations' => 'sh_category_translations',
-            'collections' => 'sh_collections',
-            'collection_translations' => 'sh_collection_translations',
-            'brands' => 'sh_brands',
-            'brand_translations' => 'sh_brand_translations',
-            'products' => 'sh_products',
-            'product_translations' => 'sh_product_translations',
-            'legals' => 'sh_legals',
-            'legal_translations' => 'sh_legal_translations',
+        // Static pages
+        $staticPages = [
+            'about' => 'monthly',
+            'contact' => 'monthly',
+            'privacy' => 'yearly',
+            'terms' => 'yearly',
+            'shipping' => 'monthly',
+            'returns' => 'monthly',
         ];
 
-        $resolved = [];
-        foreach ($map as $base => $fallback) {
-            // Prefer sh_* tables when present (tests seed these), otherwise use base
-            if (\Illuminate\Support\Facades\Schema::hasTable($fallback)) {
-                $resolved[$base] = $fallback;
-            } else {
-                $resolved[$base] = $base;
+        foreach ($staticPages as $page => $frequency) {
+            if (Route::has("localized.{$page}")) {
+                $sitemap .= $this->generateUrl(
+                    route("localized.{$page}", ['locale' => $locale]),
+                    now()->toISOString(),
+                    $frequency,
+                    0.5
+                );
             }
         }
 
-        return $resolved;
+        $sitemap .= '</urlset>';
+
+        return response($sitemap, 200, [
+            'Content-Type' => 'application/xml; charset=utf-8'
+        ]);
+    }
+
+    private function generateUrl(string $url, string $lastmod, string $changefreq, float $priority): string
+    {
+        $urlXml = '  <url>' . "\n";
+        $urlXml .= '    <loc>' . htmlspecialchars($url) . '</loc>' . "\n";
+        $urlXml .= '    <lastmod>' . $lastmod . '</lastmod>' . "\n";
+        $urlXml .= '    <changefreq>' . $changefreq . '</changefreq>' . "\n";
+        $urlXml .= '    <priority>' . $priority . '</priority>' . "\n";
+
+        // Add hreflang alternatives
+        $supportedLocales = config('app.supported_locales', ['lt', 'en', 'de', 'ru']);
+        foreach ($supportedLocales as $locale) {
+            $alternateUrl = str_replace('/' . app()->getLocale() . '/', '/' . $locale . '/', $url);
+            $urlXml .= '    <xhtml:link rel="alternate" hreflang="' . $locale . '" href="' . htmlspecialchars($alternateUrl) . '" />' . "\n";
+        }
+
+        $urlXml .= '  </url>' . "\n";
+
+        return $urlXml;
     }
 }

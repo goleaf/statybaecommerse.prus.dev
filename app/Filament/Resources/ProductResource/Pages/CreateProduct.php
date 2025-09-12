@@ -5,17 +5,30 @@ namespace App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateProduct extends CreateRecord
+class CreateProduct extends CreateRecord
 {
     protected static string $resource = ProductResource::class;
 
-    public function getTitle(): string
+    protected function getRedirectUrl(): string
     {
-        return __('admin.products.create');
+        return $this->getResource()::getUrl('index');
     }
 
-    public function getSubheading(): ?string
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
-        return __('admin.products.description');
+        // Set default values
+        $data['status'] = $data['status'] ?? 'draft';
+        $data['type'] = $data['type'] ?? 'simple';
+        $data['is_visible'] = $data['is_visible'] ?? true;
+        $data['manage_stock'] = $data['manage_stock'] ?? false;
+        $data['track_stock'] = $data['track_stock'] ?? true;
+        $data['allow_backorder'] = $data['allow_backorder'] ?? false;
+        $data['stock_quantity'] = $data['stock_quantity'] ?? 0;
+        $data['low_stock_threshold'] = $data['low_stock_threshold'] ?? 0;
+        $data['sort_order'] = $data['sort_order'] ?? 0;
+
+        return $data;
     }
 }
+
+

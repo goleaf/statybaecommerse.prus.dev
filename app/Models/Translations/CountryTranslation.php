@@ -13,6 +13,7 @@ final class CountryTranslation extends Model
         'locale',
         'name',
         'name_official',
+        'description',
     ];
 
     public $timestamps = true;

@@ -1,22 +1,33 @@
 <div class="min-h-screen bg-gray-50">
     <!-- Hero Section -->
-    <section class="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
-        <div class="absolute inset-0 bg-black opacity-20"></div>
+    <section class="relative bg-gradient-hero overflow-hidden">
+        <div class="absolute inset-0 bg-gray-900/30"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-blue-600/20"></div>
+        
+        <!-- Animated background elements -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-float"></div>
+            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-float" style="animation-delay: 2s;"></div>
+        </div>
+        
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
-            <div class="text-center">
-                <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
-                    {{ __('translations.hero_title') }}
+            <div class="text-center animate-fade-in-up">
+                <h1 class="text-5xl md:text-7xl font-heading font-bold text-white mb-6 text-balance">
+                    <span class="gradient-text-hero">{{ __('translations.hero_title') }}</span>
                 </h1>
-                <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
+                <p class="text-xl md:text-2xl text-white/90 mb-10 max-w-3xl mx-auto text-pretty leading-relaxed">
                     {{ __('translations.hero_subtitle') }}
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <div class="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in-up" style="animation-delay: 0.3s;">
                     <a href="{{ route('products.index') }}"
-                       class="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors shadow-lg">
+                       class="btn-gradient text-lg px-10 py-4 rounded-2xl font-semibold shadow-large hover:shadow-glow-lg transform hover:scale-105 transition-all duration-300">
                         {{ __('translations.shop_now') }}
+                        <svg class="w-5 h-5 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
                     </a>
                     <a href="{{ route('categories.index') }}"
-                       class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-indigo-600 transition-colors">
+                       class="border-2 border-white/30 text-white px-10 py-4 rounded-2xl font-semibold text-lg hover:bg-white/10 hover:border-white/50 transition-all duration-300 backdrop-blur-sm">
                         {{ __('translations.browse_categories') }}
                     </a>
                 </div>
@@ -24,30 +35,28 @@
         </div>
 
         <!-- Stats Bar -->
-        <div class="relative bg-white bg-opacity-10 backdrop-blur-sm border-t border-white border-opacity-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
-                    <div class="text-white">
-                        <div class="text-2xl md:text-3xl font-bold">{{ number_format($stats['products_count']) }}</div>
-                        <div class="text-sm md:text-base opacity-80">{{ __('translations.products') }}</div>
+        <div class="relative bg-white/10 backdrop-blur-xl border-t border-white/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-8 text-center animate-fade-in-up" style="animation-delay: 0.6s;">
+                    <div class="text-white group">
+                        <div class="text-3xl md:text-4xl font-bold font-heading mb-2 group-hover:scale-110 transition-transform duration-300">{{ number_format($stats['products_count']) }}</div>
+                        <div class="text-sm md:text-base opacity-90 font-medium">{{ __('translations.products') }}</div>
                     </div>
-                    <div class="text-white">
-                        <div class="text-2xl md:text-3xl font-bold">{{ number_format($stats['categories_count']) }}
-                        </div>
-                        <div class="text-sm md:text-base opacity-80">{{ __('translations.categories') }}</div>
+                    <div class="text-white group">
+                        <div class="text-3xl md:text-4xl font-bold font-heading mb-2 group-hover:scale-110 transition-transform duration-300">{{ number_format($stats['categories_count']) }}</div>
+                        <div class="text-sm md:text-base opacity-90 font-medium">{{ __('translations.categories') }}</div>
                     </div>
-                    <div class="text-white">
-                        <div class="text-2xl md:text-3xl font-bold">{{ number_format($stats['brands_count']) }}</div>
-                        <div class="text-sm md:text-base opacity-80">{{ __('translations.brands') }}</div>
+                    <div class="text-white group">
+                        <div class="text-3xl md:text-4xl font-bold font-heading mb-2 group-hover:scale-110 transition-transform duration-300">{{ number_format($stats['brands_count']) }}</div>
+                        <div class="text-sm md:text-base opacity-90 font-medium">{{ __('translations.brands') }}</div>
                     </div>
-                    <div class="text-white">
-                        <div class="text-2xl md:text-3xl font-bold">{{ number_format($stats['reviews_count']) }}</div>
-                        <div class="text-sm md:text-base opacity-80">{{ __('translations.reviews') }}</div>
+                    <div class="text-white group">
+                        <div class="text-3xl md:text-4xl font-bold font-heading mb-2 group-hover:scale-110 transition-transform duration-300">{{ number_format($stats['reviews_count']) }}</div>
+                        <div class="text-sm md:text-base opacity-90 font-medium">{{ __('translations.reviews') }}</div>
                     </div>
-                    <div class="text-white col-span-2 md:col-span-1">
-                        <div class="text-2xl md:text-3xl font-bold">{{ number_format($stats['avg_rating'], 1) }}/5
-                        </div>
-                        <div class="text-sm md:text-base opacity-80">{{ __('ecommerce.avg_rating') }}</div>
+                    <div class="text-white col-span-2 md:col-span-1 group">
+                        <div class="text-3xl md:text-4xl font-bold font-heading mb-2 group-hover:scale-110 transition-transform duration-300">{{ number_format($stats['avg_rating'], 1) }}/5</div>
+                        <div class="text-sm md:text-base opacity-90 font-medium">{{ __('ecommerce.avg_rating') }}</div>
                     </div>
                 </div>
             </div>
@@ -55,49 +64,43 @@
     </section>
 
     <!-- Sidebar + Featured Categories Grid -->
-    <section class="py-10 bg-white">
+    <section class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-3">
                     <livewire:components.home-sidebar />
                 </div>
                 <div class="lg:col-span-9">
                     @if ($featuredCategories->count() > 0)
-                        <div class="text-center mb-8">
-                            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                        <div class="text-center mb-12 animate-fade-in-up">
+                            <h2 class="text-4xl md:text-5xl font-heading font-bold text-gray-900 mb-4">
                                 {{ __('translations.featured_categories') }}</h2>
-                            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                            <p class="text-xl text-gray-600 max-w-3xl mx-auto text-pretty">
                                 {{ __('translations.categories_description') }}</p>
                         </div>
 
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                            @foreach ($featuredCategories as $category)
+                            @foreach ($featuredCategories as $index => $category)
                                 <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug ?? $category]) }}"
-                                   class="group">
-                                    <div
-                                         class="bg-gray-100 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                   class="group animate-on-scroll" style="animation-delay: {{ $index * 0.1 }}s;">
+                                    <div class="bg-gradient-to-br from-gray-50 to-white rounded-3xl p-6 text-center hover:shadow-large transition-all duration-300 group-hover:scale-105 border border-gray-100 group-hover:border-blue-200">
                                         @if ($category->icon)
-                                            <div class="w-12 h-12 mx-auto mb-4 text-indigo-600">
-                                                <x-app-icon :name="$category->icon" class="w-12 h-12" />
+                                            <div class="w-16 h-16 mx-auto mb-4 text-blue-600 group-hover:text-blue-700 transition-colors duration-300">
+                                                <x-app-icon :name="$category->icon" class="w-16 h-16" />
                                             </div>
                                         @elseif($category->getFirstMediaUrl('images'))
                                             <img src="{{ $category->getFirstMediaUrl('images', 'thumb') }}"
                                                  alt="{{ $category->name }}"
-                                                 class="w-12 h-12 mx-auto mb-4 rounded-lg object-cover">
+                                                 class="w-16 h-16 mx-auto mb-4 rounded-2xl object-cover shadow-soft group-hover:shadow-medium transition-shadow duration-300">
                                         @else
-                                            <div
-                                                 class="w-12 h-12 mx-auto mb-4 bg-indigo-100 rounded-lg flex items-center justify-center">
-                                                <svg class="w-6 h-6 text-indigo-600" fill="none"
-                                                     stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          stroke-width="2"
-                                                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 11h10" />
+                                            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center group-hover:from-blue-200 group-hover:to-purple-200 transition-all duration-300">
+                                                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 11h10" />
                                                 </svg>
                                             </div>
                                         @endif
-                                        <h3 class="font-semibold text-gray-900">{{ $category->name }}</h3>
-                                        <p class="text-sm text-gray-500">{{ $category->products_count }}
-                                            {{ __('translations.products') }}</p>
+                                        <h3 class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors duration-300 mb-2">{{ $category->name }}</h3>
+                                        <p class="text-sm text-gray-500 font-medium">{{ $category->products_count }} {{ __('translations.products') }}</p>
                                     </div>
                                 </a>
                             @endforeach
@@ -110,71 +113,76 @@
 
     <!-- Latest Products -->
     @if ($latestProducts->count() > 0)
-        <section class="py-16 bg-white">
+        <section class="py-20 bg-gradient-to-br from-gray-50 to-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                <div class="text-center mb-16 animate-fade-in-up">
+                    <h2 class="text-4xl md:text-5xl font-heading font-bold text-gray-900 mb-4">
                         {{ __('translations.latest_products') }}</h2>
-                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto text-pretty">
                         {{ __('translations.latest_products_subtitle') }}</p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    @foreach ($latestProducts as $product)
-                        <div
-                             class="bg-white rounded-2xl border border-gray-200 hover:border-indigo-300 transition-colors duration-300 overflow-hidden group">
-                            <div class="aspect-w-1 aspect-h-1 bg-gray-200 relative overflow-hidden">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    @foreach ($latestProducts as $index => $product)
+                        <div class="product-card bg-white rounded-3xl border border-gray-200 hover:border-blue-300 transition-all duration-300 overflow-hidden group shadow-soft hover:shadow-large animate-on-scroll" style="animation-delay: {{ $index * 0.1 }}s;">
+                            <div class="aspect-w-1 aspect-h-1 bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
                                 @if ($product->getFirstMediaUrl('images'))
                                     <img src="{{ $product->getFirstMediaUrl('images', 'image-md') ?: $product->getFirstMediaUrl('images') }}"
                                          alt="{{ $product->name }}"
-                                         class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                                         class="w-full h-64 object-cover product-card-image">
                                 @else
-                                    <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
-                                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor"
-                                             viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <div class="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                                        <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                     </div>
                                 @endif
 
-                                <div
-                                     class="absolute top-2 left-2 bg-green-400 text-green-900 px-2 py-1 rounded-full text-xs font-semibold">
+                                <div class="absolute top-4 left-4 bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-soft">
                                     {{ __('shared.new') }}
                                 </div>
+                                
+                                @if ($product->brand)
+                                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-gray-700 px-2 py-1 rounded-lg text-xs font-medium shadow-soft">
+                                        {{ $product->brand->name }}
+                                    </div>
+                                @endif
                             </div>
 
-                            <div class="p-4">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="font-semibold text-gray-900 line-clamp-2">
-                                        <a href="{{ route('product.show', $product->slug ?? $product) }}"
-                                           class="hover:text-indigo-600">
-                                            {{ $product->name }}
-                                        </a>
-                                    </h3>
-                                    @if ($product->brand)
-                                        <span class="text-xs text-gray-500 ml-2">{{ $product->brand->name }}</span>
-                                    @endif
-                                </div>
+                            <div class="p-6">
+                                <h3 class="font-semibold text-gray-900 text-lg mb-3 line-clamp-2 group-hover:text-blue-700 transition-colors duration-300">
+                                    <a href="{{ route('product.show', $product->slug ?? $product) }}" class="hover:text-blue-700">
+                                        {{ $product->name }}
+                                    </a>
+                                </h3>
 
-                                <div class="flex justify-between items-center mt-4">
+                                <div class="flex justify-between items-center">
                                     <div class="flex flex-col">
-                                        <span
-                                              class="text-lg font-bold text-gray-900">{{ \Illuminate\Support\Number::currency($product->price, current_currency(), app()->getLocale()) }}</span>
+                                        <span class="text-2xl font-bold text-gray-900 mb-1">{{ \Illuminate\Support\Number::currency($product->price, current_currency(), app()->getLocale()) }}</span>
                                         @if ($product->stock_quantity > 0)
-                                            <span
-                                                  class="text-xs text-green-600">{{ __('translations.in_stock') }}</span>
+                                            <span class="text-sm text-green-600 font-medium flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                                {{ __('translations.in_stock') }}
+                                            </span>
                                         @else
-                                            <span
-                                                  class="text-xs text-red-600">{{ __('translations.out_of_stock') }}</span>
+                                            <span class="text-sm text-red-600 font-medium flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                                {{ __('translations.out_of_stock') }}
+                                            </span>
                                         @endif
                                     </div>
 
-                                    <button
-                                            wire:click="addToCart({{ $product->id }})"
+                                    <button wire:click="addToCart({{ $product->id }})"
                                             @if ($product->stock_quantity <= 0) disabled @endif
-                                            class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium">
+                                            class="btn-gradient text-sm px-6 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300">
                                         {{ __('shared.add_to_cart') }}
+                                        <svg class="w-4 h-4 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
@@ -187,33 +195,29 @@
 
     <!-- Featured Brands -->
     @if ($featuredBrands->count() > 0)
-        <section class="py-16 bg-gray-50">
+        <section class="py-20 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                <div class="text-center mb-16 animate-fade-in-up">
+                    <h2 class="text-4xl md:text-5xl font-heading font-bold text-gray-900 mb-4">
                         {{ __('translations.trusted_brands') }}</h2>
-                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ __('translations.brands_description') }}</p>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto text-pretty">{{ __('translations.brands_description') }}</p>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-                    @foreach ($featuredBrands as $brand)
-                        <a href="{{ route('brands.show', $brand) }}" class="group">
-                            <div
-                                 class="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105 border border-gray-200">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
+                    @foreach ($featuredBrands as $index => $brand)
+                        <a href="{{ route('brands.show', $brand) }}" class="group animate-on-scroll" style="animation-delay: {{ $index * 0.1 }}s;">
+                            <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 text-center hover:shadow-large transition-all duration-300 group-hover:scale-105 border border-gray-200 group-hover:border-blue-300">
                                 @if ($brand->getFirstMediaUrl('images'))
                                     <img src="{{ $brand->getFirstMediaUrl('images', 'thumb') }}"
                                          alt="{{ $brand->name }}"
-                                         class="w-16 h-16 mx-auto mb-3 rounded-lg object-contain">
+                                         class="w-20 h-20 mx-auto mb-4 rounded-xl object-contain shadow-soft group-hover:shadow-medium transition-shadow duration-300">
                                 @else
-                                    <div
-                                         class="w-16 h-16 mx-auto mb-3 bg-gray-100 rounded-lg flex items-center justify-center">
-                                        <span
-                                              class="text-lg font-bold text-gray-600">{{ substr($brand->name, 0, 2) }}</span>
+                                    <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center group-hover:from-blue-200 group-hover:to-purple-200 transition-all duration-300">
+                                        <span class="text-xl font-bold text-blue-700">{{ substr($brand->name, 0, 2) }}</span>
                                     </div>
                                 @endif
-                                <h3 class="font-semibold text-gray-900 text-sm">{{ $brand->name }}</h3>
-                                <p class="text-xs text-gray-500 mt-1">{{ $brand->products_count }}
-                                    {{ __('translations.products') }}</p>
+                                <h3 class="font-semibold text-gray-900 text-sm group-hover:text-blue-700 transition-colors duration-300">{{ $brand->name }}</h3>
+                                <p class="text-xs text-gray-500 mt-1 font-medium">{{ $brand->products_count }} {{ __('translations.products') }}</p>
                             </div>
                         </a>
                     @endforeach
@@ -224,42 +228,46 @@
 
     <!-- Latest Reviews -->
     @if ($latestReviews->count() > 0)
-        <section class="py-16 bg-white">
+        <section class="py-20 bg-gradient-to-br from-gray-50 to-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                <div class="text-center mb-16 animate-fade-in-up">
+                    <h2 class="text-4xl md:text-5xl font-heading font-bold text-gray-900 mb-4">
                         {{ __('translations.customer_testimonials') }}</h2>
-                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto text-pretty">
                         {{ __('translations.customer_reviews_subtitle') }}</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach ($latestReviews as $review)
-                        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                            <div class="flex items-center mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach ($latestReviews as $index => $review)
+                        <div class="bg-white rounded-3xl p-8 border border-gray-200 shadow-soft hover:shadow-large transition-all duration-300 animate-on-scroll" style="animation-delay: {{ $index * 0.1 }}s;">
+                            <div class="flex items-center mb-6">
                                 <div class="flex items-center">
                                     @for ($i = 1; $i <= 5; $i++)
-                                        <svg class="w-4 h-4 {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }}"
+                                        <svg class="w-5 h-5 {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }}"
                                              fill="currentColor" viewBox="0 0 20 20">
-                                            <path
-                                                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                         </svg>
                                     @endfor
                                 </div>
-                                <span class="ml-2 text-sm text-gray-600">{{ $review->rating }}/5</span>
+                                <span class="ml-3 text-sm text-gray-600 font-medium">{{ $review->rating }}/5</span>
                             </div>
 
-                            <p class="text-gray-700 mb-4 line-clamp-3">{{ $review->content }}</p>
+                            <p class="text-gray-700 mb-6 line-clamp-3 text-pretty leading-relaxed">{{ $review->content }}</p>
 
                             <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="font-semibold text-gray-900 text-sm">
-                                        {{ $review->user?->name ?? __('translations.anonymous') }}</p>
-                                    <p class="text-xs text-gray-500">{{ $review->created_at->format('M j, Y') }}</p>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white font-semibold text-sm">{{ substr($review->user?->name ?? 'A', 0, 1) }}</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-900 text-sm">
+                                            {{ $review->user?->name ?? __('translations.anonymous') }}</p>
+                                        <p class="text-xs text-gray-500">{{ $review->created_at->format('M j, Y') }}</p>
+                                    </div>
                                 </div>
                                 @if ($review->product)
                                     <a href="{{ route('product.show', $review->product->slug ?? $review->product) }}"
-                                       class="text-xs text-indigo-600 hover:text-indigo-800">
+                                       class="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200">
                                         {{ Str::limit($review->product->name, 30) }}
                                     </a>
                                 @endif
@@ -272,27 +280,42 @@
     @endif
 
     <!-- Newsletter Section -->
-    <section class="py-16 bg-indigo-600">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">{{ __('translations.newsletter_title') }}</h2>
-            <p class="text-xl text-indigo-200 mb-8">{{ __('translations.newsletter_subtitle') }}</p>
+    <section class="py-20 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-600 relative overflow-hidden">
+        <!-- Background elements -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-float"></div>
+            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-float" style="animation-delay: 2s;"></div>
+        </div>
+        
+        <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="animate-fade-in-up">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-white mb-6 text-balance">
+                    {{ __('translations.newsletter_title') }}
+                </h2>
+                <p class="text-xl text-white/90 mb-12 max-w-3xl mx-auto text-pretty">
+                    {{ __('translations.newsletter_subtitle') }}
+                </p>
 
-            <form class="max-w-md mx-auto flex gap-4">
-                <input
-                       type="email"
-                       placeholder="{{ __('translations.email_placeholder') }}"
-                       class="flex-1 px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
-                       required>
-                <button
-                        type="submit"
-                        class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                    {{ __('translations.subscribe') }}
-                </button>
-            </form>
+                <form class="max-w-lg mx-auto flex flex-col sm:flex-row gap-4 animate-fade-in-up" style="animation-delay: 0.3s;">
+                    <input
+                           type="email"
+                           placeholder="{{ __('translations.email_placeholder') }}"
+                           class="flex-1 px-6 py-4 rounded-2xl border-0 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 text-gray-900 placeholder:text-gray-500 shadow-large"
+                           required>
+                    <button
+                            type="submit"
+                            class="bg-white text-blue-700 px-8 py-4 rounded-2xl font-semibold hover:bg-gray-50 transition-all duration-300 shadow-large hover:shadow-glow-lg transform hover:scale-105">
+                        {{ __('translations.subscribe') }}
+                        <svg class="w-5 h-5 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                    </button>
+                </form>
 
-            <p class="text-sm text-indigo-200 mt-4">
-                {{ __('translations.privacy_unsubscribe_notice') }}
-            </p>
+                <p class="text-sm text-white/80 mt-6 max-w-2xl mx-auto">
+                    {{ __('translations.privacy_unsubscribe_notice') }}
+                </p>
+            </div>
         </div>
     </section>
 </div>

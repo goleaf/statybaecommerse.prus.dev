@@ -5,70 +5,77 @@ namespace Database\Factories;
 use App\Models\Currency;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Currency>
+ */
 final class CurrencyFactory extends Factory
 {
     protected $model = Currency::class;
 
     public function definition(): array
     {
-        return [
-            'name' => ['en' => 'Currency ' . $this->faker->unique()->lexify('???'), 'lt' => 'Valiuta ' . $this->faker->unique()->lexify('???')],
-            'code' => strtoupper($this->faker->unique()->lexify('???')),
-            'symbol' => '¤',
-            'exchange_rate' => $this->faker->randomFloat(6, 0.5, 2.0),
-            'is_default' => false,
-            'is_enabled' => $this->faker->boolean(80),  // 80% chance of being enabled
-            'decimal_places' => $this->faker->numberBetween(0, 4),
+        $currencies = [
+            ['code' => 'EUR', 'symbol' => '€', 'name' => 'Euro', 'exchange_rate' => 1.0],
+            ['code' => 'USD', 'symbol' => '$', 'name' => 'US Dollar', 'exchange_rate' => 0.85],
+            ['code' => 'GBP', 'symbol' => '£', 'name' => 'British Pound', 'exchange_rate' => 1.15],
+            ['code' => 'JPY', 'symbol' => '¥', 'name' => 'Japanese Yen', 'exchange_rate' => 0.0065],
+            ['code' => 'CAD', 'symbol' => 'C$', 'name' => 'Canadian Dollar', 'exchange_rate' => 0.65],
         ];
-    }
 
-    public function euro(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'name' => ['en' => 'Euro', 'lt' => 'Euras'],
-            'code' => 'EUR',
-            'symbol' => '€',
-            'exchange_rate' => 1.0,
-            'is_default' => true,
-            'is_enabled' => true,
-            'decimal_places' => 2,
-        ]);
-    }
+        $currency = fake()->randomElement($currencies);
 
-    public function usd(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'name' => ['en' => 'US Dollar', 'lt' => 'JAV doleris'],
-            'code' => 'USD',
-            'symbol' => '$',
-            'exchange_rate' => 1.1,
-            'is_default' => false,
-            'is_enabled' => true,
-            'decimal_places' => 2,
-        ]);
+        return [
+            'name' => $currency['name'],
+            'code' => $currency['code'],
+            'symbol' => $currency['symbol'],
+            'exchange_rate' => $currency['exchange_rate'],
+            'decimal_places' => fake()->numberBetween(0, 4),
+            'is_enabled' => fake()->boolean(80), // 80% chance of being enabled
+            'is_default' => false, // Will be set manually in tests
+        ];
     }
 
     public function enabled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_enabled' => true,
         ]);
     }
 
     public function disabled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_enabled' => false,
         ]);
     }
 
     public function default(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_default' => true,
+            'is_enabled' => true,
+        ]);
+    }
+
+    public function eur(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Euro',
+            'code' => 'EUR',
+            'symbol' => '€',
+            'exchange_rate' => 1.0,
+            'decimal_places' => 2,
+        ]);
+    }
+
+    public function usd(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'US Dollar',
+            'code' => 'USD',
+            'symbol' => '$',
+            'exchange_rate' => 0.85,
+            'decimal_places' => 2,
         ]);
     }
 }
-
-
-

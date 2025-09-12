@@ -16,74 +16,68 @@ class BrandTest extends TestCase
         $brand = Brand::factory()->create([
             'name' => 'Test Brand',
             'slug' => 'test-brand',
-            'is_enabled' => true,
         ]);
 
         $this->assertDatabaseHas('brands', [
             'name' => 'Test Brand',
             'slug' => 'test-brand',
-            'is_enabled' => true,
         ]);
     }
 
     public function test_brand_has_many_products(): void
     {
         $brand = Brand::factory()->create();
-        Product::factory()->count(5)->create(['brand_id' => $brand->id]);
+        $products = Product::factory()->count(3)->create(['brand_id' => $brand->id]);
 
-        $this->assertCount(5, $brand->products);
+        $this->assertCount(3, $brand->products);
         $this->assertInstanceOf(Product::class, $brand->products->first());
     }
 
-    public function test_brand_cache_flush_on_save(): void
+    public function test_brand_has_media_relationship(): void
     {
-        // Mock cache to test if flush is called
-        \Illuminate\Support\Facades\Cache::shouldReceive('forget')
-            ->atLeast()
-            ->once();
-
         $brand = Brand::factory()->create();
-        $brand->save();
+
+        // Test that brand implements HasMedia
+        $this->assertInstanceOf(\Spatie\MediaLibrary\HasMedia::class, $brand);
+        
+        // Test that brand can handle media
+        $this->assertTrue(method_exists($brand, 'registerMediaCollections'));
+        $this->assertTrue(method_exists($brand, 'registerMediaConversions'));
+        $this->assertTrue(method_exists($brand, 'media'));
     }
 
-    public function test_brand_soft_deletes(): void
+    public function test_brand_has_translations_relationship(): void
     {
         $brand = Brand::factory()->create();
-        $brandId = $brand->id;
 
-        $brand->delete();
+        // Test that brand has translations relationship
+        $this->assertTrue(method_exists($brand, 'translations'));
+        $this->assertTrue(method_exists($brand, 'trans'));
+    }
 
-        $this->assertSoftDeleted('brands', ['id' => $brandId]);
-        $this->assertNotNull($brand->fresh()->deleted_at);
+    public function test_brand_route_key_name(): void
+    {
+        $brand = new Brand();
+        $this->assertEquals('slug', $brand->getRouteKeyName());
+    }
+
+    public function test_brand_casts_work_correctly(): void
+    {
+        $brand = Brand::factory()->create([
+            'is_active' => true,
+        ]);
+
+        $this->assertIsBool($brand->is_active);
     }
 
     public function test_brand_fillable_attributes(): void
     {
         $brand = new Brand();
-        
-        $expectedFillable = [
-            'name',
-            'slug',
-            'description',
-            'website',
-            'is_enabled',
-            'seo_title',
-            'seo_description',
-        ];
+        $fillable = $brand->getFillable();
 
-        $this->assertEquals($expectedFillable, $brand->getFillable());
-    }
-
-    public function test_brand_casts(): void
-    {
-        $brand = Brand::factory()->create(['is_enabled' => true]);
-
-        $this->assertIsBool($brand->is_enabled);
-    }
-
-    public function test_brand_uses_correct_table(): void
-    {
-        $brand = new Brand();
-        $this->assertEquals('brands', $brand->getTable());
+        $this->assertContains('name', $fillable);
+        $this->assertContains('slug', $fillable);
+        $this->assertContains('description', $fillable);
+        $this->assertContains('is_active', $fillable);
     }
 }

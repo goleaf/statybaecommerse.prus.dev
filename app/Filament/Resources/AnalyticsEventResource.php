@@ -4,67 +4,128 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Models\AnalyticsEvent;
-use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Actions as Actions;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use BackedEnum;
+
 final class AnalyticsEventResource extends Resource
 {
     protected static ?string $model = AnalyticsEvent::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
-
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $navigationLabel = null;
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
-            ->components([
-                \Filament\Schemas\Components\Section::make(__('admin.analytics.sections.event_information'))
-                    ->components([
-                        Forms\Components\TextInput::make('event_type')
+        return $form
+            ->schema([
+                Forms\Components\Section::make(__('admin.analytics.sections.event_information'))
+                    ->schema([
+                        Forms\Components\Select::make('event_type')
+                            ->label(__('admin.analytics.event_type'))
                             ->required()
-                            ->maxLength(255),
+                            ->options(AnalyticsEvent::getEventTypes())
+                            ->searchable()
+                            ->live(),
                         Forms\Components\TextInput::make('session_id')
+                            ->label(__('admin.analytics.session_id'))
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
                         Forms\Components\Select::make('user_id')
+                            ->label(__('admin.users.singular'))
                             ->relationship('user', 'name')
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->nullable(),
                         Forms\Components\TextInput::make('url')
+                            ->label(__('admin.analytics.url'))
                             ->url()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->nullable(),
                         Forms\Components\TextInput::make('referrer')
+                            ->label(__('admin.analytics.referrer'))
                             ->url()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->nullable(),
                         Forms\Components\TextInput::make('ip_address')
+                            ->label(__('admin.analytics.ip_address'))
                             ->ip()
-                            ->maxLength(45),
+                            ->maxLength(45)
+                            ->nullable(),
                         Forms\Components\TextInput::make('country_code')
-                            ->maxLength(2),
+                            ->label(__('admin.countries.singular'))
+                            ->maxLength(2)
+                            ->nullable(),
                         Forms\Components\DateTimePicker::make('created_at')
+                            ->label(__('admin.analytics.created_at'))
                             ->required(),
                     ])
                     ->columns(2),
-                \Filament\Schemas\Components\Section::make(__('admin.analytics.sections.event_properties'))
-                    ->components([
+                Forms\Components\Section::make(__('admin.analytics.sections.device_information'))
+                    ->schema([
+                        Forms\Components\Select::make('device_type')
+                            ->label(__('admin.analytics.device_type'))
+                            ->options(AnalyticsEvent::getDeviceTypes())
+                            ->nullable(),
+                        Forms\Components\Select::make('browser')
+                            ->label(__('admin.analytics.browser'))
+                            ->options(AnalyticsEvent::getBrowsers())
+                            ->nullable(),
+                        Forms\Components\TextInput::make('os')
+                            ->label(__('admin.analytics.os'))
+                            ->maxLength(255)
+                            ->nullable(),
+                        Forms\Components\TextInput::make('screen_resolution')
+                            ->label(__('admin.analytics.screen_resolution'))
+                            ->maxLength(255)
+                            ->nullable(),
+                    ])
+                    ->columns(2),
+                Forms\Components\Section::make(__('admin.analytics.sections.trackable_information'))
+                    ->schema([
+                        Forms\Components\TextInput::make('trackable_type')
+                            ->label(__('admin.analytics.trackable_type'))
+                            ->maxLength(255)
+                            ->nullable(),
+                        Forms\Components\TextInput::make('trackable_id')
+                            ->label(__('admin.analytics.trackable_id'))
+                            ->numeric()
+                            ->nullable(),
+                        Forms\Components\TextInput::make('value')
+                            ->label(__('admin.analytics.value'))
+                            ->numeric()
+                            ->step(0.01)
+                            ->nullable(),
+                        Forms\Components\TextInput::make('currency')
+                            ->label(__('admin.analytics.currency'))
+                            ->maxLength(3)
+                            ->default('EUR')
+                            ->nullable(),
+                    ])
+                    ->columns(2),
+                Forms\Components\Section::make(__('admin.analytics.sections.event_properties'))
+                    ->schema([
                         Forms\Components\KeyValue::make('properties')
-                            ->keyLabel('Property')
-                            ->valueLabel('Value'),
+                            ->keyLabel(__('admin.analytics.property'))
+                            ->valueLabel(__('admin.analytics.value'))
+                            ->nullable(),
                     ])
                     ->collapsible(),
-                \Filament\Schemas\Components\Section::make(__('admin.analytics.sections.user_agent'))
-                    ->components([
+                Forms\Components\Section::make(__('admin.analytics.sections.user_agent'))
+                    ->schema([
                         Forms\Components\Textarea::make('user_agent')
-                            ->rows(3),
+                            ->label(__('admin.analytics.user_agent'))
+                            ->rows(3)
+                            ->nullable(),
                     ])
                     ->collapsible(),
             ]);
@@ -75,6 +136,7 @@ final class AnalyticsEventResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('event_type')
+                    ->label(__('admin.analytics.event_type'))
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'page_view' => 'info',
@@ -82,8 +144,17 @@ final class AnalyticsEventResource extends Resource
                         'add_to_cart' => 'success',
                         'purchase' => 'success',
                         'search' => 'warning',
+                        'user_register' => 'success',
+                        'user_login' => 'info',
+                        'user_logout' => 'gray',
+                        'newsletter_signup' => 'warning',
+                        'contact_form' => 'primary',
+                        'download' => 'secondary',
+                        'video_play' => 'danger',
+                        'social_share' => 'info',
                         default => 'gray',
                     })
+                    ->formatStateUsing(fn(AnalyticsEvent $record) => $record->getEventTypeLabelAttribute())
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
@@ -94,51 +165,78 @@ final class AnalyticsEventResource extends Resource
                 Tables\Columns\TextColumn::make('session_id')
                     ->label(__('admin.analytics.session'))
                     ->limit(10)
-                    ->tooltip(fn($record) => $record->session_id),
+                    ->tooltip(fn($record) => $record->session_id)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('url')
+                    ->label(__('admin.analytics.url'))
                     ->limit(50)
-                    ->tooltip(fn($record) => $record->url),
+                    ->tooltip(fn($record) => $record->url)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('device_type')
+                    ->label(__('admin.analytics.device_type'))
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'desktop' => 'primary',
+                        'mobile' => 'success',
+                        'tablet' => 'warning',
+                        default => 'gray',
+                    })
+                    ->icon(fn(AnalyticsEvent $record) => $record->getDeviceIconAttribute())
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('browser')
+                    ->label(__('admin.analytics.browser'))
+                    ->badge()
+                    ->color('secondary')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('country_code')
                     ->label(__('admin.countries.singular'))
                     ->badge()
                     ->placeholder(__('admin.analytics.unknown')),
+                Tables\Columns\TextColumn::make('value')
+                    ->label(__('admin.analytics.value'))
+                    ->formatStateUsing(fn(AnalyticsEvent $record) => $record->getFormattedValueAttribute())
+                    ->alignEnd()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->date('Y-m-d')
+                    ->label(__('admin.analytics.created_at'))
+                    ->date('Y-m-d H:i')
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('event_type')
-                    ->options([
-                        'page_view' => __('admin.analytics.event_types.page_view'),
-                        'product_view' => __('admin.analytics.event_types.product_view'),
-                        'add_to_cart' => __('admin.analytics.event_types.add_to_cart'),
-                        'remove_from_cart' => __('admin.analytics.event_types.remove_from_cart'),
-                        'purchase' => __('admin.analytics.event_types.purchase'),
-                        'search' => __('admin.analytics.event_types.search'),
-                        'user_register' => __('admin.analytics.event_types.user_register'),
-                        'user_login' => __('admin.analytics.event_types.user_login'),
-                    ]),
+                    ->label(__('admin.analytics.event_type'))
+                    ->options(AnalyticsEvent::getEventTypes()),
+                Tables\Filters\SelectFilter::make('device_type')
+                    ->label(__('admin.analytics.device_type'))
+                    ->options(AnalyticsEvent::getDeviceTypes()),
+                Tables\Filters\SelectFilter::make('browser')
+                    ->label(__('admin.analytics.browser'))
+                    ->options(AnalyticsEvent::getBrowsers()),
                 Tables\Filters\Filter::make('has_user')
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('user_id'))
-                    ->label(__('admin.analytics.filters.registered_only')),
+                    ->label(__('admin.analytics.filters.registered_only'))
+                    ->query(fn(Builder $query): Builder => $query->registeredUsers()),
                 Tables\Filters\Filter::make('anonymous_only')
-                    ->query(fn(Builder $query): Builder => $query->whereNull('user_id'))
-                    ->label(__('admin.analytics.filters.anonymous_only')),
+                    ->label(__('admin.analytics.filters.anonymous_only'))
+                    ->query(fn(Builder $query): Builder => $query->anonymousUsers()),
+                Tables\Filters\Filter::make('with_value')
+                    ->label(__('admin.analytics.filters.with_value'))
+                    ->query(fn(Builder $query): Builder => $query->withValue()),
                 Tables\Filters\Filter::make('today')
-                    ->query(fn(Builder $query): Builder => $query->whereDate('created_at', today()))
-                    ->label(__('admin.date_ranges.today')),
+                    ->label(__('admin.date_ranges.today'))
+                    ->query(fn(Builder $query): Builder => $query->today()),
                 Tables\Filters\Filter::make('this_week')
-                    ->query(fn(Builder $query): Builder => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]))
-                    ->label(__('admin.analytics.this_week')),
+                    ->label(__('admin.analytics.this_week'))
+                    ->query(fn(Builder $query): Builder => $query->thisWeek()),
                 Tables\Filters\Filter::make('this_month')
-                    ->query(fn(Builder $query): Builder => $query->whereMonth('created_at', now()->month))
-                    ->label(__('admin.analytics.this_month')),
+                    ->label(__('admin.analytics.this_month'))
+                    ->query(fn(Builder $query): Builder => $query->thisMonth()),
                 Tables\Filters\SelectFilter::make('user_id')
+                    ->label(__('admin.users.singular'))
                     ->relationship('user', 'name')
                     ->searchable()
-                    ->preload()
-                    ->label(__('admin.users.singular')),
+                    ->preload(),
                 Tables\Filters\Filter::make('session_id')
+                    ->label(__('admin.analytics.session'))
                     ->form([
                         Forms\Components\TextInput::make('session_id')
                             ->label(__('admin.analytics.session'))
@@ -147,36 +245,36 @@ final class AnalyticsEventResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['session_id'],
-                            fn (Builder $query, $sessionId): Builder => $query->where('session_id', 'like', "%{$sessionId}%"),
+                            fn(Builder $query, $sessionId): Builder => $query->where('session_id', 'like', "%{$sessionId}%"),
                         );
-                    })
-                    ->label(__('admin.analytics.session')),
+                    }),
                 Tables\Filters\Filter::make('created_at')
+                    ->label(__('admin.date_ranges.date_range'))
                     ->form([
                         Forms\Components\DatePicker::make('from')
-                            ->label(__('admin.date_ranges.from')),
+                            ->label(__('admin.analytics.from')),
                         Forms\Components\DatePicker::make('until')
-                            ->label(__('admin.date_ranges.until')),
+                            ->label(__('admin.analytics.until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
                                 $data['from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
-                    })
-                    ->label(__('admin.date_ranges.date_range')),
+                    }),
             ])
-            ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\DeleteAction::make(),
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->headerActions([
-                Actions\Action::make('export')
+                Tables\Actions\Action::make('export')
                     ->label(__('admin.actions.export'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
@@ -186,19 +284,19 @@ final class AnalyticsEventResource extends Resource
                     }),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
-                    Actions\BulkAction::make('cleanup_old_events')
-                        ->label('Cleanup Old Events')
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('cleanup_old_events')
+                        ->label(__('admin.analytics.cleanup_old_events'))
                         ->icon('heroicon-o-trash')
                         ->color('danger')
                         ->action(function () {
                             AnalyticsEvent::where('created_at', '<', now()->subMonths(3))->delete();
                         })
                         ->requiresConfirmation()
-                        ->modalHeading('Cleanup Old Analytics Events')
-                        ->modalDescription('This will delete all analytics events older than 3 months. This action cannot be undone.')
-                        ->modalSubmitActionLabel('Cleanup Old Events'),
+                        ->modalHeading(__('admin.analytics.cleanup_old_analytics_events'))
+                        ->modalDescription(__('admin.analytics.cleanup_description'))
+                        ->modalSubmitActionLabel(__('admin.analytics.cleanup_old_events')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
@@ -208,23 +306,30 @@ final class AnalyticsEventResource extends Resource
     {
         return [
             'index' => Pages\ListAnalyticsEvents::route('/'),
+            'create' => Pages\CreateAnalyticsEvent::route('/create'),
             'view' => Pages\ViewAnalyticsEvent::route('/{record}'),
+            'edit' => Pages\EditAnalyticsEvent::route('/{record}/edit'),
         ];
     }
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['event_type', 'user.name', 'url'];
+        return ['event_type', 'user.name', 'url', 'session_id'];
     }
 
     public static function canCreate(): bool
     {
-        return false;  // created programmatically
+        return true;
     }
 
     public static function canEdit($record): bool
     {
-        return false;  // read-only
+        return true;
+    }
+
+    public static function canDelete($record): bool
+    {
+        return true;
     }
 
     public static function getNavigationGroup(): ?string

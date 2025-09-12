@@ -98,10 +98,10 @@ final class ComponentPerformanceService
             'total_components' => count($metrics),
             'total_renders' => $totalRenders,
             'avg_render_time' => round($avgRenderTime, 2),
-            'slowest_component' => array_key_first($slowest),
-            'slowest_time' => $slowest ? round(array_values($slowest)[0]['avg_time'], 2) : 0,
-            'most_used_component' => array_key_first($mostUsed),
-            'most_used_count' => $mostUsed ? array_values($mostUsed)[0]['total_renders'] : 0,
+            'slowest_component' => !empty($slowest) ? array_key_first($slowest) : null,
+            'slowest_time' => !empty($slowest) ? round(array_values($slowest)[0]['avg_time'], 2) : 0,
+            'most_used_component' => !empty($mostUsed) ? array_key_first($mostUsed) : null,
+            'most_used_count' => !empty($mostUsed) ? array_values($mostUsed)[0]['total_renders'] : 0,
             'performance_score' => $this->calculatePerformanceScore($metrics),
         ];
     }

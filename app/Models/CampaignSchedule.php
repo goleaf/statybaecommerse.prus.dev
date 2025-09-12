@@ -34,3 +34,12 @@ final class CampaignSchedule extends Model
         return $this->belongsTo(Campaign::class);
     }
 }
+
+
+
+
+
+
+
+
+

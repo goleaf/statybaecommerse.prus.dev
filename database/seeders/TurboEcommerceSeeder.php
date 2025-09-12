@@ -67,7 +67,7 @@ final class TurboEcommerceSeeder extends Seeder
         // Snapshot needed references
         $locales = $this->supportedLocales();
         $brandIds = Brand::query()->enabled()->pluck('id')->values();
-        $categoryIds = Category::query()->visible()->pluck('id')->values();
+        $categoryIds = Category::query()->active()->pluck('id')->values();
 
         // Attributes and their values
         $attributes = Attribute::query()->enabled()->with(['values' => function ($q) {

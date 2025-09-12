@@ -1,7 +1,291 @@
 <?php declare(strict_types=1);
 
-use App\Models\Order;
+namespace Tests\Unit\Models;
 
-it('instantiates Order model', function (): void {
-    expect(new Order())->toBeInstanceOf(Order::class);
-});
+use App\Models\Order;
+use App\Models\User;
+use App\Models\OrderItem;
+use App\Models\OrderShipping;
+use App\Models\Document;
+use App\Models\Zone;
+use App\Models\Channel;
+use App\Models\Partner;
+use App\Models\Translations\OrderTranslation;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class OrderTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_order_can_be_created(): void
+    {
+        $user = User::factory()->create();
+        
+        $order = Order::create([
+            'number' => 'ORD-123456',
+            'user_id' => $user->id,
+            'status' => 'pending',
+            'subtotal' => 100.00,
+            'tax_amount' => 21.00,
+            'shipping_amount' => 5.00,
+            'discount_amount' => 0.00,
+            'total' => 126.00,
+            'currency' => 'EUR',
+            'billing_address' => ['name' => 'John Doe', 'email' => 'john@example.com'],
+            'shipping_address' => ['name' => 'John Doe', 'address' => '123 Main St'],
+            'notes' => 'Test order',
+            'payment_status' => 'pending',
+            'payment_method' => 'credit_card',
+        ]);
+
+        $this->assertDatabaseHas('orders', [
+            'number' => 'ORD-123456',
+            'user_id' => $user->id,
+            'status' => 'pending',
+            'total' => 126.00,
+        ]);
+    }
+
+    public function test_order_belongs_to_user(): void
+    {
+        $user = User::factory()->create();
+        $order = Order::factory()->create(['user_id' => $user->id]);
+
+        $this->assertInstanceOf(User::class, $order->user);
+        $this->assertEquals($user->id, $order->user->id);
+    }
+
+    public function test_order_has_many_items(): void
+    {
+        $order = Order::factory()->create();
+        $item1 = OrderItem::factory()->create(['order_id' => $order->id]);
+        $item2 = OrderItem::factory()->create(['order_id' => $order->id]);
+
+        $this->assertCount(2, $order->items);
+        $this->assertTrue($order->items->contains($item1));
+        $this->assertTrue($order->items->contains($item2));
+    }
+
+    public function test_order_has_one_shipping(): void
+    {
+        $order = Order::factory()->create();
+        $shipping = OrderShipping::factory()->create(['order_id' => $order->id]);
+
+        $this->assertInstanceOf(OrderShipping::class, $order->shipping);
+        $this->assertEquals($shipping->id, $order->shipping->id);
+    }
+
+    public function test_order_has_many_documents(): void
+    {
+        $order = Order::factory()->create();
+        $document1 = Document::factory()->create([
+            'documentable_type' => Order::class,
+            'documentable_id' => $order->id,
+        ]);
+        $document2 = Document::factory()->create([
+            'documentable_type' => Order::class,
+            'documentable_id' => $order->id,
+        ]);
+
+        $this->assertCount(2, $order->documents);
+        $this->assertTrue($order->documents->contains($document1));
+        $this->assertTrue($order->documents->contains($document2));
+    }
+
+    public function test_order_has_many_translations(): void
+    {
+        $order = Order::factory()->create();
+        $translation1 = OrderTranslation::factory()->create(['order_id' => $order->id, 'locale' => 'lt']);
+        $translation2 = OrderTranslation::factory()->create(['order_id' => $order->id, 'locale' => 'en']);
+
+        $this->assertCount(2, $order->translations);
+        $this->assertTrue($order->translations->contains($translation1));
+        $this->assertTrue($order->translations->contains($translation2));
+    }
+
+    public function test_order_belongs_to_zone(): void
+    {
+        $zone = Zone::factory()->create();
+        $order = Order::factory()->create(['zone_id' => $zone->id]);
+
+        $this->assertInstanceOf(Zone::class, $order->zone);
+        $this->assertEquals($zone->id, $order->zone->id);
+    }
+
+    public function test_order_belongs_to_channel(): void
+    {
+        $channel = Channel::factory()->create();
+        $order = Order::factory()->create(['channel_id' => $channel->id]);
+
+        $this->assertInstanceOf(Channel::class, $order->channel);
+        $this->assertEquals($channel->id, $order->channel->id);
+    }
+
+    public function test_order_belongs_to_partner(): void
+    {
+        $partner = Partner::factory()->create();
+        $order = Order::factory()->create(['partner_id' => $partner->id]);
+
+        $this->assertInstanceOf(Partner::class, $order->partner);
+        $this->assertEquals($partner->id, $order->partner->id);
+    }
+
+    public function test_order_scope_by_status(): void
+    {
+        Order::factory()->create(['status' => 'pending']);
+        Order::factory()->create(['status' => 'processing']);
+        Order::factory()->create(['status' => 'pending']);
+
+        $pendingOrders = Order::byStatus('pending')->get();
+        $this->assertCount(2, $pendingOrders);
+    }
+
+    public function test_order_scope_recent(): void
+    {
+        $oldOrder = Order::factory()->create(['created_at' => now()->subDays(5)]);
+        $newOrder = Order::factory()->create(['created_at' => now()]);
+
+        $recentOrders = Order::recent()->get();
+        $this->assertEquals($newOrder->id, $recentOrders->first()->id);
+    }
+
+    public function test_order_scope_completed(): void
+    {
+        Order::factory()->create(['status' => 'pending']);
+        Order::factory()->create(['status' => 'delivered']);
+        Order::factory()->create(['status' => 'completed']);
+
+        $completedOrders = Order::completed()->get();
+        $this->assertCount(2, $completedOrders);
+    }
+
+    public function test_order_scope_paid(): void
+    {
+        Order::factory()->create(['payment_status' => 'pending', 'status' => 'pending']);
+        Order::factory()->create(['payment_status' => 'paid', 'status' => 'pending']);
+        Order::factory()->create(['payment_status' => 'pending', 'status' => 'processing']);
+
+        $paidOrders = Order::paid()->get();
+        $this->assertCount(2, $paidOrders);
+    }
+
+    public function test_order_is_paid(): void
+    {
+        $pendingOrder = Order::factory()->create(['status' => 'pending']);
+        $processingOrder = Order::factory()->create(['status' => 'processing']);
+        $shippedOrder = Order::factory()->create(['status' => 'shipped']);
+
+        $this->assertFalse($pendingOrder->isPaid());
+        $this->assertTrue($processingOrder->isPaid());
+        $this->assertTrue($shippedOrder->isPaid());
+    }
+
+    public function test_order_is_shippable(): void
+    {
+        $pendingOrder = Order::factory()->create(['status' => 'pending']);
+        $processingOrder = Order::factory()->create(['status' => 'processing']);
+        $confirmedOrder = Order::factory()->create(['status' => 'confirmed']);
+        $shippedOrder = Order::factory()->create(['status' => 'shipped']);
+
+        $this->assertFalse($pendingOrder->isShippable());
+        $this->assertTrue($processingOrder->isShippable());
+        $this->assertTrue($confirmedOrder->isShippable());
+        $this->assertFalse($shippedOrder->isShippable());
+    }
+
+    public function test_order_can_be_cancelled(): void
+    {
+        $pendingOrder = Order::factory()->create(['status' => 'pending']);
+        $confirmedOrder = Order::factory()->create(['status' => 'confirmed']);
+        $processingOrder = Order::factory()->create(['status' => 'processing']);
+        $shippedOrder = Order::factory()->create(['status' => 'shipped']);
+
+        $this->assertTrue($pendingOrder->canBeCancelled());
+        $this->assertTrue($confirmedOrder->canBeCancelled());
+        $this->assertFalse($processingOrder->canBeCancelled());
+        $this->assertFalse($shippedOrder->canBeCancelled());
+    }
+
+    public function test_order_total_items_count_attribute(): void
+    {
+        $order = Order::factory()->create();
+        OrderItem::factory()->create(['order_id' => $order->id, 'quantity' => 2]);
+        OrderItem::factory()->create(['order_id' => $order->id, 'quantity' => 3]);
+
+        $this->assertEquals(5, $order->total_items_count);
+    }
+
+    public function test_order_formatted_total_attribute(): void
+    {
+        $order = Order::factory()->create(['total' => 123.45, 'currency' => 'EUR']);
+
+        $this->assertEquals('123.45 EUR', $order->formatted_total);
+    }
+
+    public function test_order_casts(): void
+    {
+        $order = Order::factory()->create([
+            'subtotal' => '100.50',
+            'tax_amount' => '21.10',
+            'shipping_amount' => '5.00',
+            'discount_amount' => '10.00',
+            'total' => '116.60',
+            'billing_address' => ['name' => 'John Doe'],
+            'shipping_address' => ['address' => '123 Main St'],
+        ]);
+
+        $this->assertIsFloat($order->subtotal);
+        $this->assertIsFloat($order->tax_amount);
+        $this->assertIsFloat($order->shipping_amount);
+        $this->assertIsFloat($order->discount_amount);
+        $this->assertIsFloat($order->total);
+        $this->assertIsArray($order->billing_address);
+        $this->assertIsArray($order->shipping_address);
+    }
+
+    public function test_order_fillable_attributes(): void
+    {
+        $order = new Order();
+        $fillable = $order->getFillable();
+
+        $expectedFillable = [
+            'number',
+            'user_id',
+            'status',
+            'subtotal',
+            'tax_amount',
+            'shipping_amount',
+            'discount_amount',
+            'total',
+            'currency',
+            'billing_address',
+            'shipping_address',
+            'notes',
+            'shipped_at',
+            'delivered_at',
+            'channel_id',
+            'zone_id',
+            'partner_id',
+            'payment_status',
+            'payment_method',
+            'payment_reference',
+        ];
+
+        $this->assertEquals($expectedFillable, $fillable);
+    }
+
+    public function test_order_translatable_attributes(): void
+    {
+        $order = new Order();
+        $translatable = $order->getTranslatableAttributes();
+
+        $expectedTranslatable = [
+            'notes',
+            'billing_address',
+            'shipping_address',
+        ];
+
+        $this->assertEquals($expectedTranslatable, $translatable);
+    }
+}

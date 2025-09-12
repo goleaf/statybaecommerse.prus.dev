@@ -34,6 +34,8 @@ final class ProductRecommendations extends Component
             'recently_viewed' => $this->getRecentlyViewedProducts(),
             'cross_sell' => $this->getCrossSellProducts(),
             'up_sell' => $this->getUpSellProducts(),
+            'customers_also_bought' => $this->getCustomersAlsoBoughtProducts(),
+            'trending' => $this->getTrendingProducts(),
             default => $this->getRelatedProducts(),
         };
     }
@@ -155,23 +157,25 @@ final class ProductRecommendations extends Component
             return collect();
         }
 
-        // Find products frequently bought together
+        // Find products frequently bought together based on completed orders
         $frequentlyBoughtWith = Product::query()
             ->with(['media', 'brand'])
             ->where('is_visible', true)
             ->where('id', '!=', $this->productId)
             ->whereHas('orderItems', function ($query) {
                 $query->whereHas('order', function ($orderQuery) {
-                    $orderQuery->whereHas('items', function ($itemQuery) {
-                        $itemQuery->where('product_id', $this->productId);
-                    });
+                    $orderQuery->whereIn('status', ['completed', 'delivered'])
+                              ->whereHas('items', function ($itemQuery) {
+                                  $itemQuery->where('product_id', $this->productId);
+                              });
                 });
             })
             ->withCount(['orderItems' => function ($query) {
                 $query->whereHas('order', function ($orderQuery) {
-                    $orderQuery->whereHas('items', function ($itemQuery) {
-                        $itemQuery->where('product_id', $this->productId);
-                    });
+                    $orderQuery->whereIn('status', ['completed', 'delivered'])
+                              ->whereHas('items', function ($itemQuery) {
+                                  $itemQuery->where('product_id', $this->productId);
+                              });
                 });
             }])
             ->orderByDesc('order_items_count')
@@ -207,6 +211,127 @@ final class ProductRecommendations extends Component
             ->orderBy('price')
             ->limit($this->limit)
             ->get();
+    }
+
+    private function getCustomersAlsoBoughtProducts(): Collection
+    {
+        if (!$this->productId) {
+            return collect();
+        }
+
+        // Get orders that contain this product
+        $orderIds = Order::whereHas('items', function ($query) {
+            $query->where('product_id', $this->productId);
+        })
+        ->whereIn('status', ['completed', 'delivered'])
+        ->pluck('id');
+
+        if ($orderIds->isEmpty()) {
+            return $this->getRelatedProducts();
+        }
+
+        // Get other products from those orders
+        return Product::query()
+            ->with(['media', 'brand'])
+            ->where('is_visible', true)
+            ->where('id', '!=', $this->productId)
+            ->whereHas('orderItems', function ($query) use ($orderIds) {
+                $query->whereIn('order_id', $orderIds);
+            })
+            ->withCount(['orderItems' => function ($query) use ($orderIds) {
+                $query->whereIn('order_id', $orderIds);
+            }])
+            ->orderByDesc('order_items_count')
+            ->limit($this->limit)
+            ->get();
+    }
+
+    private function getTrendingProducts(): Collection
+    {
+        // Products with most sales in the last 30 days
+        return Product::query()
+            ->with(['media', 'brand'])
+            ->where('is_visible', true)
+            ->whereHas('orderItems', function ($query) {
+                $query->whereHas('order', function ($orderQuery) {
+                    $orderQuery->whereIn('status', ['completed', 'delivered'])
+                              ->where('created_at', '>=', now()->subDays(30));
+                });
+            })
+            ->withCount(['orderItems' => function ($query) {
+                $query->whereHas('order', function ($orderQuery) {
+                    $orderQuery->whereIn('status', ['completed', 'delivered'])
+                              ->where('created_at', '>=', now()->subDays(30));
+                });
+            }])
+            ->orderByDesc('order_items_count')
+            ->limit($this->limit)
+            ->get();
+    }
+
+    public function addToCart(int $productId): void
+    {
+        $product = Product::findOrFail($productId);
+        
+        if ($product->shouldHideAddToCart()) {
+            $this->addError('cart', __('frontend.product.cannot_add_to_cart'));
+            return;
+        }
+        
+        if ($product->availableQuantity() < 1) {
+            $this->addError('cart', __('frontend.product.not_enough_stock'));
+            return;
+        }
+        
+        // Create or update cart item in database
+        $cartItem = \App\Models\CartItem::updateOrCreate(
+            [
+                'session_id' => session()->getId(),
+                'product_id' => $productId,
+            ],
+            [
+                'quantity' => \App\Models\CartItem::where('session_id', session()->getId())
+                    ->where('product_id', $productId)
+                    ->sum('quantity') + 1,
+                'minimum_quantity' => $product->getMinimumQuantity(),
+                'unit_price' => $product->price,
+                'total_price' => $product->price,
+                'product_snapshot' => [
+                    'name' => $product->name,
+                    'sku' => $product->sku,
+                    'image' => $product->getMainImage(),
+                ],
+            ]
+        );
+        
+        $cartItem->updateTotalPrice();
+        
+        // Track recommendation click
+        $this->trackRecommendationClick($productId, 'add_to_cart');
+        
+        $this->dispatch('cart-updated');
+        $this->dispatch('show-success-message', message: __('frontend.cart.product_added'));
+    }
+
+    public function trackRecommendationClick(int $productId, string $action = 'click'): void
+    {
+        // Track analytics event if analytics is enabled
+        if (class_exists(\App\Models\AnalyticsEvent::class)) {
+            \App\Models\AnalyticsEvent::create([
+                'event_type' => 'recommendation_click',
+                'event_data' => [
+                    'recommended_product_id' => $productId,
+                    'source_product_id' => $this->productId,
+                    'recommendation_type' => $this->type,
+                    'action' => $action,
+                    'user_id' => $this->userId,
+                    'session_id' => session()->getId(),
+                    'referrer' => request()->header('referer'),
+                ],
+                'user_id' => $this->userId,
+                'session_id' => session()->getId(),
+            ]);
+        }
     }
 
     public function trackView(): void

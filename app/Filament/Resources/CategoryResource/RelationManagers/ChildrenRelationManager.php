@@ -2,87 +2,96 @@
 
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
-use App\Filament\Resources\CategoryResource;
-use Filament\Actions\Action;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Table;
+use Filament\Tables\Filters\TernaryFilter;
+use Illuminate\Database\Eloquent\Builder;
 
 final class ChildrenRelationManager extends RelationManager
 {
     protected static string $relationship = 'children';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $title = 'Subkategorijos';
 
-    public function form(Schema $schema): Schema
+    protected static ?string $modelLabel = 'Subkategorija';
+
+    protected static ?string $pluralModelLabel = 'Subkategorijos';
+
+    public function form(Form $form): Form
     {
-        return CategoryResource::form($schema);
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('slug')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('sort_order')
+                    ->numeric()
+                    ->default(0),
+                Forms\Components\Toggle::make('is_enabled')
+                    ->default(true),
+                Forms\Components\Toggle::make('is_visible')
+                    ->default(true),
+            ]);
     }
 
     public function table(Table $table): Table
     {
-        return CategoryResource::table($table)
-            ->headerActions([
-                \Filament\Actions\CreateAction::make()
-                    ->mutateFormDataUsing(function (array $data): array {
-                        $data['parent_id'] = $this->ownerRecord->getKey();
-                        return $data;
-                    }),
-                Action::make('attach_existing_category')
-                    ->label(__('translations.attach_existing_category'))
-                    ->icon('heroicon-o-link')
-                    ->form([
-                        Forms\Components\Select::make('child_id')
-                            ->label(__('translations.category'))
-                            ->options(fn() => \App\Models\Category::query()
-                                ->whereNull('parent_id')
-                                ->whereKeyNot($this->ownerRecord->getKey())
-                                ->orderBy('name')
-                                ->pluck('name', 'id')
-                                ->filter(fn($label) => filled($label))
-                                ->toArray())
-                            ->searchable()
-                            ->required(),
-                    ])
-                    ->action(function (array $data): void {
-                        \App\Models\Category::query()
-                            ->whereKey((int) $data['child_id'])
-                            ->update(['parent_id' => $this->ownerRecord->getKey()]);
-                    }),
+        return $table
+            ->recordTitleAttribute('name')
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('slug')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('products_count')
+                    ->counts('products')
+                    ->badge(),
+                Tables\Columns\IconColumn::make('is_enabled')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('is_visible')
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
-                Action::make('detach_child')
-                    ->label(__('translations.detach_child'))
-                    ->icon('heroicon-o-arrow-uturn-left')
-                    ->requiresConfirmation()
-                    ->action(function ($record): void {
-                        $record->update(['parent_id' => null]);
-                    }),
+            ->filters([
+                TernaryFilter::make('is_enabled')
+                    ->placeholder('Visi')
+                    ->trueLabel('Įjungtos')
+                    ->falseLabel('Išjungtos'),
+                TernaryFilter::make('is_visible')
+                    ->placeholder('Visi')
+                    ->trueLabel('Matomos')
+                    ->falseLabel('Nematomos'),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('view')
+                    ->label('Peržiūrėti')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn ($record) => CategoryResource::getUrl('view', ['record' => $record]))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    BulkAction::make('bulk_detach')
-                        ->label(__('translations.bulk_detach'))
-                        ->icon('heroicon-o-arrow-uturn-left')
-                        ->action(function ($records): void {
-                            foreach ($records as $record) {
-                                $record->update(['parent_id' => null]);
-                            }
-                        }),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->reorderable('sort_order');
+            ->defaultSort('sort_order');
     }
 }

@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
             // Countries and zones for shipping/tax logic
             CountrySeeder::class,
             ZoneSeeder::class,
+            RegionSeeder::class,
+            // Comprehensive cities seeding with multilingual support
+            AllCitiesSeeder::class,
             ChannelSeeder::class,
             // Core catalog structure with local images only
             BrandSeeder::class,

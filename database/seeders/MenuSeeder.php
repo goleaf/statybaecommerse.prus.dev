@@ -26,8 +26,8 @@ final class MenuSeeder extends Seeder
 
         // Build from visible root categories
         $roots = Category::query()
-            ->visible()
-            ->roots()
+            ->active()
+            ->root()
             ->ordered()
             ->with(['children.children.children'])
             ->get();

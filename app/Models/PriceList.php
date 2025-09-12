@@ -2,16 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\Translations\PriceListTranslation;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 final class PriceList extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasTranslations, LogsActivity;
+
+    protected string $translationModel = PriceListTranslation::class;
 
     protected $table = 'price_lists';
 
@@ -24,15 +31,26 @@ final class PriceList extends Model
         'priority',
         'starts_at',
         'ends_at',
+        'description',
+        'metadata',
+        'is_default',
+        'auto_apply',
+        'min_order_amount',
+        'max_order_amount',
     ];
 
     protected function casts(): array
     {
         return [
             'is_enabled' => 'boolean',
+            'is_default' => 'boolean',
+            'auto_apply' => 'boolean',
             'priority' => 'integer',
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
+            'min_order_amount' => 'decimal:2',
+            'max_order_amount' => 'decimal:2',
+            'metadata' => 'array',
         ];
     }
 
@@ -87,6 +105,37 @@ final class PriceList extends Model
         return $query->orderBy('priority', $direction);
     }
 
+    public function scopeDefault($query)
+    {
+        return $query->where('is_default', true);
+    }
+
+    public function scopeAutoApply($query)
+    {
+        return $query->where('auto_apply', true);
+    }
+
+    public function scopeByCurrency($query, int $currencyId)
+    {
+        return $query->where('currency_id', $currencyId);
+    }
+
+    public function scopeByZone($query, int $zoneId)
+    {
+        return $query->where('zone_id', $zoneId);
+    }
+
+    public function scopeForOrderAmount($query, float $amount)
+    {
+        return $query->where(function ($q) use ($amount) {
+            $q->whereNull('min_order_amount')
+              ->orWhere('min_order_amount', '<=', $amount);
+        })->where(function ($q) use ($amount) {
+            $q->whereNull('max_order_amount')
+              ->orWhere('max_order_amount', '>=', $amount);
+        });
+    }
+
     public function isActive(): bool
     {
         if (!$this->is_enabled) {
@@ -104,5 +153,50 @@ final class PriceList extends Model
         }
 
         return true;
+    }
+
+    public function isDefault(): bool
+    {
+        return (bool) $this->is_default;
+    }
+
+    public function canAutoApply(): bool
+    {
+        return (bool) $this->auto_apply;
+    }
+
+    public function getEffectivePriceForProduct(Product $product): ?float
+    {
+        $item = $this->items()->where('product_id', $product->id)->first();
+        return $item ? $item->net_amount : null;
+    }
+
+    public function getEffectivePriceForVariant(ProductVariant $variant): ?float
+    {
+        $item = $this->items()->where('variant_id', $variant->id)->first();
+        return $item ? $item->net_amount : null;
+    }
+
+    public function getItemsCountAttribute(): int
+    {
+        return $this->items()->count();
+    }
+
+    public function getCustomerGroupsCountAttribute(): int
+    {
+        return $this->customerGroups()->count();
+    }
+
+    public function getPartnersCountAttribute(): int
+    {
+        return $this->partners()->count();
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'code', 'currency_id', 'zone_id', 'is_enabled', 'priority', 'starts_at', 'ends_at'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

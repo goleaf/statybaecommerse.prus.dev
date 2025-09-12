@@ -82,6 +82,12 @@ return [
     'products_found' => 'produktų rasta',
     'no_products_found' => 'Produktų nerasta',
     'try_adjusting_filters' => 'Pabandykite koreguoti paieškos ar filtravimo kriterijus.',
+    // Related Products
+    'related_products' => 'Susiję produktai',
+    'related_products_description' => 'Atraskite panašius produktus, kurie gali jus sudominti',
+    'you_might_also_like' => 'Jums taip pat gali patikti',
+    'similar_products' => 'Panašūs produktai',
+    'recommended_for_you' => 'Rekomenduojama jums',
     // User Account
     'account' => 'Paskyra',
     'profile' => 'Profilis',

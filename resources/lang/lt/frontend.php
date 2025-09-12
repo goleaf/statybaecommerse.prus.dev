@@ -234,4 +234,27 @@ return [
     'home_shop_by_collection' => 'Pirkti pagal kolekciją',
     'home_collections_desc' => 'Ištyrinėkite mūsų kruopščiai parinktų aukščiausios kokybės produktų kolekcijas',
     'home_trending_products' => 'Populiarūs produktai',
+
+    // Product section
+    'product' => [
+        'request_info_title' => 'Užsakomas produktas',
+        'request_info_description' => 'Šis produktas reikalauja užklausos prieš pirkimą. Susisieksime su jumis dėl galimybės ir kainos.',
+        'request_product' => 'Užsakyti produktą',
+        'cancel_request' => 'Atšaukti užklausą',
+        'request_form_title' => 'Produkto užklausos forma',
+        'name' => 'Vardas',
+        'email' => 'El. paštas',
+        'phone' => 'Telefonas',
+        'message' => 'Žinutė',
+        'requested_quantity' => 'Užsakomas kiekis',
+        'message_placeholder' => 'Papildoma informacija apie jūsų poreikius...',
+        'cancel' => 'Atšaukti',
+        'submit_request' => 'Pateikti užklausą',
+        'cannot_add_to_cart' => 'Negalima pridėti į krepšelį',
+        'request_required' => 'Šis produktas reikalauja užklausos prieš pirkimą',
+        'cannot_add_to_cart_message' => 'Šis produktas reikalauja užklausos prieš pirkimą. Naudokite užklausos formą žemiau.',
+        'minimum_quantity_required' => 'Minimalus kiekis: :min vnt.',
+        'minimum_quantity_description' => 'Šis produktas turi minimalų užsakymo kiekį',
+        'not_enough_stock' => 'Nepakanka atsargų',
+    ],
 ];

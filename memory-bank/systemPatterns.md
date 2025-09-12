@@ -218,6 +218,28 @@
 - **Migration Strategy:** Safe database migrations
 - **Cache Warming:** Post-deployment cache warming
 
+## Filament Integration Patterns
+
+### 1. Navigation Group Pattern
+**Pattern:** Consistent navigation group type declarations
+- **Type Declaration:** Always use `protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::EnumCase;`
+- **Enum Usage:** Use NavigationGroup enum values instead of string literals
+- **Import Requirement:** Always import `use App\Enums\NavigationGroup;` at the top of Filament files
+- **Type Safety:** Prevents type compatibility errors with Filament's Page class requirements
+
+**Implementation:**
+- All Filament pages and resources must use the NavigationGroup enum
+- Navigation group property must match Filament's expected type signature
+- Consistent navigation organization across the admin panel
+- Type-safe navigation group assignments
+
+### 2. Filament Resource Pattern
+**Pattern:** Standardized Filament resource structure
+- **Form Schemas:** Separate form schema classes for complex forms
+- **Table Schemas:** Dedicated table schema classes for data display
+- **Page Classes:** Custom page classes for create, edit, and list operations
+- **Navigation Integration:** Proper navigation group and icon assignments
+
 ## Documentation Patterns
 
 ### 1. Code Documentation Pattern

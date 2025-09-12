@@ -9,83 +9,41 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Cache;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 final class Category extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes;
-    use HasTranslations;
-    use InteractsWithMedia;
-    use LogsActivity;
-
-    protected $table = 'categories';
+    use HasFactory, SoftDeletes, HasTranslations, InteractsWithMedia;
 
     protected $fillable = [
         'name',
         'slug',
         'description',
+        'short_description',
         'parent_id',
         'sort_order',
-        'is_enabled',
         'is_visible',
+        'is_enabled',
+        'is_featured',
         'seo_title',
         'seo_description',
+        'seo_keywords',
+        'show_in_menu',
+        'product_limit',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'is_enabled' => 'boolean',
-            'is_visible' => 'boolean',
-            'sort_order' => 'integer',
-        ];
-    }
+    protected $casts = [
+        'is_visible' => 'boolean',
+        'is_enabled' => 'boolean',
+        'is_featured' => 'boolean',
+        'show_in_menu' => 'boolean',
+        'sort_order' => 'integer',
+        'product_limit' => 'integer',
+    ];
 
     protected string $translationModel = \App\Models\Translations\CategoryTranslation::class;
-
-    protected static function booted(): void
-    {
-        static::saved(function (): void {
-            self::flushCaches();
-        });
-        static::deleted(function (): void {
-            self::flushCaches();
-        });
-    }
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name', 'slug', 'description', 'is_visible', 'sort_order'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Category {$eventName}")
-            ->useLogName('category');
-    }
-
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
-    }
-
-    public static function flushCaches(): void
-    {
-        $locales = collect(config('app.supported_locales', 'en'))
-            ->when(fn($v) => is_string($v), fn($c) => collect(explode(',', (string) $c)))
-            ->map(fn($v) => trim((string) $v))
-            ->filter()
-            ->values();
-        foreach ($locales as $loc) {
-            Cache::forget("nav:categories:roots:{$loc}");
-            Cache::forget("categories:roots:{$loc}");
-            Cache::forget("categories:tree:{$loc}");
-        }
-    }
 
     public function parent(): BelongsTo
     {
@@ -97,26 +55,34 @@ final class Category extends Model implements HasMedia
         return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order');
     }
 
-    public function scopeWithProductCounts($query)
-    {
-        return $query->withCount(['products' => function ($query) {
-            $query->where('is_visible', true);
-        }]);
-    }
-
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_categories');
     }
 
-    public function allChildren(): HasMany
+    public function getRouteKeyName(): string
     {
-        return $this->children()->with('allChildren');
+        return 'slug';
     }
 
-    public function ancestors(): BelongsTo
+    public function scopeActive($query)
     {
-        return $this->parent()->with('ancestors');
+        return $query->where('is_visible', true);
+    }
+
+    public function scopeRoot($query)
+    {
+        return $query->whereNull('parent_id');
+    }
+
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderBy('name');
+    }
+
+    public function scopeWithProductCounts($query)
+    {
+        return $query->withCount('products');
     }
 
     public function scopeVisible($query)
@@ -129,204 +95,94 @@ final class Category extends Model implements HasMedia
         return $query->whereNull('parent_id');
     }
 
-    public function scopeOrdered($query)
+    public function scopeEnabled($query)
     {
-        return $query->orderBy('sort_order');
+        return $query->where('is_enabled', true);
     }
 
-    public function scopeWithProducts($query)
+    public function scopeFeatured($query)
     {
-        return $query->whereHas('products');
+        return $query->where('is_featured', true);
     }
 
-    public function isRoot(): bool
+    public function scopeWithChildren($query)
     {
-        return is_null($this->parent_id);
+        return $query->withCount('children');
     }
 
-    public function hasChildren(): bool
+    public function scopeWithParent($query)
     {
-        return $this->children()->exists();
+        return $query->with('parent');
     }
 
-    public function getDepthAttribute(): int
+    public function scopeWithAllRelations($query)
     {
-        $depth = 0;
-        $parent = $this->parent;
+        return $query->with(['parent', 'children', 'products', 'translations']);
+    }
 
-        while ($parent) {
-            $depth++;
-            $parent = $parent->parent;
+    public function getFullNameAttribute(): string
+    {
+        $name = $this->trans('name', app()->getLocale());
+
+        if ($this->parent) {
+            return $this->parent->getFullNameAttribute() . ' > ' . $name;
         }
 
-        return $depth;
+        return $name;
     }
 
-    public function getProductsCountAttribute(): int
+    public function getBreadcrumbAttribute(): array
     {
-        return $this->products()->published()->count();
-    }
+        $breadcrumb = [];
+        $category = $this;
 
-    public function getAllProductsCountAttribute(): int
-    {
-        $count = $this->products_count;
-
-        foreach ($this->children as $child) {
-            $count += $child->all_products_count;
+        while ($category) {
+            array_unshift($breadcrumb, [
+                'id' => $category->id,
+                'name' => $category->trans('name', app()->getLocale()),
+                'slug' => $category->slug,
+            ]);
+            $category = $category->parent;
         }
 
-        return $count;
-    }
-
-    public function getImageAttribute(): ?string
-    {
-        return $this->getFirstMediaUrl('images') ?: null;
-    }
-
-    public function getImageUrl(?string $size = null): ?string
-    {
-        if (!$size) {
-            return $this->getFirstMediaUrl('images') ?: null;
-        }
-
-        return $this->getFirstMediaUrl('images', "image-{$size}") ?: $this->getFirstMediaUrl('images');
-    }
-
-    public function getBannerUrl(?string $size = null): ?string
-    {
-        if (!$size) {
-            return $this->getFirstMediaUrl('banner') ?: null;
-        }
-
-        return $this->getFirstMediaUrl('banner', "banner-{$size}") ?: $this->getFirstMediaUrl('banner');
-    }
-
-    public function getNameAttribute(?string $value): ?string
-    {
-        return $this->trans('name') ?: $value;
-    }
-
-    public function getDescriptionAttribute(?string $value): ?string
-    {
-        return $this->trans('description') ?: $value;
-    }
-
-    public function getSeoTitleAttribute(?string $value): ?string
-    {
-        return $this->trans('seo_title') ?: $value;
-    }
-
-    public function getSeoDescriptionAttribute(?string $value): ?string
-    {
-        return $this->trans('seo_description') ?: $value;
+        return $breadcrumb;
     }
 
     public function registerMediaCollections(): void
     {
         $this
             ->addMediaCollection('images')
-            ->singleFile()
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+            ->singleFile();
 
         $this
             ->addMediaCollection('banner')
-            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+            ->singleFile();
+
+        $this
+            ->addMediaCollection('gallery')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
 
     public function registerMediaConversions(Media $media = null): void
     {
-        // Image conversions with multiple resolutions
-        $this
-            ->addMediaConversion('image-xs')
-            ->performOnCollections('images')
-            ->width(64)
-            ->height(64)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(10)
-            ->optimize();
-
-        $this
-            ->addMediaConversion('image-sm')
-            ->performOnCollections('images')
-            ->width(128)
-            ->height(128)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(10)
-            ->optimize();
-
-        $this
-            ->addMediaConversion('image-md')
-            ->performOnCollections('images')
-            ->width(200)
-            ->height(200)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(10)
-            ->optimize();
-
-        $this
-            ->addMediaConversion('image-lg')
-            ->performOnCollections('images')
-            ->width(400)
-            ->height(400)
-            ->format('webp')
-            ->quality(90)
-            ->sharpen(5)
-            ->optimize();
-
-        // Banner conversions with multiple resolutions
-        $this
-            ->addMediaConversion('banner-sm')
-            ->performOnCollections('banner')
-            ->width(800)
-            ->height(400)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(10)
-            ->optimize();
-
-        $this
-            ->addMediaConversion('banner-md')
-            ->performOnCollections('banner')
-            ->width(1200)
-            ->height(600)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(5)
-            ->optimize();
-
-        $this
-            ->addMediaConversion('banner-lg')
-            ->performOnCollections('banner')
-            ->width(1920)
-            ->height(960)
-            ->format('webp')
-            ->quality(90)
-            ->sharpen(5)
-            ->optimize();
-
-        // Legacy conversions for backward compatibility - now in WebP
         $this
             ->addMediaConversion('thumb')
-            ->performOnCollections('images')
-            ->width(200)
-            ->height(200)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(10)
-            ->optimize();
+            ->width(300)
+            ->height(300)
+            ->sharpen(10);
 
         $this
-            ->addMediaConversion('small')
-            ->performOnCollections('images')
-            ->width(400)
-            ->height(400)
-            ->format('webp')
-            ->quality(85)
-            ->sharpen(10)
-            ->optimize();
+            ->addMediaConversion('medium')
+            ->width(600)
+            ->height(600)
+            ->sharpen(10);
+
+        $this
+            ->addMediaConversion('large')
+            ->width(1200)
+            ->height(1200)
+            ->sharpen(10);
     }
 }
