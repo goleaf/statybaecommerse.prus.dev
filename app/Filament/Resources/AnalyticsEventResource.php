@@ -135,6 +135,43 @@ final class AnalyticsEventResource extends Resource
                 Tables\Filters\Filter::make('this_month')
                     ->query(fn(Builder $query): Builder => $query->whereMonth('created_at', now()->month))
                     ->label(__('admin.analytics.this_month')),
+                Tables\Filters\SelectFilter::make('user_id')
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->label(__('admin.users.singular')),
+                Tables\Filters\Filter::make('session_id')
+                    ->form([
+                        Forms\Components\TextInput::make('session_id')
+                            ->label(__('admin.analytics.session'))
+                            ->placeholder(__('admin.analytics.enter_session_id')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['session_id'],
+                            fn (Builder $query, $sessionId): Builder => $query->where('session_id', 'like', "%{$sessionId}%"),
+                        );
+                    })
+                    ->label(__('admin.analytics.session')),
+                Tables\Filters\Filter::make('date_range')
+                    ->form([
+                        Forms\Components\DatePicker::make('from')
+                            ->label(__('admin.date_ranges.from')),
+                        Forms\Components\DatePicker::make('until')
+                            ->label(__('admin.date_ranges.until')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+                    ->label(__('admin.date_ranges.date_range')),
             ])
             ->recordActions([
                 Actions\ViewAction::make(),

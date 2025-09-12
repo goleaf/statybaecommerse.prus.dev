@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Filament\Components\LiveNotificationFeed;
 use App\Services\DocumentService;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -13,7 +14,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
-use App\Filament\Components\LiveNotificationFeed;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
-        
+
         // Set default currency for Number helper (EUR by default)
         try {
             Number::useCurrency(config('shared.localization.default_currency', 'EUR'));
@@ -116,7 +116,7 @@ class AppServiceProvider extends ServiceProvider
     private function configureDocumentVariables(): void
     {
         $service = app(DocumentService::class);
-        
+
         // Register global e-commerce variables
         config([
             'documents.global_variables' => array_merge($service->getAvailableVariables(), [
@@ -127,19 +127,16 @@ class AppServiceProvider extends ServiceProvider
                 '$COMPANY_EMAIL' => config('app.company_email', config('mail.from.address')),
                 '$COMPANY_WEBSITE' => config('app.url'),
                 '$COMPANY_VAT' => config('app.company_vat', ''),
-                
                 // Current date/time variables
                 '$CURRENT_DATE' => now()->format('Y-m-d'),
                 '$CURRENT_DATETIME' => now()->format('Y-m-d H:i:s'),
                 '$CURRENT_YEAR' => now()->year,
                 '$CURRENT_MONTH' => now()->format('F'),
                 '$CURRENT_DAY' => now()->format('d'),
-                
                 // E-commerce specific variables
                 '$STORE_CURRENCY' => config('app.currency', 'EUR'),
                 '$STORE_LOCALE' => app()->getLocale(),
                 '$STORE_TIMEZONE' => config('app.timezone'),
-                
                 // Order variables
                 '$ORDER_NUMBER' => 'Order Number',
                 '$ORDER_DATE' => 'Order Date',
@@ -151,7 +148,6 @@ class AppServiceProvider extends ServiceProvider
                 '$ORDER_STATUS' => 'Order Status',
                 '$ORDER_PAYMENT_METHOD' => 'Payment Method',
                 '$ORDER_SHIPPING_METHOD' => 'Shipping Method',
-                
                 // Customer variables
                 '$CUSTOMER_NAME' => 'Customer Name',
                 '$CUSTOMER_FIRST_NAME' => 'Customer First Name',
@@ -160,7 +156,6 @@ class AppServiceProvider extends ServiceProvider
                 '$CUSTOMER_PHONE' => 'Customer Phone',
                 '$CUSTOMER_COMPANY' => 'Customer Company',
                 '$CUSTOMER_GROUP' => 'Customer Group',
-                
                 // Address variables
                 '$BILLING_ADDRESS' => 'Billing Address',
                 '$BILLING_CITY' => 'Billing City',
@@ -170,7 +165,6 @@ class AppServiceProvider extends ServiceProvider
                 '$SHIPPING_CITY' => 'Shipping City',
                 '$SHIPPING_COUNTRY' => 'Shipping Country',
                 '$SHIPPING_POSTAL_CODE' => 'Shipping Postal Code',
-                
                 // Product variables
                 '$PRODUCT_NAME' => 'Product Name',
                 '$PRODUCT_SKU' => 'Product SKU',
@@ -180,7 +174,6 @@ class AppServiceProvider extends ServiceProvider
                 '$PRODUCT_CATEGORY' => 'Product Category',
                 '$PRODUCT_WEIGHT' => 'Product Weight',
                 '$PRODUCT_DIMENSIONS' => 'Product Dimensions',
-                
                 // Brand and category variables
                 '$BRAND_NAME' => 'Brand Name',
                 '$BRAND_DESCRIPTION' => 'Brand Description',

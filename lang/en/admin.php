@@ -1030,4 +1030,12 @@ return [
             'no_events' => 'No events',
         ],
     ],
+
+    // Additional translations
+    'view_subject' => 'View Subject',
+    'clear_old_logs' => 'Clear Old Logs',
+    'clear_old_logs_confirm' => 'Clear Old Activity Logs?',
+    'clear_old_logs_description' => 'This will delete all activity logs older than 30 days. This action cannot be undone.',
+    'logs_cleared' => 'Cleared :count activity logs',
+    'copied' => 'copied',
 ];

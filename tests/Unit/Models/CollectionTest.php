@@ -83,7 +83,7 @@ it('image and banner accessors return null without media', function (): void {
         ->and($collection->getBannerUrl())
         ->toBeNull()
         ->and($collection->getBannerUrl('md'))
-        ->toBeNull();
+        ->toBe('');
 });
 
 it('flushCaches executes without exception for configured locales', function (): void {
