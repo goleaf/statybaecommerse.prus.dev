@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -25,7 +27,7 @@ class ProductComparisonFactory extends Factory
 
     public function forUser(User $user): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'user_id' => $user->id,
             'session_id' => null,
         ]);
@@ -33,7 +35,7 @@ class ProductComparisonFactory extends Factory
 
     public function forSession(string $sessionId): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'session_id' => $sessionId,
             'user_id' => null,
         ]);

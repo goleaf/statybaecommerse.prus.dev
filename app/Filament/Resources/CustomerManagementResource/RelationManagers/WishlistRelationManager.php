@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
@@ -8,7 +10,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class WishlistRelationManager extends RelationManager
 {
@@ -84,9 +85,10 @@ class WishlistRelationManager extends RelationManager
                             return __('admin.out_of_stock');
                         }
                         if ($state < 10) {
-                            return __('admin.low_stock') . " ({$state})";
+                            return __('admin.low_stock')." ({$state})";
                         }
-                        return __('admin.in_stock') . " ({$state})";
+
+                        return __('admin.in_stock')." ({$state})";
                     }),
 
                 Tables\Columns\TextColumn::make('notes')

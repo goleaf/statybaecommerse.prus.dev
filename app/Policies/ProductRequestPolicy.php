@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Policies;
 
@@ -20,7 +22,7 @@ final class ProductRequestPolicy
      */
     public function view(User $user, ProductRequest $productRequest): bool
     {
-        return $user->is_admin || 
+        return $user->is_admin ||
                $user->hasPermissionTo('view_product_requests') ||
                $productRequest->user_id === $user->id;
     }
@@ -38,7 +40,7 @@ final class ProductRequestPolicy
      */
     public function update(User $user, ProductRequest $productRequest): bool
     {
-        return $user->is_admin || 
+        return $user->is_admin ||
                $user->hasPermissionTo('update_product_requests') ||
                $productRequest->user_id === $user->id;
     }
@@ -59,4 +61,3 @@ final class ProductRequestPolicy
         return $user->is_admin || $user->hasPermissionTo('respond_product_requests');
     }
 }
-

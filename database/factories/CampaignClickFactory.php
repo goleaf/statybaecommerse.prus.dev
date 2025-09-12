@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -30,7 +32,7 @@ final class CampaignClickFactory extends Factory
 
     public function cta(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'click_type' => 'cta',
             'clicked_url' => $this->faker->url(),
         ]);
@@ -38,7 +40,7 @@ final class CampaignClickFactory extends Factory
 
     public function banner(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'click_type' => 'banner',
             'clicked_url' => $this->faker->url(),
         ]);
@@ -46,14 +48,14 @@ final class CampaignClickFactory extends Factory
 
     public function recent(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'clicked_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
         ]);
     }
 
     public function withCustomer(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'customer_id' => Customer::factory(),
         ]);
     }

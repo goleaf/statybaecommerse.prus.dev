@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\RelationManagers;
 
@@ -8,7 +10,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class CommentsRelationManager extends RelationManager
 {
@@ -97,7 +98,7 @@ final class CommentsRelationManager extends RelationManager
                     ->action(function ($record) {
                         $record->update(['is_approved' => true]);
                     })
-                    ->visible(fn ($record): bool => !$record->is_approved),
+                    ->visible(fn ($record): bool => ! $record->is_approved),
                 Tables\Actions\Action::make('reject')
                     ->label(__('admin.news.comments.reject'))
                     ->icon('heroicon-o-x-mark')

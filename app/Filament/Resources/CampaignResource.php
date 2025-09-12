@@ -1,20 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Models\Campaign;
-use App\Models\Category;
-use App\Models\Channel;
-use App\Models\CustomerGroup;
-use App\Models\Product;
-use App\Models\Zone;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -64,8 +61,7 @@ final class CampaignResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) =>
-                                $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
+                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
                         Forms\Components\TextInput::make('slug')
                             ->label(__('campaigns.fields.slug'))
                             ->required()
@@ -256,7 +252,7 @@ final class CampaignResource extends Resource
                             ->disabled(),
                     ])
                     ->columns(3)
-                    ->visible(fn($record) => $record !== null),
+                    ->visible(fn ($record) => $record !== null),
             ]);
     }
 
@@ -271,7 +267,7 @@ final class CampaignResource extends Resource
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('campaigns.fields.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'email' => 'info',
                         'sms' => 'warning',
                         'push' => 'success',
@@ -283,7 +279,7 @@ final class CampaignResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('campaigns.fields.status'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'active' => 'success',
                         'scheduled' => 'warning',
                         'paused' => 'secondary',
@@ -364,16 +360,16 @@ final class CampaignResource extends Resource
                     ->label(__('campaigns.fields.is_featured')),
                 Tables\Filters\Filter::make('active')
                     ->label(__('campaigns.filters.active'))
-                    ->query(fn(Builder $query): Builder => $query->active()),
+                    ->query(fn (Builder $query): Builder => $query->active()),
                 Tables\Filters\Filter::make('scheduled')
                     ->label(__('campaigns.filters.scheduled'))
-                    ->query(fn(Builder $query): Builder => $query->scheduled()),
+                    ->query(fn (Builder $query): Builder => $query->scheduled()),
                 Tables\Filters\Filter::make('expired')
                     ->label(__('campaigns.filters.expired'))
-                    ->query(fn(Builder $query): Builder => $query->expired()),
+                    ->query(fn (Builder $query): Builder => $query->expired()),
                 Tables\Filters\Filter::make('featured')
                     ->label(__('campaigns.filters.featured'))
-                    ->query(fn(Builder $query): Builder => $query->featured()),
+                    ->query(fn (Builder $query): Builder => $query->featured()),
                 Tables\Filters\Filter::make('created_from')
                     ->label(__('campaigns.filters.created_from'))
                     ->form([
@@ -384,7 +380,7 @@ final class CampaignResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             );
                     }),
                 Tables\Filters\TrashedFilter::make(),
@@ -396,16 +392,16 @@ final class CampaignResource extends Resource
                     ->label(__('campaigns.actions.activate'))
                     ->icon('heroicon-o-play')
                     ->color('success')
-                    ->action(fn(Campaign $record) => $record->update(['status' => 'active']))
+                    ->action(fn (Campaign $record) => $record->update(['status' => 'active']))
                     ->requiresConfirmation()
-                    ->visible(fn(Campaign $record): bool => $record->status !== 'active'),
+                    ->visible(fn (Campaign $record): bool => $record->status !== 'active'),
                 Tables\Actions\Action::make('pause')
                     ->label(__('campaigns.actions.pause'))
                     ->icon('heroicon-o-pause')
                     ->color('warning')
-                    ->action(fn(Campaign $record) => $record->update(['status' => 'paused']))
+                    ->action(fn (Campaign $record) => $record->update(['status' => 'paused']))
                     ->requiresConfirmation()
-                    ->visible(fn(Campaign $record): bool => $record->status === 'active'),
+                    ->visible(fn (Campaign $record): bool => $record->status === 'active'),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
@@ -419,13 +415,13 @@ final class CampaignResource extends Resource
                         ->label(__('campaigns.actions.activate'))
                         ->icon('heroicon-o-play')
                         ->color('success')
-                        ->action(fn($records) => $records->each->update(['status' => 'active']))
+                        ->action(fn ($records) => $records->each->update(['status' => 'active']))
                         ->requiresConfirmation(),
                     Tables\Actions\BulkAction::make('pause')
                         ->label(__('campaigns.actions.pause'))
                         ->icon('heroicon-o-pause')
                         ->color('warning')
-                        ->action(fn($records) => $records->each->update(['status' => 'paused']))
+                        ->action(fn ($records) => $records->each->update(['status' => 'paused']))
                         ->requiresConfirmation(),
                 ]),
             ])

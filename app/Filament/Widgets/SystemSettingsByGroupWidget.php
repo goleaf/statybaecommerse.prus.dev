@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -11,7 +13,7 @@ final class SystemSettingsByGroupWidget extends ChartWidget
 
     protected static ?int $sort = 4;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {
@@ -40,7 +42,7 @@ final class SystemSettingsByGroupWidget extends ChartWidget
                 ],
             ],
             'labels' => $groups->map(function ($group) {
-                return __('admin.system_settings.' . $group->group);
+                return __('admin.system_settings.'.$group->group);
             }),
         ];
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\RegionResource\Widgets;
 
@@ -10,10 +12,10 @@ use Filament\Widgets\TableWidget as BaseWidget;
 final class RecentRegionsWidget extends BaseWidget
 {
     protected static ?string $heading = 'Recent Regions';
-    
+
     protected static ?int $sort = 4;
-    
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -26,19 +28,19 @@ final class RecentRegionsWidget extends BaseWidget
                     ->label(__('regions.name'))
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('code')
                     ->label(__('regions.code'))
                     ->searchable(),
-                
+
                 Tables\Columns\TextColumn::make('country.name')
                     ->label(__('regions.country'))
                     ->sortable(),
-                
+
                 Tables\Columns\IconColumn::make('is_enabled')
                     ->label(__('regions.is_enabled'))
                     ->boolean(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('regions.created_at'))
                     ->dateTime()

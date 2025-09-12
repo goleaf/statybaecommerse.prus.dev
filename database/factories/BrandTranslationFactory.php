@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -22,7 +24,7 @@ final class BrandTranslationFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->company();
-        
+
         return [
             'brand_id' => Brand::factory(),
             'locale' => $this->faker->randomElement(['en', 'lt', 'ru', 'de']),
@@ -39,9 +41,9 @@ final class BrandTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
-            'name' => $this->faker->company() . ' (LT)',
-            'slug' => Str::slug($attributes['name'] ?? $this->faker->company()) . '-lt',
-            'description' => 'Lietuviškas aprašymas: ' . $this->faker->paragraph(),
+            'name' => $this->faker->company().' (LT)',
+            'slug' => Str::slug($attributes['name'] ?? $this->faker->company()).'-lt',
+            'description' => 'Lietuviškas aprašymas: '.$this->faker->paragraph(),
         ]);
     }
 
@@ -65,9 +67,9 @@ final class BrandTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'ru',
-            'name' => $this->faker->company() . ' (RU)',
-            'slug' => Str::slug($attributes['name'] ?? $this->faker->company()) . '-ru',
-            'description' => 'Русское описание: ' . $this->faker->paragraph(),
+            'name' => $this->faker->company().' (RU)',
+            'slug' => Str::slug($attributes['name'] ?? $this->faker->company()).'-ru',
+            'description' => 'Русское описание: '.$this->faker->paragraph(),
         ]);
     }
 
@@ -78,9 +80,9 @@ final class BrandTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'de',
-            'name' => $this->faker->company() . ' (DE)',
-            'slug' => Str::slug($attributes['name'] ?? $this->faker->company()) . '-de',
-            'description' => 'Deutsche Beschreibung: ' . $this->faker->paragraph(),
+            'name' => $this->faker->company().' (DE)',
+            'slug' => Str::slug($attributes['name'] ?? $this->faker->company()).'-de',
+            'description' => 'Deutsche Beschreibung: '.$this->faker->paragraph(),
         ]);
     }
 }

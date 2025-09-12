@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\SystemSettingHistory;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
 
 final class SystemSettingsActivityWidget extends BaseWidget
 {
@@ -41,14 +43,14 @@ final class SystemSettingsActivityWidget extends BaseWidget
                     ->limit(30),
                 Tables\Columns\TextColumn::make('old_value')
                     ->label(__('admin.system_settings.old_value'))
-                    ->formatStateUsing(fn($state) => $state ? $this->formatHistoryValue($state) : '-')
+                    ->formatStateUsing(fn ($state) => $state ? $this->formatHistoryValue($state) : '-')
                     ->limit(30)
                     ->tooltip(function ($record) {
                         return $record->getFormattedOldValue();
                     }),
                 Tables\Columns\TextColumn::make('new_value')
                     ->label(__('admin.system_settings.new_value'))
-                    ->formatStateUsing(fn($state) => $state ? $this->formatHistoryValue($state) : '-')
+                    ->formatStateUsing(fn ($state) => $state ? $this->formatHistoryValue($state) : '-')
                     ->limit(30)
                     ->tooltip(function ($record) {
                         return $record->getFormattedNewValue();
@@ -69,7 +71,7 @@ final class SystemSettingsActivityWidget extends BaseWidget
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->url(fn(SystemSettingHistory $record): string => route('filament.admin.resources.system-settings.view', $record->systemSetting)),
+                    ->url(fn (SystemSettingHistory $record): string => route('filament.admin.resources.system-settings.view', $record->systemSetting)),
             ])
             ->defaultSort('created_at', 'desc');
     }

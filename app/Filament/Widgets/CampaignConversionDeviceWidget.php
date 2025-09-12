@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -29,7 +31,7 @@ class CampaignConversionDeviceWidget extends ChartWidget
                     ],
                 ],
             ],
-            'labels' => $data->pluck('device_type')->map(fn($type) => __("campaign_conversions.device_types.{$type}"))->toArray(),
+            'labels' => $data->pluck('device_type')->map(fn ($type) => __("campaign_conversions.device_types.{$type}"))->toArray(),
         ];
     }
 

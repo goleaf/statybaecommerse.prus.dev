@@ -1,34 +1,35 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\LocationResource\Pages;
 use App\Filament\Resources\LocationResource\RelationManagers;
-use App\Models\Location;
 use App\Models\Country;
-use BackedEnum;
+use App\Models\Location;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TimePicker;
-use Filament\Forms\Components\Repeater;
-use Filament\Resources\Resource;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\Action;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -244,6 +245,7 @@ final class LocationResource extends Resource
                     ->limit(50)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
                 Tables\Columns\TextColumn::make('city')
@@ -303,7 +305,7 @@ final class LocationResource extends Resource
                     ->label(__('locations.toggle_enabled'))
                     ->icon('heroicon-o-power')
                     ->action(function (Location $record) {
-                        $record->update(['is_enabled' => !$record->is_enabled]);
+                        $record->update(['is_enabled' => ! $record->is_enabled]);
                     })
                     ->requiresConfirmation()
                     ->color(fn (Location $record) => $record->is_enabled ? 'danger' : 'success'),

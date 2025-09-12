@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -15,7 +17,7 @@ final class DocumentTemplateFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->words(3, true) . ' Template';
+        $name = $this->faker->words(3, true).' Template';
 
         return [
             'name' => $name,
@@ -104,7 +106,7 @@ final class DocumentTemplateFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => true,
         ]);
     }
@@ -114,7 +116,7 @@ final class DocumentTemplateFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
         ]);
     }
@@ -124,7 +126,7 @@ final class DocumentTemplateFactory extends Factory
      */
     public function invoice(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'name' => 'Invoice Template',
             'slug' => 'invoice-template',
             'type' => 'invoice',
@@ -154,7 +156,7 @@ final class DocumentTemplateFactory extends Factory
      */
     public function receipt(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'name' => 'Receipt Template',
             'slug' => 'receipt-template',
             'type' => 'receipt',
@@ -179,7 +181,7 @@ final class DocumentTemplateFactory extends Factory
      */
     public function contract(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'name' => 'Contract Template',
             'slug' => 'contract-template',
             'type' => 'contract',
@@ -358,7 +360,7 @@ final class DocumentTemplateFactory extends Factory
      */
     public function withVariables(array $variables): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'variables' => $variables,
         ]);
     }
@@ -368,7 +370,7 @@ final class DocumentTemplateFactory extends Factory
      */
     public function withSettings(array $settings): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'settings' => array_merge($attributes['settings'] ?? [], $settings),
         ]);
     }

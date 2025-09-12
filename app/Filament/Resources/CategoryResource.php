@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -8,17 +10,14 @@ use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Filament\Resources\CategoryResource\Widgets;
 use App\Models\Category;
-use App\Models\Product;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
+use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -26,6 +25,7 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
+use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -43,8 +43,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -251,7 +249,7 @@ final class CategoryResource extends Resource
                             ])
                             ->columns(3)
                             ->collapsible()
-                            ->itemLabel(fn(array $state): ?string => $state['name'] ?? null),
+                            ->itemLabel(fn (array $state): ?string => $state['name'] ?? null),
                     ])
                     ->collapsible(),
             ]);
@@ -288,9 +286,10 @@ final class CategoryResource extends Resource
                     ->badge()
                     ->color('info')
                     ->getStateUsing(function (Category $record): ?string {
-                        if (!$record->parent) {
+                        if (! $record->parent) {
                             return null;
                         }
+
                         return $record->parent->trans('name', app()->getLocale()) ?: $record->parent->trans('name', 'lt');
                     }),
                 TextColumn::make('children_count')
@@ -424,16 +423,16 @@ final class CategoryResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
                 Filter::make('has_seo')
                     ->label(__('categories.filters.has_seo'))
-                    ->query(fn(Builder $query): Builder => $query->where(function ($q) {
+                    ->query(fn (Builder $query): Builder => $query->where(function ($q) {
                         $q
                             ->whereNotNull('seo_title')
                             ->where('seo_title', '!=', '')
@@ -443,7 +442,7 @@ final class CategoryResource extends Resource
                     })),
                 Filter::make('root_categories')
                     ->label(__('categories.filters.root_categories'))
-                    ->query(fn(Builder $query): Builder => $query->whereNull('parent_id')),
+                    ->query(fn (Builder $query): Builder => $query->whereNull('parent_id')),
                 TrashedFilter::make(),
             ])
             ->actions([
@@ -454,13 +453,13 @@ final class CategoryResource extends Resource
                         ->label(__('categories.actions.translate'))
                         ->icon('heroicon-o-language')
                         ->color('info')
-                        ->url(fn(Category $record): string => route('filament.admin.resources.categories.edit', ['record' => $record]) . '?tab=translations')
+                        ->url(fn (Category $record): string => route('filament.admin.resources.categories.edit', ['record' => $record]).'?tab=translations')
                         ->openUrlInNewTab(false),
                     Action::make('view_products')
                         ->label(__('categories.actions.view_products'))
                         ->icon('heroicon-o-shopping-bag')
                         ->color('warning')
-                        ->url(fn(Category $record): string => route('filament.admin.resources.products.index', ['tableFilters[category_id][value]' => $record->id]))
+                        ->url(fn (Category $record): string => route('filament.admin.resources.products.index', ['tableFilters[category_id][value]' => $record->id]))
                         ->openUrlInNewTab(false),
                     Action::make('duplicate')
                         ->label(__('categories.actions.duplicate'))
@@ -468,8 +467,8 @@ final class CategoryResource extends Resource
                         ->color('gray')
                         ->action(function (Category $record) {
                             $newCategory = $record->replicate();
-                            $newCategory->name = $record->trans('name') . ' (Copy)';
-                            $newCategory->slug = $record->slug . '-copy';
+                            $newCategory->name = $record->trans('name').' (Copy)';
+                            $newCategory->slug = $record->slug.'-copy';
                             $newCategory->save();
 
                             Notification::make()
@@ -586,7 +585,7 @@ final class CategoryResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return self::getModel()::count();
     }
 
     public static function getNavigationBadgeColor(): ?string

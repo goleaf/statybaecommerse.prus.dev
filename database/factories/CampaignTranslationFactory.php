@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -34,7 +36,7 @@ final class CampaignTranslationFactory extends Factory
 
     public function english(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'locale' => 'en',
             'name' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(3),
@@ -48,7 +50,7 @@ final class CampaignTranslationFactory extends Factory
 
     public function lithuanian(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
             'name' => 'Lietuviškas kampanijos pavadinimas',
             'description' => 'Lietuviškas kampanijos aprašymas su daugiau informacijos.',
@@ -62,7 +64,7 @@ final class CampaignTranslationFactory extends Factory
 
     public function german(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'locale' => 'de',
             'name' => 'Deutscher Kampagnenname',
             'description' => 'Deutsche Kampagnenbeschreibung mit mehr Informationen.',
@@ -74,4 +76,3 @@ final class CampaignTranslationFactory extends Factory
         ]);
     }
 }
-

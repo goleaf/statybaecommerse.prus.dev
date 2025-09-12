@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CityResource\RelationManagers;
 
@@ -69,7 +71,7 @@ class ChildrenRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('level')
-                    ->formatStateUsing(fn (int $state): string => match($state) {
+                    ->formatStateUsing(fn (int $state): string => match ($state) {
                         0 => 'City',
                         1 => 'District',
                         2 => 'Neighborhood',
@@ -77,7 +79,7 @@ class ChildrenRelationManager extends RelationManager
                         default => 'City',
                     })
                     ->badge()
-                    ->color(fn (int $state): string => match($state) {
+                    ->color(fn (int $state): string => match ($state) {
                         0 => 'success',
                         1 => 'info',
                         2 => 'warning',

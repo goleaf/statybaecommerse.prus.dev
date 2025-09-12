@@ -4,14 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         // Create brands table
-        if (!Schema::hasTable('brands')) {
+        if (! Schema::hasTable('brands')) {
             Schema::create('brands', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -31,7 +32,7 @@ return new class extends Migration {
         }
 
         // Create categories table
-        if (!Schema::hasTable('categories')) {
+        if (! Schema::hasTable('categories')) {
             Schema::create('categories', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -52,7 +53,7 @@ return new class extends Migration {
         }
 
         // Create products table
-        if (!Schema::hasTable('products')) {
+        if (! Schema::hasTable('products')) {
             Schema::create('products', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -93,7 +94,7 @@ return new class extends Migration {
         }
 
         // Create product_categories pivot table
-        if (!Schema::hasTable('product_categories')) {
+        if (! Schema::hasTable('product_categories')) {
             Schema::create('product_categories', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
@@ -107,7 +108,7 @@ return new class extends Migration {
         }
 
         // Create collections table
-        if (!Schema::hasTable('collections')) {
+        if (! Schema::hasTable('collections')) {
             Schema::create('collections', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -127,7 +128,7 @@ return new class extends Migration {
         }
 
         // Create product_collections pivot table
-        if (!Schema::hasTable('product_collections')) {
+        if (! Schema::hasTable('product_collections')) {
             Schema::create('product_collections', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
@@ -141,7 +142,7 @@ return new class extends Migration {
         }
 
         // Create orders table
-        if (!Schema::hasTable('orders')) {
+        if (! Schema::hasTable('orders')) {
             Schema::create('orders', function (Blueprint $table) {
                 $table->id();
                 $table->string('number')->unique();
@@ -168,7 +169,7 @@ return new class extends Migration {
         }
 
         // Create order_items table
-        if (!Schema::hasTable('order_items')) {
+        if (! Schema::hasTable('order_items')) {
             Schema::create('order_items', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('order_id');
@@ -186,7 +187,7 @@ return new class extends Migration {
         }
 
         // Create reviews table
-        if (!Schema::hasTable('reviews')) {
+        if (! Schema::hasTable('reviews')) {
             Schema::create('reviews', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
@@ -212,7 +213,7 @@ return new class extends Migration {
         }
 
         // Create coupons table
-        if (!Schema::hasTable('coupons')) {
+        if (! Schema::hasTable('coupons')) {
             Schema::create('coupons', function (Blueprint $table) {
                 $table->id();
                 $table->string('code')->unique();
@@ -235,7 +236,7 @@ return new class extends Migration {
         }
 
         // Create cart_items table for session-based cart
-        if (!Schema::hasTable('cart_items')) {
+        if (! Schema::hasTable('cart_items')) {
             Schema::create('cart_items', function (Blueprint $table) {
                 $table->id();
                 $table->string('session_id');

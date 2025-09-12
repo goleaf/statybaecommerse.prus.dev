@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
@@ -8,7 +10,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ReviewsRelationManager extends RelationManager
 {
@@ -75,7 +76,7 @@ class ReviewsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('rating')
                     ->label(__('admin.customers.fields.rating'))
                     ->formatStateUsing(function (int $state): string {
-                        return str_repeat('★', $state) . str_repeat('☆', 5 - $state) . " ({$state}/5)";
+                        return str_repeat('★', $state).str_repeat('☆', 5 - $state)." ({$state}/5)";
                     })
                     ->sortable(),
 
@@ -129,11 +130,11 @@ class ReviewsRelationManager extends RelationManager
                 Tables\Filters\SelectFilter::make('rating')
                     ->label(__('admin.customers.fields.rating'))
                     ->options([
-                        1 => '1 ' . __('admin.star'),
-                        2 => '2 ' . __('admin.stars'),
-                        3 => '3 ' . __('admin.stars'),
-                        4 => '4 ' . __('admin.stars'),
-                        5 => '5 ' . __('admin.stars'),
+                        1 => '1 '.__('admin.star'),
+                        2 => '2 '.__('admin.stars'),
+                        3 => '3 '.__('admin.stars'),
+                        4 => '4 '.__('admin.stars'),
+                        5 => '5 '.__('admin.stars'),
                     ]),
 
                 Tables\Filters\TernaryFilter::make('is_approved')

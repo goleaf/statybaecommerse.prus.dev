@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -17,7 +19,7 @@ final class NotificationFactory extends Factory
     {
         $types = ['order', 'product', 'user', 'system', 'payment', 'shipping', 'review', 'promotion', 'newsletter', 'support'];
         $type = $this->faker->randomElement($types);
-        
+
         $data = [
             'title' => $this->getTitleForType($type),
             'message' => $this->getMessageForType($type),
@@ -31,7 +33,7 @@ final class NotificationFactory extends Factory
         $data = array_merge($data, $this->getTypeSpecificData($type));
 
         return [
-            'type' => 'App\\Notifications\\' . ucfirst($type) . 'Notification',
+            'type' => 'App\\Notifications\\'.ucfirst($type).'Notification',
             'notifiable_type' => User::class,
             'notifiable_id' => User::factory(),
             'data' => $data,
@@ -199,13 +201,13 @@ final class NotificationFactory extends Factory
         return match ($type) {
             'order' => [
                 'order_id' => $this->faker->numberBetween(1, 1000),
-                'order_number' => 'ORD-' . $this->faker->unique()->numberBetween(1000, 9999),
+                'order_number' => 'ORD-'.$this->faker->unique()->numberBetween(1000, 9999),
                 'order_total' => $this->faker->randomFloat(2, 10, 500),
             ],
             'product' => [
                 'product_id' => $this->faker->numberBetween(1, 100),
                 'product_name' => $this->faker->words(2, true),
-                'product_sku' => 'SKU-' . $this->faker->unique()->numberBetween(1000, 9999),
+                'product_sku' => 'SKU-'.$this->faker->unique()->numberBetween(1000, 9999),
             ],
             'user' => [
                 'user_id' => $this->faker->numberBetween(1, 100),
@@ -214,7 +216,7 @@ final class NotificationFactory extends Factory
             ],
             'system' => [
                 'system_version' => $this->faker->semver(),
-                'maintenance_duration' => $this->faker->numberBetween(30, 120) . ' min',
+                'maintenance_duration' => $this->faker->numberBetween(30, 120).' min',
             ],
             'payment' => [
                 'payment_id' => $this->faker->numberBetween(1, 1000),
@@ -258,6 +260,7 @@ final class NotificationFactory extends Factory
         return $this->state(function (array $attributes) {
             $attributes['data']['urgent'] = true;
             $attributes['data']['color'] = '#EF4444'; // red
+
             return $attributes;
         });
     }
@@ -269,6 +272,7 @@ final class NotificationFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             $attributes['read_at'] = $this->faker->dateTimeBetween('-30 days', 'now');
+
             return $attributes;
         });
     }
@@ -280,6 +284,7 @@ final class NotificationFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             $attributes['read_at'] = null;
+
             return $attributes;
         });
     }
@@ -290,12 +295,13 @@ final class NotificationFactory extends Factory
     public function ofType(string $type): static
     {
         return $this->state(function (array $attributes) use ($type) {
-            $attributes['type'] = 'App\\Notifications\\' . ucfirst($type) . 'Notification';
+            $attributes['type'] = 'App\\Notifications\\'.ucfirst($type).'Notification';
             $attributes['data']['type'] = $type;
             $attributes['data']['title'] = $this->getTitleForType($type);
             $attributes['data']['message'] = $this->getMessageForType($type);
             $attributes['data']['color'] = $this->getColorForType($type);
             $attributes['data'] = array_merge($attributes['data'], $this->getTypeSpecificData($type));
+
             return $attributes;
         });
     }

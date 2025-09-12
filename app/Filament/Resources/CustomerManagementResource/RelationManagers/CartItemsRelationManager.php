@@ -1,26 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
-use App\Models\CartItem;
-use App\Models\Product;
-use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Grid;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 
 final class CartItemsRelationManager extends RelationManager
 {
@@ -36,38 +32,38 @@ final class CartItemsRelationManager extends RelationManager
     public function form(Schema $form): Schema
     {
         return $form->components([
-                Section::make(__('admin.cart_items.cart_information'))
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                Select::make('product_id')
-                                    ->label(__('admin.cart_items.fields.product'))
-                                    ->relationship('product', 'name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required(),
-                                TextInput::make('quantity')
-                                    ->label(__('admin.cart_items.fields.quantity'))
-                                    ->numeric()
-                                    ->required()
-                                    ->minValue(1)
-                                    ->default(1),
-                                TextInput::make('price')
-                                    ->label(__('admin.cart_items.fields.price'))
-                                    ->numeric()
-                                    ->prefix('€')
-                                    ->minValue(0)
-                                    ->required(),
-                                TextInput::make('total')
-                                    ->label(__('admin.cart_items.fields.total'))
-                                    ->numeric()
-                                    ->prefix('€')
-                                    ->minValue(0)
-                                    ->disabled()
-                                    ->dehydrated(false),
-                            ]),
-                    ]),
-            ]);
+            Section::make(__('admin.cart_items.cart_information'))
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
+                            Select::make('product_id')
+                                ->label(__('admin.cart_items.fields.product'))
+                                ->relationship('product', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->required(),
+                            TextInput::make('quantity')
+                                ->label(__('admin.cart_items.fields.quantity'))
+                                ->numeric()
+                                ->required()
+                                ->minValue(1)
+                                ->default(1),
+                            TextInput::make('price')
+                                ->label(__('admin.cart_items.fields.price'))
+                                ->numeric()
+                                ->prefix('€')
+                                ->minValue(0)
+                                ->required(),
+                            TextInput::make('total')
+                                ->label(__('admin.cart_items.fields.total'))
+                                ->numeric()
+                                ->prefix('€')
+                                ->minValue(0)
+                                ->disabled()
+                                ->dehydrated(false),
+                        ]),
+                ]),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -85,7 +81,7 @@ final class CartItemsRelationManager extends RelationManager
                     ->searchable()
                     ->sortable()
                     ->copyable()
-                    ->copyMessage(__('admin.cart_items.fields.sku') . ' ' . __('admin.common.copied')),
+                    ->copyMessage(__('admin.cart_items.fields.sku').' '.__('admin.common.copied')),
                 TextColumn::make('quantity')
                     ->label(__('admin.cart_items.fields.quantity'))
                     ->numeric()
@@ -136,6 +132,7 @@ final class CartItemsRelationManager extends RelationManager
                     ->label(__('admin.cart_items.create'))
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['user_id'] = $this->ownerRecord->id;
+
                         return $data;
                     }),
             ])

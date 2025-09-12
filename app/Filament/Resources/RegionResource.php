@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -9,11 +11,11 @@ use App\Filament\Resources\RegionResource\Widgets;
 use App\Models\Country;
 use App\Models\Region;
 use App\Models\Zone;
-use Filament\Resources\Resource;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
@@ -207,7 +209,7 @@ class RegionResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
-                    ->description(fn(Region $record): string => $record->translated_description ?: ''),
+                    ->description(fn (Region $record): string => $record->translated_description ?: ''),
                 Tables\Columns\TextColumn::make('full_path')
                     ->label(__('regions.full_path'))
                     ->searchable()
@@ -215,6 +217,7 @@ class RegionResource extends Resource
                     ->limit(50)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
                 Tables\Columns\TextColumn::make('country.name')
@@ -238,14 +241,14 @@ class RegionResource extends Resource
                     ->label(__('regions.level'))
                     ->sortable()
                     ->badge()
-                    ->color(fn(int $state): string => match ($state) {
+                    ->color(fn (int $state): string => match ($state) {
                         0 => 'success',
                         1 => 'primary',
                         2 => 'warning',
                         3 => 'info',
                         default => 'gray'
                     })
-                    ->formatStateUsing(fn(int $state): string => match ($state) {
+                    ->formatStateUsing(fn (int $state): string => match ($state) {
                         0 => 'Root',
                         1 => 'State/Province',
                         2 => 'County',
@@ -328,10 +331,10 @@ class RegionResource extends Resource
                     ->preload(),
                 Tables\Filters\Filter::make('has_children')
                     ->label(__('regions.has_children'))
-                    ->query(fn(Builder $query): Builder => $query->has('children')),
+                    ->query(fn (Builder $query): Builder => $query->has('children')),
                 Tables\Filters\Filter::make('has_cities')
                     ->label(__('regions.has_cities'))
-                    ->query(fn(Builder $query): Builder => $query->has('cities')),
+                    ->query(fn (Builder $query): Builder => $query->has('cities')),
                 Tables\Filters\Filter::make('created_from')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
@@ -341,7 +344,7 @@ class RegionResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             );
                     }),
                 Tables\Filters\Filter::make('created_until')
@@ -353,7 +356,7 @@ class RegionResource extends Resource
                         return $query
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -365,9 +368,9 @@ class RegionResource extends Resource
                     ->label(__('regions.toggle_enabled'))
                     ->icon('heroicon-o-power')
                     ->action(function (Region $record): void {
-                        $record->update(['is_enabled' => !$record->is_enabled]);
+                        $record->update(['is_enabled' => ! $record->is_enabled]);
                     })
-                    ->color(fn(Region $record): string => $record->is_enabled ? 'warning' : 'success')
+                    ->color(fn (Region $record): string => $record->is_enabled ? 'warning' : 'success')
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
@@ -376,12 +379,12 @@ class RegionResource extends Resource
                     Tables\Actions\BulkAction::make('enable')
                         ->label(__('regions.enable_selected'))
                         ->icon('heroicon-o-check-circle')
-                        ->action(fn($records) => $records->each->update(['is_enabled' => true]))
+                        ->action(fn ($records) => $records->each->update(['is_enabled' => true]))
                         ->requiresConfirmation(),
                     Tables\Actions\BulkAction::make('disable')
                         ->label(__('regions.disable_selected'))
                         ->icon('heroicon-o-x-circle')
-                        ->action(fn($records) => $records->each->update(['is_enabled' => false]))
+                        ->action(fn ($records) => $records->each->update(['is_enabled' => false]))
                         ->requiresConfirmation(),
                 ]),
             ])

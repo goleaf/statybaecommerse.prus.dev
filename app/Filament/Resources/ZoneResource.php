@@ -1,18 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ZoneResource\Pages;
 use App\Models\Zone;
-use Filament\Resources\Resource;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use BackedEnum;
 use UnitEnum;
 
 class ZoneResource extends Resource
@@ -193,7 +194,7 @@ class ZoneResource extends Resource
                             ->columns(2)
                             ->addActionLabel(__('zones.add_translation'))
                             ->collapsible()
-                            ->itemLabel(fn(array $state): ?string => $state['locale'] ?? null),
+                            ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
                     ]),
                 Forms\Components\Section::make('Metadata')
                     ->components([
@@ -222,7 +223,7 @@ class ZoneResource extends Resource
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('zones.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'shipping' => 'info',
                         'tax' => 'warning',
                         'payment' => 'success',
@@ -230,7 +231,7 @@ class ZoneResource extends Resource
                         'general' => 'gray',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'shipping' => __('zones.type_shipping'),
                         'tax' => __('zones.type_tax'),
                         'payment' => __('zones.type_payment'),
@@ -244,17 +245,17 @@ class ZoneResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tax_rate')
                     ->label(__('zones.tax_rate'))
-                    ->formatStateUsing(fn(string $state): string => $state . '%')
+                    ->formatStateUsing(fn (string $state): string => $state.'%')
                     ->sortable()
                     ->alignEnd(),
                 Tables\Columns\TextColumn::make('shipping_rate')
                     ->label(__('zones.shipping_rate'))
-                    ->formatStateUsing(fn(string $state): string => '€' . $state)
+                    ->formatStateUsing(fn (string $state): string => '€'.$state)
                     ->sortable()
                     ->alignEnd(),
                 Tables\Columns\TextColumn::make('free_shipping_threshold')
                     ->label(__('zones.free_shipping_threshold'))
-                    ->formatStateUsing(fn(?string $state): string => $state ? '€' . $state : '-')
+                    ->formatStateUsing(fn (?string $state): string => $state ? '€'.$state : '-')
                     ->sortable()
                     ->alignEnd(),
                 Tables\Columns\TextColumn::make('countries_count')
@@ -314,10 +315,10 @@ class ZoneResource extends Resource
                     ->relationship('currency', 'name'),
                 Tables\Filters\Filter::make('has_countries')
                     ->label(__('zones.has_countries'))
-                    ->query(fn(Builder $query): Builder => $query->has('countries')),
+                    ->query(fn (Builder $query): Builder => $query->has('countries')),
                 Tables\Filters\Filter::make('free_shipping_available')
                     ->label(__('zones.free_shipping_available'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('free_shipping_threshold')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('free_shipping_threshold')),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -327,8 +328,8 @@ class ZoneResource extends Resource
                     ->icon('heroicon-o-document-duplicate')
                     ->action(function (Zone $record) {
                         $newZone = $record->replicate();
-                        $newZone->name = $record->name . ' (Copy)';
-                        $newZone->code = $record->code . '_copy';
+                        $newZone->name = $record->name.' (Copy)';
+                        $newZone->code = $record->code.'_copy';
                         $newZone->is_default = false;
                         $newZone->save();
 
@@ -352,22 +353,22 @@ class ZoneResource extends Resource
                     Tables\Actions\BulkAction::make('enable')
                         ->label(__('zones.bulk_enable'))
                         ->icon('heroicon-o-check-circle')
-                        ->action(fn($records) => $records->each->update(['is_enabled' => true]))
+                        ->action(fn ($records) => $records->each->update(['is_enabled' => true]))
                         ->requiresConfirmation(),
                     Tables\Actions\BulkAction::make('disable')
                         ->label(__('zones.bulk_disable'))
                         ->icon('heroicon-o-x-circle')
-                        ->action(fn($records) => $records->each->update(['is_enabled' => false]))
+                        ->action(fn ($records) => $records->each->update(['is_enabled' => false]))
                         ->requiresConfirmation(),
                     Tables\Actions\BulkAction::make('activate')
                         ->label(__('zones.bulk_activate'))
                         ->icon('heroicon-o-play')
-                        ->action(fn($records) => $records->each->update(['is_active' => true]))
+                        ->action(fn ($records) => $records->each->update(['is_active' => true]))
                         ->requiresConfirmation(),
                     Tables\Actions\BulkAction::make('deactivate')
                         ->label(__('zones.bulk_deactivate'))
                         ->icon('heroicon-o-pause')
-                        ->action(fn($records) => $records->each->update(['is_active' => false]))
+                        ->action(fn ($records) => $records->each->update(['is_active' => false]))
                         ->requiresConfirmation(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),

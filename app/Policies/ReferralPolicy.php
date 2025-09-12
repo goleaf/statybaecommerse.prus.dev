@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Policies;
 
@@ -23,8 +25,8 @@ final class ReferralPolicy
      */
     public function view(User $user, Referral $referral): bool
     {
-        return $user->id === $referral->referrer_id || 
-               $user->id === $referral->referred_id || 
+        return $user->id === $referral->referrer_id ||
+               $user->id === $referral->referred_id ||
                $user->is_admin;
     }
 

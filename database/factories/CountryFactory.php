@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -34,7 +36,7 @@ class CountryFactory extends Factory
      */
     public function disabled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_enabled' => false,
         ]);
     }
@@ -44,7 +46,7 @@ class CountryFactory extends Factory
      */
     public function lithuania(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'name' => 'Lithuania',
             'cca2' => 'LT',
             'cca3' => 'LTU',
@@ -56,7 +58,7 @@ class CountryFactory extends Factory
      */
     public function latvia(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'name' => 'Latvia',
             'cca2' => 'LV',
             'cca3' => 'LVA',
@@ -68,7 +70,7 @@ class CountryFactory extends Factory
      */
     public function estonia(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'name' => 'Estonia',
             'cca2' => 'EE',
             'cca3' => 'EST',

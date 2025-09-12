@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
 final class EditUser extends EditRecord
 {
@@ -25,9 +27,9 @@ final class EditUser extends EditRecord
                 ->label(__('admin.actions.impersonate'))
                 ->icon('heroicon-o-user-circle')
                 ->color('info')
-                ->url(fn() => route('impersonate', $this->record->id))
+                ->url(fn () => route('impersonate', $this->record->id))
                 ->openUrlInNewTab()
-                ->visible(fn() => auth()->user()?->is_admin ?? false),
+                ->visible(fn () => auth()->user()?->is_admin ?? false),
         ];
     }
 

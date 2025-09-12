@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\LocationResource\Pages;
 
 use App\Filament\Resources\LocationResource;
+use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListLocations extends ListRecords
@@ -33,22 +35,22 @@ final class ListLocations extends ListRecords
                 ->icon('heroicon-o-map-pin'),
             'warehouses' => Tab::make(__('locations.warehouses'))
                 ->icon('heroicon-o-building-office-2')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'warehouse')),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'warehouse')),
             'stores' => Tab::make(__('locations.stores'))
                 ->icon('heroicon-o-building-storefront')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'store')),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'store')),
             'offices' => Tab::make(__('locations.offices'))
                 ->icon('heroicon-o-building-office')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'office')),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'office')),
             'pickup_points' => Tab::make(__('locations.pickup_points'))
                 ->icon('heroicon-o-map-pin')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'pickup_point')),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'pickup_point')),
             'enabled' => Tab::make(__('locations.enabled_locations'))
                 ->icon('heroicon-o-check-circle')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('is_enabled', true)),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_enabled', true)),
             'disabled' => Tab::make(__('locations.disabled_locations'))
                 ->icon('heroicon-o-x-circle')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('is_enabled', false)),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_enabled', false)),
         ];
     }
 }

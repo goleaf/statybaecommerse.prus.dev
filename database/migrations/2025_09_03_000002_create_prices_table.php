@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('prices', function (Blueprint $table) {
@@ -22,7 +25,7 @@ return new class extends Migration {
             $table->softDeletes();
 
             $table->foreign('currency_id')->references('id')->on('currencies')->onDelete('cascade');
-            
+
             $table->index(['priceable_id', 'priceable_type']);
             $table->index(['currency_id', 'is_enabled']);
             $table->index(['priceable_id', 'priceable_type', 'currency_id', 'is_enabled'], 'prices_composite_idx');

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories\Translations;
 
@@ -15,6 +17,7 @@ final class NewsTranslationFactory extends Factory
     public function definition(): array
     {
         $title = fake()->sentence(3);
+
         return [
             'locale' => fake()->randomElement(['lt', 'en']),
             'title' => $title,

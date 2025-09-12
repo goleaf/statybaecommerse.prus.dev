@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -21,7 +23,7 @@ final class EnhancedSettingFactory extends Factory
 
         return [
             'group' => $this->faker->randomElement($groups),
-            'key' => $this->faker->unique()->slug(2) . '_' . $this->faker->word(),
+            'key' => $this->faker->unique()->slug(2).'_'.$this->faker->word(),
             'value' => $this->generateValueByType($type),
             'type' => $type,
             'description' => $this->faker->sentence(),
@@ -78,7 +80,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function general(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'group' => 'general',
         ]);
     }
@@ -88,7 +90,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function ecommerce(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'group' => 'ecommerce',
         ]);
     }
@@ -98,7 +100,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function public(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_public' => true,
         ]);
     }
@@ -108,7 +110,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function private(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_public' => false,
         ]);
     }
@@ -118,7 +120,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function encrypted(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_encrypted' => true,
         ]);
     }
@@ -128,7 +130,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function text(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'text',
             'value' => $this->faker->words(3, true),
         ]);
@@ -139,7 +141,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function boolean(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'boolean',
             'value' => $this->faker->boolean(),
         ]);
@@ -150,7 +152,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function number(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'number',
             'value' => $this->faker->numberBetween(1, 1000),
         ]);
@@ -161,7 +163,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function json(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'json',
             'value' => json_encode([
                 'setting1' => $this->faker->word(),
@@ -180,7 +182,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function color(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'color',
             'value' => $this->faker->hexColor(),
         ]);
@@ -191,7 +193,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function withValidation(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'validation_rules' => ['required', 'string', 'max:255'],
         ]);
     }
@@ -201,7 +203,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function withKey(string $key): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'key' => $key,
         ]);
     }
@@ -211,7 +213,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function withValue(mixed $value): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'value' => $value,
         ]);
     }
@@ -221,7 +223,7 @@ final class EnhancedSettingFactory extends Factory
      */
     public function withSortOrder(int $sortOrder): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'sort_order' => $sortOrder,
         ]);
     }
@@ -231,9 +233,9 @@ final class EnhancedSettingFactory extends Factory
      */
     public function multilingual(string $baseKey): static
     {
-        return $this->state(fn(array $attributes) => [
-            'key' => $baseKey . '_' . $this->faker->randomElement(['lt', 'en']),
-            'description' => $this->faker->sentence() . ' (multilingual)',
+        return $this->state(fn (array $attributes) => [
+            'key' => $baseKey.'_'.$this->faker->randomElement(['lt', 'en']),
+            'description' => $this->faker->sentence().' (multilingual)',
         ]);
     }
 }

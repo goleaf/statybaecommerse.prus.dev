@@ -1,16 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         if (Schema::hasTable('sh_products')) {
             Schema::table('sh_products', function (Blueprint $table): void {
-                if (!Schema::hasColumn('sh_products', 'warehouse_quantity')) {
+                if (! Schema::hasColumn('sh_products', 'warehouse_quantity')) {
                     $table->integer('warehouse_quantity')->nullable()->after('security_stock');
                     $table->index('warehouse_quantity', 'sh_products_warehouse_qty_idx');
                 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeResource\Widgets;
 
@@ -36,7 +38,7 @@ final class AttributeTypesWidget extends ChartWidget
         ];
 
         foreach ($types as $type => $count) {
-            $labels[] = __('attributes.' . $type);
+            $labels[] = __('attributes.'.$type);
             $data[] = $count;
             $colors[] = $typeColors[$type] ?? '#6B7280';
         }

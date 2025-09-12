@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -22,23 +24,23 @@ final class CustomerGroupStatsWidget extends BaseWidget
                 ->description(__('customer_groups.widget_total_groups'))
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('primary'),
-                
+
             Stat::make(__('customer_groups.widget_active_groups'), $activeGroups)
                 ->description(__('customer_groups.widget_active_groups'))
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-                
+
             Stat::make(__('customer_groups.widget_groups_with_discount'), $groupsWithDiscount)
                 ->description(__('customer_groups.widget_groups_with_discount'))
                 ->descriptionIcon('heroicon-m-tag')
                 ->color('warning'),
-                
+
             Stat::make(__('customer_groups.widget_total_customers'), $totalCustomers)
                 ->description(__('customer_groups.widget_total_customers'))
                 ->descriptionIcon('heroicon-m-users')
                 ->color('info'),
-                
-            Stat::make(__('customer_groups.widget_average_discount'), number_format($averageDiscount, 2) . '%')
+
+            Stat::make(__('customer_groups.widget_average_discount'), number_format($averageDiscount, 2).'%')
                 ->description(__('customer_groups.widget_average_discount'))
                 ->descriptionIcon('heroicon-m-percent')
                 ->color('danger'),

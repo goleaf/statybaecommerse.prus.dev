@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -40,19 +42,19 @@ class BrandFactory extends Factory
             'Ceresit Lithuania',
             'Henkel Baltics',
             'Sika Lietuva',
-            'Tremco Baltic'
+            'Tremco Baltic',
         ];
 
         $name = $this->faker->randomElement($lithuanianBrands);
-        
+
         return [
             'name' => $name,
-            'slug' => Str::slug($name) . '-' . $this->faker->unique()->randomNumber(),
-            'website' => $this->faker->boolean(70) ? 'https://' . Str::slug($name) . '.lt' : null,
+            'slug' => Str::slug($name).'-'.$this->faker->unique()->randomNumber(),
+            'website' => $this->faker->boolean(70) ? 'https://'.Str::slug($name).'.lt' : null,
             'description' => $this->faker->boolean(80) ? $this->generateLithuanianDescription($name) : null,
             'is_enabled' => true,
-            'seo_title' => $name . ' - Profesionalūs įrankiai statybininkams',
-            'seo_description' => 'Aukštos kokybės ' . strtolower($name) . ' įrankiai ir įranga statybos darbams Lietuvoje.',
+            'seo_title' => $name.' - Profesionalūs įrankiai statybininkams',
+            'seo_description' => 'Aukštos kokybės '.strtolower($name).' įrankiai ir įranga statybos darbams Lietuvoje.',
         ];
     }
 
@@ -63,7 +65,7 @@ class BrandFactory extends Factory
             "Aukštos kokybės {$brandName} gaminiai statybos ir remonto darbams. Garantuota kokybė.",
             "Patikimi {$brandName} įrankiai profesionaliems statybininkams Lietuvoje.",
             "Inovatyvūs {$brandName} sprendimai statybos pramonei. Efektyvumas ir patikimumas.",
-            "Pilna {$brandName} įrankių ir įrangos gama namų statybai ir remontui."
+            "Pilna {$brandName} įrankių ir įrangos gama namų statybai ir remontui.",
         ];
 
         return $this->faker->randomElement($descriptions);

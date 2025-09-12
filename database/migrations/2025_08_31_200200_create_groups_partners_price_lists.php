@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         if (! Schema::hasTable('sh_customer_groups')) {
@@ -30,7 +31,7 @@ return new class extends Migration {
                 $table->id();
                 $table->string('name');
                 $table->string('code')->unique();
-                $table->enum('tier', ['gold','silver','bronze','custom'])->default('custom');
+                $table->enum('tier', ['gold', 'silver', 'bronze', 'custom'])->default('custom');
                 $table->unsignedBigInteger('user_id')->nullable();
                 $table->json('metadata')->nullable();
                 $table->timestamps();
@@ -114,5 +115,3 @@ return new class extends Migration {
         Schema::dropIfExists('sh_customer_groups');
     }
 };
-
-

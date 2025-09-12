@@ -5,7 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         $this->ensureUniqueIndex('sh_brand_translations', 'sh_brand_translations_locale_slug_unique', ['locale', 'slug']);
@@ -26,7 +27,7 @@ return new class extends Migration {
 
     private function ensureUniqueIndex(string $table, string $indexName, array $columns): void
     {
-        if (!Schema::hasTable($table)) {
+        if (! Schema::hasTable($table)) {
             return;
         }
 
@@ -41,11 +42,11 @@ return new class extends Migration {
 
     private function dropUniqueIfExists(string $table, string $indexName): void
     {
-        if (!Schema::hasTable($table)) {
+        if (! Schema::hasTable($table)) {
             return;
         }
 
-        if (!$this->indexExists($table, $indexName)) {
+        if (! $this->indexExists($table, $indexName)) {
             return;
         }
 
@@ -59,6 +60,7 @@ return new class extends Migration {
         $driver = DB::getDriverName();
         if ($driver === 'sqlite') {
             $result = DB::selectOne("SELECT name FROM sqlite_master WHERE type = 'index' AND name = ?", [$indexName]);
+
             return $result !== null;
         }
 
@@ -68,12 +70,14 @@ return new class extends Migration {
                 'SELECT 1 FROM information_schema.statistics WHERE table_schema = ? AND table_name = ? AND index_name = ? LIMIT 1',
                 [$db, $table, $indexName]
             );
+
             return $result !== null;
         }
 
         // Fallback: attempt and ignore errors
         try {
             Schema::table($table, function () {});
+
             return false;
         } catch (\Throwable $e) {
             return false;

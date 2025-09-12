@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Collection;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 
 final class CollectionProductsWidget extends BaseWidget
 {
@@ -28,7 +29,7 @@ final class CollectionProductsWidget extends BaseWidget
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label(__('admin.collections.fields.image'))
-                    ->getStateUsing(fn(Collection $record) => $record->getFirstMediaUrl('images', 'thumb'))
+                    ->getStateUsing(fn (Collection $record) => $record->getFirstMediaUrl('images', 'thumb'))
                     ->defaultImageUrl(asset('images/placeholder-collection.png'))
                     ->circular()
                     ->size(40),

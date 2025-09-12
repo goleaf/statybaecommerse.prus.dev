@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -17,7 +19,7 @@ class ProductImageFactory extends Factory
     {
         return [
             'product_id' => Product::factory(),
-            'path' => 'products/' . $this->faker->uuid() . '.jpg',
+            'path' => 'products/'.$this->faker->uuid().'.jpg',
             'alt_text' => $this->faker->sentence(3),
             'title' => $this->faker->sentence(2),
             'sort_order' => $this->faker->numberBetween(0, 10),

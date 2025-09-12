@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\RegionResource\Widgets;
 
@@ -8,10 +10,10 @@ use Filament\Widgets\ChartWidget;
 final class RegionsByLevelWidget extends ChartWidget
 {
     protected static ?string $heading = 'Regions by Level';
-    
+
     protected static ?int $sort = 3;
-    
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {
@@ -20,13 +22,14 @@ final class RegionsByLevelWidget extends ChartWidget
             ->orderBy('level')
             ->get()
             ->mapWithKeys(function ($item) {
-                $levelName = match($item->level) {
+                $levelName = match ($item->level) {
                     0 => 'Root',
                     1 => 'State/Province',
                     2 => 'County',
                     3 => 'District',
                     default => "Level {$item->level}"
                 };
+
                 return [$levelName => $item->count];
             });
 
@@ -36,7 +39,7 @@ final class RegionsByLevelWidget extends ChartWidget
                     'label' => __('regions.regions_by_level'),
                     'data' => array_values($regionsByLevel->toArray()),
                     'backgroundColor' => [
-                        '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6'
+                        '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
                     ],
                 ],
             ],

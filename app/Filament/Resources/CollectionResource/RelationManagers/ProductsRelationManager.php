@@ -1,16 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
 use App\Models\Product;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 final class ProductsRelationManager extends RelationManager
 {
@@ -41,7 +39,7 @@ final class ProductsRelationManager extends RelationManager
 
                 Forms\Components\DateTimePicker::make('featured_until')
                     ->label(__('admin.collections.fields.featured_until'))
-                    ->visible(fn(Forms\Get $get): bool => $get('is_featured')),
+                    ->visible(fn (Forms\Get $get): bool => $get('is_featured')),
 
                 Forms\Components\Textarea::make('notes')
                     ->label(__('admin.collections.fields.notes'))
@@ -57,7 +55,7 @@ final class ProductsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label(__('admin.products.fields.image'))
-                    ->getStateUsing(fn(Product $record) => $record->getFirstMediaUrl('images', 'thumb'))
+                    ->getStateUsing(fn (Product $record) => $record->getFirstMediaUrl('images', 'thumb'))
                     ->defaultImageUrl(asset('images/placeholder-product.png'))
                     ->circular()
                     ->size(40),
@@ -143,7 +141,7 @@ final class ProductsRelationManager extends RelationManager
                 Tables\Actions\AttachAction::make()
                     ->label(__('admin.collections.actions.add_product'))
                     ->preloadRecordSelect()
-                    ->form(fn(Tables\Actions\AttachAction $action): array => [
+                    ->form(fn (Tables\Actions\AttachAction $action): array => [
                         $action->getRecordSelect()
                             ->label(__('admin.collections.fields.product'))
                             ->searchable()
@@ -162,7 +160,7 @@ final class ProductsRelationManager extends RelationManager
 
                         Forms\Components\DateTimePicker::make('featured_until')
                             ->label(__('admin.collections.fields.featured_until'))
-                            ->visible(fn(Forms\Get $get): bool => $get('is_featured')),
+                            ->visible(fn (Forms\Get $get): bool => $get('is_featured')),
 
                         Forms\Components\Textarea::make('notes')
                             ->label(__('admin.collections.fields.notes'))
@@ -192,7 +190,7 @@ final class ProductsRelationManager extends RelationManager
                         ->color('warning')
                         ->action(function ($records) {
                             $records->each(function ($record) {
-                                $record->pivot->update(['is_featured' => !$record->pivot->is_featured]);
+                                $record->pivot->update(['is_featured' => ! $record->pivot->is_featured]);
                             });
                         })
                         ->requiresConfirmation()

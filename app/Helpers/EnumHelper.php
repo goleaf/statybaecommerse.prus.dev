@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Helpers;
 
@@ -43,7 +45,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
@@ -57,7 +59,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
@@ -71,7 +73,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return null;
         }
 
@@ -89,7 +91,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return null;
         }
 
@@ -163,7 +165,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
@@ -177,7 +179,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
@@ -191,11 +193,11 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
-        return $enumClass::map(fn($case) => $case->description());
+        return $enumClass::map(fn ($case) => $case->description());
     }
 
     /**
@@ -205,11 +207,11 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
-        return $enumClass::map(fn($case) => $case->icon());
+        return $enumClass::map(fn ($case) => $case->icon());
     }
 
     /**
@@ -219,11 +221,11 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
-        return $enumClass::map(fn($case) => $case->color());
+        return $enumClass::map(fn ($case) => $case->color());
     }
 
     /**
@@ -233,11 +235,11 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
-        return $enumClass::map(fn($case) => $case->priority());
+        return $enumClass::map(fn ($case) => $case->priority());
     }
 
     /**
@@ -247,11 +249,11 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
-        return $enumClass::map(fn($case) => $case->toArray());
+        return $enumClass::map(fn ($case) => $case->toArray());
     }
 
     /**
@@ -261,7 +263,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return collect();
         }
 
@@ -275,7 +277,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return collect();
         }
 
@@ -289,11 +291,11 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return collect();
         }
 
-        return $enumClass::filter(fn($case) => $case->$property() === $value);
+        return $enumClass::filter(fn ($case) => $case->$property() === $value);
     }
 
     /**
@@ -303,7 +305,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return collect();
         }
 
@@ -317,7 +319,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return collect();
         }
 
@@ -331,7 +333,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return collect();
         }
 
@@ -345,7 +347,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return [];
         }
 
@@ -359,7 +361,7 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return collect();
         }
 
@@ -373,11 +375,11 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return collect();
         }
 
-        return $enumClass::unique(fn($case) => $case->$property());
+        return $enumClass::unique(fn ($case) => $case->$property());
     }
 
     /**
@@ -387,11 +389,11 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return collect();
         }
 
-        return $enumClass::unique(fn($case) => implode('|', array_map(fn($prop) => $case->$prop(), $properties)));
+        return $enumClass::unique(fn ($case) => implode('|', array_map(fn ($prop) => $case->$prop(), $properties)));
     }
 
     /**
@@ -401,11 +403,11 @@ final class EnumHelper
     {
         $enumClass = self::getEnum($name);
 
-        if (!$enumClass || !class_exists($enumClass)) {
+        if (! $enumClass || ! class_exists($enumClass)) {
             return collect();
         }
 
-        return $enumClass::unique(fn($case) => $case->value . '|' . $case->label() . '|' . $case->color() . '|' . $case->icon() . '|' . $case->priority() . '|' . $case->description());
+        return $enumClass::unique(fn ($case) => $case->value.'|'.$case->label().'|'.$case->color().'|'.$case->icon().'|'.$case->priority().'|'.$case->description());
     }
 
     /**

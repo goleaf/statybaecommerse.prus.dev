@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -22,12 +24,12 @@ class CampaignConversionStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
 
-            Stat::make(__('campaign_conversions.widgets.total_value'), '€' . Number::format($totalValue, 2))
+            Stat::make(__('campaign_conversions.widgets.total_value'), '€'.Number::format($totalValue, 2))
                 ->description(__('campaign_conversions.widgets.total_value_description'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('info'),
 
-            Stat::make(__('campaign_conversions.widgets.average_value'), '€' . Number::format($averageValue, 2))
+            Stat::make(__('campaign_conversions.widgets.average_value'), '€'.Number::format($averageValue, 2))
                 ->description(__('campaign_conversions.widgets.average_value_description'))
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('warning'),
@@ -39,4 +41,3 @@ class CampaignConversionStatsWidget extends BaseWidget
         ];
     }
 }
-

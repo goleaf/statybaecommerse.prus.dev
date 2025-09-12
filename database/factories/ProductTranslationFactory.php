@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -16,7 +18,7 @@ class ProductTranslationFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->words(3, true);
-        
+
         return [
             'product_id' => Product::factory(),
             'locale' => $this->faker->randomElement(['lt', 'en']),
@@ -25,7 +27,7 @@ class ProductTranslationFactory extends Factory
             'summary' => $this->faker->sentence(10),
             'description' => $this->faker->paragraphs(3, true),
             'short_description' => $this->faker->sentence(5),
-            'seo_title' => $name . ' - ' . $this->faker->words(2, true),
+            'seo_title' => $name.' - '.$this->faker->words(2, true),
             'seo_description' => $this->faker->sentence(15),
             'meta_keywords' => $this->faker->words(5),
             'alt_text' => $this->faker->sentence(3),

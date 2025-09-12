@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CartItemResource\Pages;
 
@@ -17,12 +19,12 @@ final class CreateCartItem extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Auto-calculate total price if not set
-        if (!isset($data['total_price']) && isset($data['quantity']) && isset($data['unit_price'])) {
+        if (! isset($data['total_price']) && isset($data['quantity']) && isset($data['unit_price'])) {
             $data['total_price'] = $data['quantity'] * $data['unit_price'];
         }
 
         // Set session_id if not provided
-        if (!isset($data['session_id'])) {
+        if (! isset($data['session_id'])) {
             $data['session_id'] = session()->getId();
         }
 

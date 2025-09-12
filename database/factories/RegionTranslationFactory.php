@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -15,7 +17,7 @@ final class RegionTranslationFactory extends Factory
         return [
             'region_id' => Region::factory(),
             'locale' => $this->faker->randomElement(['lt', 'en', 'de', 'ru']),
-            'name' => $this->faker->city . ' County',
+            'name' => $this->faker->city.' County',
             'description' => $this->faker->sentence(),
         ];
     }
@@ -24,7 +26,7 @@ final class RegionTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
-            'name' => $this->faker->city . ' apskritis',
+            'name' => $this->faker->city.' apskritis',
             'description' => $this->faker->sentence(),
         ]);
     }
@@ -33,7 +35,7 @@ final class RegionTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'en',
-            'name' => $this->faker->city . ' County',
+            'name' => $this->faker->city.' County',
             'description' => $this->faker->sentence(),
         ]);
     }
@@ -42,7 +44,7 @@ final class RegionTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'de',
-            'name' => $this->faker->city . ' Bezirk',
+            'name' => $this->faker->city.' Bezirk',
             'description' => $this->faker->sentence(),
         ]);
     }
@@ -51,7 +53,7 @@ final class RegionTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'ru',
-            'name' => $this->faker->city . ' округ',
+            'name' => $this->faker->city.' округ',
             'description' => $this->faker->sentence(),
         ]);
     }

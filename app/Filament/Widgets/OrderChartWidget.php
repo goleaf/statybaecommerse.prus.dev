@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -15,10 +17,10 @@ class OrderChartWidget extends ChartWidget
     protected function getData(): array
     {
         $orders = Order::select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(total) as revenue')
-            )
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('COUNT(*) as count'),
+            DB::raw('SUM(total) as revenue')
+        )
             ->where('created_at', '>=', now()->subDays(30))
             ->groupBy('date')
             ->orderBy('date')
@@ -75,7 +77,7 @@ class OrderChartWidget extends ChartWidget
                     'position' => 'right',
                     'title' => [
                         'display' => true,
-                        'text' => __('orders.charts.revenue') . ' (€)',
+                        'text' => __('orders.charts.revenue').' (€)',
                     ],
                     'grid' => [
                         'drawOnChartArea' => false,
@@ -85,4 +87,3 @@ class OrderChartWidget extends ChartWidget
         ];
     }
 }
-

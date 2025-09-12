@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Collections;
 
-use App\Contracts\EnumInterface;
 use Illuminate\Support\Collection;
 
 final class EnumCollection extends Collection
@@ -20,7 +21,7 @@ final class EnumCollection extends Collection
      */
     public static function fromEnum(string $enumClass): self
     {
-        if (!class_exists($enumClass)) {
+        if (! class_exists($enumClass)) {
             throw new \InvalidArgumentException("Enum class '{$enumClass}' not found");
         }
 
@@ -32,12 +33,12 @@ final class EnumCollection extends Collection
      */
     public static function fromValues(string $enumClass, array $values): self
     {
-        if (!class_exists($enumClass)) {
+        if (! class_exists($enumClass)) {
             throw new \InvalidArgumentException("Enum class '{$enumClass}' not found");
         }
 
         $enums = [];
-        
+
         foreach ($values as $value) {
             try {
                 $enums[] = $enumClass::from($value);
@@ -54,15 +55,15 @@ final class EnumCollection extends Collection
      */
     public static function fromLabels(string $enumClass, array $labels): self
     {
-        if (!class_exists($enumClass)) {
+        if (! class_exists($enumClass)) {
             throw new \InvalidArgumentException("Enum class '{$enumClass}' not found");
         }
 
         $enums = [];
-        
+
         foreach ($labels as $label) {
             $enum = $enumClass::fromLabel($label);
-            
+
             if ($enum) {
                 $enums[] = $enum;
             }
@@ -76,7 +77,7 @@ final class EnumCollection extends Collection
      */
     public function values(): array
     {
-        return $this->map(fn($enum) => $enum->value)->toArray();
+        return $this->map(fn ($enum) => $enum->value)->toArray();
     }
 
     /**
@@ -84,7 +85,7 @@ final class EnumCollection extends Collection
      */
     public function labels(): array
     {
-        return $this->map(fn($enum) => $enum->label())->toArray();
+        return $this->map(fn ($enum) => $enum->label())->toArray();
     }
 
     /**
@@ -92,7 +93,7 @@ final class EnumCollection extends Collection
      */
     public function descriptions(): array
     {
-        return $this->map(fn($enum) => $enum->description())->toArray();
+        return $this->map(fn ($enum) => $enum->description())->toArray();
     }
 
     /**
@@ -100,7 +101,7 @@ final class EnumCollection extends Collection
      */
     public function icons(): array
     {
-        return $this->map(fn($enum) => $enum->icon())->toArray();
+        return $this->map(fn ($enum) => $enum->icon())->toArray();
     }
 
     /**
@@ -108,7 +109,7 @@ final class EnumCollection extends Collection
      */
     public function colors(): array
     {
-        return $this->map(fn($enum) => $enum->color())->toArray();
+        return $this->map(fn ($enum) => $enum->color())->toArray();
     }
 
     /**
@@ -116,7 +117,7 @@ final class EnumCollection extends Collection
      */
     public function priorities(): array
     {
-        return $this->map(fn($enum) => $enum->priority())->toArray();
+        return $this->map(fn ($enum) => $enum->priority())->toArray();
     }
 
     /**
@@ -124,7 +125,7 @@ final class EnumCollection extends Collection
      */
     public function options(): array
     {
-        return $this->mapWithKeys(fn($enum) => [$enum->value => $enum->label()])->toArray();
+        return $this->mapWithKeys(fn ($enum) => [$enum->value => $enum->label()])->toArray();
     }
 
     /**
@@ -132,8 +133,8 @@ final class EnumCollection extends Collection
      */
     public function optionsWithDescriptions(): array
     {
-        return $this->mapWithKeys(fn($enum) => [
-            $enum->value => $enum->toArray()
+        return $this->mapWithKeys(fn ($enum) => [
+            $enum->value => $enum->toArray(),
         ])->toArray();
     }
 
@@ -142,7 +143,7 @@ final class EnumCollection extends Collection
      */
     public function toArrays(): array
     {
-        return $this->map(fn($enum) => $enum->toArray())->toArray();
+        return $this->map(fn ($enum) => $enum->toArray())->toArray();
     }
 
     /**
@@ -158,7 +159,7 @@ final class EnumCollection extends Collection
      */
     public function forApi(): array
     {
-        return $this->map(fn($enum) => [
+        return $this->map(fn ($enum) => [
             'value' => $enum->value,
             'label' => $enum->label(),
             'description' => $enum->description(),
@@ -172,7 +173,7 @@ final class EnumCollection extends Collection
      */
     public function forGraphQL(): array
     {
-        return $this->map(fn($enum) => [
+        return $this->map(fn ($enum) => [
             'name' => strtoupper($enum->value),
             'value' => $enum->value,
             'description' => $enum->description(),
@@ -186,12 +187,12 @@ final class EnumCollection extends Collection
     {
         $enumName = class_basename($this->first()::class);
         $enum = "export enum {$enumName} {\n";
-        
+
         foreach ($this as $enumCase) {
-            $enum .= "  " . strtoupper($enumCase->value) . " = '" . $enumCase->value . "',\n";
+            $enum .= '  '.strtoupper($enumCase->value)." = '".$enumCase->value."',\n";
         }
-        
-        return $enum . "}";
+
+        return $enum.'}';
     }
 
     /**
@@ -201,12 +202,12 @@ final class EnumCollection extends Collection
     {
         $enumName = class_basename($this->first()::class);
         $object = "const {$enumName} = {\n";
-        
+
         foreach ($this as $enumCase) {
-            $object .= "  " . strtoupper($enumCase->value) . ": '" . $enumCase->value . "',\n";
+            $object .= '  '.strtoupper($enumCase->value).": '".$enumCase->value."',\n";
         }
-        
-        return $object . "};";
+
+        return $object.'};';
     }
 
     /**
@@ -215,12 +216,12 @@ final class EnumCollection extends Collection
     public function forCss(): string
     {
         $css = ":root {\n";
-        
+
         foreach ($this as $enumCase) {
-            $css .= "  --" . str_replace('_', '-', $enumCase->value) . ": '" . $enumCase->value . "';\n";
+            $css .= '  --'.str_replace('_', '-', $enumCase->value).": '".$enumCase->value."';\n";
         }
-        
-        return $css . "}";
+
+        return $css.'}';
     }
 
     /**
@@ -228,7 +229,7 @@ final class EnumCollection extends Collection
      */
     public function forDocumentation(): array
     {
-        return $this->map(fn($enum) => [
+        return $this->map(fn ($enum) => [
             'value' => $enum->value,
             'label' => $enum->label(),
             'description' => $enum->description(),
@@ -243,7 +244,7 @@ final class EnumCollection extends Collection
      */
     public function forValidation(): string
     {
-        return 'in:' . implode(',', $this->values());
+        return 'in:'.implode(',', $this->values());
     }
 
     /**
@@ -251,7 +252,7 @@ final class EnumCollection extends Collection
      */
     public function forDatabase(): string
     {
-        return "enum('" . implode("','", $this->values()) . "')";
+        return "enum('".implode("','", $this->values())."')";
     }
 
     /**
@@ -259,7 +260,7 @@ final class EnumCollection extends Collection
      */
     public function filterBy(string $property, mixed $value): self
     {
-        return $this->filter(fn($enum) => $enum->$property() === $value);
+        return $this->filter(fn ($enum) => $enum->$property() === $value);
     }
 
     /**
@@ -273,6 +274,7 @@ final class EnumCollection extends Collection
                     return false;
                 }
             }
+
             return true;
         });
     }
@@ -282,8 +284,8 @@ final class EnumCollection extends Collection
      */
     public function sortByProperty(string $property, bool $descending = false): self
     {
-        $sorted = $this->sortBy(fn($enum) => $enum->$property());
-        
+        $sorted = $this->sortBy(fn ($enum) => $enum->$property());
+
         return $descending ? $sorted->reverse() : $sorted;
     }
 
@@ -308,7 +310,7 @@ final class EnumCollection extends Collection
      */
     public function sortByValue(bool $descending = false): self
     {
-        return $this->sortBy(fn($enum) => $enum->value, $descending);
+        return $this->sortBy(fn ($enum) => $enum->value, $descending);
     }
 
     /**
@@ -316,7 +318,7 @@ final class EnumCollection extends Collection
      */
     public function groupByProperty(string $property): Collection
     {
-        return $this->groupBy(fn($enum) => $enum->$property());
+        return $this->groupBy(fn ($enum) => $enum->$property());
     }
 
     /**
@@ -340,7 +342,7 @@ final class EnumCollection extends Collection
      */
     public function whereProperty(string $property, mixed $value): self
     {
-        return $this->filter(fn($enum) => $enum->$property() === $value);
+        return $this->filter(fn ($enum) => $enum->$property() === $value);
     }
 
     /**
@@ -364,7 +366,7 @@ final class EnumCollection extends Collection
      */
     public function wherePriorityGreaterThan(int $priority): self
     {
-        return $this->filter(fn($enum) => $enum->priority() > $priority);
+        return $this->filter(fn ($enum) => $enum->priority() > $priority);
     }
 
     /**
@@ -372,7 +374,7 @@ final class EnumCollection extends Collection
      */
     public function wherePriorityLessThan(int $priority): self
     {
-        return $this->filter(fn($enum) => $enum->priority() < $priority);
+        return $this->filter(fn ($enum) => $enum->priority() < $priority);
     }
 
     /**
@@ -380,7 +382,7 @@ final class EnumCollection extends Collection
      */
     public function wherePriorityBetween(int $min, int $max): self
     {
-        return $this->filter(fn($enum) => $enum->priority() >= $min && $enum->priority() <= $max);
+        return $this->filter(fn ($enum) => $enum->priority() >= $min && $enum->priority() <= $max);
     }
 
     /**
@@ -420,7 +422,7 @@ final class EnumCollection extends Collection
      */
     public function whereLabelContains(string $text): self
     {
-        return $this->filter(fn($enum) => str_contains($enum->label(), $text));
+        return $this->filter(fn ($enum) => str_contains($enum->label(), $text));
     }
 
     /**
@@ -428,7 +430,7 @@ final class EnumCollection extends Collection
      */
     public function whereDescriptionContains(string $text): self
     {
-        return $this->filter(fn($enum) => str_contains($enum->description(), $text));
+        return $this->filter(fn ($enum) => str_contains($enum->description(), $text));
     }
 
     /**
@@ -436,7 +438,7 @@ final class EnumCollection extends Collection
      */
     public function whereValueContains(string $text): self
     {
-        return $this->filter(fn($enum) => str_contains($enum->value, $text));
+        return $this->filter(fn ($enum) => str_contains($enum->value, $text));
     }
 
     /**
@@ -444,7 +446,7 @@ final class EnumCollection extends Collection
      */
     public function whereValueStartsWith(string $text): self
     {
-        return $this->filter(fn($enum) => str_starts_with($enum->value, $text));
+        return $this->filter(fn ($enum) => str_starts_with($enum->value, $text));
     }
 
     /**
@@ -452,7 +454,7 @@ final class EnumCollection extends Collection
      */
     public function whereValueEndsWith(string $text): self
     {
-        return $this->filter(fn($enum) => str_ends_with($enum->value, $text));
+        return $this->filter(fn ($enum) => str_ends_with($enum->value, $text));
     }
 
     /**
@@ -460,7 +462,7 @@ final class EnumCollection extends Collection
      */
     public function whereValueMatches(string $pattern): self
     {
-        return $this->filter(fn($enum) => preg_match($pattern, $enum->value));
+        return $this->filter(fn ($enum) => preg_match($pattern, $enum->value));
     }
 
     /**
@@ -468,7 +470,7 @@ final class EnumCollection extends Collection
      */
     public function whereLabelMatches(string $pattern): self
     {
-        return $this->filter(fn($enum) => preg_match($pattern, $enum->label()));
+        return $this->filter(fn ($enum) => preg_match($pattern, $enum->label()));
     }
 
     /**
@@ -476,7 +478,7 @@ final class EnumCollection extends Collection
      */
     public function whereDescriptionMatches(string $pattern): self
     {
-        return $this->filter(fn($enum) => preg_match($pattern, $enum->description()));
+        return $this->filter(fn ($enum) => preg_match($pattern, $enum->description()));
     }
 
     /**
@@ -486,7 +488,7 @@ final class EnumCollection extends Collection
     {
         $offset = ($page - 1) * $perPage;
         $items = $this->slice($offset, $perPage)->values();
-        
+
         return [
             'data' => $items->toArrays(),
             'current_page' => $page,
@@ -505,6 +507,7 @@ final class EnumCollection extends Collection
     {
         return $this->filter(function ($enum) use ($query) {
             $query = strtolower($query);
+
             return str_contains(strtolower($enum->value), $query) ||
                    str_contains(strtolower($enum->label()), $query) ||
                    str_contains(strtolower($enum->description()), $query);
@@ -524,7 +527,7 @@ final class EnumCollection extends Collection
      */
     public function unique(): self
     {
-        return $this->unique(fn($enum) => $enum->value);
+        return $this->unique(fn ($enum) => $enum->value);
     }
 
     /**
@@ -532,7 +535,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabel(): self
     {
-        return $this->unique(fn($enum) => $enum->label());
+        return $this->unique(fn ($enum) => $enum->label());
     }
 
     /**
@@ -540,7 +543,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByColor(): self
     {
-        return $this->unique(fn($enum) => $enum->color());
+        return $this->unique(fn ($enum) => $enum->color());
     }
 
     /**
@@ -548,7 +551,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByIcon(): self
     {
-        return $this->unique(fn($enum) => $enum->icon());
+        return $this->unique(fn ($enum) => $enum->icon());
     }
 
     /**
@@ -556,7 +559,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->priority());
+        return $this->unique(fn ($enum) => $enum->priority());
     }
 
     /**
@@ -564,7 +567,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->description());
+        return $this->unique(fn ($enum) => $enum->description());
     }
 
     /**
@@ -572,7 +575,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueAndLabel(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label());
     }
 
     /**
@@ -580,7 +583,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueAndColor(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color());
     }
 
     /**
@@ -588,7 +591,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueAndIcon(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->icon());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->icon());
     }
 
     /**
@@ -596,7 +599,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->priority());
     }
 
     /**
@@ -604,7 +607,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->description());
     }
 
     /**
@@ -612,7 +615,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelAndColor(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color());
     }
 
     /**
@@ -620,7 +623,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelAndIcon(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->icon());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->icon());
     }
 
     /**
@@ -628,7 +631,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->priority());
     }
 
     /**
@@ -636,7 +639,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->description());
     }
 
     /**
@@ -644,7 +647,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByColorAndIcon(): self
     {
-        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->icon());
+        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->icon());
     }
 
     /**
@@ -652,7 +655,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByColorAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->priority());
     }
 
     /**
@@ -660,7 +663,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByColorAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->description());
     }
 
     /**
@@ -668,7 +671,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByIconAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->icon() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->icon().'|'.$enum->priority());
     }
 
     /**
@@ -676,7 +679,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByIconAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->icon() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->icon().'|'.$enum->description());
     }
 
     /**
@@ -684,7 +687,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -692,7 +695,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelAndColor(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color());
     }
 
     /**
@@ -700,7 +703,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelAndIcon(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->icon());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->icon());
     }
 
     /**
@@ -708,7 +711,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->priority());
     }
 
     /**
@@ -716,7 +719,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->description());
     }
 
     /**
@@ -724,7 +727,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueColorAndIcon(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->icon());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->icon());
     }
 
     /**
@@ -732,7 +735,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueColorAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->priority());
     }
 
     /**
@@ -740,7 +743,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueColorAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->description());
     }
 
     /**
@@ -748,7 +751,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueIconAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->icon() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->icon().'|'.$enum->priority());
     }
 
     /**
@@ -756,7 +759,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueIconAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->icon() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->icon().'|'.$enum->description());
     }
 
     /**
@@ -764,7 +767,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValuePriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -772,7 +775,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelColorAndIcon(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->icon());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->icon());
     }
 
     /**
@@ -780,7 +783,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelColorAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->priority());
     }
 
     /**
@@ -788,7 +791,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelColorAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->description());
     }
 
     /**
@@ -796,7 +799,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelIconAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->icon() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->icon().'|'.$enum->priority());
     }
 
     /**
@@ -804,7 +807,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelIconAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->icon() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->icon().'|'.$enum->description());
     }
 
     /**
@@ -812,7 +815,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -820,7 +823,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByColorIconAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->icon() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->icon().'|'.$enum->priority());
     }
 
     /**
@@ -828,7 +831,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByColorIconAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->icon() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->icon().'|'.$enum->description());
     }
 
     /**
@@ -836,7 +839,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByColorPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -844,7 +847,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByIconPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->icon().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -852,7 +855,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelColorAndIcon(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->icon());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->icon());
     }
 
     /**
@@ -860,7 +863,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelColorAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->priority());
     }
 
     /**
@@ -868,7 +871,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelColorAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->description());
     }
 
     /**
@@ -876,7 +879,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelIconAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->icon() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->icon().'|'.$enum->priority());
     }
 
     /**
@@ -884,7 +887,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelIconAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->icon() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->icon().'|'.$enum->description());
     }
 
     /**
@@ -892,7 +895,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -900,7 +903,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueColorIconAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority());
     }
 
     /**
@@ -908,7 +911,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueColorIconAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->icon().'|'.$enum->description());
     }
 
     /**
@@ -916,7 +919,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueColorPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -924,7 +927,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueIconPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -932,7 +935,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelColorIconAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority());
     }
 
     /**
@@ -940,7 +943,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelColorIconAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->description());
     }
 
     /**
@@ -948,7 +951,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelColorPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -956,7 +959,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelIconPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -964,7 +967,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByColorIconPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -972,7 +975,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelColorIconAndPriority(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority());
     }
 
     /**
@@ -980,7 +983,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelColorIconAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->description());
     }
 
     /**
@@ -988,7 +991,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelColorPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -996,7 +999,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueLabelIconPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -1004,7 +1007,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByValueColorIconPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -1012,7 +1015,7 @@ final class EnumCollection extends Collection
      */
     public function uniqueByLabelColorIconPriorityAndDescription(): self
     {
-        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
     }
 
     /**
@@ -1020,6 +1023,6 @@ final class EnumCollection extends Collection
      */
     public function uniqueByAll(): self
     {
-        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
+        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -7,13 +9,12 @@ use App\Filament\Resources\AttributeResource\RelationManagers;
 use App\Filament\Resources\AttributeResource\Widgets;
 use App\Models\Attribute;
 use App\Services\MultiLanguageTabService;
-use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Form;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -177,7 +178,7 @@ final class AttributeResource extends Resource
 
                         Forms\Components\TextInput::make('default_value')
                             ->label(__('attributes.default_value'))
-                            ->visible(fn (callable $get) => !in_array($get('type'), ['file', 'image']))
+                            ->visible(fn (callable $get) => ! in_array($get('type'), ['file', 'image']))
                             ->helperText(__('attributes.default_value_help')),
                     ])
                     ->columns(2),
@@ -333,7 +334,7 @@ final class AttributeResource extends Resource
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('attributes.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'text' => 'gray',
                         'number' => 'blue',
                         'boolean' => 'green',
@@ -427,23 +428,23 @@ final class AttributeResource extends Resource
 
                 Tables\Filters\Filter::make('required')
                     ->label(__('attributes.required_only'))
-                    ->query(fn(Builder $query): Builder => $query->where('is_required', true)),
+                    ->query(fn (Builder $query): Builder => $query->where('is_required', true)),
 
                 Tables\Filters\Filter::make('filterable')
                     ->label(__('attributes.filterable_only'))
-                    ->query(fn(Builder $query): Builder => $query->where('is_filterable', true)),
+                    ->query(fn (Builder $query): Builder => $query->where('is_filterable', true)),
 
                 Tables\Filters\Filter::make('searchable')
                     ->label(__('attributes.searchable_only'))
-                    ->query(fn(Builder $query): Builder => $query->where('is_searchable', true)),
+                    ->query(fn (Builder $query): Builder => $query->where('is_searchable', true)),
 
                 Tables\Filters\Filter::make('enabled')
                     ->label(__('attributes.enabled_only'))
-                    ->query(fn(Builder $query): Builder => $query->where('is_enabled', true)),
+                    ->query(fn (Builder $query): Builder => $query->where('is_enabled', true)),
 
                 Tables\Filters\Filter::make('with_values')
                     ->label(__('attributes.with_values_only'))
-                    ->query(fn(Builder $query): Builder => $query->has('values')),
+                    ->query(fn (Builder $query): Builder => $query->has('values')),
 
                 Tables\Filters\TrashedFilter::make(),
             ])

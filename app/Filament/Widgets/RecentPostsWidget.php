@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Post;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
 
 final class RecentPostsWidget extends BaseWidget
 {
@@ -34,7 +36,7 @@ final class RecentPostsWidget extends BaseWidget
                     ->searchable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label(__('posts.fields.status'))
-                    ->formatStateUsing(fn(string $state): string => __('posts.status.' . $state))
+                    ->formatStateUsing(fn (string $state): string => __('posts.status.'.$state))
                     ->colors([
                         'warning' => 'draft',
                         'success' => 'published',
@@ -51,4 +53,3 @@ final class RecentPostsWidget extends BaseWidget
             ]);
     }
 }
-

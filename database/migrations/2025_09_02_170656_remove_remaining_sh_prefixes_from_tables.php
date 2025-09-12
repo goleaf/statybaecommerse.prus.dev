@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -36,7 +36,7 @@ return new class extends Migration {
         ];
 
         foreach ($tablesToRename as $oldName => $newName) {
-            if (Schema::hasTable($oldName) && !Schema::hasTable($newName)) {
+            if (Schema::hasTable($oldName) && ! Schema::hasTable($newName)) {
                 Schema::rename($oldName, $newName);
                 // Renamed table: {$oldName} -> {$newName}
             }
@@ -74,7 +74,7 @@ return new class extends Migration {
         ];
 
         foreach ($tablesToRevert as $newName => $oldName) {
-            if (Schema::hasTable($newName) && !Schema::hasTable($oldName)) {
+            if (Schema::hasTable($newName) && ! Schema::hasTable($oldName)) {
                 Schema::rename($newName, $oldName);
             }
         }

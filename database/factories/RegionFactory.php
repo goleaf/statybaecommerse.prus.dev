@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -64,4 +66,3 @@ class RegionFactory extends Factory
         ]);
     }
 }
-

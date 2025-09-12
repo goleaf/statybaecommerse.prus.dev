@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\OrderItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -46,6 +48,7 @@ class OrderItemFactory extends Factory
     {
         return $this->state(function (array $attributes) use ($quantity) {
             $unitPrice = $attributes['unit_price'] ?? $this->faker->randomFloat(2, 5, 500);
+
             return [
                 'quantity' => $quantity,
                 'total' => $unitPrice * $quantity,
@@ -60,6 +63,7 @@ class OrderItemFactory extends Factory
     {
         return $this->state(function (array $attributes) use ($unitPrice) {
             $quantity = $attributes['quantity'] ?? $this->faker->numberBetween(1, 10);
+
             return [
                 'unit_price' => $unitPrice,
                 'price' => $unitPrice,
@@ -76,6 +80,7 @@ class OrderItemFactory extends Factory
         return $this->state(function (array $attributes) {
             $quantity = $attributes['quantity'] ?? $this->faker->numberBetween(1, 5);
             $unitPrice = $this->faker->randomFloat(2, 100, 1000);
+
             return [
                 'unit_price' => $unitPrice,
                 'price' => $unitPrice,
@@ -92,6 +97,7 @@ class OrderItemFactory extends Factory
         return $this->state(function (array $attributes) {
             $quantity = $attributes['quantity'] ?? $this->faker->numberBetween(1, 10);
             $unitPrice = $this->faker->randomFloat(2, 1, 20);
+
             return [
                 'unit_price' => $unitPrice,
                 'price' => $unitPrice,
@@ -108,7 +114,7 @@ class OrderItemFactory extends Factory
         return $this->state(function (array $attributes) {
             $product = Product::factory()->create();
             $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
-            
+
             return [
                 'product_id' => $product->id,
                 'product_variant_id' => $variant->id,

@@ -5,7 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         if (Schema::hasTable('sh_price_lists')) {
@@ -45,17 +46,19 @@ return new class extends Migration {
         $driver = DB::getDriverName();
         try {
             if ($driver === 'mysql') {
-                $cols = '`' . implode('`,`', $columns) . '`';
+                $cols = '`'.implode('`,`', $columns).'`';
                 DB::statement("CREATE INDEX IF NOT EXISTS `{$indexName}` ON `{$table}` ({$cols})");
             } elseif ($driver === 'sqlite') {
-                DB::statement("CREATE INDEX IF NOT EXISTS {$indexName} ON {$table} (" . implode(',', $columns) . ")");
+                DB::statement("CREATE INDEX IF NOT EXISTS {$indexName} ON {$table} (".implode(',', $columns).')');
             } else {
                 Schema::table($table, function (Blueprint $t) use ($columns, $indexName) {
-                    try { $t->index($columns, $indexName); } catch (Throwable $e) {}
+                    try {
+                        $t->index($columns, $indexName);
+                    } catch (Throwable $e) {
+                    }
                 });
             }
-        } catch (Throwable $e) {}
+        } catch (Throwable $e) {
+        }
     }
 };
-
-

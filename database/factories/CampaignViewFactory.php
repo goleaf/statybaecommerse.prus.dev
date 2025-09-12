@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -29,21 +31,21 @@ final class CampaignViewFactory extends Factory
 
     public function recent(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'viewed_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
         ]);
     }
 
     public function withCustomer(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'customer_id' => Customer::factory(),
         ]);
     }
 
     public function withReferer(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'referer' => $this->faker->randomElement([
                 'https://google.com',
                 'https://facebook.com',

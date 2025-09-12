@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReportResource\Pages;
 use App\Filament\Resources\ReportResource\Widgets;
 use App\Models\Report;
-use App\Models\User;
+use BackedEnum;
+use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
@@ -19,11 +21,12 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Forms\Form;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
+use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -33,12 +36,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
-use BackedEnum;
 use UnitEnum;
 
 final class ReportResource extends Resource
@@ -169,10 +169,10 @@ final class ReportResource extends Resource
                                             ->schema([
                                                 DatePicker::make('start_date')
                                                     ->label(__('admin.reports.fields.start_date'))
-                                                    ->visible(fn(Forms\Get $get) => $get('date_range') === 'custom'),
+                                                    ->visible(fn (Forms\Get $get) => $get('date_range') === 'custom'),
                                                 DatePicker::make('end_date')
                                                     ->label(__('admin.reports.fields.end_date'))
-                                                    ->visible(fn(Forms\Get $get) => $get('date_range') === 'custom'),
+                                                    ->visible(fn (Forms\Get $get) => $get('date_range') === 'custom'),
                                             ]),
                                         Select::make('schedule_frequency')
                                             ->label(__('admin.reports.fields.schedule_frequency'))
@@ -183,7 +183,7 @@ final class ReportResource extends Resource
                                                 'quarterly' => __('admin.reports.schedule_frequencies.quarterly'),
                                                 'yearly' => __('admin.reports.schedule_frequencies.yearly'),
                                             ])
-                                            ->visible(fn(Forms\Get $get) => $get('is_scheduled'))
+                                            ->visible(fn (Forms\Get $get) => $get('is_scheduled'))
                                             ->searchable(),
                                     ]),
                             ]),
@@ -283,7 +283,7 @@ final class ReportResource extends Resource
                         'gray' => 'marketing',
                         'slate' => 'custom',
                     ])
-                    ->formatStateUsing(fn(string $state): string => __("admin.reports.types.{$state}")),
+                    ->formatStateUsing(fn (string $state): string => __("admin.reports.types.{$state}")),
                 BadgeColumn::make('category')
                     ->label(__('admin.reports.fields.category'))
                     ->colors([
@@ -295,10 +295,10 @@ final class ReportResource extends Resource
                         'secondary' => 'inventory',
                         'gray' => 'analytics',
                     ])
-                    ->formatStateUsing(fn(string $state): string => __("admin.reports.categories.{$state}")),
+                    ->formatStateUsing(fn (string $state): string => __("admin.reports.categories.{$state}")),
                 TextColumn::make('date_range')
                     ->label(__('admin.reports.fields.date_range'))
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("admin.reports.date_ranges.{$state}") : '-')
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("admin.reports.date_ranges.{$state}") : '-')
                     ->toggleable(),
                 TextColumn::make('view_count')
                     ->label(__('admin.reports.fields.view_count'))
@@ -393,12 +393,12 @@ final class ReportResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn(Report $record): bool => $record->is_active),
+                    ->visible(fn (Report $record): bool => $record->is_active),
                 Action::make('view')
                     ->label(__('admin.reports.actions.view'))
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->url(fn(Report $record): string => route('reports.show', $record))
+                    ->url(fn (Report $record): string => route('reports.show', $record))
                     ->openUrlInNewTab(),
                 Action::make('download')
                     ->label(__('admin.reports.actions.download'))
@@ -412,7 +412,7 @@ final class ReportResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn(Report $record): bool => $record->isGenerated()),
+                    ->visible(fn (Report $record): bool => $record->isGenerated()),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),

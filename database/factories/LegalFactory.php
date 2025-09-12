@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -25,7 +27,7 @@ class LegalFactory extends Factory
         return [
             'title' => $title,
             'slug' => Str::slug($title),
-            'content' => '<p>' . $this->faker->paragraphs(3, true) . '</p>',
+            'content' => '<p>'.$this->faker->paragraphs(3, true).'</p>',
             'is_enabled' => true,
         ];
     }

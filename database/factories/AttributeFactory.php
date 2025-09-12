@@ -12,10 +12,10 @@ class AttributeFactory extends Factory
 
     public function definition(): array
     {
-        $label = $this->faker->randomElement(['Color','Size','Material','Fit','Length','Style']) . ' ' . $this->faker->unique()->numerify('###');
-        $types = ['text','number','boolean','select','multiselect','color','date','textarea','file','image'];
-        $groupNames = ['basic_info','technical_specs','appearance','dimensions','materials','features','compatibility','warranty','shipping','seo'];
-        
+        $label = $this->faker->randomElement(['Color', 'Size', 'Material', 'Fit', 'Length', 'Style']).' '.$this->faker->unique()->numerify('###');
+        $types = ['text', 'number', 'boolean', 'select', 'multiselect', 'color', 'date', 'textarea', 'file', 'image'];
+        $groupNames = ['basic_info', 'technical_specs', 'appearance', 'dimensions', 'materials', 'features', 'compatibility', 'warranty', 'shipping', 'seo'];
+
         return [
             'name' => $label,
             'slug' => strtolower(str_replace(' ', '-', $label)),
@@ -59,5 +59,3 @@ class AttributeFactory extends Factory
         ];
     }
 }
-
-

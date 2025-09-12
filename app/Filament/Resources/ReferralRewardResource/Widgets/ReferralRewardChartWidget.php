@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralRewardResource\Widgets;
 
@@ -15,10 +17,10 @@ final class ReferralRewardChartWidget extends ChartWidget
     protected function getData(): array
     {
         $data = ReferralReward::select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(amount) as total_amount')
-            )
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('COUNT(*) as count'),
+            DB::raw('SUM(amount) as total_amount')
+        )
             ->where('created_at', '>=', now()->subDays(30))
             ->groupBy('date')
             ->orderBy('date')
@@ -42,7 +44,7 @@ final class ReferralRewardChartWidget extends ChartWidget
                     'yAxisID' => 'y1',
                 ],
             ],
-            'labels' => $data->pluck('date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('M d'))->toArray(),
+            'labels' => $data->pluck('date')->map(fn ($date) => \Carbon\Carbon::parse($date)->format('M d'))->toArray(),
         ];
     }
 

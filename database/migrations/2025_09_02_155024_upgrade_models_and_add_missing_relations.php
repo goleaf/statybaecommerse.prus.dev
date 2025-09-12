@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -54,22 +55,22 @@ return new class extends Migration {
         // Upgrade orders table
         if (Schema::hasTable('orders')) {
             Schema::table('orders', function (Blueprint $table) {
-                if (!Schema::hasColumn('orders', 'channel_id')) {
+                if (! Schema::hasColumn('orders', 'channel_id')) {
                     $table->unsignedBigInteger('channel_id')->nullable()->after('user_id');
                 }
-                if (!Schema::hasColumn('orders', 'zone_id')) {
+                if (! Schema::hasColumn('orders', 'zone_id')) {
                     $table->unsignedBigInteger('zone_id')->nullable()->after('channel_id');
                 }
-                if (!Schema::hasColumn('orders', 'partner_id')) {
+                if (! Schema::hasColumn('orders', 'partner_id')) {
                     $table->unsignedBigInteger('partner_id')->nullable()->after('zone_id');
                 }
-                if (!Schema::hasColumn('orders', 'payment_status')) {
+                if (! Schema::hasColumn('orders', 'payment_status')) {
                     $table->string('payment_status')->default('pending')->after('status');
                 }
-                if (!Schema::hasColumn('orders', 'payment_method')) {
+                if (! Schema::hasColumn('orders', 'payment_method')) {
                     $table->string('payment_method')->nullable()->after('payment_status');
                 }
-                if (!Schema::hasColumn('orders', 'payment_reference')) {
+                if (! Schema::hasColumn('orders', 'payment_reference')) {
                     $table->string('payment_reference')->nullable()->after('payment_method');
                 }
             });
@@ -78,10 +79,10 @@ return new class extends Migration {
         // Upgrade order_items table
         if (Schema::hasTable('order_items')) {
             Schema::table('order_items', function (Blueprint $table) {
-                if (!Schema::hasColumn('order_items', 'variant_id')) {
+                if (! Schema::hasColumn('order_items', 'variant_id')) {
                     $table->unsignedBigInteger('variant_id')->nullable()->after('product_id');
                 }
-                if (!Schema::hasColumn('order_items', 'variant_name')) {
+                if (! Schema::hasColumn('order_items', 'variant_name')) {
                     $table->string('variant_name')->nullable()->after('product_sku');
                 }
             });
@@ -90,7 +91,7 @@ return new class extends Migration {
         // Upgrade cart_items table
         if (Schema::hasTable('cart_items')) {
             Schema::table('cart_items', function (Blueprint $table) {
-                if (!Schema::hasColumn('cart_items', 'variant_id')) {
+                if (! Schema::hasColumn('cart_items', 'variant_id')) {
                     $table->unsignedBigInteger('variant_id')->nullable()->after('product_id');
                 }
             });
@@ -100,11 +101,11 @@ return new class extends Migration {
     private function createMissingTables(): void
     {
         // Create locations table
-        if (!Schema::hasTable('locations')) {
+        if (! Schema::hasTable('locations')) {
             Schema::create('locations', function (Blueprint $table) {
                 $table->id();
                 $table->json('name')->nullable(); // Translatable field
-                $table->json('slug')->nullable(); // Translatable field  
+                $table->json('slug')->nullable(); // Translatable field
                 $table->json('description')->nullable(); // Translatable field
                 $table->string('code')->nullable()->unique();
                 $table->string('address_line_1')->nullable();
@@ -124,7 +125,7 @@ return new class extends Migration {
         }
 
         // Create attributes table
-        if (!Schema::hasTable('sh_attributes')) {
+        if (! Schema::hasTable('sh_attributes')) {
             Schema::create('sh_attributes', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -141,7 +142,7 @@ return new class extends Migration {
         }
 
         // Create attribute values table
-        if (!Schema::hasTable('sh_attribute_values')) {
+        if (! Schema::hasTable('sh_attribute_values')) {
             Schema::create('sh_attribute_values', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('attribute_id');
@@ -160,7 +161,7 @@ return new class extends Migration {
     private function createPivotTables(): void
     {
         // Product attributes pivot
-        if (!Schema::hasTable('sh_product_attributes')) {
+        if (! Schema::hasTable('sh_product_attributes')) {
             Schema::create('sh_product_attributes', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
@@ -174,7 +175,7 @@ return new class extends Migration {
         }
 
         // Product variant attributes pivot
-        if (!Schema::hasTable('sh_product_variant_attributes')) {
+        if (! Schema::hasTable('sh_product_variant_attributes')) {
             Schema::create('sh_product_variant_attributes', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');

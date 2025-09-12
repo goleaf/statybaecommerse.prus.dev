@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralResource\Widgets;
 
@@ -6,11 +8,10 @@ use App\Models\Referral;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Illuminate\Database\Eloquent\Builder;
 
 final class RecentReferralsWidget extends BaseWidget
 {
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?string $heading = null;
 
@@ -66,8 +67,7 @@ final class RecentReferralsWidget extends BaseWidget
 
                 Tables\Columns\TextColumn::make('total_rewards_amount')
                     ->label(__('referrals.total_rewards_amount'))
-                    ->getStateUsing(fn (Referral $record): string => 
-                        '€' . number_format($record->rewards()->sum('amount'), 2)
+                    ->getStateUsing(fn (Referral $record): string => '€'.number_format($record->rewards()->sum('amount'), 2)
                     )
                     ->badge()
                     ->color('success'),

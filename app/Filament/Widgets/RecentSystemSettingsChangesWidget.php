@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\SystemSetting;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 
 final class RecentSystemSettingsChangesWidget extends BaseWidget
 {
@@ -42,7 +43,7 @@ final class RecentSystemSettingsChangesWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('admin.system_settings.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'string', 'text' => 'gray',
                         'number' => 'blue',
                         'boolean' => 'green',
@@ -60,7 +61,7 @@ final class RecentSystemSettingsChangesWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('category.name')
                     ->label(__('admin.system_settings.category'))
                     ->badge()
-                    ->color(fn($record) => $record->category?->color ?? 'primary'),
+                    ->color(fn ($record) => $record->category?->color ?? 'primary'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('admin.system_settings.is_active'))
                     ->boolean()
@@ -71,7 +72,7 @@ final class RecentSystemSettingsChangesWidget extends BaseWidget
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_by')
                     ->label(__('admin.system_settings.updated_by'))
-                    ->formatStateUsing(fn($state) => $state ? \App\Models\User::find($state)?->name : '-')
+                    ->formatStateUsing(fn ($state) => $state ? \App\Models\User::find($state)?->name : '-')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('admin.system_settings.updated_at'))
@@ -81,7 +82,7 @@ final class RecentSystemSettingsChangesWidget extends BaseWidget
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->url(fn(SystemSetting $record): string => route('filament.admin.resources.system-settings.view', $record)),
+                    ->url(fn (SystemSetting $record): string => route('filament.admin.resources.system-settings.view', $record)),
             ])
             ->defaultSort('updated_at', 'desc');
     }

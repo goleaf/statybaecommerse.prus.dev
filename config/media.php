@@ -7,10 +7,10 @@ return [
         'collection_name' => 'default',
         'thumbnail_collection' => 'thumbnails',
     ],
-    
+
     'features' => [
         'category' => 'enabled',
-        'brand' => 'enabled', 
+        'brand' => 'enabled',
         'review' => 'enabled',
         'discount' => 'enabled',
     ],

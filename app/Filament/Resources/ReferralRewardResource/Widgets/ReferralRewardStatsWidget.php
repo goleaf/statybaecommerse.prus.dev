@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralRewardResource\Widgets;
 
 use App\Models\ReferralReward;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class ReferralRewardStatsWidget extends BaseWidget
 {
@@ -15,11 +16,11 @@ final class ReferralRewardStatsWidget extends BaseWidget
         $pendingRewards = ReferralReward::pending()->count();
         $appliedRewards = ReferralReward::applied()->count();
         $expiredRewards = ReferralReward::expired()->count();
-        
+
         $totalAmount = ReferralReward::sum('amount');
         $pendingAmount = ReferralReward::pending()->sum('amount');
         $appliedAmount = ReferralReward::applied()->sum('amount');
-        
+
         $referrerBonuses = ReferralReward::referrerBonus()->count();
         $referredDiscounts = ReferralReward::referredDiscount()->count();
 
@@ -44,17 +45,17 @@ final class ReferralRewardStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
 
-            Stat::make(__('referrals.statistics.total_amount'), '€' . number_format($totalAmount, 2))
+            Stat::make(__('referrals.statistics.total_amount'), '€'.number_format($totalAmount, 2))
                 ->description(__('referrals.statistics.all_rewards_amount'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('info'),
 
-            Stat::make(__('referrals.statistics.pending_amount'), '€' . number_format($pendingAmount, 2))
+            Stat::make(__('referrals.statistics.pending_amount'), '€'.number_format($pendingAmount, 2))
                 ->description(__('referrals.statistics.pending_rewards_amount'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning'),
 
-            Stat::make(__('referrals.statistics.applied_amount'), '€' . number_format($appliedAmount, 2))
+            Stat::make(__('referrals.statistics.applied_amount'), '€'.number_format($appliedAmount, 2))
                 ->description(__('referrals.statistics.applied_rewards_amount'))
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),

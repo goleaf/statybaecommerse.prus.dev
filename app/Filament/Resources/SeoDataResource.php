@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -8,11 +10,8 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\SeoData;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -20,11 +19,12 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Resources\Resource;
 use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -32,27 +32,15 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
-use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
-use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint;
-use Filament\Tables\Filters\QueryBuilder\Constraints\SelectConstraint;
-use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Str;
-use BackedEnum;
 use UnitEnum;
 
 final class SeoDataResource extends Resource
@@ -120,13 +108,14 @@ final class SeoDataResource extends Resource
                                                     ->required()
                                                     ->reactive()
                                                     ->searchable()
-                                                    ->afterStateUpdated(fn(callable $set) => $set('seoable_id', null)),
+                                                    ->afterStateUpdated(fn (callable $set) => $set('seoable_id', null)),
                                                 Select::make('seoable_id')
                                                     ->label(__('admin.seo_data.fields.seoable_name'))
                                                     ->options(function (callable $get) {
                                                         $type = $get('seoable_type');
-                                                        if (!$type)
+                                                        if (! $type) {
                                                             return [];
+                                                        }
 
                                                         return match ($type) {
                                                             Product::class => Product::query()->pluck('name', 'id'),
@@ -137,7 +126,7 @@ final class SeoDataResource extends Resource
                                                     })
                                                     ->required()
                                                     ->searchable()
-                                                    ->disabled(fn(callable $get) => !$get('seoable_type')),
+                                                    ->disabled(fn (callable $get) => ! $get('seoable_type')),
                                                 Select::make('locale')
                                                     ->label(__('admin.seo_data.fields.locale'))
                                                     ->options([
@@ -172,7 +161,7 @@ final class SeoDataResource extends Resource
                                             }),
                                         Placeholder::make('title_length')
                                             ->label(__('admin.seo_data.fields.title_length'))
-                                            ->content(fn(callable $get) => $get('title_length') ?? 0),
+                                            ->content(fn (callable $get) => $get('title_length') ?? 0),
                                         Textarea::make('description')
                                             ->label(__('admin.seo_data.fields.description'))
                                             ->required()
@@ -185,7 +174,7 @@ final class SeoDataResource extends Resource
                                             }),
                                         Placeholder::make('description_length')
                                             ->label(__('admin.seo_data.fields.description_length'))
-                                            ->content(fn(callable $get) => $get('description_length') ?? 0),
+                                            ->content(fn (callable $get) => $get('description_length') ?? 0),
                                         Textarea::make('keywords')
                                             ->label(__('admin.seo_data.fields.keywords'))
                                             ->maxLength(255)
@@ -198,7 +187,7 @@ final class SeoDataResource extends Resource
                                             }),
                                         Placeholder::make('keywords_count')
                                             ->label(__('admin.seo_data.fields.keywords_count'))
-                                            ->content(fn(callable $get) => $get('keywords_count') ?? 0),
+                                            ->content(fn (callable $get) => $get('keywords_count') ?? 0),
                                     ])
                                     ->columns(1),
                             ]),
@@ -313,10 +302,13 @@ final class SeoDataResource extends Resource
                                             ->label(__('admin.seo_data.fields.robots'))
                                             ->content(function (callable $get) {
                                                 $robots = [];
-                                                if ($get('no_index'))
+                                                if ($get('no_index')) {
                                                     $robots[] = 'noindex';
-                                                if ($get('no_follow'))
+                                                }
+                                                if ($get('no_follow')) {
                                                     $robots[] = 'nofollow';
+                                                }
+
                                                 return empty($robots) ? 'index, follow' : implode(', ', $robots);
                                             }),
                                     ])
@@ -369,14 +361,14 @@ final class SeoDataResource extends Resource
                                                     $score += 5;
                                                 }
 
-                                                return min($score, 100) . '/100';
+                                                return min($score, 100).'/100';
                                             }),
                                         Placeholder::make('seo_recommendations')
                                             ->label(__('admin.seo_data.seo_analysis.recommendations'))
                                             ->content(function (callable $get) {
                                                 $recommendations = [];
 
-                                                if (!$get('title')) {
+                                                if (! $get('title')) {
                                                     $recommendations[] = __('admin.seo_data.validation.title_required');
                                                 } elseif (mb_strlen($get('title')) < 30) {
                                                     $recommendations[] = __('admin.seo_data.validation.title_max', ['max' => 30]);
@@ -384,7 +376,7 @@ final class SeoDataResource extends Resource
                                                     $recommendations[] = __('admin.seo_data.validation.title_max', ['max' => 60]);
                                                 }
 
-                                                if (!$get('description')) {
+                                                if (! $get('description')) {
                                                     $recommendations[] = __('admin.seo_data.validation.description_required');
                                                 } elseif (mb_strlen($get('description')) < 120) {
                                                     $recommendations[] = __('admin.seo_data.validation.description_max', ['max' => 120]);
@@ -392,11 +384,11 @@ final class SeoDataResource extends Resource
                                                     $recommendations[] = __('admin.seo_data.validation.description_max', ['max' => 160]);
                                                 }
 
-                                                if (!$get('keywords')) {
+                                                if (! $get('keywords')) {
                                                     $recommendations[] = __('admin.seo_data.help.keywords');
                                                 }
 
-                                                if (!$get('canonical_url')) {
+                                                if (! $get('canonical_url')) {
                                                     $recommendations[] = __('admin.seo_data.help.canonical_url');
                                                 }
 
@@ -425,7 +417,7 @@ final class SeoDataResource extends Resource
                 TextColumn::make('seoable_type_name')
                     ->label(__('admin.seo_data.fields.seoable_type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'Product' => 'success',
                         'Category' => 'info',
                         'Brand' => 'warning',
@@ -435,7 +427,7 @@ final class SeoDataResource extends Resource
                 TextColumn::make('locale_name')
                     ->label(__('admin.seo_data.fields.locale'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'Lietuvių' => 'primary',
                         'English' => 'secondary',
                         default => 'gray',
@@ -448,12 +440,13 @@ final class SeoDataResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
                 TextColumn::make('title_length')
                     ->label(__('admin.seo_data.fields.title_length'))
                     ->badge()
-                    ->color(fn(int $state): string => match (true) {
+                    ->color(fn (int $state): string => match (true) {
                         $state >= 30 && $state <= 60 => 'success',
                         $state > 0 => 'warning',
                         default => 'danger',
@@ -462,7 +455,7 @@ final class SeoDataResource extends Resource
                 TextColumn::make('description_length')
                     ->label(__('admin.seo_data.fields.description_length'))
                     ->badge()
-                    ->color(fn(int $state): string => match (true) {
+                    ->color(fn (int $state): string => match (true) {
                         $state >= 120 && $state <= 160 => 'success',
                         $state > 0 => 'warning',
                         default => 'danger',
@@ -471,7 +464,7 @@ final class SeoDataResource extends Resource
                 TextColumn::make('keywords_count')
                     ->label(__('admin.seo_data.fields.keywords_count'))
                     ->badge()
-                    ->color(fn(int $state): string => match (true) {
+                    ->color(fn (int $state): string => match (true) {
                         $state >= 3 && $state <= 10 => 'success',
                         $state > 0 => 'warning',
                         default => 'danger',
@@ -480,7 +473,7 @@ final class SeoDataResource extends Resource
                 TextColumn::make('seo_score')
                     ->label(__('admin.seo_data.fields.seo_score'))
                     ->badge()
-                    ->color(fn(int $state): string => match (true) {
+                    ->color(fn (int $state): string => match (true) {
                         $state >= 80 => 'success',
                         $state >= 60 => 'warning',
                         default => 'danger',
@@ -530,32 +523,32 @@ final class SeoDataResource extends Resource
                 TernaryFilter::make('has_title')
                     ->label(__('admin.seo_data.filters.has_title'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('title'),
-                        false: fn(Builder $query) => $query->whereNull('title'),
+                        true: fn (Builder $query) => $query->whereNotNull('title'),
+                        false: fn (Builder $query) => $query->whereNull('title'),
                     ),
                 TernaryFilter::make('has_description')
                     ->label(__('admin.seo_data.filters.has_description'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('description'),
-                        false: fn(Builder $query) => $query->whereNull('description'),
+                        true: fn (Builder $query) => $query->whereNotNull('description'),
+                        false: fn (Builder $query) => $query->whereNull('description'),
                     ),
                 TernaryFilter::make('has_keywords')
                     ->label(__('admin.seo_data.filters.has_keywords'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('keywords'),
-                        false: fn(Builder $query) => $query->whereNull('keywords'),
+                        true: fn (Builder $query) => $query->whereNotNull('keywords'),
+                        false: fn (Builder $query) => $query->whereNull('keywords'),
                     ),
                 TernaryFilter::make('has_canonical_url')
                     ->label(__('admin.seo_data.filters.has_canonical_url'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('canonical_url'),
-                        false: fn(Builder $query) => $query->whereNull('canonical_url'),
+                        true: fn (Builder $query) => $query->whereNotNull('canonical_url'),
+                        false: fn (Builder $query) => $query->whereNull('canonical_url'),
                     ),
                 TernaryFilter::make('has_structured_data')
                     ->label(__('admin.seo_data.filters.has_structured_data'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('structured_data'),
-                        false: fn(Builder $query) => $query->whereNull('structured_data'),
+                        true: fn (Builder $query) => $query->whereNotNull('structured_data'),
+                        false: fn (Builder $query) => $query->whereNull('structured_data'),
                     ),
                 TernaryFilter::make('no_index')
                     ->label(__('admin.seo_data.filters.no_index')),
@@ -579,7 +572,7 @@ final class SeoDataResource extends Resource
                         return $query
                             ->when(
                                 $data['seo_score_from'],
-                                fn(Builder $query, $score): Builder => $query->whereRaw('
+                                fn (Builder $query, $score): Builder => $query->whereRaw('
                                     (CASE 
                                         WHEN title IS NOT NULL THEN 20 ELSE 0 END +
                                         CASE 
@@ -600,7 +593,7 @@ final class SeoDataResource extends Resource
                             )
                             ->when(
                                 $data['seo_score_to'],
-                                fn(Builder $query, $score): Builder => $query->whereRaw('
+                                fn (Builder $query, $score): Builder => $query->whereRaw('
                                     (CASE 
                                         WHEN title IS NOT NULL THEN 20 ELSE 0 END +
                                         CASE 

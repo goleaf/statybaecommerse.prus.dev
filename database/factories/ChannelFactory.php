@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -15,7 +17,8 @@ class ChannelFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique()->company() . ' Channel';
+        $name = $this->faker->unique()->company().' Channel';
+
         return [
             'name' => $name,
             'slug' => Str::slug($name),

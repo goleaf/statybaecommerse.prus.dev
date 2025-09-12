@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -76,7 +78,7 @@ final class CampaignFactory extends Factory
 
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'active',
             'starts_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
             'ends_at' => $this->faker->dateTimeBetween('now', '+2 months'),
@@ -85,7 +87,7 @@ final class CampaignFactory extends Factory
 
     public function scheduled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'scheduled',
             'starts_at' => $this->faker->dateTimeBetween('now', '+1 month'),
             'ends_at' => $this->faker->dateTimeBetween('+1 month', '+3 months'),
@@ -94,7 +96,7 @@ final class CampaignFactory extends Factory
 
     public function expired(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'active',
             'starts_at' => $this->faker->dateTimeBetween('-3 months', '-1 month'),
             'ends_at' => $this->faker->dateTimeBetween('-1 month', '-1 week'),
@@ -103,7 +105,7 @@ final class CampaignFactory extends Factory
 
     public function draft(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'draft',
             'starts_at' => null,
             'ends_at' => null,
@@ -112,7 +114,7 @@ final class CampaignFactory extends Factory
 
     public function featured(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_featured' => true,
             'display_priority' => $this->faker->numberBetween(80, 100),
         ]);
@@ -120,7 +122,7 @@ final class CampaignFactory extends Factory
 
     public function email(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'email',
             'subject' => $this->faker->sentence(6),
             'content' => $this->faker->paragraphs(8, true),
@@ -129,7 +131,7 @@ final class CampaignFactory extends Factory
 
     public function banner(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'banner',
             'banner_image' => $this->faker->imageUrl(1200, 600, 'business'),
             'banner_alt_text' => $this->faker->sentence(8),
@@ -140,7 +142,7 @@ final class CampaignFactory extends Factory
 
     public function social(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'social',
             'social_media_ready' => true,
             'meta_title' => $this->faker->sentence(10),
@@ -150,7 +152,7 @@ final class CampaignFactory extends Factory
 
     public function highPerformance(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'total_views' => $this->faker->numberBetween(50000, 200000),
             'total_clicks' => $this->faker->numberBetween(5000, 20000),
             'total_conversions' => $this->faker->numberBetween(500, 2000),
@@ -161,7 +163,7 @@ final class CampaignFactory extends Factory
 
     public function lowPerformance(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'total_views' => $this->faker->numberBetween(0, 1000),
             'total_clicks' => $this->faker->numberBetween(0, 50),
             'total_conversions' => $this->faker->numberBetween(0, 5),

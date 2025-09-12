@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\PostResource\Pages;
 
@@ -9,4 +11,3 @@ final class CreatePost extends CreateRecord
 {
     protected static string $resource = PostResource::class;
 }
-

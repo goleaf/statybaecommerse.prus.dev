@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
@@ -23,4 +25,3 @@ class EditOrder extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 }
-

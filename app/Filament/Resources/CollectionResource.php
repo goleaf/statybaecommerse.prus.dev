@@ -1,22 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use App\Services\MultiLanguageTabService;
-use BackedEnum;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Forms\Form;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\DeleteAction;
@@ -26,11 +26,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 use SolutionForest\TabLayoutPlugin\Schemas\TabsWidget;
 
 final class CollectionResource extends Resource
@@ -253,6 +251,7 @@ final class CollectionResource extends Resource
                         if (strlen($state) <= 50) {
                             return null;
                         }
+
                         return $state;
                     }),
 
@@ -354,7 +353,7 @@ final class CollectionResource extends Resource
                     ->icon('heroicon-o-eye')
                     ->color('warning')
                     ->action(function (Collection $record) {
-                        $record->update(['is_visible' => !$record->is_visible]);
+                        $record->update(['is_visible' => ! $record->is_visible]);
                     })
                     ->requiresConfirmation()
                     ->modalHeading(__('admin.collections.confirmations.toggle_visibility')),
@@ -375,7 +374,7 @@ final class CollectionResource extends Resource
                     ->color('warning')
                     ->action(function ($records) {
                         $records->each(function ($record) {
-                            $record->update(['is_visible' => !$record->is_visible]);
+                            $record->update(['is_visible' => ! $record->is_visible]);
                         });
                     })
                     ->requiresConfirmation()

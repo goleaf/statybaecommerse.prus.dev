@@ -1,14 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         // Create addresses table
-        if (!Schema::hasTable('sh_addresses')) {
+        if (! Schema::hasTable('sh_addresses')) {
             Schema::create('sh_addresses', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
@@ -35,7 +38,7 @@ return new class extends Migration {
         }
 
         // Create collection rules table
-        if (!Schema::hasTable('sh_collection_rules')) {
+        if (! Schema::hasTable('sh_collection_rules')) {
             Schema::create('sh_collection_rules', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('collection_id');
@@ -68,13 +71,13 @@ return new class extends Migration {
         // Add missing columns to zones table
         if (Schema::hasTable('sh_zones')) {
             Schema::table('sh_zones', function (Blueprint $table) {
-                if (!Schema::hasColumn('sh_zones', 'tax_rate')) {
+                if (! Schema::hasColumn('sh_zones', 'tax_rate')) {
                     $table->decimal('tax_rate', 5, 4)->default(0)->after('currency_id');
                 }
-                if (!Schema::hasColumn('sh_zones', 'shipping_rate')) {
+                if (! Schema::hasColumn('sh_zones', 'shipping_rate')) {
                     $table->decimal('shipping_rate', 8, 2)->default(0)->after('tax_rate');
                 }
-                if (!Schema::hasColumn('sh_zones', 'is_default')) {
+                if (! Schema::hasColumn('sh_zones', 'is_default')) {
                     $table->boolean('is_default')->default(false)->after('is_enabled');
                 }
             });
@@ -83,19 +86,19 @@ return new class extends Migration {
         // Add missing columns to currencies table
         if (Schema::hasTable('sh_currencies')) {
             Schema::table('sh_currencies', function (Blueprint $table) {
-                if (!Schema::hasColumn('sh_currencies', 'symbol')) {
+                if (! Schema::hasColumn('sh_currencies', 'symbol')) {
                     $table->string('symbol', 10)->nullable()->after('code');
                 }
-                if (!Schema::hasColumn('sh_currencies', 'exchange_rate')) {
+                if (! Schema::hasColumn('sh_currencies', 'exchange_rate')) {
                     $table->decimal('exchange_rate', 10, 6)->default(1)->after('symbol');
                 }
-                if (!Schema::hasColumn('sh_currencies', 'is_default')) {
+                if (! Schema::hasColumn('sh_currencies', 'is_default')) {
                     $table->boolean('is_default')->default(false)->after('exchange_rate');
                 }
-                if (!Schema::hasColumn('sh_currencies', 'is_enabled')) {
+                if (! Schema::hasColumn('sh_currencies', 'is_enabled')) {
                     $table->boolean('is_enabled')->default(true)->after('is_default');
                 }
-                if (!Schema::hasColumn('sh_currencies', 'decimal_places')) {
+                if (! Schema::hasColumn('sh_currencies', 'decimal_places')) {
                     $table->tinyInteger('decimal_places')->default(2)->after('is_enabled');
                 }
             });
@@ -104,22 +107,22 @@ return new class extends Migration {
         // Add missing columns to channels table
         if (Schema::hasTable('sh_channels')) {
             Schema::table('sh_channels', function (Blueprint $table) {
-                if (!Schema::hasColumn('sh_channels', 'name')) {
+                if (! Schema::hasColumn('sh_channels', 'name')) {
                     $table->string('name')->after('id');
                 }
-                if (!Schema::hasColumn('sh_channels', 'slug')) {
+                if (! Schema::hasColumn('sh_channels', 'slug')) {
                     $table->string('slug')->nullable()->after('name');
                 }
-                if (!Schema::hasColumn('sh_channels', 'url')) {
+                if (! Schema::hasColumn('sh_channels', 'url')) {
                     $table->string('url')->nullable()->after('slug');
                 }
-                if (!Schema::hasColumn('sh_channels', 'is_enabled')) {
+                if (! Schema::hasColumn('sh_channels', 'is_enabled')) {
                     $table->boolean('is_enabled')->default(true)->after('url');
                 }
-                if (!Schema::hasColumn('sh_channels', 'is_default')) {
+                if (! Schema::hasColumn('sh_channels', 'is_default')) {
                     $table->boolean('is_default')->default(false)->after('is_enabled');
                 }
-                if (!Schema::hasColumn('sh_channels', 'metadata')) {
+                if (! Schema::hasColumn('sh_channels', 'metadata')) {
                     $table->json('metadata')->nullable()->after('is_default');
                 }
             });
@@ -128,13 +131,13 @@ return new class extends Migration {
         // Add missing columns to collections table
         if (Schema::hasTable('collections')) {
             Schema::table('collections', function (Blueprint $table) {
-                if (!Schema::hasColumn('collections', 'is_automatic')) {
+                if (! Schema::hasColumn('collections', 'is_automatic')) {
                     $table->boolean('is_automatic')->default(false)->after('is_visible');
                 }
-                if (!Schema::hasColumn('collections', 'rules')) {
+                if (! Schema::hasColumn('collections', 'rules')) {
                     $table->json('rules')->nullable()->after('is_automatic');
                 }
-                if (!Schema::hasColumn('collections', 'max_products')) {
+                if (! Schema::hasColumn('collections', 'max_products')) {
                     $table->integer('max_products')->nullable()->after('rules');
                 }
             });
@@ -143,13 +146,13 @@ return new class extends Migration {
         // Add missing columns to customer groups table
         if (Schema::hasTable('sh_customer_groups')) {
             Schema::table('sh_customer_groups', function (Blueprint $table) {
-                if (!Schema::hasColumn('sh_customer_groups', 'description')) {
+                if (! Schema::hasColumn('sh_customer_groups', 'description')) {
                     $table->text('description')->nullable()->after('code');
                 }
-                if (!Schema::hasColumn('sh_customer_groups', 'discount_rate')) {
+                if (! Schema::hasColumn('sh_customer_groups', 'discount_rate')) {
                     $table->decimal('discount_rate', 5, 4)->default(0)->after('description');
                 }
-                if (!Schema::hasColumn('sh_customer_groups', 'is_enabled')) {
+                if (! Schema::hasColumn('sh_customer_groups', 'is_enabled')) {
                     $table->boolean('is_enabled')->default(true)->after('discount_rate');
                 }
             });
@@ -168,7 +171,7 @@ return new class extends Migration {
         ];
 
         foreach ($tables as $tableName => $displayName) {
-            if (Schema::hasTable($tableName) && !Schema::hasColumn($tableName, 'deleted_at')) {
+            if (Schema::hasTable($tableName) && ! Schema::hasColumn($tableName, 'deleted_at')) {
                 Schema::table($tableName, function (Blueprint $table) {
                     $table->softDeletes();
                 });

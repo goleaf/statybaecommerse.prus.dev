@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -15,8 +17,9 @@ final class AttributeValueFactory extends Factory
     public function definition(): array
     {
         $value = $this->faker->unique()->safeColorName();
+
         return [
-            'attribute_id' => fn() => \App\Models\Attribute::factory(),
+            'attribute_id' => fn () => \App\Models\Attribute::factory(),
             'value' => $value,
             'slug' => str($value)->slug()->toString(),
             'description' => $this->faker->optional(0.6)->sentence(),
@@ -36,56 +39,56 @@ final class AttributeValueFactory extends Factory
 
     public function enabled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_enabled' => true,
         ]);
     }
 
     public function disabled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_enabled' => false,
         ]);
     }
 
     public function required(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_required' => true,
         ]);
     }
 
     public function default(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_default' => true,
         ]);
     }
 
-    public function withColor(string $colorCode = null): static
+    public function withColor(?string $colorCode = null): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'color_code' => $colorCode ?? $this->faker->hexColor(),
         ]);
     }
 
-    public function withDescription(string $description = null): static
+    public function withDescription(?string $description = null): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'description' => $description ?? $this->faker->sentence(),
         ]);
     }
 
     public function withMetaData(array $metaData): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'meta_data' => $metaData,
         ]);
     }
 
     public function colorValue(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'value' => $this->faker->colorName(),
             'color_code' => $this->faker->hexColor(),
             'description' => 'Color option for products',
@@ -99,7 +102,7 @@ final class AttributeValueFactory extends Factory
 
     public function sizeValue(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'value' => $this->faker->randomElement(['XS', 'S', 'M', 'L', 'XL', 'XXL']),
             'description' => 'Size option for clothing',
             'meta_data' => [
@@ -112,7 +115,7 @@ final class AttributeValueFactory extends Factory
 
     public function materialValue(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'value' => $this->faker->randomElement(['Cotton', 'Polyester', 'Wool', 'Silk', 'Leather']),
             'description' => 'Material composition',
             'meta_data' => [

@@ -1,22 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Models\Discount;
 use App\Models\DiscountCondition;
-use App\Services\MultiLanguageTabService;
+use BackedEnum;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\ChartWidget;
-use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\TableWidget;
-use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use BackedEnum;
 use UnitEnum;
 
 final class DiscountConditionResource extends Resource
@@ -70,16 +65,16 @@ final class DiscountConditionResource extends Resource
                             ->options(DiscountCondition::getTypes())
                             ->required()
                             ->live()
-                            ->afterStateUpdated(fn(Forms\Set $set) => $set('operator', null)),
+                            ->afterStateUpdated(fn (Forms\Set $set) => $set('operator', null)),
                         Forms\Components\Select::make('operator')
                             ->label(__('discount_conditions.fields.operator'))
-                            ->options(fn(Forms\Get $get) => DiscountCondition::getOperatorsForType($get('type')))
+                            ->options(fn (Forms\Get $get) => DiscountCondition::getOperatorsForType($get('type')))
                             ->required()
                             ->live(),
                         Forms\Components\TextInput::make('value')
                             ->label(__('discount_conditions.fields.value'))
                             ->required()
-                            ->helperText(fn(Forms\Get $get) => self::getValueHelperText($get('type'), $get('operator'))),
+                            ->helperText(fn (Forms\Get $get) => self::getValueHelperText($get('type'), $get('operator'))),
                         Forms\Components\TextInput::make('position')
                             ->label(__('discount_conditions.fields.position'))
                             ->numeric()
@@ -121,7 +116,7 @@ final class DiscountConditionResource extends Resource
                             ])
                             ->columns(2)
                             ->collapsible()
-                            ->itemLabel(fn(array $state): ?string => $state['locale'] ?? null),
+                            ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
                     ]),
                 Forms\Components\Section::make(__('discount_conditions.sections.advanced'))
                     ->schema([
@@ -143,11 +138,11 @@ final class DiscountConditionResource extends Resource
                     ->label(__('discount_conditions.fields.discount'))
                     ->searchable()
                     ->sortable()
-                    ->url(fn(DiscountCondition $record): string => route('filament.admin.resources.discounts.view', $record->discount)),
+                    ->url(fn (DiscountCondition $record): string => route('filament.admin.resources.discounts.view', $record->discount)),
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('discount_conditions.fields.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'product', 'category', 'brand', 'collection' => 'info',
                         'cart_total', 'item_qty' => 'warning',
                         'zone', 'channel', 'currency' => 'success',
@@ -156,12 +151,12 @@ final class DiscountConditionResource extends Resource
                         'custom_script' => 'danger',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn(string $state): string => DiscountCondition::getTypes()[$state] ?? $state),
+                    ->formatStateUsing(fn (string $state): string => DiscountCondition::getTypes()[$state] ?? $state),
                 Tables\Columns\TextColumn::make('operator')
                     ->label(__('discount_conditions.fields.operator'))
                     ->badge()
                     ->color('gray')
-                    ->formatStateUsing(fn(string $state): string => DiscountCondition::getOperators()[$state] ?? $state),
+                    ->formatStateUsing(fn (string $state): string => DiscountCondition::getOperators()[$state] ?? $state),
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('discount_conditions.fields.value'))
                     ->limit(50)
@@ -170,6 +165,7 @@ final class DiscountConditionResource extends Resource
                         if (is_array($state)) {
                             return implode(', ', $state);
                         }
+
                         return $state;
                     }),
                 Tables\Columns\TextColumn::make('position')
@@ -181,7 +177,7 @@ final class DiscountConditionResource extends Resource
                     ->numeric()
                     ->sortable()
                     ->badge()
-                    ->color(fn(int $state): string => match (true) {
+                    ->color(fn (int $state): string => match (true) {
                         $state <= 0 => 'danger',
                         $state <= 5 => 'warning',
                         $state <= 10 => 'success',
@@ -224,16 +220,16 @@ final class DiscountConditionResource extends Resource
                     ->label(__('discount_conditions.fields.is_active')),
                 Tables\Filters\Filter::make('high_priority')
                     ->label(__('discount_conditions.filters.high_priority'))
-                    ->query(fn(Builder $query): Builder => $query->where('priority', '>', 5)),
+                    ->query(fn (Builder $query): Builder => $query->where('priority', '>', 5)),
                 Tables\Filters\Filter::make('low_priority')
                     ->label(__('discount_conditions.filters.low_priority'))
-                    ->query(fn(Builder $query): Builder => $query->where('priority', '<=', 5)),
+                    ->query(fn (Builder $query): Builder => $query->where('priority', '<=', 5)),
                 Tables\Filters\Filter::make('numeric_conditions')
                     ->label(__('discount_conditions.filters.numeric_conditions'))
-                    ->query(fn(Builder $query): Builder => $query->whereIn('type', ['cart_total', 'item_qty', 'priority'])),
+                    ->query(fn (Builder $query): Builder => $query->whereIn('type', ['cart_total', 'item_qty', 'priority'])),
                 Tables\Filters\Filter::make('string_conditions')
                     ->label(__('discount_conditions.filters.string_conditions'))
-                    ->query(fn(Builder $query): Builder => $query->whereIn('type', ['product', 'category', 'brand', 'collection', 'attribute_value'])),
+                    ->query(fn (Builder $query): Builder => $query->whereIn('type', ['product', 'category', 'brand', 'collection', 'attribute_value'])),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -268,13 +264,13 @@ final class DiscountConditionResource extends Resource
                         ->label(__('discount_conditions.actions.activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(fn($records) => $records->each->update(['is_active' => true]))
+                        ->action(fn ($records) => $records->each->update(['is_active' => true]))
                         ->requiresConfirmation(),
                     Tables\Actions\BulkAction::make('deactivate')
                         ->label(__('discount_conditions.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('warning')
-                        ->action(fn($records) => $records->each->update(['is_active' => false]))
+                        ->action(fn ($records) => $records->each->update(['is_active' => false]))
                         ->requiresConfirmation(),
                     Tables\Actions\BulkAction::make('set_priority')
                         ->label(__('discount_conditions.actions.set_priority'))
@@ -286,7 +282,7 @@ final class DiscountConditionResource extends Resource
                                 ->numeric()
                                 ->required(),
                         ])
-                        ->action(fn($records, array $data) => $records->each->update(['priority' => $data['priority']])),
+                        ->action(fn ($records, array $data) => $records->each->update(['priority' => $data['priority']])),
                 ]),
             ])
             ->defaultSort('priority', 'desc')
@@ -321,7 +317,7 @@ final class DiscountConditionResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return self::getModel()::count();
     }
 
     public static function getNavigationBadgeColor(): ?string

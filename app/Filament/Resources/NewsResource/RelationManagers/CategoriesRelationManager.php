@@ -1,14 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class CategoriesRelationManager extends RelationManager
 {
@@ -17,31 +17,31 @@ final class CategoriesRelationManager extends RelationManager
     public function form(Schema $form): Schema
     {
         return $form->components([
-                Forms\Components\TextInput::make('name')
-                    ->label(__('admin.news.categories.fields.name'))
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('slug')
-                    ->label(__('admin.news.categories.fields.slug'))
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->label(__('admin.news.categories.fields.description'))
-                    ->maxLength(500)
-                    ->rows(3),
-                Forms\Components\Toggle::make('is_visible')
-                    ->label(__('admin.news.categories.fields.is_visible'))
-                    ->default(true),
-                Forms\Components\Select::make('parent_id')
-                    ->label(__('admin.news.categories.fields.parent_id'))
-                    ->relationship('parent', 'name')
-                    ->searchable()
-                    ->preload(),
-                Forms\Components\TextInput::make('sort_order')
-                    ->label(__('admin.news.categories.fields.sort_order'))
-                    ->numeric()
-                    ->default(0),
-            ]);
+            Forms\Components\TextInput::make('name')
+                ->label(__('admin.news.categories.fields.name'))
+                ->required()
+                ->maxLength(255),
+            Forms\Components\TextInput::make('slug')
+                ->label(__('admin.news.categories.fields.slug'))
+                ->required()
+                ->maxLength(255),
+            Forms\Components\Textarea::make('description')
+                ->label(__('admin.news.categories.fields.description'))
+                ->maxLength(500)
+                ->rows(3),
+            Forms\Components\Toggle::make('is_visible')
+                ->label(__('admin.news.categories.fields.is_visible'))
+                ->default(true),
+            Forms\Components\Select::make('parent_id')
+                ->label(__('admin.news.categories.fields.parent_id'))
+                ->relationship('parent', 'name')
+                ->searchable()
+                ->preload(),
+            Forms\Components\TextInput::make('sort_order')
+                ->label(__('admin.news.categories.fields.sort_order'))
+                ->numeric()
+                ->default(0),
+        ]);
     }
 
     public function table(Table $table): Table

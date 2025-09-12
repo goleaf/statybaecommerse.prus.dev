@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -36,11 +38,11 @@ class CategoryFactory extends Factory
             'Laiptai ir pastoliai',
             'Sodo ir kiemo įranga',
             'Apsaugos sistemos',
-            'Apšvietimo sprendimai'
+            'Apšvietimo sprendimai',
         ];
 
         $name = $this->faker->unique()->randomElement($lithuanianCategories);
-        
+
         return [
             'name' => $name,
             'slug' => Str::slug($name),
@@ -48,8 +50,8 @@ class CategoryFactory extends Factory
             'parent_id' => null, // Will be set by seeder for subcategories
             'sort_order' => $this->faker->numberBetween(0, 100),
             'is_visible' => true,
-            'seo_title' => $name . ' - Profesionalūs sprendimai statybininkams',
-            'seo_description' => 'Platus ' . strtolower($name) . ' asortimentas geriausiomis kainomis. Greitas pristatymas visoje Lietuvoje.',
+            'seo_title' => $name.' - Profesionalūs sprendimai statybininkams',
+            'seo_description' => 'Platus '.strtolower($name).' asortimentas geriausiomis kainomis. Greitas pristatymas visoje Lietuvoje.',
         ];
     }
 
@@ -60,7 +62,7 @@ class CategoryFactory extends Factory
             "Aukštos kokybės {$categoryName} tiek profesionalams, tiek namų meistrams. Konkurencingos kainos ir greitas pristatymas.",
             "Viskas, ko reikia {$categoryName} srityje. Nuo pagrindinių įrankių iki specializuotos įrangos.",
             "Patikimi {$categoryName} su garantija. Konsultacijos ir techninė pagalba įsigijus prekes.",
-            "Platus {$categoryName} asortimentas visoms statybos reikmėms. Kokybė už prieinamą kainą."
+            "Platus {$categoryName} asortimentas visoms statybos reikmėms. Kokybė už prieinamą kainą.",
         ];
 
         return $this->faker->randomElement($descriptions);
@@ -68,7 +70,7 @@ class CategoryFactory extends Factory
 
     public function withParent(Category $parent): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'parent_id' => $parent->id,
         ]);
     }

@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\Zone;
 use App\Models\Currency;
+use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +23,7 @@ final class ZoneFactory extends Factory
     public function definition(): array
     {
         $types = ['shipping', 'tax', 'payment', 'delivery', 'general'];
-        
+
         return [
             'name' => $this->faker->words(2, true),
             'slug' => $this->faker->slug(),

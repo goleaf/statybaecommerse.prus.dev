@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\Translations\OrderTranslation;
 use App\Models\Order;
+use App\Models\Translations\OrderTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -56,19 +58,19 @@ class OrderTranslationFactory extends Factory
             'billing_address' => [
                 'name' => $this->faker->name(),
                 'email' => $this->faker->email(),
-                'phone' => '+370' . $this->faker->numerify('#######'),
+                'phone' => '+370'.$this->faker->numerify('#######'),
                 'address' => $this->faker->streetAddress(),
                 'city' => $this->faker->randomElement(['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys']),
-                'postal_code' => 'LT-' . $this->faker->numerify('#####'),
+                'postal_code' => 'LT-'.$this->faker->numerify('#####'),
                 'country' => 'Lietuva',
             ],
             'shipping_address' => [
                 'name' => $this->faker->name(),
                 'email' => $this->faker->email(),
-                'phone' => '+370' . $this->faker->numerify('#######'),
+                'phone' => '+370'.$this->faker->numerify('#######'),
                 'address' => $this->faker->streetAddress(),
                 'city' => $this->faker->randomElement(['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys']),
-                'postal_code' => 'LT-' . $this->faker->numerify('#####'),
+                'postal_code' => 'LT-'.$this->faker->numerify('#####'),
                 'country' => 'Lietuva',
             ],
         ]);
@@ -103,4 +105,3 @@ class OrderTranslationFactory extends Factory
         ]);
     }
 }
-

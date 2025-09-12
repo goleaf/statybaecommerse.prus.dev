@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         if (Schema::hasTable('sh_discounts')) {
@@ -154,11 +155,15 @@ return new class extends Migration {
                 }
 
                 // drop indexes if exist
-                try { $table->dropIndex('sh_discounts_status_window_index'); } catch (\Throwable $e) {}
-                try { $table->dropIndex('sh_discounts_priority_index'); } catch (\Throwable $e) {}
+                try {
+                    $table->dropIndex('sh_discounts_status_window_index');
+                } catch (\Throwable $e) {
+                }
+                try {
+                    $table->dropIndex('sh_discounts_priority_index');
+                } catch (\Throwable $e) {
+                }
             });
         }
     }
 };
-
-

@@ -5,7 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         if (Schema::hasTable('sh_products')) {
@@ -39,7 +40,7 @@ return new class extends Migration {
                     ->all();
 
                 if (! empty($columns)) {
-                    $indexName = 'sh_prod_trans_fulltext_' . substr(md5(implode(',', $columns)), 0, 8);
+                    $indexName = 'sh_prod_trans_fulltext_'.substr(md5(implode(',', $columns)), 0, 8);
                     if (! $this->indexNameExists('sh_product_translations', $indexName)) {
                         try {
                             DB::statement('ALTER TABLE `sh_product_translations` ADD FULLTEXT `'.$indexName.'` (`'.implode('`,`', $columns).'`)');
@@ -63,18 +64,22 @@ return new class extends Migration {
             return;
         }
         $driver = DB::getDriverName();
-        $cols = '`' . implode('`,`', $columns) . '`';
+        $cols = '`'.implode('`,`', $columns).'`';
         try {
             if ($driver === 'mysql') {
                 DB::statement("CREATE INDEX `{$indexName}` ON `{$table}` ({$cols})");
             } elseif ($driver === 'sqlite') {
-                DB::statement("CREATE INDEX IF NOT EXISTS {$indexName} ON {$table} (" . implode(',', $columns) . ")");
+                DB::statement("CREATE INDEX IF NOT EXISTS {$indexName} ON {$table} (".implode(',', $columns).')');
             } else {
                 Schema::table($table, function (Blueprint $t) use ($columns, $indexName) {
-                    try { $t->index($columns, $indexName); } catch (Throwable $e) {}
+                    try {
+                        $t->index($columns, $indexName);
+                    } catch (Throwable $e) {
+                    }
                 });
             }
-        } catch (Throwable $e) {}
+        } catch (Throwable $e) {
+        }
     }
 
     private function indexNameExists(string $table, string $indexName): bool
@@ -84,19 +89,22 @@ return new class extends Migration {
             if ($driver === 'mysql') {
                 $db = DB::getDatabaseName();
                 $rows = DB::select('SELECT 1 FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND INDEX_NAME = ? LIMIT 1', [$db, $table, $indexName]);
-                return !empty($rows);
+
+                return ! empty($rows);
             } elseif ($driver === 'sqlite') {
-                $rows = DB::select('PRAGMA index_list(' . $table . ')');
+                $rows = DB::select('PRAGMA index_list('.$table.')');
                 foreach ($rows as $r) {
-                    if (!empty($r->name) && $r->name === $indexName) return true;
+                    if (! empty($r->name) && $r->name === $indexName) {
+                        return true;
+                    }
                 }
+
                 return false;
             }
         } catch (Throwable $e) {
             return false;
         }
+
         return false;
     }
 };
-
-

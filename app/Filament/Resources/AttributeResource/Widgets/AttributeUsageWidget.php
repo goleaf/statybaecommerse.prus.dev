@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeResource\Widgets;
 
@@ -38,7 +40,7 @@ final class AttributeUsageWidget extends BaseWidget
                 ->color('warning')
                 ->chart([2, 4, 6, 8, 10, 12, 14]),
 
-            Stat::make(__('attributes.usage_rate'), $totalAttributes > 0 ? round(($attributesWithProducts / $totalAttributes) * 100, 1) . '%' : '0%')
+            Stat::make(__('attributes.usage_rate'), $totalAttributes > 0 ? round(($attributesWithProducts / $totalAttributes) * 100, 1).'%' : '0%')
                 ->description(__('attributes.usage_rate_description'))
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('primary')

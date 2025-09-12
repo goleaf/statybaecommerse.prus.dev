@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\CampaignConversionTranslation;
 use App\Models\CampaignConversion;
+use App\Models\CampaignConversionTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -43,4 +45,3 @@ class CampaignConversionTranslationFactory extends Factory
         ]);
     }
 }
-

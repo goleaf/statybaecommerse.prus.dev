@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 class OrderStatsWidget extends BaseWidget
 {
@@ -65,12 +66,12 @@ class OrderStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
 
-            Stat::make('orders.stats.total_revenue', '€' . number_format($totalRevenue, 2))
+            Stat::make('orders.stats.total_revenue', '€'.number_format($totalRevenue, 2))
                 ->description('orders.stats.lifetime_revenue')
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('success'),
 
-            Stat::make('orders.stats.average_order_value', '€' . number_format($averageOrderValue, 2))
+            Stat::make('orders.stats.average_order_value', '€'.number_format($averageOrderValue, 2))
                 ->description('orders.stats.per_order')
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('info'),
@@ -92,4 +93,3 @@ class OrderStatsWidget extends BaseWidget
         ];
     }
 }
-

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -15,7 +17,7 @@ final class NewsImageFactory extends Factory
     public function definition(): array
     {
         return [
-            'file_path' => 'news/images/' . fake()->uuid() . '.jpg',
+            'file_path' => 'news/images/'.fake()->uuid().'.jpg',
             'alt_text' => fake()->sentence(3),
             'caption' => fake()->sentence(),
             'is_featured' => false,
@@ -39,7 +41,7 @@ final class NewsImageFactory extends Factory
     public function png(): static
     {
         return $this->state(fn (array $attributes) => [
-            'file_path' => 'news/images/' . fake()->uuid() . '.png',
+            'file_path' => 'news/images/'.fake()->uuid().'.png',
             'mime_type' => 'image/png',
         ]);
     }
@@ -47,7 +49,7 @@ final class NewsImageFactory extends Factory
     public function webp(): static
     {
         return $this->state(fn (array $attributes) => [
-            'file_path' => 'news/images/' . fake()->uuid() . '.webp',
+            'file_path' => 'news/images/'.fake()->uuid().'.webp',
             'mime_type' => 'image/webp',
         ]);
     }

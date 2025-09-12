@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
@@ -8,7 +10,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DocumentsRelationManager extends RelationManager
 {
@@ -199,7 +200,7 @@ class DocumentsRelationManager extends RelationManager
                         // Document generation logic would go here
                         $record->update([
                             'generated_at' => now(),
-                            'file_path' => 'generated/' . $record->id . '.pdf',
+                            'file_path' => 'generated/'.$record->id.'.pdf',
                         ]);
                     }),
                 Tables\Actions\DeleteAction::make()

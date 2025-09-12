@@ -1,15 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeValueResource\RelationManagers;
 
-use App\Models\AttributeValue;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class TranslationsRelationManager extends RelationManager
 {
@@ -58,13 +58,13 @@ final class TranslationsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('locale')
                     ->label(__('translations.locale'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'lt' => 'success',
                         'en' => 'info',
                         'de' => 'warning',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'lt' => __('translations.lithuanian'),
                         'en' => __('translations.english'),
                         'de' => __('translations.german'),
@@ -83,7 +83,7 @@ final class TranslationsRelationManager extends RelationManager
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('meta_data')
                     ->label(__('attributes.meta_data'))
-                    ->formatStateUsing(fn($state) => is_array($state) ? count($state) . ' items' : '0 items')
+                    ->formatStateUsing(fn ($state) => is_array($state) ? count($state).' items' : '0 items')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('translations.created_at'))
@@ -106,13 +106,13 @@ final class TranslationsRelationManager extends RelationManager
                     ]),
                 Tables\Filters\Filter::make('with_value')
                     ->label(__('attributes.with_value'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('value')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('value')),
                 Tables\Filters\Filter::make('with_description')
                     ->label(__('attributes.with_description'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('description')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('description')),
                 Tables\Filters\Filter::make('with_meta_data')
                     ->label(__('attributes.with_meta_data'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('meta_data')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('meta_data')),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),

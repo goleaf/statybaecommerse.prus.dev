@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\CampaignClick;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 class CampaignClickStatsWidget extends BaseWidget
 {
@@ -25,11 +26,11 @@ class CampaignClickStatsWidget extends BaseWidget
                 ->color('primary'),
 
             Stat::make(__('campaign_clicks.converted_clicks'), $convertedClicks)
-                ->description(__('campaign_clicks.conversion_rate') . ': ' . $conversionRate . '%')
+                ->description(__('campaign_clicks.conversion_rate').': '.$conversionRate.'%')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
-            Stat::make(__('campaign_clicks.conversion_value'), '€' . number_format($totalConversionValue, 2))
+            Stat::make(__('campaign_clicks.conversion_value'), '€'.number_format($totalConversionValue, 2))
                 ->description(__('campaign_clicks.total_revenue'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('success'),

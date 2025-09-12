@@ -1,13 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ZoneResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 final class DiscountsRelationManager extends RelationManager
 {
@@ -68,8 +68,7 @@ final class DiscountsRelationManager extends RelationManager
                     }),
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('discounts.value'))
-                    ->formatStateUsing(fn (string $state, $record): string => 
-                        $record->type === 'percentage' ? $state . '%' : '€' . $state
+                    ->formatStateUsing(fn (string $state, $record): string => $record->type === 'percentage' ? $state.'%' : '€'.$state
                     ),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('discounts.is_active'))

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -27,7 +29,7 @@ final class CampaignProductTargetFactory extends Factory
 
     public function product(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'target_type' => 'product',
             'product_id' => Product::factory(),
             'category_id' => null,
@@ -36,7 +38,7 @@ final class CampaignProductTargetFactory extends Factory
 
     public function category(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'target_type' => 'category',
             'product_id' => null,
             'category_id' => Category::factory(),
@@ -45,7 +47,7 @@ final class CampaignProductTargetFactory extends Factory
 
     public function brand(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'target_type' => 'brand',
             'product_id' => null,
             'category_id' => null,
@@ -54,7 +56,7 @@ final class CampaignProductTargetFactory extends Factory
 
     public function collection(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'target_type' => 'collection',
             'product_id' => null,
             'category_id' => null,

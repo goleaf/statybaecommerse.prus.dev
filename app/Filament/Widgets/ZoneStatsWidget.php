@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Zone;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Illuminate\Support\Facades\DB;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 final class ZoneStatsWidget extends BaseWidget
 {
@@ -15,7 +16,7 @@ final class ZoneStatsWidget extends BaseWidget
         $activeZones = Zone::where('is_active', true)->count();
         $enabledZones = Zone::where('is_enabled', true)->count();
         $defaultZones = Zone::where('is_default', true)->count();
-        
+
         $shippingZones = Zone::where('type', 'shipping')->count();
         $taxZones = Zone::where('type', 'tax')->count();
         $paymentZones = Zone::where('type', 'payment')->count();
@@ -24,7 +25,7 @@ final class ZoneStatsWidget extends BaseWidget
 
         $zonesWithCountries = Zone::has('countries')->count();
         $zonesWithFreeShipping = Zone::whereNotNull('free_shipping_threshold')->count();
-        
+
         $averageTaxRate = Zone::where('tax_rate', '>', 0)->avg('tax_rate') ?? 0;
         $totalShippingCost = Zone::sum('shipping_rate') ?? 0;
 
@@ -77,11 +78,11 @@ final class ZoneStatsWidget extends BaseWidget
                 ->description(__('zones.zones_with_free_shipping_desc'))
                 ->descriptionIcon('heroicon-m-gift')
                 ->color('success'),
-            Stat::make(__('zones.average_tax_rate'), number_format($averageTaxRate, 2) . '%')
+            Stat::make(__('zones.average_tax_rate'), number_format($averageTaxRate, 2).'%')
                 ->description(__('zones.average_tax_rate_desc'))
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('warning'),
-            Stat::make(__('zones.total_shipping_cost'), '€' . number_format($totalShippingCost, 2))
+            Stat::make(__('zones.total_shipping_cost'), '€'.number_format($totalShippingCost, 2))
                 ->description(__('zones.total_shipping_cost_desc'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('primary'),

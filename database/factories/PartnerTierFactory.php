@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -16,7 +18,7 @@ final class PartnerTierFactory extends Factory
     {
         $tierNames = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
         $tierName = $this->faker->randomElement($tierNames);
-        
+
         return [
             'name' => $tierName,
             'code' => strtoupper($tierName),
@@ -27,16 +29,16 @@ final class PartnerTierFactory extends Factory
             'benefits' => [
                 [
                     'key' => 'Priority Support',
-                    'value' => '24/7 dedicated support team'
+                    'value' => '24/7 dedicated support team',
                 ],
                 [
                     'key' => 'Marketing Materials',
-                    'value' => 'Access to exclusive marketing resources'
+                    'value' => 'Access to exclusive marketing resources',
                 ],
                 [
                     'key' => 'Training',
-                    'value' => 'Monthly training sessions and webinars'
-                ]
+                    'value' => 'Monthly training sessions and webinars',
+                ],
             ],
         ];
     }

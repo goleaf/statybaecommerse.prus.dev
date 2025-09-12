@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\ReferralCodeStatistics;
 use App\Models\ReferralCode;
+use App\Models\ReferralCodeStatistics;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 final class ReferralCodeStatisticsFactory extends Factory

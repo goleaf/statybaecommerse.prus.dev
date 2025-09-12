@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\Translations\AttributeValueTranslation;
 use App\Models\AttributeValue;
+use App\Models\Translations\AttributeValueTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -32,49 +34,49 @@ final class AttributeValueTranslationFactory extends Factory
 
     public function english(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'locale' => 'en',
         ]);
     }
 
     public function lithuanian(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
         ]);
     }
 
     public function german(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'locale' => 'de',
         ]);
     }
 
     public function withValue(string $value): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'value' => $value,
         ]);
     }
 
     public function withDescription(string $description): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'description' => $description,
         ]);
     }
 
     public function withMetaData(array $metaData): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'meta_data' => $metaData,
         ]);
     }
 
     public function colorValue(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'value' => $this->faker->colorName(),
             'meta_data' => [
                 'hex' => $this->faker->hexColor(),
@@ -86,7 +88,7 @@ final class AttributeValueTranslationFactory extends Factory
 
     public function sizeValue(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'value' => $this->faker->randomElement(['XS', 'S', 'M', 'L', 'XL', 'XXL']),
             'meta_data' => [
                 'measurement' => 'clothing',
@@ -97,7 +99,7 @@ final class AttributeValueTranslationFactory extends Factory
 
     public function materialValue(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'value' => $this->faker->randomElement(['Cotton', 'Polyester', 'Wool', 'Silk', 'Leather']),
             'description' => $this->faker->sentence(),
             'meta_data' => [

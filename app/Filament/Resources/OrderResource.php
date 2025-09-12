@@ -1,39 +1,27 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
-use App\Models\Channel;
 use App\Models\Order;
-use App\Models\Partner;
-use App\Models\User;
-use App\Models\Zone;
-use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid as FormGrid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Support\Enums\ActionSize;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\ActionGroup;
@@ -42,20 +30,13 @@ use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TableEditAction;
 use Filament\Tables\Actions\ViewAction as TableViewAction;
 use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Actions;
-use Filament\Forms;
-use Filament\Infolists;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\HtmlString;
 use UnitEnum;
 
 class OrderResource extends Resource
@@ -254,7 +235,7 @@ class OrderResource extends Resource
                         'success' => ['confirmed', 'shipped', 'delivered', 'completed'],
                         'danger' => 'cancelled',
                     ])
-                    ->formatStateUsing(fn(string $state): string => __("orders.statuses.{$state}")),
+                    ->formatStateUsing(fn (string $state): string => __("orders.statuses.{$state}")),
                 BadgeColumn::make('payment_status')
                     ->label('orders.payment_status')
                     ->colors([
@@ -263,7 +244,7 @@ class OrderResource extends Resource
                         'danger' => ['failed', 'refunded'],
                         'info' => 'partially_refunded',
                     ])
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.payment_statuses.{$state}") : '-')
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.payment_statuses.{$state}") : '-')
                     ->toggleable(),
                 TextColumn::make('total')
                     ->label('orders.total')
@@ -342,20 +323,20 @@ class OrderResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
                 TernaryFilter::make('is_paid')
                     ->label('orders.is_paid')
                     ->queries(
-                        true: fn(Builder $query) => $query
+                        true: fn (Builder $query) => $query
                             ->whereIn('payment_status', ['paid', 'captured', 'settled', 'authorized'])
                             ->orWhereIn('status', ['processing', 'confirmed', 'shipped', 'delivered', 'completed']),
-                        false: fn(Builder $query) => $query
+                        false: fn (Builder $query) => $query
                             ->where('payment_status', 'pending')
                             ->where('status', 'pending'),
                     ),
@@ -368,7 +349,7 @@ class OrderResource extends Resource
                         ->label('orders.actions.mark_shipped')
                         ->icon('heroicon-o-truck')
                         ->color('success')
-                        ->visible(fn(Order $record): bool => $record->isShippable())
+                        ->visible(fn (Order $record): bool => $record->isShippable())
                         ->requiresConfirmation()
                         ->action(function (Order $record): void {
                             $record->update([
@@ -380,7 +361,7 @@ class OrderResource extends Resource
                         ->label('orders.actions.mark_delivered')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->visible(fn(Order $record): bool => $record->status === 'shipped')
+                        ->visible(fn (Order $record): bool => $record->status === 'shipped')
                         ->requiresConfirmation()
                         ->action(function (Order $record): void {
                             $record->update([
@@ -392,7 +373,7 @@ class OrderResource extends Resource
                         ->label('orders.actions.cancel')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->visible(fn(Order $record): bool => $record->canBeCancelled())
+                        ->visible(fn (Order $record): bool => $record->canBeCancelled())
                         ->requiresConfirmation()
                         ->action(function (Order $record): void {
                             $record->update(['status' => 'cancelled']);
@@ -437,31 +418,31 @@ class OrderResource extends Resource
                                 TextEntry::make('status')
                                     ->label('orders.status')
                                     ->badge()
-                                    ->color(fn(string $state): string => match ($state) {
+                                    ->color(fn (string $state): string => match ($state) {
                                         'pending' => 'warning',
                                         'processing' => 'info',
                                         'confirmed', 'shipped', 'delivered', 'completed' => 'success',
                                         'cancelled' => 'danger',
                                         default => 'gray',
                                     })
-                                    ->formatStateUsing(fn(string $state): string => __("orders.statuses.{$state}")),
+                                    ->formatStateUsing(fn (string $state): string => __("orders.statuses.{$state}")),
                                 TextEntry::make('payment_status')
                                     ->label('orders.payment_status')
                                     ->badge()
-                                    ->color(fn(?string $state): string => match ($state) {
+                                    ->color(fn (?string $state): string => match ($state) {
                                         'pending' => 'warning',
                                         'paid' => 'success',
                                         'failed', 'refunded' => 'danger',
                                         'partially_refunded' => 'info',
                                         default => 'gray',
                                     })
-                                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.payment_statuses.{$state}") : '-'),
+                                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.payment_statuses.{$state}") : '-'),
                             ]),
                         Grid::make(2)
                             ->schema([
                                 TextEntry::make('user.name')
                                     ->label('orders.customer')
-                                    ->url(fn(?string $state, Order $record): ?string => $record->user ? route('filament.admin.resources.users.view', $record->user) : null),
+                                    ->url(fn (?string $state, Order $record): ?string => $record->user ? route('filament.admin.resources.users.view', $record->user) : null),
                                 TextEntry::make('created_at')
                                     ->label('orders.created_at')
                                     ->dateTime(),

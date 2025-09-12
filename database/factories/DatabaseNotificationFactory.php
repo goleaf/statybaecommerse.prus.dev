@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Notification;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Illuminate\Notifications\DatabaseNotification>
@@ -41,7 +43,7 @@ class DatabaseNotificationFactory extends Factory
                 'message' => $this->faker->paragraph(2),
                 'type' => $this->faker->randomElement([
                     'order', 'product', 'user', 'system', 'payment',
-                    'shipping', 'review', 'promotion', 'newsletter', 'support'
+                    'shipping', 'review', 'promotion', 'newsletter', 'support',
                 ]),
                 'action_url' => $this->faker->url(),
                 'icon' => $this->faker->randomElement([

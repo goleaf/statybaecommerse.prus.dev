@@ -1,17 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Models\AnalyticsEvent;
-use Filament\Resources\Resource;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Actions as Actions;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 use BackedEnum;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 final class AnalyticsEventResource extends Resource
 {
@@ -138,7 +139,7 @@ final class AnalyticsEventResource extends Resource
                 Tables\Columns\TextColumn::make('event_type')
                     ->label(__('admin.analytics.event_type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'page_view' => 'info',
                         'product_view' => 'primary',
                         'add_to_cart' => 'success',
@@ -154,7 +155,7 @@ final class AnalyticsEventResource extends Resource
                         'social_share' => 'info',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn(AnalyticsEvent $record) => $record->getEventTypeLabelAttribute())
+                    ->formatStateUsing(fn (AnalyticsEvent $record) => $record->getEventTypeLabelAttribute())
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
@@ -165,23 +166,23 @@ final class AnalyticsEventResource extends Resource
                 Tables\Columns\TextColumn::make('session_id')
                     ->label(__('admin.analytics.session'))
                     ->limit(10)
-                    ->tooltip(fn($record) => $record->session_id)
+                    ->tooltip(fn ($record) => $record->session_id)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('url')
                     ->label(__('admin.analytics.url'))
                     ->limit(50)
-                    ->tooltip(fn($record) => $record->url)
+                    ->tooltip(fn ($record) => $record->url)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('device_type')
                     ->label(__('admin.analytics.device_type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'desktop' => 'primary',
                         'mobile' => 'success',
                         'tablet' => 'warning',
                         default => 'gray',
                     })
-                    ->icon(fn(AnalyticsEvent $record) => $record->getDeviceIconAttribute())
+                    ->icon(fn (AnalyticsEvent $record) => $record->getDeviceIconAttribute())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('browser')
                     ->label(__('admin.analytics.browser'))
@@ -194,7 +195,7 @@ final class AnalyticsEventResource extends Resource
                     ->placeholder(__('admin.analytics.unknown')),
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('admin.analytics.value'))
-                    ->formatStateUsing(fn(AnalyticsEvent $record) => $record->getFormattedValueAttribute())
+                    ->formatStateUsing(fn (AnalyticsEvent $record) => $record->getFormattedValueAttribute())
                     ->alignEnd()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -214,22 +215,22 @@ final class AnalyticsEventResource extends Resource
                     ->options(AnalyticsEvent::getBrowsers()),
                 Tables\Filters\Filter::make('has_user')
                     ->label(__('admin.analytics.filters.registered_only'))
-                    ->query(fn(Builder $query): Builder => $query->registeredUsers()),
+                    ->query(fn (Builder $query): Builder => $query->registeredUsers()),
                 Tables\Filters\Filter::make('anonymous_only')
                     ->label(__('admin.analytics.filters.anonymous_only'))
-                    ->query(fn(Builder $query): Builder => $query->anonymousUsers()),
+                    ->query(fn (Builder $query): Builder => $query->anonymousUsers()),
                 Tables\Filters\Filter::make('with_value')
                     ->label(__('admin.analytics.filters.with_value'))
-                    ->query(fn(Builder $query): Builder => $query->withValue()),
+                    ->query(fn (Builder $query): Builder => $query->withValue()),
                 Tables\Filters\Filter::make('today')
                     ->label(__('admin.date_ranges.today'))
-                    ->query(fn(Builder $query): Builder => $query->today()),
+                    ->query(fn (Builder $query): Builder => $query->today()),
                 Tables\Filters\Filter::make('this_week')
                     ->label(__('admin.analytics.this_week'))
-                    ->query(fn(Builder $query): Builder => $query->thisWeek()),
+                    ->query(fn (Builder $query): Builder => $query->thisWeek()),
                 Tables\Filters\Filter::make('this_month')
                     ->label(__('admin.analytics.this_month'))
-                    ->query(fn(Builder $query): Builder => $query->thisMonth()),
+                    ->query(fn (Builder $query): Builder => $query->thisMonth()),
                 Tables\Filters\SelectFilter::make('user_id')
                     ->label(__('admin.users.singular'))
                     ->relationship('user', 'name')
@@ -245,7 +246,7 @@ final class AnalyticsEventResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['session_id'],
-                            fn(Builder $query, $sessionId): Builder => $query->where('session_id', 'like', "%{$sessionId}%"),
+                            fn (Builder $query, $sessionId): Builder => $query->where('session_id', 'like', "%{$sessionId}%"),
                         );
                     }),
                 Tables\Filters\Filter::make('created_at')
@@ -260,11 +261,11 @@ final class AnalyticsEventResource extends Resource
                         return $query
                             ->when(
                                 $data['from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])

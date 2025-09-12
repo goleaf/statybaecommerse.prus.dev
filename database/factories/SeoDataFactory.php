@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\SeoData;
-use App\Models\Product;
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\SeoData;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,10 +21,10 @@ final class SeoDataFactory extends Factory
     {
         $locales = ['lt', 'en'];
         $locale = fake()->randomElement($locales);
-        
+
         $seoableTypes = [Product::class, Category::class, Brand::class];
         $seoableType = fake()->randomElement($seoableTypes);
-        
+
         return [
             'seoable_type' => $seoableType,
             'seoable_id' => match ($seoableType) {
@@ -157,4 +159,3 @@ final class SeoDataFactory extends Factory
         ]);
     }
 }
-

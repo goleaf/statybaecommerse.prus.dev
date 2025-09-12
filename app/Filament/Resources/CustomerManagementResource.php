@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -17,26 +19,23 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\DateFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
-use Filament\Tables\Filters\DateFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use BackedEnum;
 use UnitEnum;
 
 final class CustomerManagementResource extends Resource
@@ -104,8 +103,7 @@ final class CustomerManagementResource extends Resource
                                                     ->required()
                                                     ->maxLength(255)
                                                     ->live()
-                                                    ->afterStateUpdated(fn(callable $set, ?string $state) =>
-                                                        $set('slug', \Str::slug($state ?? ''))),
+                                                    ->afterStateUpdated(fn (callable $set, ?string $state) => $set('slug', \Str::slug($state ?? ''))),
                                                 TextInput::make('email')
                                                     ->label(__('admin.customers.email'))
                                                     ->email()
@@ -207,8 +205,8 @@ final class CustomerManagementResource extends Resource
                                             ->helperText(__('admin.customers.partners_help')),
                                         Placeholder::make('partner_discount_rate')
                                             ->label(__('admin.customers.partner_discount_rate'))
-                                            ->content(fn($record) => $record?->partner_discount_rate
-                                                ? number_format($record->partner_discount_rate, 2) . '%'
+                                            ->content(fn ($record) => $record?->partner_discount_rate
+                                                ? number_format($record->partner_discount_rate, 2).'%'
                                                 : __('admin.customers.no_partner_discount')),
                                     ]),
                             ]),
@@ -219,20 +217,20 @@ final class CustomerManagementResource extends Resource
                                     ->schema([
                                         Placeholder::make('addresses_count')
                                             ->label(__('admin.customers.total_addresses'))
-                                            ->content(fn($record) => $record?->addresses_count ?? 0),
+                                            ->content(fn ($record) => $record?->addresses_count ?? 0),
                                         Placeholder::make('default_address')
                                             ->label(__('admin.customers.default_address'))
-                                            ->content(fn($record) => $record?->default_address
+                                            ->content(fn ($record) => $record?->default_address
                                                 ? $record->default_address->full_address
                                                 : __('admin.customers.no_default_address')),
                                         Placeholder::make('billing_address')
                                             ->label(__('admin.customers.billing_address'))
-                                            ->content(fn($record) => $record?->billing_address
+                                            ->content(fn ($record) => $record?->billing_address
                                                 ? $record->billing_address->full_address
                                                 : __('admin.customers.no_billing_address')),
                                         Placeholder::make('shipping_address')
                                             ->label(__('admin.customers.shipping_address'))
-                                            ->content(fn($record) => $record?->shipping_address
+                                            ->content(fn ($record) => $record?->shipping_address
                                                 ? $record->shipping_address->full_address
                                                 : __('admin.customers.no_shipping_address')),
                                     ]),
@@ -246,16 +244,16 @@ final class CustomerManagementResource extends Resource
                                             ->schema([
                                                 Placeholder::make('orders_count')
                                                     ->label(__('admin.customers.total_orders'))
-                                                    ->content(fn($record) => $record?->orders_count ?? 0),
+                                                    ->content(fn ($record) => $record?->orders_count ?? 0),
                                                 Placeholder::make('total_spent')
                                                     ->label(__('admin.customers.total_spent'))
-                                                    ->content(fn($record) => $record?->orders()->sum('total')
-                                                        ? '€' . number_format($record->orders()->sum('total'), 2)
+                                                    ->content(fn ($record) => $record?->orders()->sum('total')
+                                                        ? '€'.number_format($record->orders()->sum('total'), 2)
                                                         : '€0.00'),
                                                 Placeholder::make('average_order_value')
                                                     ->label(__('admin.customers.average_order_value'))
-                                                    ->content(fn($record) => $record?->orders()->avg('total')
-                                                        ? '€' . number_format($record->orders()->avg('total'), 2)
+                                                    ->content(fn ($record) => $record?->orders()->avg('total')
+                                                        ? '€'.number_format($record->orders()->avg('total'), 2)
                                                         : '€0.00'),
                                             ]),
                                     ]),
@@ -265,13 +263,13 @@ final class CustomerManagementResource extends Resource
                                             ->schema([
                                                 Placeholder::make('cart_items_count')
                                                     ->label(__('admin.customers.cart_items'))
-                                                    ->content(fn($record) => $record?->cart_items_count ?? 0),
+                                                    ->content(fn ($record) => $record?->cart_items_count ?? 0),
                                                 Placeholder::make('reviews_count')
                                                     ->label(__('admin.customers.reviews_written'))
-                                                    ->content(fn($record) => $record?->reviews_count ?? 0),
+                                                    ->content(fn ($record) => $record?->reviews_count ?? 0),
                                                 Placeholder::make('wishlist_count')
                                                     ->label(__('admin.customers.wishlist_items'))
-                                                    ->content(fn($record) => $record?->wishlist()->count() ?? 0),
+                                                    ->content(fn ($record) => $record?->wishlist()->count() ?? 0),
                                             ]),
                                     ]),
                             ]),
@@ -293,10 +291,10 @@ final class CustomerManagementResource extends Resource
                                             ->schema([
                                                 Placeholder::make('created_at')
                                                     ->label(__('admin.customers.created_at'))
-                                                    ->content(fn($record) => $record?->created_at?->format('d/m/Y H:i')),
+                                                    ->content(fn ($record) => $record?->created_at?->format('d/m/Y H:i')),
                                                 Placeholder::make('updated_at')
                                                     ->label(__('admin.customers.updated_at'))
-                                                    ->content(fn($record) => $record?->updated_at?->format('d/m/Y H:i')),
+                                                    ->content(fn ($record) => $record?->updated_at?->format('d/m/Y H:i')),
                                             ]),
                                     ]),
                             ]),
@@ -331,7 +329,7 @@ final class CustomerManagementResource extends Resource
                     ->icon('heroicon-m-phone'),
                 BadgeColumn::make('preferred_locale')
                     ->label(__('admin.customers.language'))
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'lt' => __('admin.locales.lithuanian'),
                         'en' => __('admin.locales.english'),
                         'de' => __('admin.locales.german'),
@@ -353,6 +351,7 @@ final class CustomerManagementResource extends Resource
                         if (count($state) <= 2) {
                             return null;
                         }
+
                         return collect($state)->pluck('name')->join(', ');
                     }),
                 TextColumn::make('orders_count')
@@ -365,7 +364,8 @@ final class CustomerManagementResource extends Resource
                     ->label(__('admin.customers.total_spent'))
                     ->getStateUsing(function ($record) {
                         $total = $record->orders()->sum('total');
-                        return $total ? '€' . number_format($total, 2) : '€0.00';
+
+                        return $total ? '€'.number_format($total, 2) : '€0.00';
                     })
                     ->sortable(query: function (Builder $query, string $direction): Builder {
                         return $query
@@ -384,7 +384,7 @@ final class CustomerManagementResource extends Resource
                 IconColumn::make('email_verified_at')
                     ->label(__('admin.customers.email_verified'))
                     ->boolean()
-                    ->getStateUsing(fn($record) => !is_null($record->email_verified_at))
+                    ->getStateUsing(fn ($record) => ! is_null($record->email_verified_at))
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-exclamation-triangle')
                     ->trueColor('success')
@@ -395,7 +395,7 @@ final class CustomerManagementResource extends Resource
                     ->sortable()
                     ->placeholder(__('admin.customers.never_logged_in'))
                     ->since()
-                    ->tooltip(fn($record) => $record->last_login_at?->format('d/m/Y H:i:s')),
+                    ->tooltip(fn ($record) => $record->last_login_at?->format('d/m/Y H:i:s')),
                 TextColumn::make('created_at')
                     ->label(__('admin.customers.created_at'))
                     ->dateTime('d/m/Y H:i')
@@ -417,7 +417,7 @@ final class CustomerManagementResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['value'] !== null,
-                            fn(Builder $query, $value): Builder => $query->where('is_active', $value),
+                            fn (Builder $query, $value): Builder => $query->where('is_active', $value),
                         );
                     }),
                 SelectFilter::make('preferred_locale')
@@ -438,9 +438,9 @@ final class CustomerManagementResource extends Resource
                     ->trueLabel(__('admin.customers.verified'))
                     ->falseLabel(__('admin.customers.unverified'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('email_verified_at'),
-                        false: fn(Builder $query) => $query->whereNull('email_verified_at'),
-                        blank: fn(Builder $query) => $query,
+                        true: fn (Builder $query) => $query->whereNotNull('email_verified_at'),
+                        false: fn (Builder $query) => $query->whereNull('email_verified_at'),
+                        blank: fn (Builder $query) => $query,
                     ),
                 TernaryFilter::make('has_orders')
                     ->label(__('admin.customers.has_orders'))
@@ -448,9 +448,9 @@ final class CustomerManagementResource extends Resource
                     ->trueLabel(__('admin.customers.with_orders'))
                     ->falseLabel(__('admin.customers.without_orders'))
                     ->queries(
-                        true: fn(Builder $query) => $query->has('orders'),
-                        false: fn(Builder $query) => $query->doesntHave('orders'),
-                        blank: fn(Builder $query) => $query,
+                        true: fn (Builder $query) => $query->has('orders'),
+                        false: fn (Builder $query) => $query->doesntHave('orders'),
+                        blank: fn (Builder $query) => $query,
                     ),
                 TernaryFilter::make('has_partners')
                     ->label(__('admin.customers.has_partners'))
@@ -458,9 +458,9 @@ final class CustomerManagementResource extends Resource
                     ->trueLabel(__('admin.customers.with_partners'))
                     ->falseLabel(__('admin.customers.without_partners'))
                     ->queries(
-                        true: fn(Builder $query) => $query->has('partners'),
-                        false: fn(Builder $query) => $query->doesntHave('partners'),
-                        blank: fn(Builder $query) => $query,
+                        true: fn (Builder $query) => $query->has('partners'),
+                        false: fn (Builder $query) => $query->doesntHave('partners'),
+                        blank: fn (Builder $query) => $query,
                     ),
                 DateFilter::make('created_at')
                     ->label(__('admin.customers.created_at'))
@@ -470,12 +470,12 @@ final class CustomerManagementResource extends Resource
                     ->displayFormat('d/m/Y'),
                 Filter::make('high_value_customers')
                     ->label(__('admin.customers.high_value_customers'))
-                    ->query(fn(Builder $query): Builder => $query
+                    ->query(fn (Builder $query): Builder => $query
                         ->withSum('orders', 'total')
                         ->having('orders_sum_total', '>', 1000)),
                 Filter::make('recent_customers')
                     ->label(__('admin.customers.recent_customers'))
-                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
+                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
                 QueryBuilder::make()
                     ->constraints([
                         TextConstraint::make('name')
@@ -553,7 +553,7 @@ final class CustomerManagementResource extends Resource
 
     public static function getGlobalSearchResultTitle($record): string
     {
-        return $record->name . ' (' . $record->email . ')';
+        return $record->name.' ('.$record->email.')';
     }
 
     public static function getGlobalSearchResultDetails($record): array

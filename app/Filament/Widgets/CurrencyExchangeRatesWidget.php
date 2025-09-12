@@ -1,16 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Currency;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class CurrencyExchangeRatesWidget extends ChartWidget
 {
     protected ?string $heading = 'Currency Exchange Rates';
+
     protected ?string $pollingInterval = '60s';
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {
@@ -52,7 +55,7 @@ final class CurrencyExchangeRatesWidget extends ChartWidget
                 ],
             ],
             'labels' => $currencies->map(function ($currency) {
-                return $currency->code . ' (' . $currency->symbol . ')';
+                return $currency->code.' ('.$currency->symbol.')';
             })->toArray(),
         ];
     }

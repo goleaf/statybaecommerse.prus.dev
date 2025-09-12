@@ -5,7 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         $this->index('sh_orders', 'idx_orders_number_created', ['number', 'created_at']);
@@ -16,7 +17,7 @@ return new class extends Migration {
 
         if (Schema::hasTable('sh_order_items')) {
             Schema::table('sh_order_items', function (Blueprint $table) {
-                if (!$this->fkExists('sh_order_items', 'sh_order_items_order_id_foreign')) {
+                if (! $this->fkExists('sh_order_items', 'sh_order_items_order_id_foreign')) {
                     try {
                         $table->foreign('order_id')->references('id')->on('sh_orders')->cascadeOnDelete();
                     } catch (\Throwable $e) {
@@ -27,7 +28,7 @@ return new class extends Migration {
 
         if (Schema::hasTable('sh_prices')) {
             Schema::table('sh_prices', function (Blueprint $table) {
-                if (Schema::hasColumn('sh_prices', 'currency_id') && !$this->fkExists('sh_prices', 'sh_prices_currency_id_foreign')) {
+                if (Schema::hasColumn('sh_prices', 'currency_id') && ! $this->fkExists('sh_prices', 'sh_prices_currency_id_foreign')) {
                     try {
                         $table->foreign('currency_id')->references('id')->on('sh_currencies');
                     } catch (\Throwable $e) {
@@ -41,12 +42,13 @@ return new class extends Migration {
 
     private function index(string $table, string $name, array $columns): void
     {
-        if (!Schema::hasTable($table))
+        if (! Schema::hasTable($table)) {
             return;
+        }
         try {
             $driver = DB::getDriverName();
             if ($driver === 'mysql') {
-                $cols = '`' . implode('`,`', $columns) . '`';
+                $cols = '`'.implode('`,`', $columns).'`';
                 DB::statement("CREATE INDEX IF NOT EXISTS `{$name}` ON `{$table}` ({$cols})");
             } else {
                 Schema::table($table, function (Blueprint $t) use ($columns, $name) {
@@ -67,12 +69,12 @@ return new class extends Migration {
             if (in_array($driver, ['mysql', 'mariadb'])) {
                 $db = DB::getDatabaseName();
                 $row = DB::selectOne('SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = ? AND TABLE_NAME = ? AND CONSTRAINT_NAME = ? AND CONSTRAINT_TYPE = "FOREIGN KEY" LIMIT 1', [$db, $table, $fkName]);
+
                 return $row !== null;
             }
         } catch (\Throwable $e) {
         }
+
         return false;
     }
 };
-
-

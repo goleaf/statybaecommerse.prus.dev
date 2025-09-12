@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CartItemResource\RelationManagers;
 
@@ -57,7 +59,7 @@ final class UserRelationManager extends RelationManager
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(__('admin.users.fields.email_verified'))
                     ->boolean()
-                    ->getStateUsing(fn($record) => !is_null($record->email_verified_at)),
+                    ->getStateUsing(fn ($record) => ! is_null($record->email_verified_at)),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('admin.users.fields.is_active'))
                     ->boolean(),

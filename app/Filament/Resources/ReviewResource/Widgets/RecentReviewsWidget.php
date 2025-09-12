@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ReviewResource\Widgets;
 
@@ -11,7 +13,7 @@ final class RecentReviewsWidget extends BaseWidget
 {
     protected static ?string $heading = 'admin.reviews.widgets.recent_reviews';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -35,12 +37,12 @@ final class RecentReviewsWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('rating')
                     ->label(__('admin.reviews.fields.rating'))
                     ->badge()
-                    ->color(fn($state) => match (true) {
+                    ->color(fn ($state) => match (true) {
                         $state >= 4 => 'success',
                         $state >= 3 => 'warning',
                         default => 'danger',
                     })
-                    ->formatStateUsing(fn($state) => $state . ' ⭐'),
+                    ->formatStateUsing(fn ($state) => $state.' ⭐'),
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('admin.reviews.fields.title'))
                     ->limit(50)
@@ -49,6 +51,7 @@ final class RecentReviewsWidget extends BaseWidget
                         if (strlen($state) <= 50) {
                             return null;
                         }
+
                         return $state;
                     }),
                 Tables\Columns\IconColumn::make('is_approved')
@@ -64,7 +67,7 @@ final class RecentReviewsWidget extends BaseWidget
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->url(fn(Review $record): string => route('filament.admin.resources.reviews.view', $record)),
+                    ->url(fn (Review $record): string => route('filament.admin.resources.reviews.view', $record)),
             ])
             ->paginated(false);
     }

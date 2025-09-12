@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignConversionResource\Pages;
 
@@ -14,4 +16,3 @@ class CreateCampaignConversion extends CreateRecord
         return $this->getResource()::getUrl('index');
     }
 }
-

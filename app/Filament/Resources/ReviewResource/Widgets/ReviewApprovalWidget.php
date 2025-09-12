@@ -1,11 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ReviewResource\Widgets;
 
 use App\Models\Review;
-use Filament\Actions\Action;
-use Filament\Forms;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables;
 use Filament\Tables\Actions\Action as TableAction;
@@ -16,7 +15,7 @@ final class ReviewApprovalWidget extends BaseWidget
 {
     protected static ?string $heading = 'admin.reviews.widgets.pending_approval';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -42,12 +41,12 @@ final class ReviewApprovalWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('rating')
                     ->label(__('admin.reviews.fields.rating'))
                     ->badge()
-                    ->color(fn($state) => match (true) {
+                    ->color(fn ($state) => match (true) {
                         $state >= 4 => 'success',
                         $state >= 3 => 'warning',
                         default => 'danger',
                     })
-                    ->formatStateUsing(fn($state) => $state . ' ⭐'),
+                    ->formatStateUsing(fn ($state) => $state.' ⭐'),
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('admin.reviews.fields.title'))
                     ->limit(50)
@@ -56,6 +55,7 @@ final class ReviewApprovalWidget extends BaseWidget
                         if (strlen($state) <= 50) {
                             return null;
                         }
+
                         return $state;
                     }),
                 Tables\Columns\TextColumn::make('comment')
@@ -66,6 +66,7 @@ final class ReviewApprovalWidget extends BaseWidget
                         if (strlen($state) <= 100) {
                             return null;
                         }
+
                         return $state;
                     }),
                 Tables\Columns\TextColumn::make('created_at')
@@ -78,7 +79,7 @@ final class ReviewApprovalWidget extends BaseWidget
                     ->label(__('admin.reviews.actions.approve'))
                     ->icon('heroicon-o-check')
                     ->color('success')
-                    ->action(fn(Review $record) => $record->approve())
+                    ->action(fn (Review $record) => $record->approve())
                     ->requiresConfirmation(),
                 TableAction::make('reject')
                     ->label(__('admin.reviews.actions.reject'))
@@ -97,12 +98,12 @@ final class ReviewApprovalWidget extends BaseWidget
                             'metadata' => array_merge($record->metadata ?? [], [
                                 'rejection_reason' => $data['rejection_reason'],
                                 'rejected_by' => auth()->id(),
-                            ])
+                            ]),
                         ]);
                     })
                     ->requiresConfirmation(),
                 Tables\Actions\ViewAction::make()
-                    ->url(fn(Review $record): string => route('filament.admin.resources.reviews.view', $record)),
+                    ->url(fn (Review $record): string => route('filament.admin.resources.reviews.view', $record)),
             ])
             ->paginated(false);
     }

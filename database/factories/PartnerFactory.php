@@ -13,9 +13,10 @@ class PartnerFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->company();
+
         return [
             'name' => $name,
-            'code' => strtolower(preg_replace('/[^a-z0-9]+/i', '-', $name)) . '-' . $this->faker->unique()->numerify('###'),
+            'code' => strtolower(preg_replace('/[^a-z0-9]+/i', '-', $name)).'-'.$this->faker->unique()->numerify('###'),
             'tier_id' => PartnerTier::factory(),
             'contact_email' => $this->faker->unique()->safeEmail(),
             'contact_phone' => $this->faker->phoneNumber(),
@@ -26,4 +27,3 @@ class PartnerFactory extends Factory
         ];
     }
 }
-

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\Pages;
 
@@ -25,7 +27,7 @@ final class EditNews extends EditRecord
                     ]);
                     $this->refreshFormData(['is_visible', 'published_at']);
                 })
-                ->visible(fn (): bool => !$this->record->isPublished()),
+                ->visible(fn (): bool => ! $this->record->isPublished()),
             Actions\Action::make('unpublish')
                 ->label(__('admin.news.actions.unpublish'))
                 ->icon('heroicon-o-x-mark')
@@ -44,7 +46,7 @@ final class EditNews extends EditRecord
                     $this->record->update(['is_featured' => true]);
                     $this->refreshFormData(['is_featured']);
                 })
-                ->visible(fn (): bool => !$this->record->is_featured),
+                ->visible(fn (): bool => ! $this->record->is_featured),
             Actions\Action::make('unfeature')
                 ->label(__('admin.news.actions.unfeature'))
                 ->icon('heroicon-o-star')
@@ -84,7 +86,7 @@ final class EditNews extends EditRecord
             $news = $this->record;
 
             foreach ($translations as $locale => $translationData) {
-                if (!empty($translationData['title'])) {
+                if (! empty($translationData['title'])) {
                     $news->translations()->updateOrCreate(
                         ['locale' => $locale],
                         [

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -6,11 +8,10 @@ use App\Models\Zone;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Illuminate\Database\Eloquent\Builder;
 
 final class RecentZonesWidget extends BaseWidget
 {
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?int $sort = 3;
 
@@ -77,13 +78,13 @@ final class RecentZonesWidget extends BaseWidget
 
                 Tables\Columns\TextColumn::make('tax_rate')
                     ->label(__('zones.tax_rate'))
-                    ->formatStateUsing(fn (string $state): string => $state . '%')
+                    ->formatStateUsing(fn (string $state): string => $state.'%')
                     ->sortable()
                     ->alignEnd(),
 
                 Tables\Columns\TextColumn::make('shipping_rate')
                     ->label(__('zones.shipping_rate'))
-                    ->formatStateUsing(fn (string $state): string => '€' . $state)
+                    ->formatStateUsing(fn (string $state): string => '€'.$state)
                     ->sortable()
                     ->alignEnd(),
 

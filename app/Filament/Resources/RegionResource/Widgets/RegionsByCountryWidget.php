@@ -1,18 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\RegionResource\Widgets;
 
 use App\Models\Region;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Database\Eloquent\Builder;
 
 final class RegionsByCountryWidget extends ChartWidget
 {
     protected static ?string $heading = 'Regions by Country';
-    
+
     protected static ?int $sort = 2;
-    
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {
@@ -22,6 +23,7 @@ final class RegionsByCountryWidget extends ChartWidget
             ->get()
             ->mapWithKeys(function ($item) {
                 $countryName = $item->country?->name ?? 'Unknown';
+
                 return [$countryName => $item->count];
             });
 
@@ -32,7 +34,7 @@ final class RegionsByCountryWidget extends ChartWidget
                     'data' => array_values($regionsByCountry->toArray()),
                     'backgroundColor' => [
                         '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
-                        '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
+                        '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1',
                     ],
                 ],
             ],

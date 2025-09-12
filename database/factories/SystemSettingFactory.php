@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -15,7 +17,7 @@ final class SystemSettingFactory extends Factory
     {
         $types = ['string', 'text', 'number', 'boolean', 'array', 'json', 'file', 'image', 'select', 'color', 'date', 'datetime'];
         $groups = ['general', 'ecommerce', 'email', 'payment', 'shipping', 'seo', 'security', 'api', 'appearance', 'notifications'];
-        
+
         return [
             'category_id' => SystemSettingCategory::factory(),
             'key' => $this->faker->unique()->slug(2),

@@ -10,51 +10,51 @@ return new class extends Migration
     {
         // Add enhanced user fields
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'is_active')) {
+            if (! Schema::hasColumn('users', 'is_active')) {
                 $table->boolean('is_active')->default(true)->after('email_verified_at');
             }
-            if (!Schema::hasColumn('users', 'accepts_marketing')) {
+            if (! Schema::hasColumn('users', 'accepts_marketing')) {
                 $table->boolean('accepts_marketing')->default(false)->after('is_active');
             }
-            if (!Schema::hasColumn('users', 'two_factor_enabled')) {
+            if (! Schema::hasColumn('users', 'two_factor_enabled')) {
                 $table->boolean('two_factor_enabled')->default(false)->after('accepts_marketing');
             }
-            if (!Schema::hasColumn('users', 'phone')) {
+            if (! Schema::hasColumn('users', 'phone')) {
                 $table->string('phone')->nullable()->after('email');
             }
-            if (!Schema::hasColumn('users', 'date_of_birth')) {
+            if (! Schema::hasColumn('users', 'date_of_birth')) {
                 $table->date('date_of_birth')->nullable()->after('phone');
             }
         });
 
         // Add enhanced product fields
         Schema::table('products', function (Blueprint $table) {
-            if (!Schema::hasColumn('products', 'meta_title')) {
+            if (! Schema::hasColumn('products', 'meta_title')) {
                 $table->string('meta_title')->nullable()->after('seo_description');
             }
-            if (!Schema::hasColumn('products', 'meta_description')) {
+            if (! Schema::hasColumn('products', 'meta_description')) {
                 $table->text('meta_description')->nullable()->after('meta_title');
             }
-            if (!Schema::hasColumn('products', 'meta_keywords')) {
+            if (! Schema::hasColumn('products', 'meta_keywords')) {
                 $table->text('meta_keywords')->nullable()->after('meta_description');
             }
         });
 
         // Add enhanced order fields
         Schema::table('orders', function (Blueprint $table) {
-            if (!Schema::hasColumn('orders', 'tracking_number')) {
+            if (! Schema::hasColumn('orders', 'tracking_number')) {
                 $table->string('tracking_number')->nullable()->after('payment_reference');
             }
-            if (!Schema::hasColumn('orders', 'estimated_delivery')) {
+            if (! Schema::hasColumn('orders', 'estimated_delivery')) {
                 $table->date('estimated_delivery')->nullable()->after('tracking_number');
             }
-            if (!Schema::hasColumn('orders', 'priority')) {
+            if (! Schema::hasColumn('orders', 'priority')) {
                 $table->enum('priority', ['low', 'normal', 'high', 'urgent'])->default('normal')->after('estimated_delivery');
             }
         });
 
         // Create admin activity log table
-        if (!Schema::hasTable('admin_activity_logs')) {
+        if (! Schema::hasTable('admin_activity_logs')) {
             Schema::create('admin_activity_logs', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -74,7 +74,7 @@ return new class extends Migration
         }
 
         // Create system notifications table
-        if (!Schema::hasTable('system_notifications')) {
+        if (! Schema::hasTable('system_notifications')) {
             Schema::create('system_notifications', function (Blueprint $table) {
                 $table->id();
                 $table->string('type');
@@ -94,7 +94,7 @@ return new class extends Migration
         }
 
         // Create product analytics table
-        if (!Schema::hasTable('product_analytics')) {
+        if (! Schema::hasTable('product_analytics')) {
             Schema::create('product_analytics', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('product_id')->constrained()->cascadeOnDelete();

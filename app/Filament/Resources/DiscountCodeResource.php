@@ -1,44 +1,41 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DiscountCodeResource\Pages;
 use App\Filament\Resources\DiscountCodeResource\RelationManagers;
 use App\Models\DiscountCode;
-use App\Models\Discount;
-use App\Models\User;
 use App\Services\MultiLanguageTabService;
-use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Grid;
-use Filament\Resources\Resource;
 use Filament\Forms\Form;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ProgressEntry;
+use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
+use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Carbon;
 
 final class DiscountCodeResource extends Resource
 {
@@ -104,7 +101,7 @@ final class DiscountCodeResource extends Resource
                                             ->maxLength(255),
                                     ]),
                             ]),
-                        
+
                         ...MultiLanguageTabService::createSimpleTabs([
                             'description' => [
                                 'type' => 'textarea',
@@ -129,7 +126,7 @@ final class DiscountCodeResource extends Resource
                                     ->displayFormat('d/m/Y H:i')
                                     ->after('starts_at'),
                             ]),
-                        
+
                         Grid::make(3)
                             ->schema([
                                 TextInput::make('usage_limit')
@@ -153,7 +150,7 @@ final class DiscountCodeResource extends Resource
                                     ->default('active')
                                     ->required(),
                             ]),
-                        
+
                         Toggle::make('is_active')
                             ->label(__('discount_code_is_active'))
                             ->default(true)
@@ -173,41 +170,42 @@ final class DiscountCodeResource extends Resource
                     ->copyable()
                     ->weight(FontWeight::Bold)
                     ->color('primary'),
-                
+
                 Tables\Columns\TextColumn::make('discount.name')
                     ->label(__('discount_code_discount'))
                     ->searchable()
                     ->sortable()
                     ->limit(30),
-                
+
                 Tables\Columns\TextColumn::make('description')
                     ->label(__('discount_code_description'))
                     ->limit(50)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
-                
+
                 Tables\Columns\TextColumn::make('usage_count')
                     ->label(__('discount_code_usage_count'))
                     ->numeric()
                     ->sortable()
                     ->badge()
                     ->color(fn ($state, $record) => $record->hasReachedLimit() ? 'danger' : 'success'),
-                
+
                 Tables\Columns\TextColumn::make('usage_limit')
                     ->label(__('discount_code_usage_limit'))
                     ->numeric()
                     ->sortable()
                     ->placeholder(__('Unlimited')),
-                
+
                 Tables\Columns\TextColumn::make('remaining_uses')
                     ->label(__('discount_code_remaining_uses'))
                     ->numeric()
                     ->sortable()
                     ->placeholder(__('Unlimited'))
                     ->color(fn ($state) => $state && $state <= 5 ? 'warning' : 'success'),
-                
+
                 Tables\Columns\ProgressColumn::make('usage_percentage')
                     ->label(__('discount_code_usage_percentage'))
                     ->color(fn ($state) => match (true) {
@@ -215,12 +213,12 @@ final class DiscountCodeResource extends Resource
                         $state >= 70 => 'warning',
                         default => 'success',
                     }),
-                
+
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('discount_code_is_active'))
                     ->boolean()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('discount_code_status'))
                     ->badge()
@@ -231,25 +229,25 @@ final class DiscountCodeResource extends Resource
                         'scheduled' => 'warning',
                         default => 'gray',
                     }),
-                
+
                 Tables\Columns\TextColumn::make('starts_at')
                     ->label(__('discount_code_starts_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->placeholder(__('Immediately')),
-                
+
                 Tables\Columns\TextColumn::make('expires_at')
                     ->label(__('discount_code_expires_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->placeholder(__('Never'))
                     ->color(fn ($state) => $state && $state < now()->addDays(7) ? 'warning' : null),
-                
+
                 Tables\Columns\TextColumn::make('creator.name')
                     ->label(__('discount_code_created_by'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.table.created_at'))
                     ->dateTime('d/m/Y H:i')
@@ -262,7 +260,7 @@ final class DiscountCodeResource extends Resource
                     ->relationship('discount', 'name')
                     ->searchable()
                     ->preload(),
-                
+
                 SelectFilter::make('status')
                     ->label(__('discount_code_status'))
                     ->options([
@@ -271,18 +269,18 @@ final class DiscountCodeResource extends Resource
                         'scheduled' => __('discount_code_scheduled'),
                         'expired' => __('discount_code_expired'),
                     ]),
-                
+
                 TernaryFilter::make('is_active')
                     ->label(__('discount_code_is_active')),
-                
+
                 Filter::make('expiring_soon')
                     ->label(__('discount_code_expiring_soon'))
                     ->query(fn (Builder $query): Builder => $query->where('expires_at', '<=', now()->addDays(7))),
-                
+
                 Filter::make('usage_limit_reached')
                     ->label(__('admin.filters.usage_limit_reached'))
                     ->query(fn (Builder $query): Builder => $query->usageLimitReached()),
-                
+
                 Filter::make('created_today')
                     ->label(__('admin.filters.created_today'))
                     ->query(fn (Builder $query): Builder => $query->whereDate('created_at', today())),
@@ -295,17 +293,17 @@ final class DiscountCodeResource extends Resource
                         return $record->code;
                     })
                     ->requiresConfirmation(false),
-                
+
                 Action::make('validate')
                     ->label(__('discount_code_validate'))
                     ->icon('heroicon-m-check-circle')
                     ->color(fn (DiscountCode $record) => $record->isValid() ? 'success' : 'danger')
                     ->action(function (DiscountCode $record) {
-                        return $record->isValid() 
+                        return $record->isValid()
                             ? __('discount_code_success')
                             : __('discount_code_invalid');
                     }),
-                
+
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
@@ -319,7 +317,7 @@ final class DiscountCodeResource extends Resource
                         ->action(function (Collection $records) {
                             $records->each->update(['is_active' => true, 'status' => 'active']);
                         }),
-                    
+
                     BulkAction::make('deactivate')
                         ->label(__('admin.actions.disable'))
                         ->icon('heroicon-m-x-mark')
@@ -327,7 +325,7 @@ final class DiscountCodeResource extends Resource
                         ->action(function (Collection $records) {
                             $records->each->update(['is_active' => false, 'status' => 'inactive']);
                         }),
-                    
+
                     DeleteBulkAction::make(),
                 ]),
             ])
@@ -358,11 +356,11 @@ final class DiscountCodeResource extends Resource
                                     ->weight(FontWeight::Bold)
                                     ->color('primary')
                                     ->copyable(),
-                                
+
                                 TextEntry::make('discount.name')
                                     ->label(__('discount_code_discount')),
                             ]),
-                        
+
                         TextEntry::make('description')
                             ->label(__('discount_code_description'))
                             ->columnSpanFull(),
@@ -382,47 +380,47 @@ final class DiscountCodeResource extends Resource
                                         'scheduled' => 'warning',
                                         default => 'gray',
                                     }),
-                                
+
                                 IconEntry::make('is_active')
                                     ->label(__('discount_code_is_active'))
                                     ->boolean(),
-                                
+
                                 TextEntry::make('usage_count')
                                     ->label(__('discount_code_usage_count'))
                                     ->badge()
                                     ->color(fn ($state, $record) => $record->hasReachedLimit() ? 'danger' : 'success'),
                             ]),
-                        
+
                         Grid::make(2)
                             ->schema([
                                 TextEntry::make('starts_at')
                                     ->label(__('discount_code_starts_at'))
                                     ->dateTime('d/m/Y H:i')
                                     ->placeholder(__('Immediately')),
-                                
+
                                 TextEntry::make('expires_at')
                                     ->label(__('discount_code_expires_at'))
                                     ->dateTime('d/m/Y H:i')
                                     ->placeholder(__('Never'))
                                     ->color(fn ($state) => $state && $state < now()->addDays(7) ? 'warning' : null),
                             ]),
-                        
+
                         Grid::make(3)
                             ->schema([
                                 TextEntry::make('usage_limit')
                                     ->label(__('discount_code_usage_limit'))
                                     ->placeholder(__('Unlimited')),
-                                
+
                                 TextEntry::make('usage_limit_per_user')
                                     ->label(__('discount_code_usage_limit_per_user'))
                                     ->placeholder(__('Unlimited')),
-                                
+
                                 TextEntry::make('remaining_uses')
                                     ->label(__('discount_code_remaining_uses'))
                                     ->placeholder(__('Unlimited'))
                                     ->color(fn ($state) => $state && $state <= 5 ? 'warning' : 'success'),
                             ]),
-                        
+
                         ProgressEntry::make('usage_percentage')
                             ->label(__('discount_code_usage_percentage'))
                             ->color(fn ($state) => match (true) {
@@ -436,14 +434,14 @@ final class DiscountCodeResource extends Resource
                     ->schema([
                         TextEntry::make('creator.name')
                             ->label(__('discount_code_created_by')),
-                        
+
                         TextEntry::make('updater.name')
                             ->label(__('discount_code_updated_by')),
-                        
+
                         TextEntry::make('created_at')
                             ->label(__('admin.table.created_at'))
                             ->dateTime('d/m/Y H:i'),
-                        
+
                         TextEntry::make('updated_at')
                             ->label(__('admin.table.updated_at'))
                             ->dateTime('d/m/Y H:i'),

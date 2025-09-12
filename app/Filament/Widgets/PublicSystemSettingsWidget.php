@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\SystemSetting;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
 
 final class PublicSystemSettingsWidget extends BaseWidget
 {
@@ -41,7 +43,7 @@ final class PublicSystemSettingsWidget extends BaseWidget
                     ->limit(40),
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('admin.system_settings.value'))
-                    ->formatStateUsing(fn(SystemSetting $record) => $record->getFormattedValue())
+                    ->formatStateUsing(fn (SystemSetting $record) => $record->getFormattedValue())
                     ->limit(50)
                     ->tooltip(function (SystemSetting $record) {
                         return $record->getFormattedValue();
@@ -49,7 +51,7 @@ final class PublicSystemSettingsWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('admin.system_settings.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'string', 'text' => 'gray',
                         'number' => 'blue',
                         'boolean' => 'green',
@@ -67,7 +69,7 @@ final class PublicSystemSettingsWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('category.name')
                     ->label(__('admin.system_settings.category'))
                     ->badge()
-                    ->color(fn($record) => $record->category?->color ?? 'primary'),
+                    ->color(fn ($record) => $record->category?->color ?? 'primary'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('admin.system_settings.updated_at'))
                     ->dateTime()
@@ -76,7 +78,7 @@ final class PublicSystemSettingsWidget extends BaseWidget
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->url(fn(SystemSetting $record): string => route('filament.admin.resources.system-settings.view', $record)),
+                    ->url(fn (SystemSetting $record): string => route('filament.admin.resources.system-settings.view', $record)),
             ])
             ->defaultSort('sort_order');
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -17,10 +19,11 @@ class CollectionFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->unique()->words(2, true);
+
         return [
             'name' => Str::title($name),
-            'slug' => Str::slug($name . '-' . $this->faker->unique()->randomNumber()),
-            'description' => $this->faker->boolean(60) ? '<p>' . $this->faker->paragraphs(2, true) . '</p>' : null,
+            'slug' => Str::slug($name.'-'.$this->faker->unique()->randomNumber()),
+            'description' => $this->faker->boolean(60) ? '<p>'.$this->faker->paragraphs(2, true).'</p>' : null,
             'is_visible' => true,
             'sort_order' => $this->faker->numberBetween(0, 10),
             'seo_title' => $this->faker->boolean(40) ? $this->faker->sentence(6) : null,

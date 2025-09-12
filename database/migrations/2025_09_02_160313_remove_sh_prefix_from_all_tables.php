@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     private array $tablesToRename = [
         'sh_addresses' => 'addresses',
         'sh_attributes' => 'attributes',
@@ -67,10 +69,10 @@ return new class extends Migration {
         try {
             // Rename all tables
             foreach ($this->tablesToRename as $oldName => $newName) {
-                            if (Schema::hasTable($oldName) && !Schema::hasTable($newName)) {
-                Schema::rename($oldName, $newName);
-                // Renamed table: {$oldName} -> {$newName}
-            }
+                if (Schema::hasTable($oldName) && ! Schema::hasTable($newName)) {
+                    Schema::rename($oldName, $newName);
+                    // Renamed table: {$oldName} -> {$newName}
+                }
             }
         } finally {
             // Re-enable foreign key checks
@@ -86,7 +88,7 @@ return new class extends Migration {
         try {
             // Rename tables back
             foreach (array_reverse($this->tablesToRename, true) as $oldName => $newName) {
-                if (Schema::hasTable($newName) && !Schema::hasTable($oldName)) {
+                if (Schema::hasTable($newName) && ! Schema::hasTable($oldName)) {
                     Schema::rename($newName, $oldName);
                     echo "Renamed table back: {$newName} -> {$oldName}\n";
                 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
@@ -18,7 +20,7 @@ class CreateOrder extends CreateRecord
     {
         // Generate order number if not provided
         if (empty($data['number'])) {
-            $data['number'] = 'ORD-' . strtoupper(uniqid());
+            $data['number'] = 'ORD-'.strtoupper(uniqid());
         }
 
         // Set default currency
@@ -29,4 +31,3 @@ class CreateOrder extends CreateRecord
         return $data;
     }
 }
-

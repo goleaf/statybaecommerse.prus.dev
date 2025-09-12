@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Campaign;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
 final class CampaignOverviewWidget extends BaseWidget
@@ -56,20 +58,18 @@ final class CampaignOverviewWidget extends BaseWidget
                 ->description(__('campaigns.stats.total_conversions_description'))
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            Stat::make(__('campaigns.stats.total_revenue'), '€' . number_format($totalRevenue, 2))
+            Stat::make(__('campaigns.stats.total_revenue'), '€'.number_format($totalRevenue, 2))
                 ->description(__('campaigns.stats.total_revenue_description'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('success'),
-            Stat::make(__('campaigns.stats.avg_conversion_rate'), number_format($avgConversionRate, 2) . '%')
+            Stat::make(__('campaigns.stats.avg_conversion_rate'), number_format($avgConversionRate, 2).'%')
                 ->description(__('campaigns.stats.avg_conversion_rate_description'))
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('info'),
-            Stat::make(__('campaigns.stats.avg_ctr'), number_format($avgClickThroughRate, 2) . '%')
+            Stat::make(__('campaigns.stats.avg_ctr'), number_format($avgClickThroughRate, 2).'%')
                 ->description(__('campaigns.stats.avg_ctr_description'))
                 ->descriptionIcon('heroicon-m-chart-bar-square')
                 ->color('info'),
         ];
     }
 }
-
-

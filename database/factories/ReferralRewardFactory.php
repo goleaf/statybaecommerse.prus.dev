@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\ReferralReward;
-use App\Models\Referral;
-use App\Models\User;
 use App\Models\Order;
+use App\Models\Referral;
+use App\Models\ReferralReward;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

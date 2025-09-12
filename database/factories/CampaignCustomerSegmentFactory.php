@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -32,7 +34,7 @@ final class CampaignCustomerSegmentFactory extends Factory
 
     public function group(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'segment_type' => 'group',
             'customer_group_id' => CustomerGroup::factory(),
             'segment_criteria' => [
@@ -43,7 +45,7 @@ final class CampaignCustomerSegmentFactory extends Factory
 
     public function location(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'segment_type' => 'location',
             'customer_group_id' => null,
             'segment_criteria' => [
@@ -57,7 +59,7 @@ final class CampaignCustomerSegmentFactory extends Factory
 
     public function behavior(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'segment_type' => 'behavior',
             'customer_group_id' => null,
             'segment_criteria' => [
@@ -71,7 +73,7 @@ final class CampaignCustomerSegmentFactory extends Factory
 
     public function custom(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'segment_type' => 'custom',
             'customer_group_id' => null,
             'segment_criteria' => [

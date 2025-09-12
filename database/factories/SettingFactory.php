@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -29,28 +31,28 @@ final class SettingFactory extends Factory
 
     public function public(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_public' => true,
         ]);
     }
 
     public function required(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_required' => true,
         ]);
     }
 
     public function encrypted(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_encrypted' => true,
         ]);
     }
 
     public function ofType(string $type): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => $type,
             'value' => match ($type) {
                 'boolean' => $this->faker->boolean(),
@@ -68,7 +70,7 @@ final class SettingFactory extends Factory
 
     public function inGroup(string $group): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'group' => $group,
         ]);
     }

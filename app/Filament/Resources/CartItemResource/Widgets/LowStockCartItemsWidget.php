@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CartItemResource\Widgets;
 
@@ -6,7 +8,6 @@ use App\Models\CartItem;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Illuminate\Database\Eloquent\Builder;
 
 final class LowStockCartItemsWidget extends BaseWidget
 {
@@ -14,7 +15,7 @@ final class LowStockCartItemsWidget extends BaseWidget
 
     protected static ?int $sort = 3;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -28,7 +29,7 @@ final class LowStockCartItemsWidget extends BaseWidget
             ->columns([
                 Tables\Columns\ImageColumn::make('product.image')
                     ->label(__('admin.cart_items.fields.image'))
-                    ->getStateUsing(fn(CartItem $record) => $record->product?->getFirstMediaUrl('images', 'thumb'))
+                    ->getStateUsing(fn (CartItem $record) => $record->product?->getFirstMediaUrl('images', 'thumb'))
                     ->defaultImageUrl(asset('images/placeholder-product.png'))
                     ->circular()
                     ->size(40),

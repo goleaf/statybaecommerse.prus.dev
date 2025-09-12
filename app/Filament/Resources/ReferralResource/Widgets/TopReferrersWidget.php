@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralResource\Widgets;
 
@@ -10,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class TopReferrersWidget extends BaseWidget
 {
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?string $heading = null;
 
@@ -79,7 +81,8 @@ final class TopReferrersWidget extends BaseWidget
                         if ($record->total_referrals == 0) {
                             return '0%';
                         }
-                        return round(($record->completed_referrals / $record->total_referrals) * 100, 1) . '%';
+
+                        return round(($record->completed_referrals / $record->total_referrals) * 100, 1).'%';
                     })
                     ->badge()
                     ->color(fn (string $state): string => match (true) {

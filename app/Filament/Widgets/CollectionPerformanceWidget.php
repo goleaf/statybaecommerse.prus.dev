@@ -1,14 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Collection;
-use App\Models\Product;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 
 final class CollectionPerformanceWidget extends BaseWidget
 {
@@ -33,7 +32,7 @@ final class CollectionPerformanceWidget extends BaseWidget
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label(__('admin.collections.fields.image'))
-                    ->getStateUsing(fn(Collection $record) => $record->getFirstMediaUrl('images', 'thumb'))
+                    ->getStateUsing(fn (Collection $record) => $record->getFirstMediaUrl('images', 'thumb'))
                     ->defaultImageUrl(asset('images/placeholder-collection.png'))
                     ->circular()
                     ->size(40),
@@ -54,19 +53,19 @@ final class CollectionPerformanceWidget extends BaseWidget
                     ->numeric()
                     ->sortable()
                     ->alignCenter()
-                    ->formatStateUsing(fn($state) => number_format($state ?? 0)),
+                    ->formatStateUsing(fn ($state) => number_format($state ?? 0)),
                 Tables\Columns\TextColumn::make('total_sales')
                     ->label(__('admin.collections.analytics.total_sales'))
                     ->numeric()
                     ->sortable()
                     ->alignCenter()
-                    ->formatStateUsing(fn($state) => number_format($state ?? 0)),
+                    ->formatStateUsing(fn ($state) => number_format($state ?? 0)),
                 Tables\Columns\TextColumn::make('avg_rating')
                     ->label(__('admin.collections.analytics.avg_rating'))
                     ->numeric()
                     ->sortable()
                     ->alignCenter()
-                    ->formatStateUsing(fn($state) => $state ? number_format($state, 1) . ' ⭐' : 'N/A'),
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1).' ⭐' : 'N/A'),
                 Tables\Columns\IconColumn::make('is_visible')
                     ->label(__('admin.collections.fields.is_visible'))
                     ->boolean()

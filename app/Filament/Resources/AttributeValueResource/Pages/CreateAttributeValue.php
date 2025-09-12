@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeValueResource\Pages;
 
@@ -17,7 +19,7 @@ final class CreateAttributeValue extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Ensure slug is generated if not provided
-        if (empty($data['slug']) && !empty($data['value'])) {
+        if (empty($data['slug']) && ! empty($data['value'])) {
             $data['slug'] = \Illuminate\Support\Str::slug($data['value']);
         }
 

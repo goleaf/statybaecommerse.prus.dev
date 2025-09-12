@@ -1,9 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Collection;
-use App\Models\Product;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
@@ -18,16 +19,16 @@ final class CollectionStatsWidget extends BaseWidget
         $visibleCollections = Collection::where('is_visible', true)->count();
         $automaticCollections = Collection::where('is_automatic', true)->count();
         $manualCollections = Collection::where('is_automatic', false)->count();
-        
+
         // Get collections with products
         $collectionsWithProducts = Collection::has('products')->count();
-        
+
         // Get total products in all collections
         $totalProductsInCollections = DB::table('product_collections')->count();
-        
+
         // Get average products per collection
-        $avgProductsPerCollection = $collectionsWithProducts > 0 
-            ? round($totalProductsInCollections / $collectionsWithProducts, 1) 
+        $avgProductsPerCollection = $collectionsWithProducts > 0
+            ? round($totalProductsInCollections / $collectionsWithProducts, 1)
             : 0;
 
         return [

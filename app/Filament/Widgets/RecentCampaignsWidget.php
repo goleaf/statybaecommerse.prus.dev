@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Campaign;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
 
 class RecentCampaignsWidget extends BaseWidget
 {
@@ -27,7 +29,7 @@ class RecentCampaignsWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('campaigns.fields.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'email' => 'info',
                         'sms' => 'warning',
                         'push' => 'success',
@@ -39,7 +41,7 @@ class RecentCampaignsWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('campaigns.fields.status'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'active' => 'success',
                         'scheduled' => 'warning',
                         'paused' => 'secondary',
@@ -63,7 +65,7 @@ class RecentCampaignsWidget extends BaseWidget
             ])
             ->actions([
                 Tables\Actions\Action::make('view')
-                    ->url(fn(Campaign $record): string => route('filament.admin.resources.campaigns.view', $record))
+                    ->url(fn (Campaign $record): string => route('filament.admin.resources.campaigns.view', $record))
                     ->icon('heroicon-m-eye')
                     ->openUrlInNewTab(),
             ]);

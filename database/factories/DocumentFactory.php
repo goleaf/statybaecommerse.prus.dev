@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -24,7 +26,7 @@ final class DocumentFactory extends Factory
             'variables' => [
                 'ORDER_NUMBER' => $this->faker->unique()->numerify('ORD-#####'),
                 'CUSTOMER_NAME' => $this->faker->name(),
-                'ORDER_TOTAL' => '$' . $this->faker->randomFloat(2, 10, 1000),
+                'ORDER_TOTAL' => '$'.$this->faker->randomFloat(2, 10, 1000),
                 'ORDER_DATE' => $this->faker->date(),
                 'COMPANY_NAME' => config('app.name'),
                 'COMPANY_ADDRESS' => $this->faker->address(),
@@ -44,7 +46,7 @@ final class DocumentFactory extends Factory
      */
     public function draft(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'draft',
             'file_path' => null,
             'generated_at' => null,
@@ -56,9 +58,9 @@ final class DocumentFactory extends Factory
      */
     public function generated(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'generated',
-            'file_path' => 'documents/' . $this->faker->uuid() . '.pdf',
+            'file_path' => 'documents/'.$this->faker->uuid().'.pdf',
             'generated_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
         ]);
     }
@@ -68,9 +70,9 @@ final class DocumentFactory extends Factory
      */
     public function sent(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'sent',
-            'file_path' => 'documents/' . $this->faker->uuid() . '.pdf',
+            'file_path' => 'documents/'.$this->faker->uuid().'.pdf',
             'generated_at' => $this->faker->dateTimeBetween('-1 month', '-1 week'),
         ]);
     }
@@ -80,16 +82,16 @@ final class DocumentFactory extends Factory
      */
     public function invoice(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'title' => 'Invoice #' . $this->faker->unique()->numerify('#####'),
+        return $this->state(fn (array $attributes) => [
+            'title' => 'Invoice #'.$this->faker->unique()->numerify('#####'),
             'variables' => [
                 'INVOICE_NUMBER' => $this->faker->unique()->numerify('INV-#####'),
                 'CUSTOMER_NAME' => $this->faker->name(),
                 'INVOICE_DATE' => $this->faker->date(),
                 'DUE_DATE' => $this->faker->dateTimeBetween('now', '+30 days')->format('Y-m-d'),
-                'SUBTOTAL' => '$' . $this->faker->randomFloat(2, 100, 1000),
-                'TAX_AMOUNT' => '$' . $this->faker->randomFloat(2, 10, 100),
-                'TOTAL_AMOUNT' => '$' . $this->faker->randomFloat(2, 110, 1100),
+                'SUBTOTAL' => '$'.$this->faker->randomFloat(2, 100, 1000),
+                'TAX_AMOUNT' => '$'.$this->faker->randomFloat(2, 10, 100),
+                'TOTAL_AMOUNT' => '$'.$this->faker->randomFloat(2, 110, 1100),
             ],
         ]);
     }
@@ -99,14 +101,14 @@ final class DocumentFactory extends Factory
      */
     public function receipt(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'title' => 'Receipt #' . $this->faker->unique()->numerify('#####'),
+        return $this->state(fn (array $attributes) => [
+            'title' => 'Receipt #'.$this->faker->unique()->numerify('#####'),
             'variables' => [
                 'RECEIPT_NUMBER' => $this->faker->unique()->numerify('REC-#####'),
                 'CUSTOMER_NAME' => $this->faker->name(),
                 'PURCHASE_DATE' => $this->faker->date(),
                 'PAYMENT_METHOD' => $this->faker->randomElement(['Credit Card', 'Cash', 'Bank Transfer']),
-                'AMOUNT_PAID' => '$' . $this->faker->randomFloat(2, 10, 500),
+                'AMOUNT_PAID' => '$'.$this->faker->randomFloat(2, 10, 500),
             ],
         ]);
     }
@@ -116,8 +118,8 @@ final class DocumentFactory extends Factory
      */
     public function contract(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'title' => 'Contract #' . $this->faker->unique()->numerify('#####'),
+        return $this->state(fn (array $attributes) => [
+            'title' => 'Contract #'.$this->faker->unique()->numerify('#####'),
             'variables' => [
                 'CONTRACT_NUMBER' => $this->faker->unique()->numerify('CON-#####'),
                 'PARTY_A' => config('app.name'),
@@ -125,7 +127,7 @@ final class DocumentFactory extends Factory
                 'CONTRACT_DATE' => $this->faker->date(),
                 'EFFECTIVE_DATE' => $this->faker->dateTimeBetween('now', '+1 month')->format('Y-m-d'),
                 'EXPIRY_DATE' => $this->faker->dateTimeBetween('+1 year', '+2 years')->format('Y-m-d'),
-                'CONTRACT_VALUE' => '$' . $this->faker->randomFloat(2, 1000, 50000),
+                'CONTRACT_VALUE' => '$'.$this->faker->randomFloat(2, 1000, 50000),
             ],
         ]);
     }
@@ -135,9 +137,9 @@ final class DocumentFactory extends Factory
      */
     public function pdf(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'format' => 'pdf',
-            'file_path' => 'documents/' . $this->faker->uuid() . '.pdf',
+            'file_path' => 'documents/'.$this->faker->uuid().'.pdf',
         ]);
     }
 
@@ -146,7 +148,7 @@ final class DocumentFactory extends Factory
      */
     public function html(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'format' => 'html',
             'file_path' => null,  // HTML documents are usually not stored as files
         ]);
@@ -157,7 +159,7 @@ final class DocumentFactory extends Factory
      */
     public function withoutFile(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'file_path' => null,
         ]);
     }
@@ -167,7 +169,7 @@ final class DocumentFactory extends Factory
      */
     public function withVariables(array $variables): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'variables' => array_merge($attributes['variables'] ?? [], $variables),
         ]);
     }

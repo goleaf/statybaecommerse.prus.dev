@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -28,7 +30,7 @@ class ProductFactory extends Factory
             'Frezeris',
             'Elektrinė grandinės pjovimo mašina',
             'Smūginis gręžtuvas',
-            
+
             // Rankiniai įrankiai
             'Profesionalus plaktukas',
             'Statybinė gulsčioji',
@@ -40,7 +42,7 @@ class ProductFactory extends Factory
             'Metalinis liniuotė',
             'Kaltai medžiui',
             'Kampuotė',
-            
+
             // Statybinės medžiagos
             'Cemento mišinys',
             'Gipso plokštės',
@@ -52,7 +54,7 @@ class ProductFactory extends Factory
             'Fasadiniai dažai',
             'Klijų mišinys plytelėms',
             'Betono priedas',
-            
+
             // Saugos priemonės
             'Apsauginiai akiniai',
             'Darbo pirštinės',
@@ -63,7 +65,7 @@ class ProductFactory extends Factory
             'Atsvarinis diržas',
             'Šviečianti liemenė',
             'Pirmos pagalbos vaistinėlė',
-            'Apsauginė kaukė'
+            'Apsauginė kaukė',
         ];
 
         $name = $this->faker->randomElement($lithuanianProducts);
@@ -73,8 +75,8 @@ class ProductFactory extends Factory
         return [
             'type' => 'simple',
             'name' => $name,
-            'slug' => Str::slug($name . '-' . $this->faker->unique()->randomNumber()),
-            'sku' => 'LT-' . strtoupper(Str::random(8)),
+            'slug' => Str::slug($name.'-'.$this->faker->unique()->randomNumber()),
+            'sku' => 'LT-'.strtoupper(Str::random(8)),
             'description' => $this->generateLithuanianDescription($name),
             'short_description' => $this->generateShortDescription($name),
             'price' => $basePrice,
@@ -90,8 +92,8 @@ class ProductFactory extends Factory
             'is_featured' => $this->faker->boolean(15),
             'manage_stock' => $this->faker->boolean(85),
             'status' => $this->faker->randomElement(['published', 'published', 'published', 'draft']),
-            'seo_title' => $name . ' - Profesionalūs statybos įrankiai',
-            'seo_description' => 'Pirkite ' . strtolower($name) . ' geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje.',
+            'seo_title' => $name.' - Profesionalūs statybos įrankiai',
+            'seo_description' => 'Pirkite '.strtolower($name).' geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje.',
             'published_at' => $this->faker->dateTimeBetween('-30 days', '+5 days'),
         ];
     }
@@ -103,7 +105,7 @@ class ProductFactory extends Factory
             "<p>Profesionalus {$productName} skirtas intensyviam naudojimui statybvietėse. Ergonomiškas dizainas ir aukšta kokybė.</p><p>Idealiai tinka namų statybai, renovacijai ir remonto darbams.</p>",
             "<p>Patikimas {$productName} su išplėsta garantija. Sukurtas atsižvelgiant į Lietuvos statybininkų poreikius.</p><p>Lengvai naudojamas, saugus ir efektyvus darbo įrankis.</p>",
             "<p>Inovatyvus {$productName} su pažangiomis funkcijomis. Padidins jūsų darbo efektyvumą ir kokybę.</p><p>Sertifikuotas pagal ES standartus, tinka profesionaliems projektams.</p>",
-            "<p>Universalus {$productName} daugeliui statybos darbų. Kompaktiškas, patogus ir funkcionalus.</p><p>Puikiai tinka tiek vidaus, tiek lauko darbams. Atsparumas lietuviškoms oro sąlygoms.</p>"
+            "<p>Universalus {$productName} daugeliui statybos darbų. Kompaktiškas, patogus ir funkcionalus.</p><p>Puikiai tinka tiek vidaus, tiek lauko darbams. Atsparumas lietuviškoms oro sąlygoms.</p>",
         ];
 
         return $this->faker->randomElement($descriptions);
@@ -116,7 +118,7 @@ class ProductFactory extends Factory
             "Patikimas {$productName} statybos darbams",
             "Efektyvus {$productName} su garantija",
             "Universalus {$productName} profesionalams",
-            "Kokybiškas {$productName} geriausia kaina"
+            "Kokybiškas {$productName} geriausia kaina",
         ];
 
         return $this->faker->randomElement($shorts);

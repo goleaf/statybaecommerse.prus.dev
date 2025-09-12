@@ -1,25 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AttributeValueResource\Pages;
 use App\Filament\Resources\AttributeValueResource\RelationManagers;
 use App\Filament\Resources\AttributeValueResource\Widgets;
-use App\Models\Attribute;
 use App\Models\AttributeValue;
+use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
@@ -107,7 +108,7 @@ final class AttributeValueResource extends Resource
                                             ->required()
                                             ->maxLength(255)
                                             ->live()
-                                            ->afterStateUpdated(fn(Forms\Set $set, ?string $state) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                                            ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('slug', \Illuminate\Support\Str::slug($state))),
                                         Forms\Components\TextInput::make('slug')
                                             ->label(__('attributes.slug'))
                                             ->maxLength(255)
@@ -166,7 +167,7 @@ final class AttributeValueResource extends Resource
                                             ])
                                             ->columns(2)
                                             ->collapsible()
-                                            ->itemLabel(fn(array $state): ?string => $state['locale'] ?? null)
+                                            ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null)
                                             ->addActionLabel(__('translations.add_translation'))
                                             ->defaultItems(0),
                                     ]),
@@ -278,10 +279,10 @@ final class AttributeValueResource extends Resource
                     ->native(false),
                 Filter::make('with_color')
                     ->label(__('attributes.with_color'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('color_code')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('color_code')),
                 Filter::make('with_description')
                     ->label(__('attributes.with_description'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('description')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('description')),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([

@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Channel;
 use App\Models\Order;
+use App\Models\Partner;
 use App\Models\User;
 use App\Models\Zone;
-use App\Models\Channel;
-use App\Models\Partner;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -30,7 +32,7 @@ class OrderFactory extends Factory
         $total = $subtotal + $taxAmount + $shippingAmount - $discountAmount;
 
         return [
-            'number' => 'ORD-' . strtoupper($this->faker->unique()->bothify('######')),
+            'number' => 'ORD-'.strtoupper($this->faker->unique()->bothify('######')),
             'user_id' => User::factory(),
             'status' => $this->faker->randomElement(['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'completed', 'cancelled']),
             'subtotal' => $subtotal,

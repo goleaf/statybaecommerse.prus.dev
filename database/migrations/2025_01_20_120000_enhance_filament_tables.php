@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,28 +13,28 @@ return new class extends Migration
         // Check if columns already exist before adding them
         if (Schema::hasTable('products')) {
             Schema::table('products', function (Blueprint $table) {
-                if (!Schema::hasColumn('products', 'compare_price')) {
+                if (! Schema::hasColumn('products', 'compare_price')) {
                     $table->decimal('compare_price', 10, 2)->nullable()->after('price');
                 }
-                if (!Schema::hasColumn('products', 'cost_price')) {
+                if (! Schema::hasColumn('products', 'cost_price')) {
                     $table->decimal('cost_price', 10, 2)->nullable()->after('compare_price');
                 }
-                if (!Schema::hasColumn('products', 'barcode')) {
+                if (! Schema::hasColumn('products', 'barcode')) {
                     $table->string('barcode')->nullable()->after('sku');
                 }
-                if (!Schema::hasColumn('products', 'track_inventory')) {
+                if (! Schema::hasColumn('products', 'track_inventory')) {
                     $table->boolean('track_inventory')->default(true)->after('manage_stock');
                 }
-                if (!Schema::hasColumn('products', 'short_description')) {
+                if (! Schema::hasColumn('products', 'short_description')) {
                     $table->text('short_description')->nullable()->after('description');
                 }
-                if (!Schema::hasColumn('products', 'metadata')) {
+                if (! Schema::hasColumn('products', 'metadata')) {
                     $table->json('metadata')->nullable()->after('seo_description');
                 }
-                if (!Schema::hasColumn('products', 'published_at')) {
+                if (! Schema::hasColumn('products', 'published_at')) {
                     $table->timestamp('published_at')->nullable()->after('is_featured');
                 }
-                if (!Schema::hasColumn('products', 'video_url')) {
+                if (! Schema::hasColumn('products', 'video_url')) {
                     $table->string('video_url')->nullable()->after('metadata');
                 }
             });
@@ -41,31 +43,31 @@ return new class extends Migration
         // Add additional columns to users table for enhanced customer management
         if (Schema::hasTable('users')) {
             Schema::table('users', function (Blueprint $table) {
-                if (!Schema::hasColumn('users', 'phone')) {
+                if (! Schema::hasColumn('users', 'phone')) {
                     $table->string('phone')->nullable()->after('email');
                 }
-                if (!Schema::hasColumn('users', 'date_of_birth')) {
+                if (! Schema::hasColumn('users', 'date_of_birth')) {
                     $table->date('date_of_birth')->nullable()->after('phone');
                 }
-                if (!Schema::hasColumn('users', 'gender')) {
+                if (! Schema::hasColumn('users', 'gender')) {
                     $table->enum('gender', ['male', 'female', 'other'])->nullable()->after('date_of_birth');
                 }
-                if (!Schema::hasColumn('users', 'preferred_locale')) {
+                if (! Schema::hasColumn('users', 'preferred_locale')) {
                     $table->string('preferred_locale', 5)->default('lt')->after('gender');
                 }
-                if (!Schema::hasColumn('users', 'is_active')) {
+                if (! Schema::hasColumn('users', 'is_active')) {
                     $table->boolean('is_active')->default(true)->after('preferred_locale');
                 }
-                if (!Schema::hasColumn('users', 'accepts_marketing')) {
+                if (! Schema::hasColumn('users', 'accepts_marketing')) {
                     $table->boolean('accepts_marketing')->default(false)->after('is_active');
                 }
-                if (!Schema::hasColumn('users', 'two_factor_enabled')) {
+                if (! Schema::hasColumn('users', 'two_factor_enabled')) {
                     $table->boolean('two_factor_enabled')->default(false)->after('accepts_marketing');
                 }
-                if (!Schema::hasColumn('users', 'last_login_at')) {
+                if (! Schema::hasColumn('users', 'last_login_at')) {
                     $table->timestamp('last_login_at')->nullable()->after('two_factor_enabled');
                 }
-                if (!Schema::hasColumn('users', 'preferences')) {
+                if (! Schema::hasColumn('users', 'preferences')) {
                     $table->json('preferences')->nullable()->after('last_login_at');
                 }
             });
@@ -74,19 +76,19 @@ return new class extends Migration
         // Add additional columns to orders table
         if (Schema::hasTable('orders')) {
             Schema::table('orders', function (Blueprint $table) {
-                if (!Schema::hasColumn('orders', 'tracking_number')) {
+                if (! Schema::hasColumn('orders', 'tracking_number')) {
                     $table->string('tracking_number')->nullable()->after('notes');
                 }
-                if (!Schema::hasColumn('orders', 'metadata')) {
+                if (! Schema::hasColumn('orders', 'metadata')) {
                     $table->json('metadata')->nullable()->after('tracking_number');
                 }
-                if (!Schema::hasColumn('orders', 'locale')) {
+                if (! Schema::hasColumn('orders', 'locale')) {
                     $table->string('locale', 5)->default('lt')->after('metadata');
                 }
-                if (!Schema::hasColumn('orders', 'weight')) {
+                if (! Schema::hasColumn('orders', 'weight')) {
                     $table->decimal('weight', 8, 2)->nullable()->after('locale');
                 }
-                if (!Schema::hasColumn('orders', 'fulfillment_status')) {
+                if (! Schema::hasColumn('orders', 'fulfillment_status')) {
                     $table->string('fulfillment_status')->default('unfulfilled')->after('weight');
                 }
             });
@@ -225,19 +227,19 @@ return new class extends Migration
         });
 
         // Create settings table for application settings
-        if (!Schema::hasTable('settings')) {
-        Schema::create('settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('key')->unique();
-            $table->text('value')->nullable();
-            $table->string('type')->default('string'); // string, integer, boolean, json
-            $table->text('description')->nullable();
-            $table->boolean('is_public')->default(false);
-            $table->timestamps();
+        if (! Schema::hasTable('settings')) {
+            Schema::create('settings', function (Blueprint $table) {
+                $table->id();
+                $table->string('key')->unique();
+                $table->text('value')->nullable();
+                $table->string('type')->default('string'); // string, integer, boolean, json
+                $table->text('description')->nullable();
+                $table->boolean('is_public')->default(false);
+                $table->timestamps();
 
-            $table->index(['key']);
-            $table->index(['is_public']);
-        });
+                $table->index(['key']);
+                $table->index(['is_public']);
+            });
         }
     }
 

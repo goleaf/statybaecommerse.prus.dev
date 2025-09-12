@@ -1,16 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Models\Post;
-use App\Models\User;
+use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use FilamentTiptapEditor\TiptapEditor;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
@@ -63,7 +64,7 @@ final class PostResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
+                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
                         Forms\Components\TextInput::make('slug')
                             ->label(__('posts.fields.slug'))
                             ->required()
@@ -167,7 +168,7 @@ final class PostResource extends Resource
                     ->toggleable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label(__('posts.fields.status'))
-                    ->formatStateUsing(fn(string $state): string => __('posts.status.' . $state))
+                    ->formatStateUsing(fn (string $state): string => __('posts.status.'.$state))
                     ->colors([
                         'warning' => 'draft',
                         'success' => 'published',
@@ -220,11 +221,11 @@ final class PostResource extends Resource
                         return $query
                             ->when(
                                 $data['published_from'],
-                                fn($query, $date) => $query->whereDate('published_at', '>=', $date),
+                                fn ($query, $date) => $query->whereDate('published_at', '>=', $date),
                             )
                             ->when(
                                 $data['published_until'],
-                                fn($query, $date) => $query->whereDate('published_at', '<=', $date),
+                                fn ($query, $date) => $query->whereDate('published_at', '<=', $date),
                             );
                     }),
             ])
@@ -235,35 +236,35 @@ final class PostResource extends Resource
                     ->label(__('posts.actions.publish'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn(Post $record): bool => $record->status === 'draft')
-                    ->action(fn(Post $record) => $record->update(['status' => 'published', 'published_at' => now()]))
+                    ->visible(fn (Post $record): bool => $record->status === 'draft')
+                    ->action(fn (Post $record) => $record->update(['status' => 'published', 'published_at' => now()]))
                     ->requiresConfirmation(),
                 Tables\Actions\Action::make('unpublish')
                     ->label(__('posts.actions.unpublish'))
                     ->icon('heroicon-o-x-circle')
                     ->color('warning')
-                    ->visible(fn(Post $record): bool => $record->status === 'published')
-                    ->action(fn(Post $record) => $record->update(['status' => 'draft']))
+                    ->visible(fn (Post $record): bool => $record->status === 'published')
+                    ->action(fn (Post $record) => $record->update(['status' => 'draft']))
                     ->requiresConfirmation(),
                 Tables\Actions\Action::make('archive')
                     ->label(__('posts.actions.archive'))
                     ->icon('heroicon-o-archive-box')
                     ->color('danger')
-                    ->visible(fn(Post $record): bool => $record->status !== 'archived')
-                    ->action(fn(Post $record) => $record->update(['status' => 'archived']))
+                    ->visible(fn (Post $record): bool => $record->status !== 'archived')
+                    ->action(fn (Post $record) => $record->update(['status' => 'archived']))
                     ->requiresConfirmation(),
                 Tables\Actions\Action::make('feature')
                     ->label(__('posts.actions.feature'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn(Post $record): bool => !$record->featured)
-                    ->action(fn(Post $record) => $record->update(['featured' => true])),
+                    ->visible(fn (Post $record): bool => ! $record->featured)
+                    ->action(fn (Post $record) => $record->update(['featured' => true])),
                 Tables\Actions\Action::make('unfeature')
                     ->label(__('posts.actions.unfeature'))
                     ->icon('heroicon-o-star')
                     ->color('gray')
-                    ->visible(fn(Post $record): bool => $record->featured)
-                    ->action(fn(Post $record) => $record->update(['featured' => false])),
+                    ->visible(fn (Post $record): bool => $record->featured)
+                    ->action(fn (Post $record) => $record->update(['featured' => false])),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -273,7 +274,7 @@ final class PostResource extends Resource
                         ->exports([
                             ExcelExport::make()
                                 ->fromTable()
-                                ->withFilename(fn() => 'posts-' . date('Y-m-d'))
+                                ->withFilename(fn () => 'posts-'.date('Y-m-d'))
                                 ->withWriterType(\Maatwebsite\Excel\Excel::XLSX)
                                 ->withColumns([
                                     Column::make('title')->heading('Title'),

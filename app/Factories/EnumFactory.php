@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Factories;
 
@@ -19,8 +21,8 @@ final class EnumFactory
     public static function create(string $enumName, string $value): EnumInterface
     {
         $enumClass = self::getEnumClass($enumName);
-        
-        if (!$enumClass) {
+
+        if (! $enumClass) {
             throw new InvalidArgumentException("Enum '{$enumName}' not found");
         }
 
@@ -37,14 +39,14 @@ final class EnumFactory
     public static function createByLabel(string $enumName, string $label): EnumInterface
     {
         $enumClass = self::getEnumClass($enumName);
-        
-        if (!$enumClass) {
+
+        if (! $enumClass) {
             throw new InvalidArgumentException("Enum '{$enumName}' not found");
         }
 
         $enum = $enumClass::fromLabel($label);
-        
-        if (!$enum) {
+
+        if (! $enum) {
             throw new InvalidArgumentException("Invalid label '{$label}' for enum '{$enumName}'");
         }
 
@@ -56,7 +58,7 @@ final class EnumFactory
      */
     public static function createFromArray(string $enumName, array $data): EnumInterface
     {
-        if (!isset($data['value'])) {
+        if (! isset($data['value'])) {
             throw new InvalidArgumentException("Array must contain 'value' key");
         }
 
@@ -69,11 +71,11 @@ final class EnumFactory
     public static function createMultiple(string $enumName, array $values): array
     {
         $enums = [];
-        
+
         foreach ($values as $value) {
             $enums[] = self::create($enumName, $value);
         }
-        
+
         return $enums;
     }
 
@@ -83,11 +85,11 @@ final class EnumFactory
     public static function createMultipleFromArrays(string $enumName, array $dataArray): array
     {
         $enums = [];
-        
+
         foreach ($dataArray as $data) {
             $enums[] = self::createFromArray($enumName, $data);
         }
-        
+
         return $enums;
     }
 
@@ -97,14 +99,14 @@ final class EnumFactory
     public static function createWithValidation(string $enumName, string $value, array $rules = []): EnumInterface
     {
         $enum = self::create($enumName, $value);
-        
+
         // Apply custom validation rules
         foreach ($rules as $rule => $expected) {
-            $method = 'is' . ucfirst($rule);
-            
+            $method = 'is'.ucfirst($rule);
+
             if (method_exists($enum, $method)) {
                 $actual = $enum->$method();
-                
+
                 if ($actual !== $expected) {
                     throw new InvalidArgumentException(
                         "Enum '{$enumName}' with value '{$value}' failed validation rule '{$rule}'"
@@ -112,7 +114,7 @@ final class EnumFactory
                 }
             }
         }
-        
+
         return $enum;
     }
 
@@ -135,8 +137,8 @@ final class EnumFactory
     {
         if ($value === null) {
             $enumClass = self::getEnumClass($enumName);
-            
-            if (!$enumClass) {
+
+            if (! $enumClass) {
                 throw new InvalidArgumentException("Enum '{$enumName}' not found");
             }
 
@@ -195,7 +197,7 @@ final class EnumFactory
      */
     public static function createFromForm(string $enumName, mixed $formValue): EnumInterface
     {
-        if (is_string($formValue) && !empty($formValue)) {
+        if (is_string($formValue) && ! empty($formValue)) {
             return self::create($enumName, $formValue);
         }
 
@@ -207,7 +209,7 @@ final class EnumFactory
      */
     public static function createFromQuery(string $enumName, mixed $queryValue): EnumInterface
     {
-        if (is_string($queryValue) && !empty($queryValue)) {
+        if (is_string($queryValue) && ! empty($queryValue)) {
             return self::create($enumName, $queryValue);
         }
 
@@ -219,7 +221,7 @@ final class EnumFactory
      */
     public static function createFromSession(string $enumName, mixed $sessionValue): EnumInterface
     {
-        if (is_string($sessionValue) && !empty($sessionValue)) {
+        if (is_string($sessionValue) && ! empty($sessionValue)) {
             return self::create($enumName, $sessionValue);
         }
 
@@ -231,7 +233,7 @@ final class EnumFactory
      */
     public static function createFromCookie(string $enumName, mixed $cookieValue): EnumInterface
     {
-        if (is_string($cookieValue) && !empty($cookieValue)) {
+        if (is_string($cookieValue) && ! empty($cookieValue)) {
             return self::create($enumName, $cookieValue);
         }
 
@@ -244,7 +246,7 @@ final class EnumFactory
     public static function createFromConfig(string $enumName, string $configKey): EnumInterface
     {
         $value = config($configKey);
-        
+
         if ($value === null) {
             return self::createWithDefault($enumName);
         }
@@ -258,7 +260,7 @@ final class EnumFactory
     public static function createFromEnv(string $enumName, string $envKey): EnumInterface
     {
         $value = env($envKey);
-        
+
         if ($value === null) {
             return self::createWithDefault($enumName);
         }
@@ -319,8 +321,8 @@ final class EnumFactory
     public static function getEnumValues(string $enumName): array
     {
         $enumClass = self::getEnumClass($enumName);
-        
-        if (!$enumClass) {
+
+        if (! $enumClass) {
             return [];
         }
 
@@ -333,8 +335,8 @@ final class EnumFactory
     public static function getEnumLabels(string $enumName): array
     {
         $enumClass = self::getEnumClass($enumName);
-        
-        if (!$enumClass) {
+
+        if (! $enumClass) {
             return [];
         }
 
@@ -347,8 +349,8 @@ final class EnumFactory
     public static function getEnumOptions(string $enumName): array
     {
         $enumClass = self::getEnumClass($enumName);
-        
-        if (!$enumClass) {
+
+        if (! $enumClass) {
             return [];
         }
 
@@ -361,8 +363,8 @@ final class EnumFactory
     public static function validateValue(string $enumName, string $value): bool
     {
         $enumClass = self::getEnumClass($enumName);
-        
-        if (!$enumClass) {
+
+        if (! $enumClass) {
             return false;
         }
 
@@ -375,8 +377,8 @@ final class EnumFactory
     public static function validateLabel(string $enumName, string $label): bool
     {
         $enumClass = self::getEnumClass($enumName);
-        
-        if (!$enumClass) {
+
+        if (! $enumClass) {
             return false;
         }
 

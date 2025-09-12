@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -27,8 +29,6 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
@@ -221,7 +221,7 @@ class CampaignClickResource extends Resource
                         'info' => 'button',
                         'secondary' => 'image',
                     ])
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'cta' => __('campaign_clicks.click_type.cta'),
                         'banner' => __('campaign_clicks.click_type.banner'),
                         'link' => __('campaign_clicks.click_type.link'),
@@ -234,6 +234,7 @@ class CampaignClickResource extends Resource
                     ->limit(40)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 40 ? $state : null;
                     }),
                 BadgeColumn::make('device_type')
@@ -243,7 +244,7 @@ class CampaignClickResource extends Resource
                         'success' => 'mobile',
                         'warning' => 'tablet',
                     ])
-                    ->formatStateUsing(fn(?string $state): string => match ($state) {
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'desktop' => __('campaign_clicks.device_type.desktop'),
                         'mobile' => __('campaign_clicks.device_type.mobile'),
                         'tablet' => __('campaign_clicks.device_type.tablet'),
@@ -308,15 +309,15 @@ class CampaignClickResource extends Resource
                     ]),
                 Filter::make('has_customer')
                     ->label(__('campaign_clicks.has_customer'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('customer_id')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('customer_id')),
                 Filter::make('guest_clicks')
                     ->label(__('campaign_clicks.guest_clicks'))
-                    ->query(fn(Builder $query): Builder => $query->whereNull('customer_id')),
+                    ->query(fn (Builder $query): Builder => $query->whereNull('customer_id')),
                 DateFilter::make('clicked_at')
                     ->label(__('campaign_clicks.clicked_at')),
                 Filter::make('recent_clicks')
                     ->label(__('campaign_clicks.recent_clicks'))
-                    ->query(fn(Builder $query): Builder => $query->where('clicked_at', '>=', now()->subDays(7))),
+                    ->query(fn (Builder $query): Builder => $query->where('clicked_at', '>=', now()->subDays(7))),
             ])
             ->actions([
                 ViewAction::make(),

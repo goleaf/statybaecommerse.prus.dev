@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\Pages;
 
@@ -31,7 +33,7 @@ final class CreateNews extends CreateRecord
             $news = $this->record;
 
             foreach ($translations as $locale => $translationData) {
-                if (!empty($translationData['title'])) {
+                if (! empty($translationData['title'])) {
                     $news->translations()->create([
                         'locale' => $locale,
                         'title' => $translationData['title'],

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -6,13 +8,12 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
-use Filament\Resources\Resource;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
 use UnitEnum;
 
 final class SystemSettingResource extends Resource
@@ -142,7 +143,7 @@ final class SystemSettingResource extends Resource
                             ->default(3600)
                             ->suffix(__('admin.system_settings.seconds'))
                             ->helperText(__('admin.system_settings.cache_ttl_help'))
-                            ->visible(fn(Forms\Get $get) => $get('is_cacheable')),
+                            ->visible(fn (Forms\Get $get) => $get('is_cacheable')),
                         Forms\Components\Select::make('environment')
                             ->label(__('admin.system_settings.environment'))
                             ->options([
@@ -189,41 +190,41 @@ final class SystemSettingResource extends Resource
                             }),
                         Forms\Components\TextInput::make('value')
                             ->label(__('admin.system_settings.value'))
-                            ->visible(fn(Forms\Get $get) => in_array($get('type'), ['string', 'number', 'color', 'date', 'datetime']))
-                            ->required(fn(Forms\Get $get) => $get('is_required')),
+                            ->visible(fn (Forms\Get $get) => in_array($get('type'), ['string', 'number', 'color', 'date', 'datetime']))
+                            ->required(fn (Forms\Get $get) => $get('is_required')),
                         Forms\Components\Textarea::make('value')
                             ->label(__('admin.system_settings.value'))
-                            ->visible(fn(Forms\Get $get) => in_array($get('type'), ['text', 'json']))
+                            ->visible(fn (Forms\Get $get) => in_array($get('type'), ['text', 'json']))
                             ->rows(4)
-                            ->required(fn(Forms\Get $get) => $get('is_required')),
+                            ->required(fn (Forms\Get $get) => $get('is_required')),
                         Forms\Components\Toggle::make('value')
                             ->label(__('admin.system_settings.value'))
-                            ->visible(fn(Forms\Get $get) => $get('type') === 'boolean')
+                            ->visible(fn (Forms\Get $get) => $get('type') === 'boolean')
                             ->default(false),
                         Forms\Components\Select::make('value')
                             ->label(__('admin.system_settings.value'))
-                            ->visible(fn(Forms\Get $get) => $get('type') === 'select')
-                            ->options(fn(Forms\Get $get) => $get('options') ?? [])
+                            ->visible(fn (Forms\Get $get) => $get('type') === 'select')
+                            ->options(fn (Forms\Get $get) => $get('options') ?? [])
                             ->searchable()
-                            ->required(fn(Forms\Get $get) => $get('is_required')),
+                            ->required(fn (Forms\Get $get) => $get('is_required')),
                         Forms\Components\FileUpload::make('value')
                             ->label(__('admin.system_settings.value'))
-                            ->visible(fn(Forms\Get $get) => in_array($get('type'), ['file', 'image']))
+                            ->visible(fn (Forms\Get $get) => in_array($get('type'), ['file', 'image']))
                             ->disk('public')
                             ->directory('system-settings')
-                            ->acceptedFileTypes(fn(Forms\Get $get) => $get('type') === 'image'
+                            ->acceptedFileTypes(fn (Forms\Get $get) => $get('type') === 'image'
                                 ? ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
                                 : ['application/pdf', 'text/plain', 'application/json'])
-                            ->required(fn(Forms\Get $get) => $get('is_required')),
+                            ->required(fn (Forms\Get $get) => $get('is_required')),
                         Forms\Components\KeyValue::make('value')
                             ->label(__('admin.system_settings.value'))
-                            ->visible(fn(Forms\Get $get) => $get('type') === 'array')
+                            ->visible(fn (Forms\Get $get) => $get('type') === 'array')
                             ->keyLabel(__('admin.system_settings.key'))
                             ->valueLabel(__('admin.system_settings.value'))
-                            ->required(fn(Forms\Get $get) => $get('is_required')),
+                            ->required(fn (Forms\Get $get) => $get('is_required')),
                         Forms\Components\KeyValue::make('options')
                             ->label(__('admin.system_settings.options'))
-                            ->visible(fn(Forms\Get $get) => $get('type') === 'select')
+                            ->visible(fn (Forms\Get $get) => $get('type') === 'select')
                             ->keyLabel(__('admin.system_settings.option_key'))
                             ->valueLabel(__('admin.system_settings.option_value'))
                             ->helperText(__('admin.system_settings.options_help')),
@@ -278,7 +279,7 @@ final class SystemSettingResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->badge()
-                    ->color(fn($record) => $record->category?->color ?? 'primary'),
+                    ->color(fn ($record) => $record->category?->color ?? 'primary'),
                 Tables\Columns\TextColumn::make('key')
                     ->label(__('admin.system_settings.key'))
                     ->sortable()
@@ -295,7 +296,7 @@ final class SystemSettingResource extends Resource
                     ->label(__('admin.system_settings.type'))
                     ->sortable()
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'string', 'text' => 'gray',
                         'number' => 'blue',
                         'boolean' => 'green',
@@ -313,7 +314,7 @@ final class SystemSettingResource extends Resource
                     ->color('secondary'),
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('admin.system_settings.value'))
-                    ->formatStateUsing(fn(SystemSetting $record) => $record->getFormattedValue())
+                    ->formatStateUsing(fn (SystemSetting $record) => $record->getFormattedValue())
                     ->limit(50)
                     ->tooltip(function (SystemSetting $record) {
                         return $record->getFormattedValue();
@@ -344,7 +345,7 @@ final class SystemSettingResource extends Resource
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('updated_by')
                     ->label(__('admin.system_settings.updated_by'))
-                    ->formatStateUsing(fn($state) => $state ? \App\Models\User::find($state)?->name : '-')
+                    ->formatStateUsing(fn ($state) => $state ? \App\Models\User::find($state)?->name : '-')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('admin.system_settings.updated_at'))
@@ -354,7 +355,7 @@ final class SystemSettingResource extends Resource
                 Tables\Columns\TextColumn::make('environment')
                     ->label(__('admin.system_settings.environment'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'production' => 'danger',
                         'staging' => 'warning',
                         'development' => 'info',
@@ -440,35 +441,35 @@ final class SystemSettingResource extends Resource
                     ->label(__('admin.system_settings.is_cacheable')),
                 Tables\Filters\Filter::make('has_dependencies')
                     ->label(__('admin.system_settings.has_dependencies'))
-                    ->query(fn(Builder $query): Builder => $query->whereHas('dependencies')),
+                    ->query(fn (Builder $query): Builder => $query->whereHas('dependencies')),
                 Tables\Filters\Filter::make('has_dependents')
                     ->label(__('admin.system_settings.has_dependents'))
-                    ->query(fn(Builder $query): Builder => $query->whereHas('dependents')),
+                    ->query(fn (Builder $query): Builder => $query->whereHas('dependents')),
                 Tables\Filters\Filter::make('recently_updated')
                     ->label(__('admin.system_settings.recently_updated'))
-                    ->query(fn(Builder $query): Builder => $query->where('updated_at', '>=', now()->subDays(7))),
+                    ->query(fn (Builder $query): Builder => $query->where('updated_at', '>=', now()->subDays(7))),
                 Tables\Filters\Filter::make('frequently_accessed')
                     ->label(__('admin.system_settings.frequently_accessed'))
-                    ->query(fn(Builder $query): Builder => $query->where('access_count', '>', 10)),
+                    ->query(fn (Builder $query): Builder => $query->where('access_count', '>', 10)),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn(SystemSetting $record) => $record->canBeModified()),
+                    ->visible(fn (SystemSetting $record) => $record->canBeModified()),
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn(SystemSetting $record) => $record->canBeModified()),
+                    ->visible(fn (SystemSetting $record) => $record->canBeModified()),
                 Tables\Actions\Action::make('view_history')
                     ->label(__('admin.system_settings.view_history'))
                     ->icon('heroicon-o-clock')
                     ->color('info')
-                    ->url(fn(SystemSetting $record) => route('filament.admin.resources.system-settings.history', $record))
+                    ->url(fn (SystemSetting $record) => route('filament.admin.resources.system-settings.history', $record))
                     ->openUrlInNewTab(),
                 Tables\Actions\Action::make('view_dependencies')
                     ->label(__('admin.system_settings.view_dependencies'))
                     ->icon('heroicon-o-link')
                     ->color('warning')
-                    ->visible(fn(SystemSetting $record) => $record->hasDependencies() || $record->hasDependents())
-                    ->url(fn(SystemSetting $record) => route('filament.admin.resources.system-settings.dependencies', $record))
+                    ->visible(fn (SystemSetting $record) => $record->hasDependencies() || $record->hasDependents())
+                    ->url(fn (SystemSetting $record) => route('filament.admin.resources.system-settings.dependencies', $record))
                     ->openUrlInNewTab(),
                 Tables\Actions\Action::make('duplicate')
                     ->label(__('admin.system_settings.duplicate'))
@@ -476,8 +477,8 @@ final class SystemSettingResource extends Resource
                     ->color('secondary')
                     ->action(function (SystemSetting $record) {
                         $newRecord = $record->replicate();
-                        $newRecord->key = $record->key . '_copy_' . time();
-                        $newRecord->name = $record->name . ' (Copy)';
+                        $newRecord->key = $record->key.'_copy_'.time();
+                        $newRecord->name = $record->name.' (Copy)';
                         $newRecord->save();
 
                         return redirect()->route('filament.admin.resources.system-settings.edit', $newRecord);
@@ -500,17 +501,17 @@ final class SystemSettingResource extends Resource
                             'default_value' => $record->default_value,
                         ];
 
-                        $filename = 'system_setting_' . $record->key . '_' . now()->format('Y-m-d_H-i-s') . '.json';
+                        $filename = 'system_setting_'.$record->key.'_'.now()->format('Y-m-d_H-i-s').'.json';
 
                         return response()
                             ->json($data)
-                            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+                            ->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
                     }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn() => auth()->user()?->hasRole('admin')),
+                        ->visible(fn () => auth()->user()?->hasRole('admin')),
                     Tables\Actions\BulkAction::make('activate')
                         ->label(__('admin.system_settings.activate_selected'))
                         ->icon('heroicon-o-check-circle')
@@ -551,11 +552,11 @@ final class SystemSettingResource extends Resource
                                 ];
                             });
 
-                            $filename = 'system_settings_export_' . now()->format('Y-m-d_H-i-s') . '.json';
+                            $filename = 'system_settings_export_'.now()->format('Y-m-d_H-i-s').'.json';
 
                             return response()
                                 ->json($data->toArray())
-                                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+                                ->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
                         })
                         ->deselectRecordsAfterCompletion(),
                 ]),

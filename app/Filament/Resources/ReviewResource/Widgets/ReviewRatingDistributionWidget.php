@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ReviewResource\Widgets;
 
@@ -20,9 +22,9 @@ final class ReviewRatingDistributionWidget extends ChartWidget
 
         $labels = [];
         $data = [];
-        
+
         for ($i = 1; $i <= 5; $i++) {
-            $labels[] = $i . ' ⭐';
+            $labels[] = $i.' ⭐';
             $data[] = $ratingData[$i] ?? 0;
         }
 

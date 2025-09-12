@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CartItemResource\RelationManagers;
 
@@ -41,7 +43,7 @@ final class ProductRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label(__('admin.products.fields.image'))
-                    ->getStateUsing(fn($record) => $record->getFirstMediaUrl('images', 'thumb'))
+                    ->getStateUsing(fn ($record) => $record->getFirstMediaUrl('images', 'thumb'))
                     ->defaultImageUrl(asset('images/placeholder-product.png'))
                     ->circular()
                     ->size(40),

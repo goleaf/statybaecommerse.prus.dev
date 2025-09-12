@@ -1,14 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
+use App\Models\Campaign;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\User;
-use App\Models\Campaign;
-use Illuminate\Support\Facades\DB;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 final class RealtimeAnalyticsWidget extends BaseWidget
 {
@@ -35,12 +35,12 @@ final class RealtimeAnalyticsWidget extends BaseWidget
 
         return [
             Stat::make(__('analytics.today_orders'), $todayOrders)
-                ->description($ordersChange >= 0 ? '+' . number_format($ordersChange, 1) . '%' : number_format($ordersChange, 1) . '%')
+                ->description($ordersChange >= 0 ? '+'.number_format($ordersChange, 1).'%' : number_format($ordersChange, 1).'%')
                 ->descriptionIcon($ordersChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($ordersChange >= 0 ? 'success' : 'danger'),
 
-            Stat::make(__('analytics.today_revenue'), '€' . number_format($todayRevenue, 2))
-                ->description($revenueChange >= 0 ? '+' . number_format($revenueChange, 1) . '%' : number_format($revenueChange, 1) . '%')
+            Stat::make(__('analytics.today_revenue'), '€'.number_format($todayRevenue, 2))
+                ->description($revenueChange >= 0 ? '+'.number_format($revenueChange, 1).'%' : number_format($revenueChange, 1).'%')
                 ->descriptionIcon($revenueChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueChange >= 0 ? 'success' : 'danger'),
 

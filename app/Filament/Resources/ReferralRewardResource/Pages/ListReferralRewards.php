@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralRewardResource\Pages;
 
 use App\Filament\Resources\ReferralRewardResource;
+use Filament\Actions;
 use Filament\Resources\Components\Tabs\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListReferralRewards extends ListRecords
@@ -30,20 +32,20 @@ final class ListReferralRewards extends ListRecords
         return [
             'all' => Tab::make(__('referrals.filters.all')),
             'pending' => Tab::make(__('referrals.filters.pending'))
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', 'pending'))
-                ->badge(fn() => \App\Models\ReferralReward::where('status', 'pending')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'pending'))
+                ->badge(fn () => \App\Models\ReferralReward::where('status', 'pending')->count()),
             'applied' => Tab::make(__('referrals.filters.applied'))
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', 'applied'))
-                ->badge(fn() => \App\Models\ReferralReward::where('status', 'applied')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'applied'))
+                ->badge(fn () => \App\Models\ReferralReward::where('status', 'applied')->count()),
             'expired' => Tab::make(__('referrals.filters.expired'))
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', 'expired'))
-                ->badge(fn() => \App\Models\ReferralReward::where('status', 'expired')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'expired'))
+                ->badge(fn () => \App\Models\ReferralReward::where('status', 'expired')->count()),
             'referrer_bonus' => Tab::make(__('referrals.filters.referrer_bonus'))
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'referrer_bonus'))
-                ->badge(fn() => \App\Models\ReferralReward::where('type', 'referrer_bonus')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'referrer_bonus'))
+                ->badge(fn () => \App\Models\ReferralReward::where('type', 'referrer_bonus')->count()),
             'referred_discount' => Tab::make(__('referrals.filters.referred_discount'))
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'referred_discount'))
-                ->badge(fn() => \App\Models\ReferralReward::where('type', 'referred_discount')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'referred_discount'))
+                ->badge(fn () => \App\Models\ReferralReward::where('type', 'referred_discount')->count()),
         ];
     }
 

@@ -1,17 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
-        if (!Schema::hasTable('sh_orders')) {
+        if (! Schema::hasTable('sh_orders')) {
             return;
         }
         Schema::table('sh_orders', function (Blueprint $table): void {
-            if (!Schema::hasColumn('sh_orders', 'timeline')) {
+            if (! Schema::hasColumn('sh_orders', 'timeline')) {
                 $table->json('timeline')->nullable()->after('transactions');
             }
         });
@@ -19,7 +22,7 @@ return new class extends Migration {
 
     public function down(): void
     {
-        if (!Schema::hasTable('sh_orders')) {
+        if (! Schema::hasTable('sh_orders')) {
             return;
         }
         Schema::table('sh_orders', function (Blueprint $table): void {

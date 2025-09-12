@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Campaign;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class CampaignStatsWidget extends BaseWidget
 {
@@ -24,7 +25,7 @@ class CampaignStatsWidget extends BaseWidget
                 ->description(__('campaigns.analytics.total_conversions'))
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('warning'),
-            Stat::make(__('campaigns.analytics.revenue'), '€' . number_format(Campaign::sum('total_revenue'), 2))
+            Stat::make(__('campaigns.analytics.revenue'), '€'.number_format(Campaign::sum('total_revenue'), 2))
                 ->description(__('campaigns.analytics.total_revenue'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),

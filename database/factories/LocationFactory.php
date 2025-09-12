@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -21,14 +23,15 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->company();
+
         return [
             'name' => [
-                'lt' => $name . ' LT',
-                'en' => $name . ' EN',
+                'lt' => $name.' LT',
+                'en' => $name.' EN',
             ],
             'slug' => [
-                'lt' => \Illuminate\Support\Str::slug($name . ' LT'),
-                'en' => \Illuminate\Support\Str::slug($name . ' EN'),
+                'lt' => \Illuminate\Support\Str::slug($name.' LT'),
+                'en' => \Illuminate\Support\Str::slug($name.' EN'),
             ],
             'description' => [
                 'lt' => $this->faker->sentence(10),
@@ -56,7 +59,7 @@ class LocationFactory extends Factory
      */
     public function default(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_default' => true,
         ]);
     }
@@ -66,7 +69,7 @@ class LocationFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_enabled' => false,
         ]);
     }
@@ -76,7 +79,7 @@ class LocationFactory extends Factory
      */
     public function vilnius(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'name' => [
                 'lt' => 'Vilniaus sandėlis',
                 'en' => 'Vilnius Warehouse',
@@ -102,7 +105,7 @@ class LocationFactory extends Factory
      */
     public function kaunas(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'name' => [
                 'lt' => 'Kauno parduotuvė',
                 'en' => 'Kaunas Store',
@@ -129,7 +132,7 @@ class LocationFactory extends Factory
      */
     public function forCountry(Country $country): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'country_code' => $country->cca2,
         ]);
     }

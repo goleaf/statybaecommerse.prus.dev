@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -18,7 +20,7 @@ final class PostsByStatusWidget extends ChartWidget
         foreach ($statuses as $status) {
             $count = Post::where('status', $status)->count();
             $data[] = $count;
-            $labels[] = __('posts.status.' . $status);
+            $labels[] = __('posts.status.'.$status);
         }
 
         return [
@@ -42,4 +44,3 @@ final class PostsByStatusWidget extends ChartWidget
         return 'doughnut';
     }
 }
-

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -42,7 +44,7 @@ class CampaignChartWidget extends ChartWidget
                     'borderWidth' => 2,
                 ],
             ],
-            'labels' => $data->pluck('date')->map(fn($date) => Carbon::parse($date)->format('M j'))->toArray(),
+            'labels' => $data->pluck('date')->map(fn ($date) => Carbon::parse($date)->format('M j'))->toArray(),
         ];
     }
 

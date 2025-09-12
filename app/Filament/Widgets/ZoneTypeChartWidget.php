@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -10,7 +12,7 @@ final class ZoneTypeChartWidget extends ChartWidget
 {
     protected ?string $heading = 'zones.zone_distribution';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?int $sort = 2;
 
@@ -26,7 +28,7 @@ final class ZoneTypeChartWidget extends ChartWidget
             ->orderBy('count', 'desc')
             ->get();
 
-        $labels = $typeStats->pluck('type')->map(fn($type) => match($type) {
+        $labels = $typeStats->pluck('type')->map(fn ($type) => match ($type) {
             'shipping' => __('zones.type_shipping'),
             'tax' => __('zones.type_tax'),
             'payment' => __('zones.type_payment'),

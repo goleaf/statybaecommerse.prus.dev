@@ -110,4 +110,3 @@ return [
     'rate_limit_referral_creation' => true,
     'rate_limit_per_minute' => 10, // Max referrals per minute per user
 ];
-

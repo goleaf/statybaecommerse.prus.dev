@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -33,7 +35,7 @@ final class CampaignScheduleFactory extends Factory
 
     public function daily(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'schedule_type' => 'daily',
             'schedule_config' => [
                 'time' => $this->faker->time('H:i'),
@@ -45,7 +47,7 @@ final class CampaignScheduleFactory extends Factory
 
     public function weekly(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'schedule_type' => 'weekly',
             'schedule_config' => [
                 'time' => $this->faker->time('H:i'),
@@ -58,7 +60,7 @@ final class CampaignScheduleFactory extends Factory
 
     public function monthly(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'schedule_type' => 'monthly',
             'schedule_config' => [
                 'time' => $this->faker->time('H:i'),
@@ -71,7 +73,7 @@ final class CampaignScheduleFactory extends Factory
 
     public function custom(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'schedule_type' => 'custom',
             'schedule_config' => [
                 'cron_expression' => $this->faker->randomElement([
@@ -87,7 +89,7 @@ final class CampaignScheduleFactory extends Factory
 
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => true,
             'next_run_at' => $this->faker->dateTimeBetween('now', '+1 week'),
         ]);
@@ -95,7 +97,7 @@ final class CampaignScheduleFactory extends Factory
 
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
             'next_run_at' => null,
         ]);
@@ -103,7 +105,7 @@ final class CampaignScheduleFactory extends Factory
 
     public function upcoming(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => true,
             'next_run_at' => $this->faker->dateTimeBetween('now', '+1 day'),
         ]);
@@ -111,7 +113,7 @@ final class CampaignScheduleFactory extends Factory
 
     public function overdue(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => true,
             'next_run_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
             'last_run_at' => $this->faker->dateTimeBetween('-2 weeks', '-1 week'),

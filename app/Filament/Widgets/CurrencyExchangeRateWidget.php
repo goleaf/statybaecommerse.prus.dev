@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Currency;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class CurrencyExchangeRateWidget extends ChartWidget
 {
@@ -72,9 +73,9 @@ final class CurrencyExchangeRateWidget extends ChartWidget
                 'tooltip' => [
                     'callbacks' => [
                         'label' => 'function(context) {
-                            return "' . __('admin.currency.widgets.exchange_rate') . ': " + context.parsed.y.toFixed(6);
-                        }'
-                    ]
+                            return "'.__('admin.currency.widgets.exchange_rate').': " + context.parsed.y.toFixed(6);
+                        }',
+                    ],
                 ],
             ],
         ];

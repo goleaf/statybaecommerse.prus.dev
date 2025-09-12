@@ -1,18 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Currency;
-use App\Models\Zone;
-use App\Models\Price;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class CurrencyUsageWidget extends ChartWidget
 {
     protected ?string $heading = 'Currency Usage Distribution';
+
     protected ?string $pollingInterval = '60s';
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {
@@ -21,7 +22,7 @@ final class CurrencyUsageWidget extends ChartWidget
             ->get()
             ->map(function ($currency) {
                 return [
-                    'name' => $currency->code . ' (' . $currency->symbol . ')',
+                    'name' => $currency->code.' ('.$currency->symbol.')',
                     'zones' => $currency->zones_count,
                     'prices' => $currency->prices_count,
                     'total' => $currency->zones_count + $currency->prices_count,

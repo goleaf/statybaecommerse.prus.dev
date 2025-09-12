@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -11,7 +13,7 @@ final class SystemSettingsByTypeWidget extends ChartWidget
 
     protected static ?int $sort = 3;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {
@@ -40,7 +42,7 @@ final class SystemSettingsByTypeWidget extends ChartWidget
                 ],
             ],
             'labels' => $types->map(function ($type) {
-                return __('admin.system_settings.' . $type->type);
+                return __('admin.system_settings.'.$type->type);
             }),
         ];
     }
@@ -72,7 +74,7 @@ final class SystemSettingsByTypeWidget extends ChartWidget
                         'label' => 'function(context) {
                             const label = context.label || "";
                             const value = context.parsed.y;
-                            return label + ": " + value + " " + "' . __('admin.system_settings.settings') . '";
+                            return label + ": " + value + " " + "'.__('admin.system_settings.settings').'";
                         }',
                     ],
                 ],

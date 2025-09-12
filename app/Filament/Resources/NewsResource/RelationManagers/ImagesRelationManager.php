@@ -1,14 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class ImagesRelationManager extends RelationManager
 {
@@ -17,28 +17,28 @@ final class ImagesRelationManager extends RelationManager
     public function form(Schema $form): Schema
     {
         return $form->components([
-                Forms\Components\FileUpload::make('file_path')
-                    ->label(__('admin.news.images.fields.file_path'))
-                    ->required()
-                    ->image()
-                    ->directory('news-images')
-                    ->visibility('public')
-                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
-                    ->maxSize(5120), // 5MB
-                Forms\Components\TextInput::make('alt_text')
-                    ->label(__('admin.news.images.fields.alt_text'))
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('caption')
-                    ->label(__('admin.news.images.fields.caption'))
-                    ->maxLength(500)
-                    ->rows(3),
-                Forms\Components\Toggle::make('is_featured')
-                    ->label(__('admin.news.images.fields.is_featured')),
-                Forms\Components\TextInput::make('sort_order')
-                    ->label(__('admin.news.images.fields.sort_order'))
-                    ->numeric()
-                    ->default(0),
-            ]);
+            Forms\Components\FileUpload::make('file_path')
+                ->label(__('admin.news.images.fields.file_path'))
+                ->required()
+                ->image()
+                ->directory('news-images')
+                ->visibility('public')
+                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+                ->maxSize(5120), // 5MB
+            Forms\Components\TextInput::make('alt_text')
+                ->label(__('admin.news.images.fields.alt_text'))
+                ->maxLength(255),
+            Forms\Components\Textarea::make('caption')
+                ->label(__('admin.news.images.fields.caption'))
+                ->maxLength(500)
+                ->rows(3),
+            Forms\Components\Toggle::make('is_featured')
+                ->label(__('admin.news.images.fields.is_featured')),
+            Forms\Components\TextInput::make('sort_order')
+                ->label(__('admin.news.images.fields.sort_order'))
+                ->numeric()
+                ->default(0),
+        ]);
     }
 
     public function table(Table $table): Table

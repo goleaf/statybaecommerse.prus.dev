@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\VariantInventory;
-use App\Models\ProductVariant;
 use App\Models\Location;
 use App\Models\Partner;
+use App\Models\ProductVariant;
+use App\Models\VariantInventory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
