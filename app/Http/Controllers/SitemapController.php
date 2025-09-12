@@ -144,6 +144,25 @@ class SitemapController extends Controller
         return response($xml, 200)->header('Content-Type', 'application/xml');
     }
 
+    /**
+     * Generate XML sitemap from URLs array
+     */
+    private function generateXmlSitemap(array $urls): string
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        
+        foreach ($urls as $url) {
+            $xml .= '    <url>' . "\n";
+            $xml .= '        <loc>' . htmlspecialchars($url) . '</loc>' . "\n";
+            $xml .= '    </url>' . "\n";
+        }
+        
+        $xml .= '</urlset>';
+        
+        return $xml;
+    }
+
     public function locale(string $locale): Response
     {
         $tables = $this->resolveTables();
@@ -157,7 +176,7 @@ class SitemapController extends Controller
         }
 
         if ($cached = Cache::get("sitemap:urls:{$locale}")) {
-            $xml = view('sitemap.xml', ['urls' => $cached])->render();
+            $xml = $this->generateXmlSitemap($cached);
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
         }
@@ -172,7 +191,7 @@ class SitemapController extends Controller
 
         // Categories with translated slugs fallback to base slug
         if (!Schema::hasTable($tables['categories'])) {
-            $xml = view('sitemap.xml', ['urls' => $urls])->render();
+            $xml = $this->generateXmlSitemap($urls);
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
         }
@@ -192,7 +211,7 @@ class SitemapController extends Controller
 
         // Collections
         if (!Schema::hasTable($tables['collections'])) {
-            $xml = view('sitemap.xml', ['urls' => $urls])->render();
+            $xml = $this->generateXmlSitemap($urls);
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
         }
@@ -212,7 +231,7 @@ class SitemapController extends Controller
 
         // Brands
         if (!Schema::hasTable($tables['brands'])) {
-            $xml = view('sitemap.xml', ['urls' => $urls])->render();
+            $xml = $this->generateXmlSitemap($urls);
 
             return response($xml, 200)->header('Content-Type', 'application/xml');
         }

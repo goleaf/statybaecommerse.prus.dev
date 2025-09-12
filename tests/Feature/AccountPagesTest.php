@@ -11,7 +11,7 @@ it('loads account dashboard', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
     actingAs($user);
 
-    $this->get(route('account'))
+    $this->get(route('account.index'))
         ->assertOk()
         ->assertSee(__('Overview'));
 });

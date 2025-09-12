@@ -178,16 +178,22 @@ describe('Filament Widgets', function () {
             $order = Order::factory()->create(['status' => 'completed']);
             $order->items()->create([
                 'product_id' => $productWithSales->id,
+                'name' => $productWithSales->name,
+                'sku' => $productWithSales->sku ?? 'SKU-001',
                 'quantity' => 1,
-                'price' => 1000,
+                'unit_price' => 1000,
+                'total' => 1000,
             ]);
 
             // Create pending order for second product (should not count)
             $pendingOrder = Order::factory()->create(['status' => 'pending']);
             $pendingOrder->items()->create([
                 'product_id' => $productWithoutSales->id,
+                'name' => $productWithoutSales->name,
+                'sku' => $productWithoutSales->sku ?? 'SKU-002',
                 'quantity' => 1,
-                'price' => 1000,
+                'unit_price' => 1000,
+                'total' => 1000,
             ]);
 
             Livewire::test(TopSellingProductsWidget::class)
@@ -201,8 +207,11 @@ describe('Filament Widgets', function () {
             $order = Order::factory()->create(['status' => 'completed']);
             $order->items()->create([
                 'product_id' => $product->id,
+                'name' => $product->name,
+                'sku' => $product->sku ?? 'SKU-001',
                 'quantity' => 5,
-                'price' => 2000,  // $20.00
+                'unit_price' => 2000,  // $20.00
+                'total' => 10000,
             ]);
 
             Livewire::test(TopSellingProductsWidget::class)
@@ -218,8 +227,11 @@ describe('Filament Widgets', function () {
                 $order = Order::factory()->create(['status' => 'completed']);
                 $order->items()->create([
                     'product_id' => $product->id,
+                    'name' => $product->name,
+                    'sku' => $product->sku ?? 'SKU-' . str_pad($index + 1, 3, '0', STR_PAD_LEFT),
                     'quantity' => 15 - $index,  // Descending quantities
-                    'price' => 1000,
+                    'unit_price' => 1000,
+                    'total' => (15 - $index) * 1000,
                 ]);
             }
 

@@ -38,7 +38,7 @@ it('can access dashboard with proper permissions', function () {
     $response = $this->actingAs($this->admin)->get('/admin');
 
     $response->assertStatus(200);
-    $response->assertSee('Dashboard');
+    $response->assertSee('Valdymo skydas');
 });
 
 it('dashboard class has correct properties', function () {
@@ -60,15 +60,15 @@ it('dashboard class can check access permissions', function () {
 it('dashboard returns correct title and navigation label', function () {
     $dashboard = new Dashboard();
 
-    expect($dashboard->getTitle())->toBe(__('Dashboard'));
-    expect(Dashboard::getNavigationLabel())->toBe(__('Dashboard'));
+    expect($dashboard->getTitle())->toBe(__('Valdymo skydas'));
+    expect(Dashboard::getNavigationLabel())->toBe(__('Valdymo skydas'));
 });
 
 it('dashboard has correct widget configuration', function () {
     $dashboard = new Dashboard();
     $widgets = $dashboard->getWidgets();
 
-    expect($widgets)->toContain('App\Filament\Widgets\EnhancedEcommerceOverview');
+    expect($widgets)->toContain('App\Filament\Widgets\EcommerceOverview');
     expect($widgets)->toContain('App\Filament\Widgets\RealtimeAnalyticsWidget');
     expect($widgets)->toContain('App\Filament\Widgets\TopProductsWidget');
 });
@@ -103,5 +103,5 @@ it('dashboard widgets are accessible with proper permissions', function () {
 
     $response->assertStatus(200);
     // Check that the page contains widget containers
-    $response->assertSee('Dashboard');
+    $response->assertSee('Valdymo skydas');
 });

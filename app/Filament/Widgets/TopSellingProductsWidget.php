@@ -38,7 +38,7 @@ final class TopSellingProductsWidget extends BaseWidget
                             $query->where('status', 'completed');
                         });
                     }], 'quantity')
-                    ->orderByDesc('order_items_count')
+                    ->orderByDesc('order_items_sum_quantity')
                     ->limit(10)
             )
             ->columns([
