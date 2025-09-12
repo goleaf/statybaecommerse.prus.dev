@@ -38,7 +38,7 @@ class ExportController extends Controller
 
     public function download(string $filename): HttpResponse|StreamedResponse|RedirectResponse
     {
-        $path = 'exports/' . $filename;
+        $path = 'exports/'.$filename;
         $disk = Storage::disk('public');
 
         if (! $disk->exists($path)) {
@@ -56,6 +56,3 @@ class ExportController extends Controller
         }
     }
 }
-
-
-

@@ -328,7 +328,6 @@ return [
     'analytics_events_this_week' => 'Events This Week',
     'analytics_events_this_month' => 'Events This Month',
     'analytics_sales_overview' => 'Sales Overview',
-    
     // Campaign Clicks
     'campaign_clicks' => [
         'id' => 'ID',
@@ -370,9 +369,9 @@ return [
         'all_time' => 'All Time',
         'conversion_rate' => 'Conversion Rate',
         'total_revenue' => 'Total Revenue',
-        'today_clicks' => 'Today\'s Clicks',
+        'today_clicks' => "Today's Clicks",
         'today' => 'Today',
-        'this_week_clicks' => 'This Week\'s Clicks',
+        'this_week_clicks' => "This Week's Clicks",
         'this_week' => 'This Week',
         'clicks' => 'Clicks',
         'basic_information' => 'Basic Information',
@@ -438,5 +437,8 @@ return [
         'clicks_list' => 'Clicks List',
         'actions' => 'Actions',
         'view' => 'View',
+        'click_details' => 'Click Details',
+        'back_to_list' => 'Back to List',
+        'conversions' => 'Conversions',
     ],
 ];

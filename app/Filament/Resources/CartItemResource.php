@@ -25,7 +25,8 @@ final class CartItemResource extends Resource
     /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static UnitEnum|string|null $navigationGroup = 'admin.navigation.sales';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'admin.navigation.sales';
 
     protected static ?string $recordTitleAttribute = 'id';
 

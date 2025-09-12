@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Models\Category;
-use App\Models\Page;
 use App\Models\Product;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
@@ -13,29 +14,29 @@ final class SitemapController extends Controller
 {
     public function index(): Response
     {
-        $sitemap = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $sitemap .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        $sitemap = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $sitemap .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 
         $supportedLocales = config('app.supported_locales', ['lt', 'en', 'de', 'ru']);
 
         foreach ($supportedLocales as $locale) {
-            $sitemap .= '  <sitemap>' . "\n";
-            $sitemap .= '    <loc>' . route('sitemap.locale', ['locale' => $locale]) . '</loc>' . "\n";
-            $sitemap .= '    <lastmod>' . now()->toISOString() . '</lastmod>' . "\n";
-            $sitemap .= '  </sitemap>' . "\n";
+            $sitemap .= '  <sitemap>'."\n";
+            $sitemap .= '    <loc>'.route('sitemap.locale', ['locale' => $locale]).'</loc>'."\n";
+            $sitemap .= '    <lastmod>'.now()->toISOString().'</lastmod>'."\n";
+            $sitemap .= '  </sitemap>'."\n";
         }
 
         $sitemap .= '</sitemapindex>';
 
         return response($sitemap, 200, [
-            'Content-Type' => 'application/xml; charset=utf-8'
+            'Content-Type' => 'application/xml; charset=utf-8',
         ]);
     }
 
     public function locale(string $locale): Response
     {
-        $sitemap = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n";
+        $sitemap = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
 
         // Homepage
         $sitemap .= $this->generateUrl(
@@ -102,26 +103,26 @@ final class SitemapController extends Controller
         $sitemap .= '</urlset>';
 
         return response($sitemap, 200, [
-            'Content-Type' => 'application/xml; charset=utf-8'
+            'Content-Type' => 'application/xml; charset=utf-8',
         ]);
     }
 
     private function generateUrl(string $url, string $lastmod, string $changefreq, float $priority): string
     {
-        $urlXml = '  <url>' . "\n";
-        $urlXml .= '    <loc>' . htmlspecialchars($url) . '</loc>' . "\n";
-        $urlXml .= '    <lastmod>' . $lastmod . '</lastmod>' . "\n";
-        $urlXml .= '    <changefreq>' . $changefreq . '</changefreq>' . "\n";
-        $urlXml .= '    <priority>' . $priority . '</priority>' . "\n";
+        $urlXml = '  <url>'."\n";
+        $urlXml .= '    <loc>'.htmlspecialchars($url).'</loc>'."\n";
+        $urlXml .= '    <lastmod>'.$lastmod.'</lastmod>'."\n";
+        $urlXml .= '    <changefreq>'.$changefreq.'</changefreq>'."\n";
+        $urlXml .= '    <priority>'.$priority.'</priority>'."\n";
 
         // Add hreflang alternatives
         $supportedLocales = config('app.supported_locales', ['lt', 'en', 'de', 'ru']);
         foreach ($supportedLocales as $locale) {
-            $alternateUrl = str_replace('/' . app()->getLocale() . '/', '/' . $locale . '/', $url);
-            $urlXml .= '    <xhtml:link rel="alternate" hreflang="' . $locale . '" href="' . htmlspecialchars($alternateUrl) . '" />' . "\n";
+            $alternateUrl = str_replace('/'.app()->getLocale().'/', '/'.$locale.'/', $url);
+            $urlXml .= '    <xhtml:link rel="alternate" hreflang="'.$locale.'" href="'.htmlspecialchars($alternateUrl).'" />'."\n";
         }
 
-        $urlXml .= '  </url>' . "\n";
+        $urlXml .= '  </url>'."\n";
 
         return $urlXml;
     }

@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Models\Post;
 use App\Models\User;
-use UnitEnum;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,6 +15,7 @@ use FilamentTiptapEditor\TiptapEditor;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use UnitEnum;
 
 final class PostResource extends Resource
 {
@@ -29,7 +29,8 @@ final class PostResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 1;
 

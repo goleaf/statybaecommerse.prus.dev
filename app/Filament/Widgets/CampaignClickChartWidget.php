@@ -15,9 +15,9 @@ class CampaignClickChartWidget extends ChartWidget
     protected function getData(): array
     {
         $clicks = CampaignClick::select(
-                DB::raw('DATE(clicked_at) as date'),
-                DB::raw('COUNT(*) as count')
-            )
+            DB::raw('DATE(clicked_at) as date'),
+            DB::raw('COUNT(*) as count')
+        )
             ->where('clicked_at', '>=', now()->subDays(30))
             ->groupBy('date')
             ->orderBy('date')

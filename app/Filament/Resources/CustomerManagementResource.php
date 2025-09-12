@@ -6,7 +6,6 @@ use App\Filament\Resources\CustomerManagementResource\Pages;
 use App\Filament\Resources\CustomerManagementResource\RelationManagers;
 use App\Filament\Resources\CustomerManagementResource\Widgets;
 use App\Models\User;
-use UnitEnum;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -38,6 +37,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use BackedEnum;
+use UnitEnum;
 
 final class CustomerManagementResource extends Resource
 {
@@ -51,7 +51,7 @@ final class CustomerManagementResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Customer Management';
+    protected static $navigationGroup = 'Customer Management';
 
     protected static ?int $navigationSort = 2;
 

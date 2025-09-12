@@ -62,7 +62,8 @@ class StockResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'inventory_management';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'inventory_management';
 
     protected static ?int $navigationSort = 1;
 

@@ -23,7 +23,8 @@ class CityResource extends Resource
     /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-building-office';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Content;
 
     protected static ?int $navigationSort = 3;
 

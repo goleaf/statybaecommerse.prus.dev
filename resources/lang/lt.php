@@ -328,7 +328,6 @@ return [
     'analytics_events_this_week' => 'Šios savaitės įvykiai',
     'analytics_events_this_month' => 'Šio mėnesio įvykiai',
     'analytics_sales_overview' => 'Pardavimų apžvalga',
-    
     // Campaign Clicks
     'campaign_clicks' => [
         'id' => 'ID',
@@ -438,5 +437,8 @@ return [
         'clicks_list' => 'Paspaudimų sąrašas',
         'actions' => 'Veiksmai',
         'view' => 'Peržiūrėti',
+        'click_details' => 'Paspaudimo detalės',
+        'back_to_list' => 'Grįžti į sąrašą',
+        'conversions' => 'Konversijos',
     ],
 ];

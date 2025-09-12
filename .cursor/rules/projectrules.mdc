@@ -14,11 +14,10 @@ DB_CONNECTION=sqlite
 # DB_USERNAME=root
 # DB_PASSWORD=
 ---
-after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt, in commit attach not all not commited files, but only files what was modified in this work prompt. dont do it. make 
+
 ---
 
-- update git with this prompt changesd files. write in commit message what was changed and do not put in commit any another files what is not in git 
-
+- update git with this prompt changesd files. write in commit message what was changed and do not put in commit any another files what is not in git, after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt, in commit attach not all not commited files, but only files what was modified in this work prompt. dont do it. make 
 
 
 ---

@@ -56,7 +56,8 @@ final class CategoryResource extends Resource
 
     protected static NavigationIcon $navigationIcon = NavigationIcon::RectangleStack;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 

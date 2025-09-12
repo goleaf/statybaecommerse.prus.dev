@@ -6,7 +6,6 @@ use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers;
 use App\Filament\Resources\CountryResource\Widgets;
 use App\Models\Country;
-use UnitEnum;
 use App\Services\MultiLanguageTabService;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,6 +14,7 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 final class CountryResource extends Resource
 {
@@ -28,7 +28,7 @@ final class CountryResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'shipping';
+    protected static $navigationGroup = 'shipping';
 
     protected static ?string $navigationLabel = 'admin.countries.navigation_label';
 

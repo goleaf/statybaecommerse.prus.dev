@@ -36,7 +36,8 @@ final class AttributeValueResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Product Management';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Product Management';
 
     protected static ?int $navigationSort = 3;
 

@@ -64,7 +64,8 @@ final class SeoDataResource extends Resource
 
     protected static ?int $navigationSort = 15;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Content';
 
     protected static ?string $navigationLabel = 'SEO Data';
 

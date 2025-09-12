@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
-use App\Traits\HasTranslations;
+use Illuminate\Database\Eloquent\Model;
 
 final class CampaignConversion extends Model
 {
@@ -16,6 +16,7 @@ final class CampaignConversion extends Model
 
     protected $fillable = [
         'campaign_id',
+        'click_id',
         'order_id',
         'customer_id',
         'conversion_type',
@@ -116,7 +117,12 @@ final class CampaignConversion extends Model
 
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function click(): BelongsTo
+    {
+        return $this->belongsTo(CampaignClick::class);
     }
 
     // Scopes
@@ -183,7 +189,7 @@ final class CampaignConversion extends Model
 
     public function getDeviceTypeDisplayAttribute(): string
     {
-        return match($this->device_type) {
+        return match ($this->device_type) {
             'mobile' => __('campaign_conversions.device_types.mobile'),
             'tablet' => __('campaign_conversions.device_types.tablet'),
             'desktop' => __('campaign_conversions.device_types.desktop'),
@@ -207,7 +213,7 @@ final class CampaignConversion extends Model
         if ($cost <= 0) {
             return 0;
         }
-        
+
         return ($this->conversion_value - $cost) / $cost;
     }
 
@@ -216,7 +222,7 @@ final class CampaignConversion extends Model
         if ($cost <= 0) {
             return 0;
         }
-        
+
         return $this->conversion_value / $cost;
     }
 
@@ -232,7 +238,7 @@ final class CampaignConversion extends Model
 
     public function getAttributionValue(string $model = 'last_click'): float
     {
-        return match($model) {
+        return match ($model) {
             'first_click' => $this->first_click_attribution ?? 0,
             'linear' => $this->linear_attribution ?? 0,
             'time_decay' => $this->time_decay_attribution ?? 0,
@@ -242,10 +248,3 @@ final class CampaignConversion extends Model
         };
     }
 }
-
-
-
-
-
-
-

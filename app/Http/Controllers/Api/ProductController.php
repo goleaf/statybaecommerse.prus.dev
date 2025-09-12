@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
@@ -13,13 +15,13 @@ final class ProductController extends Controller
     {
         $query = $request->get('q', '');
         $limit = min((int) $request->get('limit', 10), 50);
-        
+
         $products = Product::query()
             ->where('is_visible', true)
             ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
-                  ->orWhere('description', 'like', "%{$query}%")
-                  ->orWhere('sku', 'like', "%{$query}%");
+                    ->orWhere('description', 'like', "%{$query}%")
+                    ->orWhere('sku', 'like', "%{$query}%");
             })
             ->with(['brand', 'media'])
             ->limit($limit)

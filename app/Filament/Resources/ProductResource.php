@@ -55,7 +55,8 @@ class ProductResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'E-commerce';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'E-commerce';
 
     protected static ?int $navigationSort = 1;
 

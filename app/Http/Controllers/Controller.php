@@ -33,7 +33,7 @@ abstract class Controller
     {
         // Use the new unified translation files (lt.php, en.php)
         $translationKey = $this->normalizeTranslationKey($key);
-        
+
         return $count === null
             ? __($translationKey, $params)
             : trans_choice($translationKey, $count, $params);
@@ -46,7 +46,7 @@ abstract class Controller
         if (str_contains($key, '.')) {
             return str_replace('.', '_', $key);
         }
-        
+
         return $key;
     }
 

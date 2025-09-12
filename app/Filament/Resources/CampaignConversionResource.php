@@ -64,7 +64,8 @@ class CampaignConversionResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'campaign_conversions.navigation.group';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'campaign_conversions.navigation.group';
 
     protected static ?int $navigationSort = 3;
 

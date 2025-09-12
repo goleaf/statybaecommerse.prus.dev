@@ -35,7 +35,8 @@ final class BrandResource extends Resource
 
     protected static NavigationIcon $navigationIcon = NavigationIcon::Tag;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?string $recordTitleAttribute = 'name';
 

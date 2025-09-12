@@ -3,9 +3,10 @@
 namespace Database\Factories;
 
 use App\Models\Campaign;
+use App\Models\CampaignClick;
 use App\Models\CampaignConversion;
-use App\Models\Customer;
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,8 +20,9 @@ final class CampaignConversionFactory extends Factory
     {
         return [
             'campaign_id' => Campaign::factory(),
+            'click_id' => $this->faker->optional(0.8)->randomElement(CampaignClick::pluck('id')->toArray()),
             'order_id' => $this->faker->optional(0.7)->randomElement(Order::pluck('id')->toArray()),
-            'customer_id' => $this->faker->optional(0.6)->randomElement(Customer::pluck('id')->toArray()),
+            'customer_id' => $this->faker->optional(0.6)->randomElement(User::pluck('id')->toArray()),
             'conversion_type' => $this->faker->randomElement(['purchase', 'signup', 'download', 'registration']),
             'conversion_value' => $this->faker->randomFloat(2, 0, 1000),
             'session_id' => $this->faker->uuid(),
@@ -47,7 +49,7 @@ final class CampaignConversionFactory extends Factory
         return $this->state(fn(array $attributes) => [
             'conversion_type' => 'signup',
             'conversion_value' => 0,
-            'customer_id' => Customer::factory(),
+            'customer_id' => User::factory(),
         ]);
     }
 
@@ -81,7 +83,14 @@ final class CampaignConversionFactory extends Factory
     public function withCustomer(): static
     {
         return $this->state(fn(array $attributes) => [
-            'customer_id' => Customer::factory(),
+            'customer_id' => User::factory(),
+        ]);
+    }
+
+    public function withClick(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'click_id' => CampaignClick::factory(),
         ]);
     }
 

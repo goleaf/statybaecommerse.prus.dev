@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -10,7 +12,7 @@ class RobotsController extends Controller
     {
         $host = parse_url((string) config('app.url'), PHP_URL_HOST) ?: request()->getHost();
         $locales = collect(explode(',', (string) config('app.supported_locales', 'en')))
-            ->map(fn($v) => trim($v))
+            ->map(fn ($v) => trim($v))
             ->filter()
             ->values();
 
@@ -23,10 +25,11 @@ class RobotsController extends Controller
         ];
 
         foreach ($locales as $locale) {
-            $lines[] = 'Sitemap: https://' . $host . '/' . $locale . '/sitemap.xml';
+            $lines[] = 'Sitemap: https://'.$host.'/'.$locale.'/sitemap.xml';
         }
 
-        $content = implode("\n", $lines) . "\n";
+        $content = implode("\n", $lines)."\n";
+
         return response($content, 200)->header('Content-Type', 'text/plain');
     }
 }

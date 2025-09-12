@@ -24,7 +24,8 @@ class RegionResource extends Resource
 
     protected static NavigationIcon $navigationIcon = NavigationIcon::Map;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Content;
 
     protected static ?int $navigationSort = 2;
 

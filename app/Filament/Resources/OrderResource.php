@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
-use UnitEnum;
 use App\Models\Channel;
 use App\Models\Order;
 use App\Models\Partner;
@@ -57,6 +56,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\HtmlString;
+use UnitEnum;
 
 class OrderResource extends Resource
 {
@@ -76,7 +76,8 @@ class OrderResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'orders.navigation_group';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'orders.navigation_group';
 
     protected static ?int $navigationSort = 1;
 

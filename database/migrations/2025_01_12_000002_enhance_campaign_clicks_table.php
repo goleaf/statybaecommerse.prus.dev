@@ -27,7 +27,7 @@ return new class extends Migration {
             if (!Schema::hasColumn('campaign_clicks', 'city')) {
                 $table->string('city')->nullable()->after('country');
             }
-            
+
             // UTM parameters
             if (!Schema::hasColumn('campaign_clicks', 'utm_source')) {
                 $table->string('utm_source')->nullable()->after('city');
@@ -44,7 +44,7 @@ return new class extends Migration {
             if (!Schema::hasColumn('campaign_clicks', 'utm_content')) {
                 $table->string('utm_content')->nullable()->after('utm_term');
             }
-            
+
             // Conversion tracking
             if (!Schema::hasColumn('campaign_clicks', 'conversion_value')) {
                 $table->decimal('conversion_value', 12, 2)->default(0)->after('utm_content');
@@ -55,7 +55,7 @@ return new class extends Migration {
             if (!Schema::hasColumn('campaign_clicks', 'conversion_data')) {
                 $table->json('conversion_data')->nullable()->after('is_converted');
             }
-            
+
             // Add indexes for performance
             $table->index(['device_type']);
             $table->index(['browser']);
@@ -77,8 +77,24 @@ return new class extends Migration {
                 $table->string('os_label')->nullable();
                 $table->text('notes')->nullable();
                 $table->json('custom_data')->nullable();
-                
+
                 $table->unique(['campaign_click_id', 'locale']);
+                $table->index(['locale']);
+            });
+        }
+
+        // Create campaign conversion translations table
+        if (!Schema::hasTable('campaign_conversion_translations')) {
+            Schema::create('campaign_conversion_translations', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('campaign_conversion_id')->constrained('campaign_conversions')->cascadeOnDelete();
+                $table->string('locale', 5);
+                $table->string('conversion_type_label')->nullable();
+                $table->string('status_label')->nullable();
+                $table->text('notes')->nullable();
+                $table->json('custom_data')->nullable();
+
+                $table->unique(['campaign_conversion_id', 'locale']);
                 $table->index(['locale']);
             });
         }
@@ -86,28 +102,47 @@ return new class extends Migration {
 
     public function down(): void
     {
+        Schema::dropIfExists('campaign_conversion_translations');
         Schema::dropIfExists('campaign_click_translations');
-        
+
         Schema::table('campaign_clicks', function (Blueprint $table) {
             $columns = [
                 'referer', 'device_type', 'browser', 'os', 'country', 'city',
                 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
                 'conversion_value', 'is_converted', 'conversion_data'
             ];
-            
+
             foreach ($columns as $column) {
                 if (Schema::hasColumn('campaign_clicks', $column)) {
                     $table->dropColumn($column);
                 }
             }
-            
+
             // Drop indexes
-            try { $table->dropIndex(['device_type']); } catch (\Throwable $e) {}
-            try { $table->dropIndex(['browser']); } catch (\Throwable $e) {}
-            try { $table->dropIndex(['country']); } catch (\Throwable $e) {}
-            try { $table->dropIndex(['utm_source']); } catch (\Throwable $e) {}
-            try { $table->dropIndex(['is_converted']); } catch (\Throwable $e) {}
-            try { $table->dropIndex(['clicked_at', 'campaign_id']); } catch (\Throwable $e) {}
+            try {
+                $table->dropIndex(['device_type']);
+            } catch (\Throwable $e) {
+            }
+            try {
+                $table->dropIndex(['browser']);
+            } catch (\Throwable $e) {
+            }
+            try {
+                $table->dropIndex(['country']);
+            } catch (\Throwable $e) {
+            }
+            try {
+                $table->dropIndex(['utm_source']);
+            } catch (\Throwable $e) {
+            }
+            try {
+                $table->dropIndex(['is_converted']);
+            } catch (\Throwable $e) {
+            }
+            try {
+                $table->dropIndex(['clicked_at', 'campaign_id']);
+            } catch (\Throwable $e) {
+            }
         });
     }
 };
