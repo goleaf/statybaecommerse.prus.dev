@@ -378,6 +378,14 @@
 - **Fixed customer count expectations**: Updated tests to account for admin user created in setUp
 - **Current status**: 19 tests passing (43 assertions) - All Filament widgets fully functional
 
+### ✅ MultiLanguageTabServiceTest.php - 7 tests passing
+- **Fixed configuration key mismatch**: Changed all instances of `app-features.supported_locales` to `app.supported_locales`
+- **Issue resolved**: Tests expected 2 languages but got 4 because service was using different config key
+- **Root cause**: Test was setting `app-features.supported_locales` but service reads from `app.supported_locales`
+- **Solution**: Updated all test methods to use the correct config key that the service actually reads
+- **Fixed tests**: All 7 test methods now use consistent configuration
+- **Current status**: 7 tests passing (36 assertions) - MultiLanguageTabService fully functional
+
 ### Files Modified:
 - `tests/Feature/MultilanguageTest.php` - Complete fix for all 22 tests
 - `tests/Feature/EnhancedSettingTest.php` - Partial fix (11/12 tests passing)
@@ -391,6 +399,7 @@
 - `tests/Feature/Filament/WidgetsTest.php` - Fixed role creation, database columns, missing methods, and property accessibility issues
 - `app/Filament/Widgets/RealtimeAnalyticsWidget.php` - Fixed method accessibility and property visibility
 - `app/Filament/Widgets/OrdersChartWidget.php` - Fixed property accessibility for sort order
+- `tests/Unit/Services/MultiLanguageTabServiceTest.php` - Fixed configuration key mismatch for supported locales
 - `app/Models/NormalSetting.php` - Added validation_rules accessor
 - `app/Filament/Resources/NormalSettingResource.php` - Fixed type hints and component defaults
 - `database/factories/NormalSettingFactory.php` - Fixed validation_rules data

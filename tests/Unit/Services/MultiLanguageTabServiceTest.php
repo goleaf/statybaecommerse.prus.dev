@@ -31,7 +31,7 @@ it('computes default active tab index with lt prioritized', function (): void {
 });
 
 it('prepares translation data by extracting translatable fields', function (): void {
-    config()->set('app-features.supported_locales', ['lt', 'en']);
+    config()->set('app.supported_locales', ['lt', 'en']);
 
     $formData = [
         'title_lt' => 'Pavadinimas LT',
@@ -61,7 +61,7 @@ it('prepares translation data by extracting translatable fields', function (): v
 });
 
 it('populates form with translations from a record-like object', function (): void {
-    config()->set('app-features.supported_locales', ['lt', 'en']);
+    config()->set('app.supported_locales', ['lt', 'en']);
 
     $translationLt = (object) ['locale' => 'lt', 'title' => 'Pavadinimas LT', 'description' => 'Aprašymas LT'];
     $translationEn = (object) ['locale' => 'en', 'title' => 'Title EN', 'description' => 'Description EN'];
@@ -92,7 +92,7 @@ it('creates simple tabs for each language when TabLayout plugin is available', f
         $this->markTestSkipped('TabLayout plugin not installed.');
     }
 
-    config()->set('app-features.supported_locales', ['lt', 'en']);
+    config()->set('app.supported_locales', ['lt', 'en']);
 
     $tabs = MultiLanguageTabService::createSimpleTabs([
         'name' => ['type' => 'text', 'required' => true],
@@ -112,7 +112,7 @@ it('creates advanced tabs with a schema builder per language', function (): void
         $this->markTestSkipped('TabLayout plugin not installed.');
     }
 
-    config()->set('app-features.supported_locales', ['lt', 'en']);
+    config()->set('app.supported_locales', ['lt', 'en']);
 
     $tabs = MultiLanguageTabService::createAdvancedTabs(function (string $locale) {
         return [\Filament\Forms\Components\TextInput::make("title_{$locale}")];
@@ -131,7 +131,7 @@ it('creates simple tab schemas for a Livewire component', function (): void {
         $this->markTestSkipped('TabLayout plugin not installed.');
     }
 
-    config()->set('app-features.supported_locales', ['lt', 'en']);
+    config()->set('app.supported_locales', ['lt', 'en']);
 
     $schemas = MultiLanguageTabService::createSimpleTabSchemas('App\Http\Livewire\Dummy', ['foo' => 'bar']);
 

@@ -769,6 +769,9 @@ return [
         'subject' => 'Subject',
         'event' => 'Event',
         'timestamp' => 'Timestamp',
+        'created_at' => 'Created At',
+        'last_login' => 'Last Login',
+        'status' => 'Status',
     ],
     // Analytics
     'analytics' => [

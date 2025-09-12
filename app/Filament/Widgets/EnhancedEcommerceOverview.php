@@ -120,11 +120,13 @@ final class EnhancedEcommerceOverview extends BaseWidget
     public function getOrdersChange(): string
     {
         $currentMonth = Order::query()
+            ->where('status', 'completed')
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
 
         $previousMonth = Order::query()
+            ->where('status', 'completed')
             ->whereMonth('created_at', now()->subMonth()->month)
             ->whereYear('created_at', now()->subMonth()->year)
             ->count();

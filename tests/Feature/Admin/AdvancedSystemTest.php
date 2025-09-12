@@ -41,6 +41,7 @@ beforeEach(function () {
         'name' => 'System Admin',
         'email' => 'admin@system.test',
         'is_active' => true,
+        'is_admin' => true,
     ]);
     $this->admin->assignRole($adminRole);
 });
@@ -58,6 +59,9 @@ it('can access all advanced admin pages', function () {
 
     foreach ($pages as $page) {
         $response = $this->actingAs($this->admin)->get($page);
+        if ($response->status() !== 200) {
+            dump("Failed page: $page with status: " . $response->status());
+        }
         $response->assertOk();
     }
 });

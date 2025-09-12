@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
-use App\Notifications\AdminNotification;
+use App\Notifications\TestNotification;
 use App\Notifications\LowStockAlert;
 use App\Models\Product;
 use Illuminate\Console\Command;
@@ -19,7 +19,7 @@ final class CreateTestNotifications extends Command
 
         // Get admin users
         $adminUsers = User::whereHas('roles', function ($query) {
-            $query->whereIn('name', ['Administrator', 'Manager']);
+            $query->whereIn('name', ['administrator', 'manager']);
         })->get();
 
         if ($adminUsers->isEmpty()) {
@@ -30,30 +30,30 @@ final class CreateTestNotifications extends Command
         // Create various types of notifications
         $notifications = [
             [
-                'title' => __('admin.notifications.welcome_title'),
-                'message' => __('admin.notifications.welcome_message'),
+                'title' => 'Sveiki atvykę į valdymo skydą',
+                'message' => 'Jūsų e-komercijos sistema sėkmingai sukonfigūruota ir paruošta naudojimui.',
                 'type' => 'success'
             ],
             [
-                'title' => __('admin.notifications.system_update_title'),
-                'message' => __('admin.notifications.system_update_message'),
+                'title' => 'Sistemos atnaujinimas',
+                'message' => 'Sistema buvo sėkmingai atnaujinta iki naujausios versijos.',
                 'type' => 'info'
             ],
             [
-                'title' => __('admin.notifications.maintenance_title'),
-                'message' => __('admin.notifications.maintenance_message'),
+                'title' => 'Priežiūros režimas',
+                'message' => 'Sistema bus nepasiekiama dėl planuotos priežiūros nuo 02:00 iki 04:00.',
                 'type' => 'warning'
             ],
             [
-                'title' => __('admin.notifications.security_alert_title'),
-                'message' => __('admin.notifications.security_alert_message'),
+                'title' => 'Saugumo įspėjimas',
+                'message' => 'Aptiktas įtartinas veiksmas. Prašome patikrinti savo paskyrą.',
                 'type' => 'error'
             ],
         ];
 
         foreach ($adminUsers as $user) {
             foreach ($notifications as $notification) {
-                $user->notify(new AdminNotification(
+                $user->notify(new TestNotification(
                     $notification['title'],
                     $notification['message'],
                     $notification['type']

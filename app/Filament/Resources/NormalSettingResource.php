@@ -150,8 +150,8 @@ class NormalSettingResource extends Resource
                         Forms\Components\Textarea::make('validation_rules')
                             ->label(__('Validation Rules'))
                             ->helperText(__('Laravel validation rules in key-value format'))
-                            ->formatStateUsing(fn($state) => is_array($state) ? json_encode($state, JSON_PRETTY_PRINT) : $state)
-                            ->dehydrateStateUsing(fn($state) => is_string($state) ? json_decode($state, true) : $state),
+                            ->formatStateUsing(fn($state) => is_array($state) ? json_encode($state, JSON_PRETTY_PRINT) : ($state ?? ''))
+                            ->dehydrateStateUsing(fn($state) => is_string($state) && !empty($state) ? json_decode($state, true) : ($state ?? [])),
                     ])
                     ->columns(2),
             ]);

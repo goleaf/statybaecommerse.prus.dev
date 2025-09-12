@@ -30,6 +30,7 @@ final class NormalSetting extends Model
         'is_public' => 'boolean',
         'is_encrypted' => 'boolean',
         'sort_order' => 'integer',
+        'validation_rules' => 'json',
     ];
 
     protected function value(): Attribute
@@ -175,13 +176,6 @@ final class NormalSetting extends Model
         return $query->where('locale', $locale);
     }
 
-    protected function validationRules(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $value ? json_decode($value, true) : [],
-            set: fn ($value) => $value ? json_encode($value) : null,
-        );
-    }
 
     protected static function booted(): void
     {
