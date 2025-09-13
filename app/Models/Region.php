@@ -151,10 +151,6 @@ final class Region extends Model
         return $query->with('zone');
     }
 
-    public function scopeWithTranslations($query)
-    {
-        return $query->with('translations');
-    }
 
     public function scopeOrdered($query)
     {
@@ -304,6 +300,182 @@ final class Region extends Model
             'customers' => $this->total_customers_count,
             'warehouses' => $this->total_warehouses_count,
             'stores' => $this->total_stores_count,
+        ];
+    }
+
+    // Enhanced translation methods
+    public function getTranslatedName(?string $locale = null): ?string
+    {
+        return $this->trans('name', $locale) ?: $this->name;
+    }
+
+    public function getTranslatedDescription(?string $locale = null): ?string
+    {
+        return $this->trans('description', $locale) ?: $this->description;
+    }
+
+    // Scope for translated regions
+    public function scopeWithTranslations($query, ?string $locale = null)
+    {
+        $locale = $locale ?: app()->getLocale();
+
+        return $query->with(['translations' => function ($q) use ($locale) {
+            $q->where('locale', $locale);
+        }]);
+    }
+
+    // Get all available locales for this region
+    public function getAvailableLocales(): array
+    {
+        return $this->translations()->pluck('locale')->toArray();
+    }
+
+    // Check if region has translation for specific locale
+    public function hasTranslationFor(string $locale): bool
+    {
+        return $this->translations()->where('locale', $locale)->exists();
+    }
+
+    // Get or create translation for locale
+    public function getOrCreateTranslation(string $locale): RegionTranslation
+    {
+        return $this->translations()->firstOrCreate(
+            ['locale' => $locale],
+            [
+                'name' => $this->name,
+                'description' => $this->description,
+            ]
+        );
+    }
+
+    // Update translation for specific locale
+    public function updateTranslation(string $locale, array $data): bool
+    {
+        $translation = $this->translations()->where('locale', $locale)->first();
+        
+        if ($translation) {
+            return $translation->update($data);
+        }
+        
+        return $this->translations()->create(array_merge(['locale' => $locale], $data)) !== null;
+    }
+
+    // Bulk update translations
+    public function updateTranslations(array $translations): bool
+    {
+        foreach ($translations as $locale => $data) {
+            $this->updateTranslation($locale, $data);
+        }
+        
+        return true;
+    }
+
+    // Additional helper methods
+    public function getFullDisplayName(?string $locale = null): string
+    {
+        $name = $this->getTranslatedName($locale);
+        
+        if ($this->country) {
+            $countryName = $this->country->getTranslatedName($locale);
+            return "{$name}, {$countryName}";
+        }
+        
+        return $name;
+    }
+
+    public function getHierarchyInfo(): array
+    {
+        return [
+            'level' => $this->level,
+            'level_name' => $this->getLevelName(),
+            'depth' => $this->getDepthAttribute(),
+            'is_root' => $this->getIsRootAttribute(),
+            'is_leaf' => $this->getIsLeafAttribute(),
+            'has_parent' => $this->parent_id !== null,
+            'has_children' => $this->children()->count() > 0,
+            'children_count' => $this->children()->count(),
+        ];
+    }
+
+    public function getLevelName(): string
+    {
+        return match ($this->level) {
+            0 => 'Root',
+            1 => 'State/Province',
+            2 => 'County',
+            3 => 'District',
+            4 => 'Municipality',
+            5 => 'Village',
+            default => "Level {$this->level}"
+        };
+    }
+
+    public function getGeographicInfo(): array
+    {
+        return [
+            'country' => $this->country ? [
+                'id' => $this->country->id,
+                'name' => $this->country->translated_name,
+                'code' => $this->country->cca2,
+            ] : null,
+            'zone' => $this->zone ? [
+                'id' => $this->zone->id,
+                'name' => $this->zone->name,
+            ] : null,
+            'parent' => $this->parent ? [
+                'id' => $this->parent->id,
+                'name' => $this->parent->translated_name,
+                'level' => $this->parent->level,
+            ] : null,
+        ];
+    }
+
+    public function getBusinessInfo(): array
+    {
+        return [
+            'cities_count' => $this->cities()->count(),
+            'addresses_count' => $this->addresses()->count(),
+            // 'users_count' => $this->users()->count(), // users table doesn't have region_id
+            // 'orders_count' => $this->orders()->count(), // orders table doesn't have region_id
+            // 'customers_count' => $this->customers()->count(), // customers table doesn't exist
+            // 'warehouses_count' => $this->warehouses()->count(), // warehouses table doesn't exist
+            // 'stores_count' => $this->stores()->count(), // stores table doesn't exist
+        ];
+    }
+
+    public function getTotalBusinessInfo(): array
+    {
+        return [
+            'total_cities' => $this->getTotalCitiesCountAttribute(),
+            'total_addresses' => $this->getTotalAddressesCountAttribute(),
+            // 'total_users' => $this->getTotalUsersCountAttribute(), // users table doesn't have region_id
+            // 'total_orders' => $this->getTotalOrdersCountAttribute(), // orders table doesn't have region_id
+            // 'total_customers' => $this->getTotalCustomersCountAttribute(), // customers table doesn't exist
+            // 'total_warehouses' => $this->getTotalWarehousesCountAttribute(), // warehouses table doesn't exist
+            // 'total_stores' => $this->getTotalStoresCountAttribute(), // stores table doesn't exist
+        ];
+    }
+
+    public function getCompleteInfo(?string $locale = null): array
+    {
+        return [
+            'basic' => [
+                'id' => $this->id,
+                'name' => $this->getTranslatedName($locale),
+                'description' => $this->getTranslatedDescription($locale),
+                'code' => $this->code,
+                'slug' => $this->slug,
+                'full_display_name' => $this->getFullDisplayName($locale),
+            ],
+            'hierarchy' => $this->getHierarchyInfo(),
+            'geographic' => $this->getGeographicInfo(),
+            'business' => $this->getBusinessInfo(),
+            'total_business' => $this->getTotalBusinessInfo(),
+            'status' => [
+                'is_enabled' => $this->is_enabled,
+                'is_default' => $this->is_default,
+                'sort_order' => $this->sort_order,
+            ],
         ];
     }
 }

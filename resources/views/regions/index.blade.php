@@ -1,156 +1,202 @@
 @extends('layouts.app')
 
-@section('title', __('regions.all_regions'))
+@section('title', __('regions.title'))
+@section('description', __('regions.subtitle'))
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ __('regions.all_regions') }}</h1>
-        <p class="text-gray-600">{{ __('regions.regions_description') }}</p>
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ __('regions.title') ?: 'Regions' }}</h1>
+                    <p class="mt-2 text-gray-600">{{ __('regions.subtitle') ?: 'Browse and explore regions' }}</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <form method="GET" action="{{ route('frontend.regions.index') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-                <label for="search" class="block text-sm font-medium text-gray-700 mb-2">{{ __('regions.search') }}</label>
-                <input type="text" 
-                       id="search" 
-                       name="search" 
-                       value="{{ request('search') }}"
-                       placeholder="{{ __('regions.search_placeholder') }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            
-            <div>
-                <label for="country" class="block text-sm font-medium text-gray-700 mb-2">{{ __('regions.country') }}</label>
-                <select id="country" name="country" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">{{ __('regions.all_countries') }}</option>
-                    @foreach($countries as $country)
-                        <option value="{{ $country->id }}" {{ request('country') == $country->id ? 'selected' : '' }}>
-                            {{ $country->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            
-            <div>
-                <label for="zone" class="block text-sm font-medium text-gray-700 mb-2">{{ __('regions.zone') }}</label>
-                <select id="zone" name="zone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">{{ __('regions.all_zones') }}</option>
-                    @foreach($zones as $zone)
-                        <option value="{{ $zone->id }}" {{ request('zone') == $zone->id ? 'selected' : '' }}>
-                            {{ $zone->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            
-            <div>
-                <label for="level" class="block text-sm font-medium text-gray-700 mb-2">{{ __('regions.level') }}</label>
-                <select id="level" name="level" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">{{ __('regions.all_levels') }}</option>
-                    <option value="0" {{ request('level') == '0' ? 'selected' : '' }}>Root</option>
-                    <option value="1" {{ request('level') == '1' ? 'selected' : '' }}>State/Province</option>
-                    <option value="2" {{ request('level') == '2' ? 'selected' : '' }}>County</option>
-                    <option value="3" {{ request('level') == '3' ? 'selected' : '' }}>District</option>
-                </select>
-            </div>
-            
-            <div class="md:col-span-2 lg:col-span-4 flex gap-2">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    {{ __('regions.filter') }}
-                </button>
-                <a href="{{ route('frontend.regions.index') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                    {{ __('regions.clear_filters') }}
-                </a>
-            </div>
-        </form>
-    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <form method="GET" action="{{ route('regions.index') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Search -->
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700">{{ __('regions.filters.search') }}</label>
+                    <input type="text" name="search" id="search" value="{{ request('search') }}" 
+                           placeholder="{{ __('regions.filters.search_placeholder') }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
 
-    <!-- Regions Grid -->
-    @if($regions->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($regions as $region)
-                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xl font-semibold text-gray-900">{{ $region->translated_name }}</h3>
-                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                                {{ $region->code }}
-                            </span>
-                        </div>
-                        
-                        @if($region->translated_description)
-                            <p class="text-gray-600 mb-4">{{ Str::limit($region->translated_description, 100) }}</p>
-                        @endif
-                        
-                        <div class="space-y-2 mb-4">
-                            @if($region->country)
-                                <div class="flex items-center text-sm text-gray-500">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    {{ $region->country->name }}
+                <!-- Country -->
+                <div>
+                    <label for="country_id" class="block text-sm font-medium text-gray-700">{{ __('regions.filters.country') }}</label>
+                    <select name="country_id" id="country_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">{{ __('regions.filters.all_countries') }}</option>
+                        @foreach($countries as $country)
+                            <option value="{{ $country->id }}" {{ request('country_id') == $country->id ? 'selected' : '' }}>
+                                {{ $country->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Zone -->
+                <div>
+                    <label for="zone_id" class="block text-sm font-medium text-gray-700">{{ __('regions.filters.zone') }}</label>
+                    <select name="zone_id" id="zone_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">{{ __('regions.filters.all_zones') }}</option>
+                        @foreach($zones as $zone)
+                            <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>
+                                {{ $zone->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Level -->
+                <div>
+                    <label for="level" class="block text-sm font-medium text-gray-700">{{ __('regions.filters.level') }}</label>
+                    <select name="level" id="level" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">{{ __('regions.filters.all_levels') }}</option>
+                        @foreach($levels as $value => $label)
+                            <option value="{{ $value }}" {{ request('level') == $value ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Enabled -->
+                <div>
+                    <label for="is_enabled" class="block text-sm font-medium text-gray-700">{{ __('regions.filters.enabled') }}</label>
+                    <select name="is_enabled" id="is_enabled" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">{{ __('regions.filters.all') }}</option>
+                        <option value="1" {{ request('is_enabled') === '1' ? 'selected' : '' }}>{{ __('regions.filters.enabled') }}</option>
+                        <option value="0" {{ request('is_enabled') === '0' ? 'selected' : '' }}>{{ __('regions.filters.disabled') }}</option>
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-2">
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                        {{ __('regions.filters.apply_filters') }}
+                    </button>
+                    <a href="{{ route('regions.index') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
+                        {{ __('regions.filters.clear_filters') }}
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results -->
+        @if($regions->count() > 0)
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                @foreach($regions as $region)
+                    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+                        <div class="p-6">
+                            <!-- Region Header -->
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-1">
+                                        {{ $region->translated_name }}
+                                    </h3>
+                                    @if($region->code)
+                                        <p class="text-sm text-gray-500">{{ $region->code }}</p>
+                                    @endif
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    @if($region->is_default)
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            {{ __('regions.fields.default') }}
+                                        </span>
+                                    @endif
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $region->is_enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                        {{ $region->is_enabled ? __('regions.fields.enabled') : __('regions.fields.disabled') }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Region Info -->
+                            <div class="space-y-2">
+                                @if($region->country)
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-globe mr-2"></i>
+                                        <span>{{ $region->country->translated_name }}</span>
+                                    </div>
+                                @endif
+
+                                @if($region->zone)
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-map-marker-alt mr-2"></i>
+                                        <span>{{ $region->zone->name }}</span>
+                                    </div>
+                                @endif
+
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-layer-group mr-2"></i>
+                                    <span>{{ $levels[$region->level] ?? __('regions.fields.level') . ' ' . $region->level }}</span>
+                                </div>
+
+                                @if($region->parent)
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i class="fas fa-arrow-up mr-2"></i>
+                                        <span>{{ $region->parent->translated_name }}</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Description -->
+                            @if($region->translated_description)
+                                <div class="mt-4">
+                                    <p class="text-sm text-gray-600 line-clamp-2">{{ Str::limit($region->translated_description, 100) }}</p>
                                 </div>
                             @endif
-                            
-                            @if($region->zone)
-                                <div class="flex items-center text-sm text-gray-500">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    </svg>
-                                    {{ $region->zone->name }}
+
+                            <!-- Stats -->
+                            <div class="mt-4 grid grid-cols-2 gap-2 text-xs text-gray-500">
+                                <div class="flex items-center">
+                                    <i class="fas fa-city mr-1"></i>
+                                    <span>{{ $region->cities_count ?? 0 }} {{ __('regions.fields.cities') }}</span>
                                 </div>
-                            @endif
-                            
-                            <div class="flex items-center text-sm text-gray-500">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                </svg>
-                                {{ __('regions.level') }}: {{ $region->level }}
+                                <div class="flex items-center">
+                                    <i class="fas fa-sitemap mr-1"></i>
+                                    <span>{{ $region->children_count ?? 0 }} {{ __('regions.fields.children') }}</span>
+                                </div>
                             </div>
-                            
-                            <div class="flex items-center text-sm text-gray-500">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                {{ $region->cities()->count() }} {{ __('regions.cities') }}
+
+                            <!-- Actions -->
+                            <div class="mt-4 pt-4 border-t border-gray-200">
+                                <a href="{{ route('regions.show', $region) }}" 
+                                   class="w-full bg-indigo-600 text-white text-center py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-200 block">
+                                    {{ __('regions.actions.view_details') }}
+                                </a>
                             </div>
-                        </div>
-                        
-                        <div class="flex justify-between items-center">
-                            <a href="{{ route('frontend.regions.show', $region) }}" 
-                               class="text-blue-600 hover:text-blue-800 font-medium">
-                                {{ __('regions.view_details') }}
-                            </a>
-                            
-                            @if($region->children()->count() > 0)
-                                <span class="text-sm text-gray-500">
-                                    {{ $region->children()->count() }} {{ __('regions.sub_regions') }}
-                                </span>
-                            @endif
                         </div>
                     </div>
+                @endforeach
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-8">
+                {{ $regions->appends(request()->query())->links() }}
+            </div>
+        @else
+            <!-- Empty State -->
+            <div class="text-center py-12">
+                <div class="mx-auto h-24 w-24 text-gray-400">
+                    <i class="fas fa-map-marked-alt text-6xl"></i>
                 </div>
-            @endforeach
-        </div>
-        
-        <!-- Pagination -->
-        <div class="mt-8">
-            {{ $regions->links() }}
-        </div>
-    @else
-        <div class="text-center py-12">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('regions.no_regions_found') }}</h3>
-            <p class="mt-1 text-sm text-gray-500">{{ __('regions.try_different_filters') }}</p>
-        </div>
-    @endif
+                <h3 class="mt-4 text-lg font-medium text-gray-900">{{ __('regions.messages.no_regions_found') }}</h3>
+                <p class="mt-2 text-gray-500">{{ __('regions.messages.try_different_filters') }}</p>
+                <div class="mt-6">
+                    <a href="{{ route('regions.index') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                        {{ __('regions.actions.view_all_regions') }}
+                    </a>
+                </div>
+            </div>
+        @endif
+    </div>
 </div>
 @endsection
-

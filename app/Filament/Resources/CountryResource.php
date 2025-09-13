@@ -17,6 +17,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -44,17 +45,16 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use BackedEnum;
 use UnitEnum;
 
 final class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-globe-alt';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-globe-alt';
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = 'Geography';
+    protected static string | UnitEnum | null $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 1;
 
@@ -75,9 +75,9 @@ final class CountryResource extends Resource
         return __('admin.countries.plural_model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make('Country Information')
                     ->tabs([
@@ -156,9 +156,9 @@ final class CountryResource extends Resource
 
                         Tab::make(__('admin.countries.sections.additional_information'))
                             ->icon('heroicon-o-map')
-                            ->schema([
+                                            ->schema([
                                 Section::make('Location Information')
-                                    ->schema([
+                                            ->schema([
                                         Grid::make(2)
                                             ->schema([
                                                 Select::make('region')
@@ -266,12 +266,12 @@ final class CountryResource extends Resource
                                                     ->helperText(__('admin.countries.helpers.requires_vat')),
 
                                                 TextInput::make('vat_rate')
-                                                    ->label(__('admin.countries.fields.vat_rate'))
+                                            ->label(__('admin.countries.fields.vat_rate'))
                                                     ->helperText(__('admin.countries.helpers.vat_rate'))
-                                                    ->numeric()
-                                                    ->step(0.01)
-                                                    ->minValue(0)
-                                                    ->maxValue(100)
+                                            ->numeric()
+                                            ->step(0.01)
+                                            ->minValue(0)
+                                            ->maxValue(100)
                                                     ->suffix('%'),
                                             ]),
 

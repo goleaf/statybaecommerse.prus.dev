@@ -13,8 +13,11 @@ final class CountryController extends Controller
     public function index(Request $request): View
     {
         $countries = Country::query()
+            ->active()
+            ->enabled()
             ->with(['regions', 'cities'])
             ->when($request->has('region'), fn ($query) => $query->where('region', $request->get('region')))
+            ->when($request->has('currency'), fn ($query) => $query->where('currency_code', $request->get('currency')))
             ->when($request->has('is_eu_member'), fn ($query) => $query->where('is_eu_member', $request->boolean('is_eu_member')))
             ->when($request->has('requires_vat'), fn ($query) => $query->where('requires_vat', $request->boolean('requires_vat')))
             ->when($request->has('search'), fn ($query) => $query->where('name', 'like', '%'.$request->get('search').'%'))
@@ -36,7 +39,7 @@ final class CountryController extends Controller
                 $query->where('is_active', true)->orderBy('sort_order')->orderBy('name');
             },
             'regions' => function ($query) {
-                $query->where('is_active', true)->orderBy('sort_order')->orderBy('name');
+                $query->where('is_enabled', true)->orderBy('sort_order')->orderBy('name');
             },
             'addresses' => function ($query) {
                 $query->latest()->limit(10);

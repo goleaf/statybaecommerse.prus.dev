@@ -460,7 +460,7 @@ class AttributeTest extends TestCase
     public function test_attribute_popularity_score(): void
     {
         $attribute = Attribute::factory()->create();
-        $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
+        $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id, 'is_enabled' => true]);
         $product1 = Product::factory()->create();
         $product2 = Product::factory()->create();
 

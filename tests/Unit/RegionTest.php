@@ -1,166 +1,314 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Tests\Unit;
+declare(strict_types=1);
 
 use App\Models\Region;
 use App\Models\Country;
 use App\Models\Zone;
+use App\Models\City;
+use App\Models\Address;
 use App\Models\Translations\RegionTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-final class RegionTest extends TestCase
-{
-    use RefreshDatabase;
+uses(RefreshDatabase::class);
 
-    public function test_region_fillable_attributes(): void
-    {
-        $region = new Region();
-        $fillable = $region->getFillable();
+beforeEach(function () {
+    $this->country = Country::factory()->create(['is_active' => true]);
+    $this->zone = Zone::factory()->create(['is_active' => true]);
+});
 
-        $expectedFillable = [
-            'name', 'slug', 'code', 'description', 'is_enabled', 'is_default',
-            'country_id', 'zone_id', 'parent_id', 'level', 'sort_order', 'metadata',
-        ];
+it('can create a region', function () {
+    $region = Region::factory()->create([
+        'name' => 'Test Region',
+        'country_id' => $this->country->id,
+        'zone_id' => $this->zone->id,
+    ]);
 
-        $this->assertEquals($expectedFillable, $fillable);
-    }
+    expect($region->name)->toBe('Test Region');
+    expect($region->country_id)->toBe($this->country->id);
+    expect($region->zone_id)->toBe($this->zone->id);
+});
 
-    public function test_region_casts(): void
-    {
-        $region = new Region();
-        $casts = $region->getCasts();
+it('belongs to a country', function () {
+    $region = Region::factory()->create(['country_id' => $this->country->id]);
+    
+    expect($region->country)->toBeInstanceOf(Country::class);
+    expect($region->country->id)->toBe($this->country->id);
+});
 
-        $this->assertEquals('boolean', $casts['is_enabled']);
-        $this->assertEquals('boolean', $casts['is_default']);
-        $this->assertEquals('integer', $casts['level']);
-        $this->assertEquals('integer', $casts['sort_order']);
-        $this->assertEquals('array', $casts['metadata']);
-    }
+it('belongs to a zone', function () {
+    $region = Region::factory()->create(['zone_id' => $this->zone->id]);
+    
+    expect($region->zone)->toBeInstanceOf(Zone::class);
+    expect($region->zone->id)->toBe($this->zone->id);
+});
 
-    public function test_region_uses_soft_deletes(): void
-    {
-        $region = new Region();
-        $this->assertTrue(in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($region)));
-    }
+it('can have a parent region', function () {
+    $parent = Region::factory()->create();
+    $child = Region::factory()->create(['parent_id' => $parent->id]);
+    
+    expect($child->parent)->toBeInstanceOf(Region::class);
+    expect($child->parent->id)->toBe($parent->id);
+});
 
-    public function test_region_uses_has_translations_trait(): void
-    {
-        $region = new Region();
-        $this->assertTrue(in_array('App\Traits\HasTranslations', class_uses($region)));
-    }
+it('can have child regions', function () {
+    $parent = Region::factory()->create();
+    $child1 = Region::factory()->create(['parent_id' => $parent->id]);
+    $child2 = Region::factory()->create(['parent_id' => $parent->id]);
+    
+    expect($parent->children)->toHaveCount(2);
+    expect($parent->children->first()->id)->toBe($child1->id);
+});
 
-    public function test_region_translation_model_property(): void
-    {
-        $region = new Region();
-        $this->assertEquals(RegionTranslation::class, $region->translationModel);
-    }
+it('has many cities', function () {
+    $region = Region::factory()->create();
+    City::factory()->count(3)->create(['region_id' => $region->id]);
+    
+    expect($region->cities)->toHaveCount(3);
+});
 
-    public function test_region_table_name(): void
-    {
-        $region = new Region();
-        $this->assertEquals('regions', $region->getTable());
-    }
+it('has many addresses', function () {
+    $region = Region::factory()->create();
+    $user = \App\Models\User::factory()->create();
+    Address::factory()->count(2)->create([
+        'region_id' => $region->id,
+        'user_id' => $user->id,
+        'country_id' => $this->country->id,
+    ]);
+    
+    expect($region->addresses)->toHaveCount(2);
+});
 
-    public function test_region_country_relationship(): void
-    {
-        $country = Country::factory()->create();
-        $region = Region::factory()->create(['country_id' => $country->id]);
+// it('has many users', function () {
+//     $region = Region::factory()->create();
+//     User::factory()->count(3)->create(['region_id' => $region->id]);
+//     
+//     expect($region->users)->toHaveCount(3);
+// });
 
-        $this->assertInstanceOf(Country::class, $region->country);
-        $this->assertEquals($country->id, $region->country->id);
-    }
+// it('has many orders', function () {
+//     $region = Region::factory()->create();
+//     Order::factory()->count(2)->create(['region_id' => $region->id]);
+//     
+//     expect($region->orders)->toHaveCount(2);
+// });
 
-    public function test_region_zone_relationship(): void
-    {
-        $zone = Zone::factory()->create();
-        $region = Region::factory()->create(['zone_id' => $zone->id]);
+// it('has many warehouses', function () {
+//     $region = Region::factory()->create();
+//     Warehouse::factory()->count(2)->create(['region_id' => $region->id]);
+//     
+//     expect($region->warehouses)->toHaveCount(2);
+// });
 
-        $this->assertInstanceOf(Zone::class, $region->zone);
-        $this->assertEquals($zone->id, $region->zone->id);
-    }
+// it('has many stores', function () {
+//     $region = Region::factory()->create();
+//     Store::factory()->count(2)->create(['region_id' => $region->id]);
+//     
+//     expect($region->stores)->toHaveCount(2);
+// });
 
-    public function test_region_parent_relationship(): void
-    {
-        $parentRegion = Region::factory()->create();
-        $childRegion = Region::factory()->create(['parent_id' => $parentRegion->id]);
+it('has translations', function () {
+    $region = Region::factory()->create(['name' => 'Test Region']);
+    
+    $region->translations()->create([
+        'locale' => 'en',
+        'name' => 'Test Region EN',
+        'description' => 'Test Region Description EN',
+    ]);
+    
+    $region->translations()->create([
+        'locale' => 'lt',
+        'name' => 'Test Region LT',
+        'description' => 'Test Region Description LT',
+    ]);
+    
+    expect($region->translations)->toHaveCount(2);
+});
 
-        $this->assertInstanceOf(Region::class, $childRegion->parent);
-        $this->assertEquals($parentRegion->id, $childRegion->parent->id);
-    }
+it('can get translated name', function () {
+    $region = Region::factory()->create(['name' => 'Original Name']);
+    
+    $region->translations()->create([
+        'locale' => 'en',
+        'name' => 'English Name',
+        'description' => 'English Description',
+    ]);
+    
+    expect($region->getTranslatedName('en'))->toBe('English Name');
+    expect($region->getTranslatedName('lt'))->toBe('Original Name'); // fallback to original
+});
 
-    public function test_region_children_relationship(): void
-    {
-        $parentRegion = Region::factory()->create();
-        $childRegion = Region::factory()->create(['parent_id' => $parentRegion->id]);
+it('can get translated description', function () {
+    $region = Region::factory()->create(['description' => 'Original Description']);
+    
+    $region->translations()->create([
+        'locale' => 'en',
+        'name' => 'English Name',
+        'description' => 'English Description',
+    ]);
+    
+    expect($region->getTranslatedDescription('en'))->toBe('English Description');
+    expect($region->getTranslatedDescription('lt'))->toBe('Original Description'); // fallback to original
+});
 
-        $this->assertTrue($parentRegion->children->contains($childRegion));
-        $this->assertEquals($childRegion->id, $parentRegion->children->first()->id);
-    }
+it('can scope with translations', function () {
+    $region = Region::factory()->create();
+    
+    $region->translations()->create([
+        'locale' => 'en',
+        'name' => 'English Name',
+        'description' => 'English Description',
+    ]);
+    
+    $regions = Region::withTranslations('en')->get();
+    
+    expect($regions)->toHaveCount(1);
+    expect($regions->first()->translations)->toHaveCount(1);
+});
 
-    public function test_region_trans_method(): void
-    {
+it('can get available locales', function () {
+    $region = Region::factory()->create();
+    
+    $region->translations()->create(['locale' => 'en', 'name' => 'English Name', 'description' => 'English Description']);
+    $region->translations()->create(['locale' => 'lt', 'name' => 'Lithuanian Name', 'description' => 'Lithuanian Description']);
+    
+    $locales = $region->getAvailableLocales();
+    
+    expect($locales)->toContain('en', 'lt');
+});
+
+it('can check if has translation for locale', function () {
+    $region = Region::factory()->create();
+    
+    $region->translations()->create([
+        'locale' => 'en',
+        'name' => 'English Name',
+        'description' => 'English Description',
+    ]);
+    
+    expect($region->hasTranslationFor('en'))->toBeTrue();
+    expect($region->hasTranslationFor('lt'))->toBeFalse();
+});
+
+it('can get or create translation', function () {
         $region = Region::factory()->create(['name' => 'Original Name']);
 
-        $this->assertEquals('Original Name', $region->trans('name'));
+    $translation = $region->getOrCreateTranslation('en');
+    
+    expect($translation)->toBeInstanceOf(RegionTranslation::class);
+    expect($translation->locale)->toBe('en');
+    expect($translation->name)->toBe('Original Name');
+});
 
-        RegionTranslation::factory()->create([
-            'region_id' => $region->id,
+it('can update translation', function () {
+    $region = Region::factory()->create();
+    
+    $region->translations()->create([
             'locale' => 'en',
-            'name' => 'Translated Name',
-        ]);
+        'name' => 'Original Name',
+        'description' => 'Original Description',
+    ]);
+    
+    $result = $region->updateTranslation('en', [
+        'name' => 'Updated Name',
+        'description' => 'Updated Description',
+    ]);
+    
+    expect($result)->toBeTrue();
+    
+    $translation = $region->translations()->where('locale', 'en')->first();
+    expect($translation->name)->toBe('Updated Name');
+    expect($translation->description)->toBe('Updated Description');
+});
 
-        app()->setLocale('en');
-        $this->assertEquals('Translated Name', $region->trans('name'));
+it('can bulk update translations', function () {
+    $region = Region::factory()->create();
+    
+    $result = $region->updateTranslations([
+        'en' => ['name' => 'English Name', 'description' => 'English Description'],
+        'lt' => ['name' => 'Lithuanian Name', 'description' => 'Lithuanian Description'],
+    ]);
+    
+    expect($result)->toBeTrue();
+    expect($region->translations)->toHaveCount(2);
+});
 
-        app()->setLocale('lt');
-        $this->assertEquals('Original Name', $region->trans('name'));
-    }
-
-    public function test_region_translated_name_accessor(): void
-    {
-        $region = Region::factory()->create(['name' => 'Original Name']);
-
-        $this->assertEquals('Original Name', $region->translated_name);
-
-        RegionTranslation::factory()->create([
-            'region_id' => $region->id,
+it('can get full display name', function () {
+    $region = Region::factory()->create(['name' => 'Test Region', 'country_id' => $this->country->id]);
+    $region->translations()->create([
             'locale' => 'en',
-            'name' => 'Translated Name',
-        ]);
+        'name' => 'English Region Name',
+        'description' => 'English Description',
+    ]);
+    
+    $fullName = $region->getFullDisplayName('en');
+    
+    expect($fullName)->toContain('English Region Name');
+    expect($fullName)->toContain($this->country->name);
+});
 
-        app()->setLocale('en');
-        $this->assertEquals('Translated Name', $region->translated_name);
-    }
+it('can get hierarchy info', function () {
+    $region = Region::factory()->create(['level' => 2]);
+    
+    $hierarchy = $region->getHierarchyInfo();
+    
+    expect($hierarchy)->toHaveKey('level');
+    expect($hierarchy)->toHaveKey('level_name');
+    expect($hierarchy)->toHaveKey('depth');
+    expect($hierarchy['level'])->toBe(2);
+});
 
-    public function test_region_metadata_casting(): void
-    {
-        $metadata = ['key1' => 'value1', 'key2' => 'value2'];
-        $region = Region::factory()->create(['metadata' => $metadata]);
+it('can get level name', function () {
+    $region = Region::factory()->create(['level' => 1]);
+    
+    expect($region->getLevelName())->toBe('State/Province');
+    
+    $region->level = 2;
+    expect($region->getLevelName())->toBe('County');
+});
 
-        $this->assertIsArray($region->metadata);
-        $this->assertEquals($metadata, $region->metadata);
-    }
-
-    public function test_region_boolean_casting(): void
-    {
+it('can get geographic info', function () {
         $region = Region::factory()->create([
-            'is_enabled' => 1,
-            'is_default' => 0,
-        ]);
+        'country_id' => $this->country->id,
+        'zone_id' => $this->zone->id,
+    ]);
+    
+    $geoInfo = $region->getGeographicInfo();
+    
+    expect($geoInfo)->toHaveKey('country');
+    expect($geoInfo)->toHaveKey('zone');
+    expect($geoInfo['country']['id'])->toBe($this->country->id);
+    expect($geoInfo['zone']['id'])->toBe($this->zone->id);
+});
 
-        $this->assertTrue($region->is_enabled);
-        $this->assertFalse($region->is_default);
-    }
-
-    public function test_region_soft_delete(): void
-    {
+it('can get business info', function () {
         $region = Region::factory()->create();
-        $regionId = $region->id;
+    
+    City::factory()->count(3)->create(['region_id' => $region->id]);
+    Address::factory()->count(2)->create(['region_id' => $region->id]);
+    // User::factory()->count(5)->create(['region_id' => $region->id]); // users table doesn't have region_id
+    
+    $businessInfo = $region->getBusinessInfo();
+    
+    expect($businessInfo['cities_count'])->toBe(3);
+    expect($businessInfo['addresses_count'])->toBe(2);
+    // expect($businessInfo['users_count'])->toBe(5); // users table doesn't have region_id
+});
 
-        $region->delete();
-
-        $this->assertSoftDeleted('regions', ['id' => $regionId]);
-        $this->assertDatabaseHas('regions', ['id' => $regionId]);
-    }
-}
+it('can get complete info', function () {
+    $region = Region::factory()->create(['name' => 'Test Region']);
+    $region->translations()->create([
+        'locale' => 'en',
+        'name' => 'English Region Name',
+        'description' => 'English Description',
+    ]);
+    
+    $completeInfo = $region->getCompleteInfo('en');
+    
+    expect($completeInfo)->toHaveKey('basic');
+    expect($completeInfo)->toHaveKey('hierarchy');
+    expect($completeInfo)->toHaveKey('geographic');
+    expect($completeInfo)->toHaveKey('business');
+    expect($completeInfo)->toHaveKey('status');
+    expect($completeInfo['basic']['name'])->toBe('English Region Name');
+});

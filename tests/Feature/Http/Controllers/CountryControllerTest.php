@@ -26,8 +26,8 @@ final class CountryControllerTest extends TestCase
 
     public function test_countries_index_page_with_filters(): void
     {
-        Country::factory()->create(['region' => 'Europe', 'currency_code' => 'EUR']);
-        Country::factory()->create(['region' => 'Asia', 'currency_code' => 'USD']);
+        Country::factory()->create(['region' => 'Europe', 'currency_code' => 'EUR', 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['region' => 'Asia', 'currency_code' => 'USD', 'is_active' => true, 'is_enabled' => true]);
 
         $response = $this->get(route('countries.index', [
             'region' => 'Europe',
@@ -122,7 +122,7 @@ final class CountryControllerTest extends TestCase
         $country = Country::factory()->create(['is_active' => true, 'is_enabled' => true]);
         
         $city = \App\Models\City::factory()->create(['country_id' => $country->id, 'is_active' => true]);
-        $region = \App\Models\Region::factory()->create(['country_id' => $country->id, 'is_active' => true]);
+        $region = \App\Models\Region::factory()->create(['country_id' => $country->id, 'is_enabled' => true]);
 
         $response = $this->get(route('countries.show', $country));
 
@@ -188,9 +188,9 @@ final class CountryControllerTest extends TestCase
 
     public function test_countries_statistics_api_endpoint(): void
     {
-        Country::factory()->create(['is_active' => true, 'is_eu_member' => true, 'requires_vat' => true]);
+        Country::factory()->create(['is_active' => true, 'is_eu_member' => true, 'requires_vat' => true, 'vat_rate' => 21.0]);
         Country::factory()->create(['is_active' => false, 'is_eu_member' => false, 'requires_vat' => false]);
-        Country::factory()->create(['vat_rate' => 21.0, 'is_active' => false]);
+        Country::factory()->create(['vat_rate' => 21.0, 'is_active' => false, 'requires_vat' => false, 'is_eu_member' => false]);
 
         $response = $this->get(route('countries.api.statistics'));
 
@@ -213,7 +213,7 @@ final class CountryControllerTest extends TestCase
 
     public function test_countries_index_page_pagination(): void
     {
-        Country::factory()->count(30)->create();
+        Country::factory()->count(30)->create(['is_active' => true, 'is_enabled' => true]);
 
         $response = $this->get(route('countries.index'));
 
@@ -225,9 +225,9 @@ final class CountryControllerTest extends TestCase
 
     public function test_countries_index_page_sorts_by_sort_order(): void
     {
-        Country::factory()->create(['name' => 'Lithuania', 'sort_order' => 2]);
-        Country::factory()->create(['name' => 'Latvia', 'sort_order' => 1]);
-        Country::factory()->create(['name' => 'Estonia', 'sort_order' => 3]);
+        Country::factory()->create(['name' => 'Lithuania', 'sort_order' => 2, 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['name' => 'Latvia', 'sort_order' => 1, 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['name' => 'Estonia', 'sort_order' => 3, 'is_active' => true, 'is_enabled' => true]);
 
         $response = $this->get(route('countries.index'));
 
@@ -241,9 +241,9 @@ final class CountryControllerTest extends TestCase
 
     public function test_countries_index_page_sorts_by_name_when_sort_order_equal(): void
     {
-        Country::factory()->create(['name' => 'Lithuania', 'sort_order' => 1]);
-        Country::factory()->create(['name' => 'Latvia', 'sort_order' => 1]);
-        Country::factory()->create(['name' => 'Estonia', 'sort_order' => 1]);
+        Country::factory()->create(['name' => 'Lithuania', 'sort_order' => 1, 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['name' => 'Latvia', 'sort_order' => 1, 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['name' => 'Estonia', 'sort_order' => 1, 'is_active' => true, 'is_enabled' => true]);
 
         $response = $this->get(route('countries.index'));
 
@@ -277,7 +277,7 @@ final class CountryControllerTest extends TestCase
 
     public function test_country_show_page_with_addresses(): void
     {
-        $country = Country::factory()->create(['cca2' => 'LT']);
+        $country = Country::factory()->create(['cca2' => 'LT', 'is_active' => true, 'is_enabled' => true]);
         
         \App\Models\Address::factory()->count(3)->create(['country_code' => 'LT']);
 
