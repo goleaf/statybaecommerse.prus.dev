@@ -344,8 +344,11 @@ final class AddressTest extends TestCase
             'floor' => '3rd Floor',
             'building' => 'Building A',
             'landmark' => 'Near the shopping center',
-            'instructions' => 'Ring the doorbell twice',
         ]);
+        
+        // Check that instructions are stored as translatable JSON
+        $address = Address::where('user_id', $user->id)->first();
+        $this->assertEquals('Ring the doorbell twice', $address->instructions);
     }
 
     public function test_address_with_contact_information(): void

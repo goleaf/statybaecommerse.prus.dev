@@ -16,9 +16,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 final class AddressController extends Controller
 {
+    use AuthorizesRequests;
     public function index(): View
     {
         $user = Auth::user();
