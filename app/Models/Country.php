@@ -237,4 +237,137 @@ final class Country extends Model
 
         return null;
     }
+
+    // Enhanced translation methods
+    public function getTranslatedName(?string $locale = null): ?string
+    {
+        return $this->trans('name', $locale) ?: $this->name;
+    }
+
+    public function getTranslatedOfficialName(?string $locale = null): ?string
+    {
+        return $this->trans('name_official', $locale) ?: $this->name_official;
+    }
+
+    public function getTranslatedDescription(?string $locale = null): ?string
+    {
+        return $this->trans('description', $locale) ?: $this->description;
+    }
+
+    // Scope for translated countries
+    public function scopeWithTranslations($query, ?string $locale = null)
+    {
+        $locale = $locale ?: app()->getLocale();
+
+        return $query->with(['translations' => function ($q) use ($locale) {
+            $q->where('locale', $locale);
+        }]);
+    }
+
+    // Get all available locales for this country
+    public function getAvailableLocales(): array
+    {
+        return $this->translations()->pluck('locale')->toArray();
+    }
+
+    // Check if country has translation for specific locale
+    public function hasTranslationFor(string $locale): bool
+    {
+        return $this->translations()->where('locale', $locale)->exists();
+    }
+
+    // Get or create translation for locale
+    public function getOrCreateTranslation(string $locale): CountryTranslation
+    {
+        return $this->translations()->firstOrCreate(
+            ['locale' => $locale],
+            [
+                'name' => $this->name,
+                'name_official' => $this->name_official,
+                'description' => $this->description,
+            ]
+        );
+    }
+
+    // Update translation for specific locale
+    public function updateTranslation(string $locale, array $data): bool
+    {
+        $translation = $this->translations()->where('locale', $locale)->first();
+        
+        if ($translation) {
+            return $translation->update($data);
+        }
+        
+        return $this->translations()->create(array_merge(['locale' => $locale], $data)) !== null;
+    }
+
+    // Bulk update translations
+    public function updateTranslations(array $translations): bool
+    {
+        foreach ($translations as $locale => $data) {
+            $this->updateTranslation($locale, $data);
+        }
+        
+        return true;
+    }
+
+    // Additional helper methods
+    public function getFullDisplayName(?string $locale = null): string
+    {
+        $name = $this->getTranslatedName($locale);
+        return $this->phone_calling_code ? "{$name} (+{$this->phone_calling_code})" : $name;
+    }
+
+    public function getCoordinatesAttribute(): array
+    {
+        return [
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+        ];
+    }
+
+    public function getFormattedCurrencyInfo(): array
+    {
+        return [
+            'code' => $this->currency_code,
+            'symbol' => $this->currency_symbol,
+            'currencies' => $this->currencies,
+        ];
+    }
+
+    public function getFormattedLanguageInfo(): array
+    {
+        return [
+            'languages' => $this->languages,
+            'timezones' => $this->timezones,
+        ];
+    }
+
+    public function getFormattedVatInfo(): array
+    {
+        return [
+            'requires_vat' => $this->requires_vat,
+            'vat_rate' => $this->vat_rate,
+            'formatted_rate' => $this->getFormattedVatRate(),
+        ];
+    }
+
+    public function getEconomicInfo(): array
+    {
+        return [
+            'currency' => $this->getFormattedCurrencyInfo(),
+            'vat' => $this->getFormattedVatInfo(),
+            'eu_member' => $this->is_eu_member,
+        ];
+    }
+
+    public function getGeographicInfo(): array
+    {
+        return [
+            'region' => $this->region,
+            'subregion' => $this->subregion,
+            'coordinates' => $this->getCoordinatesAttribute(),
+            'timezone' => $this->timezone,
+        ];
+    }
 }

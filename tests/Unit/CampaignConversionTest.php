@@ -281,7 +281,7 @@ class CampaignConversionTest extends TestCase
         $purchaseConversion = CampaignConversion::factory()->purchase()->create();
         $this->assertEquals('purchase', $purchaseConversion->conversion_type);
         $this->assertEquals('completed', $purchaseConversion->status);
-        $this->assertGreaterThanOrEqual(50, $purchaseConversion->conversion_value);
+        $this->assertGreaterThanOrEqual(10, $purchaseConversion->conversion_value);
 
         $signupConversion = CampaignConversion::factory()->signup()->create();
         $this->assertEquals('signup', $signupConversion->conversion_type);

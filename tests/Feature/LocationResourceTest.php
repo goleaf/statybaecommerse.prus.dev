@@ -1,295 +1,388 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\Country;
 use App\Models\Location;
 use App\Models\User;
-use App\Models\Country;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use App\Filament\Resources\LocationResource;
-use App\Filament\Resources\LocationResource\Pages\ListLocations;
-use App\Filament\Resources\LocationResource\Pages\CreateLocation;
-use App\Filament\Resources\LocationResource\Pages\ViewLocation;
-use App\Filament\Resources\LocationResource\Pages\EditLocation;
+use Tests\TestCase;
 
-beforeEach(function () {
-    $this->adminUser = User::factory()->create(['is_admin' => true]);
-});
+final class LocationResourceTest extends TestCase
+{
+    use RefreshDatabase;
 
-it('can list locations in admin panel', function () {
-    $location = Location::factory()->create();
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(ListLocations::class)
-        ->assertCanSeeTableRecords([$location]);
-});
-
-it('can create a new location', function () {
-    $locationData = [
-        'code' => 'LOC001',
-        'name' => 'Test Location',
-        'address_line_1' => '123 Test Street',
-        'city' => 'Test City',
-        'state' => 'Test State',
-        'postal_code' => '12345',
-        'country_code' => 'LT',
-        'phone' => '+1234567890',
-        'email' => 'test@location.com',
-        'is_enabled' => true,
-    ];
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(CreateLocation::class)
-        ->fillForm($locationData)
-        ->call('create')
-        ->assertHasNoFormErrors();
+    protected function setUp(): void
+    {
+        parent::setUp();
         
-    $this->assertDatabaseHas('locations', [
-        'code' => 'LOC001',
-        'address_line_1' => '123 Test Street',
-        'city' => 'Test City',
-        'state' => 'Test State',
-        'postal_code' => '12345',
-        'country_code' => 'LT',
-        'phone' => '+1234567890',
-        'email' => 'test@location.com',
-        'is_enabled' => true,
-    ]);
-});
+        $this->actingAs(User::factory()->create());
+    }
 
-it('can view a location', function () {
-    $location = Location::factory()->create();
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(ViewLocation::class, ['record' => $location->id])
-        ->assertOk();
-});
+    public function test_locations_index_page_loads(): void
+    {
+        Location::factory()->count(3)->create();
 
-it('can edit a location', function () {
-    $location = Location::factory()->create();
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(EditLocation::class, ['record' => $location->id])
-        ->fillForm([
-            'address_line_1' => '456 Updated Street',
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors();
-        
-    $this->assertDatabaseHas('locations', [
-        'id' => $location->id,
-        'address_line_1' => '456 Updated Street',
-    ]);
-});
+        $response = $this->get('/admin/locations');
 
-it('can delete a location', function () {
-    $location = Location::factory()->create();
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(ListLocations::class)
-        ->callTableAction('delete', $location)
-        ->assertHasNoTableActionErrors();
-    
-    $this->assertSoftDeleted('locations', [
-        'id' => $location->id,
-    ]);
-});
+        $response->assertStatus(200);
+    }
 
-it('validates required fields when creating location', function () {
-    Livewire::actingAs($this->adminUser)
-        ->test(CreateLocation::class)
-        ->fillForm([
-            'code' => null,
-            'name' => null,
-        ])
-        ->call('create')
-        ->assertHasFormErrors(['code', 'name']);
-});
+    public function test_locations_create_page_loads(): void
+    {
+        $response = $this->get('/admin/locations/create');
 
-it('validates unique location code', function () {
-    $existingLocation = Location::factory()->create(['code' => 'UNIQUE']);
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(CreateLocation::class)
-        ->fillForm([
-            'code' => 'UNIQUE',
-            'name' => 'Another Location',
-        ])
-        ->call('create')
-        ->assertHasFormErrors(['code']);
-});
+        $response->assertStatus(200);
+    }
 
-it('validates email format', function () {
-    Livewire::actingAs($this->adminUser)
-        ->test(CreateLocation::class)
-        ->fillForm([
-            'code' => 'LOC001',
-            'name' => 'Test Location',
+    public function test_locations_can_be_created(): void
+    {
+        $country = Country::factory()->create(['cca2' => 'LT']);
+
+        $locationData = [
+            'code' => 'WH001',
+            'name' => 'Test Warehouse',
+            'type' => 'warehouse',
+            'address_line_1' => '123 Test Street',
+            'city' => 'Vilnius',
+            'country_code' => 'LT',
+            'phone' => '+37012345678',
+            'email' => 'test@example.com',
+            'is_enabled' => true,
+            'is_default' => false,
+            'sort_order' => 1,
+        ];
+
+        $response = $this->post('/admin/locations', $locationData);
+
+        $this->assertDatabaseHas('locations', [
+            'code' => 'WH001',
+            'name' => 'Test Warehouse',
+            'type' => 'warehouse',
+            'is_enabled' => true,
+        ]);
+
+        $response->assertRedirect();
+    }
+
+    public function test_locations_edit_page_loads(): void
+    {
+        $location = Location::factory()->create();
+
+        $response = $this->get("/admin/locations/{$location->id}/edit");
+
+        $response->assertStatus(200);
+    }
+
+    public function test_locations_can_be_updated(): void
+    {
+        $location = Location::factory()->create(['name' => 'Old Name']);
+
+        $updateData = [
+            'name' => 'Updated Name',
+            'type' => 'store',
+            'is_enabled' => false,
+        ];
+
+        $response = $this->put("/admin/locations/{$location->id}", $updateData);
+
+        $this->assertDatabaseHas('locations', [
+            'id' => $location->id,
+            'name' => 'Updated Name',
+            'type' => 'store',
+            'is_enabled' => false,
+        ]);
+
+        $response->assertRedirect();
+    }
+
+    public function test_locations_can_be_deleted(): void
+    {
+        $location = Location::factory()->create();
+
+        $response = $this->delete("/admin/locations/{$location->id}");
+
+        $this->assertSoftDeleted('locations', ['id' => $location->id]);
+        $response->assertRedirect();
+    }
+
+    public function test_locations_view_page_loads(): void
+    {
+        $location = Location::factory()->create();
+
+        $response = $this->get("/admin/locations/{$location->id}");
+
+        $response->assertStatus(200);
+    }
+
+    public function test_locations_require_unique_code(): void
+    {
+        Location::factory()->create(['code' => 'WH001']);
+
+        $locationData = [
+            'code' => 'WH001', // Duplicate code
+            'name' => 'Test Warehouse',
+            'type' => 'warehouse',
+        ];
+
+        $response = $this->post('/admin/locations', $locationData);
+
+        $response->assertSessionHasErrors(['code']);
+    }
+
+    public function test_locations_require_name(): void
+    {
+        $locationData = [
+            'code' => 'WH001',
+            'name' => '', // Empty name
+            'type' => 'warehouse',
+        ];
+
+        $response = $this->post('/admin/locations', $locationData);
+
+        $response->assertSessionHasErrors(['name']);
+    }
+
+    public function test_locations_require_type(): void
+    {
+        $locationData = [
+            'code' => 'WH001',
+            'name' => 'Test Warehouse',
+            'type' => '', // Empty type
+        ];
+
+        $response = $this->post('/admin/locations', $locationData);
+
+        $response->assertSessionHasErrors(['type']);
+    }
+
+    public function test_locations_accept_valid_email(): void
+    {
+        $locationData = [
+            'code' => 'WH001',
+            'name' => 'Test Warehouse',
+            'type' => 'warehouse',
+            'email' => 'test@example.com',
+        ];
+
+        $response = $this->post('/admin/locations', $locationData);
+
+        $this->assertDatabaseHas('locations', [
+            'code' => 'WH001',
+            'email' => 'test@example.com',
+        ]);
+
+        $response->assertRedirect();
+    }
+
+    public function test_locations_reject_invalid_email(): void
+    {
+        $locationData = [
+            'code' => 'WH001',
+            'name' => 'Test Warehouse',
+            'type' => 'warehouse',
             'email' => 'invalid-email',
-        ])
-        ->call('create')
-        ->assertHasFormErrors(['email']);
-});
+        ];
 
-it('can filter locations by country code', function () {
-    $location1 = Location::factory()->create(['country_code' => 'LT']);
-    $location2 = Location::factory()->create(['country_code' => 'LV']);
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(ListLocations::class)
-        ->searchTable('LT')
-        ->assertCanSeeTableRecords([$location1])
-        ->assertCanNotSeeTableRecords([$location2]);
-});
+        $response = $this->post('/admin/locations', $locationData);
 
-it('can filter locations by enabled status', function () {
-    $enabledLocation = Location::factory()->create(['is_enabled' => true]);
-    $disabledLocation = Location::factory()->create(['is_enabled' => false]);
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(ListLocations::class)
-        ->filterTable('is_enabled', true)
-        ->assertCanSeeTableRecords([$enabledLocation])
-        ->assertCanNotSeeTableRecords([$disabledLocation]);
-});
+        $response->assertSessionHasErrors(['email']);
+    }
 
-it('shows correct location data in table', function () {
-    $location = Location::factory()->create([
-        'code' => 'LOC001',
-        'city' => 'Vilnius',
-        'state' => 'Vilnius County',
-        'country_code' => 'LT',
-        'is_enabled' => true,
-    ]);
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(ListLocations::class)
-        ->assertCanSeeTableRecords([$location])
-        ->assertCanRenderTableColumn('code')
-        ->assertCanRenderTableColumn('name')
-        ->assertCanRenderTableColumn('city')
-        ->assertCanRenderTableColumn('state')
-        ->assertCanRenderTableColumn('country_code')
-        ->assertCanRenderTableColumn('is_enabled');
-});
+    public function test_locations_accept_valid_coordinates(): void
+    {
+        $locationData = [
+            'code' => 'WH001',
+            'name' => 'Test Warehouse',
+            'type' => 'warehouse',
+            'latitude' => 54.6872,
+            'longitude' => 25.2797,
+        ];
 
-it('handles location activation and deactivation', function () {
-    $location = Location::factory()->create(['is_enabled' => false]);
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(EditLocation::class, ['record' => $location->id])
-        ->fillForm(['is_enabled' => true])
-        ->call('save')
-        ->assertHasNoFormErrors();
-        
-    expect($location->fresh()->is_enabled)->toBeTrue();
-});
+        $response = $this->post('/admin/locations', $locationData);
 
-it('can search locations by name', function () {
-    $location1 = Location::factory()->create(['name' => 'Vilnius Warehouse']);
-    $location2 = Location::factory()->create(['name' => 'Kaunas Store']);
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(ListLocations::class)
-        ->searchTable('Vilnius')
-        ->assertCanSeeTableRecords([$location1])
-        ->assertCanNotSeeTableRecords([$location2]);
-});
+        $this->assertDatabaseHas('locations', [
+            'code' => 'WH001',
+            'latitude' => 54.6872,
+            'longitude' => 25.2797,
+        ]);
 
-it('can search locations by code', function () {
-    $location1 = Location::factory()->create(['code' => 'VIL001']);
-    $location2 = Location::factory()->create(['code' => 'KAU001']);
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(ListLocations::class)
-        ->searchTable('VIL')
-        ->assertCanSeeTableRecords([$location1])
-        ->assertCanNotSeeTableRecords([$location2]);
-});
+        $response->assertRedirect();
+    }
 
-it('can search locations by city', function () {
-    $location1 = Location::factory()->create(['city' => 'Vilnius']);
-    $location2 = Location::factory()->create(['city' => 'Kaunas']);
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(ListLocations::class)
-        ->searchTable('Vilnius')
-        ->assertCanSeeTableRecords([$location1])
-        ->assertCanNotSeeTableRecords([$location2]);
-});
+    public function test_locations_reject_invalid_latitude(): void
+    {
+        $locationData = [
+            'code' => 'WH001',
+            'name' => 'Test Warehouse',
+            'type' => 'warehouse',
+            'latitude' => 91.0, // Invalid latitude (> 90)
+        ];
 
-it('handles bulk actions on locations', function () {
-    $location1 = Location::factory()->create();
-    $location2 = Location::factory()->create();
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(ListLocations::class)
-        ->callTableBulkAction('delete', [$location1->id, $location2->id])
-        ->assertOk();
-    
-    $this->assertSoftDeleted('locations', [
-        'id' => $location1->id,
-    ]);
-    
-    $this->assertSoftDeleted('locations', [
-        'id' => $location2->id,
-    ]);
-});
+        $response = $this->post('/admin/locations', $locationData);
 
-it('can create location with minimal required fields', function () {
-    Livewire::actingAs($this->adminUser)
-        ->test(CreateLocation::class)
-        ->fillForm([
-            'code' => 'MIN001',
-            'name' => 'Minimal Location',
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors();
-        
-    $this->assertDatabaseHas('locations', [
-        'code' => 'MIN001',
-    ]);
-});
+        $response->assertSessionHasErrors(['latitude']);
+    }
 
-it('can set phone number', function () {
-    $location = Location::factory()->create();
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(EditLocation::class, ['record' => $location->id])
-        ->fillForm(['phone' => '+37060012345'])
-        ->call('save')
-        ->assertHasNoFormErrors();
-        
-    $this->assertDatabaseHas('locations', [
-        'id' => $location->id,
-        'phone' => '+37060012345',
-    ]);
-});
+    public function test_locations_reject_invalid_longitude(): void
+    {
+        $locationData = [
+            'code' => 'WH001',
+            'name' => 'Test Warehouse',
+            'type' => 'warehouse',
+            'longitude' => 181.0, // Invalid longitude (> 180)
+        ];
 
-it('can set postal code', function () {
-    $location = Location::factory()->create();
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(EditLocation::class, ['record' => $location->id])
-        ->fillForm(['postal_code' => 'LT-01101'])
-        ->call('save')
-        ->assertHasNoFormErrors();
-        
-    $this->assertDatabaseHas('locations', [
-        'id' => $location->id,
-        'postal_code' => 'LT-01101',
-    ]);
-});
+        $response = $this->post('/admin/locations', $locationData);
 
-it('can set country code for location', function () {
-    $location = Location::factory()->create();
-    
-    Livewire::actingAs($this->adminUser)
-        ->test(EditLocation::class, ['record' => $location->id])
-        ->fillForm(['country_code' => 'LT'])
-        ->call('save')
-        ->assertHasNoFormErrors();
-        
-    $this->assertDatabaseHas('locations', [
-        'id' => $location->id,
-        'country_code' => 'LT',
-    ]);
-});
+        $response->assertSessionHasErrors(['longitude']);
+    }
+
+    public function test_locations_can_have_opening_hours(): void
+    {
+        $openingHours = [
+            ['day' => 'monday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+            ['day' => 'tuesday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+            ['day' => 'sunday', 'open_time' => null, 'close_time' => null, 'is_closed' => true],
+        ];
+
+        $locationData = [
+            'code' => 'WH001',
+            'name' => 'Test Warehouse',
+            'type' => 'warehouse',
+            'opening_hours' => $openingHours,
+        ];
+
+        $response = $this->post('/admin/locations', $locationData);
+
+        $location = Location::where('code', 'WH001')->first();
+        $this->assertEquals($openingHours, $location->opening_hours);
+
+        $response->assertRedirect();
+    }
+
+    public function test_locations_can_have_contact_info(): void
+    {
+        $contactInfo = [
+            'manager' => 'John Doe',
+            'department' => 'Warehouse',
+            'emergency_contact' => '+37012345678',
+        ];
+
+        $locationData = [
+            'code' => 'WH001',
+            'name' => 'Test Warehouse',
+            'type' => 'warehouse',
+            'contact_info' => $contactInfo,
+        ];
+
+        $response = $this->post('/admin/locations', $locationData);
+
+        $location = Location::where('code', 'WH001')->first();
+        $this->assertEquals($contactInfo, $location->contact_info);
+
+        $response->assertRedirect();
+    }
+
+    public function test_locations_can_be_filtered_by_type(): void
+    {
+        Location::factory()->create(['type' => 'warehouse', 'name' => 'Warehouse 1']);
+        Location::factory()->create(['type' => 'store', 'name' => 'Store 1']);
+
+        $response = $this->get('/admin/locations?type=warehouse');
+
+        $response->assertStatus(200);
+        $response->assertSee('Warehouse 1');
+        $response->assertDontSee('Store 1');
+    }
+
+    public function test_locations_can_be_filtered_by_country(): void
+    {
+        $country = Country::factory()->create(['cca2' => 'LT', 'name' => 'Lithuania']);
+        Location::factory()->create(['country_code' => 'LT', 'name' => 'Lithuania Location']);
+        Location::factory()->create(['country_code' => 'US', 'name' => 'US Location']);
+
+        $response = $this->get('/admin/locations?country_code=LT');
+
+        $response->assertStatus(200);
+        $response->assertSee('Lithuania Location');
+        $response->assertDontSee('US Location');
+    }
+
+    public function test_locations_can_be_filtered_by_enabled_status(): void
+    {
+        Location::factory()->create(['is_enabled' => true, 'name' => 'Enabled Location']);
+        Location::factory()->create(['is_enabled' => false, 'name' => 'Disabled Location']);
+
+        $response = $this->get('/admin/locations?is_enabled=1');
+
+        $response->assertStatus(200);
+        $response->assertSee('Enabled Location');
+        $response->assertDontSee('Disabled Location');
+    }
+
+    public function test_locations_can_be_searched(): void
+    {
+        Location::factory()->create(['name' => 'Main Warehouse']);
+        Location::factory()->create(['name' => 'Secondary Store']);
+
+        $response = $this->get('/admin/locations?search=Main');
+
+        $response->assertStatus(200);
+        $response->assertSee('Main Warehouse');
+        $response->assertDontSee('Secondary Store');
+    }
+
+    public function test_locations_can_be_bulk_enabled(): void
+    {
+        $location1 = Location::factory()->create(['is_enabled' => false]);
+        $location2 = Location::factory()->create(['is_enabled' => false]);
+
+        $response = $this->post('/admin/locations/bulk-actions', [
+            'action' => 'enable',
+            'records' => [$location1->id, $location2->id],
+        ]);
+
+        $this->assertDatabaseHas('locations', ['id' => $location1->id, 'is_enabled' => true]);
+        $this->assertDatabaseHas('locations', ['id' => $location2->id, 'is_enabled' => true]);
+
+        $response->assertRedirect();
+    }
+
+    public function test_locations_can_be_bulk_disabled(): void
+    {
+        $location1 = Location::factory()->create(['is_enabled' => true]);
+        $location2 = Location::factory()->create(['is_enabled' => true]);
+
+        $response = $this->post('/admin/locations/bulk-actions', [
+            'action' => 'disable',
+            'records' => [$location1->id, $location2->id],
+        ]);
+
+        $this->assertDatabaseHas('locations', ['id' => $location1->id, 'is_enabled' => false]);
+        $this->assertDatabaseHas('locations', ['id' => $location2->id, 'is_enabled' => false]);
+
+        $response->assertRedirect();
+    }
+
+    public function test_locations_can_be_reordered(): void
+    {
+        $location1 = Location::factory()->create(['sort_order' => 1]);
+        $location2 = Location::factory()->create(['sort_order' => 2]);
+
+        $response = $this->post('/admin/locations/reorder', [
+            'items' => [
+                ['id' => $location2->id, 'sort_order' => 1],
+                ['id' => $location1->id, 'sort_order' => 2],
+            ],
+        ]);
+
+        $this->assertDatabaseHas('locations', ['id' => $location2->id, 'sort_order' => 1]);
+        $this->assertDatabaseHas('locations', ['id' => $location1->id, 'sort_order' => 2]);
+
+        $response->assertRedirect();
+    }
+}

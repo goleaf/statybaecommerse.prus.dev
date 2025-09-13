@@ -1,0 +1,309 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature\Http\Controllers;
+
+use App\Models\Country;
+use App\Models\Translations\CountryTranslation;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class CountryControllerTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_countries_index_page_loads_successfully(): void
+    {
+        Country::factory()->count(5)->create();
+
+        $response = $this->get(route('countries.index'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('countries.index');
+        $response->assertViewHas(['countries', 'regions', 'currencies']);
+    }
+
+    public function test_countries_index_page_with_filters(): void
+    {
+        Country::factory()->create(['region' => 'Europe', 'currency_code' => 'EUR']);
+        Country::factory()->create(['region' => 'Asia', 'currency_code' => 'USD']);
+
+        $response = $this->get(route('countries.index', [
+            'region' => 'Europe',
+            'currency' => 'EUR',
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('countries.index');
+        
+        $countries = $response->viewData('countries');
+        $this->assertEquals(1, $countries->count());
+        $this->assertEquals('Europe', $countries->first()->region);
+        $this->assertEquals('EUR', $countries->first()->currency_code);
+    }
+
+    public function test_countries_index_page_with_search(): void
+    {
+        Country::factory()->create(['name' => 'Lithuania', 'cca2' => 'LT', 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['name' => 'Latvia', 'cca2' => 'LV', 'is_active' => true, 'is_enabled' => true]);
+
+        $response = $this->get(route('countries.index', ['search' => 'Lithuania']));
+
+        $response->assertStatus(200);
+        
+        $countries = $response->viewData('countries');
+        $this->assertEquals(1, $countries->count());
+        $this->assertEquals('Lithuania', $countries->first()->name);
+    }
+
+    public function test_countries_index_page_with_eu_member_filter(): void
+    {
+        Country::factory()->create(['is_eu_member' => true, 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['is_eu_member' => false, 'is_active' => true, 'is_enabled' => true]);
+
+        $response = $this->get(route('countries.index', ['is_eu_member' => '1']));
+
+        $response->assertStatus(200);
+        
+        $countries = $response->viewData('countries');
+        $this->assertEquals(1, $countries->count());
+        $this->assertTrue($countries->first()->is_eu_member);
+    }
+
+    public function test_countries_index_page_with_vat_filter(): void
+    {
+        Country::factory()->create(['requires_vat' => true, 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['requires_vat' => false, 'is_active' => true, 'is_enabled' => true]);
+
+        $response = $this->get(route('countries.index', ['requires_vat' => '1']));
+
+        $response->assertStatus(200);
+        
+        $countries = $response->viewData('countries');
+        $this->assertEquals(1, $countries->count());
+        $this->assertTrue($countries->first()->requires_vat);
+    }
+
+    public function test_country_show_page_loads_successfully(): void
+    {
+        $country = Country::factory()->create([
+            'name' => 'Lithuania',
+            'cca2' => 'LT',
+            'region' => 'Europe',
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+
+        $response = $this->get(route('countries.show', $country));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('countries.show');
+        $response->assertViewHas(['country', 'relatedCountries']);
+    }
+
+    public function test_country_show_page_with_related_countries(): void
+    {
+        $country = Country::factory()->create(['region' => 'Europe', 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['region' => 'Europe', 'name' => 'Latvia', 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['region' => 'Asia', 'name' => 'China', 'is_active' => true, 'is_enabled' => true]);
+
+        $response = $this->get(route('countries.show', $country));
+
+        $response->assertStatus(200);
+        
+        $relatedCountries = $response->viewData('relatedCountries');
+        $this->assertEquals(1, $relatedCountries->count());
+        $this->assertEquals('Latvia', $relatedCountries->first()->name);
+    }
+
+    public function test_country_show_page_with_cities_and_regions(): void
+    {
+        $country = Country::factory()->create(['is_active' => true, 'is_enabled' => true]);
+        
+        $city = \App\Models\City::factory()->create(['country_id' => $country->id, 'is_active' => true]);
+        $region = \App\Models\Region::factory()->create(['country_id' => $country->id, 'is_active' => true]);
+
+        $response = $this->get(route('countries.show', $country));
+
+        $response->assertStatus(200);
+        
+        $countryData = $response->viewData('country');
+        $this->assertTrue($countryData->relationLoaded('cities'));
+        $this->assertTrue($countryData->relationLoaded('regions'));
+        $this->assertEquals(1, $countryData->cities->count());
+        $this->assertEquals(1, $countryData->regions->count());
+    }
+
+    public function test_countries_api_endpoint(): void
+    {
+        Country::factory()->count(3)->create();
+
+        $response = $this->get(route('countries.api.search'));
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'countries' => [
+                '*' => [
+                    'id',
+                    'name',
+                    'cca2',
+                    'cca3',
+                    'region',
+                    'currency_code',
+                    'flag',
+                ],
+            ],
+            'total',
+        ]);
+    }
+
+    public function test_countries_api_endpoint_with_search(): void
+    {
+        Country::factory()->create(['name' => 'Lithuania']);
+        Country::factory()->create(['name' => 'Latvia']);
+
+        $response = $this->get(route('countries.api.search', ['search' => 'Lithuania']));
+
+        $response->assertStatus(200);
+        
+        $data = $response->json();
+        $this->assertEquals(1, $data['total']);
+        $this->assertEquals('Lithuania', $data['countries'][0]['name']);
+    }
+
+    public function test_countries_api_endpoint_with_region_filter(): void
+    {
+        Country::factory()->create(['region' => 'Europe']);
+        Country::factory()->create(['region' => 'Asia']);
+
+        $response = $this->get(route('countries.api.search', ['region' => 'Europe']));
+
+        $response->assertStatus(200);
+        
+        $data = $response->json();
+        $this->assertEquals(1, $data['total']);
+        $this->assertEquals('Europe', $data['countries'][0]['region']);
+    }
+
+    public function test_countries_statistics_api_endpoint(): void
+    {
+        Country::factory()->create(['is_active' => true, 'is_eu_member' => true, 'requires_vat' => true]);
+        Country::factory()->create(['is_active' => false, 'is_eu_member' => false, 'requires_vat' => false]);
+        Country::factory()->create(['vat_rate' => 21.0]);
+
+        $response = $this->get(route('countries.api.statistics'));
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'total_countries',
+            'active_countries',
+            'eu_members',
+            'countries_with_vat',
+            'average_vat_rate',
+        ]);
+
+        $data = $response->json();
+        $this->assertEquals(3, $data['total_countries']);
+        $this->assertEquals(1, $data['active_countries']);
+        $this->assertEquals(1, $data['eu_members']);
+        $this->assertEquals(1, $data['countries_with_vat']);
+        $this->assertEquals(21.0, $data['average_vat_rate']);
+    }
+
+    public function test_countries_index_page_pagination(): void
+    {
+        Country::factory()->count(30)->create();
+
+        $response = $this->get(route('countries.index'));
+
+        $response->assertStatus(200);
+        
+        $countries = $response->viewData('countries');
+        $this->assertEquals(24, $countries->count()); // Default pagination limit
+    }
+
+    public function test_countries_index_page_sorts_by_sort_order(): void
+    {
+        Country::factory()->create(['name' => 'Lithuania', 'sort_order' => 2]);
+        Country::factory()->create(['name' => 'Latvia', 'sort_order' => 1]);
+        Country::factory()->create(['name' => 'Estonia', 'sort_order' => 3]);
+
+        $response = $this->get(route('countries.index'));
+
+        $response->assertStatus(200);
+        
+        $countries = $response->viewData('countries');
+        $this->assertEquals('Latvia', $countries->first()->name);
+        $this->assertEquals('Lithuania', $countries->skip(1)->first()->name);
+        $this->assertEquals('Estonia', $countries->skip(2)->first()->name);
+    }
+
+    public function test_countries_index_page_sorts_by_name_when_sort_order_equal(): void
+    {
+        Country::factory()->create(['name' => 'Lithuania', 'sort_order' => 1]);
+        Country::factory()->create(['name' => 'Latvia', 'sort_order' => 1]);
+        Country::factory()->create(['name' => 'Estonia', 'sort_order' => 1]);
+
+        $response = $this->get(route('countries.index'));
+
+        $response->assertStatus(200);
+        
+        $countries = $response->viewData('countries');
+        $this->assertEquals('Estonia', $countries->first()->name);
+        $this->assertEquals('Latvia', $countries->skip(1)->first()->name);
+        $this->assertEquals('Lithuania', $countries->skip(2)->first()->name);
+    }
+
+    public function test_country_show_page_with_translations(): void
+    {
+        $country = Country::factory()->create(['name' => 'Lithuania']);
+        
+        CountryTranslation::factory()->create([
+            'country_id' => $country->id,
+            'locale' => 'lt',
+            'name' => 'Lietuva',
+            'description' => 'Šalis Europoje',
+        ]);
+
+        $response = $this->get(route('countries.show', $country));
+
+        $response->assertStatus(200);
+        
+        $countryData = $response->viewData('country');
+        $this->assertTrue($countryData->relationLoaded('translations'));
+        $this->assertEquals(1, $countryData->translations->count());
+    }
+
+    public function test_country_show_page_with_addresses(): void
+    {
+        $country = Country::factory()->create(['cca2' => 'LT']);
+        
+        \App\Models\Address::factory()->count(3)->create(['country_code' => 'LT']);
+
+        $response = $this->get(route('countries.show', $country));
+
+        $response->assertStatus(200);
+        
+        $countryData = $response->viewData('country');
+        $this->assertTrue($countryData->relationLoaded('addresses'));
+        $this->assertEquals(3, $countryData->addresses->count());
+    }
+
+    public function test_countries_index_page_only_shows_active_and_enabled_countries(): void
+    {
+        Country::factory()->create(['is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['is_active' => false, 'is_enabled' => true]);
+        Country::factory()->create(['is_active' => true, 'is_enabled' => false]);
+        Country::factory()->create(['is_active' => false, 'is_enabled' => false]);
+
+        $response = $this->get(route('countries.index'));
+
+        $response->assertStatus(200);
+        
+        $countries = $response->viewData('countries');
+        $this->assertEquals(1, $countries->count());
+        $this->assertTrue($countries->first()->is_active);
+        $this->assertTrue($countries->first()->is_enabled);
+    }
+}

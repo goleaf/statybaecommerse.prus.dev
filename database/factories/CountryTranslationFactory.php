@@ -19,54 +19,24 @@ final class CountryTranslationFactory extends Factory
     {
         return [
             'country_id' => Country::factory(),
-            'locale' => fake()->randomElement(['en', 'lt', 'de', 'fr', 'es']),
-            'name' => fake()->country(),
-            'name_official' => fake()->country() . ' Republic',
-            'description' => fake()->paragraph(),
+            'locale' => $this->faker->randomElement(['en', 'lt', 'de', 'fr', 'es', 'it']),
+            'name' => $this->faker->country(),
+            'name_official' => $this->faker->optional(0.7)->country(),
+            'description' => $this->faker->optional(0.6)->paragraph(),
         ];
-    }
-
-    public function lithuanian(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'locale' => 'lt',
-            'name' => fake()->randomElement([
-                'Lietuva',
-                'Latvija', 
-                'Estija',
-                'Lenkija',
-                'Vokietija',
-                'Prancūzija',
-                'Italija',
-                'Ispanija',
-            ]),
-            'name_official' => fake()->randomElement([
-                'Lietuvos Respublika',
-                'Latvijos Respublika',
-                'Estijos Respublika',
-                'Lenkijos Respublika',
-                'Vokietijos Federacinė Respublika',
-                'Prancūzijos Respublika',
-                'Italijos Respublika',
-                'Ispanijos Karalystė',
-            ]),
-            'description' => fake()->randomElement([
-                'Šiaurės Europos šalis',
-                'Rytų Europos šalis',
-                'Vakarų Europos šalis',
-                'Pietų Europos šalis',
-                'Centrinės Europos šalis',
-            ]),
-        ]);
     }
 
     public function english(): static
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'en',
-            'name' => fake()->country(),
-            'name_official' => fake()->country() . ' Republic',
-            'description' => fake()->paragraph(),
+        ]);
+    }
+
+    public function lithuanian(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'locale' => 'lt',
         ]);
     }
 
@@ -74,33 +44,27 @@ final class CountryTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'de',
-            'name' => fake()->randomElement([
-                'Deutschland',
-                'Frankreich',
-                'Italien',
-                'Spanien',
-                'Polen',
-                'Niederlande',
-                'Belgien',
-                'Österreich',
-            ]),
-            'name_official' => fake()->randomElement([
-                'Bundesrepublik Deutschland',
-                'Französische Republik',
-                'Italienische Republik',
-                'Königreich Spanien',
-                'Republik Polen',
-                'Königreich der Niederlande',
-                'Königreich Belgien',
-                'Republik Österreich',
-            ]),
-            'description' => fake()->randomElement([
-                'Ein Land in Westeuropa',
-                'Ein Land in Osteuropa',
-                'Ein Land in Südeuropa',
-                'Ein Land in Nordeuropa',
-                'Ein Land in Mitteleuropa',
-            ]),
+        ]);
+    }
+
+    public function french(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'locale' => 'fr',
+        ]);
+    }
+
+    public function spanish(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'locale' => 'es',
+        ]);
+    }
+
+    public function italian(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'locale' => 'it',
         ]);
     }
 }

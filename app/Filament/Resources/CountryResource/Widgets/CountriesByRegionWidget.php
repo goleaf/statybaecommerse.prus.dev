@@ -6,13 +6,20 @@ namespace App\Filament\Resources\CountryResource\Widgets;
 
 use App\Models\Country;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 final class CountriesByRegionWidget extends ChartWidget
 {
-    protected static ?string $heading = 'admin.countries.widgets.countries_by_region';
+    protected static ?string $heading = 'Countries by Region';
 
     protected static ?int $sort = 2;
+
+    protected int | string | array $columnSpan = 'full';
+
+    public function getDescription(): ?string
+    {
+        return 'Distribution of countries across different regions';
+    }
 
     protected function getData(): array
     {
@@ -25,7 +32,7 @@ final class CountriesByRegionWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('admin.countries.widgets.countries_count'),
+                    'label' => 'Countries',
                     'data' => $regions->pluck('count')->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', // Blue
@@ -35,9 +42,16 @@ final class CountriesByRegionWidget extends ChartWidget
                         '#8B5CF6', // Purple
                         '#06B6D4', // Cyan
                         '#84CC16', // Lime
-                        '#F97316', // Orange
                     ],
-                    'borderColor' => '#ffffff',
+                    'borderColor' => [
+                        '#1E40AF', // Dark Blue
+                        '#047857', // Dark Green
+                        '#D97706', // Dark Yellow
+                        '#DC2626', // Dark Red
+                        '#7C3AED', // Dark Purple
+                        '#0891B2', // Dark Cyan
+                        '#65A30D', // Dark Lime
+                    ],
                     'borderWidth' => 2,
                 ],
             ],
@@ -62,7 +76,11 @@ final class CountriesByRegionWidget extends ChartWidget
                 'tooltip' => [
                     'callbacks' => [
                         'label' => 'function(context) {
-                            return context.label + ": " + context.parsed + " " + "' . __('admin.countries.widgets.countries') . '";
+                            const label = context.label || "";
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return label + ": " + value + " (" + percentage + "%)";
                         }',
                     ],
                 ],

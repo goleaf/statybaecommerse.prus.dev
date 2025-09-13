@@ -52,6 +52,14 @@ Route::prefix('campaigns')->name('frontend.campaigns.')->group(function () {
         Route::get('/api/search', [App\Http\Controllers\Frontend\CountryController::class, 'getCountriesJson'])->name('api.search');
     });
 
+    // Country Routes for Testing
+    Route::prefix('countries')->name('countries.')->group(function () {
+        Route::get('/', [App\Http\Controllers\CountryController::class, 'index'])->name('index');
+        Route::get('/{country}', [App\Http\Controllers\CountryController::class, 'show'])->name('show');
+        Route::get('/api/search', [App\Http\Controllers\CountryController::class, 'api'])->name('api.search');
+        Route::get('/api/statistics', [App\Http\Controllers\CountryController::class, 'statistics'])->name('api.statistics');
+    });
+
     // Address Frontend Routes
     Route::middleware(['auth'])->prefix('addresses')->name('frontend.addresses.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\AddressController::class, 'index'])->name('index');
@@ -660,9 +668,20 @@ Route::get('/search', function () {
     return redirect('/'.app()->getLocale().'/search');
 })->name('search');
 // Legal pages
+Route::prefix('legal')->name('legal.')->group(function () {
+    Route::get('/', [App\Http\Controllers\LegalController::class, 'index'])->name('index');
+    Route::get('/search', [App\Http\Controllers\LegalController::class, 'search'])->name('search');
+    Route::get('/type/{type}', [App\Http\Controllers\LegalController::class, 'type'])->name('type');
+    Route::get('/{key}', [App\Http\Controllers\LegalController::class, 'show'])->name('show');
+    Route::get('/{key}/download/{format?}', [App\Http\Controllers\LegalController::class, 'download'])->name('download');
+    Route::get('/sitemap.xml', [App\Http\Controllers\LegalController::class, 'sitemap'])->name('sitemap');
+    Route::get('/rss.xml', [App\Http\Controllers\LegalController::class, 'rss'])->name('rss');
+});
+
+// Legacy legal route
 Route::get('/legal/{slug}', function ($slug) {
     return redirect('/'.app()->getLocale().'/legal/'.$slug);
-})->name('legal.show');
+})->name('legal.show.legacy');
 
 // Cpanel routes
 Route::get('/cpanel/login', function () {
@@ -1270,11 +1289,20 @@ Route::prefix('posts')->name('posts.')->group(function () {
     Route::get('/{post}', [App\Http\Controllers\PostController::class, 'show'])->name('show');
 });
 
-// City Frontend Routes
-Route::prefix('cities')->name('cities.')->group(function () {
-    Route::get('/', [App\Http\Controllers\CityController::class, 'index'])->name('index');
-    Route::get('/search', [App\Http\Controllers\CityController::class, 'search'])->name('search');
-    Route::get('/country/{country}', [App\Http\Controllers\CityController::class, 'byCountry'])->name('by-country');
-    Route::get('/region/{region}', [App\Http\Controllers\CityController::class, 'byRegion'])->name('by-region');
-    Route::get('/{city}', [App\Http\Controllers\CityController::class, 'show'])->name('show');
-});
+    // City Frontend Routes
+    Route::prefix('cities')->name('cities.')->group(function () {
+        Route::get('/', [App\Http\Controllers\CityController::class, 'index'])->name('index');
+        Route::get('/search', [App\Http\Controllers\CityController::class, 'search'])->name('search');
+        Route::get('/country/{country}', [App\Http\Controllers\CityController::class, 'byCountry'])->name('by-country');
+        Route::get('/region/{region}', [App\Http\Controllers\CityController::class, 'byRegion'])->name('by-region');
+        Route::get('/{city}', [App\Http\Controllers\CityController::class, 'show'])->name('show');
+    });
+
+    // Location Frontend Routes
+    Route::prefix('locations')->name('locations.')->group(function () {
+        Route::get('/', [App\Http\Controllers\LocationController::class, 'index'])->name('index');
+        Route::get('/{location}', [App\Http\Controllers\LocationController::class, 'show'])->name('show');
+        Route::post('/{location}/contact', [App\Http\Controllers\LocationController::class, 'contact'])->name('contact');
+    });
+
+

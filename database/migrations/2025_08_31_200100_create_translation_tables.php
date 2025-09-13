@@ -52,6 +52,9 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug');
             $table->longText('content');
+            $table->string('seo_title')->nullable();
+            $table->text('seo_description')->nullable();
+            $table->json('meta_data')->nullable();
         }, hasSlug: true);
     }
 

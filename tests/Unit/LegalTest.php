@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Legal;
+use App\Models\Translations\LegalTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,29 +14,35 @@ class LegalTest extends TestCase
     public function test_legal_can_be_created(): void
     {
         $legal = Legal::factory()->create([
+            'key' => 'privacy-policy',
             'type' => 'privacy_policy',
-            'title' => 'Privacy Policy',
-            'content' => 'This is our privacy policy content',
-            'is_active' => true,
+            'is_enabled' => true,
+            'is_required' => true,
         ]);
 
         $this->assertDatabaseHas('legals', [
+            'key' => 'privacy-policy',
             'type' => 'privacy_policy',
-            'title' => 'Privacy Policy',
-            'content' => 'This is our privacy policy content',
-            'is_active' => true,
+            'is_enabled' => true,
+            'is_required' => true,
         ]);
     }
 
     public function test_legal_casts_work_correctly(): void
     {
         $legal = Legal::factory()->create([
-            'is_active' => true,
-            'created_at' => now(),
+            'is_enabled' => true,
+            'is_required' => false,
+            'sort_order' => 10,
+            'meta_data' => ['version' => '1.0'],
+            'published_at' => now(),
         ]);
 
-        $this->assertIsBool($legal->is_active);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $legal->created_at);
+        $this->assertIsBool($legal->is_enabled);
+        $this->assertIsBool($legal->is_required);
+        $this->assertIsInt($legal->sort_order);
+        $this->assertIsArray($legal->meta_data);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $legal->published_at);
     }
 
     public function test_legal_fillable_attributes(): void
@@ -43,195 +50,290 @@ class LegalTest extends TestCase
         $legal = new Legal();
         $fillable = $legal->getFillable();
 
-        $this->assertContains('type', $fillable);
-        $this->assertContains('title', $fillable);
-        $this->assertContains('content', $fillable);
-        $this->assertContains('is_active', $fillable);
+        $expectedFillable = [
+            'key',
+            'type',
+            'is_enabled',
+            'is_required',
+            'sort_order',
+            'meta_data',
+            'published_at',
+        ];
+
+        foreach ($expectedFillable as $field) {
+            $this->assertContains($field, $fillable);
+        }
     }
 
-    public function test_legal_scope_active(): void
+    public function test_legal_scope_enabled(): void
     {
-        $activeLegal = Legal::factory()->create(['is_active' => true]);
-        $inactiveLegal = Legal::factory()->create(['is_active' => false]);
+        $enabledLegal = Legal::factory()->enabled()->create();
+        $disabledLegal = Legal::factory()->disabled()->create();
 
-        $activeLegals = Legal::active()->get();
+        $enabledLegals = Legal::enabled()->get();
 
-        $this->assertTrue($activeLegals->contains($activeLegal));
-        $this->assertFalse($activeLegals->contains($inactiveLegal));
+        $this->assertTrue($enabledLegals->contains($enabledLegal));
+        $this->assertFalse($enabledLegals->contains($disabledLegal));
+    }
+
+    public function test_legal_scope_required(): void
+    {
+        $requiredLegal = Legal::factory()->required()->create();
+        $optionalLegal = Legal::factory()->create(['is_required' => false]);
+
+        $requiredLegals = Legal::required()->get();
+
+        $this->assertTrue($requiredLegals->contains($requiredLegal));
+        $this->assertFalse($requiredLegals->contains($optionalLegal));
     }
 
     public function test_legal_scope_by_type(): void
     {
-        $privacyPolicy = Legal::factory()->create(['type' => 'privacy_policy']);
-        $termsOfService = Legal::factory()->create(['type' => 'terms_of_service']);
+        $privacyPolicy = Legal::factory()->privacyPolicy()->create();
+        $termsOfUse = Legal::factory()->termsOfUse()->create();
 
         $privacyPolicies = Legal::byType('privacy_policy')->get();
 
         $this->assertTrue($privacyPolicies->contains($privacyPolicy));
-        $this->assertFalse($privacyPolicies->contains($termsOfService));
+        $this->assertFalse($privacyPolicies->contains($termsOfUse));
     }
 
-    public function test_legal_can_have_versions(): void
+    public function test_legal_scope_published(): void
     {
-        $legal = Legal::factory()->create([
-            'version' => '1.0',
-            'version_date' => now(),
-        ]);
+        $publishedLegal = Legal::factory()->published()->create();
+        $draftLegal = Legal::factory()->draft()->create();
 
-        $this->assertEquals('1.0', $legal->version);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $legal->version_date);
+        $publishedLegals = Legal::published()->get();
+
+        $this->assertTrue($publishedLegals->contains($publishedLegal));
+        $this->assertFalse($publishedLegals->contains($draftLegal));
     }
 
-    public function test_legal_can_have_effective_date(): void
+    public function test_legal_scope_ordered(): void
     {
-        $legal = Legal::factory()->create([
-            'effective_date' => now()->addDays(30),
-        ]);
+        $legal1 = Legal::factory()->create(['sort_order' => 2]);
+        $legal2 = Legal::factory()->create(['sort_order' => 1]);
+        $legal3 = Legal::factory()->create(['sort_order' => 3]);
 
-        $this->assertInstanceOf(\Carbon\Carbon::class, $legal->effective_date);
+        $orderedLegals = Legal::ordered()->get();
+
+        $this->assertEquals($legal2->id, $orderedLegals->first()->id);
+        $this->assertEquals($legal3->id, $orderedLegals->last()->id);
     }
 
-    public function test_legal_can_have_expiry_date(): void
+    public function test_legal_scope_by_key(): void
     {
-        $legal = Legal::factory()->create([
-            'expiry_date' => now()->addYear(),
-        ]);
+        $legal = Legal::factory()->create(['key' => 'test-key']);
 
-        $this->assertInstanceOf(\Carbon\Carbon::class, $legal->expiry_date);
+        $foundLegal = Legal::byKey('test-key')->first();
+
+        $this->assertEquals($legal->id, $foundLegal->id);
     }
 
-    public function test_legal_can_have_metadata(): void
+    public function test_legal_is_published_accessor(): void
     {
-        $legal = Legal::factory()->create([
-            'metadata' => [
-                'author' => 'Legal Team',
-                'reviewed_by' => 'John Doe',
-                'approved_by' => 'Jane Smith',
-                'tags' => ['privacy', 'gdpr', 'compliance'],
-            ],
-        ]);
+        $publishedLegal = Legal::factory()->published()->create();
+        $draftLegal = Legal::factory()->draft()->create();
 
-        $this->assertIsArray($legal->metadata);
-        $this->assertEquals('Legal Team', $legal->metadata['author']);
-        $this->assertEquals('John Doe', $legal->metadata['reviewed_by']);
-        $this->assertEquals('Jane Smith', $legal->metadata['approved_by']);
-        $this->assertIsArray($legal->metadata['tags']);
+        $this->assertTrue($publishedLegal->is_published);
+        $this->assertFalse($draftLegal->is_published);
     }
 
-    public function test_legal_can_have_translations(): void
+    public function test_legal_status_accessor(): void
+    {
+        $publishedLegal = Legal::factory()->enabled()->published()->create();
+        $draftLegal = Legal::factory()->enabled()->draft()->create();
+        $disabledLegal = Legal::factory()->disabled()->create();
+
+        $this->assertEquals('published', $publishedLegal->status);
+        $this->assertEquals('draft', $draftLegal->status);
+        $this->assertEquals('disabled', $disabledLegal->status);
+    }
+
+    public function test_legal_get_types(): void
+    {
+        $types = Legal::getTypes();
+
+        $this->assertIsArray($types);
+        $this->assertArrayHasKey('privacy_policy', $types);
+        $this->assertArrayHasKey('terms_of_use', $types);
+        $this->assertArrayHasKey('refund_policy', $types);
+    }
+
+    public function test_legal_get_required_types(): void
+    {
+        $requiredTypes = Legal::getRequiredTypes();
+
+        $this->assertIsArray($requiredTypes);
+        $this->assertContains('privacy_policy', $requiredTypes);
+        $this->assertContains('terms_of_use', $requiredTypes);
+    }
+
+    public function test_legal_get_by_key(): void
+    {
+        $legal = Legal::factory()->enabled()->published()->create(['key' => 'test-key']);
+
+        $foundLegal = Legal::getByKey('test-key');
+
+        $this->assertEquals($legal->id, $foundLegal->id);
+    }
+
+    public function test_legal_get_required_documents(): void
+    {
+        $requiredLegal = Legal::factory()->required()->enabled()->published()->create();
+        $optionalLegal = Legal::factory()->enabled()->published()->create(['is_required' => false]);
+
+        $requiredDocuments = Legal::getRequiredDocuments();
+
+        $this->assertTrue($requiredDocuments->contains($requiredLegal));
+        $this->assertFalse($requiredDocuments->contains($optionalLegal));
+    }
+
+    public function test_legal_get_by_type(): void
+    {
+        $privacyPolicy = Legal::factory()->privacyPolicy()->enabled()->published()->create();
+        $termsOfUse = Legal::factory()->termsOfUse()->enabled()->published()->create();
+
+        $privacyPolicies = Legal::getByType('privacy_policy');
+
+        $this->assertTrue($privacyPolicies->contains($privacyPolicy));
+        $this->assertFalse($privacyPolicies->contains($termsOfUse));
+    }
+
+    public function test_legal_publish(): void
+    {
+        $legal = Legal::factory()->draft()->create();
+
+        $result = $legal->publish();
+
+        $this->assertTrue($result);
+        $this->assertNotNull($legal->fresh()->published_at);
+    }
+
+    public function test_legal_unpublish(): void
+    {
+        $legal = Legal::factory()->published()->create();
+
+        $result = $legal->unpublish();
+
+        $this->assertTrue($result);
+        $this->assertNull($legal->fresh()->published_at);
+    }
+
+    public function test_legal_enable(): void
+    {
+        $legal = Legal::factory()->disabled()->create();
+
+        $result = $legal->enable();
+
+        $this->assertTrue($result);
+        $this->assertTrue($legal->fresh()->is_enabled);
+    }
+
+    public function test_legal_disable(): void
+    {
+        $legal = Legal::factory()->enabled()->create();
+
+        $result = $legal->disable();
+
+        $this->assertTrue($result);
+        $this->assertFalse($legal->fresh()->is_enabled);
+    }
+
+    public function test_legal_make_required(): void
+    {
+        $legal = Legal::factory()->create(['is_required' => false]);
+
+        $result = $legal->makeRequired();
+
+        $this->assertTrue($result);
+        $this->assertTrue($legal->fresh()->is_required);
+    }
+
+    public function test_legal_make_optional(): void
+    {
+        $legal = Legal::factory()->required()->create();
+
+        $result = $legal->makeOptional();
+
+        $this->assertTrue($result);
+        $this->assertFalse($legal->fresh()->is_required);
+    }
+
+    public function test_legal_has_translations_relationship(): void
     {
         $legal = Legal::factory()->create();
-
-        // Test that legal has translations relationship
-        $this->assertTrue(method_exists($legal, 'translations'));
-        $this->assertTrue(method_exists($legal, 'trans'));
-    }
-
-    public function test_legal_can_have_slug(): void
-    {
-        $legal = Legal::factory()->create([
-            'slug' => 'privacy-policy',
+        
+        $translation = LegalTranslation::factory()->create([
+            'legal_id' => $legal->id,
+            'locale' => 'lt',
+            'title' => 'Test Title',
+            'content' => 'Test Content',
         ]);
 
-        $this->assertEquals('privacy-policy', $legal->slug);
+        $this->assertTrue($legal->translations->contains($translation));
     }
 
-    public function test_legal_can_have_summary(): void
+    public function test_legal_get_available_locales(): void
     {
-        $legal = Legal::factory()->create([
-            'summary' => 'This document outlines our privacy practices and how we collect, use, and protect your personal information.',
+        $legal = Legal::factory()->create();
+        
+        LegalTranslation::factory()->create([
+            'legal_id' => $legal->id,
+            'locale' => 'lt',
+        ]);
+        
+        LegalTranslation::factory()->create([
+            'legal_id' => $legal->id,
+            'locale' => 'en',
         ]);
 
-        $this->assertEquals('This document outlines our privacy practices and how we collect, use, and protect your personal information.', $legal->summary);
+        $locales = $legal->getAvailableLocales();
+
+        $this->assertContains('lt', $locales);
+        $this->assertContains('en', $locales);
     }
 
-    public function test_legal_can_have_required_consent(): void
+    public function test_legal_has_translation_for(): void
     {
-        $legal = Legal::factory()->create([
-            'requires_consent' => true,
+        $legal = Legal::factory()->create();
+        
+        LegalTranslation::factory()->create([
+            'legal_id' => $legal->id,
+            'locale' => 'lt',
         ]);
 
-        $this->assertTrue($legal->requires_consent);
+        $this->assertTrue($legal->hasTranslationFor('lt'));
+        $this->assertFalse($legal->hasTranslationFor('en'));
     }
 
-    public function test_legal_can_have_consent_text(): void
+    public function test_legal_get_or_create_translation(): void
     {
-        $legal = Legal::factory()->create([
-            'consent_text' => 'I agree to the terms and conditions',
-        ]);
+        $legal = Legal::factory()->create(['key' => 'test-key']);
 
-        $this->assertEquals('I agree to the terms and conditions', $legal->consent_text);
+        $translation = $legal->getOrCreateTranslation('lt');
+
+        $this->assertInstanceOf(LegalTranslation::class, $translation);
+        $this->assertEquals('lt', $translation->locale);
+        $this->assertEquals('test-key', $translation->title);
     }
 
-    public function test_legal_can_have_priority(): void
+    public function test_legal_update_translation(): void
     {
-        $legal = Legal::factory()->create([
-            'priority' => 'high',
+        $legal = Legal::factory()->create();
+        
+        $translation = LegalTranslation::factory()->create([
+            'legal_id' => $legal->id,
+            'locale' => 'lt',
         ]);
 
-        $this->assertEquals('high', $legal->priority);
-    }
-
-    public function test_legal_can_have_category(): void
-    {
-        $legal = Legal::factory()->create([
-            'category' => 'privacy',
+        $result = $legal->updateTranslation('lt', [
+            'title' => 'Updated Title',
+            'content' => 'Updated Content',
         ]);
 
-        $this->assertEquals('privacy', $legal->category);
-    }
-
-    public function test_legal_can_have_scope(): void
-    {
-        $legal = Legal::factory()->create([
-            'scope' => 'global',
-        ]);
-
-        $this->assertEquals('global', $legal->scope);
-    }
-
-    public function test_legal_can_have_related_documents(): void
-    {
-        $legal = Legal::factory()->create([
-            'related_documents' => [
-                'terms_of_service',
-                'cookie_policy',
-                'data_processing_agreement',
-            ],
-        ]);
-
-        $this->assertIsArray($legal->related_documents);
-        $this->assertContains('terms_of_service', $legal->related_documents);
-        $this->assertContains('cookie_policy', $legal->related_documents);
-        $this->assertContains('data_processing_agreement', $legal->related_documents);
-    }
-
-    public function test_legal_can_have_contact_information(): void
-    {
-        $legal = Legal::factory()->create([
-            'contact_email' => 'legal@example.com',
-            'contact_phone' => '+37012345678',
-        ]);
-
-        $this->assertEquals('legal@example.com', $legal->contact_email);
-        $this->assertEquals('+37012345678', $legal->contact_phone);
-    }
-
-    public function test_legal_can_have_last_updated(): void
-    {
-        $legal = Legal::factory()->create([
-            'last_updated' => now(),
-        ]);
-
-        $this->assertInstanceOf(\Carbon\Carbon::class, $legal->last_updated);
-    }
-
-    public function test_legal_can_have_approval_status(): void
-    {
-        $legal = Legal::factory()->create([
-            'approval_status' => 'approved',
-        ]);
-
-        $this->assertEquals('approved', $legal->approval_status);
+        $this->assertTrue($result);
+        $this->assertEquals('Updated Title', $translation->fresh()->title);
+        $this->assertEquals('Updated Content', $translation->fresh()->content);
     }
 }

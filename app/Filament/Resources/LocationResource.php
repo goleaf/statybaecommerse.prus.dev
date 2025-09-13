@@ -30,6 +30,7 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use UnitEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -47,10 +48,8 @@ final class LocationResource extends Resource
         return __('locations.navigation_label');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('locations.navigation_group');
-    }
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'E-commerce';
 
     public static function getModelLabel(): string
     {
@@ -336,6 +335,15 @@ final class LocationResource extends Resource
         return [
             RelationManagers\InventoriesRelationManager::class,
             RelationManagers\VariantInventoriesRelationManager::class,
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\LocationStatsWidget::class,
+            \App\Filament\Widgets\LocationChartWidget::class,
+            \App\Filament\Widgets\LocationInventoryWidget::class,
         ];
     }
 

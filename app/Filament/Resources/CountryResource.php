@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers;
+use App\Filament\Resources\CountryResource\Widgets;
 use App\Models\Country;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
@@ -604,6 +605,18 @@ final class CountryResource extends Resource
             RelationManagers\RegionsRelationManager::class,
             RelationManagers\UsersRelationManager::class,
             RelationManagers\CustomersRelationManager::class,
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            Widgets\CountriesOverviewWidget::class,
+            Widgets\CountriesStatsWidget::class,
+            Widgets\CountriesByRegionWidget::class,
+            Widgets\EuMembersWidget::class,
+            Widgets\CountriesWithVatWidget::class,
+            Widgets\CountryDetailsWidget::class,
         ];
     }
 

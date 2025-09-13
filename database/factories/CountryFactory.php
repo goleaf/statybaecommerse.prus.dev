@@ -16,58 +16,85 @@ final class CountryFactory extends Factory
 
     public function definition(): array
     {
-        $regions = ['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania'];
-        $currencies = ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD'];
-        $currencySymbols = ['€', '$', '£', '¥', 'CHF', 'C$', 'A$'];
+        $regions = ['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania', 'Antarctica'];
+        $currencies = ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'CNY', 'RUB', 'INR'];
         
-        $region = fake()->randomElement($regions);
-        $currencyIndex = array_rand($currencies);
-        $currency = $currencies[$currencyIndex];
-        $currencySymbol = $currencySymbols[$currencyIndex];
-
         return [
-            'name' => fake()->country(),
-            'name_official' => fake()->country() . ' Republic',
-            'cca2' => fake()->unique()->countryCode(),
-            'cca3' => fake()->unique()->countryISOAlpha3(),
-            'ccn3' => fake()->unique()->numerify('###'),
-            'code' => fake()->unique()->countryCode(),
-            'iso_code' => fake()->unique()->countryISOAlpha3(),
-            'currency_code' => $currency,
-            'currency_symbol' => $currencySymbol,
-            'phone_code' => fake()->numerify('###'),
-            'phone_calling_code' => fake()->numerify('###'),
-            'flag' => fake()->word() . '.png',
-            'svg_flag' => fake()->word() . '.svg',
-            'region' => $region,
-            'subregion' => fake()->words(2, true),
-            'latitude' => fake()->latitude(),
-            'longitude' => fake()->longitude(),
-            'currencies' => [
-                $currency => [
-                    'name' => fake()->currencyCode(),
-                    'symbol' => $currencySymbol,
-                ],
-            ],
-            'languages' => [
+            'name' => $this->faker->country(),
+            'name_official' => $this->faker->optional(0.7)->country(),
+            'description' => $this->faker->optional(0.6)->paragraph(),
+            'cca2' => $this->faker->unique()->countryCode(),
+            'cca3' => $this->faker->unique()->countryISOAlpha3(),
+            'ccn3' => $this->faker->optional(0.8)->numerify('###'),
+            'code' => $this->faker->optional(0.5)->lexify('???'),
+            'iso_code' => $this->faker->optional(0.5)->lexify('???'),
+            'currency_code' => $this->faker->randomElement($currencies),
+            'currency_symbol' => $this->faker->optional(0.7)->randomElement(['€', '$', '£', '¥', 'CHF', 'C$', 'A$', '¥', '₽', '₹']),
+            'phone_code' => $this->faker->optional(0.8)->numerify('###'),
+            'phone_calling_code' => $this->faker->optional(0.8)->numerify('###'),
+            'flag' => $this->faker->optional(0.6)->lexify('??.png'),
+            'svg_flag' => $this->faker->optional(0.4)->lexify('??.svg'),
+            'region' => $this->faker->randomElement($regions),
+            'subregion' => $this->faker->optional(0.7)->randomElement(['Northern Europe', 'Western Europe', 'Eastern Europe', 'Southern Europe', 'Central Asia', 'Eastern Asia', 'Southeast Asia', 'Southern Asia', 'Western Asia', 'Northern Africa', 'Western Africa', 'Eastern Africa', 'Middle Africa', 'Southern Africa', 'Northern America', 'Central America', 'Caribbean', 'South America', 'Australia and New Zealand', 'Melanesia', 'Micronesia', 'Polynesia']),
+            'latitude' => $this->faker->optional(0.8)->latitude(),
+            'longitude' => $this->faker->optional(0.8)->longitude(),
+            'currencies' => $this->faker->optional(0.6)->randomElements([
+                'EUR' => 'Euro',
+                'USD' => 'US Dollar',
+                'GBP' => 'British Pound',
+                'JPY' => 'Japanese Yen',
+                'CHF' => 'Swiss Franc',
+                'CAD' => 'Canadian Dollar',
+                'AUD' => 'Australian Dollar',
+                'CNY' => 'Chinese Yuan',
+                'RUB' => 'Russian Ruble',
+                'INR' => 'Indian Rupee',
+            ], $this->faker->numberBetween(1, 3)),
+            'languages' => $this->faker->optional(0.7)->randomElements([
                 'en' => 'English',
                 'lt' => 'Lithuanian',
-            ],
-            'timezones' => [
-                'UTC+2' => 'Eastern European Time',
-            ],
-            'is_active' => fake()->boolean(80), // 80% chance of being active
-            'is_enabled' => fake()->boolean(90), // 90% chance of being enabled
-            'is_eu_member' => $region === 'Europe' ? fake()->boolean(30) : false, // 30% chance if European
-            'requires_vat' => fake()->boolean(60), // 60% chance of requiring VAT
-            'vat_rate' => fake()->boolean(70) ? fake()->randomFloat(2, 0, 30) : null, // 70% chance of having VAT rate
-            'timezone' => fake()->timezone(),
-            'description' => fake()->paragraph(),
-            'metadata' => [
-                'population' => fake()->numberBetween(100000, 100000000),
-                'area' => fake()->numberBetween(1000, 10000000),
-            ],
-            'sort_order' => fake()->numberBetween(0, 100),
+                'lv' => 'Latvian',
+                'et' => 'Estonian',
+                'de' => 'German',
+                'fr' => 'French',
+                'es' => 'Spanish',
+                'it' => 'Italian',
+                'pt' => 'Portuguese',
+                'ru' => 'Russian',
+                'zh' => 'Chinese',
+                'ja' => 'Japanese',
+                'ko' => 'Korean',
+                'ar' => 'Arabic',
+                'hi' => 'Hindi',
+            ], $this->faker->numberBetween(1, 3)),
+            'timezones' => $this->faker->optional(0.6)->randomElements([
+                'Europe/Vilnius' => 'Vilnius Time',
+                'Europe/London' => 'London Time',
+                'Europe/Paris' => 'Paris Time',
+                'Europe/Berlin' => 'Berlin Time',
+                'Europe/Rome' => 'Rome Time',
+                'Europe/Madrid' => 'Madrid Time',
+                'America/New_York' => 'New York Time',
+                'America/Los_Angeles' => 'Los Angeles Time',
+                'Asia/Tokyo' => 'Tokyo Time',
+                'Asia/Shanghai' => 'Shanghai Time',
+                'Asia/Kolkata' => 'Kolkata Time',
+                'Australia/Sydney' => 'Sydney Time',
+            ], $this->faker->numberBetween(1, 2)),
+            'timezone' => $this->faker->optional(0.7)->timezone(),
+            'is_active' => $this->faker->boolean(80),
+            'is_enabled' => $this->faker->boolean(90),
+            'is_eu_member' => $this->faker->boolean(20),
+            'requires_vat' => $this->faker->boolean(60),
+            'vat_rate' => $this->faker->optional(0.7)->randomFloat(2, 0, 30),
+            'metadata' => $this->faker->optional(0.4)->randomElements([
+                'population' => $this->faker->numberBetween(100000, 1000000000),
+                'area' => $this->faker->numberBetween(1000, 10000000),
+                'capital' => $this->faker->city(),
+                'government' => $this->faker->randomElement(['Republic', 'Monarchy', 'Federation', 'Confederation']),
+                'independence_year' => $this->faker->numberBetween(1800, 2020),
+            ], $this->faker->numberBetween(1, 3)),
+            'sort_order' => $this->faker->numberBetween(0, 100),
         ];
     }
 
@@ -75,7 +102,6 @@ final class CountryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_active' => true,
-            'is_enabled' => true,
         ]);
     }
 
@@ -86,13 +112,31 @@ final class CountryFactory extends Factory
         ]);
     }
 
+    public function enabled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_enabled' => true,
+        ]);
+    }
+
+    public function disabled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_enabled' => false,
+        ]);
+    }
+
     public function euMember(): static
     {
         return $this->state(fn (array $attributes) => [
             'is_eu_member' => true,
-            'region' => 'Europe',
-            'currency_code' => 'EUR',
-            'currency_symbol' => '€',
+        ]);
+    }
+
+    public function nonEuMember(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_eu_member' => false,
         ]);
     }
 
@@ -100,7 +144,7 @@ final class CountryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'requires_vat' => true,
-            'vat_rate' => fake()->randomFloat(2, 5, 25),
+            'vat_rate' => $this->faker->randomFloat(2, 5, 30),
         ]);
     }
 
@@ -116,7 +160,8 @@ final class CountryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'region' => 'Europe',
-            'subregion' => fake()->randomElement(['Northern Europe', 'Southern Europe', 'Eastern Europe', 'Western Europe']),
+            'currency_code' => 'EUR',
+            'is_eu_member' => $this->faker->boolean(70),
         ]);
     }
 
@@ -124,23 +169,56 @@ final class CountryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'region' => 'Asia',
-            'subregion' => fake()->randomElement(['Eastern Asia', 'Southern Asia', 'Southeast Asia', 'Western Asia']),
+            'currency_code' => $this->faker->randomElement(['CNY', 'JPY', 'KRW', 'INR', 'THB']),
+        ]);
+    }
+
+    public function american(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'region' => $this->faker->randomElement(['North America', 'South America']),
+            'currency_code' => $this->faker->randomElement(['USD', 'CAD', 'BRL', 'ARS', 'CLP']),
+        ]);
+    }
+
+    public function african(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'region' => 'Africa',
+            'currency_code' => $this->faker->randomElement(['ZAR', 'EGP', 'NGN', 'KES', 'MAD']),
+        ]);
+    }
+
+    public function oceania(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'region' => 'Oceania',
+            'currency_code' => $this->faker->randomElement(['AUD', 'NZD', 'FJD', 'PGK']),
         ]);
     }
 
     public function withCoordinates(): static
     {
         return $this->state(fn (array $attributes) => [
-            'latitude' => fake()->latitude(),
-            'longitude' => fake()->longitude(),
+            'latitude' => $this->faker->latitude(),
+            'longitude' => $this->faker->longitude(),
         ]);
     }
 
     public function withFlag(): static
     {
         return $this->state(fn (array $attributes) => [
-            'flag' => fake()->word() . '.png',
-            'svg_flag' => fake()->word() . '.svg',
+            'flag' => $this->faker->lexify('??.png'),
+            'svg_flag' => $this->faker->lexify('??.svg'),
+        ]);
+    }
+
+    public function withTranslations(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Lithuania',
+            'name_official' => 'Republic of Lithuania',
+            'description' => 'A country in Northern Europe',
         ]);
     }
 }

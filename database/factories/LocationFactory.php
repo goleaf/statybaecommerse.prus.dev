@@ -11,52 +11,96 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Location>
  */
-class LocationFactory extends Factory
+final class LocationFactory extends Factory
 {
     protected $model = Location::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
-        $name = $this->faker->company();
+        $types = ['warehouse', 'store', 'office', 'other'];
+        $type = $this->faker->randomElement($types);
 
         return [
-            'name' => [
-                'lt' => $name.' LT',
-                'en' => $name.' EN',
-            ],
-            'slug' => [
-                'lt' => \Illuminate\Support\Str::slug($name.' LT'),
-                'en' => \Illuminate\Support\Str::slug($name.' EN'),
-            ],
-            'description' => [
-                'lt' => $this->faker->sentence(10),
-                'en' => $this->faker->sentence(10),
-            ],
-            'code' => strtoupper($this->faker->unique()->lexify('LOC???')),
+            'code' => strtoupper($this->faker->unique()->lexify('???###')),
+            'name' => $this->faker->company() . ' ' . ucfirst($type),
+            'slug' => $this->faker->slug(),
+            'description' => $this->faker->paragraph(),
+            'type' => $type,
             'address_line_1' => $this->faker->streetAddress(),
             'address_line_2' => $this->faker->optional()->secondaryAddress(),
             'city' => $this->faker->city(),
-            'state' => $this->faker->state(),
+            'state' => $this->faker->optional()->state(),
             'postal_code' => $this->faker->postcode(),
-            'country_code' => 'LT', // Default to Lithuania
-            'phone' => $this->faker->phoneNumber(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'is_default' => false,
-            'is_enabled' => true,
-            'type' => $this->faker->randomElement(['warehouse', 'store', 'pickup_point']),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'country_code' => $this->faker->randomElement(['LT', 'US', 'GB', 'DE', 'FR', 'CA', 'AU', 'BE', 'CH', 'AT', 'AE', 'AR', 'BG', 'BR', 'BY', 'CN', 'CZ', 'DK', 'EE', 'EG', 'ES', 'FI', 'HR', 'HU', 'ID', 'IL', 'IN', 'IT', 'JP', 'KE', 'KR', 'LV', 'MX', 'MY', 'NG', 'NL', 'NO', 'NZ', 'PH', 'PL', 'RO', 'RS', 'RU', 'SA', 'SE', 'SG', 'SI', 'SK', 'TH', 'TR', 'UA', 'VN', 'ZA']),
+            'phone' => $this->faker->optional()->phoneNumber(),
+            'email' => $this->faker->optional()->companyEmail(),
+            'latitude' => $this->faker->optional()->latitude(),
+            'longitude' => $this->faker->optional()->longitude(),
+            'opening_hours' => $this->faker->optional()->randomElement([
+                null,
+                [
+                    ['day' => 'monday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+                    ['day' => 'tuesday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+                    ['day' => 'wednesday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+                    ['day' => 'thursday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+                    ['day' => 'friday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+                    ['day' => 'saturday', 'open_time' => '10:00', 'close_time' => '15:00', 'is_closed' => false],
+                    ['day' => 'sunday', 'open_time' => null, 'close_time' => null, 'is_closed' => true],
+                ]
+            ]),
+            'contact_info' => $this->faker->optional()->randomElement([
+                null,
+                [
+                    'manager' => $this->faker->name(),
+                    'department' => $this->faker->randomElement(['Warehouse', 'Sales', 'Customer Service']),
+                    'emergency_contact' => $this->faker->phoneNumber(),
+                ]
+            ]),
+            'is_enabled' => $this->faker->boolean(80), // 80% chance of being enabled
+            'is_default' => $this->faker->boolean(10), // 10% chance of being default
+            'sort_order' => $this->faker->numberBetween(0, 100),
         ];
     }
 
-    /**
-     * Indicate that the location is the default location.
-     */
+    public function warehouse(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => 'warehouse',
+            'name' => $this->faker->company() . ' Warehouse',
+        ]);
+    }
+
+    public function storeType(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => 'store',
+            'name' => $this->faker->company() . ' Store',
+        ]);
+    }
+
+    public function office(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => 'office',
+            'name' => $this->faker->company() . ' Office',
+        ]);
+    }
+
+
+    public function enabled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_enabled' => true,
+        ]);
+    }
+
+    public function disabled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_enabled' => false,
+        ]);
+    }
+
     public function default(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -64,76 +108,46 @@ class LocationFactory extends Factory
         ]);
     }
 
-    /**
-     * Indicate that the location is inactive.
-     */
-    public function inactive(): static
+    public function withCoordinates(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_enabled' => false,
+            'latitude' => $this->faker->latitude(),
+            'longitude' => $this->faker->longitude(),
         ]);
     }
 
-    /**
-     * Create a location in Vilnius.
-     */
-    public function vilnius(): static
+    public function withOpeningHours(): static
     {
         return $this->state(fn (array $attributes) => [
-            'name' => [
-                'lt' => 'Vilniaus sandėlis',
-                'en' => 'Vilnius Warehouse',
+            'opening_hours' => [
+                ['day' => 'monday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+                ['day' => 'tuesday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+                ['day' => 'wednesday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+                ['day' => 'thursday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+                ['day' => 'friday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+                ['day' => 'saturday', 'open_time' => '10:00', 'close_time' => '15:00', 'is_closed' => false],
+                ['day' => 'sunday', 'open_time' => null, 'close_time' => null, 'is_closed' => true],
             ],
-            'slug' => [
-                'lt' => 'vilniaus-sandelis',
-                'en' => 'vilnius-warehouse',
+        ]);
+    }
+
+    public function withContactInfo(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'contact_info' => [
+                'manager' => $this->faker->name(),
+                'department' => $this->faker->randomElement(['Warehouse', 'Sales', 'Customer Service']),
+                'emergency_contact' => $this->faker->phoneNumber(),
+                'notes' => $this->faker->sentence(),
             ],
-            'description' => [
-                'lt' => 'Pagrindinis sandėlis Vilniuje',
-                'en' => 'Main warehouse in Vilnius',
-            ],
-            'address_line_1' => 'Gedimino pr. 9',
-            'city' => 'Vilnius',
-            'state' => 'Vilnius County',
-            'postal_code' => '01103',
+        ]);
+    }
+
+    public function inLithuania(): static
+    {
+        return $this->state(fn (array $attributes) => [
             'country_code' => 'LT',
-        ]);
-    }
-
-    /**
-     * Create a location in Kaunas.
-     */
-    public function kaunas(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'name' => [
-                'lt' => 'Kauno parduotuvė',
-                'en' => 'Kaunas Store',
-            ],
-            'slug' => [
-                'lt' => 'kauno-parduotuve',
-                'en' => 'kaunas-store',
-            ],
-            'description' => [
-                'lt' => 'Parduotuvė Kaune',
-                'en' => 'Store in Kaunas',
-            ],
-            'address_line_1' => 'Laisvės al. 53',
-            'city' => 'Kaunas',
-            'state' => 'Kaunas County',
-            'postal_code' => '44309',
-            'country_code' => 'LT',
-            'type' => 'store',
-        ]);
-    }
-
-    /**
-     * Create a location with specific country.
-     */
-    public function forCountry(Country $country): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'country_code' => $country->cca2,
+            'city' => $this->faker->randomElement(['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys']),
         ]);
     }
 }
