@@ -167,6 +167,239 @@ final class Brand extends Model implements HasMedia
         return $this->translations()->pluck('locale')->toArray();
     }
 
+    // Enhanced Translation Methods
+    public function scopeWithTranslations($query, ?string $locale = null)
+    {
+        $locale = $locale ?: app()->getLocale();
+        return $query->with(['translations' => function ($q) use ($locale) {
+            $q->where('locale', $locale);
+        }]);
+    }
+
+    public function hasTranslationFor(string $locale): bool
+    {
+        return $this->translations()->where('locale', $locale)->exists();
+    }
+
+    public function getOrCreateTranslation(string $locale): \App\Models\Translations\BrandTranslation
+    {
+        return $this->translations()->firstOrCreate(
+            ['locale' => $locale],
+            [
+                'name' => $this->name,
+                'slug' => $this->slug,
+                'description' => $this->description,
+                'seo_title' => $this->seo_title,
+                'seo_description' => $this->seo_description,
+            ]
+        );
+    }
+
+    public function updateTranslation(string $locale, array $data): bool
+    {
+        $translation = $this->getOrCreateTranslation($locale);
+        return $translation->update($data);
+    }
+
+    public function updateTranslations(array $translations): bool
+    {
+        foreach ($translations as $locale => $data) {
+            $this->updateTranslation($locale, $data);
+        }
+        return true;
+    }
+
+    // Helper Methods
+    public function getBrandInfo(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'description' => $this->description,
+            'website' => $this->website,
+            'is_enabled' => $this->is_enabled,
+            'seo_title' => $this->seo_title,
+            'seo_description' => $this->seo_description,
+        ];
+    }
+
+    public function getMediaInfo(): array
+    {
+        return [
+            'has_logo' => $this->hasMedia('logo'),
+            'has_banner' => $this->hasMedia('banner'),
+            'logo_url' => $this->getLogoUrl(),
+            'banner_url' => $this->getBannerUrl(),
+            'logo_urls' => [
+                'xs' => $this->getLogoUrl('xs'),
+                'sm' => $this->getLogoUrl('sm'),
+                'md' => $this->getLogoUrl('md'),
+                'lg' => $this->getLogoUrl('lg'),
+            ],
+            'banner_urls' => [
+                'sm' => $this->getBannerUrl('sm'),
+                'md' => $this->getBannerUrl('md'),
+                'lg' => $this->getBannerUrl('lg'),
+            ],
+        ];
+    }
+
+    public function getSeoInfo(): array
+    {
+        return [
+            'seo_title' => $this->seo_title,
+            'seo_description' => $this->seo_description,
+            'canonical_url' => $this->getCanonicalUrl(),
+            'meta_tags' => $this->getMetaTags(),
+        ];
+    }
+
+    public function getBusinessInfo(): array
+    {
+        return [
+            'products_count' => $this->products()->count(),
+            'published_products_count' => $this->products()->published()->count(),
+            'total_revenue' => $this->getTotalRevenue(),
+            'average_product_price' => $this->getAverageProductPrice(),
+            'is_active' => $this->is_enabled,
+            'has_products' => $this->products()->exists(),
+            'has_website' => !empty($this->website),
+            'has_media' => $this->hasAnyMedia(),
+        ];
+    }
+
+    public function getCompleteInfo(?string $locale = null): array
+    {
+        return array_merge(
+            $this->getBrandInfo(),
+            $this->getMediaInfo(),
+            $this->getSeoInfo(),
+            $this->getBusinessInfo(),
+            [
+                'translations' => $this->getAvailableLocales(),
+                'has_translations' => count($this->getAvailableLocales()) > 0,
+                'created_at' => $this->created_at?->toISOString(),
+                'updated_at' => $this->updated_at?->toISOString(),
+            ]
+        );
+    }
+
+    // Additional helper methods
+    public function getCanonicalUrl(): string
+    {
+        return route('brands.show', $this);
+    }
+
+    public function getMetaTags(): array
+    {
+        return [
+            'title' => $this->seo_title ?: $this->name,
+            'description' => $this->seo_description ?: $this->description,
+            'og:title' => $this->seo_title ?: $this->name,
+            'og:description' => $this->seo_description ?: $this->description,
+            'og:image' => $this->getLogoUrl('lg'),
+            'og:url' => $this->getCanonicalUrl(),
+        ];
+    }
+
+    public function getTotalRevenue(): float
+    {
+        return $this->products()
+            ->join('order_items', 'products.id', '=', 'order_items.product_id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.status', 'completed')
+            ->sum(\DB::raw('order_items.quantity * order_items.price'));
+    }
+
+    public function getAverageProductPrice(): ?float
+    {
+        return $this->products()->published()->avg('price');
+    }
+
+    public function getFullDisplayName(?string $locale = null): string
+    {
+        $name = $this->getTranslatedName($locale);
+        $status = $this->is_enabled ? 'Enabled' : 'Disabled';
+        return "{$name} ({$status})";
+    }
+
+    public function isActive(): bool
+    {
+        return $this->is_enabled;
+    }
+
+    public function hasProducts(): bool
+    {
+        return $this->products()->exists();
+    }
+
+    public function hasPublishedProducts(): bool
+    {
+        return $this->products()->published()->exists();
+    }
+
+    public function hasWebsite(): bool
+    {
+        return !empty($this->website);
+    }
+
+    public function hasAnyMedia(): bool
+    {
+        return $this->hasMedia('logo') || $this->hasMedia('banner');
+    }
+
+    public function getWebsiteDomain(): ?string
+    {
+        if (!$this->website) {
+            return null;
+        }
+        
+        return parse_url($this->website, PHP_URL_HOST);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_enabled', true);
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('is_enabled', false);
+    }
+
+    public function scopeWithWebsite($query)
+    {
+        return $query->whereNotNull('website')->where('website', '!=', '');
+    }
+
+    public function scopeWithoutWebsite($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('website')->orWhere('website', '');
+        });
+    }
+
+    public function scopeWithMedia($query)
+    {
+        return $query->whereHas('media');
+    }
+
+    public function scopeWithoutMedia($query)
+    {
+        return $query->whereDoesntHave('media');
+    }
+
+    public function scopePopular($query, int $minProducts = 5)
+    {
+        return $query->has('products', '>=', $minProducts);
+    }
+
+    public function scopeRecent($query, int $days = 30)
+    {
+        return $query->where('created_at', '>=', now()->subDays($days));
+    }
+
     public function registerMediaCollections(): void
     {
         $this
