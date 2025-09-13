@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class CollectionTranslation extends Model
 {
     use HasFactory;
+    protected static string $factory = \Database\Factories\CollectionTranslationFactory::class;
     protected $table = 'collection_translations';
 
     protected $fillable = [

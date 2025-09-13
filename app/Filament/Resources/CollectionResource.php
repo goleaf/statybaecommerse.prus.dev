@@ -503,6 +503,15 @@ final class CollectionResource extends Resource
         ];
     }
 
+    public static function getWidgets(): array
+    {
+        return [
+            Widgets\CollectionStatsWidget::class,
+            Widgets\CollectionPerformanceWidget::class,
+            Widgets\CollectionProductsWidget::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [

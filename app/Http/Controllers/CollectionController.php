@@ -6,31 +6,37 @@ namespace App\Http\Controllers;
 
 use App\Models\Collection;
 use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Http\JsonResponse;
 
 final class CollectionController extends Controller
 {
     public function index(Request $request): View
     {
-        $collections = Collection::query()
+        $query = Collection::withTranslations()
             ->visible()
-            ->active()
-            ->ordered()
-            ->with(['media'])
-            ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('description', 'like', '%' . $request->search . '%');
-            })
-            ->when($request->filled('type'), function ($query) use ($request) {
-                if ($request->type === 'automatic') {
-                    $query->automatic();
-                } elseif ($request->type === 'manual') {
-                    $query->manual();
-                }
-            })
-            ->paginate(12);
+            ->ordered();
+
+        // Apply filters
+        if ($request->filled('type')) {
+            $query->where('is_automatic', $request->get('type') === 'automatic');
+        }
+
+        if ($request->filled('display_type')) {
+            $query->where('display_type', $request->get('display_type'));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
+
+        $collections = $query->paginate(12);
 
         return view('collections.index', compact('collections'));
     }
@@ -38,80 +44,168 @@ final class CollectionController extends Controller
     public function show(Collection $collection): View
     {
         $collection->load(['products' => function ($query) {
-            $query->published()
-                ->with(['media', 'variants', 'categories'])
-                ->orderBy('sort_order')
-                ->orderBy('created_at', 'desc');
+            $query->published()->with(['images', 'translations']);
         }]);
 
-        $products = $collection->products()
-            ->published()
-            ->with(['media', 'variants', 'categories'])
-            ->orderBy('sort_order')
-            ->orderBy('created_at', 'desc')
-            ->paginate($collection->products_per_page ?? 12);
-
-        // Get related collections
-        $relatedCollections = Collection::query()
+        $relatedCollections = Collection::withTranslations()
             ->visible()
-            ->active()
             ->where('id', '!=', $collection->id)
-            ->whereHas('products', function ($query) use ($collection) {
-                $query->whereIn('id', $collection->products->pluck('id'));
-            })
+            ->where('display_type', $collection->display_type)
             ->limit(4)
             ->get();
 
-        return view('collections.show', compact('collection', 'products', 'relatedCollections'));
+        return view('collections.show', compact('collection', 'relatedCollections'));
     }
 
-    public function products(Request $request, Collection $collection): JsonResponse
+    // API Endpoints
+    public function api(Request $request): JsonResponse
     {
-        $products = $collection->products()
-            ->published()
-            ->with(['media', 'variants', 'categories'])
-            ->when($request->filled('category'), function ($query) use ($request) {
-                $query->whereHas('categories', function ($q) use ($request) {
-                    $q->where('slug', $request->category);
-                });
-            })
-            ->when($request->filled('price_min'), function ($query) use ($request) {
-                $query->where('price', '>=', $request->price_min);
-            })
-            ->when($request->filled('price_max'), function ($query) use ($request) {
-                $query->where('price', '<=', $request->price_max);
-            })
-            ->when($request->filled('sort'), function ($query) use ($request) {
-                match ($request->sort) {
-                    'price_asc' => $query->orderBy('price', 'asc'),
-                    'price_desc' => $query->orderBy('price', 'desc'),
-                    'name_asc' => $query->orderBy('name', 'asc'),
-                    'name_desc' => $query->orderBy('name', 'desc'),
-                    'newest' => $query->orderBy('created_at', 'desc'),
-                    'oldest' => $query->orderBy('created_at', 'asc'),
-                    default => $query->orderBy('sort_order')->orderBy('created_at', 'desc'),
-                };
-            }, function ($query) {
-                $query->orderBy('sort_order')->orderBy('created_at', 'desc');
-            })
-            ->paginate($collection->products_per_page ?? 12);
+        $query = Collection::withTranslations()->visible();
+
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
+
+        $collections = $query->limit(20)->get();
 
         return response()->json([
-            'products' => $products,
-            'collection' => $collection,
+            'collections' => $collections->map(function ($collection) {
+                return [
+                    'id' => $collection->id,
+                    'name' => $collection->getTranslatedName(),
+                    'slug' => $collection->slug,
+                    'description' => $collection->getTranslatedDescription(),
+                    'image_url' => $collection->getImageUrl(),
+                    'products_count' => $collection->getProductsCountAttribute(),
+                    'display_type' => $collection->display_type,
+                    'is_automatic' => $collection->is_automatic,
+                ];
+            }),
         ]);
     }
 
-    public function search(Request $request): JsonResponse
+    public function byType(string $type): JsonResponse
     {
-        $collections = Collection::query()
+        $isAutomatic = $type === 'automatic';
+        
+        $collections = Collection::withTranslations()
             ->visible()
-            ->active()
-            ->where('name', 'like', '%' . $request->q . '%')
-            ->orWhere('description', 'like', '%' . $request->q . '%')
-            ->limit(10)
-            ->get(['id', 'name', 'slug', 'description']);
+            ->where('is_automatic', $isAutomatic)
+            ->orderBy('sort_order')
+            ->get();
 
-        return response()->json($collections);
+        return response()->json([
+            'collections' => $collections->map(function ($collection) {
+                return [
+                    'id' => $collection->id,
+                    'name' => $collection->getTranslatedName(),
+                    'slug' => $collection->slug,
+                    'description' => $collection->getTranslatedDescription(),
+                    'image_url' => $collection->getImageUrl(),
+                    'products_count' => $collection->getProductsCountAttribute(),
+                    'display_type' => $collection->display_type,
+                ];
+            }),
+        ]);
+    }
+
+    public function withProducts(): JsonResponse
+    {
+        $collections = Collection::withTranslations()
+            ->visible()
+            ->has('products')
+            ->withCount('products')
+            ->orderBy('products_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'collections' => $collections->map(function ($collection) {
+                return [
+                    'id' => $collection->id,
+                    'name' => $collection->getTranslatedName(),
+                    'slug' => $collection->slug,
+                    'description' => $collection->getTranslatedDescription(),
+                    'image_url' => $collection->getImageUrl(),
+                    'products_count' => $collection->products_count,
+                    'display_type' => $collection->display_type,
+                    'is_automatic' => $collection->is_automatic,
+                ];
+            }),
+        ]);
+    }
+
+    public function popular(): JsonResponse
+    {
+        $collections = Collection::withTranslations()
+            ->visible()
+            ->withCount('products')
+            ->orderBy('products_count', 'desc')
+            ->limit(8)
+            ->get();
+
+        return response()->json([
+            'collections' => $collections->map(function ($collection) {
+                return [
+                    'id' => $collection->id,
+                    'name' => $collection->getTranslatedName(),
+                    'slug' => $collection->slug,
+                    'description' => $collection->getTranslatedDescription(),
+                    'image_url' => $collection->getImageUrl('sm'),
+                    'products_count' => $collection->products_count,
+                    'display_type' => $collection->display_type,
+                ];
+            }),
+        ]);
+    }
+
+    public function statistics(): JsonResponse
+    {
+        $totalCollections = Collection::count();
+        $visibleCollections = Collection::visible()->count();
+        $automaticCollections = Collection::where('is_automatic', true)->count();
+        $manualCollections = Collection::where('is_automatic', false)->count();
+        $collectionsWithProducts = Collection::has('products')->count();
+
+        return response()->json([
+            'total_collections' => $totalCollections,
+            'visible_collections' => $visibleCollections,
+            'automatic_collections' => $automaticCollections,
+            'manual_collections' => $manualCollections,
+            'collections_with_products' => $collectionsWithProducts,
+            'collections_without_products' => $totalCollections - $collectionsWithProducts,
+        ]);
+    }
+
+    public function products(Collection $collection): JsonResponse
+    {
+        $products = $collection->products()
+            ->published()
+            ->with(['images', 'translations'])
+            ->paginate($collection->products_per_page ?: 12);
+
+        return response()->json([
+            'collection' => [
+                'id' => $collection->id,
+                'name' => $collection->getTranslatedName(),
+                'slug' => $collection->slug,
+                'description' => $collection->getTranslatedDescription(),
+                'display_type' => $collection->display_type,
+                'products_per_page' => $collection->products_per_page,
+                'show_filters' => $collection->show_filters,
+            ],
+            'products' => $products->items(),
+            'pagination' => [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+            ],
+        ]);
     }
 }

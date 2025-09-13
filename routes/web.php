@@ -1361,3 +1361,16 @@ Route::prefix('locations')->name('locations.')->group(function () {
     Route::get('/api/nearby', [App\Http\Controllers\LocationController::class, 'nearby'])->name('api.nearby');
     Route::get('/api/statistics', [App\Http\Controllers\LocationController::class, 'statistics'])->name('api.statistics');
 });
+
+
+// Collection Frontend Routes
+Route::prefix('collections')->name('collections.')->group(function () {
+    Route::get('/', [App\Http\Controllers\CollectionController::class, 'index'])->name('index');
+    Route::get('/{collection}', [App\Http\Controllers\CollectionController::class, 'show'])->name('show');
+    Route::get('/api/search', [App\Http\Controllers\CollectionController::class, 'api'])->name('api.search');
+    Route::get('/api/by-type/{type}', [App\Http\Controllers\CollectionController::class, 'byType'])->name('api.by-type');
+    Route::get('/api/with-products', [App\Http\Controllers\CollectionController::class, 'withProducts'])->name('api.with-products');
+    Route::get('/api/popular', [App\Http\Controllers\CollectionController::class, 'popular'])->name('api.popular');
+    Route::get('/api/statistics', [App\Http\Controllers\CollectionController::class, 'statistics'])->name('api.statistics');
+    Route::get('/{collection}/products', [App\Http\Controllers\CollectionController::class, 'products'])->name('products');
+});

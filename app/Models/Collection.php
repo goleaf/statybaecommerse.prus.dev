@@ -188,6 +188,154 @@ final class Collection extends Model implements HasMedia
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
 
+    // Advanced Translation Methods
+    public function getTranslatedName(?string $locale = null): ?string
+    {
+        return $this->trans('name', $locale) ?: $this->name;
+    }
+
+    public function getTranslatedDescription(?string $locale = null): ?string
+    {
+        return $this->trans('description', $locale) ?: $this->description;
+    }
+
+    public function getTranslatedSlug(?string $locale = null): ?string
+    {
+        return $this->trans('slug', $locale) ?: $this->slug;
+    }
+
+    public function getTranslatedMetaTitle(?string $locale = null): ?string
+    {
+        return $this->trans('meta_title', $locale) ?: $this->meta_title;
+    }
+
+    public function getTranslatedMetaDescription(?string $locale = null): ?string
+    {
+        return $this->trans('meta_description', $locale) ?: $this->meta_description;
+    }
+
+    public function getTranslatedMetaKeywords(?string $locale = null): ?array
+    {
+        return $this->trans('meta_keywords', $locale) ?: $this->meta_keywords;
+    }
+
+    // Scope for translated collections
+    public function scopeWithTranslations($query, ?string $locale = null)
+    {
+        $locale = $locale ?: app()->getLocale();
+        return $query->with(['translations' => function ($q) use ($locale) {
+            $q->where('locale', $locale);
+        }]);
+    }
+
+    // Translation Management Methods
+    public function getAvailableLocales(): array
+    {
+        return $this->translations()->pluck('locale')->unique()->values()->toArray();
+    }
+
+    public function hasTranslationFor(string $locale): bool
+    {
+        return $this->translations()->where('locale', $locale)->exists();
+    }
+
+    public function getOrCreateTranslation(string $locale): \App\Models\Translations\CollectionTranslation
+    {
+        return $this->translations()->firstOrCreate(
+            ['locale' => $locale],
+            [
+                'name' => $this->name,
+                'slug' => $this->slug,
+                'description' => $this->description,
+                'meta_title' => $this->meta_title,
+                'meta_description' => $this->meta_description,
+                'meta_keywords' => $this->meta_keywords,
+            ]
+        );
+    }
+
+    public function updateTranslation(string $locale, array $data): bool
+    {
+        $translation = $this->getOrCreateTranslation($locale);
+        return $translation->update($data);
+    }
+
+    public function updateTranslations(array $translations): bool
+    {
+        foreach ($translations as $locale => $data) {
+            $this->updateTranslation($locale, $data);
+        }
+        return true;
+    }
+
+    // Helper Methods
+    public function getFullDisplayName(?string $locale = null): string
+    {
+        $name = $this->getTranslatedName($locale);
+        $type = $this->is_automatic ? 'Auto' : 'Manual';
+        return "{$name} ({$type})";
+    }
+
+    public function getCollectionInfo(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'description' => $this->description,
+            'type' => $this->is_automatic ? 'automatic' : 'manual',
+            'is_visible' => $this->is_visible,
+            'products_count' => $this->getProductsCountAttribute(),
+            'display_type' => $this->display_type,
+            'products_per_page' => $this->products_per_page,
+            'show_filters' => $this->show_filters,
+            'sort_order' => $this->sort_order,
+        ];
+    }
+
+    public function getSeoInfo(): array
+    {
+        return [
+            'seo_title' => $this->seo_title,
+            'seo_description' => $this->seo_description,
+            'meta_title' => $this->meta_title,
+            'meta_description' => $this->meta_description,
+            'meta_keywords' => $this->meta_keywords,
+        ];
+    }
+
+    public function getBusinessInfo(): array
+    {
+        return [
+            'products_count' => $this->getProductsCountAttribute(),
+            'max_products' => $this->max_products,
+            'display_type' => $this->display_type,
+            'products_per_page' => $this->products_per_page,
+            'show_filters' => $this->show_filters,
+            'sort_order' => $this->sort_order,
+            'is_active' => $this->is_active,
+            'is_visible' => $this->is_visible,
+            'is_automatic' => $this->is_automatic,
+        ];
+    }
+
+    public function getCompleteInfo(?string $locale = null): array
+    {
+        return array_merge(
+            $this->getCollectionInfo(),
+            $this->getSeoInfo(),
+            $this->getBusinessInfo(),
+            [
+                'translations' => $this->getAvailableLocales(),
+                'has_translations' => count($this->getAvailableLocales()) > 0,
+                'image_url' => $this->getImageUrl(),
+                'banner_url' => $this->getBannerUrl(),
+                'created_at' => $this->created_at?->toISOString(),
+                'updated_at' => $this->updated_at?->toISOString(),
+            ]
+        );
+    }
+
     public function registerMediaConversions(?Media $media = null): void
     {
         // Collection image conversions with multiple resolutions
