@@ -27,4 +27,5 @@ final class CampaignConversionTranslation extends Model
     }
 
     public $timestamps = false;
+
 }

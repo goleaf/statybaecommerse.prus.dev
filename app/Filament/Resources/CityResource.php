@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CityResource\Pages;
 use App\Filament\Resources\CityResource\RelationManagers;
+use App\Filament\Resources\CityResource\Widgets;
 use App\Models\City;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -179,6 +180,50 @@ class CityResource extends Resource
                             ->separator(','),
                     ])
                     ->columns(2),
+                Forms\Components\Section::make(__('cities.additional_data'))
+                    ->schema([
+                        Forms\Components\TextInput::make('type')
+                            ->label(__('cities.type'))
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('area')
+                            ->label(__('cities.area'))
+                            ->numeric()
+                            ->step(0.01)
+                            ->suffix(' km²'),
+                        Forms\Components\TextInput::make('density')
+                            ->label(__('cities.density'))
+                            ->numeric()
+                            ->step(0.01)
+                            ->suffix(' /km²'),
+                        Forms\Components\TextInput::make('elevation')
+                            ->label(__('cities.elevation'))
+                            ->numeric()
+                            ->step(0.01)
+                            ->suffix(' m'),
+                        Forms\Components\TextInput::make('timezone')
+                            ->label(__('cities.timezone'))
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('currency_code')
+                            ->label(__('cities.currency_code'))
+                            ->maxLength(3),
+                        Forms\Components\TextInput::make('currency_symbol')
+                            ->label(__('cities.currency_symbol'))
+                            ->maxLength(5),
+                        Forms\Components\TextInput::make('language_code')
+                            ->label(__('cities.language_code'))
+                            ->maxLength(5),
+                        Forms\Components\TextInput::make('language_name')
+                            ->label(__('cities.language_name'))
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('phone_code')
+                            ->label(__('cities.phone_code'))
+                            ->maxLength(10),
+                        Forms\Components\TextInput::make('postal_code')
+                            ->label(__('cities.postal_code'))
+                            ->maxLength(20),
+                    ])
+                    ->columns(3)
+                    ->collapsible(),
                 Forms\Components\Section::make(__('cities.status'))
                     ->schema([
                         Forms\Components\Toggle::make('is_enabled')
@@ -317,6 +362,32 @@ class CityResource extends Resource
                     ->label(__('cities.sort_order'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('area')
+                    ->label(__('cities.area'))
+                    ->numeric()
+                    ->formatStateUsing(fn (?float $state): string => $state ? number_format($state, 2) . ' km²' : '-')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('density')
+                    ->label(__('cities.density'))
+                    ->numeric()
+                    ->formatStateUsing(fn (?float $state): string => $state ? number_format($state, 2) . ' /km²' : '-')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('timezone')
+                    ->label(__('cities.timezone'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('currency_code')
+                    ->label(__('cities.currency_code'))
+                    ->badge()
+                    ->color('info')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('language_code')
+                    ->label(__('cities.language_code'))
+                    ->badge()
+                    ->color('warning')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('cities.created_at'))
                     ->dateTime()
@@ -373,6 +444,40 @@ class CityResource extends Resource
                 Tables\Filters\Filter::make('with_population')
                     ->label(__('cities.with_population'))
                     ->query(fn (Builder $query): Builder => $query->where('population', '>', 0)),
+                Tables\Filters\Filter::make('population_range')
+                    ->form([
+                        Forms\Components\TextInput::make('population_from')
+                            ->label(__('cities.population_from'))
+                            ->numeric()
+                            ->placeholder('0'),
+                        Forms\Components\TextInput::make('population_to')
+                            ->label(__('cities.population_to'))
+                            ->numeric()
+                            ->placeholder('1000000'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['population_from'],
+                                fn (Builder $query, $from): Builder => $query->where('population', '>=', $from),
+                            )
+                            ->when(
+                                $data['population_to'],
+                                fn (Builder $query, $to): Builder => $query->where('population', '<=', $to),
+                            );
+                    }),
+                Tables\Filters\SelectFilter::make('type')
+                    ->label(__('cities.type'))
+                    ->options(fn (): array => City::distinct('type')->pluck('type', 'type')->toArray())
+                    ->searchable(),
+                Tables\Filters\SelectFilter::make('timezone')
+                    ->label(__('cities.timezone'))
+                    ->options(fn (): array => City::distinct('timezone')->pluck('timezone', 'timezone')->toArray())
+                    ->searchable(),
+                Tables\Filters\SelectFilter::make('currency_code')
+                    ->label(__('cities.currency_code'))
+                    ->options(fn (): array => City::distinct('currency_code')->pluck('currency_code', 'currency_code')->toArray())
+                    ->searchable(),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
@@ -403,6 +508,16 @@ class CityResource extends Resource
             RelationManagers\AddressesRelationManager::class,
             RelationManagers\ChildrenRelationManager::class,
             RelationManagers\TranslationsRelationManager::class,
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            Widgets\CityStatsOverview::class,
+            Widgets\CityPopulationChart::class,
+            Widgets\CitiesByCountryChart::class,
+            Widgets\RecentCitiesTable::class,
         ];
     }
 

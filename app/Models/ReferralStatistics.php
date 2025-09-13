@@ -68,19 +68,36 @@ final class ReferralStatistics extends Model
      */
     public static function getOrCreateForUserAndDate(int $userId, string $date): self
     {
-        return self::firstOrCreate(
-            [
-                'user_id' => $userId,
-                'date' => $date,
-            ],
-            [
-                'total_referrals' => 0,
-                'completed_referrals' => 0,
-                'pending_referrals' => 0,
-                'total_rewards_earned' => 0,
-                'total_discounts_given' => 0,
-            ]
-        );
+        return \DB::transaction(function () use ($userId, $date) {
+            $existing = self::where('user_id', $userId)
+                ->where('date', $date)
+                ->lockForUpdate()
+                ->first();
+
+            if ($existing) {
+                return $existing;
+            }
+
+            try {
+                return self::create([
+                    'user_id' => $userId,
+                    'date' => $date,
+                    'total_referrals' => 0,
+                    'completed_referrals' => 0,
+                    'pending_referrals' => 0,
+                    'total_rewards_earned' => 0,
+                    'total_discounts_given' => 0,
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                // If the record was created by another process, fetch it
+                if ($e->getCode() === '23000') { // Integrity constraint violation
+                    return self::where('user_id', $userId)
+                        ->where('date', $date)
+                        ->firstOrFail();
+                }
+                throw $e;
+            }
+        });
     }
 
     /**

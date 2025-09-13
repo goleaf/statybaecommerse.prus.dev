@@ -69,9 +69,26 @@ final class LocationSeeder extends Seeder
             $translations = $data['translations'] ?? [];
             unset($data['translations']);
 
+            // Prepare JSON fields for name and slug based on translations
+            $nameJson = [];
+            $slugJson = [];
+            $descriptionJson = [];
+
+            foreach ($locales as $locale) {
+                $translationData = $translations[$locale] ?? [];
+                $nameJson[$locale] = $translationData['name'] ?? 'Location';
+                $slugJson[$locale] = $translationData['slug'] ?? $data['code'].'-'.$locale;
+                $descriptionJson[$locale] = $translationData['description'] ?? '';
+            }
+
+            // Add JSON fields to data
+            $data['name'] = $nameJson;
+            $data['slug'] = $slugJson;
+            $data['description'] = $descriptionJson;
+
             $location = Location::updateOrCreate(['code' => $data['code']], $data);
 
-            // Create translations for each locale
+            // Create translations for each locale (if using separate translation table)
             foreach ($locales as $locale) {
                 $translationData = $translations[$locale] ?? [];
                 $slug = $translationData['slug'] ?? $location->code.'-'.$locale;

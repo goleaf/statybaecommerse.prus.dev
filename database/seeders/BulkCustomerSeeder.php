@@ -77,7 +77,8 @@ final class BulkCustomerSeeder extends Seeder
                         'updated_at' => $now,
                     ];
                 }
-                DB::table('users')->insert($usersBatch);
+                // Use upsert to handle existing records
+                DB::table('users')->upsert($usersBatch, ['email'], ['name', 'password', 'preferred_locale', 'remember_token', 'is_admin', 'updated_at']);
                 // advance users bar
                 if (isset($usersBar)) {
                     $usersBar->advance(count($usersBatch));

@@ -57,6 +57,15 @@ class AddressTest extends TestCase
         $country = Country::factory()->create();
         $address = Address::factory()->create(['country_id' => $country->id]);
 
+        $this->assertInstanceOf(Country::class, $address->countryById);
+        $this->assertEquals($country->id, $address->countryById->id);
+    }
+
+    public function test_address_belongs_to_country_by_code(): void
+    {
+        $country = Country::factory()->create();
+        $address = Address::factory()->create(['country_code' => $country->cca2]);
+
         $this->assertInstanceOf(Country::class, $address->country);
         $this->assertEquals($country->id, $address->country->id);
     }
@@ -126,8 +135,14 @@ class AddressTest extends TestCase
 
     public function test_address_scope_shipping(): void
     {
-        $shippingAddress = Address::factory()->create(['is_shipping' => true]);
-        $billingAddress = Address::factory()->create(['is_billing' => true]);
+        $shippingAddress = Address::factory()->create([
+            'is_shipping' => true,
+            'is_billing' => false,
+        ]);
+        $billingAddress = Address::factory()->create([
+            'is_billing' => true,
+            'is_shipping' => false,
+        ]);
 
         $shippingAddresses = Address::shipping()->get();
 
@@ -137,8 +152,14 @@ class AddressTest extends TestCase
 
     public function test_address_scope_billing(): void
     {
-        $shippingAddress = Address::factory()->create(['is_shipping' => true]);
-        $billingAddress = Address::factory()->create(['is_billing' => true]);
+        $shippingAddress = Address::factory()->create([
+            'is_shipping' => true,
+            'is_billing' => false,
+        ]);
+        $billingAddress = Address::factory()->create([
+            'is_billing' => true,
+            'is_shipping' => false,
+        ]);
 
         $billingAddresses = Address::billing()->get();
 
@@ -310,10 +331,14 @@ class AddressTest extends TestCase
             'last_name' => 'Doe',
             'company_name' => 'Test Company',
             'address_line_1' => 'Test Street 123',
+            'address_line_2' => null, // Ensure no extra address line
             'apartment' => 'Apt 5B',
+            'floor' => null, // Ensure no floor
+            'building' => null, // Ensure no building
             'city' => 'Vilnius',
+            'state' => null, // Ensure no state
             'postal_code' => 'LT-01234',
-            'country_id' => $country->id,
+            'country_code' => $country->cca2,
         ]);
 
         $formattedAddress = $address->formatted_address;
@@ -337,8 +362,16 @@ class AddressTest extends TestCase
 
     public function test_address_type_checking_methods(): void
     {
-        $shippingAddress = Address::factory()->create(['type' => AddressType::SHIPPING]);
-        $billingAddress = Address::factory()->create(['type' => AddressType::BILLING]);
+        $shippingAddress = Address::factory()->create([
+            'type' => AddressType::SHIPPING,
+            'is_shipping' => true,
+            'is_billing' => false,
+        ]);
+        $billingAddress = Address::factory()->create([
+            'type' => AddressType::BILLING,
+            'is_shipping' => false,
+            'is_billing' => true,
+        ]);
         $defaultAddress = Address::factory()->create(['is_default' => true]);
         $activeAddress = Address::factory()->create(['is_active' => true]);
 
@@ -369,24 +402,51 @@ class AddressTest extends TestCase
     {
         $user = User::factory()->create();
         
-        // Create test addresses
-        $defaultAddress = Address::factory()->create([
+        // Create test addresses manually to avoid factory issues
+        $defaultAddress = new Address([
             'user_id' => $user->id,
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'address_line_1' => '123 Main St',
+            'city' => 'Test City',
+            'postal_code' => '12345',
+            'country_code' => 'US',
             'is_default' => true,
+            'is_billing' => false,
+            'is_shipping' => false,
             'is_active' => true,
         ]);
+        $defaultAddress->save();
         
-        $billingAddress = Address::factory()->create([
+        $billingAddress = new Address([
             'user_id' => $user->id,
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'address_line_1' => '456 Billing St',
+            'city' => 'Billing City',
+            'postal_code' => '54321',
+            'country_code' => 'US',
+            'is_default' => false,
             'is_billing' => true,
+            'is_shipping' => false,
             'is_active' => true,
         ]);
+        $billingAddress->save();
         
-        $shippingAddress = Address::factory()->create([
+        $shippingAddress = new Address([
             'user_id' => $user->id,
+            'first_name' => 'Bob',
+            'last_name' => 'Smith',
+            'address_line_1' => '789 Shipping St',
+            'city' => 'Shipping City',
+            'postal_code' => '98765',
+            'country_code' => 'US',
+            'is_default' => false,
+            'is_billing' => false,
             'is_shipping' => true,
             'is_active' => true,
         ]);
+        $shippingAddress->save();
 
         // Test static methods
         $this->assertEquals($defaultAddress->id, Address::getDefaultAddressForUser($user->id)->id);

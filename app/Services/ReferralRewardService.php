@@ -114,12 +114,12 @@ final class ReferralRewardService
         try {
             $discount = Discount::create([
                 'name' => 'Referral Discount - '.$percentage.'%',
-                'code' => 'REFERRAL_'.$userId.'_'.now()->format('Ymd'),
+                'slug' => 'referral-'.$userId.'-'.now()->format('Ymd'),
                 'type' => 'percentage',
                 'value' => $percentage,
                 'usage_limit' => 1, // First order only
                 'usage_count' => 0,
-                'min_spend' => 0,
+                'minimum_amount' => 0,
                 'starts_at' => now(),
                 'ends_at' => now()->addDays(30),
                 'status' => 'active',
@@ -144,6 +144,7 @@ final class ReferralRewardService
                 'user_id' => $userId,
                 'percentage' => $percentage,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return null;
@@ -266,13 +267,13 @@ final class ReferralRewardService
             return false;
         }
 
-        // Check if user has already used a referral discount
-        $usedDiscount = ReferralReward::where('user_id', $userId)
+        // Check if user has a referral discount that can be used
+        $availableDiscount = ReferralReward::where('user_id', $userId)
             ->where('type', 'referred_discount')
             ->where('status', 'applied')
             ->exists();
 
-        return ! $usedDiscount;
+        return $availableDiscount;
     }
 
     /**

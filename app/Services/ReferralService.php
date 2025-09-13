@@ -119,6 +119,7 @@ final class ReferralService
                 'referred_user_id' => $referredUserId,
                 'order_id' => $orderId,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return false;
@@ -222,14 +223,24 @@ final class ReferralService
     private function updateReferralStatistics(int $userId, string $action): void
     {
         $today = now()->toDateString();
-        $stats = ReferralStatistics::getOrCreateForUserAndDate($userId, $today);
+        
+        try {
+            $stats = ReferralStatistics::getOrCreateForUserAndDate($userId, $today);
 
-        match ($action) {
-            'increment_referrals' => $stats->incrementReferrals(),
-            'complete_referral' => $stats->completeReferral(),
-            'add_reward' => $stats->addRewardEarned(0), // Amount will be set separately
-            'add_discount' => $stats->addDiscountGiven(0), // Amount will be set separately
-        };
+            match ($action) {
+                'increment_referrals' => $stats->incrementReferrals(),
+                'complete_referral' => $stats->completeReferral(),
+                'add_reward' => $stats->addRewardEarned(0), // Amount will be set separately
+                'add_discount' => $stats->addDiscountGiven(0), // Amount will be set separately
+            };
+        } catch (\Exception $e) {
+            // Log the error but don't fail the referral completion
+            Log::warning('Failed to update referral statistics', [
+                'user_id' => $userId,
+                'action' => $action,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

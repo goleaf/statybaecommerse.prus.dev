@@ -5,17 +5,21 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Collection;
+use App\Models\Product;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Database\Eloquent\Builder;
 
 final class CollectionProductsWidget extends BaseWidget
 {
-    protected int|string|array $columnSpan = 'full';
+    protected static ?string $heading = 'admin.collections.widgets.products_heading';
 
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 3;
 
-    protected static ?string $heading = 'Collections with Most Products';
+    protected ?string $pollingInterval = '30s';
+
+    protected int | string | array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -23,66 +27,67 @@ final class CollectionProductsWidget extends BaseWidget
             ->query(
                 Collection::query()
                     ->withCount('products')
+                    ->where('is_visible', true)
                     ->orderBy('products_count', 'desc')
-                    ->limit(10)
             )
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
-                    ->label(__('admin.collections.fields.image'))
-                    ->getStateUsing(fn (Collection $record) => $record->getFirstMediaUrl('images', 'thumb'))
-                    ->defaultImageUrl(asset('images/placeholder-collection.png'))
+                    ->label(__('admin.collections.table.image'))
                     ->circular()
                     ->size(40),
+
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('admin.collections.fields.name'))
+                    ->label(__('admin.collections.table.name'))
                     ->searchable()
                     ->sortable()
-                    ->weight('medium')
-                    ->wrap(),
+                    ->weight('bold'),
+
                 Tables\Columns\TextColumn::make('slug')
-                    ->label(__('admin.collections.fields.slug'))
+                    ->label(__('admin.collections.table.slug'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
-                    ->copyMessage(__('admin.copied'))
-                    ->weight('mono'),
-                Tables\Columns\IconColumn::make('is_visible')
-                    ->label(__('admin.collections.fields.is_visible'))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-eye')
-                    ->falseIcon('heroicon-o-eye-slash')
-                    ->trueColor('success')
-                    ->falseColor('danger'),
+                    ->copyMessage(__('admin.copied')),
+
+                Tables\Columns\TextColumn::make('products_count')
+                    ->label(__('admin.collections.table.products_count'))
+                    ->badge()
+                    ->color('primary')
+                    ->sortable(),
+
                 Tables\Columns\IconColumn::make('is_automatic')
-                    ->label(__('admin.collections.fields.is_automatic'))
+                    ->label(__('admin.collections.table.is_automatic'))
                     ->boolean()
                     ->trueIcon('heroicon-o-cog-6-tooth')
                     ->falseIcon('heroicon-o-hand-raised')
                     ->trueColor('info')
                     ->falseColor('gray'),
-                Tables\Columns\TextColumn::make('products_count')
-                    ->label(__('admin.collections.fields.products_count'))
+
+                Tables\Columns\TextColumn::make('display_type')
+                    ->label(__('admin.collections.table.display_type'))
                     ->badge()
-                    ->color('primary')
-                    ->sortable()
-                    ->alignCenter(),
-                Tables\Columns\TextColumn::make('sort_order')
-                    ->label(__('admin.collections.fields.sort_order'))
-                    ->sortable()
-                    ->alignCenter()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->color(fn (string $state): string => match ($state) {
+                        'grid' => 'success',
+                        'list' => 'info',
+                        'carousel' => 'warning',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => __("admin.collections.display_types.{$state}")),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('admin.collections.fields.created_at'))
+                    ->label(__('admin.collections.table.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->label(__('admin.collections.actions.view')),
-                Tables\Actions\EditAction::make()
-                    ->label(__('admin.collections.actions.edit')),
+                Tables\Actions\Action::make('view')
+                    ->label(__('admin.collections.actions.view'))
+                    ->icon('heroicon-o-eye')
+                    ->url(fn (Collection $record): string => route('filament.admin.resources.collections.view', $record))
+                    ->openUrlInNewTab(),
             ])
-            ->defaultSort('products_count', 'desc');
+            ->defaultSort('products_count', 'desc')
+            ->paginated([10, 25, 50]);
     }
 }

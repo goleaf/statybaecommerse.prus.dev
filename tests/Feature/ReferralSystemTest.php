@@ -12,6 +12,7 @@ use App\Services\ReferralCodeService;
 use App\Services\ReferralRewardService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class ReferralSystemTest extends TestCase
@@ -43,7 +44,7 @@ final class ReferralSystemTest extends TestCase
         $this->referralRewardService = app(ReferralRewardService::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_generate_referral_code_for_user(): void
     {
         $referralCode = $this->referralService->generateReferralCodeForUser($this->referrer->id);
@@ -55,7 +56,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertEquals(8, strlen($referralCode->code));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_referral_relationship(): void
     {
         $referral = $this->referralService->createReferral(
@@ -70,7 +71,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertNotNull($referral->referral_code);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_process_referral_completion(): void
     {
         // Create referral first
@@ -107,7 +108,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertEquals('applied', $discountReward->status);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_validate_referral_code(): void
     {
         // Generate referral code
@@ -120,7 +121,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertEquals($this->referrer->id, $user->id);
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_invalid_referral_code(): void
     {
         $user = $this->referralService->validateReferralCode('INVALID123');
@@ -128,7 +129,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertNull($user);
     }
 
-    /** @test */
+    #[Test]
     public function it_prevents_duplicate_referrals(): void
     {
         // Create first referral
@@ -146,7 +147,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertNull($duplicateReferral);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_referral_statistics(): void
     {
         // Create some referrals
@@ -166,7 +167,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertEquals(1, $stats['pending_referrals']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_referral_dashboard_data(): void
     {
         // Generate referral code
@@ -188,7 +189,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertArrayHasKey('referral_url', $dashboardData);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_referral_rewards(): void
     {
         $referral = $this->referralService->createReferral(
@@ -214,7 +215,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertEquals('applied', $discountReward->status);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_validate_referral_code_format(): void
     {
         $this->assertTrue($this->referralCodeService->validateCodeFormat('ABC12345'));
@@ -224,7 +225,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertFalse($this->referralCodeService->validateCodeFormat('ABC')); // too short
     }
 
-    /** @test */
+    #[Test]
     public function it_can_generate_unique_referral_codes(): void
     {
         $code1 = $this->referralCodeService->generateUniqueCode();
@@ -235,17 +236,17 @@ final class ReferralSystemTest extends TestCase
         $this->assertEquals(8, strlen($code2));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_referral_url(): void
     {
         $code = 'TEST1234';
         $url = $this->referralCodeService->getReferralUrl($code);
 
-        $this->assertStringContains('ref=TEST1234', $url);
-        $this->assertStringContains('/register', $url);
+        $this->assertStringContainsString('ref=TEST1234', $url);
+        $this->assertStringContainsString('/register', $url);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_extract_code_from_url(): void
     {
         $url = 'https://example.com/register?ref=TEST1234';
@@ -254,7 +255,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertEquals('TEST1234', $code);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_cleanup_expired_referrals(): void
     {
         // Create expired referral
@@ -273,7 +274,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertEquals('expired', $referral->status);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_cleanup_expired_rewards(): void
     {
         $referral = Referral::factory()->create([
@@ -297,7 +298,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertEquals('expired', $reward->status);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_user_can_use_referral_discount(): void
     {
         // Initially, user cannot use referral discount
@@ -322,7 +323,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertTrue($this->referralRewardService->canUserUseReferralDiscount($this->referred->id));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_total_rewards_value(): void
     {
         $referral = Referral::factory()->create([

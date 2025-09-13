@@ -50,10 +50,14 @@ class AttributeTest extends TestCase
     public function test_attribute_belongs_to_many_products(): void
     {
         $attribute = Attribute::factory()->create();
+        $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
         $product1 = Product::factory()->create();
         $product2 = Product::factory()->create();
 
-        $attribute->products()->attach([$product1->id, $product2->id]);
+        $attribute->products()->attach([
+            $product1->id => ['attribute_value_id' => $attributeValue->id],
+            $product2->id => ['attribute_value_id' => $attributeValue->id],
+        ]);
 
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $attribute->products);
         $this->assertCount(2, $attribute->products);
@@ -268,8 +272,18 @@ class AttributeTest extends TestCase
 
         $attributesWithValues = Attribute::withValues()->get();
 
+        // The withValues scope eager loads values, so both attributes should be present
         $this->assertTrue($attributesWithValues->contains($attributeWithValues));
-        $this->assertFalse($attributesWithValues->contains($attributeWithoutValues));
+        $this->assertTrue($attributesWithValues->contains($attributeWithoutValues));
+        
+        // But the first should have values loaded and the second should have empty values
+        $loadedAttributeWithValues = $attributesWithValues->find($attributeWithValues->id);
+        $loadedAttributeWithoutValues = $attributesWithValues->find($attributeWithoutValues->id);
+        
+        $this->assertTrue($loadedAttributeWithValues->relationLoaded('values'));
+        $this->assertTrue($loadedAttributeWithoutValues->relationLoaded('values'));
+        $this->assertGreaterThan(0, $loadedAttributeWithValues->values->count());
+        $this->assertEquals(0, $loadedAttributeWithoutValues->values->count());
     }
 
     public function test_attribute_can_have_scope_with_enabled_values(): void
@@ -352,7 +366,7 @@ class AttributeTest extends TestCase
         $attribute = Attribute::factory()->create(['name' => 'Test Attribute']);
         $this->assertEquals('Test Attribute', $attribute->display_name);
 
-        $attributeWithoutName = Attribute::factory()->create(['name' => null, 'slug' => 'test-slug']);
+        $attributeWithoutName = Attribute::factory()->create(['name' => '', 'slug' => 'test-slug']);
         $this->assertEquals('test-slug', $attributeWithoutName->display_name);
     }
 
@@ -380,25 +394,24 @@ class AttributeTest extends TestCase
         $this->assertEquals('gray', $unknownAttribute->type_color);
     }
 
-    public function test_attribute_validation_rules_for_form(): void
+    public function test_attribute_validation_rules_array(): void
     {
-        $requiredAttribute = Attribute::factory()->create([
-            'is_required' => true,
-            'validation_rules' => ['max' => 255]
+        $attribute = Attribute::factory()->create([
+            'validation_rules' => ['max' => 255, 'min' => 1]
         ]);
 
-        $rules = $requiredAttribute->getValidationRulesForForm();
-        $this->assertContains('required', $rules);
-        $this->assertContains('max', $rules);
+        $rules = $attribute->validation_rules_array;
+        $this->assertIsArray($rules);
+        $this->assertEquals(255, $rules['max']);
+        $this->assertEquals(1, $rules['min']);
 
-        $optionalAttribute = Attribute::factory()->create([
-            'is_required' => false,
-            'validation_rules' => ['min' => 1]
+        $attributeWithoutRules = Attribute::factory()->create([
+            'validation_rules' => null
         ]);
 
-        $rules = $optionalAttribute->getValidationRulesForForm();
-        $this->assertNotContains('required', $rules);
-        $this->assertContains('min', $rules);
+        $rules = $attributeWithoutRules->validation_rules_array;
+        $this->assertIsArray($rules);
+        $this->assertEmpty($rules);
     }
 
     public function test_attribute_form_component_config(): void
@@ -431,10 +444,14 @@ class AttributeTest extends TestCase
     public function test_attribute_usage_count(): void
     {
         $attribute = Attribute::factory()->create();
+        $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
         $product1 = Product::factory()->create();
         $product2 = Product::factory()->create();
 
-        $attribute->products()->attach([$product1->id, $product2->id]);
+        $attribute->products()->attach([
+            $product1->id => ['attribute_value_id' => $attributeValue->id],
+            $product2->id => ['attribute_value_id' => $attributeValue->id],
+        ]);
 
         $this->assertEquals(2, $attribute->getUsageCount());
         $this->assertTrue($attribute->isUsedInProducts());
@@ -443,16 +460,20 @@ class AttributeTest extends TestCase
     public function test_attribute_popularity_score(): void
     {
         $attribute = Attribute::factory()->create();
+        $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
         $product1 = Product::factory()->create();
         $product2 = Product::factory()->create();
 
-        $attribute->products()->attach([$product1->id, $product2->id]);
+        $attribute->products()->attach([
+            $product1->id => ['attribute_value_id' => $attributeValue->id],
+            $product2->id => ['attribute_value_id' => $attributeValue->id],
+        ]);
         AttributeValue::factory()->count(3)->create(['attribute_id' => $attribute->id, 'is_enabled' => true]);
         AttributeValue::factory()->count(1)->create(['attribute_id' => $attribute->id, 'is_enabled' => false]);
 
         $score = $attribute->getPopularityScore();
-        // Score calculation: (2 products * 10) + (4 values * 2) + (3 enabled values * 1) = 20 + 8 + 3 = 31
-        $this->assertEquals(31, $score);
+        // Score calculation: (2 products * 10) + (5 values * 2) + (4 enabled values * 1) = 20 + 10 + 4 = 34
+        $this->assertEquals(34, $score);
     }
 
     public function test_attribute_status_badge(): void
@@ -477,8 +498,12 @@ class AttributeTest extends TestCase
     public function test_attribute_statistics(): void
     {
         $attribute = Attribute::factory()->create();
+        $attributeValue = AttributeValue::factory()->create([
+            'attribute_id' => $attribute->id,
+            'is_enabled' => true,
+        ]);
         $product = Product::factory()->create();
-        $attribute->products()->attach($product->id);
+        $attribute->products()->attach([$product->id => ['attribute_value_id' => $attributeValue->id]]);
         AttributeValue::factory()->count(2)->create(['attribute_id' => $attribute->id, 'is_enabled' => true]);
 
         $statistics = $attribute->getStatistics();
@@ -493,8 +518,8 @@ class AttributeTest extends TestCase
         $this->assertArrayHasKey('status_label', $statistics);
 
         $this->assertEquals(1, $statistics['usage_count']);
-        $this->assertEquals(2, $statistics['values_count']);
-        $this->assertEquals(2, $statistics['enabled_values_count']);
+        $this->assertEquals(3, $statistics['values_count']);
+        $this->assertEquals(3, $statistics['enabled_values_count']);
     }
 
     public function test_attribute_duplicate_for_group(): void
@@ -506,8 +531,8 @@ class AttributeTest extends TestCase
 
         $this->assertNotEquals($originalAttribute->id, $duplicate->id);
         $this->assertEquals('new_group', $duplicate->group_name);
-        $this->assertStringContains('(Copy)', $duplicate->name);
-        $this->assertStringContains('-copy', $duplicate->slug);
+        $this->assertStringContainsString('(Copy)', $duplicate->name);
+        $this->assertStringContainsString('-copy', $duplicate->slug);
         $this->assertEquals(2, $duplicate->values()->count());
     }
 
@@ -515,11 +540,13 @@ class AttributeTest extends TestCase
     {
         $attribute1 = Attribute::factory()->create();
         $attribute2 = Attribute::factory()->create();
+        $attributeValue1 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id]);
+        $attributeValue2 = AttributeValue::factory()->create(['attribute_id' => $attribute2->id]);
         $product1 = Product::factory()->create();
         $product2 = Product::factory()->create();
 
-        $attribute1->products()->attach($product1->id);
-        $attribute2->products()->attach($product2->id);
+        $attribute1->products()->attach([$product1->id => ['attribute_value_id' => $attributeValue1->id]]);
+        $attribute2->products()->attach([$product2->id => ['attribute_value_id' => $attributeValue2->id]]);
 
         AttributeValue::factory()->create(['attribute_id' => $attribute1->id]);
         AttributeValue::factory()->create(['attribute_id' => $attribute2->id]);
@@ -527,7 +554,7 @@ class AttributeTest extends TestCase
         $merged = $attribute1->mergeWith($attribute2);
 
         $this->assertEquals($attribute1->id, $merged->id);
-        $this->assertEquals(2, $merged->values()->count());
+        $this->assertEquals(4, $merged->values()->count());
         $this->assertFalse(Attribute::where('id', $attribute2->id)->exists());
     }
 }

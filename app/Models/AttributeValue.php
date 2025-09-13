@@ -24,6 +24,12 @@ final class AttributeValue extends Model
         'color_code',
         'sort_order',
         'is_enabled',
+        'description',
+        'hex_color',
+        'image',
+        'metadata',
+        'display_value',
+        'is_active',
     ];
 
     protected function casts(): array
@@ -31,6 +37,8 @@ final class AttributeValue extends Model
         return [
             'sort_order' => 'integer',
             'is_enabled' => 'boolean',
+            'is_active' => 'boolean',
+            'metadata' => 'array',
         ];
     }
 
@@ -41,12 +49,8 @@ final class AttributeValue extends Model
         return $this->belongsTo(Attribute::class);
     }
 
-    public function products(): BelongsToMany
-    {
-        return $this
-            ->belongsToMany(Product::class, 'product_attribute_values')
-            ->withTimestamps();
-    }
+    // Note: AttributeValue doesn't have a direct products() relationship
+    // Products are connected through variants via product_variant_attributes table
 
     public function variants(): BelongsToMany
     {
@@ -62,11 +66,41 @@ final class AttributeValue extends Model
 
     public function scopeOrdered($query)
     {
-        return $query->orderBy('position');
+        return $query->orderBy('sort_order');
     }
 
     public function scopeForAttribute($query, int $attributeId)
     {
         return $query->where('attribute_id', $attributeId);
+    }
+
+    public function scopeByAttribute($query, int $attributeId)
+    {
+        return $query->where('attribute_id', $attributeId);
+    }
+
+    public function scopeByValue($query, string $value)
+    {
+        return $query->where('value', $value);
+    }
+
+    public function scopeByDisplayValue($query, string $displayValue)
+    {
+        return $query->where('display_value', $displayValue);
+    }
+
+    public function scopeByHexColor($query, string $hexColor)
+    {
+        return $query->where('hex_color', $hexColor);
+    }
+
+    public function scopeByImage($query, string $image)
+    {
+        return $query->where('image', $image);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

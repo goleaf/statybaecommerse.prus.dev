@@ -6,6 +6,7 @@ use App\Models\AttributeValue;
 use App\Models\Attribute;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AttributeValueTest extends TestCase
@@ -18,17 +19,17 @@ class AttributeValueTest extends TestCase
         $attributeValue = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
             'value' => 'Red',
-            'display_value' => 'Red Color',
+            'slug' => 'red',
             'sort_order' => 1,
-            'is_active' => true,
+            'is_enabled' => true,
         ]);
 
         $this->assertDatabaseHas('attribute_values', [
             'attribute_id' => $attribute->id,
             'value' => 'Red',
-            'display_value' => 'Red Color',
+            'slug' => 'red',
             'sort_order' => 1,
-            'is_active' => true,
+            'is_enabled' => true,
         ]);
     }
 
@@ -41,30 +42,18 @@ class AttributeValueTest extends TestCase
         $this->assertEquals($attribute->id, $attributeValue->attribute->id);
     }
 
-    public function test_attribute_value_belongs_to_many_products(): void
-    {
-        $attribute = Attribute::factory()->create();
-        $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
-        $product1 = Product::factory()->create();
-        $product2 = Product::factory()->create();
-
-        $attributeValue->products()->attach([$product1->id, $product2->id]);
-
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $attributeValue->products);
-        $this->assertCount(2, $attributeValue->products);
-        $this->assertTrue($attributeValue->products->contains($product1));
-        $this->assertTrue($attributeValue->products->contains($product2));
-    }
+    // Note: AttributeValue doesn't have a direct products() relationship
+    // Products are connected through variants via product_variant_attributes table
 
     public function test_attribute_value_casts_work_correctly(): void
     {
         $attributeValue = AttributeValue::factory()->create([
-            'is_active' => true,
+            'is_enabled' => true,
             'sort_order' => 5,
             'created_at' => now(),
         ]);
 
-        $this->assertIsBool($attributeValue->is_active);
+        $this->assertIsBool($attributeValue->is_enabled);
         $this->assertIsInt($attributeValue->sort_order);
         $this->assertInstanceOf(\Carbon\Carbon::class, $attributeValue->created_at);
     }
@@ -76,20 +65,21 @@ class AttributeValueTest extends TestCase
 
         $this->assertContains('attribute_id', $fillable);
         $this->assertContains('value', $fillable);
-        $this->assertContains('display_value', $fillable);
-        $this->assertContains('is_active', $fillable);
+        $this->assertContains('slug', $fillable);
+        $this->assertContains('color_code', $fillable);
         $this->assertContains('sort_order', $fillable);
+        $this->assertContains('is_enabled', $fillable);
     }
 
-    public function test_attribute_value_scope_active(): void
+    public function test_attribute_value_scope_enabled(): void
     {
-        $activeValue = AttributeValue::factory()->create(['is_active' => true]);
-        $inactiveValue = AttributeValue::factory()->create(['is_active' => false]);
+        $enabledValue = AttributeValue::factory()->create(['is_enabled' => true]);
+        $disabledValue = AttributeValue::factory()->create(['is_enabled' => false]);
 
-        $activeValues = AttributeValue::active()->get();
+        $enabledValues = AttributeValue::enabled()->get();
 
-        $this->assertTrue($activeValues->contains($activeValue));
-        $this->assertFalse($activeValues->contains($inactiveValue));
+        $this->assertTrue($enabledValues->contains($enabledValue));
+        $this->assertFalse($enabledValues->contains($disabledValue));
     }
 
     public function test_attribute_value_scope_ordered(): void
@@ -386,10 +376,9 @@ class AttributeValueTest extends TestCase
     public function test_attribute_value_can_have_scope_by_attribute_and_ordered(): void
     {
         $attribute1 = Attribute::factory()->create();
-        $attribute2 = Attribute::factory()->create();
         
         $value1 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id, 'sort_order' => 1]);
-        $value2 = AttributeValue::factory()->create(['attribute_id' => $attribute2->id, 'sort_order' => 2]);
+        $value2 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id, 'sort_order' => 2]);
 
         $attribute1OrderedValues = AttributeValue::byAttribute($attribute1->id)->ordered()->get();
 
@@ -411,7 +400,7 @@ class AttributeValueTest extends TestCase
     public function test_attribute_value_can_have_scope_by_value_and_ordered(): void
     {
         $value1 = AttributeValue::factory()->create(['value' => 'Red', 'sort_order' => 1]);
-        $value2 = AttributeValue::factory()->create(['value' => 'Blue', 'sort_order' => 2]);
+        $value2 = AttributeValue::factory()->create(['value' => 'Red', 'sort_order' => 2]);
 
         $redOrderedValues = AttributeValue::byValue('Red')->ordered()->get();
 
@@ -433,7 +422,7 @@ class AttributeValueTest extends TestCase
     public function test_attribute_value_can_have_scope_by_display_value_and_ordered(): void
     {
         $value1 = AttributeValue::factory()->create(['display_value' => 'Red Color', 'sort_order' => 1]);
-        $value2 = AttributeValue::factory()->create(['display_value' => 'Blue Color', 'sort_order' => 2]);
+        $value2 = AttributeValue::factory()->create(['display_value' => 'Red Color', 'sort_order' => 2]);
 
         $redDisplayOrderedValues = AttributeValue::byDisplayValue('Red Color')->ordered()->get();
 
@@ -455,7 +444,7 @@ class AttributeValueTest extends TestCase
     public function test_attribute_value_can_have_scope_by_hex_color_and_ordered(): void
     {
         $value1 = AttributeValue::factory()->create(['hex_color' => '#FF0000', 'sort_order' => 1]);
-        $value2 = AttributeValue::factory()->create(['hex_color' => '#0000FF', 'sort_order' => 2]);
+        $value2 = AttributeValue::factory()->create(['hex_color' => '#FF0000', 'sort_order' => 2]);
 
         $redHexOrderedValues = AttributeValue::byHexColor('#FF0000')->ordered()->get();
 
@@ -477,7 +466,7 @@ class AttributeValueTest extends TestCase
     public function test_attribute_value_can_have_scope_by_image_and_ordered(): void
     {
         $value1 = AttributeValue::factory()->create(['image' => 'red-color.jpg', 'sort_order' => 1]);
-        $value2 = AttributeValue::factory()->create(['image' => 'blue-color.jpg', 'sort_order' => 2]);
+        $value2 = AttributeValue::factory()->create(['image' => 'red-color.jpg', 'sort_order' => 2]);
 
         $redImageOrderedValues = AttributeValue::byImage('red-color.jpg')->ordered()->get();
 

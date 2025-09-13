@@ -42,7 +42,12 @@ final class CampaignConversionFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'conversion_type' => 'purchase',
             'conversion_value' => $this->faker->randomFloat(2, 10, 500),
-            'order_id' => Order::factory(),
+            'status' => 'completed',
+            'order_id' => Order::factory()->create([
+                'channel_id' => null,
+                'zone_id' => null,
+                'partner_id' => null,
+            ])->id,
         ]);
     }
 
@@ -51,6 +56,7 @@ final class CampaignConversionFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'conversion_type' => 'signup',
             'conversion_value' => 0,
+            'status' => 'completed',
             'customer_id' => User::factory(),
         ]);
     }
@@ -99,8 +105,46 @@ final class CampaignConversionFactory extends Factory
     public function withOrder(): static
     {
         return $this->state(fn (array $attributes) => [
-            'order_id' => Order::factory(),
+            'order_id' => Order::factory()->create([
+                'channel_id' => null,
+                'zone_id' => null,
+                'partner_id' => null,
+            ])->id,
             'conversion_type' => 'purchase',
+        ]);
+    }
+
+    public function mobile(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'device_type' => 'mobile',
+            'is_mobile' => true,
+            'is_tablet' => false,
+            'is_desktop' => false,
+        ]);
+    }
+
+    public function desktop(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'device_type' => 'desktop',
+            'is_mobile' => false,
+            'is_tablet' => false,
+            'is_desktop' => true,
+        ]);
+    }
+
+    public function pending(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'pending',
+        ]);
+    }
+
+    public function completed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'completed',
         ]);
     }
 }

@@ -5,86 +5,74 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Collection;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Widgets\TableWidget as BaseWidget;
+use Filament\Widgets\ChartWidget;
+use Illuminate\Support\Facades\DB;
 
-final class CollectionPerformanceWidget extends BaseWidget
+final class CollectionPerformanceWidget extends ChartWidget
 {
-    protected int|string|array $columnSpan = 'full';
+    protected ?string $heading = 'admin.collections.charts.performance_heading';
 
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 2;
 
-    protected static ?string $heading = 'Collection Performance Analytics';
+    protected ?string $pollingInterval = '60s';
 
-    public function table(Table $table): Table
+    protected function getData(): array
     {
-        return $table
-            ->query(
-                Collection::query()
-                    ->withCount('products')
-                    ->withSum('products as total_views', 'views_count')
-                    ->withSum('products as total_sales', 'sales_count')
-                    ->withAvg('products as avg_rating', 'rating')
-                    ->orderBy('total_sales', 'desc')
-                    ->limit(10)
-            )
-            ->columns([
-                Tables\Columns\ImageColumn::make('image')
-                    ->label(__('admin.collections.fields.image'))
-                    ->getStateUsing(fn (Collection $record) => $record->getFirstMediaUrl('images', 'thumb'))
-                    ->defaultImageUrl(asset('images/placeholder-collection.png'))
-                    ->circular()
-                    ->size(40),
-                Tables\Columns\TextColumn::make('name')
-                    ->label(__('admin.collections.fields.name'))
-                    ->searchable()
-                    ->sortable()
-                    ->weight('medium')
-                    ->wrap(),
-                Tables\Columns\TextColumn::make('products_count')
-                    ->label(__('admin.collections.fields.products_count'))
-                    ->badge()
-                    ->color('primary')
-                    ->sortable()
-                    ->alignCenter(),
-                Tables\Columns\TextColumn::make('total_views')
-                    ->label(__('admin.collections.analytics.total_views'))
-                    ->numeric()
-                    ->sortable()
-                    ->alignCenter()
-                    ->formatStateUsing(fn ($state) => number_format($state ?? 0)),
-                Tables\Columns\TextColumn::make('total_sales')
-                    ->label(__('admin.collections.analytics.total_sales'))
-                    ->numeric()
-                    ->sortable()
-                    ->alignCenter()
-                    ->formatStateUsing(fn ($state) => number_format($state ?? 0)),
-                Tables\Columns\TextColumn::make('avg_rating')
-                    ->label(__('admin.collections.analytics.avg_rating'))
-                    ->numeric()
-                    ->sortable()
-                    ->alignCenter()
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1).' ⭐' : 'N/A'),
-                Tables\Columns\IconColumn::make('is_visible')
-                    ->label(__('admin.collections.fields.is_visible'))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-eye')
-                    ->falseIcon('heroicon-o-eye-slash')
-                    ->trueColor('success')
-                    ->falseColor('danger'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('admin.collections.fields.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->label(__('admin.collections.actions.view')),
-                Tables\Actions\EditAction::make()
-                    ->label(__('admin.collections.actions.edit')),
-            ])
-            ->defaultSort('total_sales', 'desc');
+        $collections = Collection::withCount('products')
+            ->orderBy('products_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        return [
+            'datasets' => [
+                [
+                    'label' => __('admin.collections.charts.products_count'),
+                    'data' => $collections->pluck('products_count')->toArray(),
+                    'backgroundColor' => [
+                        '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+                        '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6B7280',
+                    ],
+                    'borderColor' => [
+                        '#1E40AF', '#059669', '#D97706', '#DC2626', '#7C3AED',
+                        '#0891B2', '#65A30D', '#EA580C', '#DB2777', '#4B5563',
+                    ],
+                    'borderWidth' => 2,
+                ],
+            ],
+            'labels' => $collections->pluck('name')->toArray(),
+        ];
+    }
+
+    protected function getType(): string
+    {
+        return 'bar';
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'responsive' => true,
+            'maintainAspectRatio' => false,
+            'plugins' => [
+                'legend' => [
+                    'display' => false,
+                ],
+                'tooltip' => [
+                    'callbacks' => [
+                        'label' => 'function(context) {
+                            return "' . __('admin.collections.charts.products_count') . ': " + context.parsed.y;
+                        }',
+                    ],
+                ],
+            ],
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                    'ticks' => [
+                        'stepSize' => 1,
+                    ],
+                ],
+            ],
+        ];
     }
 }

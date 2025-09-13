@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+namespace Database\Factories\Translations;
 
 use App\Models\AttributeValue;
 use App\Models\Translations\AttributeValueTranslation;
@@ -18,7 +18,7 @@ final class AttributeValueTranslationFactory extends Factory
     public function definition(): array
     {
         return [
-            'attribute_value_id' => AttributeValue::factory(),
+            'attribute_value_id' => null, // Let tests specify this
             'locale' => $this->faker->randomElement(['en', 'lt', 'de']),
             'value' => $this->faker->word(),
             'description' => $this->faker->optional(0.7)->sentence(),
@@ -71,6 +71,13 @@ final class AttributeValueTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'meta_data' => $metaData,
+        ]);
+    }
+
+    public function forAttributeValue(int $attributeValueId): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'attribute_value_id' => $attributeValueId,
         ]);
     }
 

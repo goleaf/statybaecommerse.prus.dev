@@ -165,6 +165,7 @@ return [
     'products_count' => 'Produktų skaičius',
     'value_information' => 'Reikšmės informacija',
     'untitled_attribute' => 'Be pavadinimo atributas',
+    'untitled_value' => 'Be pavadinimo reikšmė',
     'total_attributes_description' => 'Bendras atributų skaičius sistemoje',
     'enabled_attributes_description' => 'Aktyvių atributų skaičius',
     'required_attributes_description' => 'Privalomų atributų skaičius',

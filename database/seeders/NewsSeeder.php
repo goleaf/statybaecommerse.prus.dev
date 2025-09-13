@@ -12,8 +12,8 @@ final class NewsSeeder extends Seeder
 {
     public function run(): void
     {
-        $locales = collect(config('app.supported_locales', 'lt,en'))
-            ->when(fn ($v) => is_string($v), fn ($c) => collect(preg_split('/[\s,|]+/', (string) $v, -1, PREG_SPLIT_NO_EMPTY)))
+        $supportedLocales = config('app.supported_locales', 'lt,en');
+        $locales = collect(explode(',', (string) $supportedLocales))
             ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
@@ -21,10 +21,15 @@ final class NewsSeeder extends Seeder
 
         // Create 12 news items with different dates
         for ($i = 1; $i <= 12; $i++) {
-            /** @var News $news */
-            $news = News::factory()->create([
-                'published_at' => now()->subDays($i),
-            ]);
+            // Check if news item already exists
+            $news = News::where('published_at', now()->subDays($i)->toDateString())->first();
+            
+            if (!$news) {
+                /** @var News $news */
+                $news = News::factory()->create([
+                    'published_at' => now()->subDays($i),
+                ]);
+            }
 
             foreach ($locales as $locale) {
                 // Use Lorem Ipsum for all languages as requested
@@ -35,7 +40,9 @@ final class NewsSeeder extends Seeder
 
                 // Localize title minimally by appending locale code
                 $title = $locale === 'lt' ? "Demonstracinė naujiena {$i}" : ($locale === 'en' ? $titleBase : $titleBase." ({$locale})");
+                // Make slug unique by including news ID to avoid conflicts
                 $slug = $locale === 'lt' ? str("Demonstracinė naujiena {$i}")->slug()->toString() : $slugBase.($locale === 'en' ? '' : "-{$locale}");
+                $slug = $slug . "-{$news->id}"; // Add news ID to make slug unique
 
                 NewsTranslation::updateOrCreate([
                     'news_id' => $news->id,

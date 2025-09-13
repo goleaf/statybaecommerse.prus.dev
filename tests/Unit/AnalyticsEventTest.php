@@ -19,14 +19,12 @@ class AnalyticsEventTest extends TestCase
         $event = AnalyticsEvent::factory()->create([
             'user_id' => $user->id,
             'event_type' => 'page_view',
-            'event_name' => 'product_viewed',
             'properties' => ['product_id' => 123],
         ]);
 
         $this->assertDatabaseHas('analytics_events', [
             'user_id' => $user->id,
             'event_type' => 'page_view',
-            'event_name' => 'product_viewed',
         ]);
     }
 
@@ -58,7 +56,6 @@ class AnalyticsEventTest extends TestCase
 
         $this->assertContains('user_id', $fillable);
         $this->assertContains('event_type', $fillable);
-        $this->assertContains('event_name', $fillable);
         $this->assertContains('properties', $fillable);
     }
 
@@ -67,22 +64,12 @@ class AnalyticsEventTest extends TestCase
         $pageViewEvent = AnalyticsEvent::factory()->create(['event_type' => 'page_view']);
         $clickEvent = AnalyticsEvent::factory()->create(['event_type' => 'click']);
 
-        $pageViewEvents = AnalyticsEvent::byType('page_view')->get();
+        $pageViewEvents = AnalyticsEvent::byEventType('page_view')->get();
 
         $this->assertTrue($pageViewEvents->contains($pageViewEvent));
         $this->assertFalse($pageViewEvents->contains($clickEvent));
     }
 
-    public function test_analytics_event_scope_by_name(): void
-    {
-        $productViewEvent = AnalyticsEvent::factory()->create(['event_name' => 'product_viewed']);
-        $cartAddEvent = AnalyticsEvent::factory()->create(['event_name' => 'cart_added']);
-
-        $productViewEvents = AnalyticsEvent::byName('product_viewed')->get();
-
-        $this->assertTrue($productViewEvents->contains($productViewEvent));
-        $this->assertFalse($productViewEvents->contains($cartAddEvent));
-    }
 
     public function test_analytics_event_scope_for_user(): void
     {
@@ -92,7 +79,7 @@ class AnalyticsEventTest extends TestCase
         $event1 = AnalyticsEvent::factory()->create(['user_id' => $user1->id]);
         $event2 = AnalyticsEvent::factory()->create(['user_id' => $user2->id]);
 
-        $user1Events = AnalyticsEvent::forUser($user1->id)->get();
+        $user1Events = AnalyticsEvent::byUser($user1->id)->get();
 
         $this->assertTrue($user1Events->contains($event1));
         $this->assertFalse($user1Events->contains($event2));
@@ -179,17 +166,17 @@ class AnalyticsEventTest extends TestCase
     public function test_analytics_event_can_have_metadata(): void
     {
         $event = AnalyticsEvent::factory()->create([
-            'metadata' => [
+            'properties' => [
                 'page_title' => 'Test Product',
                 'category' => 'Electronics',
                 'value' => 99.99,
             ],
         ]);
 
-        $this->assertIsArray($event->metadata);
-        $this->assertEquals('Test Product', $event->metadata['page_title']);
-        $this->assertEquals('Electronics', $event->metadata['category']);
-        $this->assertEquals(99.99, $event->metadata['value']);
+        $this->assertIsArray($event->properties);
+        $this->assertEquals('Test Product', $event->properties['page_title']);
+        $this->assertEquals('Electronics', $event->properties['category']);
+        $this->assertEquals(99.99, $event->properties['value']);
     }
 
     public function test_analytics_event_can_track_ecommerce_events(): void
@@ -198,7 +185,6 @@ class AnalyticsEventTest extends TestCase
         
         $event = AnalyticsEvent::factory()->create([
             'event_type' => 'ecommerce',
-            'event_name' => 'purchase',
             'properties' => [
                 'transaction_id' => 'TXN-123',
                 'value' => 199.99,
@@ -214,7 +200,6 @@ class AnalyticsEventTest extends TestCase
         ]);
 
         $this->assertEquals('ecommerce', $event->event_type);
-        $this->assertEquals('purchase', $event->event_name);
         $this->assertEquals('TXN-123', $event->properties['transaction_id']);
         $this->assertEquals(199.99, $event->properties['value']);
     }
@@ -223,7 +208,6 @@ class AnalyticsEventTest extends TestCase
     {
         $event = AnalyticsEvent::factory()->create([
             'event_type' => 'engagement',
-            'event_name' => 'time_on_page',
             'properties' => [
                 'duration' => 120,
                 'page' => '/products/test-product',
@@ -231,7 +215,6 @@ class AnalyticsEventTest extends TestCase
         ]);
 
         $this->assertEquals('engagement', $event->event_type);
-        $this->assertEquals('time_on_page', $event->event_name);
         $this->assertEquals(120, $event->properties['duration']);
     }
 }

@@ -15,10 +15,14 @@ final class CountryModelTest extends TestCase
     {
         $fillable = [
             'name',
+            'name_official',
             'cca2',
             'cca3',
             'ccn3',
+            'code',
+            'iso_code',
             'currency_code',
+            'currency_symbol',
             'phone_code',
             'phone_calling_code',
             'flag',
@@ -30,6 +34,13 @@ final class CountryModelTest extends TestCase
             'currencies',
             'languages',
             'timezones',
+            'is_active',
+            'is_eu_member',
+            'requires_vat',
+            'vat_rate',
+            'timezone',
+            'description',
+            'metadata',
             'is_enabled',
             'sort_order',
         ];

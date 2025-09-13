@@ -13,8 +13,10 @@ final class NewsCategorySeeder extends Seeder
 {
     public function run(): void
     {
-        $locales = collect(config('app.supported_locales', 'lt,en'))
-            ->when(fn ($v) => is_string($v), fn ($c) => collect(preg_split('/[\s,|]+/', (string) $v, -1, PREG_SPLIT_NO_EMPTY)))
+        $supportedLocales = config('app.supported_locales', 'lt,en');
+        $locales = collect(is_array($supportedLocales) 
+            ? $supportedLocales 
+            : array_filter(array_map('trim', explode(',', (string) $supportedLocales))))
             ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()

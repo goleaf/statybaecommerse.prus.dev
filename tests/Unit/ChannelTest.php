@@ -15,31 +15,25 @@ class ChannelTest extends TestCase
     {
         $channel = Channel::factory()->create([
             'name' => 'Online Store',
-            'code' => 'online',
-            'type' => 'web',
-            'is_active' => true,
+            'is_enabled' => true,
         ]);
 
         $this->assertDatabaseHas('channels', [
             'name' => 'Online Store',
-            'code' => 'online',
-            'type' => 'web',
-            'is_active' => true,
+            'is_enabled' => true,
         ]);
     }
 
     public function test_channel_casts_work_correctly(): void
     {
         $channel = Channel::factory()->create([
-            'is_active' => true,
+            'is_enabled' => true,
             'is_default' => false,
-            'sort_order' => 5,
             'created_at' => now(),
         ]);
 
-        $this->assertIsBool($channel->is_active);
+        $this->assertIsBool($channel->is_enabled);
         $this->assertIsBool($channel->is_default);
-        $this->assertIsInt($channel->sort_order);
         $this->assertInstanceOf(\Carbon\Carbon::class, $channel->created_at);
     }
 
@@ -49,17 +43,17 @@ class ChannelTest extends TestCase
         $fillable = $channel->getFillable();
 
         $this->assertContains('name', $fillable);
-        $this->assertContains('code', $fillable);
-        $this->assertContains('type', $fillable);
-        $this->assertContains('is_active', $fillable);
+        $this->assertContains('slug', $fillable);
+        $this->assertContains('url', $fillable);
+        $this->assertContains('is_enabled', $fillable);
     }
 
-    public function test_channel_scope_active(): void
+    public function test_channel_scope_enabled(): void
     {
-        $activeChannel = Channel::factory()->create(['is_active' => true]);
-        $inactiveChannel = Channel::factory()->create(['is_active' => false]);
+        $activeChannel = Channel::factory()->create(['is_enabled' => true]);
+        $inactiveChannel = Channel::factory()->create(['is_enabled' => false]);
 
-        $activeChannels = Channel::active()->get();
+        $activeChannels = Channel::enabled()->get();
 
         $this->assertTrue($activeChannels->contains($activeChannel));
         $this->assertFalse($activeChannels->contains($inactiveChannel));

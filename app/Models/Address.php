@@ -337,11 +337,15 @@ final class Address extends Model
     public static function getShippingAddressForUser(int $userId): ?self
     {
         return static::where('user_id', $userId)
+            ->where('is_active', true)
             ->where(function ($query) {
                 $query->where('is_shipping', true)
-                      ->orWhere('type', AddressType::SHIPPING);
+                      ->orWhere(function ($subQuery) {
+                          $subQuery->where('is_shipping', false)
+                                   ->where('type', AddressType::SHIPPING);
+                      });
             })
-            ->where('is_active', true)
+            ->orderBy('is_shipping', 'desc') // Prioritize is_shipping = true
             ->first();
     }
 

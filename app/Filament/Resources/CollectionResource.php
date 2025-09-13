@@ -16,7 +16,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\DeleteAction;
@@ -65,7 +64,7 @@ final class CollectionResource extends Resource
         return $form
             ->schema([
                 // Basic Information Section
-                SchemaSection::make(__('admin.collections.sections.basic_information'))
+                Section::make(__('admin.collections.sections.basic_information'))
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -120,7 +119,7 @@ final class CollectionResource extends Resource
                     ]),
 
                 // Collection Settings Section
-                SchemaSection::make(__('admin.collections.sections.collection_settings'))
+                Section::make(__('admin.collections.sections.collection_settings'))
                     ->schema([
                         TextInput::make('max_products')
                             ->label(__('admin.collections.fields.max_products'))
@@ -135,10 +134,36 @@ final class CollectionResource extends Resource
                             ->keyLabel(__('admin.collections.fields.rule_key'))
                             ->valueLabel(__('admin.collections.fields.rule_value'))
                             ->visible(fn (callable $get) => $get('is_automatic')),
+
+                        Grid::make(3)
+                            ->schema([
+                                TextInput::make('display_type')
+                                    ->label(__('admin.collections.fields.display_type'))
+                                    ->helperText(__('admin.collections.help.display_type'))
+                                    ->default('grid')
+                                    ->options([
+                                        'grid' => __('admin.collections.display_types.grid'),
+                                        'list' => __('admin.collections.display_types.list'),
+                                        'carousel' => __('admin.collections.display_types.carousel'),
+                                    ]),
+
+                                TextInput::make('products_per_page')
+                                    ->label(__('admin.collections.fields.products_per_page'))
+                                    ->helperText(__('admin.collections.help.products_per_page'))
+                                    ->numeric()
+                                    ->default(12)
+                                    ->minValue(1)
+                                    ->maxValue(100),
+
+                                Toggle::make('show_filters')
+                                    ->label(__('admin.collections.fields.show_filters'))
+                                    ->helperText(__('admin.collections.help.show_filters'))
+                                    ->default(true),
+                            ]),
                     ]),
 
                 // SEO Settings Section
-                SchemaSection::make(__('admin.collections.sections.seo_settings'))
+                Section::make(__('admin.collections.sections.seo_settings'))
                     ->schema([
                         TextInput::make('seo_title')
                             ->label(__('admin.collections.fields.seo_title'))
@@ -150,10 +175,26 @@ final class CollectionResource extends Resource
                             ->placeholder(__('admin.collections.placeholders.seo_description'))
                             ->rows(2)
                             ->maxLength(500),
+
+                        TextInput::make('meta_title')
+                            ->label(__('admin.collections.fields.meta_title'))
+                            ->placeholder(__('admin.collections.placeholders.meta_title'))
+                            ->maxLength(255),
+
+                        Textarea::make('meta_description')
+                            ->label(__('admin.collections.fields.meta_description'))
+                            ->placeholder(__('admin.collections.placeholders.meta_description'))
+                            ->rows(2)
+                            ->maxLength(500),
+
+                        TextInput::make('meta_keywords')
+                            ->label(__('admin.collections.fields.meta_keywords'))
+                            ->placeholder(__('admin.collections.placeholders.meta_keywords'))
+                            ->helperText(__('admin.collections.help.meta_keywords')),
                     ]),
 
                 // Media Section
-                SchemaSection::make(__('admin.collections.sections.media'))
+                Section::make(__('admin.collections.sections.media'))
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -212,6 +253,21 @@ final class CollectionResource extends Resource
                                     'label' => __('admin.collections.fields.seo_description'),
                                     'rows' => 2,
                                     'maxLength' => 500,
+                                ],
+                                'meta_title' => [
+                                    'type' => 'text',
+                                    'label' => __('admin.collections.fields.meta_title'),
+                                    'maxLength' => 255,
+                                ],
+                                'meta_description' => [
+                                    'type' => 'textarea',
+                                    'label' => __('admin.collections.fields.meta_description'),
+                                    'rows' => 2,
+                                    'maxLength' => 500,
+                                ],
+                                'meta_keywords' => [
+                                    'type' => 'text',
+                                    'label' => __('admin.collections.fields.meta_keywords'),
                                 ],
                             ],
                         ]),
@@ -282,6 +338,30 @@ final class CollectionResource extends Resource
                     ->sortable()
                     ->alignCenter(),
 
+                TextColumn::make('display_type')
+                    ->label(__('admin.collections.table.display_type'))
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'grid' => 'success',
+                        'list' => 'info',
+                        'carousel' => 'warning',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => __("admin.collections.display_types.{$state}")),
+
+                TextColumn::make('products_per_page')
+                    ->label(__('admin.collections.table.products_per_page'))
+                    ->sortable()
+                    ->alignCenter(),
+
+                IconColumn::make('show_filters')
+                    ->label(__('admin.collections.table.show_filters'))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-funnel')
+                    ->falseIcon('heroicon-o-funnel-slash')
+                    ->trueColor('success')
+                    ->falseColor('gray'),
+
                 TextColumn::make('created_at')
                     ->label(__('admin.collections.table.created_at'))
                     ->dateTime()
@@ -340,6 +420,29 @@ final class CollectionResource extends Resource
                                 fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
+
+                Filter::make('display_type')
+                    ->label(__('admin.collections.filters.display_type'))
+                    ->form([
+                        TextInput::make('display_type')
+                            ->label(__('admin.collections.filters.display_type'))
+                            ->options([
+                                'grid' => __('admin.collections.display_types.grid'),
+                                'list' => __('admin.collections.display_types.list'),
+                                'carousel' => __('admin.collections.display_types.carousel'),
+                            ]),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['display_type'],
+                                fn (Builder $query, $type): Builder => $query->where('display_type', $type),
+                            );
+                    }),
+
+                Filter::make('show_filters')
+                    ->label(__('admin.collections.filters.show_filters'))
+                    ->query(fn (Builder $query): Builder => $query->where('show_filters', true)),
             ])
             ->actions([
                 ViewAction::make()

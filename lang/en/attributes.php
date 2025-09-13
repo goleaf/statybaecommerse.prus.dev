@@ -165,6 +165,7 @@ return [
     'products_count' => 'Products Count',
     'value_information' => 'Value Information',
     'untitled_attribute' => 'Untitled Attribute',
+    'untitled_value' => 'Untitled Value',
     'total_attributes_description' => 'Total number of attributes in the system',
     'enabled_attributes_description' => 'Number of active attributes',
     'required_attributes_description' => 'Number of required attributes',

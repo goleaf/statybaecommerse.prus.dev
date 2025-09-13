@@ -102,6 +102,9 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         'verification_token',
         'password_reset_token',
         'password_reset_expires_at',
+        'referral_code',
+        'referral_code_generated_at',
+        'referral_settings',
     ];
 
     protected $hidden = [
@@ -336,7 +339,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
 
     public function getReferralCodeAttribute(): ?string
     {
-        return $this->referral_code;
+        return $this->attributes['referral_code'] ?? null;
     }
 
     public function getReferralUrlAttribute(): ?string

@@ -64,10 +64,10 @@ class BrandTest extends TestCase
     public function test_brand_casts_work_correctly(): void
     {
         $brand = Brand::factory()->create([
-            'is_active' => true,
+            'is_enabled' => true,
         ]);
 
-        $this->assertIsBool($brand->is_active);
+        $this->assertIsBool($brand->is_enabled);
     }
 
     public function test_brand_fillable_attributes(): void
@@ -78,6 +78,6 @@ class BrandTest extends TestCase
         $this->assertContains('name', $fillable);
         $this->assertContains('slug', $fillable);
         $this->assertContains('description', $fillable);
-        $this->assertContains('is_active', $fillable);
+        $this->assertContains('is_enabled', $fillable);
     }
 }

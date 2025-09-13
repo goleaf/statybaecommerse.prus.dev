@@ -45,6 +45,13 @@ Route::prefix('campaigns')->name('frontend.campaigns.')->group(function () {
         Route::get('/{reward}', [App\Http\Controllers\Frontend\ReferralRewardController::class, 'show'])->name('show');
     });
 
+    // Country Frontend Routes
+    Route::prefix('countries')->name('frontend.countries.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Frontend\CountryController::class, 'index'])->name('index');
+        Route::get('/{country}', [App\Http\Controllers\Frontend\CountryController::class, 'show'])->name('show');
+        Route::get('/api/search', [App\Http\Controllers\Frontend\CountryController::class, 'getCountriesJson'])->name('api.search');
+    });
+
     // Address Frontend Routes
     Route::middleware(['auth'])->prefix('addresses')->name('frontend.addresses.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\AddressController::class, 'index'])->name('index');
@@ -600,7 +607,7 @@ Route::get('/', function () {
     $supported = config('app.supported_locales', 'en');
     $locales = is_array($supported)
         ? $supported
-        : preg_split('/[\s,|]+/', (string) $supported, -1, PREG_SPLIT_NO_EMPTY);
+        : array_filter(array_map('trim', explode(',', (string) $supported)));
     $locale = $locales[0] ?? config('app.locale', 'en');
 
     return redirect('/'.$locale);
@@ -641,12 +648,13 @@ Route::get('/brands', function () {
 Route::get('/brands/{brand}', function ($brand) {
     return redirect('/'.app()->getLocale().'/brands/'.$brand);
 })->name('brands.show');
-Route::get('/collections', function () {
-    return redirect('/'.app()->getLocale().'/collections');
-})->name('collections.index');
-Route::get('/collections/{collection}', function ($collection) {
-    return redirect('/'.app()->getLocale().'/collections/'.$collection);
-})->name('collections.show');
+// Collection routes
+Route::prefix('collections')->name('collections.')->group(function () {
+    Route::get('/', [App\Http\Controllers\CollectionController::class, 'index'])->name('index');
+    Route::get('/{collection}', [App\Http\Controllers\CollectionController::class, 'show'])->name('show');
+    Route::get('/{collection}/products', [App\Http\Controllers\CollectionController::class, 'products'])->name('products');
+    Route::get('/api/search', [App\Http\Controllers\CollectionController::class, 'search'])->name('search');
+});
 Route::get('/cart', Pages\Cart::class)->name('cart.index');
 Route::get('/search', function () {
     return redirect('/'.app()->getLocale().'/search');
@@ -1260,4 +1268,13 @@ Route::prefix('posts')->name('posts.')->group(function () {
     Route::get('/search', [App\Http\Controllers\PostController::class, 'search'])->name('search');
     Route::get('/author/{authorId}', [App\Http\Controllers\PostController::class, 'byAuthor'])->name('by-author');
     Route::get('/{post}', [App\Http\Controllers\PostController::class, 'show'])->name('show');
+});
+
+// City Frontend Routes
+Route::prefix('cities')->name('cities.')->group(function () {
+    Route::get('/', [App\Http\Controllers\CityController::class, 'index'])->name('index');
+    Route::get('/search', [App\Http\Controllers\CityController::class, 'search'])->name('search');
+    Route::get('/country/{country}', [App\Http\Controllers\CityController::class, 'byCountry'])->name('by-country');
+    Route::get('/region/{region}', [App\Http\Controllers\CityController::class, 'byRegion'])->name('by-region');
+    Route::get('/{city}', [App\Http\Controllers\CityController::class, 'show'])->name('show');
 });

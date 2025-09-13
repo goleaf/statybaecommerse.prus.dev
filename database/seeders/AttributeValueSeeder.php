@@ -83,7 +83,6 @@ final class AttributeValueSeeder extends Seeder
                         'attribute_value_id' => $valueId,
                         'locale' => $loc,
                         'value' => $v[$loc] ?? $v['lt'],
-                        'key' => null,
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];
@@ -91,7 +90,7 @@ final class AttributeValueSeeder extends Seeder
                 DB::table('attribute_value_translations')->upsert(
                     $trRows,
                     ['attribute_value_id', 'locale'],
-                    ['value', 'key', 'updated_at']
+                    ['value', 'updated_at']
                 );
 
                 $order++;

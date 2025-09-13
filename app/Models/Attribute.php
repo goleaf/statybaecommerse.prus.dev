@@ -381,22 +381,22 @@ final class Attribute extends Model
 
     public function getValuesUsageCount(): int
     {
-        return $this->values()->whereHas('products')->count();
+        return $this->values()->whereHas('variants')->count();
     }
 
     public function getMostUsedValue()
     {
         return $this->values()
-            ->withCount('products')
-            ->orderBy('products_count', 'desc')
+            ->withCount('variants')
+            ->orderBy('variants_count', 'desc')
             ->first();
     }
 
     public function getLeastUsedValue()
     {
         return $this->values()
-            ->withCount('products')
-            ->orderBy('products_count', 'asc')
+            ->withCount('variants')
+            ->orderBy('variants_count', 'asc')
             ->first();
     }
 
@@ -407,7 +407,7 @@ final class Attribute extends Model
             return 0;
         }
         
-        $totalValues = $this->values()->whereHas('products')->count();
+        $totalValues = $this->values()->whereHas('variants')->count();
         return round($totalValues / $totalProducts, 2);
     }
 
@@ -485,8 +485,25 @@ final class Attribute extends Model
         // Move all values from other attribute to this one
         $otherAttribute->values()->update(['attribute_id' => $this->id]);
         
-        // Update products to use this attribute instead
-        $otherAttribute->products()->sync($this->products()->pluck('products.id')->toArray());
+        // Update product_attributes records to use this attribute instead
+        // We need to update both attribute_id and attribute_value_id
+        $otherAttribute->products()->get()->each(function ($product) use ($otherAttribute) {
+            // Get the attribute values for this product from the other attribute
+            $attributeValues = $otherAttribute->values()->whereHas('variants', function ($query) use ($product) {
+                $query->whereHas('product', function ($q) use ($product) {
+                    $q->where('id', $product->id);
+                });
+            })->get();
+            
+            // Update the product_attributes records
+            foreach ($attributeValues as $value) {
+                \DB::table('product_attributes')
+                    ->where('product_id', $product->id)
+                    ->where('attribute_id', $otherAttribute->id)
+                    ->where('attribute_value_id', $value->id)
+                    ->update(['attribute_id' => $this->id]);
+            }
+        });
         
         // Delete the other attribute
         $otherAttribute->delete();

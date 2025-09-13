@@ -34,6 +34,23 @@ final class Collection extends Model implements HasMedia
         'is_automatic',
         'rules',
         'max_products',
+        'is_active',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'display_type',
+        'products_per_page',
+        'show_filters',
+    ];
+
+    protected $translatable = [
+        'name',
+        'description',
+        'seo_title',
+        'seo_description',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
     ];
 
     protected function casts(): array
@@ -43,6 +60,10 @@ final class Collection extends Model implements HasMedia
             'sort_order' => 'integer',
             'is_automatic' => 'boolean',
             'rules' => 'array',
+            'is_active' => 'boolean',
+            'products_per_page' => 'integer',
+            'show_filters' => 'boolean',
+            'meta_keywords' => 'array',
         ];
     }
 
@@ -103,6 +124,11 @@ final class Collection extends Model implements HasMedia
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 
     public function isManual(): bool

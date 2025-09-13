@@ -178,7 +178,7 @@ final class CampaignConversion extends Model
     // Accessors
     public function getFormattedConversionValueAttribute(): string
     {
-        return '€'.number_format($this->conversion_value, 2);
+        return '€'.number_format((float) $this->conversion_value, 2);
     }
 
     public function getFormattedRoiAttribute(): string

@@ -19,7 +19,7 @@ final class LanguageController extends Controller
         $supported = config('app.supported_locales', ['lt', 'en']);
         $supportedLocales = is_array($supported)
             ? $supported
-            : preg_split('/[\s,|]+/', (string) $supported, -1, PREG_SPLIT_NO_EMPTY);
+            : array_filter(array_map('trim', explode(',', (string) $supported)));
         $supportedLocales = array_map('trim', $supportedLocales);
 
         if (! in_array($locale, $supportedLocales, true)) {

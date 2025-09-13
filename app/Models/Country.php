@@ -132,6 +132,11 @@ final class Country extends Model
         return $this->trans('name_official') ?: $this->getOriginal('name_official') ?: $this->getTranslatedNameAttribute();
     }
 
+    public function getTranslatedDescriptionAttribute(): string
+    {
+        return $this->trans('description') ?: $this->getOriginal('description') ?: '';
+    }
+
     public function getCodeAttribute(): string
     {
         return $this->cca2;
@@ -196,12 +201,12 @@ final class Country extends Model
 
     public function getVatRate(): ?float
     {
-        return $this->vat_rate;
+        return $this->vat_rate ? (float) $this->vat_rate : null;
     }
 
     public function getFormattedVatRate(): string
     {
-        return $this->vat_rate ? number_format($this->vat_rate, 2).'%' : 'N/A';
+        return $this->vat_rate ? number_format((float) $this->vat_rate, 2).'%' : 'N/A';
     }
 
     public function getFullAddress(): string

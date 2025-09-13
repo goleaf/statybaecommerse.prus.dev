@@ -2185,6 +2185,11 @@ return [
     'admin.activity_logs.actions.view_details' => 'Peržiūrėti detales',
     'admin.view_subject' => 'Peržiūrėti subjektą',
     // Missing navigation translations
+    'admin.navigation.dashboard' => 'Valdymo skydas',
+    'admin.navigation.marketing' => 'Rinkodara',
+    'admin.navigation.content' => 'Turinys',
+    'admin.navigation.analytics' => 'Analitika',
+    'admin.navigation.system' => 'Sistema',
     'admin.navigation.menus' => 'Meniu',
     'admin.navigation.news' => 'Naujienos',
     // Missing UI translations

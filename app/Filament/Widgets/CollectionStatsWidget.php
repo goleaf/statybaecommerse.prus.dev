@@ -13,6 +13,13 @@ final class CollectionStatsWidget extends BaseWidget
 {
     protected static ?int $sort = 1;
 
+    protected ?string $pollingInterval = '30s';
+
+    protected function getColumns(): int
+    {
+        return 3;
+    }
+
     protected function getStats(): array
     {
         $totalCollections = Collection::count();
