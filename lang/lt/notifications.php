@@ -172,3 +172,4 @@ return [
         'action_message' => 'Prašome papildyti šio produkto atsargas, kad išvengtumėte atsargų trūkumo.',
     ],
 ];
+

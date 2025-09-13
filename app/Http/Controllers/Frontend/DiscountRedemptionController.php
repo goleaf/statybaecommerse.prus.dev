@@ -71,7 +71,7 @@ final class DiscountRedemptionController extends Controller
                 ->count(),
         ];
 
-        return view('frontend.discount-redemptions.index', compact(
+        return view('discount-redemptions.index', compact(
             'redemptions',
             'availableDiscounts',
             'stats'
@@ -87,7 +87,7 @@ final class DiscountRedemptionController extends Controller
 
         $discountRedemption->load(['discount', 'code', 'order', 'user']);
 
-        return view('frontend.discount-redemptions.show', compact('discountRedemption'));
+        return view('discount-redemptions.show', compact('discountRedemption'));
     }
 
     /**
@@ -126,7 +126,7 @@ final class DiscountRedemptionController extends Controller
             ->limit(20)
             ->get();
 
-        return view('frontend.discount-redemptions.create', compact(
+        return view('discount-redemptions.create', compact(
             'availableDiscounts',
             'userOrders'
         ));

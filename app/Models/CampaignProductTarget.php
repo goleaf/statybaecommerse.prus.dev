@@ -34,3 +34,4 @@ final class CampaignProductTarget extends Model
         return $this->belongsTo(Category::class);
     }
 }
+

@@ -32,7 +32,7 @@ final class ReferralController extends Controller
         $totalRewards = ReferralReward::where('user_id', $user->id)->sum('amount');
         $pendingRewards = ReferralReward::where('user_id', $user->id)->pending()->sum('amount');
 
-        return view('frontend.referrals.index', compact(
+        return view('referrals.index', compact(
             'referrals',
             'totalReferrals',
             'completedReferrals',
@@ -45,7 +45,7 @@ final class ReferralController extends Controller
     {
         $referral = Referral::where('referral_code', $code)->firstOrFail();
 
-        return view('frontend.referrals.show', compact('referral'));
+        return view('referrals.show', compact('referral'));
     }
 
     public function create(): View
@@ -58,7 +58,7 @@ final class ReferralController extends Controller
                 ->with('error', __('referrals.referral_limit_reached'));
         }
 
-        return view('frontend.referrals.create');
+        return view('referrals.create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -253,7 +253,7 @@ final class ReferralController extends Controller
             'url' => route('referrals.apply', $user->referral_code),
         ]);
 
-        return view('frontend.referrals.share', compact('user', 'shareText'));
+        return view('referrals.share', compact('user', 'shareText'));
     }
 
     public function statistics(): View
@@ -284,7 +284,7 @@ final class ReferralController extends Controller
             ->limit(12)
             ->get();
 
-        return view('frontend.referrals.statistics', compact(
+        return view('referrals.statistics', compact(
             'totalReferrals',
             'completedReferrals',
             'pendingReferrals',
@@ -310,7 +310,7 @@ final class ReferralController extends Controller
         $pendingRewards = ReferralReward::where('user_id', $user->id)->pending()->sum('amount');
         $appliedRewards = ReferralReward::where('user_id', $user->id)->applied()->sum('amount');
 
-        return view('frontend.referrals.rewards', compact(
+        return view('referrals.rewards', compact(
             'rewards',
             'totalRewards',
             'pendingRewards',

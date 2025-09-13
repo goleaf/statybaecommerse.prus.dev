@@ -62,7 +62,7 @@ final class StockController extends Controller
         $locations = Location::enabled()->get();
         $suppliers = Partner::enabled()->get();
 
-        return view('frontend.stock.index', compact(
+        return view('stock.index', compact(
             'stockItems',
             'locations',
             'suppliers'
@@ -73,7 +73,7 @@ final class StockController extends Controller
     {
         $stock->load(['variant.product', 'location', 'supplier', 'stockMovements.user']);
 
-        return view('frontend.stock.show', compact('stock'));
+        return view('stock.show', compact('stock'));
     }
 
     public function adjustStock(Request $request, VariantInventory $stock): JsonResponse
@@ -227,7 +227,7 @@ final class StockController extends Controller
 
         $locations = Location::enabled()->get();
 
-        return view('frontend.stock.report', compact(
+        return view('stock.report', compact(
             'stockItems',
             'summary',
             'byLocation',

@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Country;
 use App\Models\Region;
 use App\Models\City;
+use App\Models\Zone;
+use App\Enums\AddressType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -20,8 +22,10 @@ class AddressTest extends TestCase
         
         $address = Address::factory()->create([
             'user_id' => $user->id,
-            'type' => 'shipping',
-            'street' => 'Test Street 123',
+            'type' => AddressType::SHIPPING,
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'address_line_1' => 'Test Street 123',
             'city' => 'Vilnius',
             'postal_code' => 'LT-01234',
             'is_default' => true,
@@ -29,8 +33,10 @@ class AddressTest extends TestCase
 
         $this->assertDatabaseHas('addresses', [
             'user_id' => $user->id,
-            'type' => 'shipping',
-            'street' => 'Test Street 123',
+            'type' => AddressType::SHIPPING->value,
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'address_line_1' => 'Test Street 123',
             'city' => 'Vilnius',
             'postal_code' => 'LT-01234',
             'is_default' => true,
@@ -69,21 +75,35 @@ class AddressTest extends TestCase
         $city = City::factory()->create();
         $address = Address::factory()->create(['city_id' => $city->id]);
 
-        $this->assertInstanceOf(City::class, $address->city);
-        $this->assertEquals($city->id, $address->city->id);
+        $this->assertInstanceOf(City::class, $address->cityById);
+        $this->assertEquals($city->id, $address->cityById->id);
+    }
+
+    public function test_address_belongs_to_zone(): void
+    {
+        $zone = Zone::factory()->create();
+        $address = Address::factory()->create(['zone_id' => $zone->id]);
+
+        $this->assertInstanceOf(Zone::class, $address->zone);
+        $this->assertEquals($zone->id, $address->zone->id);
     }
 
     public function test_address_casts_work_correctly(): void
     {
         $address = Address::factory()->create([
             'is_default' => true,
+            'is_billing' => true,
+            'is_shipping' => false,
             'is_active' => true,
-            'created_at' => now(),
+            'type' => AddressType::SHIPPING,
         ]);
 
         $this->assertIsBool($address->is_default);
+        $this->assertIsBool($address->is_billing);
+        $this->assertIsBool($address->is_shipping);
         $this->assertIsBool($address->is_active);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $address->created_at);
+        $this->assertInstanceOf(AddressType::class, $address->type);
+        $this->assertEquals(AddressType::SHIPPING, $address->type);
     }
 
     public function test_address_fillable_attributes(): void
@@ -93,16 +113,21 @@ class AddressTest extends TestCase
 
         $this->assertContains('user_id', $fillable);
         $this->assertContains('type', $fillable);
-        $this->assertContains('street', $fillable);
+        $this->assertContains('first_name', $fillable);
+        $this->assertContains('last_name', $fillable);
+        $this->assertContains('address_line_1', $fillable);
         $this->assertContains('city', $fillable);
         $this->assertContains('postal_code', $fillable);
         $this->assertContains('is_default', $fillable);
+        $this->assertContains('is_billing', $fillable);
+        $this->assertContains('is_shipping', $fillable);
+        $this->assertContains('is_active', $fillable);
     }
 
     public function test_address_scope_shipping(): void
     {
-        $shippingAddress = Address::factory()->create(['type' => 'shipping']);
-        $billingAddress = Address::factory()->create(['type' => 'billing']);
+        $shippingAddress = Address::factory()->create(['is_shipping' => true]);
+        $billingAddress = Address::factory()->create(['is_billing' => true]);
 
         $shippingAddresses = Address::shipping()->get();
 
@@ -112,8 +137,8 @@ class AddressTest extends TestCase
 
     public function test_address_scope_billing(): void
     {
-        $shippingAddress = Address::factory()->create(['type' => 'shipping']);
-        $billingAddress = Address::factory()->create(['type' => 'billing']);
+        $shippingAddress = Address::factory()->create(['is_shipping' => true]);
+        $billingAddress = Address::factory()->create(['is_billing' => true]);
 
         $billingAddresses = Address::billing()->get();
 
@@ -157,6 +182,39 @@ class AddressTest extends TestCase
         $this->assertFalse($user1Addresses->contains($address2));
     }
 
+    public function test_address_scope_by_type(): void
+    {
+        $shippingAddress = Address::factory()->create(['type' => AddressType::SHIPPING]);
+        $billingAddress = Address::factory()->create(['type' => AddressType::BILLING]);
+
+        $shippingAddresses = Address::byType(AddressType::SHIPPING->value)->get();
+
+        $this->assertTrue($shippingAddresses->contains($shippingAddress));
+        $this->assertFalse($shippingAddresses->contains($billingAddress));
+    }
+
+    public function test_address_scope_by_country(): void
+    {
+        $ltAddress = Address::factory()->create(['country_code' => 'LT']);
+        $lvAddress = Address::factory()->create(['country_code' => 'LV']);
+
+        $ltAddresses = Address::byCountry('LT')->get();
+
+        $this->assertTrue($ltAddresses->contains($ltAddress));
+        $this->assertFalse($ltAddresses->contains($lvAddress));
+    }
+
+    public function test_address_scope_by_city(): void
+    {
+        $vilniusAddress = Address::factory()->create(['city' => 'Vilnius']);
+        $kaunasAddress = Address::factory()->create(['city' => 'Kaunas']);
+
+        $vilniusAddresses = Address::byCity('Vilnius')->get();
+
+        $this->assertTrue($vilniusAddresses->contains($vilniusAddress));
+        $this->assertFalse($vilniusAddresses->contains($kaunasAddress));
+    }
+
     public function test_address_can_have_company_information(): void
     {
         $address = Address::factory()->create([
@@ -166,6 +224,7 @@ class AddressTest extends TestCase
 
         $this->assertEquals('Test Company', $address->company_name);
         $this->assertEquals('LT123456789', $address->company_vat);
+        $this->assertTrue($address->hasCompany());
     }
 
     public function test_address_can_have_contact_information(): void
@@ -198,18 +257,19 @@ class AddressTest extends TestCase
         $this->assertEquals('Building A', $address->building);
         $this->assertEquals('Near the shopping center', $address->landmark);
         $this->assertEquals('Ring the doorbell twice', $address->instructions);
+        $this->assertTrue($address->hasAdditionalInfo());
     }
 
     public function test_address_can_get_full_address(): void
     {
         $address = Address::factory()->create([
-            'street' => 'Test Street 123',
+            'address_line_1' => 'Test Street 123',
             'apartment' => 'Apt 5B',
             'city' => 'Vilnius',
             'postal_code' => 'LT-01234',
         ]);
 
-        $fullAddress = $address->getFullAddress();
+        $fullAddress = $address->full_address;
         
         $this->assertStringContainsString('Test Street 123', $fullAddress);
         $this->assertStringContainsString('Apt 5B', $fullAddress);
@@ -224,8 +284,185 @@ class AddressTest extends TestCase
             'last_name' => 'Doe',
         ]);
 
-        $fullName = $address->getFullName();
+        $fullName = $address->full_name;
         
         $this->assertEquals('John Doe', $fullName);
+    }
+
+    public function test_address_can_get_display_name(): void
+    {
+        $address = Address::factory()->create([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'company_name' => 'Test Company',
+        ]);
+
+        $displayName = $address->display_name;
+        
+        $this->assertEquals('John Doe (Test Company)', $displayName);
+    }
+
+    public function test_address_can_get_formatted_address(): void
+    {
+        $country = Country::factory()->create(['name' => 'Lithuania']);
+        $address = Address::factory()->create([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'company_name' => 'Test Company',
+            'address_line_1' => 'Test Street 123',
+            'apartment' => 'Apt 5B',
+            'city' => 'Vilnius',
+            'postal_code' => 'LT-01234',
+            'country_id' => $country->id,
+        ]);
+
+        $formattedAddress = $address->formatted_address;
+        
+        $this->assertStringContainsString('Test Company', $formattedAddress);
+        $this->assertStringContainsString('John Doe', $formattedAddress);
+        $this->assertStringContainsString('Test Street 123', $formattedAddress);
+        $this->assertStringContainsString('Apt 5B', $formattedAddress);
+        $this->assertStringContainsString('Vilnius, LT-01234', $formattedAddress);
+        $this->assertStringContainsString('Lithuania', $formattedAddress);
+    }
+
+    public function test_address_type_attributes(): void
+    {
+        $address = Address::factory()->create(['type' => AddressType::SHIPPING]);
+
+        $this->assertEquals(AddressType::SHIPPING->label(), $address->type_label);
+        $this->assertEquals(AddressType::SHIPPING->icon(), $address->type_icon);
+        $this->assertEquals(AddressType::SHIPPING->color(), $address->type_color);
+    }
+
+    public function test_address_type_checking_methods(): void
+    {
+        $shippingAddress = Address::factory()->create(['type' => AddressType::SHIPPING]);
+        $billingAddress = Address::factory()->create(['type' => AddressType::BILLING]);
+        $defaultAddress = Address::factory()->create(['is_default' => true]);
+        $activeAddress = Address::factory()->create(['is_active' => true]);
+
+        $this->assertTrue($shippingAddress->isShipping());
+        $this->assertFalse($shippingAddress->isBilling());
+        $this->assertTrue($billingAddress->isBilling());
+        $this->assertFalse($billingAddress->isShipping());
+        $this->assertTrue($defaultAddress->isDefault());
+        $this->assertTrue($activeAddress->isActive());
+    }
+
+    public function test_address_validation_rules(): void
+    {
+        $address = new Address();
+        $rules = $address->getValidationRules();
+
+        $this->assertArrayHasKey('user_id', $rules);
+        $this->assertArrayHasKey('type', $rules);
+        $this->assertArrayHasKey('first_name', $rules);
+        $this->assertArrayHasKey('last_name', $rules);
+        $this->assertArrayHasKey('address_line_1', $rules);
+        $this->assertArrayHasKey('city', $rules);
+        $this->assertArrayHasKey('postal_code', $rules);
+        $this->assertArrayHasKey('country_code', $rules);
+    }
+
+    public function test_address_static_methods(): void
+    {
+        $user = User::factory()->create();
+        
+        // Create test addresses
+        $defaultAddress = Address::factory()->create([
+            'user_id' => $user->id,
+            'is_default' => true,
+            'is_active' => true,
+        ]);
+        
+        $billingAddress = Address::factory()->create([
+            'user_id' => $user->id,
+            'is_billing' => true,
+            'is_active' => true,
+        ]);
+        
+        $shippingAddress = Address::factory()->create([
+            'user_id' => $user->id,
+            'is_shipping' => true,
+            'is_active' => true,
+        ]);
+
+        // Test static methods
+        $this->assertEquals($defaultAddress->id, Address::getDefaultAddressForUser($user->id)->id);
+        $this->assertEquals($billingAddress->id, Address::getBillingAddressForUser($user->id)->id);
+        $this->assertEquals($shippingAddress->id, Address::getShippingAddressForUser($user->id)->id);
+        
+        $userAddresses = Address::getAddressesForUser($user->id);
+        $this->assertCount(3, $userAddresses);
+        $this->assertTrue($userAddresses->contains($defaultAddress));
+        $this->assertTrue($userAddresses->contains($billingAddress));
+        $this->assertTrue($userAddresses->contains($shippingAddress));
+    }
+
+    public function test_address_set_as_default(): void
+    {
+        $user = User::factory()->create();
+        
+        $address1 = Address::factory()->create([
+            'user_id' => $user->id,
+            'is_default' => true,
+        ]);
+        
+        $address2 = Address::factory()->create([
+            'user_id' => $user->id,
+            'is_default' => false,
+        ]);
+
+        // Set address2 as default
+        $result = $address2->setAsDefault();
+        
+        $this->assertTrue($result);
+        $this->assertTrue($address2->fresh()->is_default);
+        $this->assertFalse($address1->fresh()->is_default);
+    }
+
+    public function test_address_duplicate_for_user(): void
+    {
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        
+        $originalAddress = Address::factory()->create([
+            'user_id' => $user1->id,
+            'is_default' => true,
+        ]);
+
+        $duplicatedAddress = $originalAddress->duplicateForUser($user2->id);
+
+        $this->assertNotEquals($originalAddress->id, $duplicatedAddress->id);
+        $this->assertEquals($user2->id, $duplicatedAddress->user_id);
+        $this->assertFalse($duplicatedAddress->is_default);
+        $this->assertEquals($originalAddress->first_name, $duplicatedAddress->first_name);
+        $this->assertEquals($originalAddress->last_name, $duplicatedAddress->last_name);
+        $this->assertEquals($originalAddress->address_line_1, $duplicatedAddress->address_line_1);
+    }
+
+    public function test_address_types_for_select(): void
+    {
+        $types = Address::getTypesForSelect();
+        
+        $this->assertIsArray($types);
+        $this->assertArrayHasKey(AddressType::SHIPPING->value, $types);
+        $this->assertArrayHasKey(AddressType::BILLING->value, $types);
+        $this->assertArrayHasKey(AddressType::HOME->value, $types);
+        $this->assertArrayHasKey(AddressType::WORK->value, $types);
+        $this->assertArrayHasKey(AddressType::OTHER->value, $types);
+    }
+
+    public function test_address_types_with_descriptions(): void
+    {
+        $types = Address::getTypesWithDescriptions();
+        
+        $this->assertIsArray($types);
+        $this->assertArrayHasKey(AddressType::SHIPPING->value, $types);
+        $this->assertArrayHasKey('label', $types[AddressType::SHIPPING->value]);
+        $this->assertArrayHasKey('description', $types[AddressType::SHIPPING->value]);
+        $this->assertArrayHasKey('icon', $types[AddressType::SHIPPING->value]);
+        $this->assertArrayHasKey('color', $types[AddressType::SHIPPING->value]);
     }
 }

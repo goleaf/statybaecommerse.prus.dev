@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('discount_redemption_translations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('discount_redemption_id')->constrained()->onDelete('cascade');
-            $table->string('locale', 5)->index();
+            $table->string('locale', 5);
             $table->text('notes')->nullable();
             $table->string('status_description')->nullable();
             $table->json('metadata_description')->nullable();

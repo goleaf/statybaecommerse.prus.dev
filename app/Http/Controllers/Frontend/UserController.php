@@ -25,7 +25,7 @@ final class UserController extends Controller
     {
         $user = Auth::user();
 
-        return view('frontend.users.profile', compact('user'));
+        return view('users.profile', compact('user'));
     }
 
     /**
@@ -58,7 +58,7 @@ final class UserController extends Controller
             ->limit(3)
             ->get();
 
-        return view('frontend.users.dashboard', compact('user', 'stats', 'recentOrders', 'recentReviews'));
+        return view('users.dashboard', compact('user', 'stats', 'recentOrders', 'recentReviews'));
     }
 
     /**
@@ -221,7 +221,7 @@ final class UserController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('frontend.users.orders', compact('orders'));
+        return view('users.orders', compact('orders'));
     }
 
     /**
@@ -232,7 +232,7 @@ final class UserController extends Controller
         $user = Auth::user();
         $addresses = $user->addresses()->latest()->get();
 
-        return view('frontend.users.addresses', compact('addresses'));
+        return view('users.addresses', compact('addresses'));
     }
 
     /**
@@ -246,7 +246,7 @@ final class UserController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('frontend.users.reviews', compact('reviews'));
+        return view('users.reviews', compact('reviews'));
     }
 
     /**
@@ -260,7 +260,7 @@ final class UserController extends Controller
             ->latest()
             ->paginate(12);
 
-        return view('frontend.users.wishlist', compact('wishlist'));
+        return view('users.wishlist', compact('wishlist'));
     }
 
     /**
@@ -274,7 +274,7 @@ final class UserController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('frontend.users.documents', compact('documents'));
+        return view('users.documents', compact('documents'));
     }
 
     /**

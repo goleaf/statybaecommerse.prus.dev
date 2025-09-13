@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             ZoneSeeder::class,
             RegionSeeder::class,
             // Comprehensive cities seeding with multilingual support
-            AllCitiesSeeder::class,
+            AllCountriesComprehensiveCitiesSeeder::class,
             ChannelSeeder::class,
             // Core catalog structure with local images only
             BrandSeeder::class,

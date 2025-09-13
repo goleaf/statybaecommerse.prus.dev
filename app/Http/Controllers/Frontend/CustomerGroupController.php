@@ -37,7 +37,7 @@ final class CustomerGroupController extends Controller
 
         $customerGroups = $query->paginate(12);
 
-        return view('frontend.customer-groups.index', compact('customerGroups'));
+        return view('customer-groups.index', compact('customerGroups'));
     }
 
     public function show(CustomerGroup $customerGroup): View
@@ -49,7 +49,7 @@ final class CustomerGroupController extends Controller
 
         $customerGroup->load(['users', 'discounts', 'priceLists']);
 
-        return view('frontend.customer-groups.show', compact('customerGroup'));
+        return view('customer-groups.show', compact('customerGroup'));
     }
 
     public function join(Request $request, CustomerGroup $customerGroup)

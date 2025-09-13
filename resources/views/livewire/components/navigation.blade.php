@@ -22,14 +22,19 @@
                 @endphp
                 <a href="{{ $homeUrl }}" class="flex items-center gap-3 group" aria-label="{{ __('nav_home') }}">
                     <div class="relative">
-                        <img src="{{ asset('images/hero.png') }}" alt="{{ config('app.name') }}" class="h-10 w-10 rounded-xl shadow-soft group-hover:shadow-medium transition-all duration-300 group-hover:scale-105" width="40" height="40" />
-                        <div class="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <img src="{{ asset('images/hero.png') }}" alt="{{ config('app.name') }}"
+                             class="h-10 w-10 rounded-xl shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-105"
+                             width="40" height="40" />
+                        <div
+                             class="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        </div>
                     </div>
-                    <span class="hidden sm:inline text-lg font-heading font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">{{ config('app.name') }}</span>
+                    <span
+                          class="hidden sm:inline text-lg font-heading font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">{{ config('app.name') }}</span>
                 </a>
             </div>
 
-            {{-- Center: Search --}}
+            {{-- Center: Enhanced Search with modern design --}}
             <div class="flex-1 max-w-2xl hidden md:block">
                 <form wire:submit.prevent="search" role="search" aria-label="{{ __('nav_search') }}">
                     <div class="relative group">
@@ -37,11 +42,11 @@
                                type="search"
                                wire:model.live.debounce.300ms="searchQuery"
                                placeholder="{{ __('search_placeholder') }}"
-                               class="block w-full rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm pl-12 pr-12 py-3 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200 shadow-soft focus:shadow-medium"
+                               class="block w-full rounded-2xl border border-gray-200 bg-white/90 backdrop-blur-xl pl-12 pr-12 py-4 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-300 shadow-sm focus:shadow-lg hover:shadow-md"
                                aria-label="{{ __('search_placeholder') }}"
                                autocomplete="off"
                                spellcheck="false" />
-                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200"
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-300"
                              aria-hidden="true">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -49,7 +54,7 @@
                             </svg>
                         </div>
                         <button type="submit"
-                                class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-blue-600 transition-colors duration-200"
+                                class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-blue-600 transition-colors duration-300 hover:scale-110"
                                 aria-label="{{ __('nav_search') }}">
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                 <path fill-rule="evenodd"
@@ -57,6 +62,21 @@
                                       clip-rule="evenodd"></path>
                             </svg>
                         </button>
+                        {{-- Search suggestions overlay --}}
+                        @if ($searchQuery && strlen($searchQuery) > 2)
+                            <div
+                                 class="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-lg z-50 max-h-96 overflow-y-auto">
+                                <div class="p-4">
+                                    <div class="text-sm text-gray-500 mb-2">{{ __('Search suggestions') }}</div>
+                                    <div class="space-y-2">
+                                        <div
+                                             class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors duration-200">
+                                            <span class="text-gray-700">{{ $searchQuery }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </form>
             </div>

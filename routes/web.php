@@ -37,6 +37,25 @@ Route::middleware(['web'])->group(function () {
         Route::get('/{reward}', [App\Http\Controllers\Frontend\ReferralRewardController::class, 'show'])->name('show');
     });
 
+    // Address Frontend Routes
+    Route::middleware(['auth'])->prefix('addresses')->name('frontend.addresses.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Frontend\AddressController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Frontend\AddressController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Frontend\AddressController::class, 'store'])->name('store');
+        Route::get('/{address}', [App\Http\Controllers\Frontend\AddressController::class, 'show'])->name('show');
+        Route::get('/{address}/edit', [App\Http\Controllers\Frontend\AddressController::class, 'edit'])->name('edit');
+        Route::put('/{address}', [App\Http\Controllers\Frontend\AddressController::class, 'update'])->name('update');
+        Route::delete('/{address}', [App\Http\Controllers\Frontend\AddressController::class, 'destroy'])->name('destroy');
+        Route::post('/{address}/set-default', [App\Http\Controllers\Frontend\AddressController::class, 'setDefault'])->name('set-default');
+        Route::post('/{address}/duplicate', [App\Http\Controllers\Frontend\AddressController::class, 'duplicate'])->name('duplicate');
+        
+        // AJAX routes for dynamic loading
+        Route::get('/api/countries', [App\Http\Controllers\Frontend\AddressController::class, 'getCountries'])->name('api.countries');
+        Route::get('/api/regions', [App\Http\Controllers\Frontend\AddressController::class, 'getRegions'])->name('api.regions');
+        Route::get('/api/zones', [App\Http\Controllers\Frontend\AddressController::class, 'getZones'])->name('api.zones');
+        Route::get('/api/cities', [App\Http\Controllers\Frontend\AddressController::class, 'getCities'])->name('api.cities');
+    });
+
     // Referral Code Frontend Routes
     Route::middleware(['auth'])->prefix('referral-codes')->name('frontend.referral-codes.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\ReferralCodeController::class, 'index'])->name('index');

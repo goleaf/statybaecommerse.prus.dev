@@ -48,14 +48,14 @@ final class VariantStockController extends Controller
         $variantStocks = $query->paginate(20);
         $locations = Location::enabled()->get();
 
-        return view('frontend.variant-stock.index', compact('variantStocks', 'locations'));
+        return view('variant-stock.index', compact('variantStocks', 'locations'));
     }
 
     public function show(VariantInventory $variantStock): View
     {
         $variantStock->load(['variant.product', 'location', 'supplier', 'stockMovements.user']);
 
-        return view('frontend.variant-stock.show', compact('variantStock'));
+        return view('variant-stock.show', compact('variantStock'));
     }
 
     public function checkAvailability(Request $request): JsonResponse

@@ -41,7 +41,7 @@ final class OrderController extends Controller
 
         $orders = $query->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('frontend.orders.index', compact('orders'));
+        return view('orders.index', compact('orders'));
     }
 
     public function show(Order $order): View
@@ -54,7 +54,7 @@ final class OrderController extends Controller
 
         $order->load(['items.product', 'items.productVariant', 'shipping', 'documents']);
 
-        return view('frontend.orders.show', compact('order'));
+        return view('orders.show', compact('order'));
     }
 
     public function create(): View
@@ -67,7 +67,7 @@ final class OrderController extends Controller
 
         $products = Product::with('variants')->where('is_visible', true)->get();
 
-        return view('frontend.orders.create', compact('products'));
+        return view('orders.create', compact('products'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -170,7 +170,7 @@ final class OrderController extends Controller
         $order->load(['items.product', 'items.productVariant']);
         $products = Product::with('variants')->where('is_visible', true)->get();
 
-        return view('frontend.orders.edit', compact('order', 'products'));
+        return view('orders.edit', compact('order', 'products'));
     }
 
     public function update(Request $request, Order $order): RedirectResponse

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('discount_condition_translations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('discount_condition_id')->constrained()->onDelete('cascade');
-            $table->string('locale', 5)->index();
+            $table->string('locale', 5);
             $table->string('name')->nullable();
             $table->text('description')->nullable();
             $table->json('metadata')->nullable();

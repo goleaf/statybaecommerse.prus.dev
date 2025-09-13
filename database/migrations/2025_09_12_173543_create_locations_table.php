@@ -10,7 +10,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('locations', function (Blueprint $table) {
+        if (! Schema::hasTable('locations')) {
+            Schema::create('locations', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
             $table->string('name');
@@ -39,7 +40,8 @@ return new class extends Migration
             $table->index(['type', 'is_enabled']);
             $table->index(['country_code', 'city']);
             $table->index('sort_order');
-        });
+            });
+        }
     }
 
     public function down(): void

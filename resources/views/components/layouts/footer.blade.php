@@ -6,10 +6,15 @@
 @php($socialFacebook = $hasSettings ? app_setting('social_facebook') ?? '#' : '#')
 @php($socialInstagram = $hasSettings ? app_setting('social_instagram') ?? '#' : '#')
 
-<footer aria-labelledby="footer-heading" class="bg-gradient-to-br from-gray-900 to-gray-800 border-t border-gray-700/50">
+<footer aria-labelledby="footer-heading" class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-t border-gray-700/50 relative overflow-hidden">
+    <!-- Background decorative elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl"></div>
+    </div>
     <h2 id="footer-heading" class="sr-only">{{ __('footer_heading') }}</h2>
-    <x-container>
-        <div class="grid grid-cols-1 gap-12 py-16 lg:grid-cols-3 lg:py-24">
+    <x-container class="relative z-10">
+        <div class="grid grid-cols-1 gap-12 py-20 lg:grid-cols-3 lg:py-28">
             <div class="lg:max-w-sm">
                 <h3 class="text-sm font-medium text-white mb-6">
                     <x-brand

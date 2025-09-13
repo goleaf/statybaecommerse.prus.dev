@@ -74,7 +74,8 @@ return new class extends Migration
         });
 
         // Create translations table
-        Schema::create('campaign_conversion_translations', function (Blueprint $table) {
+        if (! Schema::hasTable('campaign_conversion_translations')) {
+            Schema::create('campaign_conversion_translations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('campaign_conversion_id')->constrained('campaign_conversions')->cascadeOnDelete();
             $table->string('locale', 5);
@@ -84,7 +85,8 @@ return new class extends Migration
 
             $table->unique(['campaign_conversion_id', 'locale']);
             $table->index(['locale']);
-        });
+            });
+        }
 
         // Add indexes for better performance
         Schema::table('campaign_conversions', function (Blueprint $table) {

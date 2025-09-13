@@ -36,3 +36,4 @@ final class CampaignCustomerSegment extends Model
         return $this->belongsTo(CustomerGroup::class);
     }
 }
+

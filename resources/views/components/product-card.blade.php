@@ -15,17 +15,27 @@
 @endphp
 
 <div
-     class="group bg-white rounded-3xl border border-gray-200 hover:border-blue-300 transition-all duration-300 overflow-hidden shadow-soft hover:shadow-large animate-on-scroll">
-    {{-- Product Image --}}
-    <div class="aspect-w-1 aspect-h-1 bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+     class="group bg-white rounded-3xl border border-gray-200 hover:border-blue-300 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-lg animate-on-scroll relative">
+    <!-- Hover overlay effect -->
+    <div
+         class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl z-0 pointer-events-none">
+    </div>
+    {{-- Enhanced Product Image with modern effects --}}
+    <div
+         class="aspect-w-1 aspect-h-1 bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden rounded-t-3xl">
         @if ($imageUrl)
             <img src="{{ $imageUrl }}"
                  alt="{{ $product->name }}"
-                 class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                 class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                  loading="lazy">
+            <!-- Image overlay on hover -->
+            <div
+                 class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            </div>
         @else
             <div class="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-16 h-16 text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -34,16 +44,16 @@
 
         {{-- Badges --}}
         @if ($showBadge)
-            <div class="absolute top-4 left-4 flex flex-col gap-2">
+            <div class="absolute top-4 left-4 flex flex-col gap-2 z-30">
                 @if ($isNew)
                     <span
-                          class="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-soft">
+                          class="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">
                         {{ __('New') }}
                     </span>
                 @endif
                 @if ($isOnSale)
                     <span
-                          class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-soft">
+                          class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">
                         {{ __('Sale') }}
                     </span>
                 @endif
@@ -53,16 +63,16 @@
         {{-- Brand --}}
         @if ($showBrand && $product->brand)
             <div
-                 class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-gray-700 px-2 py-1 rounded-lg text-xs font-medium shadow-soft">
+                 class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-gray-700 px-2 py-1 rounded-lg text-xs font-medium shadow-sm z-30">
                 {{ $product->brand->name }}
             </div>
         @endif
 
         {{-- Quick Actions --}}
         <div
-             class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+             class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 z-20">
             <div class="flex gap-2">
-                <button class="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-full shadow-soft hover:bg-white hover:scale-110 transition-all duration-200"
+                <button class="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-full shadow-sm hover:bg-white hover:scale-110 transition-all duration-200"
                         title="{{ __('Quick View') }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -72,7 +82,7 @@
                         </path>
                     </svg>
                 </button>
-                <button class="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-full shadow-soft hover:bg-white hover:scale-110 transition-all duration-200"
+                <button class="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-full shadow-sm hover:bg-white hover:scale-110 transition-all duration-200"
                         title="{{ __('Add to Wishlist') }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

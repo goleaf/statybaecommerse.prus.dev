@@ -63,7 +63,7 @@ final class CampaignConversionController extends Controller
         $deviceTypes = CampaignConversion::distinct()->pluck('device_type');
         $sources = CampaignConversion::distinct()->pluck('source');
 
-        return view('frontend.campaign-conversions.index', compact(
+        return view('campaign-conversions.index', compact(
             'conversions',
             'campaigns',
             'conversionTypes',
@@ -77,7 +77,7 @@ final class CampaignConversionController extends Controller
     {
         $campaignConversion->load(['campaign', 'customer', 'order']);
 
-        return view('frontend.campaign-conversions.show', compact('campaignConversion'));
+        return view('campaign-conversions.show', compact('campaignConversion'));
     }
 
     public function analytics(Request $request): JsonResponse
@@ -237,7 +237,7 @@ final class CampaignConversionController extends Controller
             'desktop' => __('campaign_conversions.device_types.desktop'),
         ];
 
-        return view('frontend.campaign-conversions.create', compact(
+        return view('campaign-conversions.create', compact(
             'campaigns',
             'conversionTypes',
             'statuses',
@@ -296,7 +296,7 @@ final class CampaignConversionController extends Controller
             'desktop' => __('campaign_conversions.device_types.desktop'),
         ];
 
-        return view('frontend.campaign-conversions.edit', compact(
+        return view('campaign-conversions.edit', compact(
             'campaignConversion',
             'campaigns',
             'conversionTypes',

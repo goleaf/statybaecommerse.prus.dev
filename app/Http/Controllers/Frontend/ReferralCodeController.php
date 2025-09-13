@@ -29,7 +29,7 @@ final class ReferralCodeController extends Controller
             'total_rewards' => $user->referralCodes()->sum('reward_amount'),
         ];
 
-        return view('frontend.referral-codes.index', compact('referralCodes', 'stats'));
+        return view('referral-codes.index', compact('referralCodes', 'stats'));
     }
 
     public function show(ReferralCode $referralCode): View
@@ -40,7 +40,7 @@ final class ReferralCodeController extends Controller
 
         $stats = $referralCode->stats;
 
-        return view('frontend.referral-codes.show', compact('referralCode', 'stats'));
+        return view('referral-codes.show', compact('referralCode', 'stats'));
     }
 
     public function create(): View
@@ -49,7 +49,7 @@ final class ReferralCodeController extends Controller
 
         $campaigns = \App\Models\ReferralCampaign::active()->get();
 
-        return view('frontend.referral-codes.create', compact('campaigns'));
+        return view('referral-codes.create', compact('campaigns'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -91,7 +91,7 @@ final class ReferralCodeController extends Controller
 
         $campaigns = \App\Models\ReferralCampaign::active()->get();
 
-        return view('frontend.referral-codes.edit', compact('referralCode', 'campaigns'));
+        return view('referral-codes.edit', compact('referralCode', 'campaigns'));
     }
 
     public function update(Request $request, ReferralCode $referralCode): RedirectResponse
@@ -179,7 +179,7 @@ final class ReferralCodeController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        return view('frontend.referral-codes.usage', compact('referralCode', 'usageLogs'));
+        return view('referral-codes.usage', compact('referralCode', 'usageLogs'));
     }
 
     public function statistics(ReferralCode $referralCode): View
@@ -202,6 +202,6 @@ final class ReferralCodeController extends Controller
             ];
         });
 
-        return view('frontend.referral-codes.statistics', compact('referralCode', 'statistics', 'chartData'));
+        return view('referral-codes.statistics', compact('referralCode', 'statistics', 'chartData'));
     }
 }

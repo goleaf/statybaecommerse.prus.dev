@@ -40,7 +40,7 @@ final class ReferralRewardController extends Controller
             'applied_amount' => ReferralReward::forUser($user->id)->applied()->sum('amount'),
         ];
 
-        return view('frontend.referral-rewards.index', compact('rewards', 'stats'));
+        return view('referral-rewards.index', compact('rewards', 'stats'));
     }
 
     /**
@@ -56,7 +56,7 @@ final class ReferralRewardController extends Controller
 
         $reward->load(['referral', 'order', 'logs']);
 
-        return view('frontend.referral-rewards.show', compact('reward'));
+        return view('referral-rewards.show', compact('reward'));
     }
 
     /**

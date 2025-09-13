@@ -34,14 +34,14 @@ final class RegionController extends Controller
             })
             ->paginate(20);
 
-        return view('frontend.regions.index', compact('regions'));
+        return view('regions.index', compact('regions'));
     }
 
     public function show(Region $region): View
     {
         $region->load(['country', 'zone', 'parent', 'children', 'cities', 'translations']);
 
-        return view('frontend.regions.show', compact('region'));
+        return view('regions.show', compact('region'));
     }
 
     public function children(Region $region): JsonResponse

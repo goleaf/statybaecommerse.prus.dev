@@ -55,7 +55,7 @@ final class AttributeController extends Controller
             ->pluck('group_name')
             ->mapWithKeys(fn ($group) => [$group => __('attributes.'.$group)]);
 
-        return view('frontend.attributes.index', compact('attributes', 'types', 'groups'));
+        return view('attributes.index', compact('attributes', 'types', 'groups'));
     }
 
     public function show(Attribute $attribute): View
@@ -87,7 +87,7 @@ final class AttributeController extends Controller
                 ->get();
         }
 
-        return view('frontend.attributes.show', compact('attribute', 'relatedAttributes'));
+        return view('attributes.show', compact('attribute', 'relatedAttributes'));
     }
 
     public function filter(Request $request)
@@ -136,7 +136,7 @@ final class AttributeController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('frontend.products.filtered', compact('products', 'filterableAttributes'));
+        return view('products.filtered', compact('products', 'filterableAttributes'));
     }
 
     public function getAttributeValues(Request $request)

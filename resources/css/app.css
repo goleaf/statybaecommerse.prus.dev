@@ -161,18 +161,82 @@ html {
   }
 }
 
-/* Enhanced button styles */
+/* Enhanced button styles with modern design */
 .btn-gradient {
-  @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300;
+  @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden;
+}
+
+.btn-gradient::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-gradient:hover::before {
+  left: 100%;
 }
 
 .btn-gradient:hover {
   @apply from-blue-600 to-blue-700;
 }
 
-/* Card hover effects */
+/* Modern glassmorphism button */
+.btn-glass {
+  @apply bg-white/20 backdrop-blur-xl border border-white/30 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300;
+}
+
+.btn-glass:hover {
+  @apply bg-white/30 border-white/50;
+}
+
+/* Floating action button */
+.btn-floating {
+  @apply bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300;
+}
+
+/* Enhanced card hover effects with modern design */
 .card-hover {
-  @apply transition-all duration-300 hover:shadow-large hover:-translate-y-1;
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1 relative overflow-hidden;
+}
+
+.card-hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.card-hover:hover::before {
+  opacity: 1;
+}
+
+/* Modern card with glassmorphism */
+.card-glass {
+  @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-sm hover:shadow-lg transition-all duration-300 rounded-2xl;
+}
+
+/* Product card with enhanced animations */
+.product-card {
+  @apply bg-white rounded-3xl border border-gray-200 hover:border-blue-300 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-lg;
+}
+
+.product-card:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.product-card-image {
+  @apply transition-transform duration-500;
 }
 
 /* Loading states */
@@ -181,27 +245,82 @@ html {
 }
 
 .skeleton-text {
-  @apply skeleton h-4 w-full;
+  @apply animate-pulse bg-gray-200 rounded h-4 w-full;
 }
 
 .skeleton-title {
-  @apply skeleton h-6 w-3/4;
+  @apply animate-pulse bg-gray-200 rounded h-6 w-3/4;
 }
 
 .skeleton-avatar {
-  @apply skeleton h-12 w-12 rounded-full;
+  @apply animate-pulse bg-gray-200 rounded h-12 w-12 rounded-full;
 }
 
-/* Intersection Observer animations */
+/* Enhanced Intersection Observer animations */
 .animate-on-scroll {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .animate-on-scroll.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Staggered animation delays */
+.animate-on-scroll:nth-child(1) {
+  transition-delay: 0.1s;
+}
+
+.animate-on-scroll:nth-child(2) {
+  transition-delay: 0.2s;
+}
+
+.animate-on-scroll:nth-child(3) {
+  transition-delay: 0.3s;
+}
+
+.animate-on-scroll:nth-child(4) {
+  transition-delay: 0.4s;
+}
+
+.animate-on-scroll:nth-child(5) {
+  transition-delay: 0.5s;
+}
+
+.animate-on-scroll:nth-child(6) {
+  transition-delay: 0.6s;
+}
+
+/* Modern fade-in animations */
+.animate-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Modern scale animations */
+.animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* Parallax effects */
@@ -217,10 +336,6 @@ html {
 
 .shadow-medium {
   @apply shadow-md;
-}
-
-.shadow-large {
-  @apply shadow-lg;
 }
 
 /* Text utilities */

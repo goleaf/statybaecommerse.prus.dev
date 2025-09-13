@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders;
+namespace Database\Seeders\Cities;
 
 use App\Models\City;
 use App\Models\Country;

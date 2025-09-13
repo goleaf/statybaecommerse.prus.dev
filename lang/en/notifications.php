@@ -172,3 +172,4 @@ return [
         'action_message' => 'Please restock this product to avoid stockouts.',
     ],
 ];
+

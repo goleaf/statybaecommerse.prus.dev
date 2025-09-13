@@ -1,0 +1,531 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Resources;
+
+use App\Enums\AddressType;
+use App\Filament\Resources\AddressResource\Pages;
+use App\Filament\Resources\AddressResource\RelationManagers;
+use App\Models\Address;
+use App\Models\Country;
+use App\Models\Region;
+use App\Models\Zone;
+use App\Models\City;
+use App\Models\User;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Placeholder;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
+
+final class AddressResource extends Resource
+{
+    protected static ?string $model = Address::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Users';
+
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $navigationLabel = 'Addresses';
+
+    protected static ?string $modelLabel = 'Address';
+
+    protected static ?string $pluralModelLabel = 'Addresses';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Section::make(__('translations.address_information'))
+                    ->description(__('translations.basic_information'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('user_id')
+                                    ->label(__('translations.user'))
+                                    ->relationship('user', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required()
+                                    ->createOptionForm([
+                                        TextInput::make('name')
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('email')
+                                            ->email()
+                                            ->required()
+                                            ->maxLength(255),
+                                    ]),
+
+                                Select::make('type')
+                                    ->label(__('translations.type'))
+                                    ->options(AddressType::options())
+                                    ->required()
+                                    ->default(AddressType::SHIPPING)
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        if ($state === AddressType::BILLING->value) {
+                                            $set('is_billing', true);
+                                        } elseif ($state === AddressType::SHIPPING->value) {
+                                            $set('is_shipping', true);
+                                        }
+                                    }),
+                            ]),
+
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('first_name')
+                                    ->label(__('translations.first_name'))
+                                    ->required()
+                                    ->maxLength(255),
+
+                                TextInput::make('last_name')
+                                    ->label(__('translations.last_name'))
+                                    ->required()
+                                    ->maxLength(255),
+                            ]),
+
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('company_name')
+                                    ->label(__('translations.company'))
+                                    ->maxLength(255),
+
+                                TextInput::make('company_vat')
+                                    ->label(__('translations.company_vat'))
+                                    ->maxLength(50),
+                            ]),
+                    ]),
+
+                Section::make(__('translations.address_details'))
+                    ->description(__('translations.address_line_1'))
+                    ->schema([
+                        TextInput::make('address_line_1')
+                            ->label(__('translations.address_line_1'))
+                            ->required()
+                            ->maxLength(255),
+
+                        TextInput::make('address_line_2')
+                            ->label(__('translations.address_line_2'))
+                            ->maxLength(255),
+
+                        Grid::make(3)
+                            ->schema([
+                                TextInput::make('apartment')
+                                    ->label(__('translations.apartment'))
+                                    ->maxLength(100),
+
+                                TextInput::make('floor')
+                                    ->label(__('translations.floor'))
+                                    ->maxLength(100),
+
+                                TextInput::make('building')
+                                    ->label(__('translations.building'))
+                                    ->maxLength(100),
+                            ]),
+
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('city')
+                                    ->label(__('translations.city'))
+                                    ->required()
+                                    ->maxLength(100),
+
+                                TextInput::make('state')
+                                    ->label(__('translations.state'))
+                                    ->maxLength(100),
+                            ]),
+
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('postal_code')
+                                    ->label(__('translations.postal_code'))
+                                    ->required()
+                                    ->maxLength(20),
+
+                                TextInput::make('country_code')
+                                    ->label(__('translations.country_code'))
+                                    ->required()
+                                    ->maxLength(2)
+                                    ->default('LT'),
+                            ]),
+
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('country_id')
+                                    ->label(__('translations.country'))
+                                    ->relationship('country', 'name')
+                                    ->searchable()
+                                    ->preload(),
+
+                                Select::make('zone_id')
+                                    ->label(__('translations.zone'))
+                                    ->relationship('zone', 'name')
+                                    ->searchable()
+                                    ->preload(),
+                            ]),
+
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('region_id')
+                                    ->label(__('translations.region'))
+                                    ->relationship('region', 'name')
+                                    ->searchable()
+                                    ->preload(),
+
+                                Select::make('city_id')
+                                    ->label(__('translations.city'))
+                                    ->relationship('cityById', 'name')
+                                    ->searchable()
+                                    ->preload(),
+                            ]),
+                    ]),
+
+                Section::make(__('translations.contact_information'))
+                    ->description(__('translations.phone'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('phone')
+                                    ->label(__('translations.phone'))
+                                    ->tel()
+                                    ->maxLength(20),
+
+                                TextInput::make('email')
+                                    ->label(__('translations.email'))
+                                    ->email()
+                                    ->maxLength(255),
+                            ]),
+
+                        TextInput::make('landmark')
+                            ->label(__('translations.landmark'))
+                            ->maxLength(255),
+                    ]),
+
+                Section::make(__('translations.additional_information'))
+                    ->description(__('translations.notes'))
+                    ->schema([
+                        Textarea::make('notes')
+                            ->label(__('translations.notes'))
+                            ->maxLength(1000)
+                            ->rows(3)
+                            ->columnSpanFull(),
+
+                        Textarea::make('instructions')
+                            ->label(__('translations.instructions'))
+                            ->maxLength(1000)
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make(__('translations.settings'))
+                    ->description(__('translations.is_default'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Toggle::make('is_default')
+                                    ->label(__('translations.is_default'))
+                                    ->helperText(__('translations.is_default_help')),
+
+                                Toggle::make('is_active')
+                                    ->label(__('translations.is_active'))
+                                    ->default(true)
+                                    ->helperText(__('translations.is_active_help')),
+                            ]),
+
+                        Grid::make(2)
+                            ->schema([
+                                Toggle::make('is_billing')
+                                    ->label(__('translations.is_billing'))
+                                    ->helperText(__('translations.is_billing_help')),
+
+                                Toggle::make('is_shipping')
+                                    ->label(__('translations.is_shipping'))
+                                    ->helperText(__('translations.is_shipping_help')),
+                            ]),
+                    ]),
+
+                Section::make(__('translations.preview'))
+                    ->description(__('translations.formatted_address'))
+                    ->schema([
+                        Placeholder::make('formatted_address')
+                            ->label(__('translations.formatted_address'))
+                            ->content(function ($record) {
+                                if (!$record) {
+                                    return __('translations.no_address_preview');
+                                }
+                                return $record->formatted_address;
+                            }),
+                    ])
+                    ->collapsible(),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('user.name')
+                    ->label(__('translations.user'))
+                    ->sortable()
+                    ->searchable()
+                    ->url(fn ($record) => UserResource::getUrl('view', ['record' => $record->user_id])),
+
+                TextColumn::make('display_name')
+                    ->label(__('translations.full_name'))
+                    ->sortable()
+                    ->searchable(['first_name', 'last_name', 'company_name']),
+
+                BadgeColumn::make('type')
+                    ->label(__('translations.type'))
+                    ->formatStateUsing(fn ($state) => $state->label())
+                    ->colors([
+                        'primary' => AddressType::SHIPPING,
+                        'success' => AddressType::BILLING,
+                        'warning' => AddressType::HOME,
+                        'info' => AddressType::WORK,
+                        'secondary' => AddressType::OTHER,
+                    ]),
+
+                TextColumn::make('full_address')
+                    ->label(__('translations.address'))
+                    ->limit(50)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        return strlen($state) > 50 ? $state : null;
+                    }),
+
+                TextColumn::make('city')
+                    ->label(__('translations.city'))
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('country.name')
+                    ->label(__('translations.country'))
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('phone')
+                    ->label(__('translations.phone'))
+                    ->searchable()
+                    ->toggleable(),
+
+                IconColumn::make('is_default')
+                    ->label(__('translations.is_default'))
+                    ->boolean()
+                    ->sortable(),
+
+                IconColumn::make('is_billing')
+                    ->label(__('translations.is_billing'))
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(),
+
+                IconColumn::make('is_shipping')
+                    ->label(__('translations.is_shipping'))
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(),
+
+                IconColumn::make('is_active')
+                    ->label(__('translations.is_active'))
+                    ->boolean()
+                    ->sortable(),
+
+                TextColumn::make('created_at')
+                    ->label(__('translations.created_at'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('updated_at')
+                    ->label(__('translations.updated_at'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                SelectFilter::make('type')
+                    ->label(__('translations.type'))
+                    ->options(AddressType::options()),
+
+                SelectFilter::make('country_id')
+                    ->label(__('translations.country'))
+                    ->relationship('country', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                SelectFilter::make('user_id')
+                    ->label(__('translations.user'))
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                TernaryFilter::make('is_default')
+                    ->label(__('translations.is_default')),
+
+                TernaryFilter::make('is_billing')
+                    ->label(__('translations.is_billing')),
+
+                TernaryFilter::make('is_shipping')
+                    ->label(__('translations.is_shipping')),
+
+                TernaryFilter::make('is_active')
+                    ->label(__('translations.is_active')),
+
+                Filter::make('has_company')
+                    ->label(__('translations.has_company'))
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('company_name')),
+
+                Filter::make('has_additional_info')
+                    ->label(__('translations.has_additional_info'))
+                    ->query(fn (Builder $query): Builder => $query->where(function ($q) {
+                        $q->whereNotNull('apartment')
+                          ->orWhereNotNull('floor')
+                          ->orWhereNotNull('building')
+                          ->orWhereNotNull('landmark')
+                          ->orWhereNotNull('instructions');
+                    })),
+
+                Filter::make('created_this_month')
+                    ->label(__('translations.created_this_month'))
+                    ->query(fn (Builder $query): Builder => $query->whereMonth('created_at', now()->month)),
+            ])
+            ->actions([
+                Action::make('set_default')
+                    ->label(__('translations.set_as_default'))
+                    ->icon('heroicon-o-star')
+                    ->color('warning')
+                    ->action(function (Address $record) {
+                        $record->setAsDefault();
+                        Notification::make()
+                            ->title(__('translations.address_set_as_default'))
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn (Address $record) => !$record->is_default),
+
+                Action::make('duplicate')
+                    ->label(__('translations.duplicate'))
+                    ->icon('heroicon-o-document-duplicate')
+                    ->color('info')
+                    ->action(function (Address $record) {
+                        $newAddress = $record->duplicateForUser($record->user_id);
+                        Notification::make()
+                            ->title(__('translations.address_duplicated'))
+                            ->success()
+                            ->send();
+                    }),
+
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    BulkAction::make('activate')
+                        ->label(__('translations.activate'))
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function (Collection $records) {
+                            $records->each->update(['is_active' => true]);
+                            Notification::make()
+                                ->title(__('translations.addresses_activated'))
+                                ->success()
+                                ->send();
+                        }),
+
+                    BulkAction::make('deactivate')
+                        ->label(__('translations.deactivate'))
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->action(function (Collection $records) {
+                            $records->each->update(['is_active' => false]);
+                            Notification::make()
+                                ->title(__('translations.addresses_deactivated'))
+                                ->success()
+                                ->send();
+                        }),
+
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListAddresses::route('/'),
+            'create' => Pages\CreateAddress::route('/create'),
+            'view' => Pages\ViewAddress::route('/{record}'),
+            'edit' => Pages\EditAddress::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'primary';
+    }
+
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->display_name;
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            __('translations.user') => $record->user->name,
+            __('translations.type') => $record->type_label,
+            __('translations.city') => $record->city,
+            __('translations.country') => $record->country?->name,
+        ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['first_name', 'last_name', 'company_name', 'city', 'address_line_1'];
+    }
+}

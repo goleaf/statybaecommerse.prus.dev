@@ -21,14 +21,14 @@ final class ZoneController extends Controller
             ->ordered()
             ->paginate(12);
 
-        return view('frontend.zones.index', compact('zones'));
+        return view('zones.index', compact('zones'));
     }
 
     public function show(Zone $zone): View
     {
         $zone->load(['currency', 'countries', 'translations']);
 
-        return view('frontend.zones.show', compact('zone'));
+        return view('zones.show', compact('zone'));
     }
 
     public function getZonesByCountry(Request $request): JsonResponse

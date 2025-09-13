@@ -38,7 +38,7 @@ final class CampaignControllerNew extends Controller
         $products = Product::whereHas('campaigns')->get();
         $customerGroups = CustomerGroup::whereHas('campaigns')->get();
 
-        return view('frontend.campaigns.index', compact('campaigns', 'categories', 'products', 'customerGroups'));
+        return view('campaigns.index', compact('campaigns', 'categories', 'products', 'customerGroups'));
     }
 
     public function show(Campaign $campaign): View
@@ -68,7 +68,7 @@ final class CampaignControllerNew extends Controller
             ->limit(4)
             ->get();
 
-        return view('frontend.campaigns.show', compact('campaign', 'relatedCampaigns'));
+        return view('campaigns.show', compact('campaign', 'relatedCampaigns'));
     }
 
     public function click(Campaign $campaign, Request $request): JsonResponse
@@ -145,7 +145,7 @@ final class CampaignControllerNew extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        return view('frontend.campaigns.featured', compact('campaigns'));
+        return view('campaigns.featured', compact('campaigns'));
     }
 
     public function byType(string $type): View
@@ -163,7 +163,7 @@ final class CampaignControllerNew extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        return view('frontend.campaigns.by-type', compact('campaigns', 'type'));
+        return view('campaigns.by-type', compact('campaigns', 'type'));
     }
 
     public function search(Request $request): View
@@ -186,7 +186,7 @@ final class CampaignControllerNew extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        return view('frontend.campaigns.search', compact('campaigns', 'query'));
+        return view('campaigns.search', compact('campaigns', 'query'));
     }
 
     public function api(Request $request): JsonResponse

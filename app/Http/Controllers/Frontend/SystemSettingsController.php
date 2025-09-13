@@ -61,7 +61,7 @@ final class SystemSettingsController extends Controller
             ->orderBy('type')
             ->pluck('type');
 
-        return view('frontend.system-settings.index', compact(
+        return view('system-settings.index', compact(
             'settings',
             'categories',
             'groups',
@@ -78,7 +78,7 @@ final class SystemSettingsController extends Controller
 
         $setting->load('category');
 
-        return view('frontend.system-settings.show', compact('setting'));
+        return view('system-settings.show', compact('setting'));
     }
 
     public function byCategory(SystemSettingCategory $category): View
@@ -93,7 +93,7 @@ final class SystemSettingsController extends Controller
             ->ordered()
             ->get();
 
-        return view('frontend.system-settings.category', compact('category', 'settings'));
+        return view('system-settings.category', compact('category', 'settings'));
     }
 
     public function byGroup(string $group): View
@@ -109,7 +109,7 @@ final class SystemSettingsController extends Controller
             abort(404);
         }
 
-        return view('frontend.system-settings.group', compact('group', 'settings'));
+        return view('system-settings.group', compact('group', 'settings'));
     }
 
     public function api(Request $request): JsonResponse

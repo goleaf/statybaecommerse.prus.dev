@@ -35,3 +35,4 @@ final class SystemNotification extends Notification implements ShouldQueue
             ->line('Šis pranešimas išsiųstas iš sistemos administracijos.');
     }
 }
+

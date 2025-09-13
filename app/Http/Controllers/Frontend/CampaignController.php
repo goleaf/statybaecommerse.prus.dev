@@ -31,7 +31,7 @@ final class CampaignController extends Controller
             })
             ->paginate(12);
 
-        return view('frontend.campaigns.index', compact('campaigns'));
+        return view('campaigns.index', compact('campaigns'));
     }
 
     public function show(Campaign $campaign): View
@@ -64,7 +64,7 @@ final class CampaignController extends Controller
             ->limit(4)
             ->get();
 
-        return view('frontend.campaigns.show', compact('campaign', 'relatedCampaigns'));
+        return view('campaigns.show', compact('campaign', 'relatedCampaigns'));
     }
 
     public function click(Request $request, Campaign $campaign): JsonResponse
@@ -119,7 +119,7 @@ final class CampaignController extends Controller
             ->limit(6)
             ->get();
 
-        return view('frontend.campaigns.featured', compact('campaigns'));
+        return view('campaigns.featured', compact('campaigns'));
     }
 
     public function byType(Request $request, string $type): View
@@ -131,7 +131,7 @@ final class CampaignController extends Controller
             ->with(['targetCategories', 'targetProducts', 'channel'])
             ->paginate(12);
 
-        return view('frontend.campaigns.by-type', compact('campaigns', 'type'));
+        return view('campaigns.by-type', compact('campaigns', 'type'));
     }
 
     public function search(Request $request): View
@@ -149,6 +149,6 @@ final class CampaignController extends Controller
             ->with(['targetCategories', 'channel'])
             ->paginate(12);
 
-        return view('frontend.campaigns.search', compact('campaigns', 'query'));
+        return view('campaigns.search', compact('campaigns', 'query'));
     }
 }

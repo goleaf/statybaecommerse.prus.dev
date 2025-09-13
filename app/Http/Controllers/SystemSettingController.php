@@ -37,7 +37,7 @@ final class SystemSettingController extends Controller
             ->ordered()
             ->paginate(20);
 
-        return view('frontend.system-settings.index', compact('categories', 'settings'));
+        return view('system-settings.index', compact('categories', 'settings'));
     }
 
     public function show(string $key): View
@@ -58,7 +58,7 @@ final class SystemSettingController extends Controller
             ->limit(5)
             ->get();
 
-        return view('frontend.system-settings.show', compact('setting', 'relatedSettings'));
+        return view('system-settings.show', compact('setting', 'relatedSettings'));
     }
 
     public function category(string $slug): View
@@ -78,7 +78,7 @@ final class SystemSettingController extends Controller
             ->limit(5)
             ->get();
 
-        return view('frontend.system-settings.category', compact('category', 'settings', 'relatedCategories'));
+        return view('system-settings.category', compact('category', 'settings', 'relatedCategories'));
     }
 
     public function group(string $group): View
@@ -96,7 +96,7 @@ final class SystemSettingController extends Controller
             ->having('settings_count', '>', 0)
             ->get();
 
-        return view('frontend.system-settings.group', compact('settings', 'categories', 'group'));
+        return view('system-settings.group', compact('settings', 'categories', 'group'));
     }
 
     public function search(Request $request): View
@@ -116,7 +116,7 @@ final class SystemSettingController extends Controller
             })
             ->get();
 
-        return view('frontend.system-settings.search', compact('settings', 'categories', 'query'));
+        return view('system-settings.search', compact('settings', 'categories', 'query'));
     }
 
     public function api(Request $request): JsonResponse

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full scroll-smooth" data-theme="light">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full scroll-smooth" data-theme="light"
+      style="scroll-behavior: smooth;">
 
 <head>
     <meta charset="utf-8">
@@ -19,7 +20,7 @@
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
         <meta name="googlebot" content="index, follow">
         <meta name="bingbot" content="index, follow">
-        
+
         {{-- Open Graph / Facebook --}}
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">
@@ -28,21 +29,21 @@
         <meta property="og:image" content="{{ asset('images/og-image.jpg') }}">
         <meta property="og:site_name" content="{{ config('app.name') }}">
         <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
-        
+
         {{-- Twitter --}}
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="{{ url()->current() }}">
         <meta property="twitter:title" content="@yield('title', config('app.name'))">
         <meta property="twitter:description" content="{{ $description ?? __('meta_description_home') }}">
         <meta property="twitter:image" content="{{ asset('images/twitter-image.jpg') }}">
-        
+
         {{-- Additional SEO --}}
         <meta name="theme-color" content="#0ea5e9">
         <meta name="msapplication-TileColor" content="#0ea5e9">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
         <meta name="apple-mobile-web-app-title" content="{{ config('app.name') }}">
-        
+
         {{-- Structured Data --}}
         <script type="application/ld+json">
         {
@@ -89,7 +90,8 @@
 
     {{-- Local Fonts - No CDN --}}
     <link rel="preload" href="{{ asset('fonts/inter-var.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{ asset('fonts/space-grotesk-var.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/space-grotesk-var.woff2') }}" as="font" type="font/woff2"
+          crossorigin>
 
     {{-- Vite Assets --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -108,11 +110,19 @@
         {{ __('skip_to_results') }}
     </a>
 
-    {{-- Loading overlay --}}
-    <div id="loading-overlay" class="fixed inset-0 bg-gray-50/80 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="flex flex-col items-center gap-4">
-            <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-            <p class="text-gray-600 font-medium">{{ __('Loading...') }}</p>
+    {{-- Enhanced Loading overlay with modern design --}}
+    <div id="loading-overlay"
+         class="fixed inset-0 bg-white/95 backdrop-blur-xl z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-500">
+        <div class="flex flex-col items-center gap-6">
+            <div class="relative">
+                <div class="w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+                <div class="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-purple-500 rounded-full animate-spin"
+                     style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+            </div>
+            <div class="text-center">
+                <p class="text-gray-700 font-semibold text-lg">{{ __('Loading...') }}</p>
+                <p class="text-gray-500 text-sm mt-1">{{ __('Please wait while we prepare everything for you') }}</p>
+            </div>
         </div>
     </div>
 
@@ -130,13 +140,17 @@
     {{-- Notifications --}}
     <x-shared.notifications />
 
-    {{-- Back to top button --}}
-    <button id="back-to-top" 
-            class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-large hover:bg-blue-700 transform hover:scale-110 transition-all duration-300 opacity-0 pointer-events-none z-40"
+    {{-- Enhanced Back to top button with modern design --}}
+    <button id="back-to-top"
+            class="fixed bottom-8 right-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 opacity-0 pointer-events-none z-40 group"
             aria-label="{{ __('Back to top') }}">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        <svg class="w-6 h-6 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18">
+            </path>
         </svg>
+        <div
+             class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-sm">
+        </div>
     </button>
 
     {{-- Livewire Scripts --}}
@@ -152,7 +166,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const backToTopButton = document.getElementById('back-to-top');
-            
+
             if (backToTopButton) {
                 // Show/hide button based on scroll position
                 window.addEventListener('scroll', function() {
@@ -164,7 +178,7 @@
                         backToTopButton.classList.remove('opacity-100');
                     }
                 });
-                
+
                 // Smooth scroll to top
                 backToTopButton.addEventListener('click', function() {
                     window.scrollTo({
