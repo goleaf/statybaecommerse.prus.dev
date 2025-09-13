@@ -178,4 +178,231 @@ final class Review extends Model
             ->pluck('count', 'rating')
             ->toArray();
     }
+
+    // Advanced Translation Methods
+    public function getTranslatedTitle(?string $locale = null): ?string
+    {
+        return $this->trans('title', $locale) ?: $this->title;
+    }
+
+    public function getTranslatedComment(?string $locale = null): ?string
+    {
+        return $this->trans('comment', $locale) ?: $this->comment;
+    }
+
+    // Scope for translated reviews
+    public function scopeWithTranslations($query, ?string $locale = null)
+    {
+        $locale = $locale ?: app()->getLocale();
+        return $query->with(['translations' => function ($q) use ($locale) {
+            $q->where('locale', $locale);
+        }]);
+    }
+
+    // Translation Management Methods
+    public function getAvailableLocales(): array
+    {
+        return $this->translations()->pluck('locale')->unique()->values()->toArray();
+    }
+
+    public function hasTranslationFor(string $locale): bool
+    {
+        return $this->translations()->where('locale', $locale)->exists();
+    }
+
+    public function getOrCreateTranslation(string $locale): \App\Models\Translations\ReviewTranslation
+    {
+        return $this->translations()->firstOrCreate(
+            ['locale' => $locale],
+            [
+                'title' => $this->title,
+                'comment' => $this->comment,
+            ]
+        );
+    }
+
+    public function updateTranslation(string $locale, array $data): bool
+    {
+        $translation = $this->getOrCreateTranslation($locale);
+        return $translation->update($data);
+    }
+
+    public function updateTranslations(array $translations): bool
+    {
+        foreach ($translations as $locale => $data) {
+            $this->updateTranslation($locale, $data);
+        }
+        return true;
+    }
+
+    // Helper Methods
+    public function getFullDisplayName(?string $locale = null): string
+    {
+        $title = $this->getTranslatedTitle($locale);
+        $rating = str_repeat('⭐', $this->rating);
+        return "{$title} ({$rating})";
+    }
+
+    public function getReviewInfo(): array
+    {
+        return [
+            'id' => $this->id,
+            'product_id' => $this->product_id,
+            'user_id' => $this->user_id,
+            'reviewer_name' => $this->reviewer_name,
+            'reviewer_email' => $this->reviewer_email,
+            'rating' => $this->rating,
+            'title' => $this->title,
+            'comment' => $this->comment,
+            'is_approved' => $this->is_approved,
+            'is_featured' => $this->is_featured,
+            'locale' => $this->locale,
+            'approved_at' => $this->approved_at?->toISOString(),
+            'rejected_at' => $this->rejected_at?->toISOString(),
+        ];
+    }
+
+    public function getStatusInfo(): array
+    {
+        return [
+            'is_approved' => $this->is_approved,
+            'is_featured' => $this->is_featured,
+            'status' => $this->getStatus(),
+            'status_color' => $this->getStatusColor(),
+            'status_label' => $this->getStatusLabel(),
+            'approved_at' => $this->approved_at?->toISOString(),
+            'rejected_at' => $this->rejected_at?->toISOString(),
+        ];
+    }
+
+    public function getRatingInfo(): array
+    {
+        return [
+            'rating' => $this->rating,
+            'rating_stars' => str_repeat('⭐', $this->rating),
+            'rating_label' => $this->getRatingLabel(),
+            'rating_color' => $this->getRatingColor(),
+            'is_high_rated' => $this->rating >= 4,
+            'is_low_rated' => $this->rating <= 2,
+        ];
+    }
+
+    public function getBusinessInfo(): array
+    {
+        return [
+            'is_approved' => $this->is_approved,
+            'is_featured' => $this->is_featured,
+            'is_recent' => $this->created_at->isAfter(now()->subDays(30)),
+            'days_old' => $this->created_at->diffInDays(now()),
+            'product_name' => $this->product?->name,
+            'reviewer_type' => $this->user_id ? 'registered' : 'guest',
+        ];
+    }
+
+    public function getCompleteInfo(?string $locale = null): array
+    {
+        return array_merge(
+            $this->getReviewInfo(),
+            $this->getStatusInfo(),
+            $this->getRatingInfo(),
+            $this->getBusinessInfo(),
+            [
+                'translations' => $this->getAvailableLocales(),
+                'has_translations' => count($this->getAvailableLocales()) > 0,
+                'created_at' => $this->created_at?->toISOString(),
+                'updated_at' => $this->updated_at?->toISOString(),
+            ]
+        );
+    }
+
+    // Additional helper methods
+    public function getStatus(): string
+    {
+        if ($this->is_approved) {
+            return 'approved';
+        }
+        
+        if ($this->rejected_at) {
+            return 'rejected';
+        }
+        
+        return 'pending';
+    }
+
+    public function getStatusColor(): string
+    {
+        return match ($this->getStatus()) {
+            'approved' => 'success',
+            'rejected' => 'danger',
+            'pending' => 'warning',
+            default => 'gray',
+        };
+    }
+
+    public function getStatusLabel(): string
+    {
+        return match ($this->getStatus()) {
+            'approved' => __('admin.reviews.status.approved'),
+            'rejected' => __('admin.reviews.status.rejected'),
+            'pending' => __('admin.reviews.status.pending'),
+            default => __('admin.reviews.status.unknown'),
+        };
+    }
+
+    public function getRatingLabel(): string
+    {
+        return match ($this->rating) {
+            1 => __('admin.reviews.ratings.poor'),
+            2 => __('admin.reviews.ratings.fair'),
+            3 => __('admin.reviews.ratings.good'),
+            4 => __('admin.reviews.ratings.very_good'),
+            5 => __('admin.reviews.ratings.excellent'),
+            default => __('admin.reviews.ratings.unknown'),
+        };
+    }
+
+    public function getRatingColor(): string
+    {
+        return match ($this->rating) {
+            1, 2 => 'danger',
+            3 => 'warning',
+            4, 5 => 'success',
+            default => 'gray',
+        };
+    }
+
+    public function isRecent(int $days = 30): bool
+    {
+        return $this->created_at->isAfter(now()->subDays($days));
+    }
+
+    public function isHighRated(int $minRating = 4): bool
+    {
+        return $this->rating >= $minRating;
+    }
+
+    public function isLowRated(int $maxRating = 2): bool
+    {
+        return $this->rating <= $maxRating;
+    }
+
+    public function canBeApproved(): bool
+    {
+        return !$this->is_approved && !$this->rejected_at;
+    }
+
+    public function canBeRejected(): bool
+    {
+        return !$this->rejected_at;
+    }
+
+    public function canBeFeatured(): bool
+    {
+        return $this->is_approved && !$this->is_featured;
+    }
+
+    public function canBeUnfeatured(): bool
+    {
+        return $this->is_featured;
+    }
 }

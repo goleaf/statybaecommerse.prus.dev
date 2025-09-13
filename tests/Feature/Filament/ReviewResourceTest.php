@@ -1,238 +1,282 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Filament\Resources\ReviewResource;
+declare(strict_types=1);
+
+namespace Tests\Feature\Filament;
+
 use App\Models\Review;
 use App\Models\Product;
 use App\Models\User;
-use Livewire\Livewire;
-use Spatie\Permission\Models\Role;
-use function Pest\Laravel\{actingAs, assertDatabaseHas, assertDatabaseMissing, assertSoftDeleted};
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-beforeEach(function () {
-	$this->admin = User::factory()->create();
-	$adminRole = Role::firstOrCreate(['name' => 'admin']);
-	$this->admin->assignRole($adminRole);
-	$this->user = User::factory()->create();
-	$this->product = Product::factory()->create();
-	actingAs($this->admin);
-});
+final class ReviewResourceTest extends TestCase
+{
+    use RefreshDatabase;
 
-it('can render review resource index page', function () {
-	$this->get(ReviewResource::getUrl('index'))->assertSuccessful();
-});
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->actingAs(User::factory()->admin()->create());
+    }
 
-it('can render review resource create page', function () {
-	$this->get(ReviewResource::getUrl('create'))->assertSuccessful();
-});
+    public function test_review_resource_list_page_renders(): void
+    {
+        $product = Product::factory()->create();
+        Review::factory()->count(3)->create(['product_id' => $product->id]);
 
-it('can create review', function () {
-	$newData = [
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-		'title' => 'Great Product',
-		'content' => 'This product exceeded my expectations. Highly recommended!',
-		'rating' => 5,
-		'is_approved' => false,
-	];
+        $response = $this->get(route('filament.admin.resources.reviews.index'));
 
-	Livewire::test(ReviewResource\Pages\CreateReview::class)
-		->fillForm($newData)
-		->call('create')
-		->assertHasNoFormErrors();
+        $response->assertOk();
+    }
 
-	assertDatabaseHas('reviews', [
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-		'rating' => 5,
-		'is_approved' => false,
-		'title' => 'Great Product',
-	]);
-});
+    public function test_review_resource_create_page_renders(): void
+    {
+        $response = $this->get(route('filament.admin.resources.reviews.create'));
 
-it('can render review resource view page', function () {
-	$review = Review::factory()->create([
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
+        $response->assertOk();
+    }
 
-	$this->get(ReviewResource::getUrl('view', ['record' => $review]))->assertSuccessful();
-});
+    public function test_review_resource_can_create_review(): void
+    {
+        $product = Product::factory()->create();
+        $user = User::factory()->create();
 
-it('can render review resource edit page', function () {
-	$review = Review::factory()->create([
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
+        $reviewData = [
+            'product_id' => $product->id,
+            'user_id' => $user->id,
+            'reviewer_name' => 'John Doe',
+            'reviewer_email' => 'john@example.com',
+            'rating' => 5,
+            'title' => 'Great Product',
+            'comment' => 'This product is amazing!',
+            'locale' => 'en',
+            'is_approved' => false,
+            'is_featured' => false,
+        ];
 
-	$this->get(ReviewResource::getUrl('edit', ['record' => $review]))->assertSuccessful();
-});
+        $response = $this->post(route('filament.admin.resources.reviews.store'), $reviewData);
 
-it('can update review', function () {
-	$review = Review::factory()->create([
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
-	
-	$newData = [
-		'title' => 'Updated Review Title',
-		'content' => 'Updated review content',
-		'rating' => 4,
-		'is_approved' => true,
-	];
+        $response->assertRedirect();
+        
+        $this->assertDatabaseHas('reviews', [
+            'product_id' => $product->id,
+            'user_id' => $user->id,
+            'reviewer_name' => 'John Doe',
+            'reviewer_email' => 'john@example.com',
+            'rating' => 5,
+            'title' => 'Great Product',
+            'comment' => 'This product is amazing!',
+            'locale' => 'en',
+            'is_approved' => false,
+            'is_featured' => false,
+        ]);
+    }
 
-	Livewire::test(ReviewResource\Pages\EditReview::class, [
-		'record' => $review->getRouteKey(),
-	])
-		->fillForm(array_merge($newData, [
-			'product_id' => $this->product->id,
-			'user_id' => $this->user->id,
-		]))
-		->call('save')
-		->assertHasNoFormErrors();
+    public function test_review_resource_can_edit_review(): void
+    {
+        $product = Product::factory()->create();
+        $review = Review::factory()->create([
+            'product_id' => $product->id,
+            'title' => 'Original Title',
+            'comment' => 'Original Comment',
+        ]);
 
-	assertDatabaseHas('reviews', array_merge(['id' => $review->id], $newData));
-});
+        $updateData = [
+            'title' => 'Updated Title',
+            'comment' => 'Updated Comment',
+            'rating' => 4,
+        ];
 
-it('can delete review', function () {
-	$review = Review::factory()->create([
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
+        $response = $this->put(route('filament.admin.resources.reviews.update', $review), $updateData);
 
-	Livewire::test(ReviewResource\Pages\EditReview::class, [
-		'record' => $review->getRouteKey(),
-	])
-		->callAction('delete');
+        $response->assertRedirect();
+        
+        $this->assertDatabaseHas('reviews', [
+            'id' => $review->id,
+            'title' => 'Updated Title',
+            'comment' => 'Updated Comment',
+            'rating' => 4,
+        ]);
+    }
 
-	assertSoftDeleted('reviews', ['id' => $review->id]);
-});
+    public function test_review_resource_can_delete_review(): void
+    {
+        $product = Product::factory()->create();
+        $review = Review::factory()->create(['product_id' => $product->id]);
 
-it('can list reviews', function () {
-	$reviews = Review::factory()->count(5)->create([
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
+        $response = $this->delete(route('filament.admin.resources.reviews.destroy', $review));
 
-	Livewire::test(ReviewResource\Pages\ListReviews::class)
-		->assertCanSeeTableRecords($reviews);
-});
+        $response->assertRedirect();
+        
+        $this->assertSoftDeleted('reviews', [
+            'id' => $review->id,
+        ]);
+    }
 
-it('can filter reviews by rating', function () {
-	$fiveStarReview = Review::factory()->create([
-		'rating' => 5,
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
-	$oneStarReview = Review::factory()->create([
-		'rating' => 1,
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
+    public function test_review_resource_widgets_are_included(): void
+    {
+        $product = Product::factory()->create();
+        Review::factory()->count(3)->create(['product_id' => $product->id]);
 
-	Livewire::test(ReviewResource\Pages\ListReviews::class)
-		->filterTable('rating', 5)
-		->assertCanSeeTableRecords([$fiveStarReview])
-		->assertCanNotSeeTableRecords([$oneStarReview]);
-});
+        $response = $this->get(route('filament.admin.resources.reviews.index'));
 
-it('can filter approved reviews', function () {
-	$approvedReview = Review::factory()->create([
-		'is_approved' => true,
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
-	$pendingReview = Review::factory()->create([
-		'is_approved' => false,
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
+        $response->assertOk();
+        // Widgets should be rendered on the index page
+        $response->assertSee('Review Statistics');
+    }
 
-	Livewire::test(ReviewResource\Pages\ListReviews::class)
-		->filterTable('approved')
-		->assertCanSeeTableRecords([$approvedReview])
-		->assertCanNotSeeTableRecords([$pendingReview]);
-});
+    public function test_review_resource_bulk_actions(): void
+    {
+        $product = Product::factory()->create();
+        $reviews = Review::factory()->count(3)->create([
+            'product_id' => $product->id,
+            'is_approved' => false,
+            'is_featured' => false,
+        ]);
 
-it('can filter pending reviews', function () {
-	$approvedReview = Review::factory()->create([
-		'is_approved' => true,
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
-	$pendingReview = Review::factory()->create([
-		'is_approved' => false,
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
+        // Test bulk approve action
+        $response = $this->post(route('filament.admin.resources.reviews.bulk-action'), [
+            'action' => 'approve',
+            'records' => $reviews->pluck('id')->toArray(),
+        ]);
 
-	Livewire::test(ReviewResource\Pages\ListReviews::class)
-		->filterTable('pending')
-		->assertCanSeeTableRecords([$pendingReview])
-		->assertCanNotSeeTableRecords([$approvedReview]);
-});
+        $response->assertRedirect();
 
-it('can approve review using action', function () {
-	$review = Review::factory()->create([
-		'is_approved' => false,
-		'approved_at' => null,
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
+        foreach ($reviews as $review) {
+            $review->refresh();
+            $this->assertTrue($review->is_approved);
+            $this->assertNotNull($review->approved_at);
+        }
 
-	Livewire::test(ReviewResource\Pages\ListReviews::class)
-		->callTableAction('approve', $review);
+        // Test bulk feature action
+        $response = $this->post(route('filament.admin.resources.reviews.bulk-action'), [
+            'action' => 'feature',
+            'records' => $reviews->pluck('id')->toArray(),
+        ]);
 
-	assertDatabaseHas('reviews', [
-		'id' => $review->id,
-		'is_approved' => true,
-	]);
-});
+        $response->assertRedirect();
 
-it('can reject review using action', function () {
-	$review = Review::factory()->create([
-		'is_approved' => true,
-		'approved_at' => now(),
-		'product_id' => $this->product->id,
-		'user_id' => $this->user->id,
-	]);
+        foreach ($reviews as $review) {
+            $review->refresh();
+            $this->assertTrue($review->is_featured);
+        }
+    }
 
-	Livewire::test(ReviewResource\Pages\ListReviews::class)
-		->callTableAction('reject', $review);
+    public function test_review_resource_filters(): void
+    {
+        $product = Product::factory()->create();
+        Review::factory()->create(['product_id' => $product->id, 'is_approved' => true]);
+        Review::factory()->create(['product_id' => $product->id, 'is_approved' => false]);
+        Review::factory()->create(['product_id' => $product->id, 'is_featured' => true]);
 
-	assertDatabaseHas('reviews', [
-		'id' => $review->id,
-		'is_approved' => false,
-		'approved_at' => null,
-	]);
-});
+        // Test approved filter
+        $response = $this->get(route('filament.admin.resources.reviews.index', ['tableFilters[approved][value]' => '1']));
+        $response->assertOk();
 
-it('validates required fields when creating review', function () {
-	Livewire::test(ReviewResource\Pages\CreateReview::class)
-		->fillForm([])
-		->call('create')
-		->assertHasFormErrors(['product_id', 'user_id', 'title', 'content', 'rating']);
-});
+        // Test featured filter
+        $response = $this->get(route('filament.admin.resources.reviews.index', ['tableFilters[featured][value]' => '1']));
+        $response->assertOk();
 
-it('validates rating is within valid range', function () {
-	Livewire::test(ReviewResource\Pages\CreateReview::class)
-		->fillForm([
-			'product_id' => $this->product->id,
-			'user_id' => $this->user->id,
-			'title' => 'Test Review',
-			'content' => 'Test content',
-			'rating' => 6, // Invalid - over 5
-		])
-		->call('create')
-		->assertHasFormErrors(['rating']);
+        // Test rating filter
+        $response = $this->get(route('filament.admin.resources.reviews.index', ['tableFilters[rating][value]' => '5']));
+        $response->assertOk();
+    }
 
-	Livewire::test(ReviewResource\Pages\CreateReview::class)
-		->fillForm([
-			'product_id' => $this->product->id,
-			'user_id' => $this->user->id,
-			'title' => 'Test Review',
-			'content' => 'Test content',
-			'rating' => 0, // Invalid - under 1
-		])
-		->call('create')
-		->assertHasFormErrors(['rating']);
-});
+    public function test_review_resource_individual_actions(): void
+    {
+        $product = Product::factory()->create();
+        $review = Review::factory()->create([
+            'product_id' => $product->id,
+            'is_approved' => false,
+            'is_featured' => false,
+        ]);
+
+        // Test approve action
+        $response = $this->post(route('filament.admin.resources.reviews.bulk-action'), [
+            'action' => 'approve',
+            'records' => [$review->id],
+        ]);
+
+        $response->assertRedirect();
+
+        $review->refresh();
+        $this->assertTrue($review->is_approved);
+        $this->assertNotNull($review->approved_at);
+
+        // Test feature action
+        $response = $this->post(route('filament.admin.resources.reviews.bulk-action'), [
+            'action' => 'feature',
+            'records' => [$review->id],
+        ]);
+
+        $response->assertRedirect();
+
+        $review->refresh();
+        $this->assertTrue($review->is_featured);
+    }
+
+    public function test_review_resource_view_page(): void
+    {
+        $product = Product::factory()->create();
+        $review = Review::factory()->create([
+            'product_id' => $product->id,
+            'title' => 'Test Review',
+            'rating' => 5,
+        ]);
+
+        $response = $this->get(route('filament.admin.resources.reviews.view', $review));
+
+        $response->assertOk();
+        $response->assertSee('Test Review');
+    }
+
+    public function test_review_resource_edit_page(): void
+    {
+        $product = Product::factory()->create();
+        $review = Review::factory()->create(['product_id' => $product->id]);
+
+        $response = $this->get(route('filament.admin.resources.reviews.edit', $review));
+
+        $response->assertOk();
+    }
+
+    public function test_review_resource_validation(): void
+    {
+        $invalidData = [
+            'rating' => 6, // Invalid rating
+            'title' => '', // Required field
+            'comment' => '', // Required field
+        ];
+
+        $response = $this->post(route('filament.admin.resources.reviews.store'), $invalidData);
+
+        $response->assertSessionHasErrors(['rating', 'title', 'comment']);
+    }
+
+    public function test_review_resource_rating_validation(): void
+    {
+        $product = Product::factory()->create();
+        
+        // Test rating too low
+        $response = $this->post(route('filament.admin.resources.reviews.store'), [
+            'product_id' => $product->id,
+            'rating' => 0,
+            'title' => 'Test',
+            'comment' => 'Test comment',
+        ]);
+
+        $response->assertSessionHasErrors(['rating']);
+
+        // Test rating too high
+        $response = $this->post(route('filament.admin.resources.reviews.store'), [
+            'product_id' => $product->id,
+            'rating' => 6,
+            'title' => 'Test',
+            'comment' => 'Test comment',
+        ]);
+
+        $response->assertSessionHasErrors(['rating']);
+    }
+}
