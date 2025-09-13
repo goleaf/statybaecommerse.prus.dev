@@ -8,9 +8,6 @@ use App\Models\Region;
 use App\Models\Translations\RegionTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Translations\RegionTranslation>
- */
 final class RegionTranslationFactory extends Factory
 {
     protected $model = RegionTranslation::class;
@@ -21,7 +18,7 @@ final class RegionTranslationFactory extends Factory
             'region_id' => Region::factory(),
             'locale' => $this->faker->randomElement(['en', 'lt']),
             'name' => $this->faker->city() . ' Region',
-            'description' => $this->faker->optional(0.8)->paragraph(),
+            'description' => $this->faker->paragraph(),
         ];
     }
 
@@ -29,6 +26,8 @@ final class RegionTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'en',
+            'name' => $this->faker->city() . ' Region',
+            'description' => $this->faker->paragraph(),
         ]);
     }
 
@@ -36,27 +35,8 @@ final class RegionTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
-        ]);
-    }
-
-    public function forRegion(Region $region): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'region_id' => $region->id,
-        ]);
-    }
-
-    public function withName(string $name): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'name' => $name,
-        ]);
-    }
-
-    public function withDescription(string $description): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'description' => $description,
+            'name' => $this->faker->city() . ' Regionas',
+            'description' => $this->faker->paragraph(),
         ]);
     }
 }

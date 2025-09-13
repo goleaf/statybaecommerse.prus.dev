@@ -12,6 +12,8 @@ final class RegionTranslation extends Model
 {
     use HasFactory;
 
+    protected static string $factory = \Database\Factories\RegionTranslationFactory::class;
+
     protected $table = 'region_translations';
 
     protected $fillable = [

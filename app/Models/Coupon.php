@@ -123,6 +123,16 @@ final class Coupon extends Model
         return true;
     }
 
+    public function isExpired(): bool
+    {
+        return $this->expires_at && $this->expires_at < now();
+    }
+
+    public function isNotStarted(): bool
+    {
+        return $this->starts_at && $this->starts_at > now();
+    }
+
     public function canBeUsed(float $orderTotal): bool
     {
         if (! $this->isValid()) {
@@ -146,6 +156,6 @@ final class Coupon extends Model
             return ($orderTotal * $this->value) / 100;
         }
 
-        return min($this->value, $orderTotal);
+        return (float) min($this->value, $orderTotal);
     }
 }

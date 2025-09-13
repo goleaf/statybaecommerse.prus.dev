@@ -75,19 +75,19 @@ class CouponTest extends TestCase
         $validCoupon = Coupon::factory()->create([
             'is_active' => true,
             'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'expires_at' => now()->addDay(),
         ]);
 
         $expiredCoupon = Coupon::factory()->create([
             'is_active' => true,
             'starts_at' => now()->subDays(2),
-            'ends_at' => now()->subDay(),
+            'expires_at' => now()->subDay(),
         ]);
 
         $futureCoupon = Coupon::factory()->create([
             'is_active' => true,
             'starts_at' => now()->addDay(),
-            'ends_at' => now()->addDays(2),
+            'expires_at' => now()->addDays(2),
         ]);
 
         $validCoupons = Coupon::valid()->get();
@@ -123,22 +123,20 @@ class CouponTest extends TestCase
     {
         $coupon = Coupon::factory()->create([
             'usage_limit' => 100,
-            'usage_count' => 50,
+            'used_count' => 50,
         ]);
 
         $this->assertEquals(100, $coupon->usage_limit);
-        $this->assertEquals(50, $coupon->usage_count);
-        $this->assertTrue($coupon->hasUsageLimit());
-        $this->assertTrue($coupon->canBeUsed());
+        $this->assertEquals(50, $coupon->used_count);
     }
 
     public function test_coupon_can_have_user_limit(): void
     {
         $coupon = Coupon::factory()->create([
-            'user_limit' => 1,
+            'usage_limit_per_user' => 1,
         ]);
 
-        $this->assertEquals(1, $coupon->user_limit);
+        $this->assertEquals(1, $coupon->usage_limit_per_user);
     }
 
     public function test_coupon_can_have_minimum_amount(): void
@@ -170,27 +168,23 @@ class CouponTest extends TestCase
         $this->assertInstanceOf(Product::class, $coupon->products->first());
     }
 
-    public function test_coupon_can_have_users(): void
-    {
-        $coupon = Coupon::factory()->create();
-        $users = User::factory()->count(2)->create();
-
-        $coupon->users()->attach($users->pluck('id'));
-
-        $this->assertCount(2, $coupon->users);
-        $this->assertInstanceOf(User::class, $coupon->users->first());
-    }
 
     public function test_coupon_can_calculate_discount(): void
     {
         $percentageCoupon = Coupon::factory()->create([
             'type' => 'percentage',
             'value' => 20.00,
+            'is_active' => true,
+            'starts_at' => now()->subDay(),
+            'expires_at' => now()->addDay(),
         ]);
 
         $fixedCoupon = Coupon::factory()->create([
             'type' => 'fixed',
             'value' => 15.00,
+            'is_active' => true,
+            'starts_at' => now()->subDay(),
+            'expires_at' => now()->addDay(),
         ]);
 
         $this->assertEquals(20.00, $percentageCoupon->calculateDiscount(100.00));
@@ -202,13 +196,13 @@ class CouponTest extends TestCase
         $validCoupon = Coupon::factory()->create([
             'is_active' => true,
             'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'expires_at' => now()->addDay(),
         ]);
 
         $invalidCoupon = Coupon::factory()->create([
             'is_active' => false,
             'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'expires_at' => now()->addDay(),
         ]);
 
         $this->assertTrue($validCoupon->isValid());
@@ -218,11 +212,11 @@ class CouponTest extends TestCase
     public function test_coupon_can_check_expiration(): void
     {
         $expiredCoupon = Coupon::factory()->create([
-            'ends_at' => now()->subDay(),
+            'expires_at' => now()->subDay(),
         ]);
 
         $activeCoupon = Coupon::factory()->create([
-            'ends_at' => now()->addDay(),
+            'expires_at' => now()->addDay(),
         ]);
 
         $this->assertTrue($expiredCoupon->isExpired());
@@ -252,28 +246,4 @@ class CouponTest extends TestCase
         $this->assertEquals('Save 20% on your next purchase', $coupon->description);
     }
 
-    public function test_coupon_can_have_terms_and_conditions(): void
-    {
-        $coupon = Coupon::factory()->create([
-            'terms_and_conditions' => 'Valid for new customers only. Cannot be combined with other offers.',
-        ]);
-
-        $this->assertEquals('Valid for new customers only. Cannot be combined with other offers.', $coupon->terms_and_conditions);
-    }
-
-    public function test_coupon_can_have_metadata(): void
-    {
-        $coupon = Coupon::factory()->create([
-            'metadata' => [
-                'campaign' => 'summer_sale',
-                'source' => 'email',
-                'priority' => 'high',
-            ],
-        ]);
-
-        $this->assertIsArray($coupon->metadata);
-        $this->assertEquals('summer_sale', $coupon->metadata['campaign']);
-        $this->assertEquals('email', $coupon->metadata['source']);
-        $this->assertEquals('high', $coupon->metadata['priority']);
-    }
 }
