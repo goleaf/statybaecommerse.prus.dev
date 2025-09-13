@@ -50,8 +50,8 @@ final class Location extends Model
         return [
             'is_enabled' => 'boolean',
             'is_default' => 'boolean',
-            'latitude' => 'decimal:8',
-            'longitude' => 'decimal:8',
+            'latitude' => 'float',
+            'longitude' => 'float',
             'opening_hours' => 'array',
             'contact_info' => 'array',
             'sort_order' => 'integer',
@@ -176,9 +176,9 @@ final class Location extends Model
         return $this->type === 'office';
     }
 
-    public function isPickupPoint(): bool
+    public function isOther(): bool
     {
-        return $this->type === 'pickup_point';
+        return $this->type === 'other';
     }
 
     public function hasCoordinates(): bool

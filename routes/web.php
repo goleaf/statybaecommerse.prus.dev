@@ -875,6 +875,23 @@ Route::get('/locations/{id}', function ($id) {
     return redirect()->route('locations.view', ['slug' => $slug]);
 })->whereNumber('id')->name('locations.show');
 
+
+// Region Module Routes
+Route::prefix('regions')->name('regions.')->group(function () {
+    Route::get('/', [App\Http\Controllers\RegionController::class, 'index'])->name('index');
+    Route::get('/{region}', [App\Http\Controllers\RegionController::class, 'show'])->name('show');
+    
+    // API Routes
+    Route::prefix('api')->name('api.')->group(function () {
+        Route::get('/search', [App\Http\Controllers\RegionController::class, 'search'])->name('search');
+        Route::get('/by-country/{countryId}', [App\Http\Controllers\RegionController::class, 'byCountry'])->name('by-country');
+        Route::get('/by-zone/{zoneId}', [App\Http\Controllers\RegionController::class, 'byZone'])->name('by-zone');
+        Route::get('/by-level/{level}', [App\Http\Controllers\RegionController::class, 'byLevel'])->name('by-level');
+        Route::get('/children/{regionId}', [App\Http\Controllers\RegionController::class, 'children'])->name('children');
+        Route::get('/statistics', [App\Http\Controllers\RegionController::class, 'statistics'])->name('statistics');
+        Route::get('/data', [App\Http\Controllers\RegionController::class, 'api'])->name('data');
+    });
+});
 // --- Locale-prefixed public routes used in tests ---
 Route::prefix('{locale}')
     ->where(['locale' => '[A-Za-z\-_]+'])
@@ -1318,3 +1335,4 @@ Route::prefix('countries')->name('countries.')->group(function () {
     Route::get('/api/with-vat', [App\Http\Controllers\CountryController::class, 'withVat'])->name('api.with-vat');
     Route::get('/api/statistics', [App\Http\Controllers\CountryController::class, 'statistics'])->name('api.statistics');
 });
+

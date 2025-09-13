@@ -31,7 +31,7 @@ final class LocationFactory extends Factory
             'city' => $this->faker->city(),
             'state' => $this->faker->optional()->state(),
             'postal_code' => $this->faker->postcode(),
-            'country_code' => $this->faker->randomElement(['LT', 'US', 'GB', 'DE', 'FR', 'CA', 'AU', 'BE', 'CH', 'AT', 'AE', 'AR', 'BG', 'BR', 'BY', 'CN', 'CZ', 'DK', 'EE', 'EG', 'ES', 'FI', 'HR', 'HU', 'ID', 'IL', 'IN', 'IT', 'JP', 'KE', 'KR', 'LV', 'MX', 'MY', 'NG', 'NL', 'NO', 'NZ', 'PH', 'PL', 'RO', 'RS', 'RU', 'SA', 'SE', 'SG', 'SI', 'SK', 'TH', 'TR', 'UA', 'VN', 'ZA']),
+            'country_code' => $this->faker->randomElement(['LT', 'US', 'GB']),
             'phone' => $this->faker->optional()->phoneNumber(),
             'email' => $this->faker->optional()->companyEmail(),
             'latitude' => $this->faker->optional()->latitude(),

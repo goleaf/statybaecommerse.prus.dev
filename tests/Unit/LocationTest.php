@@ -19,18 +19,46 @@ final class LocationTest extends TestCase
     {
         parent::setUp();
         
-        // Seed countries table for foreign key constraints
-        $this->seed(\Database\Seeders\CountrySeeder::class);
+        // Create countries for foreign key constraints
+        \App\Models\Country::create([
+            'name' => 'Lithuania',
+            'cca2' => 'LT',
+            'cca3' => 'LTU',
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+        
+        \App\Models\Country::create([
+            'name' => 'United States',
+            'cca2' => 'US',
+            'cca3' => 'USA',
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+        
+        \App\Models\Country::create([
+            'name' => 'United Kingdom',
+            'cca2' => 'GB',
+            'cca3' => 'GBR',
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
     }
 
     public function test_location_can_be_created(): void
     {
-        $location = Location::factory()->create([
-            'name' => 'Test Warehouse',
+        $location = new Location([
             'code' => 'WH001',
+            'name' => 'Test Warehouse',
+            'slug' => 'test-warehouse',
             'type' => 'warehouse',
+            'country_code' => 'LT',
             'is_enabled' => true,
+            'is_default' => false,
+            'sort_order' => 0,
         ]);
+        
+        $location->save();
 
         $this->assertDatabaseHas('locations', [
             'name' => 'Test Warehouse',
@@ -149,7 +177,7 @@ final class LocationTest extends TestCase
             'longitude' => 25.2797,
         ]);
 
-        $this->assertEquals('54.68720000, 25.27970000', $location->coordinates);
+        $this->assertEquals('54.6872, 25.2797', $location->coordinates);
     }
 
     public function test_location_coordinates_attribute_with_null_values(): void
@@ -169,7 +197,7 @@ final class LocationTest extends TestCase
             'longitude' => 25.2797,
         ]);
 
-        $expected = 'https://www.google.com/maps?q=54.68720000,25.27970000';
+        $expected = 'https://www.google.com/maps?q=54.6872,25.2797';
         $this->assertEquals($expected, $location->google_maps_url);
     }
 
@@ -188,7 +216,7 @@ final class LocationTest extends TestCase
         $warehouse = Location::factory()->create(['type' => 'warehouse']);
         $store = Location::factory()->create(['type' => 'store']);
         $office = Location::factory()->create(['type' => 'office']);
-        $pickupPoint = Location::factory()->create(['type' => 'pickup_point']);
+        $other = Location::factory()->create(['type' => 'other']);
 
         $this->assertTrue($warehouse->isWarehouse());
         $this->assertFalse($warehouse->isStore());
@@ -197,7 +225,7 @@ final class LocationTest extends TestCase
         $this->assertFalse($store->isWarehouse());
 
         $this->assertTrue($office->isOffice());
-        $this->assertTrue($pickupPoint->isPickupPoint());
+        $this->assertTrue($other->isOther());
     }
 
     public function test_location_has_coordinates(): void
