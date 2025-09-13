@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
-use App\Enums\NavigationIcon;
 use App\Filament\Resources\RegionResource\Pages;
 use App\Filament\Resources\RegionResource\Widgets;
 use App\Models\Country;
@@ -24,12 +22,11 @@ class RegionResource extends Resource
 {
     protected static ?string $model = Region::class;
 
-    protected static NavigationIcon $navigationIcon = NavigationIcon::Map;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-map';
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static $navigationGroup = NavigationGroup::Content;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 2;
 
