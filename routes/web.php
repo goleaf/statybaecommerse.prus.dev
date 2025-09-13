@@ -1336,3 +1336,15 @@ Route::prefix('countries')->name('countries.')->group(function () {
     Route::get('/api/statistics', [App\Http\Controllers\CountryController::class, 'statistics'])->name('api.statistics');
 });
 
+
+
+// Region Frontend Routes
+Route::prefix('regions')->name('regions.')->group(function () {
+    Route::get('/', [App\Http\Controllers\RegionController::class, 'index'])->name('index');
+    Route::get('/{region}', [App\Http\Controllers\RegionController::class, 'show'])->name('show');
+    Route::get('/api/search', [App\Http\Controllers\RegionController::class, 'api'])->name('api.search');
+    Route::get('/api/by-country/{country}', [App\Http\Controllers\RegionController::class, 'byCountry'])->name('api.by-country');
+    Route::get('/api/by-level/{level}', [App\Http\Controllers\RegionController::class, 'byLevel'])->name('api.by-level');
+    Route::get('/api/hierarchy', [App\Http\Controllers\RegionController::class, 'hierarchy'])->name('api.hierarchy');
+    Route::get('/api/statistics', [App\Http\Controllers\RegionController::class, 'statistics'])->name('api.statistics');
+});

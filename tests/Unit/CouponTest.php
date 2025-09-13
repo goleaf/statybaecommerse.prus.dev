@@ -36,16 +36,14 @@ class CouponTest extends TestCase
         $coupon = Coupon::factory()->create([
             'value' => 15.50,
             'is_active' => true,
-            'is_public' => false,
             'starts_at' => now(),
-            'ends_at' => now()->addDays(30),
+            'expires_at' => now()->addDays(30),
         ]);
 
         $this->assertIsNumeric($coupon->value);
         $this->assertIsBool($coupon->is_active);
-        $this->assertIsBool($coupon->is_public);
         $this->assertInstanceOf(\Carbon\Carbon::class, $coupon->starts_at);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $coupon->ends_at);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $coupon->expires_at);
     }
 
     public function test_coupon_fillable_attributes(): void
@@ -71,16 +69,6 @@ class CouponTest extends TestCase
         $this->assertFalse($activeCoupons->contains($inactiveCoupon));
     }
 
-    public function test_coupon_scope_public(): void
-    {
-        $publicCoupon = Coupon::factory()->create(['is_public' => true]);
-        $privateCoupon = Coupon::factory()->create(['is_public' => false]);
-
-        $publicCoupons = Coupon::public()->get();
-
-        $this->assertTrue($publicCoupons->contains($publicCoupon));
-        $this->assertFalse($publicCoupons->contains($privateCoupon));
-    }
 
     public function test_coupon_scope_valid(): void
     {

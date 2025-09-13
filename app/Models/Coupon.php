@@ -97,6 +97,11 @@ final class Coupon extends Model
         return $query->where('type', $type);
     }
 
+    public function scopeByCode($query, string $code)
+    {
+        return $query->where('code', $code);
+    }
+
     public function isValid(): bool
     {
         if (! $this->is_active) {

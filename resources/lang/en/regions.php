@@ -1,67 +1,107 @@
 <?php
 
 return [
+    'navigation_label' => 'Regions',
+    'model_label' => 'Region',
+    'plural_model_label' => 'Regions',
+    
+    // Page titles
     'title' => 'Regions',
-    'subtitle' => 'Explore regions and administrative divisions with detailed information about their hierarchy and business data.',
+    'subtitle' => 'Explore regions and administrative divisions',
+    'page_title' => 'Regions Directory',
+    'page_description' => 'Browse through all available regions and administrative divisions',
     
-    'search' => 'Search Regions',
-    'search_placeholder' => 'Search by name, code, or description...',
+    // Fields
+    'fields' => [
+        'name' => 'Name',
+        'name_official' => 'Official Name',
+        'code' => 'Code',
+        'description' => 'Description',
+        'is_enabled' => 'Enabled',
+        'is_default' => 'Default',
+        'country' => 'Country',
+        'zone' => 'Zone',
+        'parent' => 'Parent Region',
+        'level' => 'Level',
+        'sort_order' => 'Sort Order',
+        'metadata' => 'Metadata',
+        'created_at' => 'Created At',
+        'updated_at' => 'Updated At',
+        'deleted_at' => 'Deleted At',
+        'yes' => 'Yes',
+        'no' => 'No',
+        'capital' => 'Capital',
+    ],
     
+    // Form sections
+    'basic_information' => 'Basic Information',
+    'hierarchy_settings' => 'Hierarchy Settings',
+    'status_settings' => 'Status Settings',
+    'additional_data' => 'Additional Data',
+    
+    // Placeholders
+    'placeholders' => [
+        'name' => 'Enter region name',
+        'code' => 'Enter region code',
+        'description' => 'Enter region description',
+        'sort_order' => 'Enter sort order',
+    ],
+    
+    // Help text
+    'help' => [
+        'name' => 'The name of the region',
+        'code' => 'A unique code for the region',
+        'description' => 'A brief description of the region',
+        'parent' => 'Select a parent region if this is a sub-region',
+        'level' => 'The administrative level of this region',
+        'sort_order' => 'The order in which this region should appear',
+    ],
+    
+    // Actions
+    'actions' => [
+        'create' => 'Create Region',
+        'edit' => 'Edit Region',
+        'delete' => 'Delete Region',
+        'view' => 'View Region',
+        'back_to_list' => 'Back to Regions',
+        'view_details' => 'View Details',
+        'show_on_map' => 'Show on Map',
+    ],
+    
+    // Filters
     'filters' => [
         'search' => 'Search',
-        'search_placeholder' => 'Search by name, code, or description...',
+        'search_placeholder' => 'Search regions...',
         'by_country' => 'Filter by Country',
         'by_zone' => 'Filter by Zone',
         'by_level' => 'Filter by Level',
-        'by_parent' => 'Filter by Parent Region',
+        'by_parent' => 'Filter by Parent',
         'all_countries' => 'All Countries',
         'all_zones' => 'All Zones',
         'all_levels' => 'All Levels',
         'all_parents' => 'All Parent Regions',
-        'enabled_regions' => 'Enabled Regions Only',
-        'disabled_regions' => 'Disabled Regions Only',
-        'default_regions' => 'Default Regions Only',
-        'non_default_regions' => 'Non-Default Regions Only',
+        'enabled_only' => 'Enabled Only',
+        'disabled_only' => 'Disabled Only',
+        'default_only' => 'Default Only',
+        'non_default_only' => 'Non-Default Only',
         'has_children' => 'Has Children',
         'has_cities' => 'Has Cities',
+        'root_regions' => 'Root Regions',
+        'leaf_regions' => 'Leaf Regions',
         'apply_filters' => 'Apply Filters',
         'clear_filters' => 'Clear Filters',
     ],
     
-    'fields' => [
-        'name' => 'Name',
-        'description' => 'Description',
-        'code' => 'Code',
-        'slug' => 'Slug',
-        'level' => 'Level',
-        'level_name' => 'Level Name',
-        'country' => 'Country',
-        'zone' => 'Zone',
-        'parent_region' => 'Parent Region',
-        'is_enabled' => 'Enabled',
-        'is_default' => 'Default',
-        'sort_order' => 'Sort Order',
-        'cities_count' => 'Cities',
-        'addresses_count' => 'Addresses',
-        'users_count' => 'Users',
-        'orders_count' => 'Orders',
-        'customers_count' => 'Customers',
-        'warehouses_count' => 'Warehouses',
-        'stores_count' => 'Stores',
-        'total_cities' => 'Total Cities',
-        'total_addresses' => 'Total Addresses',
-        'total_users' => 'Total Users',
-        'total_orders' => 'Total Orders',
-        'total_customers' => 'Total Customers',
-        'total_warehouses' => 'Total Warehouses',
-        'total_stores' => 'Total Stores',
-        'depth' => 'Depth',
-        'children_count' => 'Children',
-        'full_path' => 'Full Path',
-        'created_at' => 'Created At',
-        'updated_at' => 'Updated At',
+    // Status
+    'status' => [
+        'enabled' => 'Enabled',
+        'disabled' => 'Disabled',
+        'default' => 'Default',
+        'active' => 'Active',
+        'inactive' => 'Inactive',
     ],
     
+    // Levels
     'levels' => [
         0 => 'Root',
         1 => 'State/Province',
@@ -71,71 +111,89 @@ return [
         5 => 'Village',
     ],
     
-    'actions' => [
-        'view_details' => 'View Details',
-        'back_to_list' => 'Back to List',
-        'toggle_enabled' => 'Toggle Enabled',
-        'enable_selected' => 'Enable Selected',
-        'disable_selected' => 'Disable Selected',
-        'add_translation' => 'Add Translation',
+    // Statistics
+    'statistics' => [
+        'total_regions' => 'Total Regions',
+        'total_regions_description' => 'Total number of regions in the system',
+        'enabled_regions' => 'Enabled Regions',
+        'enabled_regions_description' => 'Number of enabled regions',
+        'default_regions' => 'Default Regions',
+        'default_regions_description' => 'Number of default regions',
+        'root_regions' => 'Root Regions',
+        'root_regions_description' => 'Number of root level regions',
+        'regions_by_country' => 'Regions by Country',
+        'regions_by_level' => 'Regions by Level',
+        'recent_regions' => 'Recent Regions',
     ],
     
+    // Widgets
+    'widgets' => [
+        'overview' => 'Regions Overview',
+        'by_country_chart' => 'Regions by Country',
+        'by_level_chart' => 'Regions by Level',
+        'recent_table' => 'Recent Regions',
+        'hierarchy_tree' => 'Region Hierarchy',
+        'geographic_distribution' => 'Geographic Distribution',
+    ],
+    
+    // Messages
+    'messages' => [
+        'created' => 'Region created successfully',
+        'updated' => 'Region updated successfully',
+        'deleted' => 'Region deleted successfully',
+        'restored' => 'Region restored successfully',
+        'no_regions_found' => 'No regions found',
+        'try_different_filters' => 'Try adjusting your search filters',
+        'region_not_found' => 'Region not found',
+        'cannot_delete_with_children' => 'Cannot delete region with child regions',
+        'cannot_delete_with_cities' => 'Cannot delete region with cities',
+    ],
+    
+    // Confirmations
+    'confirmations' => [
+        'delete' => 'Are you sure you want to delete this region?',
+        'delete_with_children' => 'This region has child regions. Are you sure you want to delete it?',
+        'delete_with_cities' => 'This region has cities. Are you sure you want to delete it?',
+        'bulk_delete' => 'Are you sure you want to delete the selected regions?',
+    ],
+    
+    // Empty states
+    'empty_states' => [
+        'no_regions' => 'No regions found',
+        'no_regions_description' => 'Get started by creating your first region',
+        'no_regions_found' => 'No regions match your search criteria',
+        'no_regions_found_description' => 'Try adjusting your search or filters',
+    ],
+    
+    // Validation
+    'validation' => [
+        'name_required' => 'Region name is required',
+        'name_unique' => 'Region name must be unique',
+        'code_unique' => 'Region code must be unique',
+        'parent_exists' => 'Selected parent region does not exist',
+        'country_required' => 'Country is required',
+        'level_invalid' => 'Invalid region level',
+    ],
+    
+    // Details sections
     'details' => [
         'basic_info' => 'Basic Information',
         'hierarchy_info' => 'Hierarchy Information',
         'geographic_info' => 'Geographic Information',
         'business_info' => 'Business Information',
-        'total_business_info' => 'Total Business Information',
-        'status_info' => 'Status Information',
-        'related_regions' => 'Related Regions',
+        'related_cities' => 'Related Cities',
         'child_regions' => 'Child Regions',
-        'cities_in_region' => 'Cities in Region',
+        'contact_info' => 'Contact Information',
         'actions' => 'Actions',
+        'major_cities' => 'Major Cities',
+        'and_more' => 'and :count more',
     ],
     
-    'messages' => [
-        'no_regions_found' => 'No Regions Found',
-        'try_different_filters' => 'Try adjusting your search criteria or filters to find regions.',
-        'region_created' => 'Region created successfully.',
-        'region_updated' => 'Region updated successfully.',
-        'region_deleted' => 'Region deleted successfully.',
-        'regions_enabled' => 'Selected regions enabled successfully.',
-        'regions_disabled' => 'Selected regions disabled successfully.',
-    ],
-    
-    'statistics' => [
-        'total_regions' => 'Total Regions',
-        'total_regions_description' => 'Total number of regions in the system',
-        'enabled_regions' => 'Enabled Regions',
-        'enabled_regions_description' => 'Regions that are enabled',
-        'default_regions' => 'Default Regions',
-        'default_regions_description' => 'Regions marked as default',
-        'regions_with_cities' => 'With Cities',
-        'regions_with_cities_description' => 'Regions that have cities',
-        'regions_by_level' => 'Regions by Level',
-        'regions_by_country' => 'Regions by Country',
-        'recent_regions' => 'Recent Regions',
-    ],
-    
-    'widgets' => [
-        'regions_by_country' => 'Regions by Country',
-        'regions_by_level' => 'Regions by Level',
-        'regions_count' => 'Number of Regions',
-        'regions' => 'regions',
-        'recent_regions' => 'Recent Regions',
-    ],
-    
-    'breadcrumbs' => [
-        'regions' => 'Regions',
-        'region_details' => 'Region Details',
-    ],
-    
-    'empty_states' => [
-        'no_regions' => 'No regions available',
-        'no_regions_description' => 'There are no regions to display at the moment.',
-        'no_child_regions' => 'No child regions',
-        'no_child_regions_description' => 'This region has no child regions.',
-        'no_cities' => 'No cities in this region',
-        'no_cities_description' => 'This region currently has no cities.',
+    // API responses
+    'api' => [
+        'success' => 'Success',
+        'error' => 'Error',
+        'not_found' => 'Region not found',
+        'validation_failed' => 'Validation failed',
     ],
 ];

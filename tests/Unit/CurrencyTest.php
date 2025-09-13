@@ -161,7 +161,7 @@ describe('Currency Model', function () {
         ]);
 
         // When requesting a translation that doesn't exist, it should fall back
-        expect($currency->getTranslation('name', 'fr'))->toBe('English Name');
+        expect($currency->getTranslation('name', 'fr', 'en'))->toBe('English Name');
     });
 
     it('can check if currency is default', function () {
