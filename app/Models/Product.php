@@ -738,4 +738,186 @@ final class Product extends Model implements HasMedia
             ->limit($limit)
             ->get();
     }
+
+    // Advanced Helper Methods
+    public function getProductInfo(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'sku' => $this->sku,
+            'description' => $this->description,
+            'short_description' => $this->short_description,
+            'price' => $this->price,
+            'sale_price' => $this->sale_price,
+            'compare_price' => $this->compare_price,
+            'cost_price' => $this->cost_price,
+            'status' => $this->status,
+            'type' => $this->type,
+            'is_visible' => $this->is_visible,
+            'is_featured' => $this->is_featured,
+            'published_at' => $this->published_at?->toISOString(),
+        ];
+    }
+
+    public function getInventoryInfo(): array
+    {
+        return [
+            'stock_quantity' => $this->stock_quantity,
+            'manage_stock' => $this->manage_stock,
+            'track_stock' => $this->track_stock,
+            'allow_backorder' => $this->allow_backorder,
+            'low_stock_threshold' => $this->low_stock_threshold,
+            'minimum_quantity' => $this->minimum_quantity,
+            'stock_status' => $this->getStockStatus(),
+            'is_in_stock' => $this->isInStock(),
+            'is_low_stock' => $this->isLowStock(),
+            'is_out_of_stock' => $this->isOutOfStock(),
+            'available_quantity' => $this->availableQuantity(),
+            'reserved_quantity' => $this->reservedQuantity(),
+        ];
+    }
+
+    public function getPricingInfo(): array
+    {
+        return [
+            'price' => $this->price,
+            'sale_price' => $this->sale_price,
+            'compare_price' => $this->compare_price,
+            'cost_price' => $this->cost_price,
+            'current_price' => $this->sale_price ?: $this->price,
+            'discount_percentage' => $this->getDiscountPercentage(),
+            'profit_margin' => $this->getProfitMargin(),
+            'markup_percentage' => $this->getMarkupPercentage(),
+        ];
+    }
+
+    public function getPhysicalInfo(): array
+    {
+        return [
+            'weight' => $this->weight,
+            'length' => $this->length,
+            'width' => $this->width,
+            'height' => $this->height,
+            'dimensions' => $this->getDimensions(),
+            'volume' => $this->getVolume(),
+        ];
+    }
+
+    public function getSeoInfo(): array
+    {
+        return [
+            'seo_title' => $this->seo_title,
+            'seo_description' => $this->seo_description,
+            'meta_keywords' => $this->meta_keywords ?? [],
+            'canonical_url' => $this->getCanonicalUrl(),
+        ];
+    }
+
+    public function getBusinessInfo(): array
+    {
+        return [
+            'is_featured' => $this->is_featured,
+            'is_requestable' => $this->is_requestable,
+            'requests_count' => $this->requests_count,
+            'average_rating' => $this->average_rating,
+            'reviews_count' => $this->reviews_count,
+            'views_count' => $this->views_count ?? 0,
+            'sales_count' => $this->getSalesCount(),
+            'revenue' => $this->getRevenue(),
+        ];
+    }
+
+    public function getCompleteInfo(?string $locale = null): array
+    {
+        return array_merge(
+            $this->getProductInfo(),
+            $this->getInventoryInfo(),
+            $this->getPricingInfo(),
+            $this->getPhysicalInfo(),
+            $this->getSeoInfo(),
+            $this->getBusinessInfo(),
+            [
+                'translations' => $this->getAvailableLocales(),
+                'has_translations' => count($this->getAvailableLocales()) > 0,
+                'brand' => $this->brand?->name,
+                'categories' => $this->categories->pluck('name')->toArray(),
+                'collections' => $this->collections->pluck('name')->toArray(),
+                'images_count' => $this->getImagesCount(),
+                'variants_count' => $this->variants()->count(),
+                'attributes_count' => $this->attributes()->count(),
+                'created_at' => $this->created_at?->toISOString(),
+                'updated_at' => $this->updated_at?->toISOString(),
+            ]
+        );
+    }
+
+    // Additional helper methods
+    public function getDiscountPercentage(): ?float
+    {
+        if (!$this->sale_price || !$this->price) {
+            return null;
+        }
+
+        return round((($this->price - $this->sale_price) / $this->price) * 100, 2);
+    }
+
+    public function getProfitMargin(): ?float
+    {
+        if (!$this->cost_price || !$this->price) {
+            return null;
+        }
+
+        return round((($this->price - $this->cost_price) / $this->price) * 100, 2);
+    }
+
+    public function getMarkupPercentage(): ?float
+    {
+        if (!$this->cost_price || !$this->price) {
+            return null;
+        }
+
+        return round((($this->price - $this->cost_price) / $this->cost_price) * 100, 2);
+    }
+
+    public function getDimensions(): ?string
+    {
+        if (!$this->length || !$this->width || !$this->height) {
+            return null;
+        }
+
+        return "{$this->length} × {$this->width} × {$this->height} cm";
+    }
+
+    public function getVolume(): ?float
+    {
+        if (!$this->length || !$this->width || !$this->height) {
+            return null;
+        }
+
+        return round(($this->length * $this->width * $this->height) / 1000000, 2); // Convert to cubic meters
+    }
+
+    public function getCanonicalUrl(): string
+    {
+        return route('products.show', $this);
+    }
+
+    public function getSalesCount(): int
+    {
+        return $this->orderItems()->sum('quantity');
+    }
+
+    public function getRevenue(): float
+    {
+        return $this->orderItems()->sum(DB::raw('quantity * price'));
+    }
+
+    public function getFullDisplayName(?string $locale = null): string
+    {
+        $name = $this->getTranslatedName($locale);
+        $sku = $this->sku ? " ({$this->sku})" : '';
+        return $name . $sku;
+    }
 }

@@ -463,6 +463,20 @@ class ProductResource extends Resource
         ];
     }
 
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\ProductStatsWidget::class,
+            \App\Filament\Widgets\ProductChartWidget::class,
+            Widgets\ProductPerformanceWidget::class,
+            Widgets\ProductInventoryWidget::class,
+            Widgets\ProductCategoriesWidget::class,
+            Widgets\ProductBrandsWidget::class,
+            Widgets\ProductPricingWidget::class,
+            Widgets\ProductReviewsWidget::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [

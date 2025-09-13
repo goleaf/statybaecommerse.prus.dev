@@ -71,10 +71,6 @@ final class Attribute extends Model
 
     protected $translatable = [
         'name',
-        'slug',
-        'description',
-        'placeholder',
-        'help_text',
     ];
 
     public function values(): HasMany
@@ -517,25 +513,6 @@ final class Attribute extends Model
         return $this->trans('name', $locale) ?: $this->name;
     }
 
-    public function getTranslatedDescription(?string $locale = null): ?string
-    {
-        return $this->trans('description', $locale) ?: $this->description;
-    }
-
-    public function getTranslatedSlug(?string $locale = null): ?string
-    {
-        return $this->trans('slug', $locale) ?: $this->slug;
-    }
-
-    public function getTranslatedPlaceholder(?string $locale = null): ?string
-    {
-        return $this->trans('placeholder', $locale) ?: $this->placeholder;
-    }
-
-    public function getTranslatedHelpText(?string $locale = null): ?string
-    {
-        return $this->trans('help_text', $locale) ?: $this->help_text;
-    }
 
     // Scope for translated attributes
     public function scopeWithTranslations($query, ?string $locale = null)
@@ -563,10 +540,6 @@ final class Attribute extends Model
             ['locale' => $locale],
             [
                 'name' => $this->name,
-                'slug' => $this->slug,
-                'description' => $this->description,
-                'placeholder' => $this->placeholder,
-                'help_text' => $this->help_text,
             ]
         );
     }

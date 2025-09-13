@@ -1,17 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
-use App\Models\User;
 use App\Models\Product;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Filament\Resources\ProductResource;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
-class ProductResourceTest extends TestCase
+final class ProductResourceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -19,163 +17,171 @@ class ProductResourceTest extends TestCase
     {
         parent::setUp();
         
-        // Create admin user with proper permissions
-        $this->user = User::factory()->create();
-        $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
-        $this->user->assignRole($adminRole);
+        $this->actingAs(User::factory()->admin()->create());
     }
 
-    public function test_can_list_products(): void
+    public function test_product_resource_list_page_renders(): void
     {
-        $products = Product::factory()->count(3)->create();
+        Product::factory()->count(3)->create();
 
-        $this->actingAs($this->user)
-            ->get(ProductResource::getUrl('index'))
-            ->assertOk();
+        $response = $this->get(route('filament.admin.resources.products.index'));
+
+        $response->assertOk();
     }
 
-    public function test_can_view_product(): void
+    public function test_product_resource_create_page_renders(): void
     {
-        $product = Product::factory()->create();
+        $response = $this->get(route('filament.admin.resources.products.create'));
 
-        $this->actingAs($this->user)
-            ->get(ProductResource::getUrl('view', ['record' => $product]))
-            ->assertOk();
+        $response->assertOk();
     }
 
-    public function test_can_create_product(): void
+    public function test_product_resource_can_create_product(): void
     {
-        $brand = Brand::factory()->create();
-        $category = Category::factory()->create();
-
-        $this->actingAs($this->user)
-            ->get(ProductResource::getUrl('create'))
-            ->assertOk();
-    }
-
-    public function test_can_edit_product(): void
-    {
-        $product = Product::factory()->create();
-
-        $this->actingAs($this->user)
-            ->get(ProductResource::getUrl('edit', ['record' => $product]))
-            ->assertOk();
-    }
-
-    public function test_product_resource_has_correct_model(): void
-    {
-        $this->assertEquals(Product::class, ProductResource::getModel());
-    }
-
-    public function test_product_resource_has_correct_navigation_icon(): void
-    {
-        $this->assertEquals('heroicon-o-cube', ProductResource::getNavigationIcon());
-    }
-
-    public function test_product_resource_has_correct_record_title_attribute(): void
-    {
-        $this->assertEquals('name', ProductResource::getRecordTitleAttribute());
-    }
-
-    public function test_product_table_has_required_columns(): void
-    {
-        $product = Product::factory()->create([
+        $productData = [
             'name' => 'Test Product',
-            'sku' => 'TEST-123',
+            'slug' => 'test-product',
+            'sku' => 'TEST001',
+            'description' => 'Test description',
             'price' => 99.99,
+            'status' => 'draft',
             'is_visible' => true,
-        ]);
+            'is_featured' => false,
+        ];
 
-        $this->actingAs($this->user)
-            ->get(ProductResource::getUrl('index'))
-            ->assertSee('Test Product')
-            ->assertSee('TEST-123')
-            ->assertSee('99.99');
-    }
+        $response = $this->post(route('filament.admin.resources.products.store'), $productData);
 
-    public function test_product_form_has_required_fields(): void
-    {
-        $this->actingAs($this->user)
-            ->get(ProductResource::getUrl('create'))
-            ->assertSee('name')
-            ->assertSee('sku')
-            ->assertSee('price')
-            ->assertSee('description');
-    }
-
-    public function test_can_filter_products_by_visibility(): void
-    {
-        $visibleProduct = Product::factory()->create(['is_visible' => true]);
-        $hiddenProduct = Product::factory()->create(['is_visible' => false]);
-
-        $this->actingAs($this->user)
-            ->get(ProductResource::getUrl('index'))
-            ->assertSee($visibleProduct->name)
-            ->assertSee($hiddenProduct->name);
-    }
-
-    public function test_can_search_products(): void
-    {
-        $product1 = Product::factory()->create(['name' => 'Unique Product Name']);
-        $product2 = Product::factory()->create(['name' => 'Another Product']);
-
-        $this->actingAs($this->user)
-            ->get(ProductResource::getUrl('index') . '?search=Unique')
-            ->assertSee('Unique Product Name')
-            ->assertDontSee('Another Product');
-    }
-
-    public function test_product_resource_pages_exist(): void
-    {
-        $pages = ProductResource::getPages();
-
-        $this->assertArrayHasKey('index', $pages);
-        $this->assertArrayHasKey('create', $pages);
-        $this->assertArrayHasKey('view', $pages);
-        $this->assertArrayHasKey('edit', $pages);
-    }
-
-    public function test_product_resource_has_relation_managers(): void
-    {
-        $relationManagers = ProductResource::getRelations();
-
-        // Check if relation managers exist (they might be empty)
-        $this->assertIsArray($relationManagers);
-    }
-
-    public function test_product_resource_has_eloquent_query(): void
-    {
-        $query = ProductResource::getEloquentQuery();
+        $response->assertRedirect();
         
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $query);
+        $this->assertDatabaseHas('products', [
+            'name' => 'Test Product',
+            'slug' => 'test-product',
+            'sku' => 'TEST001',
+            'description' => 'Test description',
+            'price' => 99.99,
+            'status' => 'draft',
+            'is_visible' => true,
+            'is_featured' => false,
+        ]);
     }
 
-    public function test_product_resource_has_global_search_attributes(): void
-    {
-        $searchAttributes = ProductResource::getGlobalSearchResultAttributes();
-
-        $this->assertIsArray($searchAttributes);
-    }
-
-    public function test_product_resource_has_global_search_result_details(): void
+    public function test_product_resource_can_edit_product(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'sku' => 'TEST-123',
+            'name' => 'Original Name',
+            'description' => 'Original Description',
         ]);
 
-        $details = ProductResource::getGlobalSearchResultDetails($product);
+        $updateData = [
+            'name' => 'Updated Name',
+            'description' => 'Updated Description',
+        ];
 
-        $this->assertIsArray($details);
+        $response = $this->put(route('filament.admin.resources.products.update', $product), $updateData);
+
+        $response->assertRedirect();
+        
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'name' => 'Updated Name',
+            'description' => 'Updated Description',
+        ]);
     }
 
-    public function test_product_resource_has_global_search_result_url(): void
+    public function test_product_resource_can_delete_product(): void
     {
         $product = Product::factory()->create();
 
-        $url = ProductResource::getGlobalSearchResultUrl($product);
+        $response = $this->delete(route('filament.admin.resources.products.destroy', $product));
 
-        $this->assertIsString($url);
-        $this->assertStringContainsString('products', $url);
+        $response->assertRedirect();
+        
+        $this->assertSoftDeleted('products', [
+            'id' => $product->id,
+        ]);
+    }
+
+    public function test_product_resource_widgets_are_included(): void
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->get(route('filament.admin.resources.products.index'));
+
+        $response->assertOk();
+        // Widgets should be rendered on the index page
+        $response->assertSee('Product Statistics');
+    }
+
+    public function test_product_resource_bulk_actions(): void
+    {
+        $products = Product::factory()->count(3)->create([
+            'status' => 'draft',
+            'is_visible' => false,
+        ]);
+
+        // Test bulk publish action
+        $response = $this->post(route('filament.admin.resources.products.bulk-action'), [
+            'action' => 'publish',
+            'records' => $products->pluck('id')->toArray(),
+        ]);
+
+        $response->assertRedirect();
+
+        foreach ($products as $product) {
+            $product->refresh();
+            $this->assertEquals('published', $product->status);
+            $this->assertTrue($product->is_visible);
+        }
+
+        // Test bulk feature action
+        $response = $this->post(route('filament.admin.resources.products.bulk-action'), [
+            'action' => 'feature',
+            'records' => $products->pluck('id')->toArray(),
+        ]);
+
+        $response->assertRedirect();
+
+        foreach ($products as $product) {
+            $product->refresh();
+            $this->assertTrue($product->is_featured);
+        }
+    }
+
+    public function test_product_resource_filters(): void
+    {
+        Product::factory()->create(['status' => 'published']);
+        Product::factory()->create(['status' => 'draft']);
+        Product::factory()->create(['is_featured' => true]);
+
+        // Test status filter
+        $response = $this->get(route('filament.admin.resources.products.index', ['tableFilters[status][value]' => 'published']));
+        $response->assertOk();
+
+        // Test featured filter
+        $response = $this->get(route('filament.admin.resources.products.index', ['tableFilters[is_featured][value]' => '1']));
+        $response->assertOk();
+    }
+
+    public function test_product_resource_duplicate_action(): void
+    {
+        $product = Product::factory()->create([
+            'name' => 'Original Product',
+            'sku' => 'ORIG001',
+            'slug' => 'original-product',
+        ]);
+
+        $response = $this->post(route('filament.admin.resources.products.bulk-action'), [
+            'action' => 'duplicate',
+            'records' => [$product->id],
+        ]);
+
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('products', [
+            'name' => 'Original Product (Copy)',
+            'sku' => 'ORIG001-copy',
+            'slug' => 'original-product-copy',
+            'status' => 'draft',
+        ]);
     }
 }

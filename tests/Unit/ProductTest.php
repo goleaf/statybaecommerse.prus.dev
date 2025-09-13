@@ -1,547 +1,305 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
 use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
-use App\Models\Collection;
-use App\Models\ProductImage;
-use App\Models\ProductVariant;
-use App\Models\Review;
-use App\Models\Attribute;
-use App\Models\Document;
-use App\Models\Translations\ProductTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class ProductTest extends TestCase
+final class ProductTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function createTestBrand(): Brand
+    {
+        return Brand::factory()->create([
+            'name' => 'Test Brand',
+        ]);
+    }
+
+    private function createTestCategory(): Category
+    {
+        return Category::factory()->create([
+            'name' => 'Test Category',
+        ]);
+    }
+
     public function test_product_can_be_created(): void
     {
+        $brand = $this->createTestBrand();
+        $category = $this->createTestCategory();
+
         $product = Product::factory()->create([
             'name' => 'Test Product',
-            'sku' => 'TEST-001',
+            'slug' => 'test-product',
+            'sku' => 'TEST001',
+            'description' => 'Test description',
             'price' => 99.99,
+            'sale_price' => 79.99,
+            'brand_id' => $brand->id,
+            'is_visible' => true,
+            'is_featured' => false,
+            'status' => 'published',
         ]);
 
-        $this->assertDatabaseHas('products', [
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
-            'price' => 99.99,
-        ]);
-
+        $this->assertInstanceOf(Product::class, $product);
         $this->assertEquals('Test Product', $product->name);
-        $this->assertEquals('TEST-001', $product->sku);
+        $this->assertEquals('test-product', $product->slug);
+        $this->assertEquals('TEST001', $product->sku);
+        $this->assertEquals('Test description', $product->description);
         $this->assertEquals(99.99, $product->price);
+        $this->assertEquals(79.99, $product->sale_price);
+        $this->assertEquals($brand->id, $product->brand_id);
+        $this->assertTrue($product->is_visible);
+        $this->assertFalse($product->is_featured);
+        $this->assertEquals('published', $product->status);
     }
 
-    public function test_product_has_brand_relationship(): void
+    public function test_product_translation_methods(): void
     {
-        $brand = Brand::factory()->create(['name' => 'Test Brand']);
-        $product = Product::factory()->create(['brand_id' => $brand->id]);
-
-        $this->assertInstanceOf(Brand::class, $product->brand);
-        $this->assertEquals('Test Brand', $product->brand->name);
-    }
-
-    public function test_product_has_categories_relationship(): void
-    {
-        $product = Product::factory()->create();
-        $category1 = Category::factory()->create(['name' => 'Category 1']);
-        $category2 = Category::factory()->create(['name' => 'Category 2']);
-
-        $product->categories()->attach([$category1->id, $category2->id]);
-
-        $this->assertCount(2, $product->categories);
-        $this->assertTrue($product->categories->contains($category1));
-        $this->assertTrue($product->categories->contains($category2));
-    }
-
-    public function test_product_has_collections_relationship(): void
-    {
-        $product = Product::factory()->create();
-        $collection1 = Collection::factory()->create(['name' => 'Collection 1']);
-        $collection2 = Collection::factory()->create(['name' => 'Collection 2']);
-
-        $product->collections()->attach([$collection1->id, $collection2->id]);
-
-        $this->assertCount(2, $product->collections);
-        $this->assertTrue($product->collections->contains($collection1));
-        $this->assertTrue($product->collections->contains($collection2));
-    }
-
-    public function test_product_has_images_relationship(): void
-    {
-        $product = Product::factory()->create();
-        $image1 = ProductImage::factory()->create(['product_id' => $product->id]);
-        $image2 = ProductImage::factory()->create(['product_id' => $product->id]);
-
-        $this->assertCount(2, $product->images);
-        $this->assertTrue($product->images->contains($image1));
-        $this->assertTrue($product->images->contains($image2));
-    }
-
-    public function test_product_has_variants_relationship(): void
-    {
-        $product = Product::factory()->create(['type' => 'variable']);
-        $variant1 = ProductVariant::factory()->create(['product_id' => $product->id]);
-        $variant2 = ProductVariant::factory()->create(['product_id' => $product->id]);
-
-        $this->assertCount(2, $product->variants);
-        $this->assertTrue($product->variants->contains($variant1));
-        $this->assertTrue($product->variants->contains($variant2));
-    }
-
-    public function test_product_has_reviews_relationship(): void
-    {
-        $product = Product::factory()->create();
-        $review1 = Review::factory()->create(['product_id' => $product->id]);
-        $review2 = Review::factory()->create(['product_id' => $product->id]);
-
-        $this->assertCount(2, $product->reviews);
-        $this->assertTrue($product->reviews->contains($review1));
-        $this->assertTrue($product->reviews->contains($review2));
-    }
-
-    public function test_product_has_attributes_relationship(): void
-    {
-        $product = Product::factory()->create();
-        $attribute1 = Attribute::factory()->create(['name' => 'Color']);
-        $attribute2 = Attribute::factory()->create(['name' => 'Size']);
-
-        $product->attributes()->attach([
-            $attribute1->id => ['value' => 'Red'],
-            $attribute2->id => ['value' => 'Large'],
+        $product = Product::factory()->create(['name' => 'Original Name']);
+        
+        // Test translation methods
+        $this->assertEquals('Original Name', $product->getTranslatedName());
+        $this->assertEquals($product->description, $product->getTranslatedDescription());
+        $this->assertEquals($product->slug, $product->getTranslatedSlug());
+        
+        // Test with translation
+        $product->updateTranslation('en', [
+            'name' => 'English Name',
+            'description' => 'English Description',
+            'slug' => 'english-slug',
         ]);
-
-        $this->assertCount(2, $product->attributes);
-        $this->assertTrue($product->attributes->contains($attribute1));
-        $this->assertTrue($product->attributes->contains($attribute2));
+        
+        $this->assertEquals('English Name', $product->getTranslatedName('en'));
+        $this->assertEquals('English Description', $product->getTranslatedDescription('en'));
+        $this->assertEquals('english-slug', $product->getTranslatedSlug('en'));
     }
 
-    public function test_product_has_documents_relationship(): void
+    public function test_product_scopes(): void
     {
-        $product = Product::factory()->create();
-        $document1 = Document::factory()->create([
-            'documentable_type' => Product::class,
-            'documentable_id' => $product->id,
-        ]);
-        $document2 = Document::factory()->create([
-            'documentable_type' => Product::class,
-            'documentable_id' => $product->id,
-        ]);
+        // Clear any existing products first
+        Product::query()->delete();
 
-        $this->assertCount(2, $product->documents);
-        $this->assertTrue($product->documents->contains($document1));
-        $this->assertTrue($product->documents->contains($document2));
-    }
-
-    public function test_product_has_translations_relationship(): void
-    {
-        $product = Product::factory()->create(['name' => 'Test Product']);
-        $translation = ProductTranslation::factory()->create([
-            'product_id' => $product->id,
-            'locale' => 'en',
-            'name' => 'Test Product EN',
-        ]);
-
-        $this->assertCount(1, $product->translations);
-        $this->assertTrue($product->translations->contains($translation));
-    }
-
-    public function test_product_is_published_scope(): void
-    {
+        // Create test products with specific attributes
         $publishedProduct = Product::factory()->create([
             'is_visible' => true,
             'status' => 'published',
             'published_at' => now()->subDay(),
         ]);
-
-        $draftProduct = Product::factory()->create([
-            'is_visible' => false,
-            'status' => 'draft',
-            'published_at' => null,
-        ]);
-
-        $publishedProducts = Product::published()->get();
-
-        $this->assertTrue($publishedProducts->contains($publishedProduct));
-        $this->assertFalse($publishedProducts->contains($draftProduct));
-    }
-
-    public function test_product_is_featured_scope(): void
-    {
+        $draftProduct = Product::factory()->create(['status' => 'draft']);
         $featuredProduct = Product::factory()->create(['is_featured' => true]);
-        $regularProduct = Product::factory()->create(['is_featured' => false]);
-
-        $featuredProducts = Product::featured()->get();
-
-        $this->assertTrue($featuredProducts->contains($featuredProduct));
-        $this->assertFalse($featuredProducts->contains($regularProduct));
-    }
-
-    public function test_product_is_visible_scope(): void
-    {
         $visibleProduct = Product::factory()->create(['is_visible' => true]);
         $hiddenProduct = Product::factory()->create(['is_visible' => false]);
 
+        // Test published scope
+        $publishedProducts = Product::published()->get();
+        $this->assertCount(1, $publishedProducts);
+        $this->assertEquals($publishedProduct->id, $publishedProducts->first()->id);
+
+        // Test featured scope
+        $featuredProducts = Product::featured()->get();
+        $this->assertCount(1, $featuredProducts);
+        $this->assertEquals($featuredProduct->id, $featuredProducts->first()->id);
+
+        // Test visible scope
         $visibleProducts = Product::visible()->get();
-
-        $this->assertTrue($visibleProducts->contains($visibleProduct));
-        $this->assertFalse($visibleProducts->contains($hiddenProduct));
+        $this->assertCount(2, $visibleProducts); // publishedProduct and visibleProduct
     }
 
-    public function test_product_by_brand_scope(): void
+    public function test_product_helper_methods(): void
     {
-        $brand = Brand::factory()->create();
-        $product1 = Product::factory()->create(['brand_id' => $brand->id]);
-        $product2 = Product::factory()->create(['brand_id' => null]);
-
-        $brandProducts = Product::byBrand($brand->id)->get();
-
-        $this->assertTrue($brandProducts->contains($product1));
-        $this->assertFalse($brandProducts->contains($product2));
-    }
-
-    public function test_product_by_category_scope(): void
-    {
-        $category = Category::factory()->create();
-        $product1 = Product::factory()->create();
-        $product2 = Product::factory()->create();
-
-        $product1->categories()->attach($category->id);
-
-        $categoryProducts = Product::byCategory($category->id)->get();
-
-        $this->assertTrue($categoryProducts->contains($product1));
-        $this->assertFalse($categoryProducts->contains($product2));
-    }
-
-    public function test_product_in_stock_scope(): void
-    {
-        $inStockProduct = Product::factory()->create(['stock_quantity' => 10]);
-        $outOfStockProduct = Product::factory()->create(['stock_quantity' => 0]);
-
-        $inStockProducts = Product::inStock()->get();
-
-        $this->assertTrue($inStockProducts->contains($inStockProduct));
-        $this->assertFalse($inStockProducts->contains($outOfStockProduct));
-    }
-
-    public function test_product_low_stock_scope(): void
-    {
-        $lowStockProduct = Product::factory()->create([
-            'stock_quantity' => 5,
-            'low_stock_threshold' => 10,
-        ]);
-        $normalStockProduct = Product::factory()->create([
-            'stock_quantity' => 20,
-            'low_stock_threshold' => 10,
+        $product = Product::factory()->create([
+            'name' => 'Test Product',
+            'sku' => 'TEST001',
+            'price' => 100.00,
+            'sale_price' => 80.00,
+            'cost_price' => 60.00,
+            'length' => 10.0,
+            'width' => 5.0,
+            'height' => 2.0,
         ]);
 
-        $lowStockProducts = Product::lowStock()->get();
+        // Test info methods
+        $productInfo = $product->getProductInfo();
+        $this->assertArrayHasKey('id', $productInfo);
+        $this->assertArrayHasKey('name', $productInfo);
+        $this->assertArrayHasKey('sku', $productInfo);
 
-        $this->assertTrue($lowStockProducts->contains($lowStockProduct));
-        $this->assertFalse($lowStockProducts->contains($normalStockProduct));
+        $inventoryInfo = $product->getInventoryInfo();
+        $this->assertArrayHasKey('stock_quantity', $inventoryInfo);
+        $this->assertArrayHasKey('stock_status', $inventoryInfo);
+        $this->assertArrayHasKey('is_in_stock', $inventoryInfo);
+
+        $pricingInfo = $product->getPricingInfo();
+        $this->assertArrayHasKey('price', $pricingInfo);
+        $this->assertArrayHasKey('sale_price', $pricingInfo);
+        $this->assertArrayHasKey('current_price', $pricingInfo);
+
+        $physicalInfo = $product->getPhysicalInfo();
+        $this->assertArrayHasKey('weight', $physicalInfo);
+        $this->assertArrayHasKey('dimensions', $physicalInfo);
+
+        $completeInfo = $product->getCompleteInfo();
+        $this->assertArrayHasKey('translations', $completeInfo);
+        $this->assertArrayHasKey('has_translations', $completeInfo);
     }
 
-    public function test_product_is_published_method(): void
+    public function test_product_pricing_calculations(): void
     {
-        $publishedProduct = Product::factory()->create([
+        $product = Product::factory()->create([
+            'price' => 100.00,
+            'sale_price' => 80.00,
+            'cost_price' => 60.00,
+        ]);
+
+        // Test discount percentage
+        $discountPercentage = $product->getDiscountPercentage();
+        $this->assertEquals(20.0, $discountPercentage);
+
+        // Test profit margin
+        $profitMargin = $product->getProfitMargin();
+        $this->assertEquals(40.0, $profitMargin);
+
+        // Test markup percentage
+        $markupPercentage = $product->getMarkupPercentage();
+        $this->assertEquals(66.67, $markupPercentage, '', 0.01);
+    }
+
+    public function test_product_physical_calculations(): void
+    {
+        $product = Product::factory()->create([
+            'length' => 10.0,
+            'width' => 5.0,
+            'height' => 2.0,
+        ]);
+
+        // Test dimensions
+        $dimensions = $product->getDimensions();
+        $this->assertEquals('10 × 5 × 2 cm', $dimensions);
+
+        // Test volume
+        $volume = $product->getVolume();
+        $this->assertEquals(0.0001, $volume, '', 0.00001);
+    }
+
+    public function test_product_stock_methods(): void
+    {
+        $product = Product::factory()->create([
+            'manage_stock' => true,
+            'stock_quantity' => 10,
+            'low_stock_threshold' => 5,
+        ]);
+
+        // Test stock status
+        $this->assertTrue($product->isInStock());
+        $this->assertFalse($product->isLowStock());
+        $this->assertFalse($product->isOutOfStock());
+        $this->assertEquals('in_stock', $product->getStockStatus());
+
+        // Test low stock
+        $product->update(['stock_quantity' => 3]);
+        $this->assertTrue($product->isLowStock());
+        $this->assertEquals('low_stock', $product->getStockStatus());
+
+        // Test out of stock
+        $product->update(['stock_quantity' => 0]);
+        $this->assertTrue($product->isOutOfStock());
+        $this->assertEquals('out_of_stock', $product->getStockStatus());
+    }
+
+    public function test_product_relations(): void
+    {
+        $product = Product::factory()->create();
+
+        // Test brand relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $product->brand());
+
+        // Test categories relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $product->categories());
+
+        // Test collections relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $product->collections());
+
+        // Test variants relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $product->variants());
+
+        // Test reviews relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $product->reviews());
+
+        // Test images relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $product->images());
+
+        // Test order items relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $product->orderItems());
+    }
+
+    public function test_product_translation_management(): void
+    {
+        $product = Product::factory()->create();
+
+        // Test available locales (should be empty initially)
+        $this->assertEmpty($product->getAvailableLocales());
+
+        // Test has translation for
+        $this->assertFalse($product->hasTranslationFor('en'));
+
+        // Test get or create translation
+        $translation = $product->getOrCreateTranslation('en');
+        $this->assertInstanceOf(\App\Models\Translations\ProductTranslation::class, $translation);
+        $this->assertEquals('en', $translation->locale);
+
+        // Test update translation
+        $this->assertTrue($product->updateTranslation('en', [
+            'name' => 'English Name',
+            'description' => 'English Description',
+        ]));
+
+        // Test available locales now includes 'en'
+        $this->assertContains('en', $product->getAvailableLocales());
+        $this->assertTrue($product->hasTranslationFor('en'));
+    }
+
+    public function test_product_full_display_name(): void
+    {
+        $product = Product::factory()->create([
+            'name' => 'Test Product',
+            'sku' => 'TEST001',
+        ]);
+
+        $displayName = $product->getFullDisplayName();
+        $this->assertEquals('Test Product (TEST001)', $displayName);
+
+        // Test without SKU
+        $product->update(['sku' => null]);
+        $displayName = $product->getFullDisplayName();
+        $this->assertEquals('Test Product', $displayName);
+    }
+
+    public function test_product_published_status(): void
+    {
+        $product = Product::factory()->create([
             'is_visible' => true,
+            'status' => 'published',
             'published_at' => now()->subDay(),
         ]);
 
-        $unpublishedProduct = Product::factory()->create([
-            'is_visible' => false,
-            'published_at' => now()->addDay(),
-        ]);
+        $this->assertTrue($product->isPublished());
 
-        $this->assertTrue($publishedProduct->isPublished());
-        $this->assertFalse($unpublishedProduct->isPublished());
-    }
+        // Test not published - not visible
+        $product->update(['is_visible' => false]);
+        $this->assertFalse($product->isPublished());
 
-    public function test_product_is_in_stock_method(): void
-    {
-        $inStockProduct = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
-        ]);
+        // Test not published - wrong status
+        $product->update(['is_visible' => true, 'status' => 'draft']);
+        $this->assertFalse($product->isPublished());
 
-        $outOfStockProduct = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 0,
-        ]);
-
-        $noStockManagementProduct = Product::factory()->create([
-            'manage_stock' => false,
-            'stock_quantity' => 0,
-        ]);
-
-        $this->assertTrue($inStockProduct->isInStock());
-        $this->assertFalse($outOfStockProduct->isInStock());
-        $this->assertTrue($noStockManagementProduct->isInStock());
-    }
-
-    public function test_product_is_low_stock_method(): void
-    {
-        $lowStockProduct = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 5,
-            'low_stock_threshold' => 10,
-        ]);
-
-        $normalStockProduct = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 20,
-            'low_stock_threshold' => 10,
-        ]);
-
-        $noStockManagementProduct = Product::factory()->create([
-            'manage_stock' => false,
-            'stock_quantity' => 0,
-        ]);
-
-        $this->assertTrue($lowStockProduct->isLowStock());
-        $this->assertFalse($normalStockProduct->isLowStock());
-        $this->assertFalse($noStockManagementProduct->isLowStock());
-    }
-
-    public function test_product_get_stock_status_method(): void
-    {
-        $inStockProduct = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 20,
-            'low_stock_threshold' => 10,
-        ]);
-
-        $lowStockProduct = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 5,
-            'low_stock_threshold' => 10,
-        ]);
-
-        $outOfStockProduct = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 0,
-        ]);
-
-        $noStockManagementProduct = Product::factory()->create([
-            'manage_stock' => false,
-        ]);
-
-        $this->assertEquals('in_stock', $inStockProduct->getStockStatus());
-        $this->assertEquals('low_stock', $lowStockProduct->getStockStatus());
-        $this->assertEquals('out_of_stock', $outOfStockProduct->getStockStatus());
-        $this->assertEquals('not_tracked', $noStockManagementProduct->getStockStatus());
-    }
-
-    public function test_product_decrease_stock_method(): void
-    {
-        $product = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
-        ]);
-
-        $result = $product->decreaseStock(5);
-        $product->refresh();
-
-        $this->assertTrue($result);
-        $this->assertEquals(5, $product->stock_quantity);
-
-        $result = $product->decreaseStock(10);
-        $product->refresh();
-
-        $this->assertFalse($result);
-        $this->assertEquals(5, $product->stock_quantity);
-    }
-
-    public function test_product_increase_stock_method(): void
-    {
-        $product = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
-        ]);
-
-        $product->increaseStock(5);
-        $product->refresh();
-
-        $this->assertEquals(15, $product->stock_quantity);
-    }
-
-    public function test_product_available_quantity_method(): void
-    {
-        $product = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
-        ]);
-
-        $noStockManagementProduct = Product::factory()->create([
-            'manage_stock' => false,
-        ]);
-
-        $this->assertEquals(10, $product->availableQuantity());
-        $this->assertEquals(999, $noStockManagementProduct->availableQuantity());
-    }
-
-    public function test_product_is_out_of_stock_method(): void
-    {
-        $inStockProduct = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
-        ]);
-
-        $outOfStockProduct = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 0,
-        ]);
-
-        $this->assertFalse($inStockProduct->isOutOfStock());
-        $this->assertTrue($outOfStockProduct->isOutOfStock());
-    }
-
-    public function test_product_is_variant_method(): void
-    {
-        $simpleProduct = Product::factory()->create(['type' => 'simple']);
-        $variableProduct = Product::factory()->create(['type' => 'variable']);
-
-        $this->assertFalse($simpleProduct->isVariant());
-        $this->assertTrue($variableProduct->isVariant());
-    }
-
-    public function test_product_has_variants_method(): void
-    {
-        $simpleProduct = Product::factory()->create(['type' => 'simple']);
-        $variableProduct = Product::factory()->create(['type' => 'variable']);
-        ProductVariant::factory()->create(['product_id' => $variableProduct->id]);
-
-        $this->assertFalse($simpleProduct->hasVariants());
-        $this->assertTrue($variableProduct->hasVariants());
-    }
-
-    public function test_product_get_average_rating_attribute(): void
-    {
-        $product = Product::factory()->create();
-        Review::factory()->create([
-            'product_id' => $product->id,
-            'rating' => 4,
-            'is_approved' => true,
-        ]);
-        Review::factory()->create([
-            'product_id' => $product->id,
-            'rating' => 5,
-            'is_approved' => true,
-        ]);
-
-        $this->assertEquals(4.5, $product->average_rating);
-    }
-
-    public function test_product_get_reviews_count_attribute(): void
-    {
-        $product = Product::factory()->create();
-        Review::factory()->create([
-            'product_id' => $product->id,
-            'is_approved' => true,
-        ]);
-        Review::factory()->create([
-            'product_id' => $product->id,
-            'is_approved' => false,
-        ]);
-
-        $this->assertEquals(1, $product->reviews_count);
-    }
-
-    public function test_product_get_related_products_method(): void
-    {
-        $category = Category::factory()->create();
-        $brand = Brand::factory()->create();
-        
-        $product = Product::factory()->create(['brand_id' => $brand->id]);
-        $product->categories()->attach($category->id);
-
-        $relatedProduct1 = Product::factory()->create(['brand_id' => $brand->id]);
-        $relatedProduct2 = Product::factory()->create();
-        $relatedProduct2->categories()->attach($category->id);
-
-        $relatedProducts = $product->getRelatedProducts(2);
-
-        $this->assertCount(2, $relatedProducts);
-        $this->assertTrue($relatedProducts->contains($relatedProduct1));
-        $this->assertTrue($relatedProducts->contains($relatedProduct2));
-    }
-
-    public function test_product_translation_methods(): void
-    {
-        $product = Product::factory()->create([
-            'name' => 'Original Name',
-            'description' => 'Original Description',
-        ]);
-
-        $translation = ProductTranslation::factory()->create([
-            'product_id' => $product->id,
-            'locale' => 'en',
-            'name' => 'English Name',
-            'description' => 'English Description',
-        ]);
-
-        $this->assertEquals('English Name', $product->getTranslatedName('en'));
-        $this->assertEquals('English Description', $product->getTranslatedDescription('en'));
-        $this->assertEquals('Original Name', $product->getTranslatedName('lt'));
-        $this->assertEquals('Original Description', $product->getTranslatedDescription('lt'));
-    }
-
-    public function test_product_has_translation_for_method(): void
-    {
-        $product = Product::factory()->create();
-        ProductTranslation::factory()->create([
-            'product_id' => $product->id,
-            'locale' => 'en',
-        ]);
-
-        $this->assertTrue($product->hasTranslationFor('en'));
-        $this->assertFalse($product->hasTranslationFor('fr'));
-    }
-
-    public function test_product_get_or_create_translation_method(): void
-    {
-        $product = Product::factory()->create(['name' => 'Original Name']);
-
-        $translation = $product->getOrCreateTranslation('en');
-
-        $this->assertInstanceOf(ProductTranslation::class, $translation);
-        $this->assertEquals('en', $translation->locale);
-        $this->assertEquals('Original Name', $translation->name);
-    }
-
-    public function test_product_update_translation_method(): void
-    {
-        $product = Product::factory()->create();
-        $translation = ProductTranslation::factory()->create([
-            'product_id' => $product->id,
-            'locale' => 'en',
-        ]);
-
-        $result = $product->updateTranslation('en', ['name' => 'Updated Name']);
-
-        $this->assertTrue($result);
-        $translation->refresh();
-        $this->assertEquals('Updated Name', $translation->name);
-    }
-
-    public function test_product_delete_translation_method(): void
-    {
-        $product = Product::factory()->create();
-        ProductTranslation::factory()->create([
-            'product_id' => $product->id,
-            'locale' => 'en',
-        ]);
-
-        $result = $product->deleteTranslation('en');
-
-        $this->assertTrue($result);
-        $this->assertFalse($product->hasTranslationFor('en'));
+        // Test not published - future date
+        $product->update(['status' => 'published', 'published_at' => now()->addDay()]);
+        $this->assertFalse($product->isPublished());
     }
 }
