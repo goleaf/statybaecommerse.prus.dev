@@ -74,7 +74,7 @@ final class CountryController extends Controller
             ->sort()
             ->values();
 
-        return view('frontend.countries.index', compact('countries', 'regions', 'currencies'));
+        return view('countries.index', compact('countries', 'regions', 'currencies'));
     }
 
     public function show(Country $country): View
@@ -97,7 +97,7 @@ final class CountryController extends Controller
             },
         ]);
 
-        return view('frontend.countries.show', compact('country'));
+        return view('countries.show', compact('country'));
     }
 
     public function getCountriesJson(Request $request)
