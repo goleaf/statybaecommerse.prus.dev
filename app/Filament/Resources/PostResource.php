@@ -302,9 +302,13 @@ final class PostResource extends Resource
     public static function getWidgets(): array
     {
         return [
-            Widgets\PostStatsWidget::class,
-            Widgets\RecentPostsWidget::class,
-            Widgets\PostsByStatusWidget::class,
+            \App\Filament\Widgets\PostStatsWidget::class,
+            \App\Filament\Widgets\RecentPostsWidget::class,
+            \App\Filament\Widgets\PostsByStatusWidget::class,
+            Widgets\PostEngagementWidget::class,
+            Widgets\PostPerformanceWidget::class,
+            Widgets\PostAuthorsWidget::class,
+            Widgets\PostMediaWidget::class,
         ];
     }
 

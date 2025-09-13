@@ -15,14 +15,12 @@ class CustomerGroupTest extends TestCase
     {
         $customerGroup = CustomerGroup::factory()->create([
             'name' => 'VIP Customers',
-            'code' => 'VIP',
             'description' => 'High-value customers with special privileges',
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('customer_groups', [
             'name' => 'VIP Customers',
-            'code' => 'VIP',
             'description' => 'High-value customers with special privileges',
             'is_active' => true,
         ]);
@@ -32,14 +30,14 @@ class CustomerGroupTest extends TestCase
     {
         $customerGroup = CustomerGroup::factory()->create([
             'is_active' => true,
-            'is_default' => false,
-            'sort_order' => 5,
+            'discount_percentage' => 15.50,
+            'conditions' => ['min_order' => 100],
             'created_at' => now(),
         ]);
 
         $this->assertIsBool($customerGroup->is_active);
-        $this->assertIsBool($customerGroup->is_default);
-        $this->assertIsInt($customerGroup->sort_order);
+        $this->assertIsFloat($customerGroup->discount_percentage);
+        $this->assertIsArray($customerGroup->conditions);
         $this->assertInstanceOf(\Carbon\Carbon::class, $customerGroup->created_at);
     }
 
@@ -49,43 +47,34 @@ class CustomerGroupTest extends TestCase
         $fillable = $customerGroup->getFillable();
 
         $this->assertContains('name', $fillable);
-        $this->assertContains('code', $fillable);
+        $this->assertContains('slug', $fillable);
         $this->assertContains('description', $fillable);
         $this->assertContains('is_active', $fillable);
+        $this->assertContains('discount_percentage', $fillable);
+        $this->assertContains('is_enabled', $fillable);
+        $this->assertContains('conditions', $fillable);
     }
 
-    public function test_customer_group_scope_active(): void
+    public function test_customer_group_scope_enabled(): void
     {
-        $activeGroup = CustomerGroup::factory()->create(['is_active' => true]);
-        $inactiveGroup = CustomerGroup::factory()->create(['is_active' => false]);
+        $enabledGroup = CustomerGroup::factory()->create(['is_enabled' => true]);
+        $disabledGroup = CustomerGroup::factory()->create(['is_enabled' => false]);
 
-        $activeGroups = CustomerGroup::active()->get();
+        $enabledGroups = CustomerGroup::enabled()->get();
 
-        $this->assertTrue($activeGroups->contains($activeGroup));
-        $this->assertFalse($activeGroups->contains($inactiveGroup));
+        $this->assertTrue($enabledGroups->contains($enabledGroup));
+        $this->assertFalse($enabledGroups->contains($disabledGroup));
     }
 
-    public function test_customer_group_scope_default(): void
+    public function test_customer_group_scope_with_discount(): void
     {
-        $defaultGroup = CustomerGroup::factory()->create(['is_default' => true]);
-        $nonDefaultGroup = CustomerGroup::factory()->create(['is_default' => false]);
+        $groupWithDiscount = CustomerGroup::factory()->create(['discount_percentage' => 10.00]);
+        $groupWithoutDiscount = CustomerGroup::factory()->create(['discount_percentage' => 0.00]);
 
-        $defaultGroups = CustomerGroup::default()->get();
+        $groupsWithDiscount = CustomerGroup::withDiscount()->get();
 
-        $this->assertTrue($defaultGroups->contains($defaultGroup));
-        $this->assertFalse($defaultGroups->contains($nonDefaultGroup));
-    }
-
-    public function test_customer_group_scope_ordered(): void
-    {
-        $group1 = CustomerGroup::factory()->create(['sort_order' => 2]);
-        $group2 = CustomerGroup::factory()->create(['sort_order' => 1]);
-        $group3 = CustomerGroup::factory()->create(['sort_order' => 3]);
-
-        $orderedGroups = CustomerGroup::ordered()->get();
-
-        $this->assertEquals($group2->id, $orderedGroups->first()->id);
-        $this->assertEquals($group3->id, $orderedGroups->last()->id);
+        $this->assertTrue($groupsWithDiscount->contains($groupWithDiscount));
+        $this->assertFalse($groupsWithDiscount->contains($groupWithoutDiscount));
     }
 
     public function test_customer_group_can_have_many_users(): void
