@@ -1312,7 +1312,7 @@ Route::prefix('posts')->name('posts.')->group(function () {
 Route::prefix('countries')->name('countries.')->group(function () {
     Route::get('/', [App\Http\Controllers\CountryController::class, 'index'])->name('index');
     Route::get('/{country}', [App\Http\Controllers\CountryController::class, 'show'])->name('show');
-    Route::get('/api/search', [App\Http\Controllers\CountryController::class, 'search'])->name('api.search');
+        Route::get('/api/search', [App\Http\Controllers\CountryController::class, 'api'])->name('api.search');
     Route::get('/api/by-region/{region}', [App\Http\Controllers\CountryController::class, 'byRegion'])->name('api.by-region');
     Route::get('/api/eu-members', [App\Http\Controllers\CountryController::class, 'euMembers'])->name('api.eu-members');
     Route::get('/api/with-vat', [App\Http\Controllers\CountryController::class, 'withVat'])->name('api.with-vat');

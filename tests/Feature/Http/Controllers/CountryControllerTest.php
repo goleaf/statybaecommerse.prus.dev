@@ -190,7 +190,7 @@ final class CountryControllerTest extends TestCase
     {
         Country::factory()->create(['is_active' => true, 'is_eu_member' => true, 'requires_vat' => true]);
         Country::factory()->create(['is_active' => false, 'is_eu_member' => false, 'requires_vat' => false]);
-        Country::factory()->create(['vat_rate' => 21.0]);
+        Country::factory()->create(['vat_rate' => 21.0, 'is_active' => false]);
 
         $response = $this->get(route('countries.api.statistics'));
 
