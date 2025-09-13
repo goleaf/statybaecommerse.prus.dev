@@ -22,7 +22,7 @@ class OrderControllerTest extends TestCase
         $response = $this->actingAs($user)->get(route('frontend.orders.index'));
 
         $response->assertOk();
-        $response->assertViewIs('frontend.orders.index');
+        $response->assertViewIs('orders.index');
         $response->assertViewHas('orders');
     }
 
@@ -42,7 +42,7 @@ class OrderControllerTest extends TestCase
         $response = $this->actingAs($user)->get(route('frontend.orders.show', $order));
 
         $response->assertOk();
-        $response->assertViewIs('frontend.orders.show');
+        $response->assertViewIs('orders.show');
         $response->assertViewHas('order', $order);
     }
 
@@ -65,7 +65,7 @@ class OrderControllerTest extends TestCase
         $response = $this->actingAs($user)->get(route('frontend.orders.create'));
 
         $response->assertOk();
-        $response->assertViewIs('frontend.orders.create');
+        $response->assertViewIs('orders.create');
         $response->assertViewHas('products');
     }
 
@@ -189,7 +189,7 @@ class OrderControllerTest extends TestCase
         $response = $this->actingAs($user)->get(route('frontend.orders.edit', $order));
 
         $response->assertOk();
-        $response->assertViewIs('frontend.orders.edit');
+        $response->assertViewIs('orders.edit');
         $response->assertViewHas('order', $order);
     }
 

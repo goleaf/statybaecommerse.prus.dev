@@ -19,7 +19,7 @@ final class ZoneControllerTest extends TestCase
         $response = $this->get(route('zones.index'));
         
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.zones.index');
+        $response->assertViewIs('zones.index');
         $response->assertViewHas('zones');
     }
 
@@ -30,7 +30,7 @@ final class ZoneControllerTest extends TestCase
         $response = $this->get(route('zones.show', $zone));
         
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.zones.show');
+        $response->assertViewIs('zones.show');
         $response->assertViewHas('zone', $zone);
     }
 

@@ -346,4 +346,188 @@ class AttributeTest extends TestCase
 
         $this->assertEquals(2, $attribute->getEnabledValuesCount());
     }
+
+    public function test_attribute_display_name_accessor(): void
+    {
+        $attribute = Attribute::factory()->create(['name' => 'Test Attribute']);
+        $this->assertEquals('Test Attribute', $attribute->display_name);
+
+        $attributeWithoutName = Attribute::factory()->create(['name' => null, 'slug' => 'test-slug']);
+        $this->assertEquals('test-slug', $attributeWithoutName->display_name);
+    }
+
+    public function test_attribute_type_icon_accessor(): void
+    {
+        $textAttribute = Attribute::factory()->create(['type' => 'text']);
+        $this->assertEquals('heroicon-o-document-text', $textAttribute->type_icon);
+
+        $selectAttribute = Attribute::factory()->create(['type' => 'select']);
+        $this->assertEquals('heroicon-o-list-bullet', $selectAttribute->type_icon);
+
+        $unknownAttribute = Attribute::factory()->create(['type' => 'unknown']);
+        $this->assertEquals('heroicon-o-adjustments-horizontal', $unknownAttribute->type_icon);
+    }
+
+    public function test_attribute_type_color_accessor(): void
+    {
+        $textAttribute = Attribute::factory()->create(['type' => 'text']);
+        $this->assertEquals('gray', $textAttribute->type_color);
+
+        $numberAttribute = Attribute::factory()->create(['type' => 'number']);
+        $this->assertEquals('blue', $numberAttribute->type_color);
+
+        $unknownAttribute = Attribute::factory()->create(['type' => 'unknown']);
+        $this->assertEquals('gray', $unknownAttribute->type_color);
+    }
+
+    public function test_attribute_validation_rules_for_form(): void
+    {
+        $requiredAttribute = Attribute::factory()->create([
+            'is_required' => true,
+            'validation_rules' => ['max' => 255]
+        ]);
+
+        $rules = $requiredAttribute->getValidationRulesForForm();
+        $this->assertContains('required', $rules);
+        $this->assertContains('max', $rules);
+
+        $optionalAttribute = Attribute::factory()->create([
+            'is_required' => false,
+            'validation_rules' => ['min' => 1]
+        ]);
+
+        $rules = $optionalAttribute->getValidationRulesForForm();
+        $this->assertNotContains('required', $rules);
+        $this->assertContains('min', $rules);
+    }
+
+    public function test_attribute_form_component_config(): void
+    {
+        $attribute = Attribute::factory()->create([
+            'name' => 'Test Attribute',
+            'type' => 'select',
+            'placeholder' => 'Select option',
+            'help_text' => 'Choose an option',
+            'is_required' => true,
+            'default_value' => 'option1',
+            'min_value' => 1,
+            'max_value' => 10,
+            'step_value' => 0.5,
+        ]);
+
+        $config = $attribute->getFormComponentConfig();
+
+        $this->assertEquals('select', $config['type']);
+        $this->assertEquals('Test Attribute', $config['label']);
+        $this->assertEquals('Select option', $config['placeholder']);
+        $this->assertEquals('Choose an option', $config['help_text']);
+        $this->assertTrue($config['required']);
+        $this->assertEquals('option1', $config['default_value']);
+        $this->assertEquals(1, $config['min_value']);
+        $this->assertEquals(10, $config['max_value']);
+        $this->assertEquals(0.5, $config['step_value']);
+    }
+
+    public function test_attribute_usage_count(): void
+    {
+        $attribute = Attribute::factory()->create();
+        $product1 = Product::factory()->create();
+        $product2 = Product::factory()->create();
+
+        $attribute->products()->attach([$product1->id, $product2->id]);
+
+        $this->assertEquals(2, $attribute->getUsageCount());
+        $this->assertTrue($attribute->isUsedInProducts());
+    }
+
+    public function test_attribute_popularity_score(): void
+    {
+        $attribute = Attribute::factory()->create();
+        $product1 = Product::factory()->create();
+        $product2 = Product::factory()->create();
+
+        $attribute->products()->attach([$product1->id, $product2->id]);
+        AttributeValue::factory()->count(3)->create(['attribute_id' => $attribute->id, 'is_enabled' => true]);
+        AttributeValue::factory()->count(1)->create(['attribute_id' => $attribute->id, 'is_enabled' => false]);
+
+        $score = $attribute->getPopularityScore();
+        // Score calculation: (2 products * 10) + (4 values * 2) + (3 enabled values * 1) = 20 + 8 + 3 = 31
+        $this->assertEquals(31, $score);
+    }
+
+    public function test_attribute_status_badge(): void
+    {
+        $disabledAttribute = Attribute::factory()->create(['is_enabled' => false]);
+        $this->assertEquals('disabled', $disabledAttribute->status_badge);
+        $this->assertEquals('gray', $disabledAttribute->status_color);
+
+        $requiredAttribute = Attribute::factory()->create(['is_enabled' => true, 'is_required' => true]);
+        $this->assertEquals('required', $requiredAttribute->status_badge);
+        $this->assertEquals('red', $requiredAttribute->status_color);
+
+        $filterableAttribute = Attribute::factory()->create(['is_enabled' => true, 'is_required' => false, 'is_filterable' => true]);
+        $this->assertEquals('filterable', $filterableAttribute->status_badge);
+        $this->assertEquals('blue', $filterableAttribute->status_color);
+
+        $standardAttribute = Attribute::factory()->create(['is_enabled' => true, 'is_required' => false, 'is_filterable' => false]);
+        $this->assertEquals('standard', $standardAttribute->status_badge);
+        $this->assertEquals('green', $standardAttribute->status_color);
+    }
+
+    public function test_attribute_statistics(): void
+    {
+        $attribute = Attribute::factory()->create();
+        $product = Product::factory()->create();
+        $attribute->products()->attach($product->id);
+        AttributeValue::factory()->count(2)->create(['attribute_id' => $attribute->id, 'is_enabled' => true]);
+
+        $statistics = $attribute->getStatistics();
+
+        $this->assertIsArray($statistics);
+        $this->assertArrayHasKey('usage_count', $statistics);
+        $this->assertArrayHasKey('values_count', $statistics);
+        $this->assertArrayHasKey('enabled_values_count', $statistics);
+        $this->assertArrayHasKey('popularity_score', $statistics);
+        $this->assertArrayHasKey('status', $statistics);
+        $this->assertArrayHasKey('status_color', $statistics);
+        $this->assertArrayHasKey('status_label', $statistics);
+
+        $this->assertEquals(1, $statistics['usage_count']);
+        $this->assertEquals(2, $statistics['values_count']);
+        $this->assertEquals(2, $statistics['enabled_values_count']);
+    }
+
+    public function test_attribute_duplicate_for_group(): void
+    {
+        $originalAttribute = Attribute::factory()->create(['group_name' => 'original_group']);
+        AttributeValue::factory()->count(2)->create(['attribute_id' => $originalAttribute->id]);
+
+        $duplicate = $originalAttribute->duplicateForGroup('new_group');
+
+        $this->assertNotEquals($originalAttribute->id, $duplicate->id);
+        $this->assertEquals('new_group', $duplicate->group_name);
+        $this->assertStringContains('(Copy)', $duplicate->name);
+        $this->assertStringContains('-copy', $duplicate->slug);
+        $this->assertEquals(2, $duplicate->values()->count());
+    }
+
+    public function test_attribute_merge_with(): void
+    {
+        $attribute1 = Attribute::factory()->create();
+        $attribute2 = Attribute::factory()->create();
+        $product1 = Product::factory()->create();
+        $product2 = Product::factory()->create();
+
+        $attribute1->products()->attach($product1->id);
+        $attribute2->products()->attach($product2->id);
+
+        AttributeValue::factory()->create(['attribute_id' => $attribute1->id]);
+        AttributeValue::factory()->create(['attribute_id' => $attribute2->id]);
+
+        $merged = $attribute1->mergeWith($attribute2);
+
+        $this->assertEquals($attribute1->id, $merged->id);
+        $this->assertEquals(2, $merged->values()->count());
+        $this->assertFalse(Attribute::where('id', $attribute2->id)->exists());
+    }
 }

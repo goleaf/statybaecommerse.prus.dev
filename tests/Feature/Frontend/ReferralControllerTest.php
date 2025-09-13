@@ -28,7 +28,7 @@ final class ReferralControllerTest extends TestCase
         $response = $this->get(route('referrals.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.referrals.index');
+        $response->assertViewIs('referrals.index');
         $response->assertViewHas('referrals');
         $response->assertViewHas('totalReferrals');
         $response->assertViewHas('completedReferrals');
@@ -41,7 +41,7 @@ final class ReferralControllerTest extends TestCase
         $response = $this->get(route('referrals.create'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.referrals.create');
+        $response->assertViewIs('referrals.create');
     }
 
     public function test_can_create_referral(): void
@@ -267,7 +267,7 @@ final class ReferralControllerTest extends TestCase
         $response = $this->get(route('referrals.share'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.referrals.share');
+        $response->assertViewIs('referrals.share');
         $response->assertViewHas('user');
         $response->assertViewHas('shareText');
     }
@@ -288,7 +288,7 @@ final class ReferralControllerTest extends TestCase
         $response = $this->get(route('referrals.statistics'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.referrals.statistics');
+        $response->assertViewIs('referrals.statistics');
         $response->assertViewHas('totalReferrals');
         $response->assertViewHas('completedReferrals');
         $response->assertViewHas('pendingReferrals');
@@ -307,7 +307,7 @@ final class ReferralControllerTest extends TestCase
         $response = $this->get(route('referrals.rewards'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.referrals.rewards');
+        $response->assertViewIs('referrals.rewards');
         $response->assertViewHas('rewards');
         $response->assertViewHas('totalRewards');
         $response->assertViewHas('pendingRewards');
@@ -321,7 +321,7 @@ final class ReferralControllerTest extends TestCase
         $response = $this->get(route('referrals.apply', 'PUBLIC123'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.referrals.show');
+        $response->assertViewIs('referrals.show');
         $response->assertViewHas('referral');
     }
 

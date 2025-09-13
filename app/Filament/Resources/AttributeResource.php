@@ -14,6 +14,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -226,9 +227,9 @@ final class AttributeResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $form): Schema
+    public static function infolist(Infolist $infolist): Infolist
     {
-        return $form
+        return $infolist
             ->components([
                 Section::make(__('attributes.attribute_information'))
                     ->components([
@@ -480,6 +481,8 @@ final class AttributeResource extends Resource
             Widgets\AttributeStatsWidget::class,
             Widgets\AttributeTypesWidget::class,
             Widgets\AttributeUsageWidget::class,
+            Widgets\AttributeAnalyticsWidget::class,
+            Widgets\AttributePerformanceWidget::class,
         ];
     }
 

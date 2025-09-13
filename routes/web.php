@@ -1055,8 +1055,15 @@ Route::prefix('seo-data')->name('seo-data.')->group(function () {
 Route::prefix('attributes')->name('frontend.attributes.')->group(function () {
     Route::get('/', [App\Http\Controllers\Frontend\AttributeController::class, 'index'])->name('index');
     Route::get('/{attribute}', [App\Http\Controllers\Frontend\AttributeController::class, 'show'])->name('show');
-    Route::get('/api/values', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeValues'])->name('values');
-    Route::post('/filter', [App\Http\Controllers\Frontend\AttributeController::class, 'filter'])->name('filter');
+    Route::get('/filter/products', [App\Http\Controllers\Frontend\AttributeController::class, 'filter'])->name('filter');
+    
+    // API Routes for enhanced functionality
+    Route::get('/api/values', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeValues'])->name('api.values');
+    Route::get('/api/statistics', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeStatistics'])->name('api.statistics');
+    Route::get('/api/groups', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeGroups'])->name('api.groups');
+    Route::get('/api/types', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeTypes'])->name('api.types');
+    Route::get('/api/search', [App\Http\Controllers\Frontend\AttributeController::class, 'searchAttributes'])->name('api.search');
+    Route::get('/api/compare', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeComparison'])->name('api.compare');
 });
 
 // Attribute Value Frontend Routes
@@ -1218,8 +1225,15 @@ Route::prefix('seo-data')->name('seo-data.')->group(function () {
 Route::prefix('attributes')->name('frontend.attributes.')->group(function () {
     Route::get('/', [App\Http\Controllers\Frontend\AttributeController::class, 'index'])->name('index');
     Route::get('/{attribute}', [App\Http\Controllers\Frontend\AttributeController::class, 'show'])->name('show');
-    Route::get('/api/values', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeValues'])->name('values');
-    Route::post('/filter', [App\Http\Controllers\Frontend\AttributeController::class, 'filter'])->name('filter');
+    Route::get('/filter/products', [App\Http\Controllers\Frontend\AttributeController::class, 'filter'])->name('filter');
+    
+    // API Routes for enhanced functionality
+    Route::get('/api/values', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeValues'])->name('api.values');
+    Route::get('/api/statistics', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeStatistics'])->name('api.statistics');
+    Route::get('/api/groups', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeGroups'])->name('api.groups');
+    Route::get('/api/types', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeTypes'])->name('api.types');
+    Route::get('/api/search', [App\Http\Controllers\Frontend\AttributeController::class, 'searchAttributes'])->name('api.search');
+    Route::get('/api/compare', [App\Http\Controllers\Frontend\AttributeController::class, 'getAttributeComparison'])->name('api.compare');
 });
 
 // Attribute Value Frontend Routes

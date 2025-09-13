@@ -48,7 +48,7 @@ final class StockManagementTest extends TestCase
         $response = $this->get(route('stock.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.stock.index');
+        $response->assertViewIs('stock.index');
         $response->assertViewHas('stockItems');
         $response->assertViewHas('locations');
         $response->assertViewHas('suppliers');
@@ -59,7 +59,7 @@ final class StockManagementTest extends TestCase
         $response = $this->get(route('stock.show', $this->stockItem));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.stock.show');
+        $response->assertViewIs('stock.show');
         $response->assertViewHas('stock', $this->stockItem);
     }
 
@@ -267,7 +267,7 @@ final class StockManagementTest extends TestCase
         $response = $this->get(route('stock.report'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.stock.report');
+        $response->assertViewIs('stock.report');
         $response->assertViewHas('stockItems');
         $response->assertViewHas('summary');
         $response->assertViewHas('byLocation');

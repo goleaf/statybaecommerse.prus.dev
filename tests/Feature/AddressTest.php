@@ -26,7 +26,7 @@ final class AddressTest extends TestCase
         $response = $this->actingAs($user)->get(route('frontend.addresses.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.addresses.index');
+        $response->assertViewIs('addresses.index');
         $response->assertSee($address->display_name);
     }
 
@@ -37,7 +37,7 @@ final class AddressTest extends TestCase
         $response = $this->actingAs($user)->get(route('frontend.addresses.create'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.addresses.create');
+        $response->assertViewIs('addresses.create');
         $response->assertSee(__('translations.add_new_address'));
     }
 
@@ -83,7 +83,7 @@ final class AddressTest extends TestCase
         $response = $this->actingAs($user)->get(route('frontend.addresses.show', $address));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.addresses.show');
+        $response->assertViewIs('addresses.show');
         $response->assertSee($address->display_name);
     }
 
@@ -95,7 +95,7 @@ final class AddressTest extends TestCase
         $response = $this->actingAs($user)->get(route('frontend.addresses.edit', $address));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.addresses.edit');
+        $response->assertViewIs('addresses.edit');
         $response->assertSee($address->first_name);
     }
 

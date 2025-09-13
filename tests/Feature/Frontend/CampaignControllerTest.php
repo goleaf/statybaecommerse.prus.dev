@@ -24,7 +24,7 @@ final class CampaignControllerTest extends TestCase
         $response = $this->get(route('frontend.campaigns.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.campaigns.index');
+        $response->assertViewIs('campaigns.index');
         $response->assertViewHas('campaigns');
         $response->assertSee($campaigns->first()->trans('name'));
     }
@@ -92,7 +92,7 @@ final class CampaignControllerTest extends TestCase
         $response = $this->get(route('frontend.campaigns.show', $campaign));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.campaigns.show');
+        $response->assertViewIs('campaigns.show');
         $response->assertViewHas('campaign');
         $response->assertViewHas('relatedCampaigns');
         $response->assertSee($campaign->trans('name'));
@@ -276,7 +276,7 @@ final class CampaignControllerTest extends TestCase
         $response = $this->get(route('frontend.campaigns.featured'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.campaigns.featured');
+        $response->assertViewIs('campaigns.featured');
         $response->assertViewHas('campaigns');
 
         foreach ($featuredCampaigns as $campaign) {
@@ -304,7 +304,7 @@ final class CampaignControllerTest extends TestCase
         $response = $this->get(route('frontend.campaigns.by-type', 'email'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.campaigns.by-type');
+        $response->assertViewIs('campaigns.by-type');
         $response->assertViewHas('campaigns');
         $response->assertViewHas('type', 'email');
 

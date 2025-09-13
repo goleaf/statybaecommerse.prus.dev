@@ -9,9 +9,12 @@ use Filament\Widgets\ChartWidget;
 
 final class AttributeTypesWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Attribute Types Distribution';
-
     protected static ?int $sort = 2;
+
+    public function getHeading(): string
+    {
+        return 'Attribute Types Distribution';
+    }
 
     protected function getData(): array
     {

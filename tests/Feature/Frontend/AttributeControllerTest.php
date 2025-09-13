@@ -18,7 +18,7 @@ class AttributeControllerTest extends TestCase
         $response = $this->get(route('frontend.attributes.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.attributes.index');
+        $response->assertViewIs('attributes.index');
         $response->assertViewHas(['attributes', 'types', 'groups']);
     }
 
@@ -97,7 +97,7 @@ class AttributeControllerTest extends TestCase
         $response = $this->get(route('frontend.attributes.show', $attribute));
 
         $response->assertStatus(200);
-        $response->assertViewIs('frontend.attributes.show');
+        $response->assertViewIs('attributes.show');
         $response->assertViewHas(['attribute', 'relatedAttributes']);
         $response->assertSee($attribute->name);
     }

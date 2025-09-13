@@ -291,4 +291,222 @@ final class Attribute extends Model
     {
         return $this->enabledValues()->count();
     }
+
+    // Additional helper methods
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->name ?: $this->slug;
+    }
+
+    public function getFormattedDescriptionAttribute(): string
+    {
+        return $this->description ? strip_tags($this->description) : '';
+    }
+
+    public function getTypeIconAttribute(): string
+    {
+        return match ($this->type) {
+            'text' => 'heroicon-o-document-text',
+            'number' => 'heroicon-o-calculator',
+            'boolean' => 'heroicon-o-check-circle',
+            'select' => 'heroicon-o-list-bullet',
+            'multiselect' => 'heroicon-o-squares-2x2',
+            'color' => 'heroicon-o-swatch',
+            'date' => 'heroicon-o-calendar',
+            'textarea' => 'heroicon-o-document',
+            'file' => 'heroicon-o-paper-clip',
+            'image' => 'heroicon-o-photo',
+            default => 'heroicon-o-adjustments-horizontal',
+        };
+    }
+
+    public function getTypeColorAttribute(): string
+    {
+        return match ($this->type) {
+            'text' => 'gray',
+            'number' => 'blue',
+            'boolean' => 'green',
+            'select' => 'yellow',
+            'multiselect' => 'orange',
+            'color' => 'purple',
+            'date' => 'red',
+            'textarea' => 'indigo',
+            'file' => 'pink',
+            'image' => 'rose',
+            default => 'gray',
+        };
+    }
+
+    public function getValidationRulesForForm(): array
+    {
+        $rules = [];
+        
+        if ($this->is_required) {
+            $rules[] = 'required';
+        }
+        
+        if ($this->validation_rules) {
+            $rules = array_merge($rules, $this->validation_rules);
+        }
+        
+        return $rules;
+    }
+
+    public function getFormComponentConfig(): array
+    {
+        return [
+            'type' => $this->type,
+            'label' => $this->name,
+            'placeholder' => $this->placeholder,
+            'help_text' => $this->help_text,
+            'required' => $this->is_required,
+            'validation_rules' => $this->getValidationRulesForForm(),
+            'default_value' => $this->default_value,
+            'min_value' => $this->min_value,
+            'max_value' => $this->max_value,
+            'step_value' => $this->step_value,
+            'options' => $this->isSelectType() ? $this->enabledValues->pluck('value', 'id')->toArray() : [],
+        ];
+    }
+
+    public function isUsedInProducts(): bool
+    {
+        return $this->products()->exists();
+    }
+
+    public function getUsageCount(): int
+    {
+        return $this->products()->count();
+    }
+
+    public function getValuesUsageCount(): int
+    {
+        return $this->values()->whereHas('products')->count();
+    }
+
+    public function getMostUsedValue()
+    {
+        return $this->values()
+            ->withCount('products')
+            ->orderBy('products_count', 'desc')
+            ->first();
+    }
+
+    public function getLeastUsedValue()
+    {
+        return $this->values()
+            ->withCount('products')
+            ->orderBy('products_count', 'asc')
+            ->first();
+    }
+
+    public function getAverageValuesPerProduct(): float
+    {
+        $totalProducts = $this->getUsageCount();
+        if ($totalProducts === 0) {
+            return 0;
+        }
+        
+        $totalValues = $this->values()->whereHas('products')->count();
+        return round($totalValues / $totalProducts, 2);
+    }
+
+    public function getPopularityScore(): int
+    {
+        $usageCount = $this->getUsageCount();
+        $valuesCount = $this->getValuesCount();
+        $enabledValuesCount = $this->getEnabledValuesCount();
+        
+        // Calculate popularity based on usage and values
+        $score = ($usageCount * 10) + ($valuesCount * 2) + ($enabledValuesCount * 1);
+        
+        return min($score, 100); // Cap at 100
+    }
+
+    public function getStatusBadgeAttribute(): string
+    {
+        if (!$this->is_enabled) {
+            return 'disabled';
+        }
+        
+        if ($this->is_required) {
+            return 'required';
+        }
+        
+        if ($this->is_filterable) {
+            return 'filterable';
+        }
+        
+        return 'standard';
+    }
+
+    public function getStatusColorAttribute(): string
+    {
+        return match ($this->status_badge) {
+            'disabled' => 'gray',
+            'required' => 'red',
+            'filterable' => 'blue',
+            'standard' => 'green',
+            default => 'gray',
+        };
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status_badge) {
+            'disabled' => __('attributes.disabled'),
+            'required' => __('attributes.required'),
+            'filterable' => __('attributes.filterable'),
+            'standard' => __('attributes.standard'),
+            default => __('attributes.unknown'),
+        };
+    }
+
+    public function duplicateForGroup(string $newGroupName): self
+    {
+        $duplicate = $this->replicate();
+        $duplicate->group_name = $newGroupName;
+        $duplicate->name = $this->name . ' (Copy)';
+        $duplicate->slug = $this->slug . '-copy';
+        $duplicate->save();
+        
+        // Duplicate values
+        foreach ($this->values as $value) {
+            $valueDuplicate = $value->replicate();
+            $valueDuplicate->attribute_id = $duplicate->id;
+            $valueDuplicate->save();
+        }
+        
+        return $duplicate;
+    }
+
+    public function mergeWith(Attribute $otherAttribute): self
+    {
+        // Move all values from other attribute to this one
+        $otherAttribute->values()->update(['attribute_id' => $this->id]);
+        
+        // Update products to use this attribute instead
+        $otherAttribute->products()->sync($this->products()->pluck('products.id')->toArray());
+        
+        // Delete the other attribute
+        $otherAttribute->delete();
+        
+        return $this;
+    }
+
+    public function getStatistics(): array
+    {
+        return [
+            'usage_count' => $this->getUsageCount(),
+            'values_count' => $this->getValuesCount(),
+            'enabled_values_count' => $this->getEnabledValuesCount(),
+            'popularity_score' => $this->getPopularityScore(),
+            'average_values_per_product' => $this->getAverageValuesPerProduct(),
+            'most_used_value' => $this->getMostUsedValue(),
+            'least_used_value' => $this->getLeastUsedValue(),
+            'status' => $this->status_badge,
+            'status_color' => $this->status_color,
+            'status_label' => $this->status_label,
+        ];
+    }
 }
