@@ -8,15 +8,23 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web'])->group(function () {
     // Campaign Frontend Routes
-    Route::prefix('campaigns')->name('frontend.campaigns.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\CampaignController::class, 'index'])->name('index');
-        Route::get('/featured', [App\Http\Controllers\Frontend\CampaignController::class, 'featured'])->name('featured');
-        Route::get('/search', [App\Http\Controllers\Frontend\CampaignController::class, 'search'])->name('search');
-        Route::get('/type/{type}', [App\Http\Controllers\Frontend\CampaignController::class, 'byType'])->name('by-type');
-        Route::get('/{campaign}', [App\Http\Controllers\Frontend\CampaignController::class, 'show'])->name('show');
-        Route::post('/{campaign}/click', [App\Http\Controllers\Frontend\CampaignController::class, 'click'])->name('click');
-        Route::post('/{campaign}/conversion', [App\Http\Controllers\Frontend\CampaignController::class, 'conversion'])->name('conversion');
-    });
+Route::prefix('campaigns')->name('frontend.campaigns.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Frontend\CampaignController::class, 'index'])->name('index');
+    Route::get('/featured', [App\Http\Controllers\Frontend\CampaignController::class, 'featured'])->name('featured');
+    Route::get('/search', [App\Http\Controllers\Frontend\CampaignController::class, 'search'])->name('search');
+    Route::get('/type/{type}', [App\Http\Controllers\Frontend\CampaignController::class, 'byType'])->name('by-type');
+    Route::get('/{campaign}', [App\Http\Controllers\Frontend\CampaignController::class, 'show'])->name('show');
+    Route::post('/{campaign}/click', [App\Http\Controllers\Frontend\CampaignController::class, 'click'])->name('click');
+    Route::post('/{campaign}/conversion', [App\Http\Controllers\Frontend\CampaignController::class, 'conversion'])->name('conversion');
+
+    // API Routes for enhanced functionality
+    Route::get('/api/statistics', [App\Http\Controllers\Frontend\CampaignController::class, 'getCampaignStatistics'])->name('api.statistics');
+    Route::get('/api/types', [App\Http\Controllers\Frontend\CampaignController::class, 'getCampaignTypes'])->name('api.types');
+    Route::get('/api/performance', [App\Http\Controllers\Frontend\CampaignController::class, 'getCampaignPerformance'])->name('api.performance');
+    Route::get('/api/analytics', [App\Http\Controllers\Frontend\CampaignController::class, 'getCampaignAnalytics'])->name('api.analytics');
+    Route::get('/api/compare', [App\Http\Controllers\Frontend\CampaignController::class, 'getCampaignComparison'])->name('api.compare');
+    Route::get('/{campaign}/recommendations', [App\Http\Controllers\Frontend\CampaignController::class, 'getCampaignRecommendations'])->name('recommendations');
+});
 
     // Campaign Conversion Frontend Routes
     Route::prefix('campaign-conversions')->name('frontend.campaign-conversions.')->group(function () {

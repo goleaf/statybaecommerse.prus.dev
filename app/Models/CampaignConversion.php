@@ -14,6 +14,8 @@ final class CampaignConversion extends Model
 {
     use HasFactory, HasTranslations;
 
+    public $timestamps = false;
+
     protected $translationModel = CampaignConversionTranslation::class;
 
     protected $fillable = [

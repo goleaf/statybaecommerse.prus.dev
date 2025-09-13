@@ -15,6 +15,8 @@ final class CampaignClick extends Model
 {
     use HasFactory, HasTranslations;
 
+    public $timestamps = false;
+
     protected $table = 'campaign_clicks';
 
     protected $fillable = [

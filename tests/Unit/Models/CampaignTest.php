@@ -27,16 +27,18 @@ final class CampaignTest extends TestCase
     {
         $campaign = Campaign::factory()->create([
             'name' => 'Test Campaign',
-            'type' => 'email',
             'status' => 'active',
-            'budget' => 1000.0,
+            'metadata' => [
+                'type' => 'email',
+                'budget' => 1000.0,
+                'source' => 'manual',
+                'tags' => ['test'],
+            ],
         ]);
 
         $this->assertDatabaseHas('discount_campaigns', [
             'name' => 'Test Campaign',
-            'type' => 'email',
             'status' => 'active',
-            'budget' => 1000.0,
         ]);
 
         $this->assertEquals('Test Campaign', $campaign->name);
@@ -530,5 +532,402 @@ final class CampaignTest extends TestCase
 
         $this->assertEquals('slug', $campaign->getRouteKeyName());
         $this->assertEquals('test-campaign', $campaign->getRouteKey());
+    }
+
+    public function test_display_name_accessor(): void
+    {
+        $campaign = Campaign::factory()->create(['name' => 'Test Campaign']);
+        $this->assertEquals('Test Campaign', $campaign->display_name);
+
+        $campaignWithoutName = Campaign::factory()->create(['name' => null, 'slug' => 'test-slug']);
+        $this->assertEquals('test-slug', $campaignWithoutName->display_name);
+    }
+
+    public function test_formatted_description_accessor(): void
+    {
+        $campaign = Campaign::factory()->create(['description' => '<p>Test <strong>description</strong></p>']);
+        $this->assertEquals('Test description', $campaign->formatted_description);
+
+        $campaignWithoutDescription = Campaign::factory()->create(['description' => null]);
+        $this->assertEquals('', $campaignWithoutDescription->formatted_description);
+    }
+
+    public function test_type_icon_accessor(): void
+    {
+        $this->assertEquals('heroicon-o-envelope', Campaign::factory()->create(['type' => 'email'])->type_icon);
+        $this->assertEquals('heroicon-o-device-phone-mobile', Campaign::factory()->create(['type' => 'sms'])->type_icon);
+        $this->assertEquals('heroicon-o-bell', Campaign::factory()->create(['type' => 'push'])->type_icon);
+        $this->assertEquals('heroicon-o-photo', Campaign::factory()->create(['type' => 'banner'])->type_icon);
+        $this->assertEquals('heroicon-o-window', Campaign::factory()->create(['type' => 'popup'])->type_icon);
+        $this->assertEquals('heroicon-o-share', Campaign::factory()->create(['type' => 'social'])->type_icon);
+        $this->assertEquals('heroicon-o-megaphone', Campaign::factory()->create(['type' => 'unknown'])->type_icon);
+    }
+
+    public function test_type_color_accessor(): void
+    {
+        $this->assertEquals('blue', Campaign::factory()->create(['type' => 'email'])->type_color);
+        $this->assertEquals('green', Campaign::factory()->create(['type' => 'sms'])->type_color);
+        $this->assertEquals('yellow', Campaign::factory()->create(['type' => 'push'])->type_color);
+        $this->assertEquals('purple', Campaign::factory()->create(['type' => 'banner'])->type_color);
+        $this->assertEquals('pink', Campaign::factory()->create(['type' => 'popup'])->type_color);
+        $this->assertEquals('red', Campaign::factory()->create(['type' => 'social'])->type_color);
+        $this->assertEquals('gray', Campaign::factory()->create(['type' => 'unknown'])->type_color);
+    }
+
+    public function test_duration_accessor(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'start_date' => now()->subDays(10),
+            'end_date' => now()->addDays(5),
+        ]);
+        $this->assertEquals(15, $campaign->duration);
+
+        $campaignWithoutDates = Campaign::factory()->create(['start_date' => null, 'end_date' => null]);
+        $this->assertNull($campaignWithoutDates->duration);
+    }
+
+    public function test_days_remaining_accessor(): void
+    {
+        $campaign = Campaign::factory()->create(['end_date' => now()->addDays(5)]);
+        $this->assertEquals(5, $campaign->days_remaining);
+
+        $expiredCampaign = Campaign::factory()->create(['end_date' => now()->subDays(5)]);
+        $this->assertEquals(0, $expiredCampaign->days_remaining);
+
+        $campaignWithoutEndDate = Campaign::factory()->create(['end_date' => null]);
+        $this->assertNull($campaignWithoutEndDate->days_remaining);
+    }
+
+    public function test_progress_percentage_accessor(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'start_date' => now()->subDays(5),
+            'end_date' => now()->addDays(5),
+        ]);
+        $this->assertEquals(50.0, $campaign->progress_percentage);
+
+        $campaignWithoutDates = Campaign::factory()->create(['start_date' => null, 'end_date' => null]);
+        $this->assertEquals(0.0, $campaignWithoutDates->progress_percentage);
+    }
+
+    public function test_budget_utilization_accessor(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'budget_limit' => 1000,
+            'total_revenue' => 500,
+        ]);
+        $this->assertEquals(50.0, $campaign->budget_utilization);
+
+        $campaignWithoutLimit = Campaign::factory()->create(['budget_limit' => null]);
+        $this->assertEquals(0.0, $campaignWithoutLimit->budget_utilization);
+    }
+
+    public function test_performance_score_accessor(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'total_views' => 1000,
+            'total_clicks' => 100,
+            'total_conversions' => 10,
+            'budget_limit' => 1000,
+            'total_revenue' => 1200,
+        ]);
+        
+        $score = $campaign->performance_score;
+        $this->assertIsInt($score);
+        $this->assertGreaterThanOrEqual(0, $score);
+        $this->assertLessThanOrEqual(100, $score);
+    }
+
+    public function test_performance_grade_accessor(): void
+    {
+        $highPerformingCampaign = Campaign::factory()->create([
+            'total_views' => 1000,
+            'total_clicks' => 200,
+            'total_conversions' => 50,
+            'budget_limit' => 1000,
+            'total_revenue' => 2000,
+        ]);
+        $this->assertContains($highPerformingCampaign->performance_grade, ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D', 'F']);
+    }
+
+    public function test_performance_color_accessor(): void
+    {
+        $campaign = Campaign::factory()->create();
+        $this->assertContains($campaign->performance_color, ['success', 'warning', 'info', 'danger']);
+    }
+
+    public function test_get_statistics_method(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'total_views' => 1000,
+            'total_clicks' => 100,
+            'total_conversions' => 10,
+            'total_revenue' => 1000,
+        ]);
+
+        $statistics = $campaign->getStatistics();
+        
+        $this->assertIsArray($statistics);
+        $this->assertArrayHasKey('views', $statistics);
+        $this->assertArrayHasKey('clicks', $statistics);
+        $this->assertArrayHasKey('conversions', $statistics);
+        $this->assertArrayHasKey('revenue', $statistics);
+        $this->assertArrayHasKey('conversion_rate', $statistics);
+        $this->assertArrayHasKey('click_through_rate', $statistics);
+        $this->assertArrayHasKey('roi', $statistics);
+        $this->assertArrayHasKey('performance_score', $statistics);
+        $this->assertArrayHasKey('performance_grade', $statistics);
+        $this->assertArrayHasKey('performance_color', $statistics);
+    }
+
+    public function test_formatted_budget_accessor(): void
+    {
+        $campaign = Campaign::factory()->create(['budget' => 1234.56]);
+        $this->assertEquals('€1,234.56', $campaign->formatted_budget);
+    }
+
+    public function test_formatted_budget_limit_accessor(): void
+    {
+        $campaign = Campaign::factory()->create(['budget_limit' => 5000.00]);
+        $this->assertEquals('€5,000.00', $campaign->formatted_budget_limit);
+    }
+
+    public function test_formatted_total_revenue_accessor(): void
+    {
+        $campaign = Campaign::factory()->create(['total_revenue' => 2500.75]);
+        $this->assertEquals('€2,500.75', $campaign->formatted_total_revenue);
+    }
+
+    public function test_is_high_performing_method(): void
+    {
+        $highPerformingCampaign = Campaign::factory()->create([
+            'total_views' => 1000,
+            'total_clicks' => 200,
+            'total_conversions' => 50,
+            'budget_limit' => 1000,
+            'total_revenue' => 2000,
+        ]);
+        
+        $lowPerformingCampaign = Campaign::factory()->create([
+            'total_views' => 1000,
+            'total_clicks' => 10,
+            'total_conversions' => 1,
+            'budget_limit' => 1000,
+            'total_revenue' => 100,
+        ]);
+
+        $this->assertTrue($highPerformingCampaign->isHighPerforming());
+        $this->assertFalse($lowPerformingCampaign->isHighPerforming());
+    }
+
+    public function test_is_underperforming_method(): void
+    {
+        $underperformingCampaign = Campaign::factory()->create([
+            'total_views' => 1000,
+            'total_clicks' => 5,
+            'total_conversions' => 0,
+            'budget_limit' => 1000,
+            'total_revenue' => 0,
+        ]);
+        
+        $goodCampaign = Campaign::factory()->create([
+            'total_views' => 1000,
+            'total_clicks' => 100,
+            'total_conversions' => 10,
+            'budget_limit' => 1000,
+            'total_revenue' => 1000,
+        ]);
+
+        $this->assertTrue($underperformingCampaign->isUnderperforming());
+        $this->assertFalse($goodCampaign->isUnderperforming());
+    }
+
+    public function test_needs_attention_method(): void
+    {
+        $campaignNeedingAttention = Campaign::factory()->create([
+            'total_views' => 1000,
+            'total_clicks' => 5,
+            'total_conversions' => 0,
+            'budget_limit' => 1000,
+            'total_revenue' => 950, // High budget utilization
+        ]);
+        
+        $goodCampaign = Campaign::factory()->create([
+            'total_views' => 1000,
+            'total_clicks' => 100,
+            'total_conversions' => 10,
+            'budget_limit' => 1000,
+            'total_revenue' => 500,
+        ]);
+
+        $this->assertTrue($campaignNeedingAttention->needsAttention());
+        $this->assertFalse($goodCampaign->needsAttention());
+    }
+
+    public function test_can_be_activated_method(): void
+    {
+        $draftCampaign = Campaign::factory()->create(['status' => 'draft']);
+        $scheduledCampaign = Campaign::factory()->create(['status' => 'scheduled']);
+        $activeCampaign = Campaign::factory()->create(['status' => 'active']);
+
+        $this->assertTrue($draftCampaign->canBeActivated());
+        $this->assertTrue($scheduledCampaign->canBeActivated());
+        $this->assertFalse($activeCampaign->canBeActivated());
+    }
+
+    public function test_can_be_paused_method(): void
+    {
+        $activeCampaign = Campaign::factory()->create(['status' => 'active']);
+        $pausedCampaign = Campaign::factory()->create(['status' => 'paused']);
+
+        $this->assertTrue($activeCampaign->canBePaused());
+        $this->assertFalse($pausedCampaign->canBePaused());
+    }
+
+    public function test_can_be_resumed_method(): void
+    {
+        $pausedCampaign = Campaign::factory()->create(['status' => 'paused']);
+        $activeCampaign = Campaign::factory()->create(['status' => 'active']);
+
+        $this->assertTrue($pausedCampaign->canBeResumed());
+        $this->assertFalse($activeCampaign->canBeResumed());
+    }
+
+    public function test_can_be_completed_method(): void
+    {
+        $expiredActiveCampaign = Campaign::factory()->create([
+            'status' => 'active',
+            'end_date' => now()->subDay(),
+        ]);
+        
+        $activeCampaign = Campaign::factory()->create([
+            'status' => 'active',
+            'end_date' => now()->addDay(),
+        ]);
+
+        $this->assertTrue($expiredActiveCampaign->canBeCompleted());
+        $this->assertFalse($activeCampaign->canBeCompleted());
+    }
+
+    public function test_get_recommended_actions_method(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'total_views' => 1000,
+            'total_clicks' => 5,
+            'total_conversions' => 1,
+            'budget_limit' => 1000,
+            'total_revenue' => 950,
+            'end_date' => now()->addDays(3),
+            'cta_text' => null,
+            'content' => 'Short',
+        ]);
+
+        $actions = $campaign->getRecommendedActions();
+        
+        $this->assertIsArray($actions);
+        $this->assertContains('review_performance', $actions);
+        $this->assertContains('monitor_budget', $actions);
+        $this->assertContains('optimize_content', $actions);
+        $this->assertContains('improve_targeting', $actions);
+        $this->assertContains('extend_campaign', $actions);
+        $this->assertContains('add_cta', $actions);
+        $this->assertContains('expand_content', $actions);
+    }
+
+    public function test_duplicate_for_new_period_method(): void
+    {
+        $originalCampaign = Campaign::factory()->create([
+            'name' => 'Original Campaign',
+            'slug' => 'original-campaign',
+            'status' => 'active',
+            'total_views' => 100,
+            'total_clicks' => 10,
+            'total_conversions' => 1,
+            'total_revenue' => 100,
+        ]);
+
+        $newStartDate = now()->addDays(30);
+        $newEndDate = now()->addDays(60);
+
+        $duplicate = $originalCampaign->duplicateForNewPeriod($newStartDate, $newEndDate);
+
+        $this->assertNotEquals($originalCampaign->id, $duplicate->id);
+        $this->assertEquals('Original Campaign (Copy)', $duplicate->name);
+        $this->assertStringContains('original-campaign-copy-', $duplicate->slug);
+        $this->assertEquals('draft', $duplicate->status);
+        $this->assertEquals($newStartDate->format('Y-m-d H:i:s'), $duplicate->start_date->format('Y-m-d H:i:s'));
+        $this->assertEquals($newEndDate->format('Y-m-d H:i:s'), $duplicate->end_date->format('Y-m-d H:i:s'));
+        $this->assertEquals(0, $duplicate->total_views);
+        $this->assertEquals(0, $duplicate->total_clicks);
+        $this->assertEquals(0, $duplicate->total_conversions);
+        $this->assertEquals(0, $duplicate->total_revenue);
+        $this->assertEquals(0, $duplicate->conversion_rate);
+    }
+
+    public function test_get_targeting_summary_method(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'target_audience' => ['age' => '18-25'],
+            'target_segments' => ['behavior' => 'new_customers'],
+        ]);
+
+        $categories = Category::factory()->count(2)->create();
+        $products = Product::factory()->count(3)->create();
+        $customerGroups = CustomerGroup::factory()->count(1)->create();
+
+        $campaign->targetCategories()->attach($categories->pluck('id'));
+        $campaign->targetProducts()->attach($products->pluck('id'));
+        $campaign->targetCustomerGroups()->attach($customerGroups->pluck('id'));
+
+        $summary = $campaign->getTargetingSummary();
+
+        $this->assertEquals(2, $summary['categories_count']);
+        $this->assertEquals(3, $summary['products_count']);
+        $this->assertEquals(1, $summary['customer_groups_count']);
+        $this->assertTrue($summary['has_audience_targeting']);
+        $this->assertTrue($summary['has_segment_targeting']);
+    }
+
+    public function test_get_content_summary_method(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'subject' => 'Test Subject',
+            'content' => '<p>This is a test content with more than 100 characters to test the content length calculation properly.</p>',
+            'cta_text' => 'Click Here',
+            'cta_url' => 'https://example.com',
+            'banner_image' => 'banner.jpg',
+        ]);
+
+        $summary = $campaign->getContentSummary();
+
+        $this->assertTrue($summary['has_subject']);
+        $this->assertTrue($summary['has_content']);
+        $this->assertTrue($summary['has_cta']);
+        $this->assertTrue($summary['has_banner']);
+        $this->assertGreaterThan(100, $summary['content_length']);
+        $this->assertEquals(12, $summary['subject_length']);
+    }
+
+    public function test_get_automation_summary_method(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'auto_start' => true,
+            'auto_end' => false,
+            'auto_pause_on_budget' => true,
+            'send_notifications' => true,
+            'track_conversions' => false,
+            'is_featured' => true,
+            'social_media_ready' => false,
+        ]);
+
+        $summary = $campaign->getAutomationSummary();
+
+        $this->assertTrue($summary['auto_start']);
+        $this->assertFalse($summary['auto_end']);
+        $this->assertTrue($summary['auto_pause_on_budget']);
+        $this->assertTrue($summary['send_notifications']);
+        $this->assertFalse($summary['track_conversions']);
+        $this->assertTrue($summary['is_featured']);
+        $this->assertFalse($summary['social_media_ready']);
     }
 }

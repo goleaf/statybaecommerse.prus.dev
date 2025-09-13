@@ -431,6 +431,17 @@ final class CampaignResource extends Resource
             ->persistFiltersInSession();
     }
 
+    public static function getWidgets(): array
+    {
+        return [
+            Widgets\CampaignStatsWidget::class,
+            Widgets\CampaignPerformanceWidget::class,
+            Widgets\CampaignAnalyticsWidget::class,
+            Widgets\CampaignTypeChartWidget::class,
+            Widgets\CampaignGrowthChartWidget::class,
+        ];
+    }
+
     public static function getRelations(): array
     {
         return [

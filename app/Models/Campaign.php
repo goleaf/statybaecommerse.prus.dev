@@ -25,15 +25,8 @@ final class Campaign extends Model
     protected $fillable = [
         'name',
         'slug',
-        'description',
-        'type',
-        'subject',
-        'content',
         'starts_at',
         'ends_at',
-        'start_date',
-        'end_date',
-        'budget',
         'channel_id',
         'zone_id',
         'status',
@@ -43,27 +36,6 @@ final class Campaign extends Model
         'track_conversions',
         'max_uses',
         'budget_limit',
-        'total_views',
-        'total_clicks',
-        'total_conversions',
-        'total_revenue',
-        'conversion_rate',
-        'target_audience',
-        'target_categories',
-        'target_products',
-        'target_customer_groups',
-        'target_segments',
-        'display_priority',
-        'banner_image',
-        'banner_alt_text',
-        'cta_text',
-        'cta_url',
-        'auto_start',
-        'auto_end',
-        'auto_pause_on_budget',
-        'meta_title',
-        'meta_description',
-        'social_media_ready',
     ];
 
     protected function casts(): array
@@ -308,7 +280,9 @@ final class Campaign extends Model
             'viewed_at' => now(),
         ]);
 
-        $this->increment('total_views');
+        $metadata = $this->metadata ?? [];
+        $metadata['total_views'] = ($metadata['total_views'] ?? 0) + 1;
+        $this->update(['metadata' => $metadata]);
     }
 
     public function recordClick(string $clickType = 'cta', ?string $clickedUrl = null, ?string $sessionId = null, ?string $ipAddress = null, ?string $userAgent = null, ?int $customerId = null): void
@@ -323,7 +297,9 @@ final class Campaign extends Model
             'clicked_at' => now(),
         ]);
 
-        $this->increment('total_clicks');
+        $metadata = $this->metadata ?? [];
+        $metadata['total_clicks'] = ($metadata['total_clicks'] ?? 0) + 1;
+        $this->update(['metadata' => $metadata]);
     }
 
     public function recordConversion(string $conversionType = 'purchase', float $conversionValue = 0, ?int $orderId = null, ?int $customerId = null, ?string $sessionId = null, array $conversionData = []): void
@@ -338,9 +314,11 @@ final class Campaign extends Model
             'converted_at' => now(),
         ]);
 
-        $this->increment('total_conversions');
-        $this->increment('total_revenue', $conversionValue);
-        $this->update(['conversion_rate' => $this->getConversionRate()]);
+        $metadata = $this->metadata ?? [];
+        $metadata['total_conversions'] = ($metadata['total_conversions'] ?? 0) + 1;
+        $metadata['total_revenue'] = ($metadata['total_revenue'] ?? 0) + $conversionValue;
+        $metadata['conversion_rate'] = $this->getConversionRate();
+        $this->update(['metadata' => $metadata]);
     }
 
     public function getBannerUrl(): ?string
@@ -422,5 +400,452 @@ final class Campaign extends Model
         $media = $this->getFirstMedia('images');
 
         return $media ? $media->getUrl($conversion) : null;
+    }
+
+    // Additional helper methods and accessors
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->name ?: $this->slug;
+    }
+
+    // Accessors for metadata fields
+    public function getDescriptionAttribute(): ?string
+    {
+        return $this->metadata['description'] ?? null;
+    }
+
+    public function getTypeAttribute(): ?string
+    {
+        return $this->metadata['type'] ?? 'banner';
+    }
+
+    public function getSubjectAttribute(): ?string
+    {
+        return $this->metadata['subject'] ?? null;
+    }
+
+    public function getContentAttribute(): ?string
+    {
+        return $this->metadata['content'] ?? null;
+    }
+
+    public function getStartDateAttribute(): ?\Carbon\Carbon
+    {
+        return $this->starts_at;
+    }
+
+    public function getEndDateAttribute(): ?\Carbon\Carbon
+    {
+        return $this->ends_at;
+    }
+
+    public function getBudgetAttribute(): ?float
+    {
+        return $this->metadata['budget'] ?? null;
+    }
+
+    public function getTotalViewsAttribute(): int
+    {
+        return $this->metadata['total_views'] ?? 0;
+    }
+
+    public function getTotalClicksAttribute(): int
+    {
+        return $this->metadata['total_clicks'] ?? 0;
+    }
+
+    public function getTotalConversionsAttribute(): int
+    {
+        return $this->metadata['total_conversions'] ?? 0;
+    }
+
+    public function getTotalRevenueAttribute(): float
+    {
+        return $this->metadata['total_revenue'] ?? 0;
+    }
+
+    public function getConversionRateAttribute(): float
+    {
+        return $this->metadata['conversion_rate'] ?? 0;
+    }
+
+    public function getTargetAudienceAttribute(): ?array
+    {
+        return $this->metadata['target_audience'] ?? null;
+    }
+
+    public function getTargetSegmentsAttribute(): ?array
+    {
+        return $this->metadata['target_segments'] ?? null;
+    }
+
+    public function getDisplayPriorityAttribute(): int
+    {
+        return $this->metadata['display_priority'] ?? 0;
+    }
+
+    public function getBannerImageAttribute(): ?string
+    {
+        return $this->metadata['banner_image'] ?? null;
+    }
+
+    public function getBannerAltTextAttribute(): ?string
+    {
+        return $this->metadata['banner_alt_text'] ?? null;
+    }
+
+    public function getCtaTextAttribute(): ?string
+    {
+        return $this->metadata['cta_text'] ?? null;
+    }
+
+    public function getCtaUrlAttribute(): ?string
+    {
+        return $this->metadata['cta_url'] ?? null;
+    }
+
+    public function getAutoStartAttribute(): bool
+    {
+        return $this->metadata['auto_start'] ?? false;
+    }
+
+    public function getAutoEndAttribute(): bool
+    {
+        return $this->metadata['auto_end'] ?? false;
+    }
+
+    public function getAutoPauseOnBudgetAttribute(): bool
+    {
+        return $this->metadata['auto_pause_on_budget'] ?? false;
+    }
+
+    public function getMetaTitleAttribute(): ?string
+    {
+        return $this->metadata['meta_title'] ?? null;
+    }
+
+    public function getMetaDescriptionAttribute(): ?string
+    {
+        return $this->metadata['meta_description'] ?? null;
+    }
+
+    public function getSocialMediaReadyAttribute(): bool
+    {
+        return $this->metadata['social_media_ready'] ?? false;
+    }
+
+    public function getFormattedDescriptionAttribute(): string
+    {
+        return $this->description ? strip_tags($this->description) : '';
+    }
+
+    public function getTypeIconAttribute(): string
+    {
+        return match ($this->type) {
+            'email' => 'heroicon-o-envelope',
+            'sms' => 'heroicon-o-device-phone-mobile',
+            'push' => 'heroicon-o-bell',
+            'banner' => 'heroicon-o-photo',
+            'popup' => 'heroicon-o-window',
+            'social' => 'heroicon-o-share',
+            default => 'heroicon-o-megaphone',
+        };
+    }
+
+    public function getTypeColorAttribute(): string
+    {
+        return match ($this->type) {
+            'email' => 'blue',
+            'sms' => 'green',
+            'push' => 'yellow',
+            'banner' => 'purple',
+            'popup' => 'pink',
+            'social' => 'red',
+            default => 'gray',
+        };
+    }
+
+    public function getTypeLabelAttribute(): string
+    {
+        return match ($this->type) {
+            'email' => __('campaigns.types.email'),
+            'sms' => __('campaigns.types.sms'),
+            'push' => __('campaigns.types.push'),
+            'banner' => __('campaigns.types.banner'),
+            'popup' => __('campaigns.types.popup'),
+            'social' => __('campaigns.types.social'),
+            default => ucfirst($this->type),
+        };
+    }
+
+    public function getDurationAttribute(): ?int
+    {
+        if (!$this->start_date || !$this->end_date) {
+            return null;
+        }
+
+        return $this->start_date->diffInDays($this->end_date);
+    }
+
+    public function getDaysRemainingAttribute(): ?int
+    {
+        if (!$this->end_date) {
+            return null;
+        }
+
+        $remaining = now()->diffInDays($this->end_date, false);
+        return $remaining > 0 ? $remaining : 0;
+    }
+
+    public function getProgressPercentageAttribute(): float
+    {
+        if (!$this->start_date || !$this->end_date) {
+            return 0;
+        }
+
+        $total = $this->start_date->diffInDays($this->end_date);
+        $elapsed = $this->start_date->diffInDays(now());
+
+        if ($total <= 0) {
+            return 100;
+        }
+
+        return min(100, max(0, ($elapsed / $total) * 100));
+    }
+
+    public function getBudgetUtilizationAttribute(): float
+    {
+        if (!$this->budget_limit || $this->budget_limit <= 0) {
+            return 0;
+        }
+
+        return min(100, ($this->total_revenue / $this->budget_limit) * 100);
+    }
+
+    public function getPerformanceScoreAttribute(): int
+    {
+        $score = 0;
+        
+        // Base score from conversion rate
+        $score += min(40, $this->getConversionRate() * 0.4);
+        
+        // Click-through rate contribution
+        $score += min(30, $this->getClickThroughRate() * 0.3);
+        
+        // Budget utilization (efficient spending)
+        if ($this->budget_limit > 0) {
+            $utilization = $this->getBudgetUtilization();
+            $score += min(20, $utilization * 0.2);
+        }
+        
+        // ROI contribution
+        $roi = $this->getROI();
+        $score += min(10, max(0, $roi * 0.1));
+        
+        return min(100, max(0, round($score)));
+    }
+
+    public function getPerformanceGradeAttribute(): string
+    {
+        $score = $this->performance_score;
+        
+        return match (true) {
+            $score >= 90 => 'A+',
+            $score >= 80 => 'A',
+            $score >= 70 => 'B+',
+            $score >= 60 => 'B',
+            $score >= 50 => 'C+',
+            $score >= 40 => 'C',
+            $score >= 30 => 'D',
+            default => 'F',
+        };
+    }
+
+    public function getPerformanceColorAttribute(): string
+    {
+        $score = $this->performance_score;
+        
+        return match (true) {
+            $score >= 80 => 'success',
+            $score >= 60 => 'warning',
+            $score >= 40 => 'info',
+            default => 'danger',
+        };
+    }
+
+    public function getStatistics(): array
+    {
+        return [
+            'views' => $this->total_views,
+            'clicks' => $this->total_clicks,
+            'conversions' => $this->total_conversions,
+            'revenue' => $this->total_revenue,
+            'conversion_rate' => $this->getConversionRate(),
+            'click_through_rate' => $this->getClickThroughRate(),
+            'roi' => $this->getROI(),
+            'performance_score' => $this->performance_score,
+            'performance_grade' => $this->performance_grade,
+            'performance_color' => $this->performance_color,
+            'budget_utilization' => $this->budget_utilization,
+            'progress_percentage' => $this->progress_percentage,
+            'days_remaining' => $this->days_remaining,
+            'duration' => $this->duration,
+        ];
+    }
+
+    public function getFormattedBudgetAttribute(): string
+    {
+        return '€' . number_format($this->budget, 2);
+    }
+
+    public function getFormattedBudgetLimitAttribute(): string
+    {
+        return '€' . number_format($this->budget_limit, 2);
+    }
+
+    public function getFormattedTotalRevenueAttribute(): string
+    {
+        return '€' . number_format($this->total_revenue, 2);
+    }
+
+    public function getFormattedROIAttribute(): string
+    {
+        return number_format($this->getROI(), 2) . '%';
+    }
+
+    public function getFormattedConversionRateAttribute(): string
+    {
+        return number_format($this->getConversionRate(), 2) . '%';
+    }
+
+    public function getFormattedClickThroughRateAttribute(): string
+    {
+        return number_format($this->getClickThroughRate(), 2) . '%';
+    }
+
+    public function getFormattedBudgetUtilizationAttribute(): string
+    {
+        return number_format($this->budget_utilization, 2) . '%';
+    }
+
+    public function getFormattedProgressPercentageAttribute(): string
+    {
+        return number_format($this->progress_percentage, 1) . '%';
+    }
+
+    public function isHighPerforming(): bool
+    {
+        return $this->performance_score >= 80;
+    }
+
+    public function isUnderperforming(): bool
+    {
+        return $this->performance_score < 40;
+    }
+
+    public function needsAttention(): bool
+    {
+        return $this->isUnderperforming() || $this->budget_utilization > 90;
+    }
+
+    public function canBeActivated(): bool
+    {
+        return $this->status === 'draft' || $this->status === 'scheduled';
+    }
+
+    public function canBePaused(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    public function canBeResumed(): bool
+    {
+        return $this->status === 'paused';
+    }
+
+    public function canBeCompleted(): bool
+    {
+        return $this->status === 'active' && $this->isExpired();
+    }
+
+    public function getRecommendedActions(): array
+    {
+        $actions = [];
+
+        if ($this->needsAttention()) {
+            $actions[] = 'review_performance';
+        }
+
+        if ($this->budget_utilization > 80) {
+            $actions[] = 'monitor_budget';
+        }
+
+        if ($this->getConversionRate() < 2) {
+            $actions[] = 'optimize_content';
+        }
+
+        if ($this->getClickThroughRate() < 1) {
+            $actions[] = 'improve_targeting';
+        }
+
+        if ($this->days_remaining && $this->days_remaining <= 7) {
+            $actions[] = 'extend_campaign';
+        }
+
+        return $actions;
+    }
+
+    public function duplicateForNewPeriod(\Carbon\Carbon $newStartDate, \Carbon\Carbon $newEndDate): self
+    {
+        $duplicate = $this->replicate();
+        $duplicate->name = $this->name . ' (Copy)';
+        $duplicate->slug = $this->slug . '-copy-' . time();
+        $duplicate->start_date = $newStartDate;
+        $duplicate->end_date = $newEndDate;
+        $duplicate->status = 'draft';
+        $duplicate->total_views = 0;
+        $duplicate->total_clicks = 0;
+        $duplicate->total_conversions = 0;
+        $duplicate->total_revenue = 0;
+        $duplicate->conversion_rate = 0;
+        $duplicate->save();
+
+        return $duplicate;
+    }
+
+    public function getTargetingSummary(): array
+    {
+        return [
+            'categories_count' => $this->targetCategories()->count(),
+            'products_count' => $this->targetProducts()->count(),
+            'customer_groups_count' => $this->targetCustomerGroups()->count(),
+            'has_audience_targeting' => !empty($this->target_audience),
+            'has_segment_targeting' => !empty($this->target_segments),
+        ];
+    }
+
+    public function getContentSummary(): array
+    {
+        return [
+            'has_subject' => !empty($this->subject),
+            'has_content' => !empty($this->content),
+            'has_cta' => !empty($this->cta_text) && !empty($this->cta_url),
+            'has_banner' => !empty($this->banner_image),
+            'content_length' => strlen(strip_tags($this->content ?? '')),
+            'subject_length' => strlen($this->subject ?? ''),
+        ];
+    }
+
+    public function getAutomationSummary(): array
+    {
+        return [
+            'auto_start' => $this->auto_start,
+            'auto_end' => $this->auto_end,
+            'auto_pause_on_budget' => $this->auto_pause_on_budget,
+            'send_notifications' => $this->send_notifications,
+            'track_conversions' => $this->track_conversions,
+            'is_featured' => $this->is_featured,
+            'social_media_ready' => $this->social_media_ready,
+        ];
     }
 }

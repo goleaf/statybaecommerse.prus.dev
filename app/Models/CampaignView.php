@@ -12,6 +12,8 @@ final class CampaignView extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'campaign_id',
         'session_id',
