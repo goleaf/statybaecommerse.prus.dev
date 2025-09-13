@@ -6,15 +6,42 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers;
-use App\Filament\Resources\CountryResource\Widgets;
 use App\Models\Country;
-use App\Services\MultiLanguageTabService;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
@@ -22,264 +49,381 @@ final class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-globe-alt';
 
-    /** @var string|\BackedEnum|null */
-
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static $navigationGroup = 'shipping';
-
-    protected static ?string $navigationLabel = 'admin.countries.navigation_label';
-
-    protected static ?string $modelLabel = 'admin.countries.model_label';
-
-    protected static ?string $pluralModelLabel = 'admin.countries.plural_model_label';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Geography';
 
     protected static ?int $navigationSort = 1;
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.countries.navigation_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.countries.model_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.countries.plural_model_label');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Tabs::make('CountryFormTabs')
+                Tabs::make('Country Information')
                     ->tabs([
-                        Forms\Components\Tabs\Tab::make(__('admin.countries.sections.basic_information'))
+                        Tab::make(__('admin.countries.sections.basic_information'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
-                                Forms\Components\Section::make(__('admin.countries.sections.basic_information'))
+                                Section::make(__('admin.countries.sections.basic_information'))
                                     ->schema([
-                                        Forms\Components\Grid::make(3)
+                                        Grid::make(2)
                                             ->schema([
-                                                Forms\Components\TextInput::make('cca2')
+                                                TextInput::make('name')
+                                                    ->label(__('admin.countries.fields.name'))
+                                                    ->helperText(__('admin.countries.helpers.name'))
+                                                    ->required()
+                                                    ->maxLength(255)
+                                                    ->live()
+                                                    ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('name_official', $state)),
+
+                                                TextInput::make('name_official')
+                                                    ->label(__('admin.countries.fields.name_official'))
+                                                    ->helperText(__('admin.countries.helpers.name_official'))
+                                                    ->maxLength(255),
+                                            ]),
+
+                                        Textarea::make('description')
+                                            ->label(__('admin.countries.fields.description'))
+                                            ->helperText(__('admin.countries.helpers.description'))
+                                            ->rows(3)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(1),
+
+                                Section::make(__('admin.countries.sections.country_settings'))
+                                    ->schema([
+                                        Grid::make(3)
+                                            ->schema([
+                                                TextInput::make('cca2')
                                                     ->label(__('admin.countries.fields.cca2'))
+                                                    ->helperText(__('admin.countries.helpers.cca2'))
                                                     ->required()
                                                     ->maxLength(2)
-                                                    ->alpha()
                                                     ->uppercase()
-                                                    ->unique(ignoreRecord: true)
-                                                    ->helperText(__('admin.countries.helpers.cca2')),
-                                                Forms\Components\TextInput::make('cca3')
+                                                    ->unique(ignoreRecord: true),
+
+                                                TextInput::make('cca3')
                                                     ->label(__('admin.countries.fields.cca3'))
+                                                    ->helperText(__('admin.countries.helpers.cca3'))
                                                     ->required()
                                                     ->maxLength(3)
-                                                    ->alpha()
                                                     ->uppercase()
-                                                    ->unique(ignoreRecord: true)
-                                                    ->helperText(__('admin.countries.helpers.cca3')),
-                                                Forms\Components\TextInput::make('ccn3')
+                                                    ->unique(ignoreRecord: true),
+
+                                                TextInput::make('ccn3')
                                                     ->label(__('admin.countries.fields.ccn3'))
+                                                    ->helperText(__('admin.countries.helpers.ccn3'))
                                                     ->maxLength(3)
                                                     ->numeric()
-                                                    ->helperText(__('admin.countries.helpers.ccn3')),
+                                                    ->unique(ignoreRecord: true),
                                             ]),
-                                        Forms\Components\Grid::make(2)
+
+                                        Grid::make(2)
                                             ->schema([
-                                                Forms\Components\TextInput::make('code')
+                                                TextInput::make('code')
                                                     ->label(__('admin.countries.fields.code'))
-                                                    ->maxLength(3)
-                                                    ->alpha()
-                                                    ->uppercase()
-                                                    ->unique(ignoreRecord: true)
-                                                    ->helperText(__('admin.countries.helpers.code')),
-                                                Forms\Components\TextInput::make('iso_code')
+                                                    ->helperText(__('admin.countries.helpers.code'))
+                                                    ->maxLength(10),
+
+                                                TextInput::make('iso_code')
                                                     ->label(__('admin.countries.fields.iso_code'))
-                                                    ->maxLength(3)
-                                                    ->alpha()
-                                                    ->uppercase()
-                                                    ->unique(ignoreRecord: true)
-                                                    ->helperText(__('admin.countries.helpers.iso_code')),
+                                                    ->helperText(__('admin.countries.helpers.iso_code'))
+                                                    ->maxLength(10),
                                             ]),
-                                        Forms\Components\Grid::make(2)
+                                    ])
+                                    ->columns(1),
+                            ]),
+
+                        Tab::make(__('admin.countries.sections.additional_information'))
+                            ->icon('heroicon-o-map')
+                            ->schema([
+                                Section::make('Location Information')
+                                    ->schema([
+                                        Grid::make(2)
                                             ->schema([
-                                                Forms\Components\TextInput::make('phone_code')
-                                                    ->label(__('admin.countries.fields.phone_code'))
-                                                    ->maxLength(10)
-                                                    ->helperText(__('admin.countries.helpers.phone_code')),
-                                                Forms\Components\TextInput::make('phone_calling_code')
-                                                    ->label(__('admin.countries.fields.phone_calling_code'))
-                                                    ->maxLength(10)
-                                                    ->helperText(__('admin.countries.helpers.phone_calling_code')),
-                                            ]),
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\TextInput::make('currency_code')
-                                                    ->label(__('admin.countries.fields.currency_code'))
-                                                    ->maxLength(3)
-                                                    ->alpha()
-                                                    ->uppercase()
-                                                    ->helperText(__('admin.countries.helpers.currency_code')),
-                                                Forms\Components\TextInput::make('currency_symbol')
-                                                    ->label(__('admin.countries.fields.currency_symbol'))
-                                                    ->maxLength(5)
-                                                    ->helperText(__('admin.countries.helpers.currency_symbol')),
-                                            ]),
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\TextInput::make('region')
+                                                Select::make('region')
                                                     ->label(__('admin.countries.fields.region'))
-                                                    ->maxLength(255)
-                                                    ->helperText(__('admin.countries.helpers.region')),
-                                                Forms\Components\TextInput::make('subregion')
+                                                    ->helperText(__('admin.countries.helpers.region'))
+                                                    ->options([
+                                                        'Europe' => 'Europe',
+                                                        'Asia' => 'Asia',
+                                                        'Africa' => 'Africa',
+                                                        'North America' => 'North America',
+                                                        'South America' => 'South America',
+                                                        'Oceania' => 'Oceania',
+                                                        'Antarctica' => 'Antarctica',
+                                                    ])
+                                                    ->searchable(),
+
+                                                TextInput::make('subregion')
                                                     ->label(__('admin.countries.fields.subregion'))
-                                                    ->maxLength(255)
-                                                    ->helperText(__('admin.countries.helpers.subregion')),
+                                                    ->helperText(__('admin.countries.helpers.subregion'))
+                                                    ->maxLength(255),
                                             ]),
-                                        Forms\Components\Grid::make(2)
+
+                                        Grid::make(2)
                                             ->schema([
-                                                Forms\Components\TextInput::make('latitude')
+                                                TextInput::make('latitude')
                                                     ->label(__('admin.countries.fields.latitude'))
+                                                    ->helperText(__('admin.countries.helpers.latitude'))
                                                     ->numeric()
                                                     ->step(0.000001)
                                                     ->minValue(-90)
-                                                    ->maxValue(90)
-                                                    ->helperText(__('admin.countries.helpers.latitude')),
-                                                Forms\Components\TextInput::make('longitude')
+                                                    ->maxValue(90),
+
+                                                TextInput::make('longitude')
                                                     ->label(__('admin.countries.fields.longitude'))
+                                                    ->helperText(__('admin.countries.helpers.longitude'))
                                                     ->numeric()
                                                     ->step(0.000001)
                                                     ->minValue(-180)
-                                                    ->maxValue(180)
-                                                    ->helperText(__('admin.countries.helpers.longitude')),
+                                                    ->maxValue(180),
                                             ]),
-                                        Forms\Components\Grid::make(2)
+                                    ])
+                                    ->columns(1),
+
+                                Section::make('Economic Information')
+                                    ->schema([
+                                        Grid::make(2)
                                             ->schema([
-                                                Forms\Components\TextInput::make('timezone')
-                                                    ->label(__('admin.countries.fields.timezone'))
-                                                    ->maxLength(50)
-                                                    ->helperText(__('admin.countries.helpers.timezone')),
-                                                Forms\Components\TextInput::make('sort_order')
-                                                    ->label(__('admin.countries.fields.sort_order'))
+                                                TextInput::make('currency_code')
+                                                    ->label(__('admin.countries.fields.currency_code'))
+                                                    ->helperText(__('admin.countries.helpers.currency_code'))
+                                                    ->maxLength(3)
+                                                    ->uppercase(),
+
+                                                TextInput::make('currency_symbol')
+                                                    ->label(__('admin.countries.fields.currency_symbol'))
+                                                    ->helperText(__('admin.countries.helpers.currency_symbol'))
+                                                    ->maxLength(10),
+                                            ]),
+
+                                        Grid::make(2)
+                                            ->schema([
+                                                TextInput::make('phone_code')
+                                                    ->label(__('admin.countries.fields.phone_code'))
+                                                    ->helperText(__('admin.countries.helpers.phone_code'))
+                                                    ->maxLength(10),
+
+                                                TextInput::make('phone_calling_code')
+                                                    ->label(__('admin.countries.fields.phone_calling_code'))
+                                                    ->helperText(__('admin.countries.helpers.phone_calling_code'))
+                                                    ->maxLength(10)
+                                                    ->numeric(),
+                                            ]),
+
+                                        TextInput::make('timezone')
+                                            ->label(__('admin.countries.fields.timezone'))
+                                            ->helperText(__('admin.countries.helpers.timezone'))
+                                            ->maxLength(255)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(1),
+
+                                Section::make('Status & Settings')
+                                    ->schema([
+                                        Grid::make(3)
+                                            ->schema([
+                                                Toggle::make('is_active')
+                                                    ->label(__('admin.countries.fields.is_active'))
+                                                    ->helperText(__('admin.countries.helpers.is_active'))
+                                                    ->default(true),
+
+                                                Toggle::make('is_enabled')
+                                                    ->label(__('admin.countries.fields.is_enabled'))
+                                                    ->helperText(__('admin.countries.helpers.is_enabled'))
+                                                    ->default(true),
+
+                                                Toggle::make('is_eu_member')
+                                                    ->label(__('admin.countries.fields.is_eu_member'))
+                                                    ->helperText(__('admin.countries.helpers.is_eu_member')),
+                                            ]),
+
+                                        Grid::make(2)
+                                            ->schema([
+                                                Toggle::make('requires_vat')
+                                                    ->label(__('admin.countries.fields.requires_vat'))
+                                                    ->helperText(__('admin.countries.helpers.requires_vat')),
+
+                                                TextInput::make('vat_rate')
+                                                    ->label(__('admin.countries.fields.vat_rate'))
+                                                    ->helperText(__('admin.countries.helpers.vat_rate'))
                                                     ->numeric()
-                                                    ->default(0)
-                                                    ->helperText(__('admin.countries.helpers.sort_order')),
+                                                    ->step(0.01)
+                                                    ->minValue(0)
+                                                    ->maxValue(100)
+                                                    ->suffix('%'),
+                                            ]),
+
+                                        TextInput::make('sort_order')
+                                            ->label(__('admin.countries.fields.sort_order'))
+                                            ->helperText(__('admin.countries.helpers.sort_order'))
+                                            ->numeric()
+                                            ->default(0)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(1),
+                            ]),
+
+                        Tab::make('Media & Files')
+                            ->icon('heroicon-o-photo')
+                            ->schema([
+                                Section::make('Flag Files')
+                                    ->schema([
+                                        Grid::make(2)
+                                            ->schema([
+                                                FileUpload::make('flag')
+                                                    ->label(__('admin.countries.fields.flag_file'))
+                                                    ->helperText(__('admin.countries.helpers.flag_file'))
+                                                    ->image()
+                                                    ->directory('flags')
+                                                    ->visibility('public')
+                                                    ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/gif', 'image/webp']),
+
+                                                FileUpload::make('svg_flag')
+                                                    ->label(__('admin.countries.fields.svg_flag_file'))
+                                                    ->helperText(__('admin.countries.helpers.svg_flag_file'))
+                                                    ->directory('flags/svg')
+                                                    ->visibility('public')
+                                                    ->acceptedFileTypes(['image/svg+xml']),
                                             ]),
                                     ])
                                     ->columns(1),
                             ]),
-                        Forms\Components\Tabs\Tab::make(__('admin.countries.sections.country_settings'))
+
+                        Tab::make('Data Arrays')
                             ->icon('heroicon-o-cog-6-tooth')
                             ->schema([
-                                Forms\Components\Section::make(__('admin.countries.sections.country_settings'))
+                                Section::make('Currencies')
                                     ->schema([
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\Toggle::make('is_active')
-                                                    ->label(__('admin.countries.fields.is_active'))
-                                                    ->default(true)
-                                                    ->helperText(__('admin.countries.helpers.is_active')),
-                                                Forms\Components\Toggle::make('is_enabled')
-                                                    ->label(__('admin.countries.fields.is_enabled'))
-                                                    ->default(true)
-                                                    ->helperText(__('admin.countries.helpers.is_enabled')),
-                                            ]),
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\Toggle::make('is_eu_member')
-                                                    ->label(__('admin.countries.fields.is_eu_member'))
-                                                    ->default(false)
-                                                    ->helperText(__('admin.countries.helpers.is_eu_member')),
-                                                Forms\Components\Toggle::make('requires_vat')
-                                                    ->label(__('admin.countries.fields.requires_vat'))
-                                                    ->default(false)
-                                                    ->helperText(__('admin.countries.helpers.requires_vat')),
-                                            ]),
-                                        Forms\Components\TextInput::make('vat_rate')
-                                            ->label(__('admin.countries.fields.vat_rate'))
-                                            ->numeric()
-                                            ->step(0.01)
-                                            ->minValue(0)
-                                            ->maxValue(100)
-                                            ->suffix('%')
-                                            ->helperText(__('admin.countries.helpers.vat_rate')),
-                                        Forms\Components\KeyValue::make('currencies')
+                                        Repeater::make('currencies')
                                             ->label(__('admin.countries.fields.currencies'))
-                                            ->keyLabel(__('admin.countries.helpers.currency_key'))
-                                            ->valueLabel(__('admin.countries.helpers.currency_value'))
+                                            ->helperText(__('admin.countries.helpers.currencies'))
+                                            ->schema([
+                                                TextInput::make('key')
+                                                    ->label(__('admin.countries.helpers.currency_key'))
+                                                    ->required()
+                                                    ->maxLength(10),
+
+                                                TextInput::make('value')
+                                                    ->label(__('admin.countries.helpers.currency_value'))
+                                                    ->required()
+                                                    ->maxLength(255),
+                                            ])
+                                            ->columns(2)
                                             ->addActionLabel(__('admin.countries.actions.add_currency'))
-                                            ->helperText(__('admin.countries.helpers.currencies')),
-                                        Forms\Components\KeyValue::make('languages')
+                                            ->collapsible(),
+                                    ])
+                                    ->columns(1),
+
+                                Section::make('Languages')
+                                    ->schema([
+                                        Repeater::make('languages')
                                             ->label(__('admin.countries.fields.languages'))
-                                            ->keyLabel(__('admin.countries.helpers.language_key'))
-                                            ->valueLabel(__('admin.countries.helpers.language_value'))
+                                            ->helperText(__('admin.countries.helpers.languages'))
+                                            ->schema([
+                                                TextInput::make('key')
+                                                    ->label(__('admin.countries.helpers.language_key'))
+                                                    ->required()
+                                                    ->maxLength(10),
+
+                                                TextInput::make('value')
+                                                    ->label(__('admin.countries.helpers.language_value'))
+                                                    ->required()
+                                                    ->maxLength(255),
+                                            ])
+                                            ->columns(2)
                                             ->addActionLabel(__('admin.countries.actions.add_language'))
-                                            ->helperText(__('admin.countries.helpers.languages')),
-                                        Forms\Components\KeyValue::make('timezones')
+                                            ->collapsible(),
+                                    ])
+                                    ->columns(1),
+
+                                Section::make('Timezones')
+                                    ->schema([
+                                        Repeater::make('timezones')
                                             ->label(__('admin.countries.fields.timezones'))
-                                            ->keyLabel(__('admin.countries.helpers.timezone_key'))
-                                            ->valueLabel(__('admin.countries.helpers.timezone_value'))
+                                            ->helperText(__('admin.countries.helpers.timezones'))
+                                            ->schema([
+                                                TextInput::make('key')
+                                                    ->label(__('admin.countries.helpers.timezone_key'))
+                                                    ->required()
+                                                    ->maxLength(50),
+
+                                                TextInput::make('value')
+                                                    ->label(__('admin.countries.helpers.timezone_value'))
+                                                    ->required()
+                                                    ->maxLength(255),
+                                            ])
+                                            ->columns(2)
                                             ->addActionLabel(__('admin.countries.actions.add_timezone'))
-                                            ->helperText(__('admin.countries.helpers.timezones')),
-                                        Forms\Components\KeyValue::make('metadata')
+                                            ->collapsible(),
+                                    ])
+                                    ->columns(1),
+
+                                Section::make('Metadata')
+                                    ->schema([
+                                        KeyValue::make('metadata')
                                             ->label(__('admin.countries.fields.metadata'))
+                                            ->helperText(__('admin.countries.helpers.metadata'))
                                             ->keyLabel(__('admin.countries.helpers.metadata_key'))
                                             ->valueLabel(__('admin.countries.helpers.metadata_value'))
-                                            ->addActionLabel(__('admin.countries.actions.add_metadata'))
-                                            ->helperText(__('admin.countries.helpers.metadata')),
+                                            ->addActionLabel(__('admin.countries.actions.add_metadata')),
                                     ])
                                     ->columns(1),
                             ]),
-                        Forms\Components\Tabs\Tab::make(__('admin.countries.sections.additional_information'))
-                            ->icon('heroicon-o-document-text')
-                            ->schema([
-                                Forms\Components\Section::make(__('admin.countries.sections.additional_information'))
-                                    ->schema([
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\TextInput::make('flag')
-                                                    ->label(__('admin.countries.fields.flag'))
-                                                    ->maxLength(255)
-                                                    ->helperText(__('admin.countries.helpers.flag')),
-                                                Forms\Components\TextInput::make('svg_flag')
-                                                    ->label(__('admin.countries.fields.svg_flag'))
-                                                    ->maxLength(255)
-                                                    ->helperText(__('admin.countries.helpers.svg_flag')),
-                                            ]),
-                                        Forms\Components\FileUpload::make('flag_file')
-                                            ->label(__('admin.countries.fields.flag_file'))
-                                            ->image()
-                                            ->directory('flags')
-                                            ->visibility('public')
-                                            ->helperText(__('admin.countries.helpers.flag_file')),
-                                        Forms\Components\FileUpload::make('svg_flag_file')
-                                            ->label(__('admin.countries.fields.svg_flag_file'))
-                                            ->acceptedFileTypes(['image/svg+xml'])
-                                            ->directory('flags/svg')
-                                            ->visibility('public')
-                                            ->helperText(__('admin.countries.helpers.svg_flag_file')),
-                                    ])
-                                    ->columns(1),
-                            ]),
-                        Forms\Components\Tabs\Tab::make(__('admin.countries.sections.translations'))
+
+                        Tab::make(__('admin.countries.sections.translations'))
                             ->icon('heroicon-o-language')
                             ->schema([
-                                ...MultiLanguageTabService::createSectionedTabs([
-                                    'name' => [
-                                        'type' => 'text',
-                                        'label' => __('admin.countries.fields.name'),
-                                        'required' => true,
-                                        'maxLength' => 255,
-                                        'helper' => __('admin.countries.helpers.name'),
-                                    ],
-                                    'name_official' => [
-                                        'type' => 'text',
-                                        'label' => __('admin.countries.fields.name_official'),
-                                        'required' => false,
-                                        'maxLength' => 255,
-                                        'helper' => __('admin.countries.helpers.name_official'),
-                                    ],
-                                    'description' => [
-                                        'type' => 'textarea',
-                                        'label' => __('admin.countries.fields.description'),
-                                        'required' => false,
-                                        'rows' => 4,
-                                        'helper' => __('admin.countries.helpers.description'),
-                                    ],
-                                ]),
+                                Section::make('Translations')
+                                    ->schema([
+                                        Repeater::make('translations')
+                                            ->relationship('translations')
+                                            ->schema([
+                                                Select::make('locale')
+                                                    ->label('Language')
+                                                    ->options([
+                                                        'lt' => 'Lithuanian',
+                                                        'en' => 'English',
+                                                    ])
+                                                    ->required(),
+
+                                                TextInput::make('name')
+                                                    ->label(__('admin.countries.fields.name'))
+                                                    ->maxLength(255),
+
+                                                TextInput::make('name_official')
+                                                    ->label(__('admin.countries.fields.name_official'))
+                                                    ->maxLength(255),
+
+                                                Textarea::make('description')
+                                                    ->label(__('admin.countries.fields.description'))
+                                                    ->rows(3),
+                                            ])
+                                            ->columns(2)
+                                            ->collapsible()
+                                            ->defaultItems(0),
+                                    ])
+                                    ->columns(1),
                             ]),
                     ])
                     ->columnSpanFull(),
@@ -290,164 +434,163 @@ final class CountryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('flag')
+                ImageColumn::make('flag')
                     ->label(__('admin.countries.fields.flag'))
                     ->disk('public')
-                    ->height(30)
-                    ->width(45)
-                    ->circular(false)
-                    ->defaultImageUrl(asset('images/no-flag.png')),
-                Tables\Columns\TextColumn::make('translated_name')
+                    ->visibility('public')
+                    ->size(40)
+                    ->circular(),
+
+                TextColumn::make('name')
                     ->label(__('admin.countries.fields.name'))
-                    ->getStateUsing(fn (Country $record): string => $record->trans('name') ?: $record->name ?: '-')
-                    ->searchable(['name'])
+                    ->searchable()
                     ->sortable()
-                    ->weight('bold')
-                    ->copyable(),
-                Tables\Columns\TextColumn::make('cca2')
+                    ->weight('bold'),
+
+                TextColumn::make('cca2')
                     ->label(__('admin.countries.fields.cca2'))
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color('info'),
-                Tables\Columns\TextColumn::make('cca3')
+                    ->color('primary'),
+
+                TextColumn::make('cca3')
                     ->label(__('admin.countries.fields.cca3'))
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color('success'),
-                Tables\Columns\TextColumn::make('region')
+                    ->color('secondary'),
+
+                TextColumn::make('region')
                     ->label(__('admin.countries.fields.region'))
                     ->searchable()
                     ->sortable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('subregion')
-                    ->label(__('admin.countries.fields.subregion'))
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('currency_code')
+                    ->badge()
+                    ->color('info'),
+
+                TextColumn::make('currency_code')
                     ->label(__('admin.countries.fields.currency_code'))
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color('warning'),
-                Tables\Columns\TextColumn::make('phone_calling_code')
-                    ->label(__('admin.countries.fields.phone_calling_code'))
-                    ->formatStateUsing(fn (?string $state): string => $state ? "+{$state}" : '-')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('is_active')
+                    ->color('success'),
+
+                IconColumn::make('is_active')
                     ->label(__('admin.countries.fields.is_active'))
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger'),
-                Tables\Columns\IconColumn::make('is_eu_member')
+
+                IconColumn::make('is_eu_member')
                     ->label(__('admin.countries.fields.is_eu_member'))
                     ->boolean()
-                    ->trueIcon('heroicon-o-flag')
-                    ->falseIcon('heroicon-o-minus')
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('info')
                     ->falseColor('gray'),
-                Tables\Columns\TextColumn::make('vat_rate')
+
+                TextColumn::make('vat_rate')
                     ->label(__('admin.countries.fields.vat_rate'))
-                    ->formatStateUsing(fn (?float $state): string => $state ? number_format($state, 2).'%' : '-')
-                    ->sortable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('addresses_count')
+                    ->formatStateUsing(fn (?float $state): string => $state ? number_format($state, 2).'%' : 'N/A')
+                    ->sortable(),
+
+                TextColumn::make('addresses_count')
                     ->label(__('admin.countries.fields.addresses_count'))
                     ->counts('addresses')
-                    ->sortable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('created_at')
+                    ->sortable(),
+
+                TextColumn::make('created_at')
                     ->label(__('admin.countries.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+
+                TextColumn::make('updated_at')
                     ->label(__('admin.countries.fields.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('is_active')
+                TrashedFilter::make(),
+
+                TernaryFilter::make('is_active')
                     ->label(__('admin.countries.filters.is_active'))
+                    ->placeholder(__('admin.countries.filters.active_only'))
                     ->trueLabel(__('admin.countries.filters.active_only'))
                     ->falseLabel(__('admin.countries.filters.inactive_only')),
-                Tables\Filters\TernaryFilter::make('is_eu_member')
+
+                TernaryFilter::make('is_eu_member')
                     ->label(__('admin.countries.filters.is_eu_member'))
+                    ->placeholder(__('admin.countries.filters.eu_members_only'))
                     ->trueLabel(__('admin.countries.filters.eu_members_only'))
                     ->falseLabel(__('admin.countries.filters.non_eu_only')),
-                Tables\Filters\TernaryFilter::make('requires_vat')
+
+                TernaryFilter::make('requires_vat')
                     ->label(__('admin.countries.filters.requires_vat'))
+                    ->placeholder(__('admin.countries.filters.vat_required'))
                     ->trueLabel(__('admin.countries.filters.vat_required'))
                     ->falseLabel(__('admin.countries.filters.no_vat')),
-                Tables\Filters\SelectFilter::make('region')
+
+                SelectFilter::make('region')
                     ->label(__('admin.countries.filters.region'))
-                    ->options(fn () => Country::distinct()->pluck('region', 'region')->filter())
-                    ->searchable(),
-                Tables\Filters\SelectFilter::make('currency_code')
+                    ->options([
+                        'Europe' => 'Europe',
+                        'Asia' => 'Asia',
+                        'Africa' => 'Africa',
+                        'North America' => 'North America',
+                        'South America' => 'South America',
+                        'Oceania' => 'Oceania',
+                        'Antarctica' => 'Antarctica',
+                    ])
+                    ->multiple(),
+
+                SelectFilter::make('currency_code')
                     ->label(__('admin.countries.filters.currency'))
-                    ->options(fn () => Country::distinct()->pluck('currency_code', 'currency_code')->filter())
-                    ->searchable(),
-                Tables\Filters\Filter::make('has_vat_rate')
+                    ->options(fn (): array => Country::distinct()->pluck('currency_code', 'currency_code')->filter()->toArray())
+                    ->multiple(),
+
+                Filter::make('has_vat_rate')
                     ->label(__('admin.countries.filters.has_vat_rate'))
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('vat_rate')),
-                Tables\Filters\TrashedFilter::make(),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('vat_rate')->where('vat_rate', '>', 0)),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->label(__('admin.countries.actions.view')),
-                Tables\Actions\EditAction::make()
-                    ->label(__('admin.countries.actions.edit')),
-                Tables\Actions\DeleteAction::make()
-                    ->label(__('admin.countries.actions.delete'))
-                    ->requiresConfirmation()
-                    ->modalHeading(__('admin.countries.confirmations.delete_heading'))
-                    ->modalDescription(__('admin.countries.confirmations.delete_description')),
-                Tables\Actions\RestoreAction::make()
-                    ->label(__('admin.countries.actions.restore')),
-                Tables\Actions\ForceDeleteAction::make()
-                    ->label(__('admin.countries.actions.force_delete'))
-                    ->requiresConfirmation()
-                    ->modalHeading(__('admin.countries.confirmations.force_delete_heading'))
-                    ->modalDescription(__('admin.countries.confirmations.force_delete_description')),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->label(__('admin.countries.actions.bulk_delete'))
-                        ->requiresConfirmation()
-                        ->modalHeading(__('admin.countries.confirmations.bulk_delete_heading'))
-                        ->modalDescription(__('admin.countries.confirmations.bulk_delete_description')),
-                    Tables\Actions\RestoreBulkAction::make()
-                        ->label(__('admin.countries.actions.bulk_restore')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
-                        ->label(__('admin.countries.actions.bulk_force_delete'))
-                        ->requiresConfirmation()
-                        ->modalHeading(__('admin.countries.confirmations.bulk_force_delete_heading'))
-                        ->modalDescription(__('admin.countries.confirmations.bulk_force_delete_description')),
-                    Tables\Actions\BulkAction::make('activate')
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+
+                    BulkAction::make('activate')
                         ->label(__('admin.countries.actions.bulk_activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(fn ($records) => $records->each->update(['is_active' => true]))
-                        ->requiresConfirmation()
-                        ->modalHeading(__('admin.countries.confirmations.bulk_activate_heading')),
-                    Tables\Actions\BulkAction::make('deactivate')
+                        ->action(function (Collection $records): void {
+                            $records->each->update(['is_active' => true]);
+                        })
+                        ->deselectRecordsAfterCompletion()
+                        ->requiresConfirmation(),
+
+                    BulkAction::make('deactivate')
                         ->label(__('admin.countries.actions.bulk_deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(fn ($records) => $records->each->update(['is_active' => false]))
-                        ->requiresConfirmation()
-                        ->modalHeading(__('admin.countries.confirmations.bulk_deactivate_heading')),
+                        ->action(function (Collection $records): void {
+                            $records->each->update(['is_active' => false]);
+                        })
+                        ->deselectRecordsAfterCompletion()
+                        ->requiresConfirmation(),
                 ]),
             ])
-            ->defaultSort('sort_order', 'asc')
-            ->reorderable('sort_order')
+            ->defaultSort('sort_order')
             ->emptyStateHeading(__('admin.countries.empty_state.heading'))
             ->emptyStateDescription(__('admin.countries.empty_state.description'))
             ->emptyStateIcon('heroicon-o-globe-alt');
@@ -457,13 +600,10 @@ final class CountryResource extends Resource
     {
         return [
             RelationManagers\AddressesRelationManager::class,
-            RelationManagers\RegionsRelationManager::class,
             RelationManagers\CitiesRelationManager::class,
+            RelationManagers\RegionsRelationManager::class,
             RelationManagers\UsersRelationManager::class,
             RelationManagers\CustomersRelationManager::class,
-            RelationManagers\ShippingZonesRelationManager::class,
-            RelationManagers\TaxRatesRelationManager::class,
-            RelationManagers\CurrenciesRelationManager::class,
         ];
     }
 
@@ -477,16 +617,6 @@ final class CountryResource extends Resource
         ];
     }
 
-    public static function getWidgets(): array
-    {
-        return [
-            Widgets\CountriesOverviewWidget::class,
-            Widgets\CountriesByRegionWidget::class,
-            Widgets\EuMembersWidget::class,
-            Widgets\CountriesWithVatWidget::class,
-        ];
-    }
-
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -495,13 +625,22 @@ final class CountryResource extends Resource
             ]);
     }
 
-    public static function getNavigationBadge(): ?string
+    public static function getGlobalSearchResultTitle($record): string
     {
-        return self::getModel()::count();
+        return $record->name.' ('.$record->cca2.')';
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    public static function getGlobalSearchResultDetails($record): array
     {
-        return 'success';
+        return [
+            'Region' => $record->region,
+            'Currency' => $record->currency_code,
+            'EU Member' => $record->is_eu_member ? 'Yes' : 'No',
+        ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'name_official', 'cca2', 'cca3', 'region'];
     }
 }
