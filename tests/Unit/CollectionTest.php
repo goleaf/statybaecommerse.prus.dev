@@ -112,17 +112,15 @@ class CollectionTest extends TestCase
         $collection = new Collection();
         
         // Test that the model has translatable attributes defined
-        $this->assertTrue(property_exists($collection, 'translatable'));
-        $this->assertIsArray($collection->translatable);
+        $this->assertTrue(property_exists(Collection::class, 'translatable'));
+        $this->assertIsArray(Collection::$translatable);
         
-        if (!empty($collection->translatable)) {
-            $this->assertContains('name', $collection->translatable);
-            $this->assertContains('description', $collection->translatable);
-            $this->assertContains('seo_title', $collection->translatable);
-            $this->assertContains('seo_description', $collection->translatable);
-            $this->assertContains('meta_title', $collection->translatable);
-            $this->assertContains('meta_description', $collection->translatable);
-            $this->assertContains('meta_keywords', $collection->translatable);
+        if (!empty(Collection::$translatable)) {
+            $this->assertContains('name', Collection::$translatable);
+            $this->assertContains('description', Collection::$translatable);
+            $this->assertContains('meta_title', Collection::$translatable);
+            $this->assertContains('meta_description', Collection::$translatable);
+            $this->assertContains('meta_keywords', Collection::$translatable);
         }
     }
 
@@ -247,7 +245,7 @@ class CollectionTest extends TestCase
         ]);
 
         $this->assertTrue($collection->rules()->exists());
-        $this->assertInstanceOf(CollectionRule::class, $collection->rules->first());
+        $this->assertInstanceOf(CollectionRule::class, $collection->rules()->first());
     }
 
     public function test_collection_can_have_translations(): void
@@ -285,7 +283,11 @@ class CollectionTest extends TestCase
     public function test_collection_products_count_attribute(): void
     {
         $collection = Collection::factory()->create();
-        $products = Product::factory()->count(3)->create(['status' => 'published']);
+        $products = Product::factory()->count(3)->create([
+            'status' => 'published',
+            'is_visible' => true,
+            'published_at' => now()->subDay(),
+        ]);
         $unpublishedProducts = Product::factory()->count(2)->create(['status' => 'draft']);
 
         $collection->products()->attach($products->pluck('id'));

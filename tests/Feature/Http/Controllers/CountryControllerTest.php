@@ -137,7 +137,7 @@ final class CountryControllerTest extends TestCase
 
     public function test_countries_api_endpoint(): void
     {
-        Country::factory()->count(3)->create();
+        Country::factory()->count(3)->create(['is_active' => true, 'is_enabled' => true]);
 
         $response = $this->get(route('countries.api.search'));
 
@@ -160,8 +160,8 @@ final class CountryControllerTest extends TestCase
 
     public function test_countries_api_endpoint_with_search(): void
     {
-        Country::factory()->create(['name' => 'Lithuania']);
-        Country::factory()->create(['name' => 'Latvia']);
+        Country::factory()->create(['name' => 'Lithuania', 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['name' => 'Latvia', 'is_active' => true, 'is_enabled' => true]);
 
         $response = $this->get(route('countries.api.search', ['search' => 'Lithuania']));
 
@@ -174,8 +174,8 @@ final class CountryControllerTest extends TestCase
 
     public function test_countries_api_endpoint_with_region_filter(): void
     {
-        Country::factory()->create(['region' => 'Europe']);
-        Country::factory()->create(['region' => 'Asia']);
+        Country::factory()->create(['region' => 'Europe', 'is_active' => true, 'is_enabled' => true]);
+        Country::factory()->create(['region' => 'Asia', 'is_active' => true, 'is_enabled' => true]);
 
         $response = $this->get(route('countries.api.search', ['region' => 'Europe']));
 

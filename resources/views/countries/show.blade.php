@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', $country->translated_name . ' - ' . __('frontend.countries.title'))
-@section('description', $country->translated_description ?: __('frontend.countries.subtitle'))
+@section('title', $country->translated_name . ' - ' . __('countries.title'))
+@section('description', $country->translated_description ?: __('countries.subtitle'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -9,8 +9,8 @@
     <nav class="mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
             <li>
-                <a href="{{ route('frontend.countries.index') }}" class="hover:text-blue-600 dark:hover:text-blue-400">
-                    {{ __('frontend.countries.title') }}
+                <a href="{{ route('countries.index') }}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                    {{ __('countries.title') }}
                 </a>
             </li>
             <li class="flex items-center">
@@ -52,20 +52,20 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="text-center">
                         <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $country->cca2 }}</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('frontend.countries.fields.code') }}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('countries.fields.code') }}</div>
                     </div>
                     
                     @if($country->currency_code)
                         <div class="text-center">
                             <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $country->currency_code }}</div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('frontend.countries.fields.currency') }}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('countries.fields.currency') }}</div>
                         </div>
                     @endif
                     
                     @if($country->phone_calling_code)
                         <div class="text-center">
                             <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">+{{ $country->phone_calling_code }}</div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('frontend.countries.fields.phone_code') }}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('countries.fields.phone_code') }}</div>
                         </div>
                     @endif
                     
@@ -74,7 +74,7 @@
                             <div class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                                 <i class="fas fa-flag"></i>
                             </div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('frontend.countries.fields.eu_member') }}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('countries.fields.eu_member') }}</div>
                         </div>
                     @endif
                 </div>
@@ -89,13 +89,13 @@
             <!-- Basic Information -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('frontend.countries.details.basic_info') }}
+                    {{ __('countries.details.basic_info') }}
                 </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('frontend.countries.fields.name') }}
+                            {{ __('countries.fields.name') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $country->translated_name }}</p>
                     </div>
@@ -103,7 +103,7 @@
                     @if($country->translated_official_name)
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('frontend.countries.fields.name_official') }}
+                                {{ __('countries.fields.name_official') }}
                             </label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $country->translated_official_name }}</p>
                         </div>
@@ -111,7 +111,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('frontend.countries.fields.code') }}
+                            {{ __('countries.fields.code') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $country->cca2 }}</p>
                     </div>
@@ -126,7 +126,7 @@
                     @if($country->region)
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('frontend.countries.fields.region') }}
+                                {{ __('countries.fields.region') }}
                             </label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $country->region }}</p>
                         </div>
@@ -135,7 +135,7 @@
                     @if($country->subregion)
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('frontend.countries.fields.subregion') }}
+                                {{ __('countries.fields.subregion') }}
                             </label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $country->subregion }}</p>
                         </div>
@@ -146,14 +146,14 @@
             <!-- Economic Information -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('frontend.countries.details.economic_info') }}
+                    {{ __('countries.details.economic_info') }}
                 </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @if($country->currency_code)
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('frontend.countries.fields.currency') }}
+                                {{ __('countries.fields.currency') }}
                             </label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-white">
                                 {{ $country->currency_code }}
@@ -167,7 +167,7 @@
                     @if($country->vat_rate)
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('frontend.countries.fields.vat_rate') }}
+                                {{ __('countries.fields.vat_rate') }}
                             </label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ number_format($country->vat_rate, 2) }}%</p>
                         </div>
@@ -175,18 +175,18 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('frontend.countries.fields.is_eu_member') }}
+                            {{ __('countries.fields.is_eu_member') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             @if($country->is_eu_member)
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                                     <i class="fas fa-check mr-1"></i>
-                                    {{ __('frontend.countries.fields.yes') }}
+                                    {{ __('countries.fields.yes') }}
                                 </span>
                             @else
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                                     <i class="fas fa-times mr-1"></i>
-                                    {{ __('frontend.countries.fields.no') }}
+                                    {{ __('countries.fields.no') }}
                                 </span>
                             @endif
                         </p>
@@ -194,18 +194,18 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('frontend.countries.fields.requires_vat') }}
+                            {{ __('countries.fields.requires_vat') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             @if($country->requires_vat)
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
                                     <i class="fas fa-check mr-1"></i>
-                                    {{ __('frontend.countries.fields.yes') }}
+                                    {{ __('countries.fields.yes') }}
                                 </span>
                             @else
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                                     <i class="fas fa-times mr-1"></i>
-                                    {{ __('frontend.countries.fields.no') }}
+                                    {{ __('countries.fields.no') }}
                                 </span>
                             @endif
                         </p>
@@ -217,7 +217,7 @@
             @if($country->translated_description)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                        {{ __('frontend.countries.fields.description') }}
+                        {{ __('countries.fields.description') }}
                     </h2>
                     <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
                         {{ $country->translated_description }}
@@ -231,7 +231,7 @@
             <!-- Contact Information -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('frontend.countries.details.contact_info') }}
+                    {{ __('countries.details.contact_info') }}
                 </h3>
                 
                 <div class="space-y-3">
@@ -259,7 +259,7 @@
             @if($country->cities->count() > 0)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                        {{ __('frontend.countries.details.major_cities') }}
+                        {{ __('countries.details.major_cities') }}
                     </h3>
                     
                     <div class="space-y-2">
@@ -270,7 +270,7 @@
                                 </span>
                                 @if($city->is_capital)
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                        {{ __('frontend.countries.fields.capital') }}
+                                        {{ __('countries.fields.capital') }}
                                     </span>
                                 @endif
                             </div>
@@ -278,7 +278,7 @@
                         
                         @if($country->cities->count() > 10)
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                                {{ __('frontend.countries.details.and_more', ['count' => $country->cities->count() - 10]) }}
+                                {{ __('countries.details.and_more', ['count' => $country->cities->count() - 10]) }}
                             </p>
                         @endif
                     </div>
@@ -288,20 +288,20 @@
             <!-- Actions -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('frontend.countries.details.actions') }}
+                    {{ __('countries.details.actions') }}
                 </h3>
                 
                 <div class="space-y-3">
-                    <a href="{{ route('frontend.countries.index') }}" 
+                    <a href="{{ route('countries.index') }}" 
                        class="w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-md text-sm font-medium transition duration-200 block">
-                        {{ __('frontend.countries.actions.back_to_list') }}
+                        {{ __('countries.actions.back_to_list') }}
                     </a>
                     
                     @if($country->latitude && $country->longitude)
                         <a href="https://maps.google.com/?q={{ $country->latitude }},{{ $country->longitude }}" 
                            target="_blank"
                            class="w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 px-4 rounded-md text-sm font-medium transition duration-200 block">
-                            {{ __('frontend.countries.actions.show_on_map') }}
+                            {{ __('countries.actions.show_on_map') }}
                         </a>
                     @endif
                 </div>

@@ -1,46 +1,46 @@
 @extends('layouts.app')
 
-@section('title', __('frontend.countries.title'))
-@section('description', __('frontend.countries.subtitle'))
+@section('title', __('countries.title'))
+@section('description', __('countries.subtitle'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {{ __('frontend.countries.title') }}
+            {{ __('countries.title') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400">
-            {{ __('frontend.countries.subtitle') }}
+            {{ __('countries.subtitle') }}
         </p>
     </div>
 
     <!-- Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-        <form method="GET" action="{{ route('frontend.countries.index') }}" class="space-y-4">
+        <form method="GET" action="{{ route('countries.index') }}" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- Search -->
                 <div>
                     <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('frontend.countries.filters.search') }}
+                        {{ __('countries.filters.search') }}
                     </label>
                     <input type="text" 
                            id="search" 
                            name="search" 
                            value="{{ request('search') }}"
-                           placeholder="{{ __('frontend.countries.filters.search_placeholder') }}"
+                           placeholder="{{ __('countries.filters.search_placeholder') }}"
                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                 </div>
 
                 <!-- Region Filter -->
                 <div>
                     <label for="region" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('frontend.countries.filters.by_region') }}
+                        {{ __('countries.filters.by_region') }}
                     </label>
                     <select id="region" 
                             name="region" 
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                        <option value="">{{ __('frontend.countries.filters.all_regions') }}</option>
+                        <option value="">{{ __('countries.filters.all_regions') }}</option>
                         @foreach($regions as $region)
                             <option value="{{ $region }}" {{ request('region') === $region ? 'selected' : '' }}>
                                 {{ $region }}
@@ -52,12 +52,12 @@
                 <!-- Currency Filter -->
                 <div>
                     <label for="currency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('frontend.countries.filters.by_currency') }}
+                        {{ __('countries.filters.by_currency') }}
                     </label>
                     <select id="currency" 
                             name="currency" 
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                        <option value="">{{ __('frontend.countries.filters.all_currencies') }}</option>
+                        <option value="">{{ __('countries.filters.all_currencies') }}</option>
                         @foreach($currencies as $currency)
                             <option value="{{ $currency }}" {{ request('currency') === $currency ? 'selected' : '' }}>
                                 {{ $currency }}
@@ -69,17 +69,17 @@
                 <!-- EU Member Filter -->
                 <div>
                     <label for="eu_member" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('frontend.countries.filters.eu_members') }}
+                        {{ __('countries.filters.eu_members') }}
                     </label>
                     <select id="eu_member" 
                             name="eu_member" 
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                        <option value="">{{ __('frontend.countries.filters.all') }}</option>
+                        <option value="">{{ __('countries.filters.all') }}</option>
                         <option value="1" {{ request('eu_member') === '1' ? 'selected' : '' }}>
-                            {{ __('frontend.countries.filters.eu_members_only') }}
+                            {{ __('countries.filters.eu_members_only') }}
                         </option>
                         <option value="0" {{ request('eu_member') === '0' ? 'selected' : '' }}>
-                            {{ __('frontend.countries.filters.non_eu_only') }}
+                            {{ __('countries.filters.non_eu_only') }}
                         </option>
                     </select>
                 </div>
@@ -88,12 +88,12 @@
             <div class="flex justify-between items-center">
                 <button type="submit" 
                         class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200">
-                    {{ __('frontend.countries.filters.apply_filters') }}
+                    {{ __('countries.filters.apply_filters') }}
                 </button>
                 
-                <a href="{{ route('frontend.countries.index') }}" 
+                <a href="{{ route('countries.index') }}" 
                    class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
-                    {{ __('frontend.countries.filters.clear_filters') }}
+                    {{ __('countries.filters.clear_filters') }}
                 </a>
             </div>
         </form>
@@ -125,37 +125,37 @@
                         
                         <div class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                             <div class="flex justify-between">
-                                <span>{{ __('frontend.countries.fields.code') }}:</span>
+                                <span>{{ __('countries.fields.code') }}:</span>
                                 <span class="font-medium">{{ $country->cca2 }}</span>
                             </div>
                             
                             @if($country->region)
                                 <div class="flex justify-between">
-                                    <span>{{ __('frontend.countries.fields.region') }}:</span>
+                                    <span>{{ __('countries.fields.region') }}:</span>
                                     <span class="font-medium">{{ $country->region }}</span>
                                 </div>
                             @endif
                             
                             @if($country->currency_code)
                                 <div class="flex justify-between">
-                                    <span>{{ __('frontend.countries.fields.currency') }}:</span>
+                                    <span>{{ __('countries.fields.currency') }}:</span>
                                     <span class="font-medium">{{ $country->currency_code }}</span>
                                 </div>
                             @endif
                             
                             @if($country->is_eu_member)
                                 <div class="flex items-center justify-between">
-                                    <span>{{ __('frontend.countries.fields.is_eu_member') }}:</span>
+                                    <span>{{ __('countries.fields.is_eu_member') }}:</span>
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                         <i class="fas fa-check mr-1"></i>
-                                        {{ __('frontend.countries.fields.yes') }}
+                                        {{ __('countries.fields.yes') }}
                                     </span>
                                 </div>
                             @endif
                             
                             @if($country->vat_rate)
                                 <div class="flex justify-between">
-                                    <span>{{ __('frontend.countries.fields.vat_rate') }}:</span>
+                                    <span>{{ __('countries.fields.vat_rate') }}:</span>
                                     <span class="font-medium">{{ number_format($country->vat_rate, 2) }}%</span>
                                 </div>
                             @endif
@@ -163,9 +163,9 @@
 
                         <!-- Actions -->
                         <div class="mt-4 flex space-x-2">
-                            <a href="{{ route('frontend.countries.show', $country) }}" 
+                            <a href="{{ route('countries.show', $country) }}" 
                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-3 rounded-md text-sm font-medium transition duration-200">
-                                {{ __('frontend.countries.actions.view_details') }}
+                                {{ __('countries.actions.view_details') }}
                             </a>
                         </div>
                     </div>
@@ -184,10 +184,10 @@
                 <i class="fas fa-globe"></i>
             </div>
             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                {{ __('frontend.countries.messages.no_countries_found') }}
+                {{ __('countries.messages.no_countries_found') }}
             </h3>
             <p class="text-gray-600 dark:text-gray-400">
-                {{ __('frontend.countries.messages.try_different_filters') }}
+                {{ __('countries.messages.try_different_filters') }}
             </p>
         </div>
     @endif

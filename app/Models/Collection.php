@@ -43,11 +43,9 @@ final class Collection extends Model implements HasMedia
         'show_filters',
     ];
 
-    protected $translatable = [
+    public static $translatable = [
         'name',
         'description',
-        'seo_title',
-        'seo_description',
         'meta_title',
         'meta_description',
         'meta_keywords',

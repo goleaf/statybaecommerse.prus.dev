@@ -18,8 +18,9 @@ final class CountryController extends Controller
             ->when($request->has('is_eu_member'), fn ($query) => $query->where('is_eu_member', $request->boolean('is_eu_member')))
             ->when($request->has('requires_vat'), fn ($query) => $query->where('requires_vat', $request->boolean('requires_vat')))
             ->when($request->has('search'), fn ($query) => $query->where('name', 'like', '%'.$request->get('search').'%'))
+            ->orderBy('sort_order')
             ->orderBy('name')
-            ->paginate(12);
+            ->paginate(24);
 
         $regions = Country::distinct()->pluck('region')->filter()->sort()->values();
         $currencies = Country::distinct()->pluck('currency_code')->filter()->sort()->values();
@@ -52,6 +53,23 @@ final class CountryController extends Controller
             ->get();
 
         return view('countries.show', compact('country', 'relatedCountries'));
+    }
+
+    public function api(Request $request)
+    {
+        $countries = Country::query()
+            ->active()
+            ->enabled()
+            ->when($request->has('search'), fn ($query) => $query->where('name', 'like', '%'.$request->get('search').'%'))
+            ->when($request->has('region'), fn ($query) => $query->where('region', $request->get('region')))
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get(['id', 'name', 'cca2', 'cca3', 'flag', 'region', 'currency_code']);
+
+        return response()->json([
+            'countries' => $countries,
+            'total' => $countries->count()
+        ]);
     }
 
     public function search(Request $request)
@@ -110,6 +128,7 @@ final class CountryController extends Controller
             'active_countries' => Country::where('is_active', true)->count(),
             'eu_members' => Country::where('is_eu_member', true)->count(),
             'countries_with_vat' => Country::where('requires_vat', true)->count(),
+            'average_vat_rate' => Country::where('requires_vat', true)->avg('vat_rate'),
             'by_region' => Country::selectRaw('region, COUNT(*) as count')
                 ->whereNotNull('region')
                 ->groupBy('region')
