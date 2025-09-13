@@ -29,7 +29,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
@@ -335,101 +335,8 @@ class LegalResource extends Resource
                         };
                     }),
             ])
-            ->actions([
-                Action::make('view')
-                    ->label(__('admin.legal.view'))
-                    ->icon('heroicon-o-eye')
-                    ->url(fn (Legal $record): string => route('legal.show', $record->key))
-                    ->openUrlInNewTab(),
-
-                Action::make('publish')
-                    ->label(__('admin.legal.publish'))
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->visible(fn (Legal $record): bool => !$record->is_published)
-                    ->action(function (Legal $record): void {
-                        $record->publish();
-                        
-                        Notification::make()
-                            ->title(__('admin.legal.published_successfully'))
-                            ->success()
-                            ->send();
-                    }),
-
-                Action::make('unpublish')
-                    ->label(__('admin.legal.unpublish'))
-                    ->icon('heroicon-o-x-circle')
-                    ->color('warning')
-                    ->visible(fn (Legal $record): bool => $record->is_published)
-                    ->action(function (Legal $record): void {
-                        $record->unpublish();
-                        
-                        Notification::make()
-                            ->title(__('admin.legal.unpublished_successfully'))
-                            ->success()
-                            ->send();
-                    }),
-
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    BulkAction::make('publish')
-                        ->label(__('admin.legal.publish_selected'))
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->action(function (Collection $records): void {
-                            $records->each->publish();
-                            
-                            Notification::make()
-                                ->title(__('admin.legal.published_selected_successfully'))
-                                ->success()
-                                ->send();
-                        }),
-
-                    BulkAction::make('unpublish')
-                        ->label(__('admin.legal.unpublish_selected'))
-                        ->icon('heroicon-o-x-circle')
-                        ->color('warning')
-                        ->action(function (Collection $records): void {
-                            $records->each->unpublish();
-                            
-                            Notification::make()
-                                ->title(__('admin.legal.unpublished_selected_successfully'))
-                                ->success()
-                                ->send();
-                        }),
-
-                    BulkAction::make('enable')
-                        ->label(__('admin.legal.enable_selected'))
-                        ->icon('heroicon-o-check')
-                        ->color('success')
-                        ->action(function (Collection $records): void {
-                            $records->each->enable();
-                            
-                            Notification::make()
-                                ->title(__('admin.legal.enabled_selected_successfully'))
-                                ->success()
-                                ->send();
-                        }),
-
-                    BulkAction::make('disable')
-                        ->label(__('admin.legal.disable_selected'))
-                        ->icon('heroicon-o-x-mark')
-                        ->color('danger')
-                        ->action(function (Collection $records): void {
-                            $records->each->disable();
-                            
-                            Notification::make()
-                                ->title(__('admin.legal.disabled_selected_successfully'))
-                                ->success()
-                                ->send();
-                        }),
-
-                    Tables\Actions\BulkDeleteAction::make(),
-                ]),
-            ])
+            ->actions([])
+            ->bulkActions([])
             ->defaultSort('sort_order')
             ->reorderable('sort_order');
     }
@@ -452,7 +359,7 @@ class LegalResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::getModel()::count();
     }
 
     public static function getNavigationBadgeColor(): ?string

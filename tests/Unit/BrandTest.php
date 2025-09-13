@@ -137,8 +137,13 @@ final class BrandTest extends TestCase
         $this->assertFalse($brand->hasPublishedProducts());
 
         // Create products for the brand
-        Product::factory()->count(2)->create(['brand_id' => $brand->id]);
-        Product::factory()->create(['brand_id' => $brand->id, 'status' => 'published']);
+        Product::factory()->count(2)->create(['brand_id' => $brand->id, 'status' => 'draft']);
+        Product::factory()->create([
+            'brand_id' => $brand->id, 
+            'status' => 'published',
+            'is_visible' => true,
+            'published_at' => now()->subDay()
+        ]);
 
         // Refresh the brand to get updated relations
         $brand->refresh();
