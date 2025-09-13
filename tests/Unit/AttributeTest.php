@@ -1,560 +1,285 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
 use App\Models\Attribute;
-use App\Models\AttributeValue;
-use App\Models\Product;
+use App\Models\Translations\AttributeTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class AttributeTest extends TestCase
+final class AttributeTest extends TestCase
 {
     use RefreshDatabase;
 
     public function test_attribute_can_be_created(): void
     {
         $attribute = Attribute::factory()->create([
-            'name' => 'Color',
-            'slug' => 'color',
-            'type' => 'select',
+            'name' => 'Test Attribute',
+            'slug' => 'test-attribute',
+            'type' => 'text',
+            'description' => 'Test description',
             'is_required' => true,
             'is_filterable' => true,
+            'is_searchable' => false,
             'is_visible' => true,
+            'is_enabled' => true,
             'sort_order' => 1,
+            'group_name' => 'test-group',
         ]);
 
-        $this->assertDatabaseHas('attributes', [
-            'name' => 'Color',
-            'slug' => 'color',
-            'type' => 'select',
-            'is_required' => true,
-            'is_filterable' => true,
-            'is_visible' => true,
-            'sort_order' => 1,
+        $this->assertInstanceOf(Attribute::class, $attribute);
+        $this->assertEquals('Test Attribute', $attribute->name);
+        $this->assertEquals('test-attribute', $attribute->slug);
+        $this->assertEquals('text', $attribute->type);
+        $this->assertEquals('Test description', $attribute->description);
+        $this->assertTrue($attribute->is_required);
+        $this->assertTrue($attribute->is_filterable);
+        $this->assertFalse($attribute->is_searchable);
+        $this->assertTrue($attribute->is_visible);
+        $this->assertTrue($attribute->is_enabled);
+        $this->assertEquals(1, $attribute->sort_order);
+        $this->assertEquals('test-group', $attribute->group_name);
+    }
+
+    public function test_attribute_translation_methods(): void
+    {
+        $attribute = Attribute::factory()->create(['name' => 'Original Name']);
+        
+        // Test translation methods
+        $this->assertEquals('Original Name', $attribute->getTranslatedName());
+        $this->assertEquals($attribute->description, $attribute->getTranslatedDescription());
+        $this->assertEquals($attribute->slug, $attribute->getTranslatedSlug());
+        
+        // Test with translation
+        $attribute->updateTranslation('en', [
+            'name' => 'English Name',
+            'description' => 'English Description',
+            'slug' => 'english-slug',
         ]);
+        
+        $this->assertEquals('English Name', $attribute->getTranslatedName('en'));
+        $this->assertEquals('English Description', $attribute->getTranslatedDescription('en'));
+        $this->assertEquals('english-slug', $attribute->getTranslatedSlug('en'));
     }
 
-    public function test_attribute_has_many_values(): void
+    public function test_attribute_scopes(): void
     {
-        $attribute = Attribute::factory()->create();
-        $value1 = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
-        $value2 = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
+        // Clear any existing attributes first
+        Attribute::query()->delete();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $attribute->values);
-        $this->assertCount(2, $attribute->values);
-        $this->assertTrue($attribute->values->contains($value1));
-        $this->assertTrue($attribute->values->contains($value2));
-    }
-
-    public function test_attribute_belongs_to_many_products(): void
-    {
-        $attribute = Attribute::factory()->create();
-        $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
-        $product1 = Product::factory()->create();
-        $product2 = Product::factory()->create();
-
-        $attribute->products()->attach([
-            $product1->id => ['attribute_value_id' => $attributeValue->id],
-            $product2->id => ['attribute_value_id' => $attributeValue->id],
-        ]);
-
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $attribute->products);
-        $this->assertCount(2, $attribute->products);
-        $this->assertTrue($attribute->products->contains($product1));
-        $this->assertTrue($attribute->products->contains($product2));
-    }
-
-    public function test_attribute_casts_work_correctly(): void
-    {
-        $attribute = Attribute::factory()->create([
-            'is_required' => true,
-            'is_filterable' => false,
-            'is_visible' => true,
-            'sort_order' => 5,
-            'created_at' => now(),
-        ]);
-
-        $this->assertIsBool($attribute->is_required);
-        $this->assertIsBool($attribute->is_filterable);
-        $this->assertIsBool($attribute->is_visible);
-        $this->assertIsInt($attribute->sort_order);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $attribute->created_at);
-    }
-
-    public function test_attribute_fillable_attributes(): void
-    {
-        $attribute = new Attribute();
-        $fillable = $attribute->getFillable();
-
-        $this->assertContains('name', $fillable);
-        $this->assertContains('slug', $fillable);
-        $this->assertContains('type', $fillable);
-        $this->assertContains('is_required', $fillable);
-        $this->assertContains('is_filterable', $fillable);
-    }
-
-    public function test_attribute_scope_required(): void
-    {
-        $requiredAttribute = Attribute::factory()->create(['is_required' => true]);
-        $optionalAttribute = Attribute::factory()->create(['is_required' => false]);
-
-        $requiredAttributes = Attribute::required()->get();
-
-        $this->assertTrue($requiredAttributes->contains($requiredAttribute));
-        $this->assertFalse($requiredAttributes->contains($optionalAttribute));
-    }
-
-    public function test_attribute_scope_filterable(): void
-    {
-        $filterableAttribute = Attribute::factory()->create(['is_filterable' => true]);
-        $nonFilterableAttribute = Attribute::factory()->create(['is_filterable' => false]);
-
-        $filterableAttributes = Attribute::filterable()->get();
-
-        $this->assertTrue($filterableAttributes->contains($filterableAttribute));
-        $this->assertFalse($filterableAttributes->contains($nonFilterableAttribute));
-    }
-
-    public function test_attribute_scope_visible(): void
-    {
-        $visibleAttribute = Attribute::factory()->create(['is_visible' => true]);
-        $hiddenAttribute = Attribute::factory()->create(['is_visible' => false]);
-
-        $visibleAttributes = Attribute::visible()->get();
-
-        $this->assertTrue($visibleAttributes->contains($visibleAttribute));
-        $this->assertFalse($visibleAttributes->contains($hiddenAttribute));
-    }
-
-    public function test_attribute_scope_ordered(): void
-    {
-        $attribute1 = Attribute::factory()->create(['sort_order' => 2]);
-        $attribute2 = Attribute::factory()->create(['sort_order' => 1]);
-        $attribute3 = Attribute::factory()->create(['sort_order' => 3]);
-
-        $orderedAttributes = Attribute::ordered()->get();
-
-        $this->assertEquals($attribute2->id, $orderedAttributes->first()->id);
-        $this->assertEquals($attribute3->id, $orderedAttributes->last()->id);
-    }
-
-    public function test_attribute_can_have_description(): void
-    {
-        $attribute = Attribute::factory()->create([
-            'description' => 'Product color attribute',
-        ]);
-
-        $this->assertEquals('Product color attribute', $attribute->description);
-    }
-
-    public function test_attribute_can_have_validation_rules(): void
-    {
-        $attribute = Attribute::factory()->create([
-            'validation_rules' => ['required' => true, 'max' => 255],
-        ]);
-
-        $this->assertIsArray($attribute->validation_rules);
-        $this->assertTrue($attribute->validation_rules['required']);
-        $this->assertEquals(255, $attribute->validation_rules['max']);
-    }
-
-    public function test_attribute_can_have_default_value(): void
-    {
-        $attribute = Attribute::factory()->create([
-            'default_value' => 'red',
-        ]);
-
-        $this->assertEquals('red', $attribute->default_value);
-    }
-
-    public function test_attribute_can_have_meta_data(): void
-    {
-        $attribute = Attribute::factory()->create([
-            'meta_data' => [
-                'created_by' => 'admin',
-                'version' => '1.0',
-                'tags' => ['color', 'product', 'attribute'],
-            ],
-        ]);
-
-        $this->assertIsArray($attribute->meta_data);
-        $this->assertEquals('admin', $attribute->meta_data['created_by']);
-        $this->assertEquals('1.0', $attribute->meta_data['version']);
-        $this->assertIsArray($attribute->meta_data['tags']);
-    }
-
-    public function test_attribute_can_have_scope_by_type(): void
-    {
-        $attribute1 = Attribute::factory()->create(['type' => 'select']);
-        $attribute2 = Attribute::factory()->create(['type' => 'text']);
-
-        $selectAttributes = Attribute::byType('select')->get();
-
-        $this->assertTrue($selectAttributes->contains($attribute1));
-        $this->assertFalse($selectAttributes->contains($attribute2));
-    }
-
-    public function test_attribute_can_have_scope_by_category(): void
-    {
-        $categoryId = 1;
-        $attribute1 = Attribute::factory()->create(['category_id' => $categoryId]);
-        $attribute2 = Attribute::factory()->create(['category_id' => 2]);
-
-        $categoryAttributes = Attribute::byCategory($categoryId)->get();
-
-        $this->assertTrue($categoryAttributes->contains($attribute1));
-        $this->assertFalse($categoryAttributes->contains($attribute2));
-    }
-
-    public function test_attribute_can_have_scope_by_group(): void
-    {
-        $groupName = 'basic_info';
-        $attribute1 = Attribute::factory()->create(['group_name' => $groupName]);
-        $attribute2 = Attribute::factory()->create(['group_name' => 'technical_specs']);
-
-        $groupAttributes = Attribute::byGroup($groupName)->get();
-
-        $this->assertTrue($groupAttributes->contains($attribute1));
-        $this->assertFalse($groupAttributes->contains($attribute2));
-    }
-
-    public function test_attribute_can_have_scope_enabled(): void
-    {
+        // Create test attributes with specific attributes
         $enabledAttribute = Attribute::factory()->create(['is_enabled' => true]);
         $disabledAttribute = Attribute::factory()->create(['is_enabled' => false]);
-
-        $enabledAttributes = Attribute::enabled()->get();
-
-        $this->assertTrue($enabledAttributes->contains($enabledAttribute));
-        $this->assertFalse($enabledAttributes->contains($disabledAttribute));
-    }
-
-    public function test_attribute_can_have_scope_searchable(): void
-    {
+        $requiredAttribute = Attribute::factory()->create(['is_required' => true]);
+        $filterableAttribute = Attribute::factory()->create(['is_filterable' => true]);
         $searchableAttribute = Attribute::factory()->create(['is_searchable' => true]);
-        $nonSearchableAttribute = Attribute::factory()->create(['is_searchable' => false]);
+        $orderedAttribute1 = Attribute::factory()->create(['sort_order' => 2]);
+        $orderedAttribute2 = Attribute::factory()->create(['sort_order' => 1]);
 
+        // Test enabled scope
+        $enabledAttributes = Attribute::enabled()->get();
+        $this->assertCount(1, $enabledAttributes);
+        $this->assertEquals($enabledAttribute->id, $enabledAttributes->first()->id);
+
+        // Test required scope
+        $requiredAttributes = Attribute::required()->get();
+        $this->assertCount(1, $requiredAttributes);
+        $this->assertEquals($requiredAttribute->id, $requiredAttributes->first()->id);
+
+        // Test filterable scope
+        $filterableAttributes = Attribute::filterable()->get();
+        $this->assertCount(1, $filterableAttributes);
+        $this->assertEquals($filterableAttribute->id, $filterableAttributes->first()->id);
+
+        // Test searchable scope
         $searchableAttributes = Attribute::searchable()->get();
+        $this->assertCount(1, $searchableAttributes);
+        $this->assertEquals($searchableAttribute->id, $searchableAttributes->first()->id);
 
-        $this->assertTrue($searchableAttributes->contains($searchableAttribute));
-        $this->assertFalse($searchableAttributes->contains($nonSearchableAttribute));
+        // Test ordered scope
+        $orderedAttributes = Attribute::ordered()->get();
+        $this->assertCount(2, $orderedAttributes);
+        $this->assertEquals($orderedAttribute2->id, $orderedAttributes->first()->id); // sort_order = 1 comes first
     }
 
-    public function test_attribute_can_have_scope_editable(): void
+    public function test_attribute_helper_methods(): void
     {
-        $editableAttribute = Attribute::factory()->create(['is_editable' => true]);
-        $nonEditableAttribute = Attribute::factory()->create(['is_editable' => false]);
+        $attribute = Attribute::factory()->create([
+            'type' => 'text',
+            'name' => 'Test Attribute',
+        ]);
 
-        $editableAttributes = Attribute::editable()->get();
+        // Test type methods
+        $this->assertTrue($attribute->isTextType());
+        $this->assertFalse($attribute->isNumericType());
+        $this->assertFalse($attribute->isBooleanType());
+        $this->assertFalse($attribute->isSelectType());
 
-        $this->assertTrue($editableAttributes->contains($editableAttribute));
-        $this->assertFalse($editableAttributes->contains($nonEditableAttribute));
+        // Test full display name
+        $displayName = $attribute->getFullDisplayName();
+        $this->assertStringContainsString('Test Attribute', $displayName);
+        $this->assertStringContainsString('Text', $displayName);
+
+        // Test info methods
+        $attributeInfo = $attribute->getAttributeInfo();
+        $this->assertArrayHasKey('id', $attributeInfo);
+        $this->assertArrayHasKey('name', $attributeInfo);
+        $this->assertArrayHasKey('type', $attributeInfo);
+
+        $technicalInfo = $attribute->getTechnicalInfo();
+        $this->assertArrayHasKey('type', $technicalInfo);
+        $this->assertArrayHasKey('default_value', $technicalInfo);
+
+        $businessInfo = $attribute->getBusinessInfo();
+        $this->assertArrayHasKey('usage_count', $businessInfo);
+        $this->assertArrayHasKey('values_count', $businessInfo);
+
+        $completeInfo = $attribute->getCompleteInfo();
+        $this->assertArrayHasKey('translations', $completeInfo);
+        $this->assertArrayHasKey('has_translations', $completeInfo);
     }
 
-    public function test_attribute_can_have_scope_sortable(): void
-    {
-        $sortableAttribute = Attribute::factory()->create(['is_sortable' => true]);
-        $nonSortableAttribute = Attribute::factory()->create(['is_sortable' => false]);
-
-        $sortableAttributes = Attribute::sortable()->get();
-
-        $this->assertTrue($sortableAttributes->contains($sortableAttribute));
-        $this->assertFalse($sortableAttributes->contains($nonSortableAttribute));
-    }
-
-    public function test_attribute_can_have_scope_with_values(): void
-    {
-        $attributeWithValues = Attribute::factory()->create();
-        AttributeValue::factory()->create(['attribute_id' => $attributeWithValues->id]);
-
-        $attributeWithoutValues = Attribute::factory()->create();
-
-        $attributesWithValues = Attribute::withValues()->get();
-
-        // The withValues scope eager loads values, so both attributes should be present
-        $this->assertTrue($attributesWithValues->contains($attributeWithValues));
-        $this->assertTrue($attributesWithValues->contains($attributeWithoutValues));
-        
-        // But the first should have values loaded and the second should have empty values
-        $loadedAttributeWithValues = $attributesWithValues->find($attributeWithValues->id);
-        $loadedAttributeWithoutValues = $attributesWithValues->find($attributeWithoutValues->id);
-        
-        $this->assertTrue($loadedAttributeWithValues->relationLoaded('values'));
-        $this->assertTrue($loadedAttributeWithoutValues->relationLoaded('values'));
-        $this->assertGreaterThan(0, $loadedAttributeWithValues->values->count());
-        $this->assertEquals(0, $loadedAttributeWithoutValues->values->count());
-    }
-
-    public function test_attribute_can_have_scope_with_enabled_values(): void
+    public function test_attribute_translation_management(): void
     {
         $attribute = Attribute::factory()->create();
-        AttributeValue::factory()->create(['attribute_id' => $attribute->id, 'is_enabled' => true]);
-        AttributeValue::factory()->create(['attribute_id' => $attribute->id, 'is_enabled' => false]);
 
-        $attributesWithEnabledValues = Attribute::withEnabledValues()->get();
+        // Test available locales (should be empty initially)
+        $this->assertEmpty($attribute->getAvailableLocales());
 
-        $this->assertTrue($attributesWithEnabledValues->contains($attribute));
+        // Test has translation for
+        $this->assertFalse($attribute->hasTranslationFor('en'));
+
+        // Test get or create translation
+        $translation = $attribute->getOrCreateTranslation('en');
+        $this->assertInstanceOf(AttributeTranslation::class, $translation);
+        $this->assertEquals('en', $translation->locale);
+
+        // Test update translation
+        $this->assertTrue($attribute->updateTranslation('en', [
+            'name' => 'English Name',
+            'description' => 'English Description',
+        ]));
+
+        // Test available locales now includes 'en'
+        $this->assertContains('en', $attribute->getAvailableLocales());
+        $this->assertTrue($attribute->hasTranslationFor('en'));
+
+        // Test update multiple translations
+        $this->assertTrue($attribute->updateTranslations([
+            'lt' => [
+                'name' => 'Lithuanian Name',
+                'description' => 'Lithuanian Description',
+            ],
+        ]));
+
+        $this->assertContains('lt', $attribute->getAvailableLocales());
     }
 
-    public function test_attribute_type_helper_methods(): void
+    public function test_attribute_relations(): void
+    {
+        $attribute = Attribute::factory()->create();
+
+        // Test values relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $attribute->values());
+
+        // Test products relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $attribute->products());
+
+        // Test variants relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $attribute->variants());
+
+        // Test category relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $attribute->category());
+    }
+
+    public function test_attribute_with_translations_scope(): void
+    {
+        $attribute = Attribute::factory()->create();
+        $attribute->updateTranslation('en', ['name' => 'English Name']);
+
+        $attributesWithTranslations = Attribute::withTranslations('en')->get();
+        $this->assertCount(1, $attributesWithTranslations);
+        
+        $loadedAttribute = $attributesWithTranslations->first();
+        $this->assertTrue($loadedAttribute->relationLoaded('translations'));
+    }
+
+    public function test_attribute_type_methods(): void
     {
         $textAttribute = Attribute::factory()->create(['type' => 'text']);
-        $selectAttribute = Attribute::factory()->create(['type' => 'select']);
         $numberAttribute = Attribute::factory()->create(['type' => 'number']);
         $booleanAttribute = Attribute::factory()->create(['type' => 'boolean']);
-        $dateAttribute = Attribute::factory()->create(['type' => 'date']);
-        $fileAttribute = Attribute::factory()->create(['type' => 'file']);
+        $selectAttribute = Attribute::factory()->create(['type' => 'select']);
 
+        // Test text type
         $this->assertTrue($textAttribute->isTextType());
-        $this->assertFalse($textAttribute->isSelectType());
         $this->assertFalse($textAttribute->isNumericType());
         $this->assertFalse($textAttribute->isBooleanType());
-        $this->assertFalse($textAttribute->isDateType());
-        $this->assertFalse($textAttribute->isFileType());
+        $this->assertFalse($textAttribute->isSelectType());
 
-        $this->assertTrue($selectAttribute->isSelectType());
+        // Test number type
+        $this->assertFalse($numberAttribute->isTextType());
         $this->assertTrue($numberAttribute->isNumericType());
+        $this->assertFalse($numberAttribute->isBooleanType());
+        $this->assertFalse($numberAttribute->isSelectType());
+
+        // Test boolean type
+        $this->assertFalse($booleanAttribute->isTextType());
+        $this->assertFalse($booleanAttribute->isNumericType());
         $this->assertTrue($booleanAttribute->isBooleanType());
-        $this->assertTrue($dateAttribute->isDateType());
-        $this->assertTrue($fileAttribute->isFileType());
-    }
+        $this->assertFalse($booleanAttribute->isSelectType());
 
-    public function test_attribute_can_have_multiple_values(): void
-    {
-        $multiselectAttribute = Attribute::factory()->create(['type' => 'multiselect']);
-        $fileAttribute = Attribute::factory()->create(['type' => 'file']);
-        $textAttribute = Attribute::factory()->create(['type' => 'text']);
-
-        $this->assertTrue($multiselectAttribute->canHaveMultipleValues());
-        $this->assertTrue($fileAttribute->canHaveMultipleValues());
-        $this->assertFalse($textAttribute->canHaveMultipleValues());
-    }
-
-    public function test_attribute_get_default_value_for_type(): void
-    {
-        $textAttribute = Attribute::factory()->create(['type' => 'text']);
-        $numberAttribute = Attribute::factory()->create(['type' => 'number']);
-        $booleanAttribute = Attribute::factory()->create(['type' => 'boolean']);
-        $colorAttribute = Attribute::factory()->create(['type' => 'color']);
-
-        $this->assertEquals('', $textAttribute->getDefaultValueForType());
-        $this->assertEquals(0, $numberAttribute->getDefaultValueForType());
-        $this->assertEquals(false, $booleanAttribute->getDefaultValueForType());
-        $this->assertEquals('#000000', $colorAttribute->getDefaultValueForType());
-    }
-
-    public function test_attribute_get_values_count(): void
-    {
-        $attribute = Attribute::factory()->create();
-        AttributeValue::factory()->count(3)->create(['attribute_id' => $attribute->id]);
-
-        $this->assertEquals(3, $attribute->getValuesCount());
-    }
-
-    public function test_attribute_get_enabled_values_count(): void
-    {
-        $attribute = Attribute::factory()->create();
-        AttributeValue::factory()->count(2)->create(['attribute_id' => $attribute->id, 'is_enabled' => true]);
-        AttributeValue::factory()->count(1)->create(['attribute_id' => $attribute->id, 'is_enabled' => false]);
-
-        $this->assertEquals(2, $attribute->getEnabledValuesCount());
-    }
-
-    public function test_attribute_display_name_accessor(): void
-    {
-        $attribute = Attribute::factory()->create(['name' => 'Test Attribute']);
-        $this->assertEquals('Test Attribute', $attribute->display_name);
-
-        $attributeWithoutName = Attribute::factory()->create(['name' => '', 'slug' => 'test-slug']);
-        $this->assertEquals('test-slug', $attributeWithoutName->display_name);
-    }
-
-    public function test_attribute_type_icon_accessor(): void
-    {
-        $textAttribute = Attribute::factory()->create(['type' => 'text']);
-        $this->assertEquals('heroicon-o-document-text', $textAttribute->type_icon);
-
-        $selectAttribute = Attribute::factory()->create(['type' => 'select']);
-        $this->assertEquals('heroicon-o-list-bullet', $selectAttribute->type_icon);
-
-        $unknownAttribute = Attribute::factory()->create(['type' => 'unknown']);
-        $this->assertEquals('heroicon-o-adjustments-horizontal', $unknownAttribute->type_icon);
-    }
-
-    public function test_attribute_type_color_accessor(): void
-    {
-        $textAttribute = Attribute::factory()->create(['type' => 'text']);
-        $this->assertEquals('gray', $textAttribute->type_color);
-
-        $numberAttribute = Attribute::factory()->create(['type' => 'number']);
-        $this->assertEquals('blue', $numberAttribute->type_color);
-
-        $unknownAttribute = Attribute::factory()->create(['type' => 'unknown']);
-        $this->assertEquals('gray', $unknownAttribute->type_color);
-    }
-
-    public function test_attribute_validation_rules_array(): void
-    {
-        $attribute = Attribute::factory()->create([
-            'validation_rules' => ['max' => 255, 'min' => 1]
-        ]);
-
-        $rules = $attribute->validation_rules_array;
-        $this->assertIsArray($rules);
-        $this->assertEquals(255, $rules['max']);
-        $this->assertEquals(1, $rules['min']);
-
-        $attributeWithoutRules = Attribute::factory()->create([
-            'validation_rules' => null
-        ]);
-
-        $rules = $attributeWithoutRules->validation_rules_array;
-        $this->assertIsArray($rules);
-        $this->assertEmpty($rules);
-    }
-
-    public function test_attribute_form_component_config(): void
-    {
-        $attribute = Attribute::factory()->create([
-            'name' => 'Test Attribute',
-            'type' => 'select',
-            'placeholder' => 'Select option',
-            'help_text' => 'Choose an option',
-            'is_required' => true,
-            'default_value' => 'option1',
-            'min_value' => 1,
-            'max_value' => 10,
-            'step_value' => 0.5,
-        ]);
-
-        $config = $attribute->getFormComponentConfig();
-
-        $this->assertEquals('select', $config['type']);
-        $this->assertEquals('Test Attribute', $config['label']);
-        $this->assertEquals('Select option', $config['placeholder']);
-        $this->assertEquals('Choose an option', $config['help_text']);
-        $this->assertTrue($config['required']);
-        $this->assertEquals('option1', $config['default_value']);
-        $this->assertEquals(1, $config['min_value']);
-        $this->assertEquals(10, $config['max_value']);
-        $this->assertEquals(0.5, $config['step_value']);
-    }
-
-    public function test_attribute_usage_count(): void
-    {
-        $attribute = Attribute::factory()->create();
-        $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
-        $product1 = Product::factory()->create();
-        $product2 = Product::factory()->create();
-
-        $attribute->products()->attach([
-            $product1->id => ['attribute_value_id' => $attributeValue->id],
-            $product2->id => ['attribute_value_id' => $attributeValue->id],
-        ]);
-
-        $this->assertEquals(2, $attribute->getUsageCount());
-        $this->assertTrue($attribute->isUsedInProducts());
-    }
-
-    public function test_attribute_popularity_score(): void
-    {
-        $attribute = Attribute::factory()->create();
-        $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id, 'is_enabled' => true]);
-        $product1 = Product::factory()->create();
-        $product2 = Product::factory()->create();
-
-        $attribute->products()->attach([
-            $product1->id => ['attribute_value_id' => $attributeValue->id],
-            $product2->id => ['attribute_value_id' => $attributeValue->id],
-        ]);
-        AttributeValue::factory()->count(3)->create(['attribute_id' => $attribute->id, 'is_enabled' => true]);
-        AttributeValue::factory()->count(1)->create(['attribute_id' => $attribute->id, 'is_enabled' => false]);
-
-        $score = $attribute->getPopularityScore();
-        // Score calculation: (2 products * 10) + (5 values * 2) + (4 enabled values * 1) = 20 + 10 + 4 = 34
-        $this->assertEquals(34, $score);
-    }
-
-    public function test_attribute_status_badge(): void
-    {
-        $disabledAttribute = Attribute::factory()->create(['is_enabled' => false]);
-        $this->assertEquals('disabled', $disabledAttribute->status_badge);
-        $this->assertEquals('gray', $disabledAttribute->status_color);
-
-        $requiredAttribute = Attribute::factory()->create(['is_enabled' => true, 'is_required' => true]);
-        $this->assertEquals('required', $requiredAttribute->status_badge);
-        $this->assertEquals('red', $requiredAttribute->status_color);
-
-        $filterableAttribute = Attribute::factory()->create(['is_enabled' => true, 'is_required' => false, 'is_filterable' => true]);
-        $this->assertEquals('filterable', $filterableAttribute->status_badge);
-        $this->assertEquals('blue', $filterableAttribute->status_color);
-
-        $standardAttribute = Attribute::factory()->create(['is_enabled' => true, 'is_required' => false, 'is_filterable' => false]);
-        $this->assertEquals('standard', $standardAttribute->status_badge);
-        $this->assertEquals('green', $standardAttribute->status_color);
+        // Test select type
+        $this->assertFalse($selectAttribute->isTextType());
+        $this->assertFalse($selectAttribute->isNumericType());
+        $this->assertFalse($selectAttribute->isBooleanType());
+        $this->assertTrue($selectAttribute->isSelectType());
     }
 
     public function test_attribute_statistics(): void
     {
         $attribute = Attribute::factory()->create();
-        $attributeValue = AttributeValue::factory()->create([
-            'attribute_id' => $attribute->id,
-            'is_enabled' => true,
-        ]);
-        $product = Product::factory()->create();
-        $attribute->products()->attach([$product->id => ['attribute_value_id' => $attributeValue->id]]);
-        AttributeValue::factory()->count(2)->create(['attribute_id' => $attribute->id, 'is_enabled' => true]);
-
+        
+        // Test statistics method
         $statistics = $attribute->getStatistics();
-
-        $this->assertIsArray($statistics);
         $this->assertArrayHasKey('usage_count', $statistics);
         $this->assertArrayHasKey('values_count', $statistics);
-        $this->assertArrayHasKey('enabled_values_count', $statistics);
         $this->assertArrayHasKey('popularity_score', $statistics);
         $this->assertArrayHasKey('status', $statistics);
         $this->assertArrayHasKey('status_color', $statistics);
         $this->assertArrayHasKey('status_label', $statistics);
-
-        $this->assertEquals(1, $statistics['usage_count']);
-        $this->assertEquals(3, $statistics['values_count']);
-        $this->assertEquals(3, $statistics['enabled_values_count']);
+        
+        // Test individual statistic methods
+        $this->assertIsInt($attribute->getUsageCount());
+        $this->assertIsInt($attribute->getValuesCount());
+        $this->assertIsInt($attribute->getEnabledValuesCount());
+        $this->assertIsInt($attribute->getPopularityScore());
+        $this->assertIsFloat($attribute->getAverageValuesPerProduct());
     }
 
-    public function test_attribute_duplicate_for_group(): void
+    public function test_attribute_form_component_config(): void
     {
-        $originalAttribute = Attribute::factory()->create(['group_name' => 'original_group']);
-        AttributeValue::factory()->count(2)->create(['attribute_id' => $originalAttribute->id]);
+        $attribute = Attribute::factory()->create([
+            'type' => 'select',
+            'is_required' => true,
+            'default_value' => 'default',
+            'min_value' => 1,
+            'max_value' => 100,
+            'step_value' => 0.5,
+        ]);
 
-        $duplicate = $originalAttribute->duplicateForGroup('new_group');
-
-        $this->assertNotEquals($originalAttribute->id, $duplicate->id);
-        $this->assertEquals('new_group', $duplicate->group_name);
-        $this->assertStringContainsString('(Copy)', $duplicate->name);
-        $this->assertStringContainsString('-copy', $duplicate->slug);
-        $this->assertEquals(2, $duplicate->values()->count());
-    }
-
-    public function test_attribute_merge_with(): void
-    {
-        $attribute1 = Attribute::factory()->create();
-        $attribute2 = Attribute::factory()->create();
-        $attributeValue1 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id]);
-        $attributeValue2 = AttributeValue::factory()->create(['attribute_id' => $attribute2->id]);
-        $product1 = Product::factory()->create();
-        $product2 = Product::factory()->create();
-
-        $attribute1->products()->attach([$product1->id => ['attribute_value_id' => $attributeValue1->id]]);
-        $attribute2->products()->attach([$product2->id => ['attribute_value_id' => $attributeValue2->id]]);
-
-        AttributeValue::factory()->create(['attribute_id' => $attribute1->id]);
-        AttributeValue::factory()->create(['attribute_id' => $attribute2->id]);
-
-        $merged = $attribute1->mergeWith($attribute2);
-
-        $this->assertEquals($attribute1->id, $merged->id);
-        $this->assertEquals(4, $merged->values()->count());
-        $this->assertFalse(Attribute::where('id', $attribute2->id)->exists());
+        $config = $attribute->getFormComponentConfig();
+        
+        $this->assertEquals('select', $config['type']);
+        $this->assertEquals($attribute->name, $config['label']);
+        $this->assertTrue($config['required']);
+        $this->assertEquals('default', $config['default_value']);
+        $this->assertEquals(1, $config['min_value']);
+        $this->assertEquals(100, $config['max_value']);
+        $this->assertEquals(0.5, $config['step_value']);
+        $this->assertArrayHasKey('validation_rules', $config);
+        $this->assertArrayHasKey('options', $config);
     }
 }

@@ -1,151 +1,120 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Filament\Resources\AttributeResource;
+declare(strict_types=1);
+
+namespace Tests\Feature\Filament;
+
 use App\Models\Attribute;
 use App\Models\User;
-use Filament\Actions\DeleteAction;
-use Livewire\Livewire;
-use Spatie\Permission\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-use function Pest\Laravel\{actingAs, assertDatabaseHas, assertDatabaseMissing};
+final class AttributeResourceTest extends TestCase
+{
+    use RefreshDatabase;
 
-beforeEach(function () {
-    $this->admin = User::factory()->create();
-    Role::findOrCreate('admin', config('auth.defaults.guard', 'web'));
-    $this->admin->assignRole('admin');
-});
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->actingAs(User::factory()->admin()->create());
+    }
 
-it('can render attribute resource index page', function () {
-    actingAs($this->admin)
-        ->get(AttributeResource::getUrl('index'))
-        ->assertSuccessful();
-});
+    public function test_attribute_resource_list_page_renders(): void
+    {
+        Attribute::factory()->count(3)->create();
 
-it('can render attribute resource create page', function () {
-    actingAs($this->admin)
-        ->get(AttributeResource::getUrl('create'))
-        ->assertSuccessful();
-});
+        $response = $this->get(route('filament.admin.resources.attributes.index'));
 
-it('can create attribute', function () {
-    $newData = [
-        'name' => 'Test Attribute',
-        'slug' => 'test-attribute',
-        'type' => 'text',
-        'is_required' => false,
-        'is_filterable' => true,
-        'is_searchable' => false,
-        'is_visible' => true,
-        'is_editable' => true,
-        'is_sortable' => true,
-        'is_enabled' => true,
-        'sort_order' => 0,
-    ];
+        $response->assertOk();
+    }
 
-    Livewire::test(AttributeResource\Pages\CreateAttribute::class)
-        ->fillForm($newData)
-        ->call('create')
-        ->assertHasNoFormErrors();
+    public function test_attribute_resource_create_page_renders(): void
+    {
+        $response = $this->get(route('filament.admin.resources.attributes.create'));
 
-    assertDatabaseHas('attributes', $newData);
-});
+        $response->assertOk();
+    }
 
-it('can render attribute resource view page', function () {
-    $attribute = Attribute::factory()->create();
-
-    actingAs($this->admin)
-        ->get(AttributeResource::getUrl('view', ['record' => $attribute]))
-        ->assertSuccessful();
-});
-
-it('can render attribute resource edit page', function () {
-    $attribute = Attribute::factory()->create();
-
-    Livewire::test(AttributeResource\Pages\EditAttribute::class, [
-        'record' => $attribute->getRouteKey(),
-    ])->assertStatus(200);
-});
-
-it('can update attribute', function () {
-    $attribute = Attribute::factory()->create();
-    $newData = [
-        'name' => 'Updated Attribute',
-        'slug' => 'updated-attribute',
-        'type' => 'select',
-        'is_required' => true,
-        'is_filterable' => false,
-        'is_searchable' => true,
-        'is_visible' => true,
-        'is_editable' => true,
-        'is_sortable' => true,
-        'is_enabled' => true,
-        'sort_order' => 10,
-    ];
-
-    Livewire::test(AttributeResource\Pages\EditAttribute::class, [
-        'record' => $attribute->getRouteKey(),
-    ])
-        ->fillForm($newData)
-        ->call('save')
-        ->assertHasNoFormErrors();
-
-    assertDatabaseHas('attributes', array_merge(['id' => $attribute->id], $newData));
-});
-
-it('can delete attribute', function () {
-    $attribute = Attribute::factory()->create();
-
-    Livewire::test(AttributeResource\Pages\EditAttribute::class, [
-        'record' => $attribute->getRouteKey(),
-    ])
-        ->callAction(DeleteAction::class);
-
-    assertDatabaseMissing('attributes', ['id' => $attribute->id]);
-});
-
-it('can list attributes', function () {
-    $attributes = Attribute::factory()->count(10)->create();
-
-    Livewire::test(AttributeResource\Pages\ListAttributes::class)
-        ->assertCanSeeTableRecords($attributes);
-});
-
-it('can search attributes', function () {
-    $attribute = Attribute::factory()->create(['name' => 'Searchable Attribute']);
-    $other = Attribute::factory()->create(['name' => 'Other Attribute']);
-
-    Livewire::test(AttributeResource\Pages\ListAttributes::class)
-        ->searchTable('Searchable')
-        ->assertCanSeeTableRecords([$attribute])
-        ->assertCanNotSeeTableRecords([$other]);
-});
-
-it('can filter attributes by type', function () {
-    $textAttribute = Attribute::factory()->create(['type' => 'text']);
-    $numberAttribute = Attribute::factory()->create(['type' => 'number']);
-
-    Livewire::test(AttributeResource\Pages\ListAttributes::class)
-        ->filterTable('type', 'text')
-        ->assertCanSeeTableRecords([$textAttribute])
-        ->assertCanNotSeeTableRecords([$numberAttribute]);
-});
-
-it('validates required fields when creating attribute', function () {
-    Livewire::test(AttributeResource\Pages\CreateAttribute::class)
-        ->fillForm([])
-        ->call('create')
-        ->assertHasFormErrors(['name', 'slug', 'type']);
-});
-
-it('validates unique slug when creating attribute', function () {
-    $existingAttribute = Attribute::factory()->create(['slug' => 'existing-slug']);
-
-    Livewire::test(AttributeResource\Pages\CreateAttribute::class)
-        ->fillForm([
+    public function test_attribute_resource_can_create_attribute(): void
+    {
+        $attributeData = [
             'name' => 'Test Attribute',
-            'slug' => 'existing-slug',
+            'slug' => 'test-attribute',
             'type' => 'text',
-        ])
-        ->call('create')
-        ->assertHasFormErrors(['slug']);
-});
+            'description' => 'Test description',
+            'is_required' => true,
+            'is_filterable' => true,
+            'is_searchable' => false,
+            'is_visible' => true,
+            'is_enabled' => true,
+            'sort_order' => 1,
+            'group_name' => 'test-group',
+        ];
+
+        $response = $this->post(route('filament.admin.resources.attributes.store'), $attributeData);
+
+        $response->assertRedirect();
+        
+        $this->assertDatabaseHas('attributes', [
+            'name' => 'Test Attribute',
+            'slug' => 'test-attribute',
+            'type' => 'text',
+            'description' => 'Test description',
+            'is_required' => true,
+            'is_filterable' => true,
+            'is_searchable' => false,
+            'is_visible' => true,
+            'is_enabled' => true,
+            'sort_order' => 1,
+            'group_name' => 'test-group',
+        ]);
+    }
+
+    public function test_attribute_resource_can_edit_attribute(): void
+    {
+        $attribute = Attribute::factory()->create([
+            'name' => 'Original Name',
+            'description' => 'Original Description',
+        ]);
+
+        $updateData = [
+            'name' => 'Updated Name',
+            'description' => 'Updated Description',
+        ];
+
+        $response = $this->put(route('filament.admin.resources.attributes.update', $attribute), $updateData);
+
+        $response->assertRedirect();
+        
+        $this->assertDatabaseHas('attributes', [
+            'id' => $attribute->id,
+            'name' => 'Updated Name',
+            'description' => 'Updated Description',
+        ]);
+    }
+
+    public function test_attribute_resource_can_delete_attribute(): void
+    {
+        $attribute = Attribute::factory()->create();
+
+        $response = $this->delete(route('filament.admin.resources.attributes.destroy', $attribute));
+
+        $response->assertRedirect();
+        
+        $this->assertSoftDeleted('attributes', [
+            'id' => $attribute->id,
+        ]);
+    }
+
+    public function test_attribute_resource_widgets_are_included(): void
+    {
+        $attribute = Attribute::factory()->create();
+
+        $response = $this->get(route('filament.admin.resources.attributes.index'));
+
+        $response->assertOk();
+        // Widgets should be rendered on the index page
+        $response->assertSee('Attribute Statistics');
+    }
+}

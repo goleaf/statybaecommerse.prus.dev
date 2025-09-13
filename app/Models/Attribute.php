@@ -511,6 +511,157 @@ final class Attribute extends Model
         return $this;
     }
 
+    // Advanced Translation Methods
+    public function getTranslatedName(?string $locale = null): ?string
+    {
+        return $this->trans('name', $locale) ?: $this->name;
+    }
+
+    public function getTranslatedDescription(?string $locale = null): ?string
+    {
+        return $this->trans('description', $locale) ?: $this->description;
+    }
+
+    public function getTranslatedSlug(?string $locale = null): ?string
+    {
+        return $this->trans('slug', $locale) ?: $this->slug;
+    }
+
+    public function getTranslatedPlaceholder(?string $locale = null): ?string
+    {
+        return $this->trans('placeholder', $locale) ?: $this->placeholder;
+    }
+
+    public function getTranslatedHelpText(?string $locale = null): ?string
+    {
+        return $this->trans('help_text', $locale) ?: $this->help_text;
+    }
+
+    // Scope for translated attributes
+    public function scopeWithTranslations($query, ?string $locale = null)
+    {
+        $locale = $locale ?: app()->getLocale();
+        return $query->with(['translations' => function ($q) use ($locale) {
+            $q->where('locale', $locale);
+        }]);
+    }
+
+    // Translation Management Methods
+    public function getAvailableLocales(): array
+    {
+        return $this->translations()->pluck('locale')->unique()->values()->toArray();
+    }
+
+    public function hasTranslationFor(string $locale): bool
+    {
+        return $this->translations()->where('locale', $locale)->exists();
+    }
+
+    public function getOrCreateTranslation(string $locale): \App\Models\Translations\AttributeTranslation
+    {
+        return $this->translations()->firstOrCreate(
+            ['locale' => $locale],
+            [
+                'name' => $this->name,
+                'slug' => $this->slug,
+                'description' => $this->description,
+                'placeholder' => $this->placeholder,
+                'help_text' => $this->help_text,
+            ]
+        );
+    }
+
+    public function updateTranslation(string $locale, array $data): bool
+    {
+        $translation = $this->getOrCreateTranslation($locale);
+        return $translation->update($data);
+    }
+
+    public function updateTranslations(array $translations): bool
+    {
+        foreach ($translations as $locale => $data) {
+            $this->updateTranslation($locale, $data);
+        }
+        return true;
+    }
+
+    // Helper Methods
+    public function getFullDisplayName(?string $locale = null): string
+    {
+        $name = $this->getTranslatedName($locale);
+        $type = $this->getFormattedTypeAttribute();
+        return "{$name} ({$type})";
+    }
+
+    public function getAttributeInfo(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'type' => $this->type,
+            'description' => $this->description,
+            'group_name' => $this->group_name,
+            'sort_order' => $this->sort_order,
+            'is_required' => $this->is_required,
+            'is_filterable' => $this->is_filterable,
+            'is_searchable' => $this->is_searchable,
+            'is_visible' => $this->is_visible,
+            'is_editable' => $this->is_editable,
+            'is_sortable' => $this->is_sortable,
+            'is_enabled' => $this->is_enabled,
+        ];
+    }
+
+    public function getTechnicalInfo(): array
+    {
+        return [
+            'type' => $this->type,
+            'default_value' => $this->default_value,
+            'validation_rules' => $this->validation_rules,
+            'min_value' => $this->min_value,
+            'max_value' => $this->max_value,
+            'step_value' => $this->step_value,
+            'placeholder' => $this->placeholder,
+            'help_text' => $this->help_text,
+            'icon' => $this->icon,
+            'color' => $this->color,
+            'meta_data' => $this->meta_data,
+        ];
+    }
+
+    public function getBusinessInfo(): array
+    {
+        return [
+            'usage_count' => $this->getUsageCount(),
+            'values_count' => $this->getValuesCount(),
+            'enabled_values_count' => $this->getEnabledValuesCount(),
+            'popularity_score' => $this->getPopularityScore(),
+            'average_values_per_product' => $this->getAverageValuesPerProduct(),
+            'status' => $this->status_badge,
+            'status_color' => $this->status_color,
+            'status_label' => $this->status_label,
+        ];
+    }
+
+    public function getCompleteInfo(?string $locale = null): array
+    {
+        return array_merge(
+            $this->getAttributeInfo(),
+            $this->getTechnicalInfo(),
+            $this->getBusinessInfo(),
+            [
+                'translations' => $this->getAvailableLocales(),
+                'has_translations' => count($this->getAvailableLocales()) > 0,
+                'formatted_type' => $this->getFormattedTypeAttribute(),
+                'type_icon' => $this->getTypeIconAttribute(),
+                'type_color' => $this->getTypeColorAttribute(),
+                'created_at' => $this->created_at?->toISOString(),
+                'updated_at' => $this->updated_at?->toISOString(),
+            ]
+        );
+    }
+
     public function getStatistics(): array
     {
         return [

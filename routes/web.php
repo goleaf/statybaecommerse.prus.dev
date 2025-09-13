@@ -1374,3 +1374,17 @@ Route::prefix('collections')->name('collections.')->group(function () {
     Route::get('/api/statistics', [App\Http\Controllers\CollectionController::class, 'statistics'])->name('api.statistics');
     Route::get('/{collection}/products', [App\Http\Controllers\CollectionController::class, 'products'])->name('products');
 });
+
+
+// Attribute Frontend Routes
+Route::prefix('attributes')->name('attributes.')->group(function () {
+    Route::get('/', [App\Http\Controllers\AttributeController::class, 'index'])->name('index');
+    Route::get('/{attribute}', [App\Http\Controllers\AttributeController::class, 'show'])->name('show');
+    Route::get('/api/search', [App\Http\Controllers\AttributeController::class, 'api'])->name('api.search');
+    Route::get('/api/by-type/{type}', [App\Http\Controllers\AttributeController::class, 'byType'])->name('api.by-type');
+    Route::get('/api/by-group/{group}', [App\Http\Controllers\AttributeController::class, 'byGroup'])->name('api.by-group');
+    Route::get('/api/filterable', [App\Http\Controllers\AttributeController::class, 'filterable'])->name('api.filterable');
+    Route::get('/api/required', [App\Http\Controllers\AttributeController::class, 'required'])->name('api.required');
+    Route::get('/api/statistics', [App\Http\Controllers\AttributeController::class, 'statistics'])->name('api.statistics');
+    Route::get('/{attribute}/values', [App\Http\Controllers\AttributeController::class, 'values'])->name('values');
+});

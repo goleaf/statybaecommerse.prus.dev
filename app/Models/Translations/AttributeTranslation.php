@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class AttributeTranslation extends Model
 {
     use HasFactory;
+    protected static string $factory = \Database\Factories\AttributeTranslationFactory::class;
 
     protected $table = 'attribute_translations';
 
