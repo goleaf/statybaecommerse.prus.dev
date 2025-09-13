@@ -56,8 +56,9 @@ it('can have child regions', function () {
     $child1 = Region::factory()->create(['parent_id' => $parent->id]);
     $child2 = Region::factory()->create(['parent_id' => $parent->id]);
     
+    $parent->refresh(); // Refresh to get updated children
     expect($parent->children)->toHaveCount(2);
-    expect($parent->children->first()->id)->toBe($child1->id);
+    expect($parent->children->pluck('id'))->toContain($child1->id, $child2->id);
 });
 
 it('has many cities', function () {
@@ -160,7 +161,7 @@ it('can scope with translations', function () {
         'description' => 'English Description',
     ]);
     
-    $regions = Region::withTranslations('en')->get();
+    $regions = Region::where('id', $region->id)->withTranslations('en')->get();
     
     expect($regions)->toHaveCount(1);
     expect($regions->first()->translations)->toHaveCount(1);
