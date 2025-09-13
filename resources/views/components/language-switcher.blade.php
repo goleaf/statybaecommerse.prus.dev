@@ -1,6 +1,12 @@
 @php
     $currentLocale = app()->getLocale();
     $supportedLocales = config('app.supported_locales', ['lt', 'en', 'de', 'ru']);
+    
+    // Ensure supportedLocales is always an array
+    if (is_string($supportedLocales)) {
+        $supportedLocales = array_map('trim', explode(',', $supportedLocales));
+    }
+    
     $localeNames = [
         'lt' => 'Lietuvių',
         'en' => 'English',
