@@ -252,4 +252,173 @@ final class Location extends Model
 
         return $formatted;
     }
+
+    // Enhanced translation methods
+    public function getTranslatedName(?string $locale = null): ?string
+    {
+        return $this->trans('name', $locale) ?: $this->name;
+    }
+
+    public function getTranslatedDescription(?string $locale = null): ?string
+    {
+        return $this->trans('description', $locale) ?: $this->description;
+    }
+
+    public function getTranslatedSlug(?string $locale = null): ?string
+    {
+        return $this->trans('slug', $locale) ?: $this->slug;
+    }
+
+    // Scope for translated locations
+    public function scopeWithTranslations($query, ?string $locale = null)
+    {
+        $locale = $locale ?: app()->getLocale();
+
+        return $query->with(['translations' => function ($q) use ($locale) {
+            $q->where('locale', $locale);
+        }]);
+    }
+
+    // Get all available locales for this location
+    public function getAvailableLocales(): array
+    {
+        return $this->translations()->pluck('locale')->toArray();
+    }
+
+    // Check if location has translation for specific locale
+    public function hasTranslationFor(string $locale): bool
+    {
+        return $this->translations()->where('locale', $locale)->exists();
+    }
+
+    // Get or create translation for locale
+    public function getOrCreateTranslation(string $locale): LocationTranslation
+    {
+        return $this->translations()->firstOrCreate(
+            ['locale' => $locale],
+            [
+                'name' => $this->name,
+                'description' => $this->description,
+                'slug' => $this->slug,
+            ]
+        );
+    }
+
+    // Update translation for specific locale
+    public function updateTranslation(string $locale, array $data): bool
+    {
+        $translation = $this->translations()->where('locale', $locale)->first();
+        
+        if ($translation) {
+            return $translation->update($data);
+        }
+        
+        return $this->translations()->create(array_merge(['locale' => $locale], $data)) !== null;
+    }
+
+    // Bulk update translations
+    public function updateTranslations(array $translations): bool
+    {
+        foreach ($translations as $locale => $data) {
+            $this->updateTranslation($locale, $data);
+        }
+        
+        return true;
+    }
+
+    // Additional helper methods
+    public function getFullDisplayName(?string $locale = null): string
+    {
+        $name = $this->getTranslatedName($locale);
+        
+        if ($this->country) {
+            $countryName = $this->country->getTranslatedName($locale);
+            return "{$name}, {$countryName}";
+        }
+        
+        return $name;
+    }
+
+    public function getLocationInfo(): array
+    {
+        return [
+            'basic' => [
+                'id' => $this->id,
+                'name' => $this->getTranslatedName(),
+                'description' => $this->getTranslatedDescription(),
+                'code' => $this->code,
+                'slug' => $this->getTranslatedSlug(),
+                'type' => $this->type,
+                'type_label' => $this->getTypeLabelAttribute(),
+            ],
+            'address' => [
+                'full_address' => $this->getFullAddressAttribute(),
+                'address_line_1' => $this->address_line_1,
+                'address_line_2' => $this->address_line_2,
+                'city' => $this->city,
+                'state' => $this->state,
+                'postal_code' => $this->postal_code,
+                'country_code' => $this->country_code,
+            ],
+            'contact' => [
+                'phone' => $this->phone,
+                'email' => $this->email,
+                'contact_info' => $this->contact_info,
+            ],
+            'coordinates' => [
+                'latitude' => $this->latitude,
+                'longitude' => $this->longitude,
+                'coordinates_string' => $this->getCoordinatesAttribute(),
+                'google_maps_url' => $this->getGoogleMapsUrlAttribute(),
+                'has_coordinates' => $this->hasCoordinates(),
+            ],
+            'business' => [
+                'opening_hours' => $this->opening_hours,
+                'formatted_opening_hours' => $this->getFormattedOpeningHours(),
+                'has_opening_hours' => $this->hasOpeningHours(),
+                'is_open_now' => $this->isOpenNow(),
+            ],
+            'status' => [
+                'is_enabled' => $this->is_enabled,
+                'is_default' => $this->is_default,
+                'sort_order' => $this->sort_order,
+            ],
+        ];
+    }
+
+    public function getBusinessInfo(): array
+    {
+        return [
+            'type' => $this->type,
+            'type_label' => $this->getTypeLabelAttribute(),
+            'is_warehouse' => $this->isWarehouse(),
+            'is_store' => $this->isStore(),
+            'is_office' => $this->isOffice(),
+            'is_pickup_point' => $this->type === 'pickup_point',
+            'has_coordinates' => $this->hasCoordinates(),
+            'has_opening_hours' => $this->hasOpeningHours(),
+            'is_open_now' => $this->isOpenNow(),
+        ];
+    }
+
+    public function getCompleteInfo(?string $locale = null): array
+    {
+        return [
+            'basic' => [
+                'id' => $this->id,
+                'name' => $this->getTranslatedName($locale),
+                'description' => $this->getTranslatedDescription($locale),
+                'code' => $this->code,
+                'slug' => $this->getTranslatedSlug($locale),
+                'full_display_name' => $this->getFullDisplayName($locale),
+            ],
+            'location' => $this->getLocationInfo(),
+            'business' => $this->getBusinessInfo(),
+            'status' => [
+                'is_enabled' => $this->is_enabled,
+                'is_default' => $this->is_default,
+                'sort_order' => $this->sort_order,
+            ],
+        ];
+    }
 }

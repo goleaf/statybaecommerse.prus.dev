@@ -1348,3 +1348,16 @@ Route::prefix('regions')->name('regions.')->group(function () {
     Route::get('/api/hierarchy', [App\Http\Controllers\RegionController::class, 'hierarchy'])->name('api.hierarchy');
     Route::get('/api/statistics', [App\Http\Controllers\RegionController::class, 'statistics'])->name('api.statistics');
 });
+
+
+// Location Frontend Routes
+Route::prefix('locations')->name('locations.')->group(function () {
+    Route::get('/', [App\Http\Controllers\LocationController::class, 'index'])->name('index');
+    Route::get('/{location}', [App\Http\Controllers\LocationController::class, 'show'])->name('show');
+    Route::get('/api/search', [App\Http\Controllers\LocationController::class, 'api'])->name('api.search');
+    Route::get('/api/by-type/{type}', [App\Http\Controllers\LocationController::class, 'byType'])->name('api.by-type');
+    Route::get('/api/by-country/{country}', [App\Http\Controllers\LocationController::class, 'byCountry'])->name('api.by-country');
+    Route::get('/api/by-city/{city}', [App\Http\Controllers\LocationController::class, 'byCity'])->name('api.by-city');
+    Route::get('/api/nearby', [App\Http\Controllers\LocationController::class, 'nearby'])->name('api.nearby');
+    Route::get('/api/statistics', [App\Http\Controllers\LocationController::class, 'statistics'])->name('api.statistics');
+});

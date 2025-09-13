@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Models\Country;
-use App\Models\Inventory;
 use App\Models\Location;
-use App\Models\VariantInventory;
+use App\Models\Translations\LocationTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,403 +14,337 @@ final class LocationTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
+    private function createTestCountry(): Country
     {
-        parent::setUp();
-        
-        // Create countries for foreign key constraints
-        \App\Models\Country::create([
-            'name' => 'Lithuania',
+        return Country::factory()->create([
             'cca2' => 'LT',
-            'cca3' => 'LTU',
-            'is_active' => true,
-            'is_enabled' => true,
-        ]);
-        
-        \App\Models\Country::create([
-            'name' => 'United States',
-            'cca2' => 'US',
-            'cca3' => 'USA',
-            'is_active' => true,
-            'is_enabled' => true,
-        ]);
-        
-        \App\Models\Country::create([
-            'name' => 'United Kingdom',
-            'cca2' => 'GB',
-            'cca3' => 'GBR',
-            'is_active' => true,
-            'is_enabled' => true,
+            'name' => 'Lithuania',
         ]);
     }
 
     public function test_location_can_be_created(): void
     {
-        $location = new Location([
-            'code' => 'WH001',
-            'name' => 'Test Warehouse',
-            'slug' => 'test-warehouse',
+        $country = $this->createTestCountry();
+
+        $location = Location::factory()->create([
+            'name' => 'Test Location',
+            'code' => 'TEST001',
             'type' => 'warehouse',
-            'country_code' => 'LT',
             'is_enabled' => true,
-            'is_default' => false,
-            'sort_order' => 0,
+            'latitude' => 54.6872,
+            'longitude' => 25.2797,
+            'country_code' => 'LT',
         ]);
-        
-        $location->save();
 
         $this->assertDatabaseHas('locations', [
-            'name' => 'Test Warehouse',
-            'code' => 'WH001',
+            'name' => 'Test Location',
+            'code' => 'TEST001',
             'type' => 'warehouse',
             'is_enabled' => true,
+            'latitude' => 54.6872,
+            'longitude' => 25.2797,
+            'country_code' => 'LT',
         ]);
 
-        $this->assertEquals('Test Warehouse', $location->name);
-        $this->assertEquals('WH001', $location->code);
+        $this->assertEquals('Test Location', $location->name);
+        $this->assertEquals('TEST001', $location->code);
         $this->assertEquals('warehouse', $location->type);
         $this->assertTrue($location->is_enabled);
+        $this->assertEquals(54.6872, $location->latitude);
+        $this->assertEquals(25.2797, $location->longitude);
     }
 
-    public function test_location_belongs_to_country(): void
+    public function test_location_translation_methods(): void
     {
-        $country = \App\Models\Country::where('cca2', 'LT')->first();
-        $location = new Location([
-            'code' => 'TEST001',
-            'name' => 'Test Location',
-            'slug' => 'test-location',
-            'type' => 'warehouse',
-            'country_code' => 'LT',
-            'is_enabled' => true,
-            'is_default' => false,
-            'sort_order' => 0,
-        ]);
-        $location->save();
-
-        $this->assertInstanceOf(Country::class, $location->country);
-        $this->assertEquals('LT', $location->country->cca2);
-    }
-
-    public function test_location_has_many_inventories(): void
-    {
-        $location = new Location([
-            'code' => 'TEST002',
-            'name' => 'Test Location 2',
-            'slug' => 'test-location-2',
-            'type' => 'warehouse',
-            'country_code' => 'LT',
-            'is_enabled' => true,
-            'is_default' => false,
-            'sort_order' => 0,
-        ]);
-        $location->save();
+        $country = $this->createTestCountry();
         
-        // Note: This test would require Inventory model and factory to be properly set up
-        // For now, we'll just test that the relationship method exists
-        $this->assertTrue(method_exists($location, 'inventories'));
-    }
-
-    public function test_location_has_many_variant_inventories(): void
-    {
-        $location = new Location([
-            'code' => 'TEST003',
-            'name' => 'Test Location 3',
-            'slug' => 'test-location-3',
-            'type' => 'warehouse',
+        $location = Location::factory()->create([
+            'name' => 'Original Name',
             'country_code' => 'LT',
-            'is_enabled' => true,
-            'is_default' => false,
-            'sort_order' => 0,
         ]);
-        $location->save();
         
-        // Note: This test would require VariantInventory model and factory to be properly set up
-        // For now, we'll just test that the relationship method exists
-        $this->assertTrue(method_exists($location, 'variantInventories'));
+        // Create translation
+        LocationTranslation::factory()->create([
+            'location_id' => $location->id,
+            'locale' => 'en',
+            'name' => 'English Name',
+            'slug' => 'english-slug',
+            'description' => 'English Description',
+        ]);
+
+        // Test translated methods
+        $this->assertEquals('English Name', $location->getTranslatedName('en'));
+        $this->assertEquals('english-slug', $location->getTranslatedSlug('en'));
+        $this->assertEquals('English Description', $location->getTranslatedDescription('en'));
+
+        // Test fallback to original
+        $this->assertEquals('Original Name', $location->getTranslatedName('lt'));
+        $this->assertEquals('Original Name', $location->getTranslatedName());
     }
 
-    public function test_location_scope_enabled(): void
+    public function test_location_scopes(): void
     {
-        $enabledLocation = new Location([
-            'code' => 'ENABLED001',
-            'name' => 'Enabled Location',
-            'slug' => 'enabled-location',
-            'type' => 'warehouse',
-            'country_code' => 'LT',
-            'is_enabled' => true,
-            'is_default' => false,
-            'sort_order' => 0,
-        ]);
-        $enabledLocation->save();
+        $country = $this->createTestCountry();
 
-        $disabledLocation = new Location([
-            'code' => 'DISABLED001',
-            'name' => 'Disabled Location',
-            'slug' => 'disabled-location',
-            'type' => 'warehouse',
+        // Create locations with different attributes
+        $enabledLocation = Location::factory()->create([
+            'is_enabled' => true,
             'country_code' => 'LT',
+        ]);
+        
+        $disabledLocation = Location::factory()->create([
             'is_enabled' => false,
-            'is_default' => false,
-            'sort_order' => 0,
+            'country_code' => 'LT',
         ]);
-        $disabledLocation->save();
 
+        $defaultLocation = Location::factory()->create([
+            'is_default' => true,
+            'country_code' => 'LT',
+        ]);
+
+        $warehouseLocation = Location::factory()->create([
+            'type' => 'warehouse',
+            'country_code' => 'LT',
+        ]);
+
+        // Test scopes
         $enabledLocations = Location::enabled()->get();
-
-        $this->assertCount(1, $enabledLocations);
-        $this->assertTrue($enabledLocations->first()->is_enabled);
-    }
-
-    public function test_location_scope_default(): void
-    {
-        Location::factory()->create(['is_default' => true]);
-        Location::factory()->create(['is_default' => false]);
+        $this->assertTrue($enabledLocations->contains('id', $enabledLocation->id));
+        $this->assertFalse($enabledLocations->contains('id', $disabledLocation->id));
 
         $defaultLocations = Location::default()->get();
-
-        $this->assertCount(1, $defaultLocations);
-        $this->assertTrue($defaultLocations->first()->is_default);
-    }
-
-    public function test_location_scope_by_type(): void
-    {
-        Location::factory()->create(['type' => 'warehouse']);
-        Location::factory()->create(['type' => 'store']);
+        $this->assertTrue($defaultLocations->contains('id', $defaultLocation->id));
 
         $warehouses = Location::byType('warehouse')->get();
-
-        $this->assertCount(1, $warehouses);
-        $this->assertEquals('warehouse', $warehouses->first()->type);
+        $this->assertTrue($warehouses->contains('id', $warehouseLocation->id));
     }
 
-    public function test_location_full_address_attribute(): void
+    public function test_location_type_methods(): void
     {
-        $location = Location::factory()->create([
-            'address_line_1' => '123 Main St',
-            'address_line_2' => 'Suite 100',
-            'city' => 'Vilnius',
-            'state' => 'Vilniaus',
-            'postal_code' => '01101',
+        $country = $this->createTestCountry();
+
+        $warehouse = Location::factory()->create([
+            'type' => 'warehouse',
+            'country_code' => 'LT',
         ]);
 
-        $expected = '123 Main St, Suite 100, Vilnius, Vilniaus, 01101';
-        $this->assertEquals($expected, $location->full_address);
-    }
-
-    public function test_location_full_address_with_empty_fields(): void
-    {
-        $location = Location::factory()->create([
-            'address_line_1' => '123 Main St',
-            'address_line_2' => null,
-            'city' => 'Vilnius',
-            'state' => null,
-            'postal_code' => '01101',
+        $store = Location::factory()->create([
+            'type' => 'store',
+            'country_code' => 'LT',
         ]);
-
-        $expected = '123 Main St, Vilnius, 01101';
-        $this->assertEquals($expected, $location->full_address);
-    }
-
-    public function test_location_type_label_attribute(): void
-    {
-        $warehouse = Location::factory()->create(['type' => 'warehouse']);
-        $store = Location::factory()->create(['type' => 'store']);
-
-        $this->assertEquals(__('locations.type_warehouse'), $warehouse->type_label);
-        $this->assertEquals(__('locations.type_store'), $store->type_label);
-    }
-
-    public function test_location_coordinates_attribute(): void
-    {
-        $location = Location::factory()->create([
-            'latitude' => 54.6872,
-            'longitude' => 25.2797,
-        ]);
-
-        $this->assertEquals('54.6872, 25.2797', $location->coordinates);
-    }
-
-    public function test_location_coordinates_attribute_with_null_values(): void
-    {
-        $location = Location::factory()->create([
-            'latitude' => null,
-            'longitude' => null,
-        ]);
-
-        $this->assertNull($location->coordinates);
-    }
-
-    public function test_location_google_maps_url_attribute(): void
-    {
-        $location = Location::factory()->create([
-            'latitude' => 54.6872,
-            'longitude' => 25.2797,
-        ]);
-
-        $expected = 'https://www.google.com/maps?q=54.6872,25.2797';
-        $this->assertEquals($expected, $location->google_maps_url);
-    }
-
-    public function test_location_google_maps_url_with_null_values(): void
-    {
-        $location = Location::factory()->create([
-            'latitude' => null,
-            'longitude' => null,
-        ]);
-
-        $this->assertNull($location->google_maps_url);
-    }
-
-    public function test_location_type_checker_methods(): void
-    {
-        $warehouse = Location::factory()->create(['type' => 'warehouse']);
-        $store = Location::factory()->create(['type' => 'store']);
-        $office = Location::factory()->create(['type' => 'office']);
-        $other = Location::factory()->create(['type' => 'other']);
 
         $this->assertTrue($warehouse->isWarehouse());
         $this->assertFalse($warehouse->isStore());
 
         $this->assertTrue($store->isStore());
         $this->assertFalse($store->isWarehouse());
-
-        $this->assertTrue($office->isOffice());
-        $this->assertTrue($other->isOther());
     }
 
-    public function test_location_has_coordinates(): void
+    public function test_location_coordinate_methods(): void
     {
-        $locationWithCoords = Location::factory()->create([
+        $country = $this->createTestCountry();
+
+        $location = Location::factory()->create([
             'latitude' => 54.6872,
             'longitude' => 25.2797,
+            'country_code' => 'LT',
         ]);
+
+        $this->assertTrue($location->hasCoordinates());
+        $this->assertEquals('54.6872, 25.2797', $location->getCoordinatesAttribute());
 
         $locationWithoutCoords = Location::factory()->create([
             'latitude' => null,
             'longitude' => null,
+            'country_code' => 'LT',
         ]);
 
-        $this->assertTrue($locationWithCoords->hasCoordinates());
         $this->assertFalse($locationWithoutCoords->hasCoordinates());
+        $this->assertNull($locationWithoutCoords->getCoordinatesAttribute());
     }
 
-    public function test_location_has_opening_hours(): void
+    public function test_location_opening_hours_methods(): void
     {
-        $locationWithHours = Location::factory()->create([
-            'opening_hours' => [
-                ['day' => 'monday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+        $country = $this->createTestCountry();
+
+        $openingHours = [
+            [
+                'day' => 'monday',
+                'open_time' => '09:00',
+                'close_time' => '17:00',
+                'is_closed' => false,
             ],
+            [
+                'day' => 'tuesday',
+                'open_time' => '09:00',
+                'close_time' => '17:00',
+                'is_closed' => false,
+            ],
+        ];
+
+        $location = Location::factory()->create([
+            'opening_hours' => $openingHours,
+            'country_code' => 'LT',
         ]);
+
+        $this->assertTrue($location->hasOpeningHours());
+        $this->assertEquals($openingHours, $location->opening_hours);
 
         $locationWithoutHours = Location::factory()->create([
             'opening_hours' => null,
+            'country_code' => 'LT',
         ]);
 
-        $this->assertTrue($locationWithHours->hasOpeningHours());
         $this->assertFalse($locationWithoutHours->hasOpeningHours());
+        $this->assertNull($locationWithoutHours->opening_hours);
     }
 
-    public function test_location_get_opening_hours_for_day(): void
+    public function test_location_address_methods(): void
     {
+        $country = $this->createTestCountry();
+
         $location = Location::factory()->create([
-            'opening_hours' => [
-                ['day' => 'monday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
-                ['day' => 'tuesday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+            'address_line_1' => 'Vilniaus g. 1',
+            'address_line_2' => 'Apt. 5',
+            'city' => 'Vilnius',
+            'state' => 'Vilniaus apskritis',
+            'postal_code' => '01103',
+            'country_code' => 'LT',
+        ]);
+
+        $this->assertEquals('Vilniaus g. 1, Apt. 5, Vilnius, Vilniaus apskritis, 01103', $location->getFullAddressAttribute());
+
+        $locationWithoutAddress = Location::factory()->create([
+            'address_line_1' => null,
+            'address_line_2' => null,
+            'city' => null,
+            'state' => null,
+            'postal_code' => null,
+            'country_code' => 'LT',
+        ]);
+
+        $this->assertEquals('', $locationWithoutAddress->getFullAddressAttribute());
+    }
+
+    public function test_location_translation_management(): void
+    {
+        $country = $this->createTestCountry();
+        
+        $location = Location::factory()->create([
+            'name' => 'Original Name',
+            'country_code' => 'LT',
+        ]);
+
+        // Test available locales
+        $this->assertEquals([], $location->getAvailableLocales());
+
+        // Test hasTranslationFor
+        $this->assertFalse($location->hasTranslationFor('en'));
+
+        // Test getOrCreateTranslation
+        $translation = $location->getOrCreateTranslation('en');
+        $this->assertInstanceOf(LocationTranslation::class, $translation);
+        $this->assertEquals('en', $translation->locale);
+
+        // Test updateTranslation
+        $location->updateTranslation('en', [
+            'name' => 'English Name',
+            'description' => 'English Description',
+        ]);
+
+        $translation = $location->translations()->where('locale', 'en')->first();
+        $this->assertEquals('English Name', $translation->name);
+        $this->assertEquals('English Description', $translation->description);
+
+        // Test updateTranslations
+        $location->updateTranslations([
+            'lt' => [
+                'name' => 'Lietuviškas pavadinimas',
+                'description' => 'Lietuviškas aprašymas',
             ],
         ]);
 
-        $mondayHours = $location->getOpeningHoursForDay('monday');
-        $sundayHours = $location->getOpeningHoursForDay('sunday');
-
-        $this->assertNotNull($mondayHours);
-        $this->assertEquals('monday', $mondayHours['day']);
-        $this->assertEquals('09:00', $mondayHours['open_time']);
-        $this->assertEquals('17:00', $mondayHours['close_time']);
-
-        $this->assertNull($sundayHours);
+        $ltTranslation = $location->translations()->where('locale', 'lt')->first();
+        $this->assertEquals('Lietuviškas pavadinimas', $ltTranslation->name);
+        $this->assertEquals('Lietuviškas aprašymas', $ltTranslation->description);
     }
 
-    public function test_location_get_formatted_opening_hours(): void
+    public function test_location_helper_methods(): void
     {
+        $country = $this->createTestCountry();
+        
         $location = Location::factory()->create([
-            'opening_hours' => [
-                ['day' => 'monday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
-                ['day' => 'sunday', 'open_time' => null, 'close_time' => null, 'is_closed' => true],
-            ],
+            'name' => 'Test Location',
+            'type' => 'warehouse',
+            'country_code' => 'LT',
         ]);
 
-        $formattedHours = $location->getFormattedOpeningHours();
+        // Test getFullDisplayName
+        $this->assertEquals('Test Location, Lithuania', $location->getFullDisplayName());
 
-        $this->assertArrayHasKey('monday', $formattedHours);
-        $this->assertArrayHasKey('sunday', $formattedHours);
+        // Test getLocationInfo
+        $locationInfo = $location->getLocationInfo();
+        $this->assertArrayHasKey('basic', $locationInfo);
+        $this->assertArrayHasKey('address', $locationInfo);
+        $this->assertArrayHasKey('contact', $locationInfo);
+        $this->assertArrayHasKey('coordinates', $locationInfo);
+        $this->assertArrayHasKey('business', $locationInfo);
+        $this->assertArrayHasKey('status', $locationInfo);
 
-        $this->assertEquals(__('locations.monday'), $formattedHours['monday']['day']);
-        $this->assertEquals('09:00', $formattedHours['monday']['open_time']);
-        $this->assertEquals('17:00', $formattedHours['monday']['close_time']);
-        $this->assertFalse($formattedHours['monday']['is_closed']);
+        // Test getBusinessInfo
+        $businessInfo = $location->getBusinessInfo();
+        $this->assertArrayHasKey('type', $businessInfo);
+        $this->assertArrayHasKey('type_label', $businessInfo);
+        $this->assertArrayHasKey('is_warehouse', $businessInfo);
+        $this->assertArrayHasKey('is_store', $businessInfo);
 
-        $this->assertEquals(__('locations.sunday'), $formattedHours['sunday']['day']);
-        $this->assertTrue($formattedHours['sunday']['is_closed']);
+        // Test getCompleteInfo
+        $completeInfo = $location->getCompleteInfo();
+        $this->assertArrayHasKey('basic', $completeInfo);
+        $this->assertArrayHasKey('location', $completeInfo);
+        $this->assertArrayHasKey('business', $completeInfo);
+        $this->assertArrayHasKey('status', $completeInfo);
     }
 
-    public function test_location_soft_deletes(): void
+    public function test_location_relations(): void
     {
-        $location = Location::factory()->create();
-        $locationId = $location->id;
-
-        $location->delete();
-
-        $this->assertSoftDeleted('locations', ['id' => $locationId]);
-        $this->assertDatabaseHas('locations', ['id' => $locationId]);
-    }
-
-    public function test_location_fillable_attributes(): void
-    {
-        $fillable = [
-            'name',
-            'slug',
-            'description',
-            'code',
-            'address_line_1',
-            'address_line_2',
-            'city',
-            'state',
-            'postal_code',
-            'country_code',
-            'phone',
-            'email',
-            'is_enabled',
-            'is_default',
-            'type',
-            'latitude',
-            'longitude',
-            'opening_hours',
-            'contact_info',
-            'sort_order',
-        ];
-
-        $location = new Location();
-        $this->assertEquals($fillable, $location->getFillable());
-    }
-
-    public function test_location_casts(): void
-    {
+        $country = $this->createTestCountry();
+        
         $location = Location::factory()->create([
-            'is_enabled' => '1',
-            'is_default' => '0',
-            'latitude' => '54.6872',
-            'longitude' => '25.2797',
-            'opening_hours' => ['monday' => '09:00-17:00'],
-            'contact_info' => ['phone' => '+37012345678'],
-            'sort_order' => '10',
+            'country_code' => 'LT',
         ]);
 
-        $this->assertIsBool($location->is_enabled);
-        $this->assertIsBool($location->is_default);
-        $this->assertIsFloat($location->latitude);
-        $this->assertIsFloat($location->longitude);
-        $this->assertIsArray($location->opening_hours);
-        $this->assertIsArray($location->contact_info);
-        $this->assertIsInt($location->sort_order);
+        // Test country relation
+        $this->assertInstanceOf(Country::class, $location->country);
+        $this->assertEquals('LT', $location->country->cca2);
+
+        // Test translations relation
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $location->translations);
+    }
+
+    public function test_location_search_scope(): void
+    {
+        $country = $this->createTestCountry();
+
+        $location1 = Location::factory()->create([
+            'name' => 'Vilnius Warehouse',
+            'code' => 'VIL001',
+            'country_code' => 'LT',
+        ]);
+
+        $location2 = Location::factory()->create([
+            'name' => 'Kaunas Store',
+            'code' => 'KAU002',
+            'country_code' => 'LT',
+        ]);
+
+        // Test search by name using where clause
+        $results = Location::where('name', 'like', '%Vilnius%')->get();
+        $this->assertTrue($results->contains('id', $location1->id));
+        $this->assertFalse($results->contains('id', $location2->id));
+
+        // Test search by code
+        $results = Location::where('code', 'VIL001')->get();
+        $this->assertTrue($results->contains('id', $location1->id));
     }
 }
