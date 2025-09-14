@@ -1,39 +1,51 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
-/**
- * ListProducts
- * 
- * Filament v4 resource for ListProducts management in the admin panel with comprehensive CRUD operations, filters, and actions.
- * 
- * @property string $resource
- * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
- * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)
- */
-class ListProducts extends ListRecords
+
+final class ListProducts extends ListRecords
 {
     protected static string $resource = ProductResource::class;
-    /**
-     * Handle getHeaderActions functionality with proper error handling.
-     * @return array
-     */
+
     protected function getHeaderActions(): array
     {
-        return [Actions\CreateAction::make()];
+        return [
+            Actions\CreateAction::make(),
+        ];
     }
-    /**
-     * Handle getTabs functionality with proper error handling.
-     * @return array
-     */
+
     public function getTabs(): array
     {
-        return ['all' => Tab::make(__('translations.all_products'))->icon('heroicon-o-cube'), 'published' => Tab::make(__('translations.published_products'))->icon('heroicon-o-check-circle')->modifyQueryUsing(fn(Builder $query) => $query->where('status', 'published')->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now())), 'draft' => Tab::make(__('translations.draft_products'))->icon('heroicon-o-document-text')->modifyQueryUsing(fn(Builder $query) => $query->where('status', 'draft')), 'featured' => Tab::make(__('translations.featured_products'))->icon('heroicon-o-star')->modifyQueryUsing(fn(Builder $query) => $query->where('is_featured', true)), 'low_stock' => Tab::make(__('translations.low_stock_products'))->icon('heroicon-o-exclamation-triangle')->modifyQueryUsing(fn(Builder $query) => $query->whereRaw('stock_quantity <= low_stock_threshold')), 'out_of_stock' => Tab::make(__('translations.out_of_stock_products'))->icon('heroicon-o-x-circle')->modifyQueryUsing(fn(Builder $query) => $query->where('stock_quantity', '<=', 0))];
+        return [
+            'all' => Tab::make(__('products.tabs.all'))
+                ->icon('heroicon-o-cube'),
+
+            'published' => Tab::make(__('products.tabs.published'))
+                ->icon('heroicon-o-eye')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_visible', true)),
+
+            'draft' => Tab::make(__('products.tabs.draft'))
+                ->icon('heroicon-o-document')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_visible', false)),
+
+            'featured' => Tab::make(__('products.tabs.featured'))
+                ->icon('heroicon-o-star')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_featured', true)),
+
+            'low_stock' => Tab::make(__('products.tabs.low_stock'))
+                ->icon('heroicon-o-exclamation-triangle')
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereRaw('stock_quantity <= low_stock_threshold')),
+
+            'out_of_stock' => Tab::make(__('products.tabs.out_of_stock'))
+                ->icon('heroicon-o-x-circle')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('stock_quantity', '<=', 0)),
+        ];
     }
 }

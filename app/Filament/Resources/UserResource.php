@@ -6,302 +6,287 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use App\Enums\NavigationGroup;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\CreateRecord;
-use Filament\Resources\Pages\EditRecord;
-use Filament\Resources\Pages\ViewRecord;
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use BackedEnum;
+use UnitEnum;
 
+/**
+ * UserResource
+ * 
+ * Filament v4 resource for User management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-users';
-
-    protected static ?string $navigationGroup = 'User Management';
-
+    
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Users;
+    
     protected static ?int $navigationSort = 1;
+    protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
+    /**
+     * Handle getNavigationLabel functionality with proper error handling.
+     * @return string
+     */
+    public static function getNavigationLabel(): string
     {
-        return $form
-            ->schema([
-                Section::make(__('admin.user.personal_information'))
-                    ->schema([
-                        TextInput::make('name')
-                            ->label(__('admin.user.name'))
-                            ->required()
-                            ->maxLength(255),
-                        
-                        TextInput::make('email')
-                            ->label(__('admin.user.email'))
-                            ->email()
-                            ->required()
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(255),
-                        
-                        TextInput::make('first_name')
-                            ->label(__('admin.user.first_name'))
-                            ->maxLength(255),
-                        
-                        TextInput::make('last_name')
-                            ->label(__('admin.user.last_name'))
-                            ->maxLength(255),
-                        
-                        Select::make('gender')
-                            ->label(__('admin.user.gender'))
-                            ->options([
-                                'male' => __('admin.user.gender_male'),
-                                'female' => __('admin.user.gender_female'),
-                                'other' => __('admin.user.gender_other'),
-                            ])
-                            ->nullable(),
-                        
-                        DatePicker::make('birth_date')
-                            ->label(__('admin.user.birth_date'))
-                            ->nullable(),
-                        
-                        TextInput::make('phone_number')
-                            ->label(__('admin.user.phone_number'))
-                            ->tel()
-                            ->maxLength(255),
-                    ])
-                    ->columns(2),
-                
-                Section::make(__('admin.user.account_settings'))
-                    ->schema([
-                        Toggle::make('is_active')
-                            ->label(__('admin.user.is_active'))
-                            ->default(true),
-                        
-                        Toggle::make('is_verified')
-                            ->label(__('admin.user.is_verified')),
-                        
-                        Toggle::make('accepts_marketing')
-                            ->label(__('admin.user.accepts_marketing')),
-                        
-                        Toggle::make('two_factor_enabled')
-                            ->label(__('admin.user.two_factor_enabled')),
-                        
-                        Select::make('preferred_locale')
-                            ->label(__('admin.user.preferred_locale'))
-                            ->options([
-                                'lt' => __('admin.locale.lithuanian'),
-                                'en' => __('admin.locale.english'),
-                            ])
-                            ->default('lt'),
-                        
-                        TextInput::make('timezone')
-                            ->label(__('admin.user.timezone'))
-                            ->maxLength(255)
-                            ->default('Europe/Vilnius'),
-                    ])
-                    ->columns(2),
-                
-                Section::make(__('admin.user.company_information'))
-                    ->schema([
-                        TextInput::make('company')
-                            ->label(__('admin.user.company'))
-                            ->maxLength(255),
-                        
-                        TextInput::make('job_title')
-                            ->label(__('admin.user.job_title'))
-                            ->maxLength(255),
-                        
-                        TextInput::make('website')
-                            ->label(__('admin.user.website'))
-                            ->url()
-                            ->maxLength(255),
-                        
-                        Textarea::make('bio')
-                            ->label(__('admin.user.bio'))
-                            ->rows(3),
-                    ])
-                    ->columns(2),
-                
-                Section::make(__('admin.user.preferences'))
-                    ->schema([
-                        KeyValue::make('preferences')
-                            ->label(__('admin.user.preferences'))
-                            ->keyLabel(__('admin.user.preference_key'))
-                            ->valueLabel(__('admin.user.preference_value')),
-                        
-                        KeyValue::make('notification_preferences')
-                            ->label(__('admin.user.notification_preferences'))
-                            ->keyLabel(__('admin.user.notification_key'))
-                            ->valueLabel(__('admin.user.notification_value')),
-                        
-                        KeyValue::make('marketing_preferences')
-                            ->label(__('admin.user.marketing_preferences'))
-                            ->keyLabel(__('admin.user.marketing_key'))
-                            ->valueLabel(__('admin.user.marketing_value')),
-                    ])
-                    ->collapsible(),
-            ]);
+        return __('users.title');
     }
 
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Users->label();
+    }
+
+    /**
+     * Handle getPluralModelLabel functionality with proper error handling.
+     * @return string
+     */
+    public static function getPluralModelLabel(): string
+    {
+        return __('users.plural');
+    }
+
+    /**
+     * Handle getModelLabel functionality with proper error handling.
+     * @return string
+     */
+    public static function getModelLabel(): string
+    {
+        return __('users.single');
+    }
+
+    /**
+     * Configure the Filament form schema with fields and validation.
+     * @param Schema $schema
+     * @return Schema
+     */
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->schema([
+            Section::make(__('users.sections.basic_information'))
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('name')
+                                ->label(__('users.fields.name'))
+                                ->required()
+                                ->maxLength(255)
+                                ->columnSpan(1),
+
+                            TextInput::make('email')
+                                ->label(__('users.fields.email'))
+                                ->email()
+                                ->required()
+                                ->unique(ignoreRecord: true)
+                                ->maxLength(255)
+                                ->columnSpan(1),
+                        ]),
+
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('phone')
+                                ->label(__('users.fields.phone'))
+                                ->tel()
+                                ->maxLength(20)
+                                ->columnSpan(1),
+
+                            DatePicker::make('date_of_birth')
+                                ->label(__('users.fields.date_of_birth'))
+                                ->columnSpan(1),
+                        ]),
+
+                    Textarea::make('bio')
+                        ->label(__('users.fields.bio'))
+                        ->maxLength(1000)
+                        ->rows(3),
+                ])
+                ->columns(1),
+
+            Section::make(__('users.sections.preferences'))
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
+                            Select::make('locale')
+                                ->label(__('users.fields.locale'))
+                                ->options([
+                                    'lt' => 'Lietuvių',
+                                    'en' => 'English',
+                                ])
+                                ->default('lt')
+                                ->columnSpan(1),
+
+                            Select::make('timezone')
+                                ->label(__('users.fields.timezone'))
+                                ->options([
+                                    'Europe/Vilnius' => 'Europe/Vilnius',
+                                    'UTC' => 'UTC',
+                                ])
+                                ->default('Europe/Vilnius')
+                                ->columnSpan(1),
+                        ]),
+
+                    Toggle::make('email_notifications')
+                        ->label(__('users.fields.email_notifications'))
+                        ->default(true),
+
+                    Toggle::make('sms_notifications')
+                        ->label(__('users.fields.sms_notifications'))
+                        ->default(false),
+                ])
+                ->columns(1),
+
+            Section::make(__('users.sections.status'))
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
+                            Toggle::make('is_active')
+                                ->label(__('users.fields.is_active'))
+                                ->default(true)
+                                ->columnSpan(1),
+
+                            DatePicker::make('email_verified_at')
+                                ->label(__('users.fields.email_verified_at'))
+                                ->columnSpan(1),
+                        ]),
+                ])
+                ->columns(1),
+        ]);
+    }
+
+    /**
+     * Configure the Filament table with columns, filters, and actions.
+     * @param Table $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->label(__('admin.user.id'))
-                    ->sortable(),
-                
                 TextColumn::make('name')
-                    ->label(__('admin.user.name'))
+                    ->label(__('users.fields.name'))
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('email')
-                    ->label(__('admin.user.email'))
+                    ->label(__('users.fields.email'))
                     ->searchable()
                     ->sortable(),
-                
-                TextColumn::make('first_name')
-                    ->label(__('admin.user.first_name'))
+
+                TextColumn::make('phone')
+                    ->label(__('users.fields.phone'))
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                
-                TextColumn::make('last_name')
-                    ->label(__('admin.user.last_name'))
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                
-                BadgeColumn::make('gender')
-                    ->label(__('admin.user.gender'))
-                    ->colors([
-                        'primary' => 'male',
-                        'secondary' => 'female',
-                        'success' => 'other',
-                    ])
-                    ->toggleable(isToggledHiddenByDefault: true),
-                
-                TextColumn::make('phone_number')
-                    ->label(__('admin.user.phone_number'))
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                
+                    ->toggleable(),
+
+                TextColumn::make('locale')
+                    ->label(__('users.fields.locale'))
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'lt' => 'success',
+                        'en' => 'info',
+                        default => 'gray',
+                    }),
+
                 IconColumn::make('is_active')
-                    ->label(__('admin.user.is_active'))
+                    ->label(__('users.fields.is_active'))
                     ->boolean(),
-                
-                IconColumn::make('is_verified')
-                    ->label(__('admin.user.is_verified'))
+
+                IconColumn::make('email_verified_at')
+                    ->label(__('users.fields.email_verified'))
                     ->boolean(),
-                
-                IconColumn::make('accepts_marketing')
-                    ->label(__('admin.user.accepts_marketing'))
-                    ->boolean()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                
-                TextColumn::make('last_login_at')
-                    ->label(__('admin.user.last_login_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 TextColumn::make('created_at')
-                    ->label(__('admin.user.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                
-                TextColumn::make('updated_at')
-                    ->label(__('admin.user.updated_at'))
+                    ->label(__('users.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('gender')
-                    ->label(__('admin.user.gender'))
+                SelectFilter::make('locale')
+                    ->label(__('users.fields.locale'))
                     ->options([
-                        'male' => __('admin.user.gender_male'),
-                        'female' => __('admin.user.gender_female'),
-                        'other' => __('admin.user.gender_other'),
+                        'lt' => 'Lietuvių',
+                        'en' => 'English',
                     ]),
-                
+
                 TernaryFilter::make('is_active')
-                    ->label(__('admin.user.is_active')),
-                
-                TernaryFilter::make('is_verified')
-                    ->label(__('admin.user.is_verified')),
-                
-                TernaryFilter::make('accepts_marketing')
-                    ->label(__('admin.user.accepts_marketing')),
-                
-                SelectFilter::make('preferred_locale')
-                    ->label(__('admin.user.preferred_locale'))
-                    ->options([
-                        'lt' => __('admin.locale.lithuanian'),
-                        'en' => __('admin.locale.english'),
-                    ]),
-                
-                Tables\Filters\TrashedFilter::make(),
+                    ->label(__('users.fields.is_active')),
+
+                TernaryFilter::make('email_verified_at')
+                    ->label(__('users.fields.email_verified')),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
+                    BulkAction::make('activate')
+                        ->label(__('users.actions.activate'))
+                        ->icon('heroicon-o-check-circle')
+                        ->action(function (Collection $records) {
+                            $records->each->update(['is_active' => true]);
+                            Notification::make()
+                                ->title(__('users.messages.bulk_activate_success'))
+                                ->success()
+                                ->send();
+                        }),
+
+                    BulkAction::make('deactivate')
+                        ->label(__('users.actions.deactivate'))
+                        ->icon('heroicon-o-x-circle')
+                        ->action(function (Collection $records) {
+                            $records->each->update(['is_active' => false]);
+                            Notification::make()
+                                ->title(__('users.messages.bulk_deactivate_success'))
+                                ->success()
+                                ->send();
+                        }),
+
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
+    /**
+     * Get the resource pages.
+     * @return array
+     */
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'view' => Pages\ViewUser::route('/{record}'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
     }
 }

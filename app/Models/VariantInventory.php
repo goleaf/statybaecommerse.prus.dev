@@ -35,13 +35,25 @@ final class VariantInventory extends Model
     
     protected $fillable = [
         'variant_id',
+        'location_id',
         'warehouse_code',
         'stock',
         'reserved',
         'available',
+        'incoming',
+        'threshold',
         'reorder_point',
         'reorder_quantity',
+        'max_stock_level',
+        'cost_per_unit',
+        'supplier_id',
+        'batch_number',
+        'expiry_date',
+        'status',
+        'is_tracked',
+        'notes',
         'last_restocked_at',
+        'last_sold_at',
     ];
 
     protected function casts(): array

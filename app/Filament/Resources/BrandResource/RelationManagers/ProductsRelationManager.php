@@ -1,49 +1,138 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
-use Filament\Forms;
+use App\Models\Product;
 use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-/**
- * ProductsRelationManager
- * 
- * Filament v4 resource for ProductsRelationManager management in the admin panel with comprehensive CRUD operations, filters, and actions.
- * 
- * @property string $relationship
- * @property string|null $title
- * @property string|null $modelLabel
- * @property string|null $pluralModelLabel
- * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
- * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)
- */
+
 final class ProductsRelationManager extends RelationManager
 {
     protected static string $relationship = 'products';
-    protected static ?string $title = 'admin.brands.relations.products_title';
-    protected static ?string $modelLabel = 'admin.brands.relations.product_label';
-    protected static ?string $pluralModelLabel = 'admin.brands.relations.products_label';
-    /**
-     * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
-     */
-    public function form(Form $form): Form
+
+    protected static ?string $title = 'Brand Products';
+
+    public function form(Schema $schema): Schema
     {
-        return $schema->schema([Forms\Components\TextInput::make('name')->label(__('admin.products.fields.name'))->required()->maxLength(255), Forms\Components\TextInput::make('sku')->label(__('admin.products.fields.sku'))->required()->maxLength(255)->unique(ignoreRecord: true), Forms\Components\Textarea::make('description')->label(__('admin.products.fields.description'))->maxLength(1000)->rows(3), Forms\Components\TextInput::make('price')->label(__('admin.products.fields.price'))->numeric()->prefix('€')->required(), Forms\Components\Toggle::make('is_enabled')->label(__('admin.products.fields.is_enabled'))->default(true)])->columns(2);
+        return $schema
+            ->components([
+                Forms\Components\TextInput::make('name')
+                    ->label(__('admin.products.fields.name'))
+                    ->required(),
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('sku')
+                    ->label(__('admin.products.fields.sku'))
+                    ->required(),
+                    ->maxLength(255),
+                    ->unique(Product::class, 'sku', ignoreRecord: true),
+                Forms\Components\Textarea::make('description')
+                    ->label(__('admin.products.fields.description'))
+                    ->rows(3),
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('price')
+                    ->label(__('admin.products.fields.price'))
+                    ->numeric(),
+                    ->prefix('€'),
+                    ->required(),
+                Forms\Components\TextInput::make('stock_quantity')
+                    ->label(__('admin.products.fields.stock_quantity'))
+                    ->numeric(),
+                    ->default(0),
+                Forms\Components\Toggle::make('is_published')
+                    ->label(__('admin.products.fields.is_published'))
+                    ->default(true),
+                Forms\Components\Toggle::make('is_featured')
+                    ->label(__('admin.products.fields.is_featured'))
+                    ->default(false),
+            ]);
     }
-    /**
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-     */
+
     public function table(Table $table): Table
     {
-        return $table->recordTitleAttribute('name')->columns([Tables\Columns\TextColumn::make('name')->label(__('admin.products.fields.name'))->searchable()->sortable(), Tables\Columns\TextColumn::make('sku')->label(__('admin.products.fields.sku'))->searchable()->sortable()->copyable(), Tables\Columns\TextColumn::make('price')->label(__('admin.products.fields.price'))->money('EUR')->sortable(), Tables\Columns\IconColumn::make('is_enabled')->label(__('admin.products.fields.is_enabled'))->boolean()->trueColor('success')->falseColor('danger'), Tables\Columns\TextColumn::make('created_at')->label(__('admin.products.fields.created_at'))->date('Y-m-d')->sortable()->toggleable(isToggledHiddenByDefault: true)])->filters([Tables\Filters\TrashedFilter::make(), Tables\Filters\Filter::make('enabled')->label(__('admin.products.filters.enabled_only'))->query(fn(Builder $query): Builder => $query->where('is_enabled', true))->toggle()])->headerActions([Tables\Actions\CreateAction::make()])->actions([Tables\Actions\ViewAction::make(), Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make(), Tables\Actions\ForceDeleteBulkAction::make(), Tables\Actions\RestoreBulkAction::make()])])->modifyQueryUsing(fn(Builder $query): Builder => $query->withoutGlobalScopes([SoftDeletingScope::class]))->defaultSort('name', 'asc');
+    {
+        return $table
+            ->recordTitleAttribute('name')
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('admin.products.fields.name'))
+                    ->searchable(),
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('sku')
+                    ->label(__('admin.products.fields.sku'))
+                    ->searchable(),
+                    ->sortable(),
+                    ->copyable(),
+                    ->copyMessage(__('admin.common.copied')),
+                Tables\Columns\TextColumn::make('price')
+                    ->label(__('admin.products.fields.price'))
+                    ->money('EUR'),
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('stock_quantity')
+                    ->label(__('admin.products.fields.stock_quantity'))
+                    ->numeric(),
+                    ->sortable(),
+                    ->badge(),
+                    ->color(fn($state) => match (true) {
+                        $state <= 0 => 'danger',
+                        $state <= 5 => 'warning',
+                        default => 'success',
+                    }),
+                Tables\Columns\IconColumn::make('is_published')
+                    ->label(__('admin.products.fields.is_published'))
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('is_featured')
+                    ->label(__('admin.products.fields.is_featured'))
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('admin.products.fields.created_at'))
+                    ->dateTime(),
+                    ->sortable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('is_published')
+                    ->label(__('admin.products.fields.is_published')),
+                Tables\Filters\TernaryFilter::make('is_featured')
+                    ->label(__('admin.products.fields.is_featured')),
+                Tables\Filters\Filter::make('low_stock')
+                    ->label(__('admin.products.filters.low_stock'))
+                    ->query(fn(Builder $query): Builder => $query->where('stock_quantity', '<=', 5)),
+                Tables\Filters\Filter::make('out_of_stock')
+                    ->label(__('admin.products.filters.out_of_stock'))
+                    ->query(fn(Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('publish')
+                        ->label(__('admin.products.actions.publish'))
+                        ->icon('heroicon-o-eye')
+                        ->color('success')
+                        ->action(fn($records) => $records->each->update(['is_published' => true]))
+                        ->requiresConfirmation(),
+                    Tables\Actions\BulkAction::make('unpublish')
+                        ->label(__('admin.products.actions.unpublish'))
+                        ->icon('heroicon-o-eye-slash')
+                        ->color('warning')
+                        ->action(fn($records) => $records->each->update(['is_published' => false]))
+                        ->requiresConfirmation(),
+                ]),
+            ])
+            ->defaultSort("created_at", "desc");
+    }
+}
     }
 }

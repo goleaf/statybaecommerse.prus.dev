@@ -1,50 +1,137 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Filament\Resources\ProductResource\RelationManagers;
-
 use App\Models\Review;
-use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
 use Filament\Tables\Table;
-/**
- * ReviewsRelationManager
- * 
- * Filament v4 resource for ReviewsRelationManager management in the admin panel with comprehensive CRUD operations, filters, and actions.
- * 
- * @property string $relationship
- * @property string|null $title
- * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
- * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)
- */
-class ReviewsRelationManager extends RelationManager
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+final class ReviewsRelationManager extends RelationManager
 {
     protected static string $relationship = 'reviews';
-    protected static ?string $title = 'Reviews';
-    /**
-     * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
-     */
-    public function form(Form $form): Form
+    protected static ?string $title = 'Product Reviews';
+    public function form(Schema $schema): Schema
     {
-        return $schema->schema([Forms\Components\TextInput::make('reviewer_name')->label(__('translations.reviewer_name'))->required()->maxLength(255), Forms\Components\TextInput::make('reviewer_email')->label(__('translations.reviewer_email'))->email()->required()->maxLength(255), Forms\Components\Select::make('rating')->label(__('translations.rating'))->options([1 => '1 ' . __('translations.star'), 2 => '2 ' . __('translations.stars'), 3 => '3 ' . __('translations.stars'), 4 => '4 ' . __('translations.stars'), 5 => '5 ' . __('translations.stars')])->required(), Forms\Components\TextInput::make('title')->label(__('translations.review_title'))->maxLength(255), Forms\Components\Textarea::make('content')->label(__('translations.review_content'))->required()->rows(4), Forms\Components\Toggle::make('is_approved')->label(__('translations.is_approved'))->default(false)]);
+        return $schema
+            ->components([
+                Forms\Components\Select::make('user_id')
+                    ->label(__('admin.reviews.fields.user'))
+                    ->relationship('user', 'name')
+                    ->searchable(),
+                    ->preload(),
+                    ->required(),
+                Forms\Components\TextInput::make('rating')
+                    ->label(__('admin.reviews.fields.rating'))
+                    ->numeric(),
+                    ->minValue(1)
+                    ->maxValue(5)
+                Forms\Components\Textarea::make('title')
+                    ->label(__('admin.reviews.fields.title'))
+                    ->maxLength(255),
+                    ->rows(2),
+                Forms\Components\Textarea::make('comment')
+                    ->label(__('admin.reviews.fields.comment'))
+                    ->rows(4)
+                    ->columnSpanFull(),
+                Forms\Components\Toggle::make('is_approved')
+                    ->label(__('admin.reviews.fields.is_approved'))
+                    ->default(false),
+                Forms\Components\Toggle::make('is_featured')
+                    ->label(__('admin.reviews.fields.is_featured'))
+                Forms\Components\KeyValue::make('metadata')
+                    ->label(__('admin.reviews.fields.metadata'))
+                    ->keyLabel(__('admin.reviews.fields.metadata_key'))
+                    ->valueLabel(__('admin.reviews.fields.metadata_value'))
+            ]);
     }
-    /**
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-     */
     public function table(Table $table): Table
     {
-        return $table->recordTitleAttribute('title')->columns([Tables\Columns\TextColumn::make('reviewer_name')->label(__('translations.reviewer_name'))->searchable()->sortable(), Tables\Columns\TextColumn::make('reviewer_email')->label(__('translations.reviewer_email'))->searchable()->sortable(), Tables\Columns\TextColumn::make('rating')->label(__('translations.rating'))->formatStateUsing(fn(int $state): string => str_repeat('⭐', $state))->sortable(), Tables\Columns\TextColumn::make('title')->label(__('translations.review_title'))->searchable()->sortable()->limit(50), Tables\Columns\TextColumn::make('content')->label(__('translations.review_content'))->limit(100)->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-            $state = $column->getState();
-            if (strlen($state) <= 100) {
-                return null;
-            }
-            return $state;
-        }), Tables\Columns\IconColumn::make('is_approved')->label(__('translations.is_approved'))->boolean(), Tables\Columns\TextColumn::make('created_at')->label(__('translations.created_at'))->dateTime()->sortable()])->filters([Tables\Filters\SelectFilter::make('rating')->label(__('translations.rating'))->options([1 => '1 ' . __('translations.star'), 2 => '2 ' . __('translations.stars'), 3 => '3 ' . __('translations.stars'), 4 => '4 ' . __('translations.stars'), 5 => '5 ' . __('translations.stars')]), Tables\Filters\SelectFilter::make('is_approved')->label(__('translations.is_approved'))->options([true => __('translations.yes'), false => __('translations.no')])])->headerActions([Tables\Actions\CreateAction::make()])->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make(), Tables\Actions\Action::make('approve')->label(__('translations.approve'))->icon('heroicon-o-check-circle')->color('success')->action(fn(Review $record) => $record->update(['is_approved' => true]))->visible(fn(Review $record) => !$record->is_approved), Tables\Actions\Action::make('disapprove')->label(__('translations.disapprove'))->icon('heroicon-o-x-circle')->color('danger')->action(fn(Review $record) => $record->update(['is_approved' => false]))->visible(fn(Review $record) => $record->is_approved)])->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make(), Tables\Actions\BulkAction::make('approve')->label(__('translations.approve'))->icon('heroicon-o-check-circle')->color('success')->action(fn($records) => $records->each->update(['is_approved' => true])), Tables\Actions\BulkAction::make('disapprove')->label(__('translations.disapprove'))->icon('heroicon-o-x-circle')->color('danger')->action(fn($records) => $records->each->update(['is_approved' => false]))])])->defaultSort('created_at', 'desc');
+        return $table
+            ->recordTitleAttribute('title')
+            ->columns([
+                Tables\Columns\TextColumn::make('user.name')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('rating')
+                    ->sortable(),
+                    ->badge(),
+                    ->color(fn($state) => match (true) {
+                        $state >= 4 => 'success',
+                        $state >= 3 => 'warning',
+                        default => 'danger',
+                    }),
+                Tables\Columns\TextColumn::make('title')
+                    ->limit(50),
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 50) {
+                            return null;
+                        }
+                        return $state;
+                Tables\Columns\TextColumn::make('comment')
+                    ->limit(100)
+                        if (strlen($state) <= 100) {
+                Tables\Columns\IconColumn::make('is_approved')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('is_featured')
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('admin.reviews.fields.created_at'))
+                    ->dateTime(),
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('rating')
+                    ->options([
+                        1 => '1 ⭐',
+                        2 => '2 ⭐⭐',
+                        3 => '3 ⭐⭐⭐',
+                        4 => '4 ⭐⭐⭐⭐',
+                        5 => '5 ⭐⭐⭐⭐⭐',
+                    ]),
+                Tables\Filters\TernaryFilter::make('is_approved')
+                    ->label(__('admin.reviews.fields.is_approved')),
+                Tables\Filters\TernaryFilter::make('is_featured')
+                    ->label(__('admin.reviews.fields.is_featured')),
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')
+                            ->label(__('admin.reviews.filters.created_from')),
+                        Forms\Components\DatePicker::make('created_until')
+                            ->label(__('admin.reviews.filters.created_until')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                                $data['created_until'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('approve')
+                        ->label(__('admin.reviews.actions.approve'))
+                        ->icon('heroicon-o-check')
+                        ->color('success')
+                        ->action(fn($records) => $records->each->update(['is_approved' => true]))
+                        ->requiresConfirmation(),
+                    Tables\Actions\BulkAction::make('disapprove')
+                        ->label(__('admin.reviews.actions.disapprove'))
+                        ->icon('heroicon-o-x-mark')
+                        ->color('danger')
+                        ->action(fn($records) => $records->each->update(['is_approved' => false]))
+                ]),
+            ->defaultSort("created_at", "desc");
     }
+}
 }

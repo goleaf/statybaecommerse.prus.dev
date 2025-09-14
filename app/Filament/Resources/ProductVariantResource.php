@@ -11,10 +11,10 @@ use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Enums\NavigationGroup;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Section;
@@ -52,8 +52,7 @@ final class ProductVariantResource extends Resource
 {
     protected static ?string $model = ProductVariant::class;
     
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = NavigationGroup::Products;
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
     
     protected static ?int $navigationSort = 3;
     protected static ?string $recordTitleAttribute = 'display_name';
@@ -96,12 +95,12 @@ final class ProductVariantResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
+     * @param Schema $schema
+     * @return Schema
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Tabs::make(__('product_variants.tabs.main'))
                 ->tabs([
                     Tab::make(__('product_variants.tabs.basic_information'))

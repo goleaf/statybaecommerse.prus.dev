@@ -49,7 +49,11 @@ final class AdminPanelProvider extends PanelProvider
             ])
             // ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources([
-                \App\Filament\Resources\LegalResource::class,
+                \App\Filament\Resources\UserResource::class,
+                \App\Filament\Resources\ProductResource::class,
+                \App\Filament\Resources\ProductVariantResource::class,
+                // \App\Filament\Resources\VariantPricingRuleResource::class, // Temporarily disabled - class not found
+                // \App\Filament\Resources\LegalResource::class, // Temporarily disabled
                 // \App\Filament\Resources\RecommendationConfigResource::class, // Temporarily disabled due to Filament v4 compatibility issues
                 // \App\Filament\Resources\RecommendationConfigResourceSimple::class, // Disabled due to Filament v4 compatibility issues
                 // \App\Filament\Resources\SystemSettingResource::class, // Disabled due to Filament v4 compatibility issues
@@ -95,6 +99,7 @@ final class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 NavigationGroup::make()->label(__('admin.navigation.dashboard'))->icon('heroicon-o-home'),
                 NavigationGroup::make()->label(__('admin.navigation.commerce'))->icon('heroicon-o-shopping-bag'),
+                NavigationGroup::make()->label(__('admin.navigation.products'))->icon('heroicon-o-cube'),
                 NavigationGroup::make()->label(__('admin.navigation.marketing'))->icon('heroicon-o-megaphone'),
                 NavigationGroup::make()->label(__('admin.navigation.content'))->icon('heroicon-o-document-text'),
                 NavigationGroup::make()->label(__('admin.navigation.analytics'))->icon('heroicon-o-chart-bar'),
