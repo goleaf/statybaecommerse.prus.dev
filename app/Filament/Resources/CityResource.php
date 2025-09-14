@@ -30,6 +30,7 @@ class CityResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-building-office';
 
     /**
@@ -65,10 +66,8 @@ class CityResource extends Resource
         return __('cities.navigation_group');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Forms\Components\Section::make(__('cities.basic_information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')

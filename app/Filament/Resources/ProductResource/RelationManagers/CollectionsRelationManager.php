@@ -23,8 +23,7 @@ class CollectionsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Forms\Components\Select::make('collection_id')
                     ->label(__('translations.collection'))
                     ->relationship('collections', 'name')

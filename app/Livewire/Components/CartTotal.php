@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Components;
 
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -22,6 +23,41 @@ class CartTotal extends Component
     public float $shippingDiscount = 0.0;
 
     public float $total = 0.0;
+
+    #[Computed]
+    public function cartSubtotal(): float
+    {
+        $sessionKey = session()->getId();
+
+        if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
+            try {
+                // @phpstan-ignore-next-line
+                return (float) \Darryldecode\Cart\Facades\CartFacade::session($sessionKey)->getSubTotal();
+            } catch (\Throwable $e) {
+                return 0.0;
+            }
+        }
+
+        return 0.0;
+    }
+
+    #[Computed]
+    public function discountCalculation(): array
+    {
+        return $this->calculateDiscountsAndShipping($this->cartSubtotal);
+    }
+
+    #[Computed]
+    public function finalTotal(): float
+    {
+        $subtotal = $this->cartSubtotal;
+        $result = $this->discountCalculation;
+        $discount = (float) ($result['discount_total_amount'] ?? 0.0);
+        $shippingDiscount = (float) data_get($result, 'shipping.discount_amount', 0.0);
+        $shipping = (float) data_get(session()->get('checkout'), 'shipping_option.0.price', 0.0);
+        
+        return max(0, ($subtotal - $discount) + max(0, $shipping - $shippingDiscount));
+    }
 
     #[On('cartUpdated')]
     #[On('coupon-updated')]
@@ -122,9 +158,9 @@ class CartTotal extends Component
     public function render(): View
     {
         return view('livewire.components.cart-total', [
-            'subtotal' => $this->subtotal,
+            'subtotal' => $this->cartSubtotal,
             'discount' => $this->discount,
-            'total' => $this->total,
+            'total' => $this->finalTotal,
         ]);
     }
 }

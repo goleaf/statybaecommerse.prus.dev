@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\NewsTag;
+use App\Services\PaginationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -44,8 +45,10 @@ class NewsController extends Controller
             $query->featured();
         }
 
-        $news = $query->orderBy('published_at', 'desc')
-            ->paginate(12);
+        $news = PaginationService::paginateWithContext(
+            $query->orderBy('published_at', 'desc'),
+            'news'
+        );
 
         $categories = NewsCategory::visible()
             ->with('translations')

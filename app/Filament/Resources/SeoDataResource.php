@@ -41,6 +41,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 final /**
@@ -55,13 +56,14 @@ class SeoDataResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-magnifying-glass';
 
     protected static ?int $navigationSort = 15;
 
     public static function getNavigationGroup(): ?string
     {
-        return __('admin.navigation.content');
+        return NavigationGroup::Content->label();
     }
 
     public static function getNavigationLabel(): string
@@ -79,10 +81,8 @@ class SeoDataResource extends Resource
         return __('admin.models.seo_entries');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Tabs::make('SEO Data')
                     ->tabs([
                         Tab::make(__('admin.seo_data.fields.basic_information'))

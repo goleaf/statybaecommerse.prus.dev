@@ -19,7 +19,7 @@ use UnitEnum;
 
 final class RecommendationSystemManagement extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    // protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static UnitEnum|string|null $navigationGroup = 'Recommendation System';
 

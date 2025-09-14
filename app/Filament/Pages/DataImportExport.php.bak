@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 final class DataImportExport extends Page
 {
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-arrows-up-down';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-arrows-up-down';
     protected static \UnitEnum|string|null $navigationGroup = \App\Enums\NavigationGroup::System;
     protected static ?int $navigationSort = 3;
 

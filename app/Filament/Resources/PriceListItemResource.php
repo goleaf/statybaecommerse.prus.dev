@@ -43,7 +43,8 @@ class PriceListItemResource extends Resource
 {
     protected static ?string $model = PriceListItem::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-currency-euro';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|\BackedEnum|null */
 
@@ -73,8 +74,7 @@ class PriceListItemResource extends Resource
 
     public function form(Schema $form): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Tabs::make('Price List Item')
                     ->tabs([
                         Tab::make(__('admin.price_list_items.tabs.basic_information'))

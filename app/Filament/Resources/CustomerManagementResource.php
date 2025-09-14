@@ -49,6 +49,7 @@ class CustomerManagementResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-users';
 
     /** @var string|\BackedEnum|null */
@@ -89,10 +90,8 @@ class CustomerManagementResource extends Resource
             ->withCount(['orders', 'cartItems', 'reviews', 'addresses']);
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->components([
+    public static function form(Schema $schema): Schema {
+        return $schema->components([
                 Tabs::make(__('admin.customers.customer_information'))
                     ->tabs([
                         Tab::make(__('admin.customers.personal_information'))

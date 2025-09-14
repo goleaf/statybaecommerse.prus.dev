@@ -6,7 +6,9 @@ namespace App\Livewire\Pages;
 
 use App\Models\Product;
 use App\Services\SearchService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -32,7 +34,8 @@ class Search extends Component
         private readonly SearchService $searchService
     ) {}
 
-    public function render(): View
+    #[Computed]
+    public function searchResults(): LengthAwarePaginator
     {
         $locale = app()->getLocale();
 
@@ -82,10 +85,13 @@ class Search extends Component
                 $products = $products->orderByDesc('published_at');
         }
 
-        $products = $products->paginate(12);
+        return $products->paginate(12);
+    }
 
+    public function render(): View
+    {
         return view('livewire.pages.search', [
-            'products' => $products,
+            'products' => $this->searchResults,
             'term' => $this->q,
         ])->title(__('frontend.search.results'));
     }

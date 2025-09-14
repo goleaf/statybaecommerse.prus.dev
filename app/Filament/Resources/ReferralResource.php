@@ -35,6 +35,7 @@ class ReferralResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-users';
 
     /** @var string|\BackedEnum|null */
@@ -67,10 +68,8 @@ class ReferralResource extends Resource
         return __('referrals.plural_model_label');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Forms\Components\Section::make(__('referrals.referral_information'))
                     ->schema([
                         Forms\Components\Select::make('referrer_id')
@@ -411,8 +410,7 @@ class ReferralResource extends Resource
 
     public static function infolist(Schema $form): Schema
     {
-        return $form
-            ->components([
+        return $schema->components([
                 Infolists\Components\Section::make(__('referrals.referral_details'))
                     ->components([
                         Infolists\Components\TextEntry::make('referrer.name')

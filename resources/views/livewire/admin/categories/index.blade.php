@@ -114,6 +114,7 @@
                                             {{ __('Edit') }}
                                         </a>
                                         <button wire:click="delete({{ $category->id }})"
+                                                wire:confirm="{{ __('translations.confirm_delete_category') }}"
                                                 class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                                             {{ __('Delete') }}
                                         </button>

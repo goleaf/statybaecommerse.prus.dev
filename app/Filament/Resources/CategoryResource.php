@@ -36,6 +36,7 @@ use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
 
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -57,14 +58,15 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static NavigationIcon $navigationIcon = NavigationIcon::RectangleStack;
+    /** @var BackedEnum|string|null */
+    protected static $navigationIcon = NavigationIcon::RectangleStack;
 
     /**
      * @var UnitEnum|string|null
      */
     protected static $navigationGroup = NavigationGroup::Products;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -85,7 +87,7 @@ class CategoryResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make(__('categories.tabs.translations'))
                     ->tabs([

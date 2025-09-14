@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
-use App\Services\SearchService;
+use App\Services\AutocompleteService;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -12,7 +12,7 @@ use Livewire\Component;
 final /**
  * LiveSearch
  * 
- * Livewire component for reactive frontend functionality.
+ * Enhanced Livewire component for advanced autocomplete functionality.
  */
 class LiveSearch extends Component
 {
@@ -21,7 +21,11 @@ class LiveSearch extends Component
 
     public array $results = [];
 
+    public array $suggestions = [];
+
     public bool $showResults = false;
+
+    public bool $showSuggestions = false;
 
     public int $maxResults = 10;
 
@@ -29,22 +33,62 @@ class LiveSearch extends Component
 
     public bool $isSearching = false;
 
+    public array $searchTypes = ['products', 'categories', 'brands', 'collections'];
+
+    public bool $enableSuggestions = true;
+
+    public bool $enableRecentSearches = true;
+
+    public bool $enablePopularSearches = true;
+
+    public function mount(): void
+    {
+        if ($this->enableSuggestions) {
+            $this->loadSuggestions();
+        }
+    }
+
     public function updatedQuery(): void
     {
         if (strlen($this->query) >= $this->minQueryLength) {
             $this->isSearching = true;
             $this->performSearch();
             $this->showResults = true;
+            $this->showSuggestions = false;
         } else {
             $this->clearResults();
+            if ($this->enableSuggestions && empty($this->query)) {
+                $this->loadSuggestions();
+                $this->showSuggestions = true;
+            } else {
+                $this->showSuggestions = false;
+            }
         }
     }
 
     public function performSearch(): void
     {
-        $searchService = app(SearchService::class);
-        $this->results = $searchService->search($this->query, $this->maxResults);
+        $autocompleteService = app(AutocompleteService::class);
+        $this->results = $autocompleteService->search($this->query, $this->maxResults, $this->searchTypes);
         $this->isSearching = false;
+    }
+
+    public function loadSuggestions(): void
+    {
+        $autocompleteService = app(AutocompleteService::class);
+        $suggestions = [];
+
+        if ($this->enableRecentSearches) {
+            $recent = $autocompleteService->getRecentSuggestions(3);
+            $suggestions = array_merge($suggestions, $recent);
+        }
+
+        if ($this->enablePopularSearches) {
+            $popular = $autocompleteService->getPopularSuggestions(7);
+            $suggestions = array_merge($suggestions, $popular);
+        }
+
+        $this->suggestions = array_slice($suggestions, 0, 10);
     }
 
     public function clearResults(): void
@@ -54,11 +98,52 @@ class LiveSearch extends Component
         $this->isSearching = false;
     }
 
+    public function clearQuery(): void
+    {
+        $this->query = '';
+        $this->clearResults();
+        if ($this->enableSuggestions) {
+            $this->loadSuggestions();
+            $this->showSuggestions = true;
+        }
+    }
+
     public function selectResult(array $result): void
     {
         $this->query = $result['title'];
         $this->clearResults();
         $this->redirect($result['url']);
+    }
+
+    public function selectSuggestion(array $suggestion): void
+    {
+        if (isset($suggestion['search_term'])) {
+            $this->query = $suggestion['search_term'];
+        } else {
+            $this->query = $suggestion['title'];
+        }
+        $this->showSuggestions = false;
+        $this->updatedQuery();
+    }
+
+    public function clearRecentSearches(): void
+    {
+        $autocompleteService = app(AutocompleteService::class);
+        $autocompleteService->clearRecentSearches();
+        $this->loadSuggestions();
+    }
+
+    public function toggleSearchType(string $type): void
+    {
+        if (in_array($type, $this->searchTypes)) {
+            $this->searchTypes = array_filter($this->searchTypes, fn($t) => $t !== $type);
+        } else {
+            $this->searchTypes[] = $type;
+        }
+        
+        if (!empty($this->query) && strlen($this->query) >= $this->minQueryLength) {
+            $this->performSearch();
+        }
     }
 
     public function render(): View

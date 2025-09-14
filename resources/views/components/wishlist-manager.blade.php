@@ -60,6 +60,7 @@
                                 {{-- Remove from Wishlist Button --}}
                                 @if ($showRemove)
                                     <button wire:click="removeFromWishlist({{ $item->id }})"
+                                            wire:confirm="{{ __('translations.confirm_remove_wishlist_item') }}"
                                             class="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-600 hover:bg-white hover:scale-110 transition-all duration-200 shadow-soft">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

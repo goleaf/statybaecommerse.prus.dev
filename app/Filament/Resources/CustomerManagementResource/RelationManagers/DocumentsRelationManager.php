@@ -28,8 +28,7 @@ class DocumentsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Forms\Components\TextInput::make('title')
                     ->label(__('admin.documents.fields.title'))
                     ->required()

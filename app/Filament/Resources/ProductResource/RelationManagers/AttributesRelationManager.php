@@ -23,8 +23,7 @@ class AttributesRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Forms\Components\Select::make('attribute_id')
                     ->label(__('translations.attribute'))
                     ->relationship('attributes', 'name')

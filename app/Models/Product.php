@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\PublishedScope;
+use App\Models\Scopes\VisibleScope;
 use App\Observers\ProductObserver;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +26,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[ObservedBy([ProductObserver::class])]
+#[ScopedBy([ActiveScope::class, PublishedScope::class, VisibleScope::class])]
 final /**
  * Product
  * 
@@ -305,6 +310,69 @@ class Product extends Model implements HasMedia
     public function recentHistories(): HasMany
     {
         return $this->hasMany(ProductHistory::class)->recent(30);
+    }
+
+    public function priceHistories(): HasMany
+    {
+        return $this->hasMany(ProductHistory::class)->byAction('price_changed');
+    }
+
+    public function stockHistories(): HasMany
+    {
+        return $this->hasMany(ProductHistory::class)->byAction('stock_updated');
+    }
+
+    public function statusHistories(): HasMany
+    {
+        return $this->hasMany(ProductHistory::class)->byAction('status_changed');
+    }
+
+    public function significantHistories(): HasMany
+    {
+        return $this->hasMany(ProductHistory::class)->whereIn('field_name', [
+            'price', 'sale_price', 'stock_quantity', 'status', 'is_visible'
+        ]);
+    }
+
+    public function getLastPriceChange(): ?ProductHistory
+    {
+        return $this->priceHistories()->latest()->first();
+    }
+
+    public function getLastStockUpdate(): ?ProductHistory
+    {
+        return $this->stockHistories()->latest()->first();
+    }
+
+    public function getLastStatusChange(): ?ProductHistory
+    {
+        return $this->statusHistories()->latest()->first();
+    }
+
+    public function getChangeCount(int $days = 30): int
+    {
+        return $this->histories()->recent($days)->count();
+    }
+
+    public function getPriceChangeCount(int $days = 30): int
+    {
+        return $this->priceHistories()->recent($days)->count();
+    }
+
+    public function getStockChangeCount(int $days = 30): int
+    {
+        return $this->stockHistories()->recent($days)->count();
+    }
+
+    public function hasRecentChanges(int $days = 7): bool
+    {
+        return $this->histories()->recent($days)->exists();
+    }
+
+    public function getChangeFrequency(int $days = 30): float
+    {
+        $changeCount = $this->getChangeCount($days);
+        return $changeCount > 0 ? round($changeCount / $days, 2) : 0;
     }
 
     public function scopePublished($query)

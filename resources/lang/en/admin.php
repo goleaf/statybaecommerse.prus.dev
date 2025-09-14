@@ -93,7 +93,22 @@ return [
     'products' => [
         'title' => 'Products',
         'create' => 'Create Product',
+        'select_product' => 'Select a product...',
+        'searching' => 'Searching products...',
+        'no_products_found' => 'No products found',
+        'try_different_keywords' => 'Try different keywords',
+        'in_stock' => 'In Stock',
+        'out_of_stock' => 'Out of Stock',
         'edit' => 'Edit Product',
+    ],
+    // Categories
+    'category' => [
+        'select_category' => 'Select a category...',
+        'searching' => 'Searching categories...',
+        'no_categories_found' => 'No categories found',
+        'try_different_keywords' => 'Try different keywords',
+        'products' => 'products',
+        'subcategories' => 'subcategories',
         'view' => 'View Product',
         'delete' => 'Delete Product',
         'bulk_actions' => 'Bulk Actions',

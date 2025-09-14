@@ -503,7 +503,7 @@ final class EnumCollection extends Collection
     /**
      * Get enum cases with search
      */
-    public function search(string $query): self
+    public function searchEnum(string $query): self
     {
         return $this->filter(function ($enum) use ($query) {
             $query = strtolower($query);
@@ -517,17 +517,20 @@ final class EnumCollection extends Collection
     /**
      * Get enum cases with random selection
      */
-    public function random(int $count = 1): self
+    public function random($number = null, $preserveKeys = false): self
     {
-        return new self($this->random($count));
+        return new self(parent::random($number, $preserveKeys));
     }
 
     /**
      * Get enum cases with unique values
      */
-    public function unique(): self
+    public function unique($key = null, $strict = false): self
     {
-        return $this->unique(fn ($enum) => $enum->value);
+        if ($key === null) {
+            $key = fn ($enum) => $enum->value;
+        }
+        return new self(parent::unique($key, $strict));
     }
 
     /**
@@ -1024,5 +1027,52 @@ final class EnumCollection extends Collection
     public function uniqueByAll(): self
     {
         return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
+    }
+
+    /**
+     * Split the collection into a given number of groups
+     * 
+     * This method divides the collection into the specified number of groups,
+     * distributing items as evenly as possible across all groups.
+     * 
+     * @param int $numberOfGroups The number of groups to split into
+     * @return \Illuminate\Support\Collection
+     */
+    public function splitIn($numberOfGroups): \Illuminate\Support\Collection
+    {
+        return parent::splitIn($numberOfGroups);
+    }
+
+    /**
+     * Split enum cases into groups for display purposes
+     * 
+     * @param int $columns Number of columns to display
+     * @return \Illuminate\Support\Collection
+     */
+    public function splitForDisplay(int $columns = 3): \Illuminate\Support\Collection
+    {
+        return $this->splitIn($columns);
+    }
+
+    /**
+     * Split enum cases into groups for form layouts
+     * 
+     * @param int $columns Number of form columns
+     * @return \Illuminate\Support\Collection
+     */
+    public function splitForForm(int $columns = 2): \Illuminate\Support\Collection
+    {
+        return $this->splitIn($columns);
+    }
+
+    /**
+     * Split enum cases into groups for API responses
+     * 
+     * @param int $groups Number of groups for API pagination
+     * @return \Illuminate\Support\Collection
+     */
+    public function splitForApi(int $groups = 4): \Illuminate\Support\Collection
+    {
+        return $this->splitIn($groups);
     }
 }

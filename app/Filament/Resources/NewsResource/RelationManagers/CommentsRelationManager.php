@@ -22,8 +22,7 @@ class CommentsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Forms\Components\TextInput::make('author_name')
                     ->label(__('admin.news.comments.fields.author_name'))
                     ->required()

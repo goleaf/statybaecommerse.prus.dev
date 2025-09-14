@@ -38,8 +38,7 @@ class OrderShippingRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Section::make('orders.shipping_details')
                     ->schema([
                         Grid::make(2)

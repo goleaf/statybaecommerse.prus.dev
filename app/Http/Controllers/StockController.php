@@ -9,6 +9,7 @@ use App\Models\Partner;
 use App\Models\VariantInventory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\LazyCollection;
 use Illuminate\View\View;
 
 final /**
@@ -258,11 +259,9 @@ class StockController extends Controller
             $query->where('status', $request->get('status'));
         }
 
-        $stockItems = $query->get();
-
         $filename = 'stock_export_'.now()->format('Y-m-d_H-i-s').'.csv';
 
-        return response()->streamDownload(function () use ($stockItems) {
+        return response()->streamDownload(function () use ($query) {
             $handle = fopen('php://output', 'w');
 
             // CSV headers
@@ -281,23 +280,27 @@ class StockController extends Controller
                 __('inventory.created_at'),
             ]);
 
-            // CSV data
-            foreach ($stockItems as $item) {
-                fputcsv($handle, [
-                    $item->variant->product->name,
-                    $item->variant->display_name,
-                    $item->location->name,
-                    $item->supplier?->name ?? '',
-                    $item->stock,
-                    $item->reserved,
-                    $item->available_stock,
-                    $item->cost_per_unit,
-                    $item->stock_value,
-                    $item->stock_status_label,
-                    $item->expiry_date?->format('Y-m-d') ?? '',
-                    $item->created_at->format('Y-m-d H:i:s'),
-                ]);
-            }
+            // Use LazyCollection with timeout to prevent long-running export operations
+            $timeout = now()->addMinutes(15); // 15 minute timeout for stock exports
+            
+            $query->cursor()
+                ->takeUntilTimeout($timeout)
+                ->each(function ($item) use ($handle) {
+                    fputcsv($handle, [
+                        $item->variant->product->name,
+                        $item->variant->display_name,
+                        $item->location->name,
+                        $item->supplier?->name ?? '',
+                        $item->stock,
+                        $item->reserved,
+                        $item->available_stock,
+                        $item->cost_per_unit,
+                        $item->stock_value,
+                        $item->stock_status_label,
+                        $item->expiry_date?->format('Y-m-d') ?? '',
+                        $item->created_at->format('Y-m-d H:i:s'),
+                    ]);
+                });
 
             fclose($handle);
         }, $filename, [

@@ -9,6 +9,8 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -43,7 +45,8 @@ class ComponentShowcase extends Component
         $this->showModal = ! $this->showModal;
     }
 
-    public function getFeaturedProductsProperty()
+    #[Computed]
+    public function featuredProducts(): Collection
     {
         return Product::query()
             ->with(['brand', 'media', 'prices'])
@@ -53,7 +56,8 @@ class ComponentShowcase extends Component
             ->get();
     }
 
-    public function getCategoriesProperty()
+    #[Computed]
+    public function categories(): Collection
     {
         return Category::query()
             ->where('is_visible', true)
@@ -61,7 +65,8 @@ class ComponentShowcase extends Component
             ->get();
     }
 
-    public function getBrandsProperty()
+    #[Computed]
+    public function brands(): Collection
     {
         return Brand::query()
             ->where('is_enabled', true)
@@ -71,6 +76,10 @@ class ComponentShowcase extends Component
 
     public function render(): View
     {
-        return view('livewire.pages.component-showcase');
+        return view('livewire.pages.component-showcase', [
+            'featuredProducts' => $this->featuredProducts,
+            'categories' => $this->categories,
+            'brands' => $this->brands,
+        ]);
     }
 }

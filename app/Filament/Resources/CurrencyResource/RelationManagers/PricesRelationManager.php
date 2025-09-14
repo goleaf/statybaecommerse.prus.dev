@@ -29,8 +29,7 @@ class PricesRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Forms\Components\Select::make('priceable_type')
                     ->options([
                         'App\Models\Product' => 'Product',

@@ -32,6 +32,8 @@ class ProductHistory extends Model
         'ip_address',
         'user_agent',
         'metadata',
+        'causer_type',
+        'causer_id',
         'created_at',
         'updated_at',
     ];

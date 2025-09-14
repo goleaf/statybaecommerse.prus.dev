@@ -8,6 +8,7 @@ use App\Filament\Resources\RecommendationBlockResource\Pages;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationConfig;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -45,10 +46,8 @@ final class RecommendationBlockResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Section::make(__('translations.recommendation_block_basic_info'))
                     ->schema([
                         TextInput::make('name')

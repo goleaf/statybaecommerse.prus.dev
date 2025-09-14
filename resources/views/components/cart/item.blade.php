@@ -48,6 +48,7 @@
                 <button
                         type="button"
                         wire:click="removeToCart({{ $item->id }})"
+                        wire:confirm="{{ __('translations.confirm_remove_cart_item') }}"
                         class="inline-flex items-center px-2 py-1.5 bg-red-50 text-xs gap-2 font-medium text-red-700 hover:bg-red-100">
                     <x-untitledui-trash-03 class="size-4" aria-hidden="true" />
                     {{ __('Remove') }}

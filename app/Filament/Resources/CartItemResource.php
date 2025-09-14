@@ -30,6 +30,7 @@ class CartItemResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-shopping-bag';
 
     /**
@@ -61,10 +62,8 @@ class CartItemResource extends Resource
         return __('admin.models.cart_items');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Forms\Components\Section::make(__('admin.sections.basic_information'))
                     ->schema([
                         Forms\Components\Select::make('user_id')

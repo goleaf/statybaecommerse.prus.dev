@@ -13,13 +13,13 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\IconEntry;
 use Filament\Schemas\Components\TextEntry;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 final /**
@@ -38,7 +38,13 @@ class ReviewResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('admin.navigation.catalog');
+        return NavigationGroup::Reports->label();
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $pendingCount = static::getModel()::where('status', 'pending')->count();
+        return $pendingCount > 0 ? (string) $pendingCount : null;
     }
 
     public static function getNavigationLabel(): string
@@ -56,10 +62,8 @@ class ReviewResource extends Resource
         return __('admin.reviews.review');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->components([
+    public static function form(Schema $schema): Schema {
+        return $schema->components([
                 // Review Settings (Non-translatable)
                 Section::make(__('admin.reviews.review_settings'))
                     ->description(__('admin.reviews.review_settings_description'))
@@ -357,11 +361,17 @@ class ReviewResource extends Resource
                         ->label(__('admin.reviews.feature_selected'))
                         ->icon('heroicon-o-star')
                         ->color('info')
+                        ->requiresConfirmation()
+                        ->modalHeading(__('admin.reviews.feature_reviews'))
+                        ->modalDescription(__('admin.reviews.feature_reviews_description'))
                         ->action(fn ($records) => $records->each->update(['is_featured' => true])),
                     Tables\Actions\BulkAction::make('unfeature')
                         ->label(__('admin.reviews.unfeature_selected'))
                         ->icon('heroicon-o-star')
                         ->color('gray')
+                        ->requiresConfirmation()
+                        ->modalHeading(__('admin.reviews.unfeature_reviews'))
+                        ->modalDescription(__('admin.reviews.unfeature_reviews_description'))
                         ->action(fn ($records) => $records->each->update(['is_featured' => false])),
                 ]),
             ])

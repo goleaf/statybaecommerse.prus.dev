@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Enums\NavigationGroup;
 
 final /**
  * CampaignResource
@@ -30,11 +31,12 @@ use UnitEnum;
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-megaphone';
 
     public static function getNavigationGroup(): ?string
     {
-        return __('admin.navigation.marketing');
+        return NavigationGroup::Marketing->label();
     }
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -56,10 +58,8 @@ use UnitEnum;
         return __('campaigns.models.campaigns');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Forms\Components\Section::make(__('campaigns.sections.basic_information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')

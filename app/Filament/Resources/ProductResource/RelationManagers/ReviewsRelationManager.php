@@ -24,8 +24,7 @@ class ReviewsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Forms\Components\TextInput::make('reviewer_name')
                     ->label(__('translations.reviewer_name'))
                     ->required()

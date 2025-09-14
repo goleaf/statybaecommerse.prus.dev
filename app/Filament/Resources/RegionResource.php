@@ -27,7 +27,8 @@ class RegionResource extends Resource
 {
     protected static ?string $model = Region::class;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-map';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-map';
 
     protected static ?int $navigationSort = 2;
 
@@ -49,10 +50,8 @@ class RegionResource extends Resource
         return __('regions.plural_model_label');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Forms\Components\Section::make(__('regions.basic_information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')

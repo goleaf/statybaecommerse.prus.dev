@@ -8,6 +8,7 @@ use App\Models\Collection as CollectionModel;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -57,7 +58,8 @@ class Show extends Component
         }
     }
 
-    public function getProductsProperty(): LengthAwarePaginator
+    #[Computed]
+    public function products(): LengthAwarePaginator
     {
         $collection = $this->collection;
 

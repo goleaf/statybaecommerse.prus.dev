@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\LazyCollection;
 
 final /**
  * CampaignClickController
@@ -274,23 +275,27 @@ class CampaignClickController extends Controller
                 __('campaign_clicks.conversion_value'),
             ]);
 
-            // CSV data
-            foreach ($clicks as $click) {
-                fputcsv($handle, [
-                    $click->id,
-                    $click->campaign->name ?? '',
-                    $click->customer->name ?? __('campaign_clicks.guest'),
-                    $click->click_type_label,
-                    $click->clicked_url,
-                    $click->clicked_at->format('Y-m-d H:i:s'),
-                    $click->device_type_label,
-                    $click->browser_label,
-                    $click->country,
-                    $click->utm_source,
-                    $click->is_converted ? __('campaign_clicks.yes') : __('campaign_clicks.no'),
-                    $click->conversion_value,
-                ]);
-            }
+            // Use LazyCollection with timeout to prevent long-running export operations
+            $timeout = now()->addMinutes(10); // 10 minute timeout for campaign click exports
+            
+            LazyCollection::make($clicks)
+                ->takeUntilTimeout($timeout)
+                ->each(function ($click) use ($handle) {
+                    fputcsv($handle, [
+                        $click->id,
+                        $click->campaign->name ?? '',
+                        $click->customer->name ?? __('campaign_clicks.guest'),
+                        $click->click_type_label,
+                        $click->clicked_url,
+                        $click->clicked_at->format('Y-m-d H:i:s'),
+                        $click->device_type_label,
+                        $click->browser_label,
+                        $click->country,
+                        $click->utm_source,
+                        $click->is_converted ? __('campaign_clicks.yes') : __('campaign_clicks.no'),
+                        $click->conversion_value,
+                    ]);
+                });
 
             fclose($handle);
         }, 200, $headers);

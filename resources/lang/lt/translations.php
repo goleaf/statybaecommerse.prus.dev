@@ -287,4 +287,5 @@ return [
     'inc' => 'Inc.',
     'all_rights_reserved' => 'Visos teisės saugomos',
     'created_with_filament' => 'Sukurta su Filament',
+    'confirm_remove_category_selection' => 'Ar tikrai norite pašalinti šią kategorijos pasirinkimą?',
 ];

@@ -27,8 +27,7 @@ class ProductsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Forms\Components\TextInput::make('name')
                     ->label(__('products.name'))
                     ->required()

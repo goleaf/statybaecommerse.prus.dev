@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 final /**
@@ -22,7 +23,8 @@ class Home extends Component
 {
     use WithCart, WithNotifications;
 
-    public function getFeaturedProductsProperty(): Collection
+    #[Computed]
+    public function featuredProducts(): Collection
     {
         return Product::query()
             ->with(['brand', 'categories', 'media'])
@@ -35,7 +37,8 @@ class Home extends Component
             ->get();
     }
 
-    public function getLatestProductsProperty(): Collection
+    #[Computed]
+    public function latestProducts(): Collection
     {
         return Product::query()
             ->with(['brand', 'categories', 'media'])
@@ -47,7 +50,8 @@ class Home extends Component
             ->get();
     }
 
-    public function getPopularProductsProperty(): Collection
+    #[Computed]
+    public function popularProducts(): Collection
     {
         return Product::query()
             ->with(['brand', 'categories', 'media'])
@@ -61,7 +65,8 @@ class Home extends Component
             ->get();
     }
 
-    public function getFeaturedCategoriesProperty(): Collection
+    #[Computed]
+    public function featuredCategories(): Collection
     {
         return Category::query()
             ->with(['media'])
@@ -78,7 +83,8 @@ class Home extends Component
             ->get();
     }
 
-    public function getFeaturedBrandsProperty(): Collection
+    #[Computed]
+    public function featuredBrands(): Collection
     {
         return Brand::query()
             ->with(['media'])
@@ -95,7 +101,8 @@ class Home extends Component
             ->get();
     }
 
-    public function getLatestReviewsProperty(): Collection
+    #[Computed]
+    public function latestReviews(): Collection
     {
         return Review::query()
             ->with(['product', 'user'])
@@ -108,7 +115,8 @@ class Home extends Component
             ->get();
     }
 
-    public function getStatsProperty(): array
+    #[Computed]
+    public function stats(): array
     {
         return [
             'products_count' => Product::where('is_visible', true)->count(),

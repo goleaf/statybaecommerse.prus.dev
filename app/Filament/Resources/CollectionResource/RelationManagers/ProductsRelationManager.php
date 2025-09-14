@@ -23,8 +23,7 @@ class ProductsRelationManager extends RelationManager
 
     public function form(Schema $form): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Forms\Components\Select::make('product_id')
                     ->label(__('admin.collections.fields.product'))
                     ->relationship('product', 'name')

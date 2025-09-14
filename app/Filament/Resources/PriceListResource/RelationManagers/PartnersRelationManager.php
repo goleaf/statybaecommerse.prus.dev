@@ -37,8 +37,7 @@ class PartnersRelationManager extends RelationManager
 
     public function form(Schema $form): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Section::make(__('admin.partners.basic_information'))
                     ->schema([
                         Grid::make(2)

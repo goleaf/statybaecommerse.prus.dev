@@ -27,6 +27,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 final /**
@@ -43,14 +44,14 @@ class CustomerGroupResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Users->label();
+    }
+
     public static function getNavigationLabel(): string
     {
         return __('customer_groups.navigation_label');
-    }
-
-    public static function getNavigationGroup(): ?string
-    {
-        return __('customer_groups.navigation_group');
     }
 
     public static function getModelLabel(): string
@@ -63,10 +64,8 @@ class CustomerGroupResource extends Resource
         return __('customer_groups.navigation_label');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Section::make(__('customer_groups.navigation_label'))
                     ->description(__('customer_groups.description'))
                     ->schema([

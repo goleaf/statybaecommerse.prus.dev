@@ -25,9 +25,7 @@ class ZoneResource extends Resource
 {
     protected static ?string $model = Zone::class;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-globe-alt';
 
     /** @var string|\BackedEnum|null */
@@ -45,10 +43,8 @@ class ZoneResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Zones';
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->components([
+    public static function form(Schema $schema): Schema {
+        return $schema->components([
                 Forms\Components\Section::make('Basic Information')
                     ->components([
                         Forms\Components\TextInput::make('name')

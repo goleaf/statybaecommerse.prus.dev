@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\LazyCollection;
 
 final /**
  * SearchService
@@ -46,6 +47,9 @@ class SearchService
         $locale = app()->getLocale();
         $searchTerm = '%' . str_replace(['%', '_'], ['\%', '\_'], $query) . '%';
 
+        // Use LazyCollection with timeout to prevent long-running search operations
+        $timeout = now()->addSeconds(10); // 10 second timeout for product search
+
         return Product::query()
             ->with(['media', 'brand', 'categories'])
             ->where('is_visible', true)
@@ -74,8 +78,9 @@ class SearchService
                     ELSE 4
                 END
             ", ["%{$query}%", "%{$query}%", "%{$query}%"])
-            ->limit($limit)
-            ->get()
+            ->cursor()
+            ->takeUntilTimeout($timeout)
+            ->take($limit)
             ->map(function (Product $product) use ($query) {
                 return [
                     'id' => $product->id,

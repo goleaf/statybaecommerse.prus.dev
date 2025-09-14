@@ -81,6 +81,7 @@
                 @php($b = $this->availableBrands->firstWhere('id', (int) $bid))
                 @if ($b)
                     <button type="button" wire:click="removeBrandFilter({{ (int) $bid }})"
+                            wire:confirm="{{ __('translations.confirm_remove_brand_filter') }}"
                             class="inline-flex items-center gap-1 text-xs bg-gray-100 rounded-full px-2 py-1">
                         <span>{{ $b->trans('name') ?? $b->name }}</span>
                         <span aria-hidden="true">×</span>
@@ -88,7 +89,9 @@
                 @endif
             @endforeach
             @if (collect($brandIds)->filter()->isNotEmpty())
-                <button type="button" wire:click="clearBrandFilters" class="text-xs underline">
+                <button type="button" wire:click="clearBrandFilters" 
+                        wire:confirm="{{ __('translations.confirm_clear_brand_filters') }}"
+                        class="text-xs underline">
                     {{ __('Clear all') }}
                 </button>
             @endif
@@ -111,6 +114,7 @@
                     @php($val = $options->flatten(1)->firstWhere('id', (int) $valId) ?? null)
                     @if ($val)
                         <button type="button" wire:click="removeAttributeFilter({{ (int) $valId }})"
+                                wire:confirm="{{ __('translations.confirm_remove_attribute_filter') }}"
                                 class="inline-flex items-center gap-1 text-xs bg-gray-100 rounded-full px-2 py-1">
                             <span>{{ $val->value }}</span>
                             <span aria-hidden="true">×</span>
@@ -118,7 +122,9 @@
                     @endif
                 @endforeach
                 @if (collect($selectedValues)->filter()->isNotEmpty())
-                    <button type="button" wire:click="clearAttributeFilters" class="text-xs underline">
+                    <button type="button" wire:click="clearAttributeFilters" 
+                            wire:confirm="{{ __('translations.confirm_clear_attribute_filters') }}"
+                            class="text-xs underline">
                         {{ __('Clear all') }}
                     </button>
                 @endif

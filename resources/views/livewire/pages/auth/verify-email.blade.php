@@ -70,7 +70,9 @@ new #[Layout('components.layouts.templates.app')] class extends Component {
                                   wire:click="sendVerification"
                                   wire:loading.attr="data-loading" />
 
-                <x-buttons.default wire:click="logout" type="submit">
+                <x-buttons.default wire:click="logout" 
+                                   wire:confirm="{{ __('translations.confirm_logout') }}"
+                                   type="submit">
                     {{ __('Log out') }}
                 </x-buttons.default>
             </div>

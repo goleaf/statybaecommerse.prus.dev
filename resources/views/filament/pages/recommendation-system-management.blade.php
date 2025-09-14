@@ -104,6 +104,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <x-filament::button
                     wire:click="clearCache"
+                    wire:confirm="{{ __('translations.confirm_clear_recommendation_cache') }}"
                     color="danger"
                     icon="heroicon-o-trash"
                     size="lg"
@@ -147,13 +148,13 @@
                             {{ __('translations.available_algorithms') }}
                         </h4>
                         <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                            <li>• Content-Based Filtering</li>
-                            <li>• Collaborative Filtering</li>
-                            <li>• Hybrid Recommendation</li>
-                            <li>• Popularity-Based</li>
-                            <li>• Trending Products</li>
-                            <li>• Cross-Sell</li>
-                            <li>• Up-Sell</li>
+                            <li>• {{ __('translations.content_based_filtering') }}</li>
+                            <li>• {{ __('translations.collaborative_filtering') }}</li>
+                            <li>• {{ __('translations.hybrid_recommendation') }}</li>
+                            <li>• {{ __('translations.popularity_based') }}</li>
+                            <li>• {{ __('translations.trending_products') }}</li>
+                            <li>• {{ __('translations.cross_sell') }}</li>
+                            <li>• {{ __('translations.up_sell') }}</li>
                         </ul>
                     </div>
                     <div>
@@ -161,12 +162,12 @@
                             {{ __('translations.features') }}
                         </h4>
                         <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                            <li>• Real-time caching</li>
-                            <li>• User behavior tracking</li>
-                            <li>• Performance analytics</li>
-                            <li>• A/B testing support</li>
-                            <li>• Dynamic algorithm weights</li>
-                            <li>• Multi-language support</li>
+                            <li>• {{ __('translations.realtime_caching') }}</li>
+                            <li>• {{ __('translations.user_behavior_tracking') }}</li>
+                            <li>• {{ __('translations.performance_analytics') }}</li>
+                            <li>• {{ __('translations.ab_testing_support') }}</li>
+                            <li>• {{ __('translations.dynamic_algorithm_weights') }}</li>
+                            <li>• {{ __('translations.multilanguage_support') }}</li>
                         </ul>
                     </div>
                 </div>

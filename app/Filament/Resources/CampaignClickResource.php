@@ -44,6 +44,7 @@ class CampaignClickResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-cursor-arrow-rays';
 
     protected static ?string $navigationLabel = 'Campaign Clicks';
@@ -61,10 +62,8 @@ class CampaignClickResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Section::make(__('campaign_clicks.basic_information'))
                     ->schema([
                         Grid::make(2)

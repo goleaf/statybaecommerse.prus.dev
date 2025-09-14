@@ -24,8 +24,7 @@ class ImagesRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Forms\Components\FileUpload::make('path')
                     ->label(__('translations.image'))
                     ->image()

@@ -27,6 +27,7 @@ class NewsResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
@@ -51,10 +52,8 @@ class NewsResource extends Resource
         return __('admin.news.title');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Forms\Components\Section::make(__('admin.news.fields.title'))
                     ->schema([
                         Forms\Components\Tabs::make('news_tabs')

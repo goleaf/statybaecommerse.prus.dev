@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Components;
 
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -15,21 +16,8 @@ use Livewire\Component;
  */
 class TaxPrice extends Component
 {
-    public float $amount = 0.0;
-
-    #[On('cartUpdated')]
-    #[On('coupon-updated')]
-    public function updateAmounts(): void
-    {
-        $this->compute();
-    }
-
-    public function mount(): void
-    {
-        $this->compute();
-    }
-
-    protected function compute(): void
+    #[Computed]
+    public function taxAmount(): float
     {
         $sessionKey = session()->getId();
 
@@ -46,8 +34,6 @@ class TaxPrice extends Component
         // Get discount via CartTotal calculation
         $discount = 0.0;
         try {
-            $cartTotal = app(\App\Livewire\Components\CartTotal::class);
-            // Access protected compute via instance render cycle is not trivial; re-run its logic partially
             $coupon = session('checkout.coupon.code');
             $code = $coupon ? strtoupper(trim((string) $coupon)) : '';
             $items = [];
@@ -86,13 +72,40 @@ class TaxPrice extends Component
         }
 
         $zoneCode = (string) (session('zone.code') ?? session('zoneCode') ?? '');
-        $this->amount = app(\App\Services\Taxes\TaxCalculator::class)->compute(max(0.0, $subtotal - $discount), $zoneCode ?: null);
+        return app(\App\Services\Taxes\TaxCalculator::class)->compute(max(0.0, $subtotal - $discount), $zoneCode ?: null);
+    }
+
+    #[Computed]
+    public function taxBreakdown(): array
+    {
+        $zoneCode = (string) (session('zone.code') ?? session('zoneCode') ?? '');
+        $taxRate = app(\App\Services\Taxes\TaxCalculator::class)->getTaxRate($zoneCode ?: null);
+        
+        return [
+            'zone_code' => $zoneCode,
+            'tax_rate' => $taxRate,
+            'tax_amount' => $this->taxAmount,
+            'taxable_amount' => $this->taxAmount / ($taxRate / 100),
+        ];
+    }
+
+    #[On('cartUpdated')]
+    #[On('coupon-updated')]
+    public function updateAmounts(): void
+    {
+        // Computed properties will automatically update
+    }
+
+    public function mount(): void
+    {
+        // Computed properties will be calculated on first access
     }
 
     public function render(): View
     {
         return view('livewire.components.tax-price', [
-            'amount' => $this->amount,
+            'amount' => $this->taxAmount,
+            'breakdown' => $this->taxBreakdown,
         ]);
     }
 }

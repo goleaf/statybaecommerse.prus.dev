@@ -39,8 +39,7 @@ class CustomerGroupsRelationManager extends RelationManager
 
     public function form(Schema $form): Schema
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Section::make(__('admin.customer_groups.basic_information'))
                     ->schema([
                         Grid::make(2)

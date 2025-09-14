@@ -46,6 +46,7 @@ class PriceListResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-currency-dollar';
 
     /** @var string|\BackedEnum|null */
@@ -74,10 +75,8 @@ class PriceListResource extends Resource
         return __('admin.price_lists.plural_model_label');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Section::make(__('admin.price_lists.basic_information'))
                     ->schema([
                         Grid::make(2)

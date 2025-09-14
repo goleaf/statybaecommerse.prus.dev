@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\LazyCollection;
 
 final class RecommendationService
 {
@@ -83,26 +84,37 @@ final class RecommendationService
         $configs = $block->getConfigs();
         $allRecommendations = collect();
 
-        foreach ($configs as $config) {
-            try {
-                $algorithm = $this->getAlgorithmInstance($config->type, $config->config);
-                $recommendations = $algorithm->getRecommendations($user, $product, $context);
-                
-                if ($recommendations->isNotEmpty()) {
-                    $allRecommendations = $allRecommendations->merge($recommendations);
+        // Use LazyCollection with timeout to prevent long-running recommendation generation
+        $timeout = now()->addSeconds(30); // 30 second timeout for recommendation generation
+        
+        LazyCollection::make($configs)
+            ->takeUntilTimeout($timeout)
+            ->each(function ($config) use (&$allRecommendations, $user, $product, $context) {
+                try {
+                    $algorithm = $this->getAlgorithmInstance($config->type, $config->config);
+                    $recommendations = $algorithm->getRecommendations($user, $product, $context);
+                    
+                    if ($recommendations->isNotEmpty()) {
+                        $allRecommendations = $allRecommendations->merge($recommendations);
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Algorithm '{$config->type}' failed", [
+                        'error' => $e->getMessage(),
+                        'config_id' => $config->id,
+                    ]);
                 }
-            } catch (\Exception $e) {
-                Log::error("Algorithm '{$config->type}' failed", [
-                    'error' => $e->getMessage(),
-                    'config_id' => $config->id,
-                ]);
-                continue;
-            }
-        }
+            });
 
         // Remove duplicates and limit results
         return $allRecommendations
             ->unique('id')
+            ->skipWhile(function ($product) {
+                // Skip products with low relevance scores or missing essential data
+                return $product->relevance_score < 0.3 || 
+                       empty($product->name) || 
+                       !$product->is_visible ||
+                       $product->price <= 0;
+            })
             ->take($block->max_products);
     }
 

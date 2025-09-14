@@ -31,7 +31,9 @@
                     {{ __('Cancel') }}
                 </button>
 
-                <button type="button" wire:click="deleteUser" wire:loading.attr="disabled"
+                <button type="button" wire:click="deleteUser" 
+                        wire:confirm.prompt="{{ __('translations.confirm_delete_account') }}\n\n{{ __('translations.confirm_type_delete') }}|DELETE"
+                        wire:loading.attr="disabled"
                         class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
                     {{ __('Delete Account') }}
                 </button>

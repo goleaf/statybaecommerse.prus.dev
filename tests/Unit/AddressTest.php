@@ -90,7 +90,7 @@ class AddressTest extends TestCase
 
     public function test_address_belongs_to_zone(): void
     {
-        $zone = Zone::factory()->create();
+        $zone = Zone::factory()->active()->enabled()->create();
         $address = Address::factory()->create(['zone_id' => $zone->id]);
 
         $this->assertInstanceOf(Zone::class, $address->zone);

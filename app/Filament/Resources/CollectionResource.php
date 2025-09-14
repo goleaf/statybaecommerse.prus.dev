@@ -65,10 +65,8 @@ class CollectionResource extends Resource
         return __('admin.models.collections');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 // Basic Information Section
                 Section::make(__('admin.collections.sections.basic_information'))
                     ->schema([

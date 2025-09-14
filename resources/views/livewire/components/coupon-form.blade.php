@@ -5,6 +5,7 @@
         <x-buttons.primary wire:click="apply">{{ __('Apply') }}</x-buttons.primary>
         @if (session()->has('checkout.coupon'))
             <button type="button" wire:click="remove"
+                    wire:confirm="{{ __('translations.confirm_remove_coupon') }}"
                     class="inline-flex items-center rounded-md px-3 py-2 text-sm border border-gray-300 text-gray-700 hover:bg-gray-50">
                 {{ __('Remove') }}
             </button>

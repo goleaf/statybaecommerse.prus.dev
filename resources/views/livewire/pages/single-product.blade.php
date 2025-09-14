@@ -50,15 +50,62 @@
                                 {!! $product->trans('description') ?? $product->description !!}
                             </div>
                             
-                            <!-- Product History Link -->
-                            <div class="mt-4">
+                            <!-- Product History Section -->
+                            <div class="mt-6 border-t border-gray-200 pt-4">
+                                <h3 class="text-sm font-medium text-gray-900 mb-3">{{ __('frontend.products.history_title') }}</h3>
+                                
+                                <!-- History Statistics -->
+                                <div class="grid grid-cols-2 gap-3 mb-4">
+                                    <div class="bg-gray-50 rounded-lg p-3">
+                                        <div class="text-xs text-gray-500">{{ __('frontend.total_changes') }}</div>
+                                        <div class="text-lg font-semibold text-gray-900">{{ $product->getChangeCount(30) }}</div>
+                                        <div class="text-xs text-gray-400">{{ __('frontend.last_30_days') }}</div>
+                                    </div>
+                                    <div class="bg-gray-50 rounded-lg p-3">
+                                        <div class="text-xs text-gray-500">{{ __('frontend.price_changes') }}</div>
+                                        <div class="text-lg font-semibold text-gray-900">{{ $product->getPriceChangeCount(30) }}</div>
+                                        <div class="text-xs text-gray-400">{{ __('frontend.last_30_days') }}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Recent Changes Preview -->
+                                @if($product->hasRecentChanges(7))
+                                    <div class="mb-4">
+                                        <div class="text-xs text-gray-500 mb-2">{{ __('frontend.products.recent_changes') }}</div>
+                                        <div class="space-y-2">
+                                            @foreach($product->recentHistories()->limit(3)->get() as $history)
+                                                <div class="flex items-center justify-between text-xs">
+                                                    <div class="flex items-center">
+                                                        @switch($history->action)
+                                                            @case('price_changed')
+                                                                <x-heroicon-s-currency-euro class="h-3 w-3 text-green-500 mr-1" />
+                                                                @break
+                                                            @case('stock_updated')
+                                                                <x-heroicon-s-cube class="h-3 w-3 text-blue-500 mr-1" />
+                                                                @break
+                                                            @case('status_changed')
+                                                                <x-heroicon-s-check-circle class="h-3 w-3 text-yellow-500 mr-1" />
+                                                                @break
+                                                            @default
+                                                                <x-heroicon-s-pencil class="h-3 w-3 text-gray-500 mr-1" />
+                                                        @endswitch
+                                                        <span class="text-gray-600">{{ __('frontend.events.' . $history->action) }}</span>
+                                                    </div>
+                                                    <span class="text-gray-400">{{ $history->created_at->diffForHumans() }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- View Full History Link -->
                                 <a href="{{ route('localized.products.history', [
                                     'locale' => app()->getLocale(),
                                     'product' => $product->trans('slug') ?? $product->slug,
                                 ]) }}" 
-                                   class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500">
-                                    <x-heroicon-s-clock class="mr-1 h-4 w-4" />
-                                    {{ __('frontend.products.view_history') }}
+                                   class="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-md hover:bg-indigo-100 hover:text-indigo-700 transition-colors">
+                                    <x-heroicon-s-clock class="mr-2 h-4 w-4" />
+                                    {{ __('frontend.products.view_full_history') }}
                                 </a>
                             </div>
                         </div>

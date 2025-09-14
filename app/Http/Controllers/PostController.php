@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Services\PaginationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -42,7 +43,7 @@ class PostController extends Controller
             });
         }
 
-        $posts = $query->paginate(12);
+        $posts = PaginationService::paginateWithContext($query, 'posts');
 
         return view('posts.index', compact('posts'));
     }
@@ -69,11 +70,13 @@ class PostController extends Controller
 
     public function featured(): View
     {
-        $posts = Post::published()
-            ->featured()
-            ->with('user')
-            ->latest('published_at')
-            ->paginate(12);
+        $posts = PaginationService::paginateWithContext(
+            Post::published()
+                ->featured()
+                ->with('user')
+                ->latest('published_at'),
+            'posts'
+        );
 
         return view('posts.featured', compact('posts'));
     }

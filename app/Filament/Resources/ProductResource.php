@@ -25,6 +25,8 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 
 
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -34,6 +36,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 /**
@@ -61,6 +64,7 @@ class ProductResource extends Resource
      * 
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-cube';
 
     /**
@@ -70,7 +74,7 @@ class ProductResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return __('admin.navigation.catalog');
+        return NavigationGroup::Products->label();
     }
 
     /**
@@ -98,7 +102,7 @@ class ProductResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('translations.product_basic_information'))
                     ->schema([
@@ -452,6 +456,9 @@ class ProductResource extends Resource
                 TableAction::make('duplicate')
                     ->label(__('translations.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
+                    ->requiresConfirmation()
+                    ->modalHeading(__('translations.confirm_duplicate_product'))
+                    ->modalDescription(__('translations.confirm_duplicate_product_description'))
                     ->action(function (Product $record) {
                         $newProduct = $record->replicate();
                         $newProduct->name = $record->name.' (Copy)';
@@ -474,6 +481,9 @@ class ProductResource extends Resource
                     BulkAction::make('publish')
                         ->label(__('translations.publish'))
                         ->icon('heroicon-o-check-circle')
+                        ->requiresConfirmation()
+                        ->modalHeading(__('translations.confirm_publish_products'))
+                        ->modalDescription(__('translations.confirm_publish_products_description'))
                         ->action(fn ($records) => $records->each->update([
                             'status' => 'published',
                             'is_visible' => true,
@@ -482,6 +492,9 @@ class ProductResource extends Resource
                     BulkAction::make('unpublish')
                         ->label(__('translations.unpublish'))
                         ->icon('heroicon-o-x-circle')
+                        ->requiresConfirmation()
+                        ->modalHeading(__('translations.confirm_unpublish_products'))
+                        ->modalDescription(__('translations.confirm_unpublish_products_description'))
                         ->action(fn ($records) => $records->each->update([
                             'status' => 'draft',
                             'is_visible' => false,
@@ -489,10 +502,16 @@ class ProductResource extends Resource
                     BulkAction::make('feature')
                         ->label(__('translations.feature'))
                         ->icon('heroicon-o-star')
+                        ->requiresConfirmation()
+                        ->modalHeading(__('translations.confirm_feature_products'))
+                        ->modalDescription(__('translations.confirm_feature_products_description'))
                         ->action(fn ($records) => $records->each->update(['is_featured' => true])),
                     BulkAction::make('unfeature')
                         ->label(__('translations.unfeature'))
                         ->icon('heroicon-o-star')
+                        ->requiresConfirmation()
+                        ->modalHeading(__('translations.confirm_unfeature_products'))
+                        ->modalDescription(__('translations.confirm_unfeature_products_description'))
                         ->action(fn ($records) => $records->each->update(['is_featured' => false])),
                 ]),
             ])

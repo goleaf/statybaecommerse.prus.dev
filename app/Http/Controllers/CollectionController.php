@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Collection;
 use App\Models\Product;
+use App\Services\ProductGalleryService;
+use App\Services\PaginationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -41,7 +43,7 @@ class CollectionController extends Controller
             });
         }
 
-        $collections = $query->paginate(12);
+        $collections = PaginationService::paginateWithContext($query, 'collections');
 
         return view('collections.index', compact('collections'));
     }
@@ -57,9 +59,23 @@ class CollectionController extends Controller
             ->where('id', '!=', $collection->id)
             ->where('display_type', $collection->display_type)
             ->limit(4)
-            ->get();
+            ->get()
+            ->skipWhile(function ($relatedCollection) {
+                // Skip related collections that are not properly configured
+                return empty($relatedCollection->name) || 
+                       !$relatedCollection->is_visible ||
+                       empty($relatedCollection->slug) ||
+                       $relatedCollection->products()->count() <= 0;
+            });
 
-        return view('collections.show', compact('collection', 'relatedCollections'));
+        // Use splitIn method for better product organization
+        $galleryService = new ProductGalleryService();
+        $organizedProducts = $galleryService->arrangeForCollection(
+            $collection->products, 
+            $collection->display_type ?? 1
+        );
+
+        return view('collections.show', compact('collection', 'relatedCollections', 'organizedProducts'));
     }
 
     // API Endpoints
@@ -79,18 +95,25 @@ class CollectionController extends Controller
         $collections = $query->limit(20)->get();
 
         return response()->json([
-            'collections' => $collections->map(function ($collection) {
-                return [
-                    'id' => $collection->id,
-                    'name' => $collection->getTranslatedName(),
-                    'slug' => $collection->slug,
-                    'description' => $collection->getTranslatedDescription(),
-                    'image_url' => $collection->getImageUrl(),
-                    'products_count' => $collection->getProductsCountAttribute(),
-                    'display_type' => $collection->display_type,
-                    'is_automatic' => $collection->is_automatic,
-                ];
-            }),
+            'collections' => $collections
+                ->skipWhile(function ($collection) {
+                    // Skip collections that are not properly configured or have missing essential data
+                    return empty($collection->name) || 
+                           !$collection->is_visible ||
+                           empty($collection->slug);
+                })
+                ->map(function ($collection) {
+                    return [
+                        'id' => $collection->id,
+                        'name' => $collection->getTranslatedName(),
+                        'slug' => $collection->slug,
+                        'description' => $collection->getTranslatedDescription(),
+                        'image_url' => $collection->getImageUrl(),
+                        'products_count' => $collection->getProductsCountAttribute(),
+                        'display_type' => $collection->display_type,
+                        'is_automatic' => $collection->is_automatic,
+                    ];
+                }),
         ]);
     }
 
@@ -105,17 +128,24 @@ class CollectionController extends Controller
             ->get();
 
         return response()->json([
-            'collections' => $collections->map(function ($collection) {
-                return [
-                    'id' => $collection->id,
-                    'name' => $collection->getTranslatedName(),
-                    'slug' => $collection->slug,
-                    'description' => $collection->getTranslatedDescription(),
-                    'image_url' => $collection->getImageUrl(),
-                    'products_count' => $collection->getProductsCountAttribute(),
-                    'display_type' => $collection->display_type,
-                ];
-            }),
+            'collections' => $collections
+                ->skipWhile(function ($collection) {
+                    // Skip collections that are not properly configured or have missing essential data
+                    return empty($collection->name) || 
+                           !$collection->is_visible ||
+                           empty($collection->slug);
+                })
+                ->map(function ($collection) {
+                    return [
+                        'id' => $collection->id,
+                        'name' => $collection->getTranslatedName(),
+                        'slug' => $collection->slug,
+                        'description' => $collection->getTranslatedDescription(),
+                        'image_url' => $collection->getImageUrl(),
+                        'products_count' => $collection->getProductsCountAttribute(),
+                        'display_type' => $collection->display_type,
+                    ];
+                }),
         ]);
     }
 
@@ -130,18 +160,26 @@ class CollectionController extends Controller
             ->get();
 
         return response()->json([
-            'collections' => $collections->map(function ($collection) {
-                return [
-                    'id' => $collection->id,
-                    'name' => $collection->getTranslatedName(),
-                    'slug' => $collection->slug,
-                    'description' => $collection->getTranslatedDescription(),
-                    'image_url' => $collection->getImageUrl(),
-                    'products_count' => $collection->products_count,
-                    'display_type' => $collection->display_type,
-                    'is_automatic' => $collection->is_automatic,
-                ];
-            }),
+            'collections' => $collections
+                ->skipWhile(function ($collection) {
+                    // Skip collections that are not properly configured or have missing essential data
+                    return empty($collection->name) || 
+                           !$collection->is_visible ||
+                           empty($collection->slug) ||
+                           $collection->products_count <= 0;
+                })
+                ->map(function ($collection) {
+                    return [
+                        'id' => $collection->id,
+                        'name' => $collection->getTranslatedName(),
+                        'slug' => $collection->slug,
+                        'description' => $collection->getTranslatedDescription(),
+                        'image_url' => $collection->getImageUrl(),
+                        'products_count' => $collection->products_count,
+                        'display_type' => $collection->display_type,
+                        'is_automatic' => $collection->is_automatic,
+                    ];
+                }),
         ]);
     }
 
@@ -155,17 +193,25 @@ class CollectionController extends Controller
             ->get();
 
         return response()->json([
-            'collections' => $collections->map(function ($collection) {
-                return [
-                    'id' => $collection->id,
-                    'name' => $collection->getTranslatedName(),
-                    'slug' => $collection->slug,
-                    'description' => $collection->getTranslatedDescription(),
-                    'image_url' => $collection->getImageUrl('sm'),
-                    'products_count' => $collection->products_count,
-                    'display_type' => $collection->display_type,
-                ];
-            }),
+            'collections' => $collections
+                ->skipWhile(function ($collection) {
+                    // Skip collections that are not properly configured or have missing essential data
+                    return empty($collection->name) || 
+                           !$collection->is_visible ||
+                           empty($collection->slug) ||
+                           $collection->products_count <= 0;
+                })
+                ->map(function ($collection) {
+                    return [
+                        'id' => $collection->id,
+                        'name' => $collection->getTranslatedName(),
+                        'slug' => $collection->slug,
+                        'description' => $collection->getTranslatedDescription(),
+                        'image_url' => $collection->getImageUrl('sm'),
+                        'products_count' => $collection->products_count,
+                        'display_type' => $collection->display_type,
+                    ];
+                }),
         ]);
     }
 
@@ -189,10 +235,21 @@ class CollectionController extends Controller
 
     public function products(Collection $collection): JsonResponse
     {
-        $products = $collection->products()
-            ->published()
-            ->with(['images', 'translations'])
-            ->paginate($collection->products_per_page ?: 12);
+        $products = PaginationService::paginateQueryWithSkipWhile(
+            $collection->products()
+                ->published()
+                ->with(['images', 'translations']),
+            function ($product) {
+                // Skip products that are not properly configured for display
+                return empty($product->name) || 
+                       !$product->is_visible ||
+                       $product->price <= 0 ||
+                       empty($product->slug) ||
+                       !$product->getFirstMediaUrl('images');
+            },
+            $collection->products_per_page ?: 12,
+            2
+        );
 
         return response()->json([
             'collection' => [
@@ -210,6 +267,94 @@ class CollectionController extends Controller
                 'last_page' => $products->lastPage(),
                 'per_page' => $products->perPage(),
                 'total' => $products->total(),
+            ],
+        ]);
+    }
+
+    /**
+     * Get products organized using splitIn method for gallery layout
+     */
+    public function productsGallery(Collection $collection, Request $request): JsonResponse
+    {
+        $columnCount = $request->get('columns', 4);
+        $columnCount = max(1, min(6, (int) $columnCount)); // Limit between 1-6 columns
+
+        $products = $collection->products()
+            ->published()
+            ->with(['images', 'translations'])
+            ->get()
+            ->skipWhile(function ($product) {
+                // Skip products that are not properly configured for gallery display
+                return empty($product->name) || 
+                       !$product->is_visible ||
+                       $product->price <= 0 ||
+                       empty($product->slug) ||
+                       !$product->getFirstMediaUrl('images');
+            });
+
+        $galleryService = new ProductGalleryService();
+        $organizedProducts = $galleryService->arrangeForGallery($products, $columnCount);
+
+        return response()->json([
+            'collection' => [
+                'id' => $collection->id,
+                'name' => $collection->getTranslatedName(),
+                'slug' => $collection->slug,
+                'display_type' => $collection->display_type,
+            ],
+            'gallery_layout' => [
+                'columns' => $columnCount,
+                'total_products' => $products->count(),
+                'columns_data' => $organizedProducts,
+            ],
+        ]);
+    }
+
+    /**
+     * Get collections organized using splitIn method for homepage display
+     */
+    public function homepageLayout(Request $request): JsonResponse
+    {
+        $columnCount = $request->get('columns', 4);
+        $columnCount = max(2, min(6, (int) $columnCount)); // Limit between 2-6 columns
+
+        $collections = Collection::withTranslations()
+            ->visible()
+            ->withCount('products')
+            ->orderBy('sort_order')
+            ->get()
+            ->skipWhile(function ($collection) {
+                // Skip collections that are not suitable for homepage display
+                return empty($collection->name) || 
+                       !$collection->is_visible ||
+                       empty($collection->slug) ||
+                       $collection->products_count <= 0 ||
+                       !$collection->getImageUrl('sm');
+            });
+
+        $organizedCollections = $collections->splitIn($columnCount);
+
+        return response()->json([
+            'layout' => [
+                'columns' => $columnCount,
+                'total_collections' => $collections->count(),
+                'columns_data' => $organizedCollections->map(function ($columnCollections, $columnIndex) {
+                    return [
+                        'column_id' => $columnIndex + 1,
+                        'item_count' => $columnCollections->count(),
+                        'collections' => $columnCollections->map(function ($collection) {
+                            return [
+                                'id' => $collection->id,
+                                'name' => $collection->getTranslatedName(),
+                                'slug' => $collection->slug,
+                                'description' => $collection->getTranslatedDescription(),
+                                'image_url' => $collection->getImageUrl('sm'),
+                                'products_count' => $collection->products_count,
+                                'display_type' => $collection->display_type,
+                            ];
+                        })
+                    ];
+                })
             ],
         ]);
     }

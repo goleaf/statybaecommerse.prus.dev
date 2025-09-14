@@ -30,6 +30,7 @@ class PostResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-document-text';
 
     /** @var string|\BackedEnum|null */
@@ -58,10 +59,8 @@ class PostResource extends Resource
         return __('posts.title');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Forms\Components\Section::make(__('posts.fields.title'))
                     ->schema([
                         Forms\Components\TextInput::make('title')
@@ -263,13 +262,15 @@ class PostResource extends Resource
                     ->icon('heroicon-o-star')
                     ->color('warning')
                     ->visible(fn (Post $record): bool => ! $record->featured)
-                    ->action(fn (Post $record) => $record->update(['featured' => true])),
+                    ->action(fn (Post $record) => $record->update(['featured' => true]))
+                    ->requiresConfirmation(),
                 Tables\Actions\Action::make('unfeature')
                     ->label(__('posts.actions.unfeature'))
                     ->icon('heroicon-o-star')
                     ->color('gray')
                     ->visible(fn (Post $record): bool => $record->featured)
-                    ->action(fn (Post $record) => $record->update(['featured' => false])),
+                    ->action(fn (Post $record) => $record->update(['featured' => false]))
+                    ->requiresConfirmation(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

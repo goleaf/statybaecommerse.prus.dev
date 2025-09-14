@@ -24,7 +24,6 @@ use Filament\Schemas\Components\BadgeEntry;
 use Filament\Schemas\Components\RepeatableEntry;
 use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Schemas\Components\TextEntry;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
@@ -41,6 +40,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Collection;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 /**
@@ -52,19 +52,17 @@ class StockResource extends Resource
 {
     protected static ?string $model = VariantInventory::class;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-cube';
 
     /** @var string|\BackedEnum|null */
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static $navigationGroup = 'inventory_management';
-
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Inventory->label();
+    }
 
     protected static ?string $navigationLabel = 'inventory.stock_management';
 
@@ -101,10 +99,8 @@ class StockResource extends Resource
         return $lowStockCount > 0 ? 'warning' : 'success';
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Section::make(__('inventory.basic_information'))
                     ->schema([
                         Grid::make(2)

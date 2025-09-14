@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Scopes\ActiveCampaignScope;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\StatusScope;
 use App\Traits\HasTranslations;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+#[ScopedBy([ActiveScope::class, StatusScope::class, ActiveCampaignScope::class])]
 final /**
  * Campaign
  * 

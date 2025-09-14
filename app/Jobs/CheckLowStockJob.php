@@ -14,6 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\LazyCollection;
 
 final class CheckLowStockJob implements ShouldQueue
 {
@@ -23,6 +24,9 @@ final class CheckLowStockJob implements ShouldQueue
     {
         Log::info('Starting low stock check...');
 
+        // Use LazyCollection with timeout to prevent long-running operations
+        $timeout = now()->addMinutes(5); // 5 minute timeout for low stock checks
+        
         $lowStockProducts = Product::where('is_visible', true)
             ->where('manage_stock', true)
             ->where('stock_quantity', '<=', DB::raw('low_stock_threshold'))
@@ -30,13 +34,11 @@ final class CheckLowStockJob implements ShouldQueue
                 $query->where('type', LowStockAlert::class)
                     ->where('created_at', '>=', now()->subHours(24));
             })
-            ->get();
+            ->cursor()
+            ->takeUntilTimeout($timeout);
 
-        if ($lowStockProducts->isEmpty()) {
-            Log::info('No low stock products found.');
-
-            return;
-        }
+        $processedCount = 0;
+        $alertCount = 0;
 
         // Get admin users with inventory management permissions
         $adminUsers = User::whereHas('roles', function ($query) {
@@ -53,13 +55,20 @@ final class CheckLowStockJob implements ShouldQueue
         }
 
         foreach ($lowStockProducts as $product) {
+            $processedCount++;
+            
             foreach ($adminUsers as $admin) {
                 $admin->notify(new LowStockAlert($product));
+                $alertCount++;
             }
 
             Log::info("Low stock alert sent for product: {$product->name} (Stock: {$product->stock_quantity})");
         }
 
-        Log::info("Low stock check completed. Alerts sent for {$lowStockProducts->count()} products.");
+        if ($processedCount === 0) {
+            Log::info('No low stock products found.');
+        } else {
+            Log::info("Low stock check completed. Processed {$processedCount} products, sent {$alertCount} alerts.");
+        }
     }
 }

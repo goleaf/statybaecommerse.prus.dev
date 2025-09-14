@@ -23,7 +23,8 @@ class DiscountConditionResource extends Resource
 {
     protected static ?string $model = DiscountCondition::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     /**
      * @var UnitEnum|string|null
@@ -38,10 +39,8 @@ class DiscountConditionResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Discount Conditions';
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Forms\Components\Section::make(__('discount_conditions.sections.basic_info'))
                     ->schema([
                         Forms\Components\Select::make('discount_id')

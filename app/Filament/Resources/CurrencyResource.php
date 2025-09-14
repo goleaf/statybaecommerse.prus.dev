@@ -28,6 +28,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 final /**
@@ -46,7 +47,7 @@ class CurrencyResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System Settings';
+        return NavigationGroup::System->label();
     }
 
     public static function getNavigationLabel(): string
@@ -64,10 +65,8 @@ class CurrencyResource extends Resource
         return __('currency_title');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Section::make(__('currency_sections.basic_information'))
                     ->description(__('currency_help.code'))
                     ->icon('heroicon-o-currency-dollar')

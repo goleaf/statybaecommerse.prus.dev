@@ -50,6 +50,8 @@ final class AdminPanelProvider extends PanelProvider
             // ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources([
                 \App\Filament\Resources\LegalResource::class,
+                // \App\Filament\Resources\RecommendationConfigResourceSimple::class, // Disabled due to Filament v4 compatibility issues
+                // \App\Filament\Resources\RecommendationConfigResource::class, // Temporarily disabled due to type issues
                 // \App\Filament\Resources\SystemSettingResource::class, // Disabled due to Filament v4 compatibility issues
                 // \App\Filament\Resources\PostResource::class, // Temporarily disabled due to Filament v4 compatibility issues
                 // \App\Filament\Resources\SystemSettingsResource::class, // Disabled due to Filament v4 compatibility issues
@@ -97,6 +99,7 @@ final class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()->label(__('admin.navigation.content'))->icon('heroicon-o-document-text'),
                 NavigationGroup::make()->label(__('admin.navigation.analytics'))->icon('heroicon-o-chart-bar'),
                 NavigationGroup::make()->label(__('admin.navigation.system'))->icon('heroicon-o-cog-6-tooth'),
+                NavigationGroup::make()->label('Recommendation System')->icon('heroicon-o-sparkles'),
             ])
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()

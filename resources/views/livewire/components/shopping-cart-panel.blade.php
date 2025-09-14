@@ -112,6 +112,7 @@
                                     
                                     <button 
                                         wire:click="removeItem({{ $item->id }})"
+                                        wire:confirm="{{ __('translations.confirm_remove_cart_item') }}"
                                         class="p-1 text-red-400 hover:text-red-600"
                                         title="{{ __('translations.remove_item') }}"
                                     >
@@ -137,6 +138,7 @@
                                 </span>
                                 <button 
                                     wire:click="removeDiscountCode"
+                                    wire:confirm="{{ __('translations.confirm_remove_discount_code') }}"
                                     class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200"
                                 >
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

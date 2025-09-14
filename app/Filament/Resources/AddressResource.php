@@ -33,6 +33,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 final /**
@@ -44,11 +45,12 @@ class AddressResource extends Resource
 {
     protected static ?string $model = Address::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-map-pin';
 
     public static function getNavigationGroup(): ?string
     {
-        return __('admin.navigation.users');
+        return NavigationGroup::Orders->label();
     }
 
     protected static ?int $navigationSort = 3;

@@ -7,6 +7,8 @@ namespace App\Livewire\Components;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -21,17 +23,15 @@ class CustomerDashboard extends Component
 
     public User $user;
 
-    public array $stats = [];
-
     public function mount(): void
     {
         $this->user = auth()->user();
-        $this->loadStats();
     }
 
-    public function loadStats(): void
+    #[Computed]
+    public function stats(): array
     {
-        $this->stats = [
+        return [
             'total_orders' => $this->user->orders()->count(),
             'completed_orders' => $this->user->orders()->where('status', 'completed')->count(),
             'pending_orders' => $this->user->orders()->where('status', 'pending')->count(),
@@ -43,7 +43,8 @@ class CustomerDashboard extends Component
         ];
     }
 
-    public function getRecentOrdersProperty()
+    #[Computed]
+    public function recentOrders(): Collection
     {
         return $this->user->orders()
             ->with(['items.product'])
@@ -52,7 +53,8 @@ class CustomerDashboard extends Component
             ->get();
     }
 
-    public function getWishlistItemsProperty()
+    #[Computed]
+    public function wishlistItems(): Collection
     {
         return $this->user->wishlist()
             ->with(['media', 'brand'])
@@ -60,7 +62,8 @@ class CustomerDashboard extends Component
             ->get();
     }
 
-    public function getRecommendedProductsProperty()
+    #[Computed(persist: true)]
+    public function recommendedProducts(): Collection
     {
         // Simple recommendation based on previous purchases
         $purchasedCategories = $this->user->orders()
@@ -95,7 +98,6 @@ class CustomerDashboard extends Component
     public function removeFromWishlist(int $productId): void
     {
         $this->user->wishlist()->detach($productId);
-        $this->loadStats();
 
         $this->dispatch('wishlist-updated');
         $this->dispatch('notify', [
@@ -125,6 +127,11 @@ class CustomerDashboard extends Component
 
     public function render(): View
     {
-        return view('livewire.components.customer-dashboard');
+        return view('livewire.components.customer-dashboard', [
+            'stats' => $this->stats,
+            'recentOrders' => $this->recentOrders,
+            'wishlistItems' => $this->wishlistItems,
+            'recommendedProducts' => $this->recommendedProducts,
+        ]);
     }
 }

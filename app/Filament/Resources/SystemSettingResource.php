@@ -25,7 +25,8 @@ class SystemSettingResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;
 
-    // Navigation icon and group are set via methods
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?int $navigationSort = 1;
 
@@ -34,6 +35,11 @@ class SystemSettingResource extends Resource
     protected static ?string $modelLabel = 'System Setting';
 
     protected static ?string $pluralModelLabel = 'System Settings';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::System->label();
+    }
 
     public static function form(Schema $schema): Schema
     {

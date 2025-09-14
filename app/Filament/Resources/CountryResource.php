@@ -46,6 +46,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use BackedEnum;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 final /**
@@ -57,12 +58,15 @@ class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-globe-alt';
-
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = 'Content';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-globe-alt';
 
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::System->label();
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 

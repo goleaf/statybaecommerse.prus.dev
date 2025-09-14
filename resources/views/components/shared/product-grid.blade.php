@@ -21,26 +21,52 @@ $gridClasses = match($columns) {
     6 => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6',
     default => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
 };
+
+// Use splitIn method for better product distribution if available
+$organizedProducts = $products;
+if (method_exists($products, 'splitIn') && $products->count() > $columns) {
+    $organizedProducts = $products->splitIn($columns);
+}
 @endphp
 
 @if($products->count() > 0)
     <div class="space-y-8">
         {{-- Products Grid --}}
-        <div @class([
-            'grid gap-6',
-            $gridClasses => $layout === 'grid',
-            'space-y-4' => $layout === 'list',
-        ])>
-            @foreach($products as $product)
-                <x-shared.product-card 
-                    :product="$product"
-                    :layout="$layout"
-                    :show-quick-add="$showQuickAdd"
-                    :show-wishlist="$showWishlist"
-                    :show-compare="$showCompare"
-                />
-            @endforeach
-        </div>
+        @if($layout === 'grid' && isset($organizedProducts) && $organizedProducts instanceof \Illuminate\Support\Collection && $organizedProducts->first() instanceof \Illuminate\Support\Collection)
+            {{-- Use splitIn organized layout --}}
+            <div class="grid gap-6 {{ $gridClasses }}">
+                @foreach($organizedProducts as $columnIndex => $columnProducts)
+                    <div class="space-y-6">
+                        @foreach($columnProducts as $product)
+                            <x-shared.product-card 
+                                :product="$product"
+                                :layout="$layout"
+                                :show-quick-add="$showQuickAdd"
+                                :show-wishlist="$showWishlist"
+                                :show-compare="$showCompare"
+                            />
+                        @endforeach
+                    </div>
+                @endforeach
+            </div>
+        @else
+            {{-- Standard grid layout --}}
+            <div @class([
+                'grid gap-6',
+                $gridClasses => $layout === 'grid',
+                'space-y-4' => $layout === 'list',
+            ])>
+                @foreach($products as $product)
+                    <x-shared.product-card 
+                        :product="$product"
+                        :layout="$layout"
+                        :show-quick-add="$showQuickAdd"
+                        :show-wishlist="$showWishlist"
+                        :show-compare="$showCompare"
+                    />
+                @endforeach
+            </div>
+        @endif
 
         {{-- Pagination --}}
         @if($showPagination && method_exists($products, 'hasPages') && $products->hasPages())

@@ -6,6 +6,8 @@ namespace App\Livewire\Pages;
 
 use App\Livewire\Concerns\WithCart;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 final /**
@@ -28,11 +30,14 @@ class SingleProduct extends Component
             abort(404);
         }
 
-        $product->load(['brand', 'categories', 'media', 'variants', 'reviews', 'translations']);
+        $product->load(['brand', 'categories', 'media', 'variants', 'reviews', 'translations', 'histories']);
         $this->product = $product;
 
         // Track product view for recommendations
         $this->trackProductView();
+        
+        // Track product view in history
+        $this->trackProductViewHistory();
     }
 
     public function trackProductView(): void
@@ -65,6 +70,76 @@ class SingleProduct extends Component
                 'session_id' => session()->getId(),
             ]);
         }
+    }
+
+    public function trackProductViewHistory(): void
+    {
+        // Only track if user is authenticated to avoid spam
+        if (!auth()->check()) {
+            return;
+        }
+
+        // Check if we already tracked this view in the last hour
+        $lastView = \App\Models\ProductHistory::where('product_id', $this->product->id)
+            ->where('user_id', auth()->id())
+            ->where('action', 'viewed')
+            ->where('created_at', '>', now()->subHour())
+            ->first();
+
+        if ($lastView) {
+            return;
+        }
+
+        // Create history entry for product view
+        \App\Models\ProductHistory::create([
+            'product_id' => $this->product->id,
+            'user_id' => auth()->id(),
+            'action' => 'viewed',
+            'field_name' => 'page_view',
+            'old_value' => null,
+            'new_value' => 'product_page',
+            'description' => 'Product page viewed',
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'metadata' => [
+                'referrer' => request()->header('referer'),
+                'session_id' => session()->getId(),
+                'view_timestamp' => now()->toISOString(),
+            ],
+            'causer_type' => \App\Models\User::class,
+            'causer_id' => auth()->id(),
+        ]);
+    }
+
+    public function trackAddToCartHistory(Product $product, int $quantity): void
+    {
+        // Only track if user is authenticated
+        if (!auth()->check()) {
+            return;
+        }
+
+        // Create history entry for add to cart
+        \App\Models\ProductHistory::create([
+            'product_id' => $product->id,
+            'user_id' => auth()->id(),
+            'action' => 'added_to_cart',
+            'field_name' => 'cart_quantity',
+            'old_value' => null,
+            'new_value' => (string) $quantity,
+            'description' => "Added {$quantity} item(s) to cart",
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'metadata' => [
+                'product_name' => $product->name,
+                'product_sku' => $product->sku,
+                'unit_price' => $product->price,
+                'total_price' => $product->price * $quantity,
+                'session_id' => session()->getId(),
+                'cart_timestamp' => now()->toISOString(),
+            ],
+            'causer_type' => \App\Models\User::class,
+            'causer_id' => auth()->id(),
+        ]);
     }
 
     public function addToCart(): void
@@ -124,10 +199,14 @@ class SingleProduct extends Component
 
         $cartItem->updateTotalPrice();
 
+        // Track add to cart in history
+        $this->trackAddToCartHistory($product, $quantity);
+
         $this->dispatch('cart-updated');
     }
 
-    public function getRelatedProductsProperty()
+    #[Computed]
+    public function relatedProducts(): Collection
     {
         return $this->product->getRelatedProducts(4);
     }

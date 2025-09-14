@@ -135,7 +135,7 @@
 
                 <!-- Pagination -->
                 <div class="mt-12">
-                    {{ $posts->links() }}
+                    <x-perfect-pagination :paginator="$posts" />
                 </div>
             @else
                 <div class="text-center py-12">

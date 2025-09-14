@@ -27,8 +27,7 @@ class VariantsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Forms\Components\Select::make('product_id')
                     ->label(__('products.product'))
                     ->relationship('product', 'name')

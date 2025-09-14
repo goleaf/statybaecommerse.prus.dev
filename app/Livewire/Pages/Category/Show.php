@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire\Pages\Category;
 
 use App\Models\Category;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -34,7 +36,8 @@ class Show extends Component
         $this->category = $category;
     }
 
-    public function getProductsProperty()
+    #[Computed]
+    public function products(): LengthAwarePaginator
     {
         return $this
             ->category

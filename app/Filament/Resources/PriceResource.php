@@ -31,6 +31,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 final /**
@@ -45,14 +46,15 @@ class PriceResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-currency-euro';
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static $navigationGroup = 'Pricing';
-
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Products->label();
+    }
 
     protected static ?string $recordTitleAttribute = 'amount';
 
@@ -71,10 +73,8 @@ class PriceResource extends Resource
         return __('admin.prices.plural_model_label');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Tabs::make('Price Information')
                     ->tabs([
                         Tab::make(__('admin.prices.basic_information'))

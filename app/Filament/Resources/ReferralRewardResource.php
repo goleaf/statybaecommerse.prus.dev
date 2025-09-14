@@ -29,7 +29,8 @@ class ReferralRewardResource extends Resource
 {
     protected static ?string $model = ReferralReward::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-gift';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-gift';
 
     /**
      * @var UnitEnum|string|null
@@ -44,10 +45,8 @@ class ReferralRewardResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->components([
+    public static function form(Schema $schema): Schema {
+        return $schema->components([
                 Forms\Components\Section::make(__('referrals.forms.reward_information'))
                     ->components([
                         Forms\Components\Select::make('referral_id')
@@ -345,8 +344,7 @@ class ReferralRewardResource extends Resource
 
     public static function infolist(Schema $form): Schema
     {
-        return $form
-            ->components([
+        return $schema->components([
                 Infolists\Components\Section::make(__('referrals.forms.reward_details'))
                     ->components([
                         Infolists\Components\TextEntry::make('title')

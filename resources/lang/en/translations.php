@@ -268,4 +268,5 @@ return [
     'inc' => 'Inc.',
     'all_rights_reserved' => 'All rights reserved',
     'created_with_filament' => 'Created with Filament',
+    'confirm_remove_category_selection' => 'Are you sure you want to remove this category selection?',
 ];

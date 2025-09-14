@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\LegalResource\Pages;
 use App\Models\Legal;
 use Filament\Forms;
@@ -12,6 +13,7 @@ use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use UnitEnum;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Section;
@@ -37,7 +39,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use BackedEnum;
-use UnitEnum;
 
 /**
  * LegalResource
@@ -48,11 +49,14 @@ class LegalResource extends Resource
 {
     protected static ?string $model = Legal::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
-
-    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
-
+    /** @var BackedEnum|string|null */
+    // protected static $navigationIcon = 'heroicon-o-document-text';
     protected static ?int $navigationSort = 3;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Content->label();
+    }
 
     protected static ?string $recordTitleAttribute = 'key';
 

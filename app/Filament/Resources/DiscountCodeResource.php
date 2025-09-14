@@ -24,7 +24,6 @@ use Filament\Schemas\Components\IconEntry;
 use Filament\Schemas\Components\ProgressEntry;
 use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Schemas\Components\TextEntry;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
@@ -36,6 +35,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 final /**
@@ -54,7 +54,7 @@ class DiscountCodeResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('admin.navigation.marketing');
+        return NavigationGroup::Marketing->label();
     }
 
     public static function getNavigationLabel(): string
@@ -72,10 +72,8 @@ class DiscountCodeResource extends Resource
         return __('discount_codes');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Section::make(__('admin.tabs.general'))
                     ->schema([
                         Grid::make(2)

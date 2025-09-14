@@ -26,7 +26,8 @@ class ActivityLogResource extends Resource
 {
     protected static ?string $model = Activity::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-clipboard-document-list';
 
     public static function getNavigationGroup(): ?string
     {
@@ -52,10 +53,8 @@ class ActivityLogResource extends Resource
         return __('admin.models.activity_logs');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Forms\Components\Section::make(__('admin.activity_logs.sections.activity_information'))
                     ->schema([
                         Forms\Components\TextInput::make('log_name')

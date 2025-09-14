@@ -8,8 +8,10 @@ use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -136,7 +138,8 @@ class ProductSearchWidget extends Component
         $this->showFilters = ! $this->showFilters;
     }
 
-    public function getProductsProperty()
+    #[Computed]
+    public function products(): LengthAwarePaginator
     {
         $query = Product::query()
             ->with(['media', 'brand', 'categories', 'variants'])

@@ -20,7 +20,6 @@ use Filament\Schemas\Components\KeyValueEntry;
 use Filament\Schemas\Components\RepeatableEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\TextEntry;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Actions\Action as TableAction;
@@ -37,6 +36,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 /**
@@ -51,6 +51,7 @@ class OrderResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static ?string $navigationLabel = 'orders.navigation_label';
@@ -64,14 +65,21 @@ class OrderResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
-    protected static $navigationGroup = 'orders.navigation_group';
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Orders->label();
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $pendingCount = static::getModel()::where('status', 'pending')->count();
+        return $pendingCount > 0 ? (string) $pendingCount : null;
+    }
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 FormSection::make('orders.basic_information')
                     ->schema([
                         FormGrid::make(2)

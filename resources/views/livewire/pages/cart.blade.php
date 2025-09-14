@@ -42,7 +42,9 @@
                                         <p class="font-medium">
                                             {{ \Illuminate\Support\Number::currency((float) $item->price * (int) $item->quantity, current_currency(), app()->getLocale()) }}
                                         </p>
-                                        <button wire:click="removeItem({{ (int) $item->id }})" class="text-sm text-red-600 hover:underline">{{ __('Remove') }}</button>
+                                        <button wire:click="removeItem({{ (int) $item->id }})" 
+                                                wire:confirm="{{ __('translations.confirm_remove_cart_item') }}"
+                                                class="text-sm text-red-600 hover:underline">{{ __('Remove') }}</button>
                                     </div>
                                 </div>
                             @endforeach

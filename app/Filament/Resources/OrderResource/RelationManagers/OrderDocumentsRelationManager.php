@@ -38,8 +38,7 @@ class OrderDocumentsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Section::make('orders.document_information')
                     ->schema([
                         Grid::make(2)

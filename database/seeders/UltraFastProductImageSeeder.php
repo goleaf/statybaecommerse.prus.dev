@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\LazyCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class UltraFastProductImageSeeder extends Seeder
@@ -81,7 +82,9 @@ final class UltraFastProductImageSeeder extends Seeder
             return;
         }
 
-        // Ultra-fast chunked processing with minimal overhead
+        // Ultra-fast chunked processing with minimal overhead and timeout protection
+        $timeout = now()->addMinutes(30); // 30 minute timeout for image generation
+        
         Product::query()
             ->select(['id', 'name', 'slug', 'is_featured'])
             ->whereDoesntHave('media', function ($q) {
@@ -94,7 +97,10 @@ final class UltraFastProductImageSeeder extends Seeder
                     });
             })
             ->orderBy('id')
-            ->chunkById(self::BATCH_SIZE, function (Collection $products): void {
+            ->cursor()
+            ->takeUntilTimeout($timeout)
+            ->chunk(self::BATCH_SIZE)
+            ->each(function (Collection $products): void {
                 $batchStart = microtime(true);
                 $this->processBatchUltraFast($products);
                 $batchTime = microtime(true) - $batchStart;

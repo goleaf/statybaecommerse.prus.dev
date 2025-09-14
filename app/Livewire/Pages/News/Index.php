@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Pages\News;
 
 use App\Models\News;
+use App\Services\PaginationService;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
@@ -39,7 +40,10 @@ class Index extends Component
             });
         }
 
-        $items = $query->orderByDesc('news.published_at')->paginate(12);
+        $items = PaginationService::paginateWithContext(
+            $query->orderByDesc('news.published_at'),
+            'news'
+        );
 
         return view('livewire.pages.news.index', compact('items'));
     }

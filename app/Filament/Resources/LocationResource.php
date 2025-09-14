@@ -66,10 +66,8 @@ class LocationResource extends Resource
         return __('locations.plural_model_label');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Section::make(__('locations.basic_information'))
                     ->schema([
                         Grid::make(2)

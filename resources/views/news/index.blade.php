@@ -170,7 +170,7 @@
 
     <!-- Pagination -->
     <div class="mt-8">
-        {{ $news->appends(request()->query())->links() }}
+        <x-perfect-pagination :paginator="$news->appends(request()->query())" />
     </div>
     @else
     <div class="text-center py-12">

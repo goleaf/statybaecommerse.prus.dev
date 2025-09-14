@@ -29,8 +29,7 @@ class ValuesRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
+        return $schema->schema([
                 Section::make(__('attributes.value_information'))
                     ->schema([
                         Forms\Components\TextInput::make('value')

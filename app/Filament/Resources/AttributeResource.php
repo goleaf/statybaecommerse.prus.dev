@@ -14,13 +14,13 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\IconEntry;
 use Filament\Schemas\Components\TextEntry;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 final /**
@@ -39,7 +39,7 @@ class AttributeResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('admin.navigation.catalog');
+        return NavigationGroup::Products->label();
     }
 
     public static function getNavigationLabel(): string
@@ -57,10 +57,8 @@ class AttributeResource extends Resource
         return __('attributes.attribute');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->components([
+    public static function form(Schema $schema): Schema {
+        return $schema->components([
                 // Attribute Settings (Non-translatable)
                 Section::make(__('attributes.attribute_settings'))
                     ->description(__('attributes.attribute_settings_description'))

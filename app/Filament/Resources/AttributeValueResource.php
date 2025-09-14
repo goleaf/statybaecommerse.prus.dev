@@ -37,6 +37,7 @@ class AttributeValueResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-tag';
 
     /** @var string|\BackedEnum|null */
@@ -65,10 +66,8 @@ class AttributeValueResource extends Resource
         return __('attributes.attribute_values');
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Tabs::make('Attribute Value')
                     ->tabs([
                         Tabs\Tab::make(__('attributes.basic_information'))

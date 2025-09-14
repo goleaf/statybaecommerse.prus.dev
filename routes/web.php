@@ -624,7 +624,7 @@ Route::get('/', function () {
 Route::get('/home', fn () => redirect()->route('home'));
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
 Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.show');
-Route::get('/products/{product}/history', \App\Livewire\Pages\ProductHistory::class)->name('products.history');
+Route::get('/products/{product}/history', Pages\ProductHistoryPage::class)->name('products.history');
 
 // Product Request routes (authenticated users only)
 Route::middleware(['auth'])->group(function () {
@@ -908,7 +908,7 @@ Route::prefix('{locale}')
         // Product routes
         Route::get('/products', Pages\ProductCatalog::class)->name('localized.products.index');
         Route::get('/products/{product}', Pages\SingleProduct::class)->name('localized.products.show');
-        Route::get('/products/{product}/history', \App\Livewire\Pages\ProductHistory::class)->name('localized.products.history');
+        Route::get('/products/{product}/history', Pages\ProductHistoryPage::class)->name('localized.products.history');
 
         // Product Request routes (authenticated users only)
         Route::middleware(['auth'])->group(function () {

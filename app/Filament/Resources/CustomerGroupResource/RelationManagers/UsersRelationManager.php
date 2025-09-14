@@ -22,8 +22,7 @@ class UsersRelationManager extends RelationManager
 
     public function form(Schema $form): Schema
     {
-        return $form
-            ->components([
+        return $schema->components([
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),

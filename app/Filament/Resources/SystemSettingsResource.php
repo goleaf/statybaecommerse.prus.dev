@@ -26,7 +26,8 @@ class SystemSettingsResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     /** @var string|\BackedEnum|null */
 
@@ -43,10 +44,8 @@ class SystemSettingsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'System Settings';
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->components([
+    public static function form(Schema $schema): Schema {
+        return $schema->components([
                 Forms\Components\Section::make(__('admin.system_settings.setting_information'))
                     ->components([
                         Forms\Components\Select::make('category_id')

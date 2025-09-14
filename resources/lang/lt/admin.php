@@ -301,7 +301,22 @@ return [
     'products' => [
         'title' => 'Produktai',
         'create' => 'Sukurti produktą',
+        'select_product' => 'Pasirinkite produktą...',
+        'searching' => 'Ieškoma produktų...',
+        'no_products_found' => 'Produktų nerasta',
+        'try_different_keywords' => 'Išbandykite kitus raktažodžius',
+        'in_stock' => 'Yra sandėlyje',
+        'out_of_stock' => 'Nėra sandėlyje',
         'edit' => 'Redaguoti produktą',
+    ],
+    // Categories
+    'category' => [
+        'select_category' => 'Pasirinkite kategoriją...',
+        'searching' => 'Ieškoma kategorijų...',
+        'no_categories_found' => 'Kategorijų nerasta',
+        'try_different_keywords' => 'Išbandykite kitus raktažodžius',
+        'products' => 'produktai',
+        'subcategories' => 'pogrupiai',
         'view' => 'Peržiūrėti produktą',
         'delete' => 'Ištrinti produktą',
         'bulk_actions' => 'Masinis veiksmas',

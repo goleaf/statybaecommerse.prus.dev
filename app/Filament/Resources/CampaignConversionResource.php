@@ -19,7 +19,6 @@ use Filament\Schemas\Schema;
 use Filament\Schemas\Components\KeyValueEntry;
 use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Schemas\Components\TextEntry;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
@@ -35,6 +34,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use App\Enums\NavigationGroup;
 use UnitEnum;
 
 /**
@@ -49,6 +49,7 @@ class CampaignConversionResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static ?string $navigationLabel = 'campaign_conversions.navigation.label';
@@ -59,17 +60,15 @@ class CampaignConversionResource extends Resource
 
     /** @var string|\BackedEnum|null */
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static $navigationGroup = 'campaign_conversions.navigation.group';
-
     protected static ?int $navigationSort = 3;
 
-    public static function form(Schema $schema): Schema
+    public static function getNavigationGroup(): ?string
     {
-        return $form
-            ->schema([
+        return NavigationGroup::Marketing->label();
+    }
+
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Section::make(__('campaign_conversions.form.basic_information'))
                     ->schema([
                         Grid::make(3)

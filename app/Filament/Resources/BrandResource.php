@@ -38,7 +38,8 @@ class BrandResource extends Resource
 {
     protected static ?string $model = Brand::class;
 
-    protected static NavigationIcon $navigationIcon = NavigationIcon::Tag;
+    /** @var BackedEnum|string|null */
+    protected static $navigationIcon = NavigationIcon::Tag;
 
     /**
      * @var UnitEnum|string|null
@@ -64,7 +65,7 @@ class BrandResource extends Resource
         return __('admin.brands.model.plural');
     }
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {

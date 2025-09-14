@@ -8,8 +8,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Traits\HandlesContentNegotiation;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -17,11 +20,12 @@ use Illuminate\View\View;
 final /**
  * OrderController
  * 
- * HTTP controller handling web requests and responses.
+ * HTTP controller handling web requests and responses with content negotiation.
  */
 class OrderController extends Controller
 {
-    public function index(Request $request): View
+    use HandlesContentNegotiation;
+    public function index(Request $request): JsonResponse|View|Response
     {
         $user = Auth::user();
 
@@ -46,7 +50,19 @@ class OrderController extends Controller
 
         $orders = $query->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('orders.index', compact('orders'));
+        $data = [
+            'orders' => $orders->items(),
+            'pagination' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'per_page' => $orders->perPage(),
+                'total' => $orders->total(),
+                'from' => $orders->firstItem(),
+                'to' => $orders->lastItem(),
+            ],
+        ];
+
+        return $this->handleContentNegotiation($request, $data, 'orders.index', ['orders' => $orders]);
     }
 
     public function show(Order $order): View

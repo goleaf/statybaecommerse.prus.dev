@@ -24,16 +24,15 @@ class AnalyticsEventResource extends Resource
 {
     protected static ?string $model = AnalyticsEvent::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $navigationLabel = null;
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema
-    {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Forms\Components\Section::make(__('admin.analytics.sections.event_information'))
                     ->schema([
                         Forms\Components\Select::make('event_type')
