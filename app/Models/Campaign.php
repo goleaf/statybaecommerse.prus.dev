@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -176,6 +177,16 @@ class Campaign extends Model
     public function orders(): HasManyThrough
     {
         return $this->hasManyThrough(Order::class, CampaignConversion::class);
+    }
+
+    /**
+     * Get the campaign's latest order.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
+    public function latestOrder(): HasOneThrough
+    {
+        return $this->orders()->one()->latestOfMany();
     }
 
     public function targetCategories(): BelongsToMany

@@ -51,7 +51,16 @@ class DiscountRedemptionController extends Controller
             $query->whereDate('redeemed_at', '<=', $request->date_to);
         }
 
-        $redemptions = $query->orderBy('redeemed_at', 'desc')->paginate(15);
+        $redemptions = $query->orderBy('redeemed_at', 'desc')->get()
+            ->skipWhile(function ($redemption) {
+                // Skip redemptions that are not properly configured for display
+                return empty($redemption->discount_id) || 
+                       empty($redemption->code_id) ||
+                       empty($redemption->user_id) ||
+                       empty($redemption->amount_saved) ||
+                       empty($redemption->currency_code);
+            })
+            ->paginate(15);
 
         // Get user's available discounts for filter
         $availableDiscounts = Discount::where('is_active', true)
@@ -259,7 +268,13 @@ class DiscountRedemptionController extends Controller
                 $query->whereNull('usage_limit')
                     ->orWhereRaw('usage_count < usage_limit');
             })
-            ->get(['id', 'code', 'description_lt', 'description_en', 'usage_limit', 'usage_count']);
+            ->get(['id', 'code', 'description_lt', 'description_en', 'usage_limit', 'usage_count'])
+            ->skipWhile(function ($code) {
+                // Skip codes that are not properly configured for display
+                return empty($code->code) || 
+                       empty($code->id) ||
+                       !$code->is_active;
+            });
 
         return response()->json($codes);
     }

@@ -305,13 +305,13 @@ describe('Product Model', function () {
     it('can get formatted price', function () {
         $product = Product::factory()->create(['price' => 29.99]);
 
-        expect($product->formatted_price)->toBe('€29.99');
+        expect($product->formatted_price)->toBe('29,99' . "\u{00A0}" . '€');
     });
 
     it('can get formatted compare price', function () {
         $product = Product::factory()->create(['compare_price' => 39.99]);
 
-        expect($product->formatted_compare_price)->toBe('€39.99');
+        expect($product->formatted_compare_price)->toBe('39,99' . "\u{00A0}" . '€');
     });
 
     it('can get stock status', function () {

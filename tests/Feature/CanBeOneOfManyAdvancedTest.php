@@ -156,14 +156,14 @@ final class CanBeOneOfManyAdvancedTest extends TestCase
         $oldDocument = Document::factory()->create([
             'documentable_type' => User::class,
             'documentable_id' => $user->id,
-            'status' => 'generated',
+            'status' => 'active',
             'created_at' => now()->subDays(10),
         ]);
         
         $latestDocument = Document::factory()->create([
             'documentable_type' => User::class,
             'documentable_id' => $user->id,
-            'status' => 'generated',
+            'status' => 'active',
             'created_at' => now()->subDays(1),
         ]);
 
@@ -184,14 +184,14 @@ final class CanBeOneOfManyAdvancedTest extends TestCase
         $oldDocument = Document::factory()->create([
             'documentable_type' => Product::class,
             'documentable_id' => $product->id,
-            'status' => 'generated',
+            'status' => 'active',
             'created_at' => now()->subDays(10),
         ]);
         
         $latestDocument = Document::factory()->create([
             'documentable_type' => Product::class,
             'documentable_id' => $product->id,
-            'status' => 'generated',
+            'status' => 'active',
             'created_at' => now()->subDays(1),
         ]);
 

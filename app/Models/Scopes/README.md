@@ -56,6 +56,11 @@ Automatically filters records where `is_active = true`, `is_enabled = true`, or 
 - Price
 - PriceList
 - PriceListItem
+- Document
+- DocumentTemplate
+- Legal
+- Location
+- OrderShipping
 
 ### PublishedScope
 Automatically filters records where `published_at` is not null and is in the past.
@@ -64,6 +69,7 @@ Automatically filters records where `published_at` is not null and is in the pas
 - Product
 - News
 - Post
+- Legal
 
 ### VisibleScope
 Automatically filters records where `is_visible = true`.
@@ -99,6 +105,8 @@ Automatically filters records where `is_enabled = true`.
 - PartnerTier
 - Price
 - PriceList
+- Legal
+- Location
 
 ### ApprovedScope
 Automatically filters records where `is_approved = true`.
@@ -121,6 +129,7 @@ Automatically filters records by status field with model-specific allowed status
 - CampaignConversion
 - DiscountCode
 - DiscountRedemption
+- Document
 
 ### ActiveCampaignScope
 Automatically filters campaigns that are currently active based on start/end dates.
@@ -153,6 +162,7 @@ Automatically filters records by user ownership for data privacy.
 - CouponUsage
 - AnalyticsEvent
 - DiscountRedemption
+- OrderShipping
 
 ### DateRangeScope
 Automatically filters records by date ranges for time-sensitive content.

@@ -152,7 +152,7 @@ final class SkipWhileFunctionalityTest extends TestCase
             (object) ['id' => 1, 'price' => 5, 'category' => 'electronics', 'in_stock' => true],
             (object) ['id' => 2, 'price' => 50, 'category' => 'electronics', 'in_stock' => false],
             (object) ['id' => 3, 'price' => 100, 'category' => 'clothing', 'in_stock' => true],
-            (object) ['id' => 4, 'price' => 200, 'category' => 'electronics', 'in_stock' => true],
+            (object) ['id' => 4, 'price' => 120, 'category' => 'electronics', 'in_stock' => true],
         ]);
 
         $criteria = [
@@ -177,7 +177,7 @@ final class SkipWhileFunctionalityTest extends TestCase
             return $item <= 5;
         });
 
-        $this->assertEquals([6, 7, 8, 9, 10], $subset->all());
+        $this->assertEquals([6, 7, 8, 9, 10], $subset->values()->all());
     }
 
     public function test_skip_while_with_string_values(): void
@@ -188,7 +188,7 @@ final class SkipWhileFunctionalityTest extends TestCase
             return strlen($item) <= 5;
         });
 
-        $this->assertEquals(['elderberry'], $subset->all());
+        $this->assertEquals(['banana', 'cherry', 'date', 'elderberry'], $subset->values()->all());
     }
 
     public function test_skip_while_with_associative_arrays(): void

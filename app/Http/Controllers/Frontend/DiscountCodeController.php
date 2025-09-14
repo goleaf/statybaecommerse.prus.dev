@@ -189,6 +189,13 @@ class DiscountCodeController extends Controller
                     ->orWhere('expires_at', '>=', now());
             })
             ->get()
+            ->skipWhile(function ($code) {
+                // Skip codes that are not properly configured for display
+                return empty($code->code) || 
+                       empty($code->discount) ||
+                       !$code->is_active ||
+                       empty($code->discount_id);
+            })
             ->filter(function ($code) {
                 // Filter out codes that user has already used up their limit
                 if ($code->usage_limit_per_user && Auth::check()) {

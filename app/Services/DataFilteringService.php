@@ -109,20 +109,19 @@ final class DataFilteringService
      */
     public function filterProductsByPriceRange(Collection $products, float $minPrice = 0, float $maxPrice = null): Collection
     {
-        return $products->skipWhile(function ($product) use ($minPrice, $maxPrice) {
+        return $products->filter(function ($product) use ($minPrice, $maxPrice) {
             $price = $product->price ?? $product['price'] ?? 0;
             
-            // Skip products below minimum price
+            // Include products within price range
             if ($price < $minPrice) {
-                return true;
+                return false;
             }
             
-            // Skip products above maximum price (if specified)
             if ($maxPrice !== null && $price > $maxPrice) {
-                return true;
+                return false;
             }
             
-            return false;
+            return true;
         });
     }
 

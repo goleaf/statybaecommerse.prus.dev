@@ -286,6 +286,16 @@ class Product extends Model implements HasMedia
         return $this->morphMany(Price::class, 'priceable');
     }
 
+    /**
+     * Get the product's latest price.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function latestPrice(): MorphOne
+    {
+        return $this->morphOne(Price::class, 'priceable')->latestOfMany();
+    }
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'product_categories');
