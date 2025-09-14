@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -16,7 +17,7 @@ final /**
  */
 class AdminUser extends Authenticatable implements FilamentUser
 {
-    use Notifiable;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
