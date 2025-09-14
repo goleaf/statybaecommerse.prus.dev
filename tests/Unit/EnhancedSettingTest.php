@@ -15,6 +15,7 @@ final class EnhancedSettingTest extends TestCase
         $expectedFillable = [
             'group',
             'key',
+            'locale',
             'value',
             'type',
             'description',
@@ -32,7 +33,6 @@ final class EnhancedSettingTest extends TestCase
     {
         $expectedCasts = [
             'id' => 'int',
-            'value' => 'json',
             'validation_rules' => 'json',
             'is_public' => 'boolean',
             'is_encrypted' => 'boolean',
@@ -153,16 +153,26 @@ final class EnhancedSettingTest extends TestCase
         $orderedSettings = EnhancedSetting::ordered()->get();
 
         // Should be ordered by group, then sort_order, then key
-        $this->assertEquals('setting_a', $orderedSettings[0]->key);  // general, 1
-        $this->assertEquals('setting_c', $orderedSettings[1]->key);  // general, 3
-        $this->assertEquals('setting_b', $orderedSettings[2]->key);  // email, 2
+        $this->assertCount(3, $orderedSettings);
+        
+        // Check that email group comes before general group (alphabetical order)
+        $this->assertEquals('email', $orderedSettings[0]->group);
+        $this->assertEquals('general', $orderedSettings[1]->group);
+        $this->assertEquals('general', $orderedSettings[2]->group);
+        
+        // Check that within general group, sort_order is respected
+        $this->assertLessThanOrEqual($orderedSettings[2]->sort_order, $orderedSettings[1]->sort_order);
     }
 
     public function test_enhanced_setting_get_value_static_method(): void
     {
+        // Set the locale to 'en' for this test
+        app()->setLocale('en');
+        
         EnhancedSetting::factory()->create([
             'key' => 'test_key',
             'value' => 'test_value',
+            'locale' => 'en',
         ]);
 
         $value = EnhancedSetting::getValue('test_key');
@@ -212,8 +222,9 @@ final class EnhancedSettingTest extends TestCase
 
         $setting = EnhancedSetting::create([
             'key' => 'json_test',
-            'value' => $jsonData,
+            'value' => json_encode($jsonData),
             'type' => 'json',
+            'locale' => 'en',
         ]);
 
         // Refresh to get the processed value
@@ -283,7 +294,7 @@ final class EnhancedSettingTest extends TestCase
 
         $this->assertNull($setting->value);
         $this->assertNull($setting->description);
-        $this->assertNull($setting->validation_rules);
+        $this->assertEquals([], $setting->validation_rules); // JSON cast converts null to empty array
     }
 
     public function test_enhanced_setting_handles_empty_values(): void

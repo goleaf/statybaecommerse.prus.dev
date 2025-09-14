@@ -130,9 +130,10 @@ final class NormalSetting extends Model
         return $query->orderBy('group')->orderBy('sort_order')->orderBy('key');
     }
 
-    public static function getValue(string $key, $default = null)
+    public static function getValue(string $key, $default = null, ?string $locale = null)
     {
-        $setting = self::where('key', $key)->first();
+        $locale = $locale ?? app()->getLocale();
+        $setting = self::where('key', $key)->where('locale', $locale)->first();
 
         return $setting ? $setting->value : $default;
     }
