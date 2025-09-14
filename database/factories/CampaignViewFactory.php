@@ -23,10 +23,24 @@ final class CampaignViewFactory extends Factory
             'session_id' => $this->faker->uuid(),
             'ip_address' => $this->faker->ipv4(),
             'user_agent' => $this->faker->userAgent(),
-            'referer' => $this->faker->optional(0.7)->url(),
-            'customer_id' => $this->faker->optional(0.3)->randomElement(User::pluck('id')->toArray()),
+            'referer' => $this->faker->optional()->url(),
+            'customer_id' => $this->faker->optional()->randomElement([User::factory()]),
             'viewed_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
+    }
+
+    public function withCustomer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'customer_id' => User::factory(),
+        ]);
+    }
+
+    public function withoutCustomer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'customer_id' => null,
+        ]);
     }
 
     public function recent(): static
@@ -36,22 +50,24 @@ final class CampaignViewFactory extends Factory
         ]);
     }
 
-    public function withCustomer(): static
+    public function old(): static
     {
         return $this->state(fn (array $attributes) => [
-            'customer_id' => Customer::factory(),
+            'viewed_at' => $this->faker->dateTimeBetween('-1 year', '-1 month'),
         ]);
     }
 
     public function withReferer(): static
     {
         return $this->state(fn (array $attributes) => [
-            'referer' => $this->faker->randomElement([
-                'https://google.com',
-                'https://facebook.com',
-                'https://twitter.com',
-                'https://example.com',
-            ]),
+            'referer' => $this->faker->url(),
+        ]);
+    }
+
+    public function withoutReferer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'referer' => null,
         ]);
     }
 }
