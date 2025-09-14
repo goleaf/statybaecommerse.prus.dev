@@ -50,7 +50,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             ],
             [
                 'name' => 'Elektrėnai',
-                'code' => 'LT-VL-ELE',
+                'code' => 'LT-VLN-ELE',
                 'latitude' => 54.7833,
                 'longitude' => 24.6667,
                 'population' => 11000,
@@ -75,7 +75,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             ],
             [
                 'name' => 'Jonava',
-                'code' => 'LT-KA-JON',
+                'code' => 'LT-KAU-JON',
                 'latitude' => 55.0833,
                 'longitude' => 24.2833,
                 'population' => 26000,
