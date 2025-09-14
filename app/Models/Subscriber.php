@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,6 +19,7 @@ final class Subscriber extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'user_id',
         'email',
         'first_name',
         'last_name',
@@ -152,9 +154,21 @@ final class Subscriber extends Model
         return in_array($interest, $this->interests ?? []);
     }
 
+    // Relationships
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     // Static methods
     public static function subscribe(array $data): self
     {
+        // Try to find existing user by email
+        $user = User::where('email', $data['email'])->first();
+        if ($user) {
+            $data['user_id'] = $user->id;
+        }
+
         return static::create(array_merge($data, [
             'status' => 'active',
             'subscribed_at' => now(),

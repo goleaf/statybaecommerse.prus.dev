@@ -97,25 +97,7 @@
                                 {{ __('footer_subscribe_desc') }}
                             </p>
                             {{-- Enhanced Newsletter Form --}}
-                            <form class="space-y-4" target="_blank" novalidate>
-                                <div class="flex flex-col sm:flex-row gap-3">
-                                    <input
-                                           type="email"
-                                           id="newsletter-email"
-                                           name="EMAIL"
-                                           placeholder="{{ __('footer_enter_email') }}"
-                                           class="flex-1 rounded-xl border-slate-300 bg-white/80 backdrop-blur-sm px-4 py-3 text-sm text-slate-800 placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:bg-white shadow-sm transition-all duration-200"
-                                           required />
-                                    <button
-                                            type="submit"
-                                            class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-medium text-white hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white transition-all duration-200 transform hover:scale-105 shadow-lg shadow-blue-500/25">
-                                        {{ __('footer_subscribe_button') }}
-                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </form>
+                            <livewire:newsletter-subscription />
                         </div>
                         <div class="flex items-center space-x-6">
                             <a href="{{ $socialFacebook }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 transform hover:scale-110 p-2 rounded-full hover:bg-blue-50">
