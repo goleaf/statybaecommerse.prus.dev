@@ -37,9 +37,14 @@ return [
             'database' => env('DB_DATABASE', database_path('database.sqlite')),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-            'busy_timeout' => null,
-            'journal_mode' => null,
-            'synchronous' => null,
+            'busy_timeout' => env('DB_BUSY_TIMEOUT', 10000), // 10 seconds
+            'journal_mode' => env('DB_JOURNAL_MODE', 'wal'), // Write-Ahead Logging
+            'synchronous' => env('DB_SYNCHRONOUS', 'normal'), // Balance between safety and performance
+            'cache_size' => env('DB_CACHE_SIZE', -64000), // 64MB cache
+            'temp_store' => env('DB_TEMP_STORE', 'memory'), // Store temp tables in memory
+            'mmap_size' => env('DB_MMAP_SIZE', 268435456), // 256MB memory mapping
+            'page_size' => env('DB_PAGE_SIZE', 4096), // 4KB page size
+            'auto_vacuum' => env('DB_AUTO_VACUUM', 'incremental'), // Incremental vacuum
         ],
 
         'mysql' => [

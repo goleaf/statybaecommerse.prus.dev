@@ -130,6 +130,12 @@
         ],
         "cache:clear": [
             "@php artisan optimize:clear"
+        ],
+        "sqlite:optimize": [
+            "@php artisan sqlite:optimize"
+        ],
+        "sqlite:check": [
+            "@php artisan sqlite:optimize --check"
         ]
     },
     "extra": {
