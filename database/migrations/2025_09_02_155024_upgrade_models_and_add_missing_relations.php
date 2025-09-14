@@ -186,6 +186,13 @@ return new class extends Migration
                 $table->foreign('attribute_value_id')->references('id')->on('sh_attribute_values')->onDelete('cascade');
                 $table->unique(['variant_id', 'attribute_value_id'], 'variant_attribute_value_unique');
             });
+        } else {
+            // Table exists, check if index exists and add if not
+            if (!Schema::hasIndex('sh_product_variant_attributes', 'variant_attribute_value_unique')) {
+                Schema::table('sh_product_variant_attributes', function (Blueprint $table) {
+                    $table->unique(['variant_id', 'attribute_value_id'], 'variant_attribute_value_unique');
+                });
+            }
         }
     }
 

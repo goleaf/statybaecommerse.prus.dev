@@ -12,30 +12,104 @@ return new class extends Migration
     {
         Schema::table('variant_inventories', function (Blueprint $table) {
             // Add new columns for enhanced inventory management
-            $table->text('notes')->nullable()->after('is_tracked');
-            $table->timestamp('last_restocked_at')->nullable()->after('notes');
-            $table->timestamp('last_sold_at')->nullable()->after('last_restocked_at');
-            $table->decimal('cost_per_unit', 10, 2)->nullable()->after('last_sold_at');
-            $table->integer('reorder_point')->default(0)->after('cost_per_unit');
-            $table->integer('max_stock_level')->nullable()->after('reorder_point');
-            $table->unsignedBigInteger('supplier_id')->nullable()->after('max_stock_level');
-            $table->string('batch_number')->nullable()->after('supplier_id');
-            $table->date('expiry_date')->nullable()->after('batch_number');
-            $table->string('status')->default('active')->after('expiry_date');
+            if (! Schema::hasColumn('variant_inventories', 'notes')) {
+                $table->text('notes')->nullable()->after('is_tracked');
+            }
+            if (! Schema::hasColumn('variant_inventories', 'last_restocked_at')) {
+                $table->timestamp('last_restocked_at')->nullable()->after('notes');
+            }
+            if (! Schema::hasColumn('variant_inventories', 'last_sold_at')) {
+                $table->timestamp('last_sold_at')->nullable()->after('last_restocked_at');
+            }
+            if (! Schema::hasColumn('variant_inventories', 'cost_per_unit')) {
+                $table->decimal('cost_per_unit', 10, 2)->nullable()->after('last_sold_at');
+            }
+            if (! Schema::hasColumn('variant_inventories', 'reorder_point')) {
+                $table->integer('reorder_point')->default(0)->after('cost_per_unit');
+            }
+            if (! Schema::hasColumn('variant_inventories', 'max_stock_level')) {
+                $table->integer('max_stock_level')->nullable()->after('reorder_point');
+            }
+            if (! Schema::hasColumn('variant_inventories', 'supplier_id')) {
+                $table->unsignedBigInteger('supplier_id')->nullable()->after('max_stock_level');
+            }
+            if (! Schema::hasColumn('variant_inventories', 'batch_number')) {
+                $table->string('batch_number')->nullable()->after('supplier_id');
+            }
+            if (! Schema::hasColumn('variant_inventories', 'expiry_date')) {
+                $table->date('expiry_date')->nullable()->after('batch_number');
+            }
+            if (! Schema::hasColumn('variant_inventories', 'status')) {
+                $table->string('status')->default('active')->after('expiry_date');
+            }
 
             // Add soft deletes
-            $table->softDeletes();
-
-            // Add indexes for better performance
-            $table->index(['status', 'is_tracked']);
-            $table->index(['supplier_id']);
-            $table->index(['expiry_date']);
-            $table->index(['last_restocked_at']);
-            $table->index(['reorder_point']);
-
-            // Add foreign key constraint for supplier
-            $table->foreign('supplier_id')->references('id')->on('partners')->onDelete('set null');
+            if (! Schema::hasColumn('variant_inventories', 'deleted_at')) {
+                $table->softDeletes();
+            }
         });
+
+        // Add indexes for better performance (only if they don't exist)
+        if (Schema::hasColumn('variant_inventories', 'status') && Schema::hasColumn('variant_inventories', 'is_tracked')) {
+            try {
+                Schema::table('variant_inventories', function (Blueprint $table) {
+                    $table->index(['status', 'is_tracked']);
+                });
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
+        }
+
+        if (Schema::hasColumn('variant_inventories', 'supplier_id')) {
+            try {
+                Schema::table('variant_inventories', function (Blueprint $table) {
+                    $table->index(['supplier_id']);
+                });
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
+        }
+
+        if (Schema::hasColumn('variant_inventories', 'expiry_date')) {
+            try {
+                Schema::table('variant_inventories', function (Blueprint $table) {
+                    $table->index(['expiry_date']);
+                });
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
+        }
+
+        if (Schema::hasColumn('variant_inventories', 'last_restocked_at')) {
+            try {
+                Schema::table('variant_inventories', function (Blueprint $table) {
+                    $table->index(['last_restocked_at']);
+                });
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
+        }
+
+        if (Schema::hasColumn('variant_inventories', 'reorder_point')) {
+            try {
+                Schema::table('variant_inventories', function (Blueprint $table) {
+                    $table->index(['reorder_point']);
+                });
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
+        }
+
+        // Add foreign key constraint for supplier
+        if (Schema::hasColumn('variant_inventories', 'supplier_id') && Schema::hasTable('partners')) {
+            try {
+                Schema::table('variant_inventories', function (Blueprint $table) {
+                    $table->foreign('supplier_id')->references('id')->on('partners')->onDelete('set null');
+                });
+            } catch (\Exception $e) {
+                // Foreign key might already exist
+            }
+        }
 
         // Create stock_movements table
         if (! Schema::hasTable('stock_movements')) {

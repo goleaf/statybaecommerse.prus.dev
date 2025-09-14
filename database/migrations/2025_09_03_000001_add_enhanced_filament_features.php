@@ -41,17 +41,19 @@ return new class extends Migration
         });
 
         // Add enhanced order fields
-        Schema::table('orders', function (Blueprint $table) {
-            if (! Schema::hasColumn('orders', 'tracking_number')) {
-                $table->string('tracking_number')->nullable()->after('payment_reference');
-            }
-            if (! Schema::hasColumn('orders', 'estimated_delivery')) {
-                $table->date('estimated_delivery')->nullable()->after('tracking_number');
-            }
-            if (! Schema::hasColumn('orders', 'priority')) {
-                $table->enum('priority', ['low', 'normal', 'high', 'urgent'])->default('normal')->after('estimated_delivery');
-            }
-        });
+        if (Schema::hasTable('orders')) {
+            Schema::table('orders', function (Blueprint $table) {
+                if (! Schema::hasColumn('orders', 'tracking_number')) {
+                    $table->string('tracking_number')->nullable()->after('delivered_at');
+                }
+                if (! Schema::hasColumn('orders', 'estimated_delivery')) {
+                    $table->date('estimated_delivery')->nullable()->after('tracking_number');
+                }
+                if (! Schema::hasColumn('orders', 'priority')) {
+                    $table->enum('priority', ['low', 'normal', 'high', 'urgent'])->default('normal')->after('estimated_delivery');
+                }
+            });
+        }
 
         // Create admin activity log table
         if (! Schema::hasTable('admin_activity_logs')) {
@@ -118,9 +120,11 @@ return new class extends Migration
         Schema::dropIfExists('system_notifications');
         Schema::dropIfExists('admin_activity_logs');
 
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn(['tracking_number', 'estimated_delivery', 'priority']);
-        });
+        if (Schema::hasTable('orders')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->dropColumn(['tracking_number', 'estimated_delivery', 'priority']);
+            });
+        }
 
         Schema::table('products', function (Blueprint $table) {
             $table->dropColumn(['meta_title', 'meta_description', 'meta_keywords']);

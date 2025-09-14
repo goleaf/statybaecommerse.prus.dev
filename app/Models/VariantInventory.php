@@ -1,52 +1,69 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
-use App\Models\Scopes\StatusScope;
+use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+
 /**
  * VariantInventory
  * 
- * Eloquent model representing the VariantInventory entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * Eloquent model representing the VariantInventory entity for variant stock management.
  * 
  * @property mixed $table
  * @property mixed $fillable
+ * @property mixed $casts
+ * @property mixed $appends
  * @method static \Illuminate\Database\Eloquent\Builder|VariantInventory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VariantInventory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VariantInventory query()
  * @mixin \Eloquent
  */
-#[ScopedBy([ActiveScope::class, StatusScope::class])]
+#[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class VariantInventory extends Model
 {
-    use HasFactory, LogsActivity, SoftDeletes;
+    use HasFactory, SoftDeletes;
+
     protected $table = 'variant_inventories';
-    protected $fillable = ['variant_id', 'location_id', 'stock', 'reserved', 'incoming', 'threshold', 'is_tracked', 'notes', 'last_restocked_at', 'last_sold_at', 'cost_per_unit', 'reorder_point', 'max_stock_level', 'supplier_id', 'batch_number', 'expiry_date', 'status'];
-    /**
-     * Handle casts functionality with proper error handling.
-     * @return array
-     */
+    
+    protected $fillable = [
+        'variant_id',
+        'warehouse_code',
+        'stock',
+        'reserved',
+        'available',
+        'reorder_point',
+        'reorder_quantity',
+        'last_restocked_at',
+    ];
+
     protected function casts(): array
     {
-        return ['stock' => 'integer', 'reserved' => 'integer', 'incoming' => 'integer', 'threshold' => 'integer', 'is_tracked' => 'boolean', 'cost_per_unit' => 'decimal:2', 'reorder_point' => 'integer', 'max_stock_level' => 'integer', 'last_restocked_at' => 'datetime', 'last_sold_at' => 'datetime', 'expiry_date' => 'date'];
+        return [
+            'stock' => 'integer',
+            'reserved' => 'integer',
+            'available' => 'integer',
+            'reorder_point' => 'integer',
+            'reorder_quantity' => 'integer',
+            'last_restocked_at' => 'datetime',
+        ];
     }
-    /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     * @return LogOptions
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['stock', 'reserved', 'incoming', 'threshold', 'is_tracked', 'notes', 'status'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "Variant Inventory {$eventName}")->useLogName('variant_inventory');
-    }
+
+    protected $appends = [
+        'is_low_stock',
+        'is_out_of_stock',
+        'needs_reorder',
+        'stock_status',
+        'utilization_percentage',
+    ];
+
     /**
      * Handle variant functionality with proper error handling.
      * @return BelongsTo
@@ -55,279 +72,210 @@ final class VariantInventory extends Model
     {
         return $this->belongsTo(ProductVariant::class, 'variant_id');
     }
+
     /**
-     * Handle location functionality with proper error handling.
-     * @return BelongsTo
+     * Handle isLowStock functionality with proper error handling.
+     * @return bool
      */
-    public function location(): BelongsTo
+    public function getIsLowStockAttribute(): bool
     {
-        return $this->belongsTo(Location::class, 'location_id');
+        return $this->available <= $this->reorder_point;
     }
+
     /**
-     * Handle supplier functionality with proper error handling.
-     * @return BelongsTo
+     * Handle isOutOfStock functionality with proper error handling.
+     * @return bool
      */
-    public function supplier(): BelongsTo
+    public function getIsOutOfStockAttribute(): bool
     {
-        return $this->belongsTo(Partner::class, 'supplier_id');
+        return $this->available <= 0;
     }
+
     /**
-     * Handle stockMovements functionality with proper error handling.
-     * @return HasMany
+     * Handle needsReorder functionality with proper error handling.
+     * @return bool
      */
-    public function stockMovements(): HasMany
+    public function getNeedsReorderAttribute(): bool
     {
-        return $this->hasMany(StockMovement::class, 'variant_inventory_id');
+        return $this->available <= $this->reorder_point;
     }
-    /**
-     * Handle scopeTracked functionality with proper error handling.
-     * @param mixed $query
-     */
-    public function scopeTracked($query)
-    {
-        return $query->where('is_tracked', true);
-    }
-    /**
-     * Handle scopeLowStock functionality with proper error handling.
-     * @param mixed $query
-     */
-    public function scopeLowStock($query)
-    {
-        return $query->whereRaw('stock <= threshold');
-    }
-    /**
-     * Handle scopeOutOfStock functionality with proper error handling.
-     * @param mixed $query
-     */
-    public function scopeOutOfStock($query)
-    {
-        return $query->where('stock', '<=', 0);
-    }
-    /**
-     * Handle scopeNeedsReorder functionality with proper error handling.
-     * @param mixed $query
-     */
-    public function scopeNeedsReorder($query)
-    {
-        return $query->whereRaw('stock <= reorder_point');
-    }
-    /**
-     * Handle scopeExpiringSoon functionality with proper error handling.
-     * @param mixed $query
-     * @param int $days
-     */
-    public function scopeExpiringSoon($query, int $days = 30)
-    {
-        return $query->whereNotNull('expiry_date')->where('expiry_date', '<=', now()->addDays($days));
-    }
-    /**
-     * Handle scopeByStatus functionality with proper error handling.
-     * @param mixed $query
-     * @param string $status
-     */
-    public function scopeByStatus($query, string $status)
-    {
-        return $query->where('status', $status);
-    }
-    /**
-     * Handle scopeByLocation functionality with proper error handling.
-     * @param mixed $query
-     * @param int $locationId
-     */
-    public function scopeByLocation($query, int $locationId)
-    {
-        return $query->where('location_id', $locationId);
-    }
-    /**
-     * Handle scopeByVariant functionality with proper error handling.
-     * @param mixed $query
-     * @param int $variantId
-     */
-    public function scopeByVariant($query, int $variantId)
-    {
-        return $query->where('variant_id', $variantId);
-    }
-    /**
-     * Handle getAvailableStockAttribute functionality with proper error handling.
-     * @return int
-     */
-    public function getAvailableStockAttribute(): int
-    {
-        return max(0, $this->stock - $this->reserved);
-    }
-    /**
-     * Handle getStockValueAttribute functionality with proper error handling.
-     * @return float
-     */
-    public function getStockValueAttribute(): float
-    {
-        return $this->stock * ($this->cost_per_unit ?? 0);
-    }
-    /**
-     * Handle getReservedValueAttribute functionality with proper error handling.
-     * @return float
-     */
-    public function getReservedValueAttribute(): float
-    {
-        return $this->reserved * ($this->cost_per_unit ?? 0);
-    }
-    /**
-     * Handle getTotalValueAttribute functionality with proper error handling.
-     * @return float
-     */
-    public function getTotalValueAttribute(): float
-    {
-        return $this->stock_value + $this->reserved_value;
-    }
+
     /**
      * Handle getStockStatusAttribute functionality with proper error handling.
      * @return string
      */
     public function getStockStatusAttribute(): string
     {
-        if (!$this->is_tracked) {
-            return 'not_tracked';
-        }
-        if ($this->isOutOfStock()) {
+        if ($this->is_out_of_stock) {
             return 'out_of_stock';
         }
-        if ($this->isLowStock()) {
+        
+        if ($this->is_low_stock) {
             return 'low_stock';
         }
-        if ($this->needsReorder()) {
-            return 'needs_reorder';
-        }
+        
         return 'in_stock';
     }
+
     /**
-     * Handle getStockStatusLabelAttribute functionality with proper error handling.
-     * @return string
+     * Handle getUtilizationPercentageAttribute functionality with proper error handling.
+     * @return float
      */
-    public function getStockStatusLabelAttribute(): string
+    public function getUtilizationPercentageAttribute(): float
     {
-        return match ($this->stock_status) {
-            'not_tracked' => __('inventory.not_tracked'),
-            'out_of_stock' => __('inventory.out_of_stock'),
-            'low_stock' => __('inventory.low_stock'),
-            'needs_reorder' => __('inventory.needs_reorder'),
-            'in_stock' => __('inventory.in_stock'),
-            default => __('inventory.unknown'),
-        };
+        if ($this->stock <= 0) {
+            return 0.0;
+        }
+        
+        return ($this->reserved / $this->stock) * 100;
     }
+
     /**
-     * Handle isLowStock functionality with proper error handling.
-     * @return bool
+     * Handle scopeInStock functionality with proper error handling.
+     * @param mixed $query
      */
-    public function isLowStock(): bool
+    public function scopeInStock($query)
     {
-        return $this->stock <= $this->threshold;
+        return $query->where('available', '>', 0);
     }
+
     /**
-     * Handle isOutOfStock functionality with proper error handling.
-     * @return bool
+     * Handle scopeLowStock functionality with proper error handling.
+     * @param mixed $query
      */
-    public function isOutOfStock(): bool
+    public function scopeLowStock($query)
     {
-        return $this->available_stock <= 0;
+        return $query->whereRaw('available <= reorder_point');
     }
+
     /**
-     * Handle needsReorder functionality with proper error handling.
-     * @return bool
+     * Handle scopeOutOfStock functionality with proper error handling.
+     * @param mixed $query
      */
-    public function needsReorder(): bool
+    public function scopeOutOfStock($query)
     {
-        return $this->stock <= $this->reorder_point;
+        return $query->where('available', '<=', 0);
     }
+
     /**
-     * Handle isExpiringSoon functionality with proper error handling.
-     * @param int $days
-     * @return bool
+     * Handle scopeNeedsReorder functionality with proper error handling.
+     * @param mixed $query
      */
-    public function isExpiringSoon(int $days = 30): bool
+    public function scopeNeedsReorder($query)
     {
-        return $this->expiry_date && $this->expiry_date <= now()->addDays($days);
+        return $query->whereRaw('available <= reorder_point');
     }
+
     /**
-     * Handle isExpired functionality with proper error handling.
-     * @return bool
+     * Handle scopeByWarehouse functionality with proper error handling.
+     * @param mixed $query
+     * @param string $warehouseCode
      */
-    public function isExpired(): bool
+    public function scopeByWarehouse($query, string $warehouseCode)
     {
-        return $this->expiry_date && $this->expiry_date < now();
+        return $query->where('warehouse_code', $warehouseCode);
     }
+
     /**
-     * Handle canReserve functionality with proper error handling.
+     * Reserve stock for an order.
      * @param int $quantity
      * @return bool
      */
-    public function canReserve(int $quantity): bool
+    public function reserveStock(int $quantity): bool
     {
-        return $this->available_stock >= $quantity;
-    }
-    /**
-     * Handle reserve functionality with proper error handling.
-     * @param int $quantity
-     * @return bool
-     */
-    public function reserve(int $quantity): bool
-    {
-        if (!$this->canReserve($quantity)) {
+        if ($this->available < $quantity) {
             return false;
         }
-        $this->increment('reserved', $quantity);
-        return true;
+        
+        $this->reserved += $quantity;
+        $this->available = $this->stock - $this->reserved;
+        
+        return $this->save();
     }
+
     /**
-     * Handle unreserve functionality with proper error handling.
+     * Release reserved stock.
      * @param int $quantity
-     * @return void
+     * @return bool
      */
-    public function unreserve(int $quantity): void
+    public function releaseStock(int $quantity): bool
     {
-        $this->decrement('reserved', max(0, $quantity));
+        if ($this->reserved < $quantity) {
+            return false;
+        }
+        
+        $this->reserved -= $quantity;
+        $this->available = $this->stock - $this->reserved;
+        
+        return $this->save();
     }
+
     /**
-     * Handle adjustStock functionality with proper error handling.
+     * Add stock to inventory.
      * @param int $quantity
-     * @param string $reason
-     * @return void
+     * @return bool
      */
-    public function adjustStock(int $quantity, string $reason = 'manual_adjustment'): void
+    public function addStock(int $quantity): bool
     {
-        $this->increment('stock', $quantity);
-        // Log the stock movement
-        $this->stockMovements()->create(['quantity' => $quantity, 'type' => $quantity > 0 ? 'in' : 'out', 'reason' => $reason, 'reference' => 'manual_adjustment', 'user_id' => auth()->id(), 'moved_at' => now()]);
+        $this->stock += $quantity;
+        $this->available = $this->stock - $this->reserved;
+        $this->last_restocked_at = now();
+        
+        return $this->save();
     }
+
     /**
-     * Handle getDisplayNameAttribute functionality with proper error handling.
+     * Remove stock from inventory.
+     * @param int $quantity
+     * @return bool
+     */
+    public function removeStock(int $quantity): bool
+    {
+        if ($this->stock < $quantity) {
+            return false;
+        }
+        
+        $this->stock -= $quantity;
+        $this->available = $this->stock - $this->reserved;
+        
+        return $this->save();
+    }
+
+    /**
+     * Update available stock calculation.
+     * @return bool
+     */
+    public function updateAvailableStock(): bool
+    {
+        $this->available = max(0, $this->stock - $this->reserved);
+        return $this->save();
+    }
+
+    /**
+     * Get stock status badge color.
      * @return string
      */
-    public function getDisplayNameAttribute(): string
+    public function getStockStatusColor(): string
     {
-        return $this->variant->display_name . ' - ' . $this->location->name;
+        return match ($this->stock_status) {
+            'out_of_stock' => 'danger',
+            'low_stock' => 'warning',
+            'in_stock' => 'success',
+            default => 'secondary',
+        };
     }
+
     /**
-     * Handle getProductNameAttribute functionality with proper error handling.
+     * Get stock status label.
      * @return string
      */
-    public function getProductNameAttribute(): string
+    public function getStockStatusLabel(): string
     {
-        return $this->variant->product->name;
-    }
-    /**
-     * Handle getVariantNameAttribute functionality with proper error handling.
-     * @return string
-     */
-    public function getVariantNameAttribute(): string
-    {
-        return $this->variant->display_name;
-    }
-    /**
-     * Handle getLocationNameAttribute functionality with proper error handling.
-     * @return string
-     */
-    public function getLocationNameAttribute(): string
-    {
-        return $this->location->name;
+        return match ($this->stock_status) {
+            'out_of_stock' => 'Out of Stock',
+            'low_stock' => 'Low Stock',
+            'in_stock' => 'In Stock',
+            default => 'Unknown',
+        };
     }
 }
