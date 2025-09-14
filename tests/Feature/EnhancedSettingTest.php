@@ -201,7 +201,7 @@ final class EnhancedSettingTest extends TestCase
 
         EnhancedSetting::factory()->count(3)->create();
 
-        $response = $this->get('/admin/normal-settings');
+        $response = $this->get('/admin/legals');
 
         $response->assertStatus(200);
     }
@@ -210,7 +210,7 @@ final class EnhancedSettingTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        $response = $this->get('/admin/normal-settings/create');
+        $response = $this->get('/admin/legals/create');
 
         $response->assertStatus(200);
     }
@@ -247,7 +247,7 @@ final class EnhancedSettingTest extends TestCase
             'value' => 'test value'
         ]);
 
-        $response = $this->get("/admin/normal-settings/{$setting->id}");
+        $response = $this->get("/admin/legals/{$setting->id}");
 
         // If there's a Filament KeyValueStateCast error, skip the test
         if ($response->status() === 500) {
@@ -267,7 +267,7 @@ final class EnhancedSettingTest extends TestCase
             'value' => 'test value'
         ]);
 
-        $response = $this->get("/admin/normal-settings/{$setting->id}/edit");
+        $response = $this->get("/admin/legals/{$setting->id}/edit");
 
         // If there's a Filament KeyValueStateCast error, skip the test
         if ($response->status() === 500) {
@@ -322,13 +322,13 @@ final class EnhancedSettingTest extends TestCase
         $response = $this->get('/admin/normal-settings');
         $response->assertRedirect('/admin/login');
 
-        $response = $this->get('/admin/normal-settings/create');
+        $response = $this->get('/admin/legals/create');
         $response->assertRedirect('/admin/login');
 
-        $response = $this->get("/admin/normal-settings/{$setting->id}");
+        $response = $this->get("/admin/legals/{$setting->id}");
         $response->assertRedirect('/admin/login');
 
-        $response = $this->get("/admin/normal-settings/{$setting->id}/edit");
+        $response = $this->get("/admin/legals/{$setting->id}/edit");
         $response->assertRedirect('/admin/login');
     }
 
