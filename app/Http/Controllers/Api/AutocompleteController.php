@@ -369,4 +369,220 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Order search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Handle paginatedSearch functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function paginatedSearch(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'q' => 'required|string|min:2|max:255',
+                'page' => 'integer|min:1',
+                'per_page' => 'integer|min:1|max:100',
+                'filters' => 'array',
+                'types' => 'array',
+                'types.*' => 'string|in:products,categories,brands,collections,attributes,locations,countries,cities,orders,customers,addresses',
+            ]);
+
+            $query = $validated['q'];
+            $page = $validated['page'] ?? 1;
+            $perPage = $validated['per_page'] ?? 20;
+            $filters = $validated['filters'] ?? [];
+            $types = $validated['types'] ?? [];
+
+            $paginationService = app(\App\Services\SearchPaginationService::class);
+            $results = $paginationService->getInfiniteScrollData($query, $page, $perPage, $filters, $types);
+
+            return response()->json([
+                'success' => true,
+                'data' => $results['data'],
+                'pagination' => $results['pagination'],
+                'infinite_scroll' => $results['infinite_scroll'],
+                'filters' => $results['filters'],
+                'query' => $results['query'],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Paginated search failed', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Handle exportSearch functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function exportSearch(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'q' => 'required|string|min:2|max:255',
+                'format' => 'string|in:json,csv,xml,xlsx',
+                'types' => 'array',
+                'types.*' => 'string|in:products,categories,brands,collections,attributes,locations,countries,cities,orders,customers,addresses',
+                'options' => 'array',
+            ]);
+
+            $query = $validated['q'];
+            $format = $validated['format'] ?? 'json';
+            $types = $validated['types'] ?? [];
+            $options = $validated['options'] ?? [];
+
+            // Get search results
+            $results = $this->autocompleteService->search($query, 1000, $types);
+
+            // Export results
+            $exportService = app(\App\Services\SearchExportService::class);
+            $exportResult = $exportService->exportSearchResults($results, $query, $format, $options);
+
+            return response()->json($exportResult);
+        } catch (ValidationException $e) {
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Export failed', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Handle downloadExport functionality with proper error handling.
+     * @param string $exportId
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function downloadExport(string $exportId)
+    {
+        try {
+            $exportService = app(\App\Services\SearchExportService::class);
+            $exportData = $exportService->getExportData($exportId);
+
+            if (!$exportData) {
+                return response()->json(['success' => false, 'message' => 'Export not found or expired'], 404);
+            }
+
+            $filename = "search_results_{$exportData['query']}_{$exportData['format']}_" . now()->format('Y-m-d_H-i-s');
+            $mimeType = $this->getMimeType($exportData['format']);
+
+            return response()->streamDownload(function () use ($exportData) {
+                echo $exportData['data'];
+            }, $filename, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'attachment',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Download failed', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Handle shareSearch functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function shareSearch(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'q' => 'required|string|min:2|max:255',
+                'types' => 'array',
+                'types.*' => 'string|in:products,categories,brands,collections,attributes,locations,countries,cities,orders,customers,addresses',
+                'options' => 'array',
+            ]);
+
+            $query = $validated['q'];
+            $types = $validated['types'] ?? [];
+            $options = $validated['options'] ?? [];
+
+            // Get search results
+            $results = $this->autocompleteService->search($query, 100, $types);
+
+            // Generate shareable link
+            $exportService = app(\App\Services\SearchExportService::class);
+            $shareResult = $exportService->generateShareableLink($results, $query, $options);
+
+            return response()->json($shareResult);
+        } catch (ValidationException $e) {
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Share failed', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Handle viewSharedSearch functionality with proper error handling.
+     * @param string $shareId
+     * @return JsonResponse
+     */
+    public function viewSharedSearch(string $shareId): JsonResponse
+    {
+        try {
+            $exportService = app(\App\Services\SearchExportService::class);
+            $shareData = $exportService->getSharedSearch($shareId);
+
+            if (!$shareData) {
+                return response()->json(['success' => false, 'message' => 'Shared search not found or expired'], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'share_data' => $shareData,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'View shared search failed', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Handle getAvailableFilters functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getAvailableFilters(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'q' => 'required|string|min:2|max:255',
+                'types' => 'array',
+                'types.*' => 'string|in:products,categories,brands,collections,attributes,locations,countries,cities,orders,customers,addresses',
+            ]);
+
+            $query = $validated['q'];
+            $types = $validated['types'] ?? [];
+
+            // Get search results
+            $results = $this->autocompleteService->search($query, 1000, $types);
+
+            // Get available filters
+            $paginationService = app(\App\Services\SearchPaginationService::class);
+            $filters = $paginationService->getAvailableFilters($results);
+
+            return response()->json([
+                'success' => true,
+                'filters' => $filters,
+                'query' => $query,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Get filters failed', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Handle getMimeType functionality with proper error handling.
+     * @param string $format
+     * @return string
+     */
+    private function getMimeType(string $format): string
+    {
+        return match ($format) {
+            'json' => 'application/json',
+            'csv' => 'text/csv',
+            'xml' => 'application/xml',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            default => 'application/octet-stream',
+        };
+    }
 }
