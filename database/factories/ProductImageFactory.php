@@ -21,9 +21,7 @@ class ProductImageFactory extends Factory
             'product_id' => Product::factory(),
             'path' => 'products/'.$this->faker->uuid().'.jpg',
             'alt_text' => $this->faker->sentence(3),
-            'title' => $this->faker->sentence(2),
             'sort_order' => $this->faker->numberBetween(0, 10),
-            'is_primary' => false,
         ];
     }
 

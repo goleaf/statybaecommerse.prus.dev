@@ -325,6 +325,26 @@ class Product extends Model implements HasMedia
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
+    /**
+     * Get the product's latest image.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestImage(): HasOne
+    {
+        return $this->images()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the product's primary image (lowest sort order).
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function primaryImage(): HasOne
+    {
+        return $this->images()->one()->ofMany('sort_order', 'min');
+    }
+
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
@@ -340,6 +360,16 @@ class Product extends Model implements HasMedia
         return $this->hasMany(Inventory::class);
     }
 
+    /**
+     * Get the product's latest inventory update.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestInventory(): HasOne
+    {
+        return $this->inventories()->one()->latestOfMany();
+    }
+
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
@@ -348,6 +378,16 @@ class Product extends Model implements HasMedia
     public function requests(): HasMany
     {
         return $this->hasMany(ProductRequest::class);
+    }
+
+    /**
+     * Get the product's latest request.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestRequest(): HasOne
+    {
+        return $this->requests()->one()->latestOfMany();
     }
 
     public function attributes(): BelongsToMany

@@ -63,7 +63,14 @@ class NewsController extends Controller
             ->with(['categories', 'tags', 'images'])
             ->orderBy('published_at', 'desc')
             ->limit(3)
-            ->get();
+            ->get()
+            ->skipWhile(function ($news) {
+                // Skip news items that are not properly configured for display
+                return empty($news->title) || 
+                       empty($news->slug) ||
+                       !$news->is_published ||
+                       empty($news->getFirstMediaUrl('images'));
+            });
 
         return view('news.index', compact('news', 'categories', 'tags', 'featuredNews'));
     }
@@ -91,7 +98,14 @@ class NewsController extends Controller
             })
             ->with(['categories', 'tags', 'images'])
             ->limit(4)
-            ->get();
+            ->get()
+            ->skipWhile(function ($relatedNews) {
+                // Skip related news items that are not properly configured for display
+                return empty($relatedNews->title) || 
+                       empty($relatedNews->slug) ||
+                       !$relatedNews->is_published ||
+                       empty($relatedNews->getFirstMediaUrl('images'));
+            });
 
         return view('news.show', compact('news', 'relatedNews'));
     }

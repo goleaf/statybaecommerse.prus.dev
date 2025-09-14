@@ -25,6 +25,14 @@ class ReviewController extends Controller
         $reviews = Review::with(['user', 'product'])
             ->where('is_approved', true)
             ->latest()
+            ->get()
+            ->skipWhile(function ($review) {
+                // Skip reviews that are not properly configured for display
+                return empty($review->title) || 
+                       empty($review->comment) ||
+                       !$review->is_approved ||
+                       $review->rating <= 0;
+            })
             ->paginate(20);
 
         return view('reviews.index', compact('reviews'));

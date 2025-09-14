@@ -49,7 +49,16 @@ class ReportController extends Controller
             $query->orderBy($sortBy, $sortDirection);
         }
 
-        $reports = $query->paginate(12);
+        $reports = $query->get()
+            ->skipWhile(function ($report) {
+                // Skip reports that are not properly configured for display
+                return empty($report->name) || 
+                       !$report->is_active ||
+                       !$report->is_public ||
+                       empty($report->type) ||
+                       empty($report->category);
+            })
+            ->paginate(12);
 
         // Get filter options
         $types = Report::select('type')
@@ -88,7 +97,15 @@ class ReportController extends Controller
                     ->orWhere('category', $report->category);
             })
             ->limit(4)
-            ->get();
+            ->get()
+            ->skipWhile(function ($relatedReport) {
+                // Skip related reports that are not properly configured for display
+                return empty($relatedReport->name) || 
+                       !$relatedReport->is_active ||
+                       !$relatedReport->is_public ||
+                       empty($relatedReport->type) ||
+                       empty($relatedReport->category);
+            });
 
         return view('reports.show', compact('report', 'relatedReports'));
     }

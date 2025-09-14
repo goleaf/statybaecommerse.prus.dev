@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[ScopedBy([ActiveScope::class, PublishedScope::class, VisibleScope::class])]
 final /**
@@ -78,9 +79,29 @@ class News extends Model
         return $this->hasMany(NewsComment::class);
     }
 
+    /**
+     * Get the news article's latest comment.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestComment(): HasOne
+    {
+        return $this->comments()->one()->latestOfMany();
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(NewsImage::class);
+    }
+
+    /**
+     * Get the news article's latest image.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestImage(): HasOne
+    {
+        return $this->images()->one()->latestOfMany();
     }
 
     public function incrementViewCount(): void

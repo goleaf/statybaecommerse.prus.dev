@@ -44,6 +44,12 @@ Automatically filters records where `is_active = true`, `is_enabled = true`, or 
 - CampaignProductTarget
 - CampaignSchedule
 - CampaignView
+- City
+- Country
+- Region
+- Currency
+- CustomerGroup
+- PartnerTier
 
 ### PublishedScope
 Automatically filters records where `published_at` is not null and is in the past.
@@ -80,6 +86,11 @@ Automatically filters records where `is_enabled = true`.
 - Zone
 - ProductVariant
 - AttributeValue
+- City
+- Region
+- Currency
+- CustomerGroup
+- PartnerTier
 
 ### ApprovedScope
 Automatically filters records where `is_approved = true`.

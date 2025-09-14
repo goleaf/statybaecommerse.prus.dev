@@ -57,7 +57,15 @@ class BrandController extends Controller
             ->whereNotNull('published_at')
             ->latest()
             ->limit(12)
-            ->get();
+            ->get()
+            ->skipWhile(function ($product) {
+                // Skip products that are not properly configured for display
+                return empty($product->name) || 
+                       !$product->is_visible ||
+                       $product->price <= 0 ||
+                       empty($product->slug) ||
+                       !$product->getFirstMediaUrl('images');
+            });
 
         // Get SEO data
         $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName().' - '.config('app.name');

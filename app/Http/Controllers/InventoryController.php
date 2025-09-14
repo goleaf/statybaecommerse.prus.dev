@@ -68,7 +68,16 @@ class InventoryController extends Controller
             $query->orderBy('name', 'asc');
         }
 
-        $products = $query->paginate(20)->withQueryString();
+        $products = $query->get()
+            ->skipWhile(function ($product) {
+                // Skip products that are not properly configured for display
+                return empty($product->name) || 
+                       !$product->is_visible ||
+                       empty($product->slug) ||
+                       $product->price <= 0;
+            })
+            ->paginate(20)
+            ->withQueryString();
 
         return view('inventory', compact('products'));
     }

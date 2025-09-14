@@ -10,6 +10,7 @@ use App\Services\ProductGalleryService;
 use App\Services\PaginationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\LazyCollection;
 use Illuminate\View\View;
 
 final /**
@@ -463,21 +464,25 @@ class CollectionController extends Controller
         $galleryService = new ProductGalleryService();
         $allProducts = collect();
         
-        // Collect products from all collections
-        foreach ($collections as $collection) {
-            $products = $collection->products()
-                ->published()
-                ->with(['images', 'translations'])
-                ->get();
-            
-            // Apply date filtering using skipWhile
-            $newProducts = $galleryService->arrangeWithDateFiltering($products, [
-                'new_arrivals_days' => $days,
-                'exclude_old' => true
-            ]);
-            
-            $allProducts = $allProducts->merge($newProducts);
-        }
+        // Use LazyCollection with timeout to prevent long-running new arrivals processing
+        $timeout = now()->addSeconds(30); // 30 second timeout for new arrivals processing
+        
+        LazyCollection::make($collections)
+            ->takeUntilTimeout($timeout)
+            ->each(function ($collection) use (&$allProducts, $galleryService, $days) {
+                $products = $collection->products()
+                    ->published()
+                    ->with(['images', 'translations'])
+                    ->get();
+                
+                // Apply date filtering using skipWhile
+                $newProducts = $galleryService->arrangeWithDateFiltering($products, [
+                    'new_arrivals_days' => $days,
+                    'exclude_old' => true
+                ]);
+                
+                $allProducts = $allProducts->merge($newProducts);
+            });
         
         // Remove duplicates and apply final filtering
         $uniqueProducts = $allProducts->unique('id')->skipWhile(function ($product) {

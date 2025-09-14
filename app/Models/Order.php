@@ -132,6 +132,16 @@ class Order extends Model
         return $this->hasMany(DiscountRedemption::class);
     }
 
+    /**
+     * Get the order's latest discount redemption.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestDiscountRedemption(): HasOne
+    {
+        return $this->discountRedemptions()->one()->latestOfMany();
+    }
+
     public function zone(): BelongsTo
     {
         return $this->belongsTo(Zone::class);

@@ -645,9 +645,29 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreferenceC
         return $this->hasMany(ReferralCode::class);
     }
 
+    /**
+     * Get the user's latest referral code.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestReferralCode(): HasOne
+    {
+        return $this->referralCodes()->one()->latestOfMany();
+    }
+
     public function referralRewards(): HasMany
     {
         return $this->hasMany(ReferralReward::class);
+    }
+
+    /**
+     * Get the user's latest referral reward.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestReferralReward(): HasOne
+    {
+        return $this->referralRewards()->one()->latestOfMany();
     }
 
     public function referralStatistics(): HasMany

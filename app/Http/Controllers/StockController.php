@@ -62,7 +62,16 @@ class StockController extends Controller
         $sortDirection = $request->get('sort_direction', 'desc');
         $query->orderBy($sortBy, $sortDirection);
 
-        $stockItems = $query->paginate(20)->withQueryString();
+        $stockItems = $query->get()
+            ->skipWhile(function ($stockItem) {
+                // Skip stock items that are not properly configured for display
+                return empty($stockItem->variant) || 
+                       empty($stockItem->variant->product) ||
+                       empty($stockItem->location) ||
+                       $stockItem->quantity < 0;
+            })
+            ->paginate(20)
+            ->withQueryString();
 
         // Get filter options
         $locations = Location::enabled()->get();

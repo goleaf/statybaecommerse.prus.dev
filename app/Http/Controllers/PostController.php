@@ -63,7 +63,14 @@ class PostController extends Controller
             ->where('id', '!=', $post->id)
             ->where('user_id', $post->user_id)
             ->limit(3)
-            ->get();
+            ->get()
+            ->skipWhile(function ($relatedPost) {
+                // Skip related posts that are not properly configured for display
+                return empty($relatedPost->title) || 
+                       empty($relatedPost->slug) ||
+                       $relatedPost->status !== 'published' ||
+                       empty($relatedPost->excerpt);
+            });
 
         return view('posts.show', compact('post', 'relatedPosts'));
     }

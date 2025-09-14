@@ -40,7 +40,16 @@ class SeoDataController extends Controller
             });
         }
 
-        $seoData = $query->paginate(20);
+        $seoData = $query->get()
+            ->skipWhile(function ($seoData) {
+                // Skip SEO data that is not properly configured for display
+                return empty($seoData->title) || 
+                       empty($seoData->description) ||
+                       empty($seoData->locale) ||
+                       empty($seoData->seoable_type) ||
+                       !$seoData->seoable;
+            })
+            ->paginate(20);
 
         return view('seo-data.index', compact('seoData'));
     }
@@ -73,7 +82,16 @@ class SeoDataController extends Controller
             });
         }
 
-        $seoData = $query->paginate(20);
+        $seoData = $query->get()
+            ->skipWhile(function ($seoData) {
+                // Skip SEO data that is not properly configured for display
+                return empty($seoData->title) || 
+                       empty($seoData->description) ||
+                       empty($seoData->locale) ||
+                       empty($seoData->seoable_type) ||
+                       !$seoData->seoable;
+            })
+            ->paginate(20);
 
         return view('seo-data.by-type', compact('seoData', 'type'));
     }

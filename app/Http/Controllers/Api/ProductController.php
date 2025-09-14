@@ -26,6 +26,9 @@ class ProductController extends Controller
         $query = $request->get('q', '');
         $limit = min((int) $request->get('limit', 10), 50);
 
+        // Use LazyCollection with timeout to prevent long-running search operations
+        $timeout = now()->addSeconds(10); // 10 second timeout for product search
+
         $products = Product::query()
             ->where('is_visible', true)
             ->where(function ($q) use ($query) {
@@ -34,8 +37,10 @@ class ProductController extends Controller
                     ->orWhere('sku', 'like', "%{$query}%");
             })
             ->with(['brand', 'media', 'category'])
-            ->limit($limit)
-            ->get();
+            ->cursor()
+            ->takeUntilTimeout($timeout)
+            ->take($limit)
+            ->collect();
 
         // Apply skipWhile to filter out products that are not properly configured
         $filteredProducts = $products->skipWhile(function (Product $product) {
