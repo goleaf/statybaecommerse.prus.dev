@@ -7,7 +7,12 @@ namespace App\Livewire\Pages\Account;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
-final class Documents extends Component
+final /**
+ * Documents
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Documents extends Component
 {
     public array $documents = [];
 

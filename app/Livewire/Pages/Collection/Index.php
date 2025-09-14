@@ -10,6 +10,11 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('layouts.templates.app')]
+/**
+ * Index
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Index extends Component
 {
     public function render(): View

@@ -8,7 +8,12 @@ use App\Models\Location;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class LocationChartWidget extends ChartWidget
+final /**
+ * LocationChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class LocationChartWidget extends ChartWidget
 {
     protected ?string $heading = 'Locations by Type';
 

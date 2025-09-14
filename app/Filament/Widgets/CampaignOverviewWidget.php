@@ -9,7 +9,12 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
-final class CampaignOverviewWidget extends BaseWidget
+final /**
+ * CampaignOverviewWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class CampaignOverviewWidget extends BaseWidget
 {
     protected function getStats(): array
     {

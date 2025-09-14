@@ -10,7 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class AttributeValueController extends Controller
+final /**
+ * AttributeValueController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class AttributeValueController extends Controller
 {
     public function index(Request $request): View
     {

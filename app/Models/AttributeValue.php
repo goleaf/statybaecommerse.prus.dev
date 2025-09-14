@@ -11,7 +11,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class AttributeValue extends Model
+final /**
+ * AttributeValue
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class AttributeValue extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
 

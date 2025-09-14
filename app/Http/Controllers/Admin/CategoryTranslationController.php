@@ -6,4 +6,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-final class CategoryTranslationController extends Controller {}
+final /**
+ * CategoryTranslationController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class CategoryTranslationController extends Controller {}

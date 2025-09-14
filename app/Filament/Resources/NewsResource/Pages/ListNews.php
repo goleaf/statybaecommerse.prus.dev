@@ -9,7 +9,12 @@ use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 
-final class ListNews extends ListRecords
+final /**
+ * ListNews
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListNews extends ListRecords
 {
     protected static string $resource = NewsResource::class;
 

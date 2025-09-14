@@ -8,7 +8,12 @@ use App\Models\Currency;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class CurrencyOverviewWidget extends BaseWidget
+final /**
+ * CurrencyOverviewWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class CurrencyOverviewWidget extends BaseWidget
 {
     protected ?string $pollingInterval = '30s';
 

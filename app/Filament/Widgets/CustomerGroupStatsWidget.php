@@ -9,7 +9,12 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
-final class CustomerGroupStatsWidget extends BaseWidget
+final /**
+ * CustomerGroupStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class CustomerGroupStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

@@ -9,7 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
-final class DocumentTemplate extends Model
+final /**
+ * DocumentTemplate
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class DocumentTemplate extends Model
 {
     use HasFactory;
 

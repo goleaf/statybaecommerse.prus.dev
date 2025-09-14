@@ -8,7 +8,12 @@ use App\Filament\Resources\LocationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditLocation extends EditRecord
+final /**
+ * EditLocation
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditLocation extends EditRecord
 {
     protected static string $resource = LocationResource::class;
 

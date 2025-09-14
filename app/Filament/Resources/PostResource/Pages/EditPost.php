@@ -8,7 +8,12 @@ use App\Filament\Resources\PostResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditPost extends EditRecord
+final /**
+ * EditPost
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditPost extends EditRecord
 {
     protected static string $resource = PostResource::class;
 

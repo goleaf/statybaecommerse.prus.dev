@@ -10,6 +10,11 @@ use App\Models\Currency;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 
+/**
+ * CurrencySelector
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class CurrencySelector extends Component
 {
     public array $currencies = [];

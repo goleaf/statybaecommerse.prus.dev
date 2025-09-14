@@ -9,7 +9,12 @@ use App\Filament\Resources\SeoDataResource\Widgets;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewSeoData extends ViewRecord
+final /**
+ * ViewSeoData
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewSeoData extends ViewRecord
 {
     protected static string $resource = SeoDataResource::class;
 

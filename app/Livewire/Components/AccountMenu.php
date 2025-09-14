@@ -7,6 +7,11 @@ namespace App\Livewire\Components;
 use App\Livewire\Actions\Logout;
 use Livewire\Component;
 
+/**
+ * AccountMenu
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class AccountMenu extends Component
 {
     public function logout(Logout $logout): void

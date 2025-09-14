@@ -8,7 +8,12 @@ use App\Filament\Resources\UserResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditUser extends EditRecord
+final /**
+ * EditUser
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 

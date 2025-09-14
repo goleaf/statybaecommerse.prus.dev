@@ -8,7 +8,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Auth;
 
-final class NotificationController extends Controller
+final /**
+ * NotificationController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class NotificationController extends Controller
 {
     public function index()
     {

@@ -7,7 +7,12 @@ namespace App\Services;
 use App\Models\ReferralCode;
 use Illuminate\Support\Str;
 
-final class ReferralCodeService
+final /**
+ * ReferralCodeService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class ReferralCodeService
 {
     /**
      * Generate a unique referral code

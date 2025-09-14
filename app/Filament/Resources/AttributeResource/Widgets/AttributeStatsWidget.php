@@ -8,7 +8,12 @@ use App\Models\Attribute;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class AttributeStatsWidget extends BaseWidget
+final /**
+ * AttributeStatsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class AttributeStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

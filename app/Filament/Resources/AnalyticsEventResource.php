@@ -8,13 +8,19 @@ use App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Models\AnalyticsEvent;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
-final class AnalyticsEventResource extends Resource
+final /**
+ * AnalyticsEventResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class AnalyticsEventResource extends Resource
 {
     protected static ?string $model = AnalyticsEvent::class;
 
@@ -24,7 +30,7 @@ final class AnalyticsEventResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

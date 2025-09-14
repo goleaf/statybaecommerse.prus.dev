@@ -6,4 +6,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-final class AttributeValueTranslationController extends Controller {}
+final /**
+ * AttributeValueTranslationController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class AttributeValueTranslationController extends Controller {}

@@ -159,7 +159,12 @@ use Spatie\Translatable\HasTranslations;
  * 
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
-final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
+final /**
+ * User
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
     use HasFactory, HasRoles, HasTranslations, LogsActivity, Notifiable, SoftDeletes;
 

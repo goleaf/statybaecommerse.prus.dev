@@ -8,7 +8,12 @@ use App\Models\Order;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class CurrencyUsageChartWidget extends ChartWidget
+final /**
+ * CurrencyUsageChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class CurrencyUsageChartWidget extends ChartWidget
 {
     protected ?string $heading = 'Currency Usage in Orders';
 

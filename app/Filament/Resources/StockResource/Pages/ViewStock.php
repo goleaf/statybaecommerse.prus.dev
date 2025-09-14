@@ -9,6 +9,11 @@ use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 
+/**
+ * ViewStock
+ * 
+ * Filament resource for admin panel management.
+ */
 class ViewStock extends ViewRecord
 {
     protected static string $resource = StockResource::class;

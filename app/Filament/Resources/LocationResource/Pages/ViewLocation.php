@@ -8,7 +8,12 @@ use App\Filament\Resources\LocationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewLocation extends ViewRecord
+final /**
+ * ViewLocation
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewLocation extends ViewRecord
 {
     protected static string $resource = LocationResource::class;
 

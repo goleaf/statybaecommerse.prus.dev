@@ -9,11 +9,11 @@ use App\Filament\Resources\ReviewResource\Widgets;
 use App\Models\Review;
 use App\Services\MultiLanguageTabService;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\IconEntry;
+use Filament\Schemas\Components\TextEntry;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -22,7 +22,12 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use SolutionForest\TabLayoutPlugin\Components\Tabs;
 use UnitEnum;
 
-final class ReviewResource extends Resource
+final /**
+ * ReviewResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class ReviewResource extends Resource
 {
     protected static ?string $model = Review::class;
 
@@ -51,7 +56,7 @@ final class ReviewResource extends Resource
         return __('admin.reviews.review');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->components([
@@ -137,7 +142,7 @@ final class ReviewResource extends Resource
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         return $infolist
             ->components([

@@ -14,7 +14,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
-final class OrderController extends Controller
+final /**
+ * OrderController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class OrderController extends Controller
 {
     public function index(Request $request): View
     {

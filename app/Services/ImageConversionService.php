@@ -9,7 +9,12 @@ use Spatie\Image\Image;
 use Spatie\MediaLibrary\Conversions\Conversion;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-final class ImageConversionService
+final /**
+ * ImageConversionService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class ImageConversionService
 {
     /**
      * Generate WebP conversions for brand images

@@ -7,7 +7,12 @@ namespace App\Livewire;
 use Illuminate\Notifications\DatabaseNotification;
 use Livewire\Component;
 
-final class NotificationDropdown extends Component
+final /**
+ * NotificationDropdown
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class NotificationDropdown extends Component
 {
     public int $unreadCount = 0;
 

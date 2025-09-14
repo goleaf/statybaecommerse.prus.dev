@@ -6,7 +6,12 @@ namespace App\Livewire\Components;
 
 use Livewire\Component;
 
-final class ShoppingCartButton extends Component
+final /**
+ * ShoppingCartButton
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ShoppingCartButton extends Component
 {
     public int $cartTotalItems = 0;
 

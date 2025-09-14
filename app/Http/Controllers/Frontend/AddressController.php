@@ -18,7 +18,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-final class AddressController extends Controller
+final /**
+ * AddressController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class AddressController extends Controller
 {
     use AuthorizesRequests;
     public function index(): View

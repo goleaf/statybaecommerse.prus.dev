@@ -11,6 +11,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Validate;
 use Spatie\LivewireWizard\Components\StepComponent;
 
+/**
+ * Delivery
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Delivery extends StepComponent
 {
     /**

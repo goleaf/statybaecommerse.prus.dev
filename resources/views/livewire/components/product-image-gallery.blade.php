@@ -50,7 +50,7 @@
                 {{-- Generated Image Badge --}}
                 @if ($this->currentImage['generated'] ?? false)
                     <div class="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
-                        {{ __('translations.random_image') }}
+                        {{ __('frontend.images.random_image') }}
                     </div>
                 @endif
             @endif
@@ -77,10 +77,10 @@
         <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div class="flex items-center justify-between text-sm">
                 <span class="text-gray-600 dark:text-gray-400">
-                    {{ __('translations.images') }}: {{ count($this->images) }}
+                    {{ __('frontend.images.images') }}: {{ count($this->images) }}
                 </span>
                 <span class="text-green-600 dark:text-green-400 font-medium">
-                    {{ __('translations.webp_format') }}
+                    {{ __('frontend.images.webp_format') }}
                 </span>
             </div>
         </div>

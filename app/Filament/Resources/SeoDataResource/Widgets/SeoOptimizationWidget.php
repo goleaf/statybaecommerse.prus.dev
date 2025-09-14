@@ -8,7 +8,12 @@ use App\Models\SeoData;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class SeoOptimizationWidget extends BaseWidget
+final /**
+ * SeoOptimizationWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class SeoOptimizationWidget extends BaseWidget
 {
     protected static ?string $heading = 'SEO Optimization Status';
 

@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
+/**
+ * ReviewForm
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class ReviewForm extends Component
 {
     public int $productId;

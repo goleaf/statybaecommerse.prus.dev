@@ -10,6 +10,11 @@ use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+/**
+ * Reviews
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Reviews extends Component
 {
     use WithPagination;

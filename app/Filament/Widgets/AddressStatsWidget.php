@@ -10,7 +10,12 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
-final class AddressStatsWidget extends BaseWidget
+final /**
+ * AddressStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class AddressStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

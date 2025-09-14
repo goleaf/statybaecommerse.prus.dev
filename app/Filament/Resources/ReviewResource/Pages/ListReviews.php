@@ -9,7 +9,12 @@ use App\Filament\Resources\ReviewResource\Widgets;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-final class ListReviews extends ListRecords
+final /**
+ * ListReviews
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListReviews extends ListRecords
 {
     protected static string $resource = ReviewResource::class;
 

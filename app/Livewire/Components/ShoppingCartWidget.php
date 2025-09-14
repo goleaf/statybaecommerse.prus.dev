@@ -14,7 +14,12 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-final class ShoppingCartWidget extends Component
+final /**
+ * ShoppingCartWidget
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ShoppingCartWidget extends Component
 {
     public bool $isOpen = false;
 

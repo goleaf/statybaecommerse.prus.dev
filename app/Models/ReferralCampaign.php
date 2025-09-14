@@ -12,7 +12,12 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
-final class ReferralCampaign extends Model
+final /**
+ * ReferralCampaign
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class ReferralCampaign extends Model
 {
     use HasFactory, HasTranslations, LogsActivity;
 

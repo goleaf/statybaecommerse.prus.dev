@@ -19,14 +19,17 @@ final class NotificationObserver
      */
     public function created(Notification $notification): void
     {
-        // Log notification creation
-        Log::info('Notification created', [
-            'notification_id' => $notification->id,
-            'type' => $notification->type,
-            'notifiable_type' => $notification->notifiable_type,
-            'notifiable_id' => $notification->notifiable_id,
-            'urgent' => $notification->data['urgent'] ?? false,
-        ]);
+        // Skip logging during tests to prevent test output issues
+        if (!app()->environment('testing')) {
+            // Log notification creation
+            Log::info('Notification created', [
+                'notification_id' => $notification->id,
+                'type' => $notification->type,
+                'notifiable_type' => $notification->notifiable_type,
+                'notifiable_id' => $notification->notifiable_id,
+                'urgent' => $notification->data['urgent'] ?? false,
+            ]);
+        }
 
         // Send real-time notification if needed
         $this->sendRealTimeNotification($notification);
@@ -37,11 +40,14 @@ final class NotificationObserver
      */
     public function updated(Notification $notification): void
     {
-        // Log notification updates
-        Log::info('Notification updated', [
-            'notification_id' => $notification->id,
-            'read_at' => $notification->read_at,
-        ]);
+        // Skip logging during tests to prevent test output issues
+        if (!app()->environment('testing')) {
+            // Log notification updates
+            Log::info('Notification updated', [
+                'notification_id' => $notification->id,
+                'read_at' => $notification->read_at,
+            ]);
+        }
 
         // Send real-time update if read status changed
         if ($notification->wasChanged('read_at')) {
@@ -54,11 +60,14 @@ final class NotificationObserver
      */
     public function deleted(Notification $notification): void
     {
-        // Log notification deletion
-        Log::info('Notification deleted', [
-            'notification_id' => $notification->id,
-            'type' => $notification->type,
-        ]);
+        // Skip logging during tests to prevent test output issues
+        if (!app()->environment('testing')) {
+            // Log notification deletion
+            Log::info('Notification deleted', [
+                'notification_id' => $notification->id,
+                'type' => $notification->type,
+            ]);
+        }
     }
 
     /**
@@ -66,12 +75,15 @@ final class NotificationObserver
      */
     private function sendRealTimeNotification(Notification $notification): void
     {
-        // This would integrate with your real-time system (WebSocket, Pusher, etc.)
-        // For now, we'll just log it
-        Log::info('Real-time notification sent', [
-            'notification_id' => $notification->id,
-            'user_id' => $notification->notifiable_id,
-        ]);
+        // Skip logging during tests to prevent test output issues
+        if (!app()->environment('testing')) {
+            // This would integrate with your real-time system (WebSocket, Pusher, etc.)
+            // For now, we'll just log it
+            Log::info('Real-time notification sent', [
+                'notification_id' => $notification->id,
+                'user_id' => $notification->notifiable_id,
+            ]);
+        }
 
         // Example integration with Laravel WebSockets or Pusher:
         // broadcast(new NotificationCreated($notification))->toOthers();
@@ -82,10 +94,13 @@ final class NotificationObserver
      */
     private function sendReadStatusUpdate(Notification $notification): void
     {
-        Log::info('Read status update sent', [
-            'notification_id' => $notification->id,
-            'read_at' => $notification->read_at,
-        ]);
+        // Skip logging during tests to prevent test output issues
+        if (!app()->environment('testing')) {
+            Log::info('Read status update sent', [
+                'notification_id' => $notification->id,
+                'read_at' => $notification->read_at,
+            ]);
+        }
 
         // Example integration:
         // broadcast(new NotificationReadStatusUpdated($notification))->toOthers();

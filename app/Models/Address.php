@@ -12,7 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
-final class Address extends Model
+final /**
+ * Address
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Address extends Model
 {
     use HasFactory, SoftDeletes, HasTranslations;
 

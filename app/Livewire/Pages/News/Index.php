@@ -8,7 +8,12 @@ use App\Models\News;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
-final class Index extends Component
+final /**
+ * Index
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Index extends Component
 {
     public function render(): View
     {

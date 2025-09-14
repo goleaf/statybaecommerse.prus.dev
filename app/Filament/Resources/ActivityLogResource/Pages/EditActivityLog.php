@@ -8,7 +8,12 @@ use App\Filament\Resources\ActivityLogResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditActivityLog extends EditRecord
+final /**
+ * EditActivityLog
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditActivityLog extends EditRecord
 {
     protected static string $resource = ActivityLogResource::class;
 

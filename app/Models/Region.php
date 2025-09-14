@@ -12,7 +12,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class Region extends Model
+final /**
+ * Region
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Region extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
 

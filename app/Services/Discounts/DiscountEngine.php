@@ -6,6 +6,11 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * DiscountEngine
+ * 
+ * Service class containing business logic and external integrations.
+ */
 class DiscountEngine
 {
     public function evaluate(array $context): array

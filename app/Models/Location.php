@@ -14,7 +14,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-final class Location extends Model
+final /**
+ * Location
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Location extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes, LogsActivity;
 

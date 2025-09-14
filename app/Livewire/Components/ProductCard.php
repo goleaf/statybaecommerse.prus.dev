@@ -8,7 +8,12 @@ use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
-final class ProductCard extends Component
+final /**
+ * ProductCard
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductCard extends Component
 {
     public Product $product;
 

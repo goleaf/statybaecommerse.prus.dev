@@ -8,7 +8,12 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class InventoryController extends Controller
+final /**
+ * InventoryController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class InventoryController extends Controller
 {
     public function index(Request $request): View
     {

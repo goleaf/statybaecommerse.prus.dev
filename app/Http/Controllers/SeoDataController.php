@@ -8,7 +8,12 @@ use App\Models\SeoData;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class SeoDataController extends Controller
+final /**
+ * SeoDataController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class SeoDataController extends Controller
 {
     public function index(Request $request): View
     {

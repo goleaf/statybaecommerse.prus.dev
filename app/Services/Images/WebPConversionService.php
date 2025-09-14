@@ -7,7 +7,12 @@ namespace App\Services\Images;
 use Illuminate\Support\Facades\Log;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-final class WebPConversionService
+final /**
+ * WebPConversionService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class WebPConversionService
 {
     private const WEBP_QUALITY = 90;
 

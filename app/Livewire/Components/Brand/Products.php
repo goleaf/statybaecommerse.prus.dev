@@ -10,6 +10,11 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
+/**
+ * Products
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Products extends Component
 {
     public int $brandId;

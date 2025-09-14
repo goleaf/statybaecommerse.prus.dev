@@ -10,7 +10,12 @@ use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-final class Notifications extends Component
+final /**
+ * Notifications
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Notifications extends Component
 {
     use WithPagination;
 

@@ -12,6 +12,11 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 
 #[Layout('components.layouts.templates.account')]
+/**
+ * Addresses
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Addresses extends Component
 {
     public function removeAddress(int $id): void

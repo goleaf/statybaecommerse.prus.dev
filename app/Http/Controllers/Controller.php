@@ -12,7 +12,12 @@ use Illuminate\Support\Facades\Request;
  * for all controllers including locale preference handling
  * and translation utilities.
  */
-abstract class Controller
+abstract /**
+ * Controller
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class Controller
 {
     /**
      * Create a new controller instance.

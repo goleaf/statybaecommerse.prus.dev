@@ -15,12 +15,12 @@
         <div class="text-sm text-gray-600">
             @if ($product->isVariant())
                 @if ($this->variant)
-                    <span>{{ __('Reserved') }}: {{ $this->variant->reservedQuantity() }}</span>
-                    <span class="ml-3">{{ __('Available') }}: {{ $this->variant->availableQuantity() }}</span>
+                    <span>{{ __('frontend.products.reserved') }}: {{ $this->variant->reservedQuantity() }}</span>
+                    <span class="ml-3">{{ __('frontend.products.available') }}: {{ $this->variant->availableQuantity() }}</span>
                 @endif
             @else
-                <span>{{ __('Reserved') }}: {{ $product->reservedQuantity() }}</span>
-                <span class="ml-3">{{ __('Available') }}: {{ $product->availableQuantity() }}</span>
+                <span>{{ __('frontend.products.reserved') }}: {{ $product->reservedQuantity() }}</span>
+                <span class="ml-3">{{ __('frontend.products.available') }}: {{ $product->availableQuantity() }}</span>
             @endif
         </div>
     </div>
@@ -106,13 +106,13 @@
                     @elseif($this->variant && $this->variant->isOutOfStock())
                         {{ __('Out of stock') }}
                     @else
-                        {{ __('Add to cart') }}
+                        {{ __('frontend.products.add_to_cart') }}
                     @endif
                 @else
                     @if ($product->isOutOfStock())
                         {{ __('Out of stock') }}
                     @else
-                        {{ __('Add to cart') }}
+                        {{ __('frontend.products.add_to_cart') }}
                     @endif
                 @endif
             </x-buttons.primary>

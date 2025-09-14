@@ -7,6 +7,11 @@ namespace App\Filament\Widgets;
 use App\Models\Legal;
 use Filament\Widgets\ChartWidget;
 
+/**
+ * LegalStatusChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class LegalStatusChartWidget extends ChartWidget
 {
     protected ?string $heading = 'Legal Documents Status Overview';

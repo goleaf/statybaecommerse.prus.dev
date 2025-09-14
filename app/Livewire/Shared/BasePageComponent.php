@@ -13,7 +13,12 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('layouts.templates.app')]
-abstract class BasePageComponent extends Component
+abstract /**
+ * BasePageComponent
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class BasePageComponent extends Component
 {
     use WithCart, WithNotifications;
 

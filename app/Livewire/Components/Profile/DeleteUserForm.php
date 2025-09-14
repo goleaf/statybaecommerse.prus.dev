@@ -9,7 +9,12 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-final class DeleteUserForm extends Component
+final /**
+ * DeleteUserForm
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class DeleteUserForm extends Component
 {
     #[Validate('required|string|current_password')]
     public string $password = '';

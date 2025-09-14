@@ -4,23 +4,28 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\DatePicker;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\KeyValue;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\BadgeColumn;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
+/**
+ * OrderShippingRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
 class OrderShippingRelationManager extends RelationManager
 {
     protected static string $relationship = 'shipping';

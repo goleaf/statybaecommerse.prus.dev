@@ -6,8 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Models\Post;
 use Filament\Forms;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\SpatieMediaLibraryFileUpload;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
@@ -18,7 +18,12 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use UnitEnum;
 
-final class PostResource extends Resource
+final /**
+ * PostResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
 
@@ -53,7 +58,7 @@ final class PostResource extends Resource
         return __('posts.title');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

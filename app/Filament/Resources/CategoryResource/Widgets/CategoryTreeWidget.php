@@ -7,7 +7,12 @@ namespace App\Filament\Resources\CategoryResource\Widgets;
 use App\Models\Category;
 use Filament\Widgets\Widget;
 
-final class CategoryTreeWidget extends Widget
+final /**
+ * CategoryTreeWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class CategoryTreeWidget extends Widget
 {
     protected static string $view = 'filament.resources.category-resource.widgets.category-tree-widget';
 

@@ -10,14 +10,19 @@ use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
-final class SystemSettingsResource extends Resource
+final /**
+ * SystemSettingsResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class SystemSettingsResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;
 
@@ -38,7 +43,7 @@ final class SystemSettingsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'System Settings';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->components([

@@ -6,4 +6,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-final class DiscountPreviewController extends Controller {}
+final /**
+ * DiscountPreviewController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class DiscountPreviewController extends Controller {}

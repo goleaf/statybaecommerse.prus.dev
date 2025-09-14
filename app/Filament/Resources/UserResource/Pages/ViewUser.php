@@ -8,7 +8,12 @@ use App\Filament\Resources\UserResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewUser extends ViewRecord
+final /**
+ * ViewUser
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewUser extends ViewRecord
 {
     protected static string $resource = UserResource::class;
 

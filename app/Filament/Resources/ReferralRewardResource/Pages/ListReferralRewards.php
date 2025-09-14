@@ -10,7 +10,12 @@ use Filament\Resources\Components\Tabs\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListReferralRewards extends ListRecords
+final /**
+ * ListReferralRewards
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListReferralRewards extends ListRecords
 {
     protected static string $resource = ReferralRewardResource::class;
 

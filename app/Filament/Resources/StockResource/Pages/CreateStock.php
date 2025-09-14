@@ -9,6 +9,11 @@ use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 
+/**
+ * CreateStock
+ * 
+ * Filament resource for admin panel management.
+ */
 class CreateStock extends CreateRecord
 {
     protected static string $resource = StockResource::class;

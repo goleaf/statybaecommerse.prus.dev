@@ -9,7 +9,12 @@ use App\Models\ProductRequest;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
-final class ProductRequestForm extends Component
+final /**
+ * ProductRequestForm
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductRequestForm extends Component
 {
     public Product $product;
 

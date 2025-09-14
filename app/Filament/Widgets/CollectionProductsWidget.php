@@ -11,7 +11,12 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CollectionProductsWidget extends BaseWidget
+final /**
+ * CollectionProductsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class CollectionProductsWidget extends BaseWidget
 {
     protected static ?string $heading = 'admin.collections.widgets.products_heading';
 

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\FileUpload;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -21,6 +21,11 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
+/**
+ * OrderDocumentsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
 class OrderDocumentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'documents';

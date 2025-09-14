@@ -8,7 +8,12 @@ use Illuminate\Notifications\DatabaseNotification;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-final class NotificationCenter extends Component
+final /**
+ * NotificationCenter
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class NotificationCenter extends Component
 {
     use WithPagination;
 

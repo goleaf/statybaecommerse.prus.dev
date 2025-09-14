@@ -8,7 +8,12 @@ use App\Filament\Resources\AttributeValueResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewAttributeValue extends ViewRecord
+final /**
+ * ViewAttributeValue
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewAttributeValue extends ViewRecord
 {
     protected static string $resource = AttributeValueResource::class;
 

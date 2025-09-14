@@ -6,4 +6,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-final class ProductTranslationController extends Controller {}
+final /**
+ * ProductTranslationController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class ProductTranslationController extends Controller {}

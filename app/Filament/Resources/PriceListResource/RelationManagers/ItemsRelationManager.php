@@ -7,21 +7,26 @@ namespace App\Filament\Resources\PriceListResource\RelationManagers;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-final class ItemsRelationManager extends RelationManager
+final /**
+ * ItemsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class ItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'items';
 

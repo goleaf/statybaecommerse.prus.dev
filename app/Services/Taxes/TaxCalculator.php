@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Taxes;
 
-final class TaxCalculator
+final /**
+ * TaxCalculator
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class TaxCalculator
 {
     public function compute(float $amount, ?string $zoneCode = null): float
     {

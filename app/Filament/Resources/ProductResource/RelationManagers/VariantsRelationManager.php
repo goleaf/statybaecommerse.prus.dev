@@ -6,12 +6,17 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\ProductVariant;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * VariantsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
 class VariantsRelationManager extends RelationManager
 {
     protected static string $relationship = 'variants';

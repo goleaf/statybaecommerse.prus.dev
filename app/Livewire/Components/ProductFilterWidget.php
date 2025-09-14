@@ -12,7 +12,12 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-final class ProductFilterWidget extends Component
+final /**
+ * ProductFilterWidget
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductFilterWidget extends Component
 {
     #[Url]
     public string $search = '';

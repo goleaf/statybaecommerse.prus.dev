@@ -44,6 +44,11 @@ use Illuminate\Support\Str;
 use BackedEnum;
 use UnitEnum;
 
+/**
+ * ReportResource
+ * 
+ * Filament resource for admin panel management.
+ */
 class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;

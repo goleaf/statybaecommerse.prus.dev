@@ -9,7 +9,12 @@ use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-final class ProductGallery extends Component
+final /**
+ * ProductGallery
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductGallery extends Component
 {
     use WithPagination;
 

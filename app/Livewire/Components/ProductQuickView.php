@@ -11,7 +11,12 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-final class ProductQuickView extends Component
+final /**
+ * ProductQuickView
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductQuickView extends Component
 {
     use WithCart, WithNotifications;
 

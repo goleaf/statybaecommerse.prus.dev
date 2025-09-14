@@ -6,7 +6,12 @@ namespace App\Services\Payments;
 
 use App\Models\Order;
 
-final class PaymentService
+final /**
+ * PaymentService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class PaymentService
 {
     /**
      * Process payment for the given order.

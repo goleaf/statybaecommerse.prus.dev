@@ -9,7 +9,12 @@ use App\Notifications\TestNotification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 
-final class LiveNotificationService
+final /**
+ * LiveNotificationService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class LiveNotificationService
 {
     public function sendToAdmins(string $title, string $message, string $type = 'info'): void
     {

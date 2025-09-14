@@ -9,6 +9,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
+/**
+ * RecentCampaignsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class RecentCampaignsWidget extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';

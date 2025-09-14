@@ -8,7 +8,12 @@ use App\Models\DiscountCondition;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class DiscountConditionStatsWidget extends BaseWidget
+final /**
+ * DiscountConditionStatsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class DiscountConditionStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

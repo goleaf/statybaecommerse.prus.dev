@@ -7,7 +7,12 @@ namespace App\Models\Translations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class ReferralTranslation extends Model
+final /**
+ * ReferralTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class ReferralTranslation extends Model
 {
     protected $table = 'referral_translations';
 

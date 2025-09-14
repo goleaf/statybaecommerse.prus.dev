@@ -9,6 +9,11 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * LegalStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class LegalStatsWidget extends BaseWidget
 {
     protected function getStats(): array

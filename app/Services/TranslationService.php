@@ -6,7 +6,12 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\App;
 
-final class TranslationService
+final /**
+ * TranslationService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class TranslationService
 {
     /**
      * Get translation using snake_case keys from unified language files

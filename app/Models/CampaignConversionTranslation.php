@@ -6,7 +6,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-final class CampaignConversionTranslation extends Model
+final /**
+ * CampaignConversionTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class CampaignConversionTranslation extends Model
 {
     protected $fillable = [
         'campaign_conversion_id',

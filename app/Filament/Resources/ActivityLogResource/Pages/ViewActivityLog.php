@@ -8,7 +8,12 @@ use App\Filament\Resources\ActivityLogResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewActivityLog extends ViewRecord
+final /**
+ * ViewActivityLog
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewActivityLog extends ViewRecord
 {
     protected static string $resource = ActivityLogResource::class;
 

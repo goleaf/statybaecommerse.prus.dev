@@ -9,7 +9,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-final class LowStockCartItemsWidget extends BaseWidget
+final /**
+ * LowStockCartItemsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class LowStockCartItemsWidget extends BaseWidget
 {
     protected static ?string $heading = 'admin.cart_items.widgets.low_stock_items';
 

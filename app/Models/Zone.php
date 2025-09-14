@@ -14,7 +14,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class Zone extends Model
+final /**
+ * Zone
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Zone extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
 

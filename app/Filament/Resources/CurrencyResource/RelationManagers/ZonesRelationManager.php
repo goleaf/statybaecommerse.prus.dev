@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CurrencyResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-final class ZonesRelationManager extends RelationManager
+final /**
+ * ZonesRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class ZonesRelationManager extends RelationManager
 {
     protected static string $relationship = 'zones';
 

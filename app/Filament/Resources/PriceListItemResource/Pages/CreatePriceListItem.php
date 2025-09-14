@@ -8,7 +8,12 @@ use App\Filament\Resources\PriceListItemResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreatePriceListItem extends CreateRecord
+final /**
+ * CreatePriceListItem
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreatePriceListItem extends CreateRecord
 {
     protected static string $resource = PriceListItemResource::class;
 

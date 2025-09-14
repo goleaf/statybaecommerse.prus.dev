@@ -12,7 +12,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
-final class ReviewController extends Controller
+final /**
+ * ReviewController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class ReviewController extends Controller
 {
     public function index(Request $request): View
     {

@@ -12,7 +12,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
-final class ReferralRewardController extends Controller
+final /**
+ * ReferralRewardController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class ReferralRewardController extends Controller
 {
     /**
      * Display the user's referral rewards

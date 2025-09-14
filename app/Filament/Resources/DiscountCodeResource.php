@@ -13,18 +13,18 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\ProgressEntry;
-use Filament\Infolists\Components\Section as InfolistSection;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\DateTimePicker;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Toggle;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\IconEntry;
+use Filament\Schemas\Components\ProgressEntry;
+use Filament\Schemas\Components\Section as InfolistSection;
+use Filament\Schemas\Components\TextEntry;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
@@ -36,8 +36,14 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
-final class DiscountCodeResource extends Resource
+final /**
+ * DiscountCodeResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class DiscountCodeResource extends Resource
 {
     protected static ?string $model = DiscountCode::class;
 
@@ -66,7 +72,7 @@ final class DiscountCodeResource extends Resource
         return __('discount_codes');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([
@@ -343,7 +349,7 @@ final class DiscountCodeResource extends Resource
         ];
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         return $infolist
             ->schema([

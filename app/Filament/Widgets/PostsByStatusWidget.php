@@ -7,7 +7,12 @@ namespace App\Filament\Widgets;
 use App\Models\Post;
 use Filament\Widgets\ChartWidget;
 
-final class PostsByStatusWidget extends ChartWidget
+final /**
+ * PostsByStatusWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class PostsByStatusWidget extends ChartWidget
 {
     protected ?string $heading = 'Posts by Status';
 

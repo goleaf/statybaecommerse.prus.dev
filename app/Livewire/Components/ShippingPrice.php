@@ -8,6 +8,11 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+/**
+ * ShippingPrice
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class ShippingPrice extends Component
 {
     public float $amount = 0.0;

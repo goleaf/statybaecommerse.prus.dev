@@ -10,7 +10,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class Review extends Model
+final /**
+ * Review
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Review extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
 

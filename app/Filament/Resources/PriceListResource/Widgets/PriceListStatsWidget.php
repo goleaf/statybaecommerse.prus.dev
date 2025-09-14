@@ -9,7 +9,12 @@ use App\Models\PriceListItem;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class PriceListStatsWidget extends BaseWidget
+final /**
+ * PriceListStatsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class PriceListStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

@@ -8,6 +8,11 @@ use App\Filament\Resources\OrderResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
+/**
+ * ViewOrder
+ * 
+ * Filament resource for admin panel management.
+ */
 class ViewOrder extends ViewRecord
 {
     protected static string $resource = OrderResource::class;

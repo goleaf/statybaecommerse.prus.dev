@@ -11,7 +11,12 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-final class ShoppingCart extends Component
+final /**
+ * ShoppingCart
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ShoppingCart extends Component
 {
     public bool $isOpen = false;
 

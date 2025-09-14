@@ -8,6 +8,11 @@ use App\Models\Campaign;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
+/**
+ * CampaignStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class CampaignStatsWidget extends BaseWidget
 {
     protected function getStats(): array

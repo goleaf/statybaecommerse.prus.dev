@@ -8,4 +8,9 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout(name: 'layouts.templates.app')]
-abstract class AbstractPageComponent extends Component {}
+abstract /**
+ * AbstractPageComponent
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class AbstractPageComponent extends Component {}

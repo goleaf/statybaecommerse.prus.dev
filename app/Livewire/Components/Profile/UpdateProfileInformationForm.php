@@ -9,7 +9,12 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-final class UpdateProfileInformationForm extends Component
+final /**
+ * UpdateProfileInformationForm
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class UpdateProfileInformationForm extends Component
 {
     #[Validate('required|string|max:255')]
     public string $name = '';

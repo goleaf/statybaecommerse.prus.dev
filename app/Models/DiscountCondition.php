@@ -11,7 +11,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-final class DiscountCondition extends Model
+final /**
+ * DiscountCondition
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class DiscountCondition extends Model
 {
     use HasFactory, HasTranslations;
 

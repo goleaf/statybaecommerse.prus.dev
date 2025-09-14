@@ -10,7 +10,12 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-final class SystemSettingsService
+final /**
+ * SystemSettingsService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class SystemSettingsService
 {
     private const CACHE_KEY = 'system_settings';
 

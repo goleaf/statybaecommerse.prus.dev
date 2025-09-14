@@ -7,6 +7,11 @@ namespace App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource;
 use Filament\Resources\Pages\CreateRecord;
 
+/**
+ * CreateProduct
+ * 
+ * Filament resource for admin panel management.
+ */
 class CreateProduct extends CreateRecord
 {
     protected static string $resource = ProductResource::class;

@@ -10,7 +10,12 @@ use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-final class CustomerDashboard extends Component
+final /**
+ * CustomerDashboard
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class CustomerDashboard extends Component
 {
     use WithPagination;
 

@@ -7,7 +7,12 @@ namespace App\Filament\Resources\AttributeValueResource\Pages;
 use App\Filament\Resources\AttributeValueResource;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateAttributeValue extends CreateRecord
+final /**
+ * CreateAttributeValue
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreateAttributeValue extends CreateRecord
 {
     protected static string $resource = AttributeValueResource::class;
 

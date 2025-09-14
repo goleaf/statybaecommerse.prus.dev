@@ -10,7 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class Coupon extends Model
+final /**
+ * Coupon
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Coupon extends Model
 {
     use HasFactory, SoftDeletes;
 

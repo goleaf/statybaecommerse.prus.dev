@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use LivewireUI\Modal\ModalComponent;
 
+/**
+ * AddressForm
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class AddressForm extends ModalComponent
 {
     #[Validate('required|string')]

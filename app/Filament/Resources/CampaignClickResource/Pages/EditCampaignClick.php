@@ -8,6 +8,11 @@ use App\Filament\Resources\CampaignClickResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
+/**
+ * EditCampaignClick
+ * 
+ * Filament resource for admin panel management.
+ */
 class EditCampaignClick extends EditRecord
 {
     protected static string $resource = CampaignClickResource::class;

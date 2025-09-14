@@ -11,7 +11,12 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
-final class ReportController extends Controller
+final /**
+ * ReportController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class ReportController extends Controller
 {
     public function index(Request $request): View
     {

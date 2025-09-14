@@ -15,7 +15,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-final class CampaignClickController extends Controller
+final /**
+ * CampaignClickController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class CampaignClickController extends Controller
 {
     public function index(Request $request): JsonResponse
     {

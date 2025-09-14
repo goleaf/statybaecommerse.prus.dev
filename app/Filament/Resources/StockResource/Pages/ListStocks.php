@@ -11,6 +11,11 @@ use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * ListStocks
+ * 
+ * Filament resource for admin panel management.
+ */
 class ListStocks extends ListRecords
 {
     protected static string $resource = StockResource::class;

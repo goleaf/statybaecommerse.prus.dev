@@ -8,7 +8,12 @@ use App\Filament\Resources\AnalyticsEventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewAnalyticsEvent extends ViewRecord
+final /**
+ * ViewAnalyticsEvent
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewAnalyticsEvent extends ViewRecord
 {
     protected static string $resource = AnalyticsEventResource::class;
 

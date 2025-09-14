@@ -13,6 +13,11 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Layout('layouts.templates.app')]
+/**
+ * Search
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Search extends Component
 {
     use WithPagination;

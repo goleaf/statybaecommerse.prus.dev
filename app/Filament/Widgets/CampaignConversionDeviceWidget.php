@@ -7,6 +7,11 @@ namespace App\Filament\Widgets;
 use App\Models\CampaignConversion;
 use Filament\Widgets\ChartWidget;
 
+/**
+ * CampaignConversionDeviceWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class CampaignConversionDeviceWidget extends ChartWidget
 {
     protected ?string $heading = 'campaign_conversions.widgets.device_breakdown';

@@ -8,7 +8,12 @@ use App\Models\Zone;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class ZoneTypeChartWidget extends ChartWidget
+final /**
+ * ZoneTypeChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class ZoneTypeChartWidget extends ChartWidget
 {
     protected ?string $heading = 'zones.zone_distribution';
 

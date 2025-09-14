@@ -8,7 +8,12 @@ use App\Filament\Resources\AnalyticsEventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditAnalyticsEvent extends EditRecord
+final /**
+ * EditAnalyticsEvent
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditAnalyticsEvent extends EditRecord
 {
     protected static string $resource = AnalyticsEventResource::class;
 

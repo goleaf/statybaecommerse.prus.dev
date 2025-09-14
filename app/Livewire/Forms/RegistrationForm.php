@@ -12,7 +12,12 @@ use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
-final class RegistrationForm extends Form
+final /**
+ * RegistrationForm
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class RegistrationForm extends Form
 {
     #[Validate('required|string|max:255')]
     public string $first_name = '';

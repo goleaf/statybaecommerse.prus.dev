@@ -12,7 +12,12 @@ use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-final class ProductRecommendations extends Component
+final /**
+ * ProductRecommendations
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductRecommendations extends Component
 {
     public ?int $productId = null;
 

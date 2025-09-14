@@ -8,7 +8,12 @@ use App\Models\Location;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class LocationStatsWidget extends BaseWidget
+final /**
+ * LocationStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class LocationStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

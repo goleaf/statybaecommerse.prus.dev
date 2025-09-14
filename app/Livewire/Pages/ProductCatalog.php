@@ -13,7 +13,12 @@ use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 
-final class ProductCatalog extends Component
+final /**
+ * ProductCatalog
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductCatalog extends Component
 {
     use WithCart, WithFilters, WithNotifications;
 

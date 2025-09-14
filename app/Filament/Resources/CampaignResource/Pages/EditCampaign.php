@@ -8,7 +8,12 @@ use App\Filament\Resources\CampaignResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditCampaign extends EditRecord
+final /**
+ * EditCampaign
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditCampaign extends EditRecord
 {
     protected static string $resource = CampaignResource::class;
 

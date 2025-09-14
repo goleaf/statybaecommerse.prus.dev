@@ -9,7 +9,12 @@ use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditReport extends EditRecord
+final /**
+ * EditReport
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditReport extends EditRecord
 {
     protected static string $resource = ReportResource::class;
 

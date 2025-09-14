@@ -17,7 +17,12 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-final class Index extends AbstractPageComponent implements HasSchemas
+final /**
+ * Index
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Index extends AbstractPageComponent implements HasSchemas
 {
     use InteractsWithSchemas;
     use WithPagination;

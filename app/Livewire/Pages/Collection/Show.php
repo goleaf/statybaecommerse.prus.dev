@@ -13,6 +13,11 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 
 #[Layout('layouts.templates.app')]
+/**
+ * Show
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Show extends Component
 {
     public string $slug;

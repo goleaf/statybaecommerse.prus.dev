@@ -237,4 +237,75 @@ return [
     'guest' => 'Svečias',
     'order_created_from' => 'Užsakymas sukurtas nuo',
     'order_created_until' => 'Užsakymas sukurtas iki',
+    
+    // Related products and recommendations
+    'related_products' => 'Susiję produktai',
+    'related_products_description' => 'Produktai, kurie gali jus sudominti',
+    'you_might_also_like' => 'Jums gali patikti',
+    'similar_products' => 'Panašūs produktai',
+    
+    // Product availability
+    'in_stock' => 'Yra sandėlyje',
+    'out_of_stock' => 'Nėra sandėlyje',
+    'low_stock' => 'Mažos atsargos',
+    'pre_order' => 'Išankstinis užsakymas',
+    'coming_soon' => 'Netrukus',
+    
+    // Product status messages
+    'item_added_to_cart' => 'Prekė pridėta į krepšelį',
+    'item_removed_from_cart' => 'Prekė pašalinta iš krepšelio',
+    'cart_updated' => 'Krepšelis atnaujintas',
+    'quantity_updated' => 'Kiekis atnaujintas',
+    'stock_updated' => 'Atsargos atnaujintos',
+    
+    // Product features
+    'free_shipping' => 'Nemokamas pristatymas',
+    'fast_delivery' => 'Greitas pristatymas',
+    'secure_payment' => 'Saugus mokėjimas',
+    'money_back_guarantee' => 'Pinigų grąžinimo garantija',
+    'warranty' => 'Garantija',
+    'support' => 'Palaikymas',
+    
+    // Product actions
+    'add_to_wishlist' => 'Pridėti į norų sąrašą',
+    'remove_from_wishlist' => 'Pašalinti iš norų sąrašo',
+    'compare_products' => 'Palyginti produktus',
+    'share_product' => 'Dalintis produktu',
+    'print_product' => 'Spausdinti produktą',
+    
+    // Product information
+    'product_information' => 'Produkto informacija',
+    'technical_specifications' => 'Techninės specifikacijos',
+    'shipping_information' => 'Pristatymo informacija',
+    'return_policy' => 'Grąžinimo politika',
+    'warranty_information' => 'Garantijos informacija',
+    
+    // Product reviews and ratings
+    'average_rating' => 'Vidutinis įvertinimas',
+    'total_reviews' => 'Iš viso atsiliepimų',
+    'write_first_review' => 'Parašyti pirmą atsiliepimą',
+    'helpful_review' => 'Naudingas atsiliepimas',
+    'verified_purchase' => 'Patvirtintas pirkimas',
+    
+    // Product variants
+    'select_variant' => 'Pasirinkti variantą',
+    'variant_not_available' => 'Variantas neprieinamas',
+    'choose_options' => 'Pasirinkti parinktis',
+    'selected_options' => 'Pasirinktos parinktys',
+    
+    // Product bundles and packages
+    'bundle_products' => 'Produktų komplektas',
+    'package_contents' => 'Komplekto turinys',
+    'save_with_bundle' => 'Sutaupykite su komplektu',
+    'bundle_discount' => 'Komplekto nuolaida',
+    
+    // Product recommendations
+    'frequently_bought_together' => 'Dažnai perkama kartu',
+    'customers_who_bought' => 'Klientai, kurie pirko',
+    'recommended_for_you' => 'Rekomenduojama jums',
+    'trending_now' => 'Populiaru dabar',
+    'new_arrivals' => 'Naujos prekės',
+    'best_sellers' => 'Geriausiai parduodami',
+    'on_sale' => 'Išpardavime',
+    'clearance' => 'Išpardavimas',
 ];

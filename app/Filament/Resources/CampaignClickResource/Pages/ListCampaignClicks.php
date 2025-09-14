@@ -10,6 +10,11 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * ListCampaignClicks
+ * 
+ * Filament resource for admin panel management.
+ */
 class ListCampaignClicks extends ListRecords
 {
     protected static string $resource = CampaignClickResource::class;

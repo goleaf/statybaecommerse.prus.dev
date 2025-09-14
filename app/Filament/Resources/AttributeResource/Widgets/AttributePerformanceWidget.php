@@ -8,7 +8,12 @@ use App\Models\Attribute;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class AttributePerformanceWidget extends BaseWidget
+final /**
+ * AttributePerformanceWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class AttributePerformanceWidget extends BaseWidget
 {
     protected static ?int $sort = 5;
 

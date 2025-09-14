@@ -16,7 +16,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
-final class SystemSettingResource extends Resource
+final /**
+ * SystemSettingResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class SystemSettingResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;
 

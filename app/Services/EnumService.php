@@ -12,7 +12,12 @@ use App\Enums\PaymentType;
 use App\Enums\ProductStatus;
 use App\Enums\UserRole;
 
-final class EnumService
+final /**
+ * EnumService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class EnumService
 {
     /**
      * Get all available enums

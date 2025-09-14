@@ -9,14 +9,20 @@ use App\Filament\Resources\ActivityLogResource\RelationManagers;
 use App\Filament\Resources\ActivityLogResource\Widgets;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Activitylog\Models\Activity;
+use UnitEnum;
 
-final class ActivityLogResource extends Resource
+final /**
+ * ActivityLogResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class ActivityLogResource extends Resource
 {
     protected static ?string $model = Activity::class;
 
@@ -46,7 +52,7 @@ final class ActivityLogResource extends Resource
         return __('admin.models.activity_logs');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

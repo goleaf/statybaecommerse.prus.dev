@@ -7,20 +7,20 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Grid as FormGrid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section as FormSection;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\KeyValueEntry;
-use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\DatePicker;
+use Filament\Schemas\Components\Grid as FormGrid;
+use Filament\Schemas\Components\KeyValue;
+use Filament\Schemas\Components\Section as FormSection;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\KeyValueEntry;
+use Filament\Schemas\Components\RepeatableEntry;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\TextEntry;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Actions\Action as TableAction;
@@ -29,7 +29,7 @@ use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TableEditAction;
 use Filament\Tables\Actions\ViewAction as TableViewAction;
-use Filament\Tables\Columns\BadgeColumn;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -39,6 +39,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
+/**
+ * OrderResource
+ * 
+ * Filament resource for admin panel management.
+ */
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
@@ -63,7 +68,7 @@ class OrderResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([
@@ -403,7 +408,7 @@ class OrderResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         return $infolist
             ->schema([

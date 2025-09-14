@@ -9,7 +9,12 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-final class ProductComparison extends Component
+final /**
+ * ProductComparison
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductComparison extends Component
 {
     public array $compareProducts = [];
 

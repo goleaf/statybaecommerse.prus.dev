@@ -13,7 +13,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
-final class ReferralController extends Controller
+final /**
+ * ReferralController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class ReferralController extends Controller
 {
     public function index(): View
     {

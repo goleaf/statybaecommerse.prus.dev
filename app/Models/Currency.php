@@ -11,7 +11,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
-final class Currency extends Model
+final /**
+ * Currency
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Currency extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
 

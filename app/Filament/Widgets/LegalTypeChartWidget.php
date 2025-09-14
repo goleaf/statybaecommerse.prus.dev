@@ -8,6 +8,11 @@ use App\Models\Legal;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * LegalTypeChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class LegalTypeChartWidget extends ChartWidget
 {
     protected ?string $heading = 'Legal Documents by Type';

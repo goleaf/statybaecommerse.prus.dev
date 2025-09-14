@@ -7,7 +7,12 @@ namespace App\Services\Shared;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-final class ComponentPerformanceService
+final /**
+ * ComponentPerformanceService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class ComponentPerformanceService
 {
     private const METRICS_CACHE_KEY = 'component_performance_metrics';
 

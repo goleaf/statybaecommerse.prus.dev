@@ -6,6 +6,11 @@ namespace App\Services\Debug;
 
 use Illuminate\Support\Facades\Log;
 
+/**
+ * DiscountDebugCollector
+ * 
+ * Service class containing business logic and external integrations.
+ */
 class DiscountDebugCollector
 {
     public function logDiscountApplication(string $code, array $context, bool $applied, float $amount): void

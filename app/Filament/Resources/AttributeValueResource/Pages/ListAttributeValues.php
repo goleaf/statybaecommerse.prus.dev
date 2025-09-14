@@ -10,7 +10,12 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListAttributeValues extends ListRecords
+final /**
+ * ListAttributeValues
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListAttributeValues extends ListRecords
 {
     protected static string $resource = AttributeValueResource::class;
 

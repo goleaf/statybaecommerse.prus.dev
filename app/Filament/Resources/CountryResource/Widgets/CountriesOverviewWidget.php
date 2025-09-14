@@ -9,7 +9,12 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CountriesOverviewWidget extends BaseWidget
+final /**
+ * CountriesOverviewWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class CountriesOverviewWidget extends BaseWidget
 {
     protected function getStats(): array
     {

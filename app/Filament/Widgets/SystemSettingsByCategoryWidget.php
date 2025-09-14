@@ -9,7 +9,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-final class SystemSettingsByCategoryWidget extends BaseWidget
+final /**
+ * SystemSettingsByCategoryWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class SystemSettingsByCategoryWidget extends BaseWidget
 {
     protected static ?string $heading = 'System Settings by Category';
 

@@ -10,7 +10,12 @@ use App\Models\Product;
 use App\Models\SeoData;
 use Filament\Widgets\ChartWidget;
 
-final class SeoDataByTypeWidget extends ChartWidget
+final /**
+ * SeoDataByTypeWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class SeoDataByTypeWidget extends ChartWidget
 {
     protected static ?string $heading = 'SEO Data by Object Type';
 

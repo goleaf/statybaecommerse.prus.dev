@@ -12,7 +12,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class City extends Model
+final /**
+ * City
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class City extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
 

@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace App\Filament\Resources\StockResource\Widgets;
 
 use App\Models\VariantInventory;
-use Filament\Tables\Columns\BadgeColumn;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
+/**
+ * StockMovementsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
 class StockMovementsWidget extends BaseWidget
 {
     public ?VariantInventory $record = null;

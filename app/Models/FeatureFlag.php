@@ -7,7 +7,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-final class FeatureFlag extends Model
+final /**
+ * FeatureFlag
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class FeatureFlag extends Model
 {
     use HasFactory;
 

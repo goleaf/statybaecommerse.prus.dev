@@ -7,7 +7,12 @@ namespace App\Livewire;
 use App\Models\Product;
 use Livewire\Component;
 
-final class InventoryStatus extends Component
+final /**
+ * InventoryStatus
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class InventoryStatus extends Component
 {
     public Product $product;
 

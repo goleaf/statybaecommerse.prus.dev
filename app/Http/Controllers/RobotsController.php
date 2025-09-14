@@ -6,6 +6,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Response;
 
+/**
+ * RobotsController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
 class RobotsController extends Controller
 {
     public function __invoke(): Response

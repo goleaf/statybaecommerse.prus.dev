@@ -10,7 +10,12 @@ use App\Models\NewsTag;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class NewsController extends Controller
+final /**
+ * NewsController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class NewsController extends Controller
 {
     public function index(Request $request): View
     {

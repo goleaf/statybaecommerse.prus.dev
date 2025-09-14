@@ -8,7 +8,12 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
-final class NotificationService
+final /**
+ * NotificationService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class NotificationService
 {
     /**
      * Create a new notification for a user

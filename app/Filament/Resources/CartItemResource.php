@@ -10,7 +10,7 @@ use App\Filament\Resources\CartItemResource\Widgets;
 use App\Models\CartItem;
 use App\Models\Product;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,7 +18,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-final class CartItemResource extends Resource
+final /**
+ * CartItemResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class CartItemResource extends Resource
 {
     protected static ?string $model = CartItem::class;
 
@@ -56,7 +61,7 @@ final class CartItemResource extends Resource
         return __('admin.models.cart_items');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

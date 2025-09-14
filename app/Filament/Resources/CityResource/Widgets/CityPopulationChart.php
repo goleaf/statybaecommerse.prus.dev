@@ -8,7 +8,12 @@ use App\Models\City;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CityPopulationChart extends ChartWidget
+final /**
+ * CityPopulationChart
+ * 
+ * Filament resource for admin panel management.
+ */
+class CityPopulationChart extends ChartWidget
 {
     protected static ?string $heading = 'City Population Distribution';
 

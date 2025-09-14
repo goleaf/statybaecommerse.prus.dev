@@ -8,6 +8,11 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+/**
+ * TaxPrice
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class TaxPrice extends Component
 {
     public float $amount = 0.0;

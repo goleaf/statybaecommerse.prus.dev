@@ -8,7 +8,12 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Cache;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-final class ImageStatsService
+final /**
+ * ImageStatsService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class ImageStatsService
 {
     public function getImageStatistics(): array
     {

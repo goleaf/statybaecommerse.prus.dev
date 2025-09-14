@@ -14,7 +14,12 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-final class ProductSearchWidget extends Component
+final /**
+ * ProductSearchWidget
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductSearchWidget extends Component
 {
     use WithPagination;
 

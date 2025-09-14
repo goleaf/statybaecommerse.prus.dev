@@ -10,13 +10,18 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CategoriesRelationManager extends RelationManager
+final /**
+ * CategoriesRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class CategoriesRelationManager extends RelationManager
 {
     protected static string $relationship = 'categories';
 
     public function form(Schema $form): Schema
     {
-        return $form->components([
+        return $schema->components([
             Forms\Components\TextInput::make('name')
                 ->label(__('admin.news.categories.fields.name'))
                 ->required()

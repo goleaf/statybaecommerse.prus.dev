@@ -12,7 +12,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Notifications\DatabaseNotification;
 
-final class Notification extends DatabaseNotification
+final /**
+ * Notification
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Notification extends DatabaseNotification
 {
     use HasFactory;
 

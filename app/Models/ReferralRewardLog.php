@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class ReferralRewardLog extends Model
+final /**
+ * ReferralRewardLog
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class ReferralRewardLog extends Model
 {
     use HasFactory;
 

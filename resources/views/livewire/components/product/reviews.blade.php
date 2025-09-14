@@ -1,8 +1,8 @@
 <div class="mt-8">
-    <h2 class="text-lg font-semibold">{{ __('Customer reviews') }}</h2>
+    <h2 class="text-lg font-semibold">{{ __('frontend.products.customer_reviews') }}</h2>
 
     @if ($reviews->isEmpty())
-        <p class="text-sm text-gray-500 mt-2">{{ __('No reviews yet.') }}</p>
+        <p class="text-sm text-gray-500 mt-2">{{ __('frontend.products.no_reviews_yet') }}</p>
     @else
         <ul class="mt-4 space-y-4">
             @foreach ($reviews as $r)

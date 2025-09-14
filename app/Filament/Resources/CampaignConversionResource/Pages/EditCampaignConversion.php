@@ -8,6 +8,11 @@ use App\Filament\Resources\CampaignConversionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
+/**
+ * EditCampaignConversion
+ * 
+ * Filament resource for admin panel management.
+ */
 class EditCampaignConversion extends EditRecord
 {
     protected static string $resource = CampaignConversionResource::class;

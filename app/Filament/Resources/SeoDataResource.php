@@ -11,19 +11,19 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\SeoData;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\KeyValue;
+use Filament\Schemas\Components\Placeholder;
+use Filament\Schemas\Components\Repeater;
+use Filament\Schemas\Components\RichEditor;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -32,7 +32,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
@@ -43,7 +43,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-final class SeoDataResource extends Resource
+final /**
+ * SeoDataResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class SeoDataResource extends Resource
 {
     protected static ?string $model = SeoData::class;
 
@@ -74,7 +79,7 @@ final class SeoDataResource extends Resource
         return __('admin.models.seo_entries');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

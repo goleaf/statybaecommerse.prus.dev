@@ -10,7 +10,12 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-final class WishlistWidget extends Component
+final /**
+ * WishlistWidget
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class WishlistWidget extends Component
 {
     public array $wishlistItems = [];
 

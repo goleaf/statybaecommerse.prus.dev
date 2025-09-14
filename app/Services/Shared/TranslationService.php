@@ -7,7 +7,12 @@ namespace App\Services\Shared;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 
-final class TranslationService
+final /**
+ * TranslationService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class TranslationService
 {
     private const CACHE_TTL = 3600; // 1 hour
 

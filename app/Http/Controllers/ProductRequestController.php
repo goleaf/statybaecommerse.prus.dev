@@ -11,7 +11,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class ProductRequestController extends Controller
+final /**
+ * ProductRequestController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class ProductRequestController extends Controller
 {
     /**
      * Display the product request form.

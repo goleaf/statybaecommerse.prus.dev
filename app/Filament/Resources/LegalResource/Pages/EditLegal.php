@@ -10,6 +10,11 @@ use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
 
+/**
+ * EditLegal
+ * 
+ * Filament resource for admin panel management.
+ */
 class EditLegal extends EditRecord
 {
     protected static string $resource = LegalResource::class;

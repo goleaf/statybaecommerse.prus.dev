@@ -20,7 +20,7 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
@@ -29,7 +29,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-final class BrandResource extends Resource
+final /**
+ * BrandResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class BrandResource extends Resource
 {
     protected static ?string $model = Brand::class;
 
@@ -61,9 +66,9 @@ final class BrandResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->components([
+        return $schema->components([
             Section::make(__('admin.brands.sections.basic_information'))
                 ->components([
                     Forms\Components\TextInput::make('name')

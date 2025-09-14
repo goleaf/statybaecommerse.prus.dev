@@ -10,6 +10,11 @@ use Filament\Resources\Pages\ListRecords;
 // use Filament\Resources\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * ListLegals
+ * 
+ * Filament resource for admin panel management.
+ */
 class ListLegals extends ListRecords
 {
     protected static string $resource = LegalResource::class;

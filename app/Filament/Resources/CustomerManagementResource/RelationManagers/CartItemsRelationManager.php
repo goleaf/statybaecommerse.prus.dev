@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
@@ -18,7 +18,12 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-final class CartItemsRelationManager extends RelationManager
+final /**
+ * CartItemsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class CartItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'cartItems';
 
@@ -31,7 +36,7 @@ final class CartItemsRelationManager extends RelationManager
 
     public function form(Schema $form): Schema
     {
-        return $form->components([
+        return $schema->components([
             Section::make(__('admin.cart_items.cart_information'))
                 ->schema([
                     Grid::make(2)

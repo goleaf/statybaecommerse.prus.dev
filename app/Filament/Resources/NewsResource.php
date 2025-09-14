@@ -8,14 +8,19 @@ use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
-final class NewsResource extends Resource
+final /**
+ * NewsResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class NewsResource extends Resource
 {
     protected static ?string $model = News::class;
 
@@ -46,7 +51,7 @@ final class NewsResource extends Resource
         return __('admin.news.title');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

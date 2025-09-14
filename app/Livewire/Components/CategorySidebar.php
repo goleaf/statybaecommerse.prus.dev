@@ -10,7 +10,12 @@ use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-final class CategorySidebar extends Component
+final /**
+ * CategorySidebar
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class CategorySidebar extends Component
 {
     public ?int $selectedCategoryId = null;
 

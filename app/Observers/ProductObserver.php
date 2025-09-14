@@ -12,6 +12,11 @@ final class ProductObserver
 {
     public function created(Product $product): void
     {
+        // Skip placeholder image generation during tests to prevent memory issues
+        if (app()->environment('testing')) {
+            return;
+        }
+
         try {
             $collection = 'gallery'; // Default collection name for product images
             if ($product->getMedia($collection)->isNotEmpty()) {

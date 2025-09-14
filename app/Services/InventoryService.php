@@ -9,7 +9,12 @@ use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-final class InventoryService
+final /**
+ * InventoryService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class InventoryService
 {
     public function adjustProductStock(Product $product, int $quantity, string $reason = 'adjustment', ?string $notes = null): bool
     {

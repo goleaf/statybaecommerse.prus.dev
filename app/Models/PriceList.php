@@ -15,7 +15,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-final class PriceList extends Model
+final /**
+ * PriceList
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class PriceList extends Model
 {
     use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
 

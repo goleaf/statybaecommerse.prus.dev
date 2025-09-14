@@ -8,6 +8,11 @@ use App\Models\Order;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * OrderChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class OrderChartWidget extends ChartWidget
 {
     protected ?string $heading = 'orders.charts.orders_over_time';

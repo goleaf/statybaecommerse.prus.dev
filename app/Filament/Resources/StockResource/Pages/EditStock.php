@@ -9,6 +9,11 @@ use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
+/**
+ * EditStock
+ * 
+ * Filament resource for admin panel management.
+ */
 class EditStock extends EditRecord
 {
     protected static string $resource = StockResource::class;

@@ -8,7 +8,12 @@ use App\Models\Category;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-final class Show extends Component
+final /**
+ * Show
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Show extends Component
 {
     use WithPagination;
 

@@ -14,7 +14,12 @@ use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-final class SearchWidget extends Component
+final /**
+ * SearchWidget
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class SearchWidget extends Component
 {
     use WithPagination;
 

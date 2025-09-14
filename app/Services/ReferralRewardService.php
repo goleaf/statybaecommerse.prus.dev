@@ -10,7 +10,12 @@ use App\Models\Referral;
 use App\Models\ReferralReward;
 use Illuminate\Support\Facades\Log;
 
-final class ReferralRewardService
+final /**
+ * ReferralRewardService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class ReferralRewardService
 {
     /**
      * Create a discount reward for the referred user

@@ -13,7 +13,12 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-final class CheckoutProcess extends Component
+final /**
+ * CheckoutProcess
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class CheckoutProcess extends Component
 {
     #[Validate('required|string|max:255')]
     public string $billingFirstName = '';

@@ -9,7 +9,12 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CityStatsOverview extends BaseWidget
+final /**
+ * CityStatsOverview
+ * 
+ * Filament resource for admin panel management.
+ */
+class CityStatsOverview extends BaseWidget
 {
     protected static ?int $sort = 1;
 

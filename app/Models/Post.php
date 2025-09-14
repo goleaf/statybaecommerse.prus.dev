@@ -13,7 +13,12 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-final class Post extends Model implements HasMedia
+final /**
+ * Post
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Post extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia, LogsActivity;
 

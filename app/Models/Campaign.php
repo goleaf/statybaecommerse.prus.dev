@@ -15,7 +15,12 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-final class Campaign extends Model
+final /**
+ * Campaign
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Campaign extends Model
 {
     use HasFactory, SoftDeletes;
     use HasTranslations;

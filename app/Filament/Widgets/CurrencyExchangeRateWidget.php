@@ -7,7 +7,12 @@ namespace App\Filament\Widgets;
 use App\Models\Currency;
 use Filament\Widgets\ChartWidget;
 
-final class CurrencyExchangeRateWidget extends ChartWidget
+final /**
+ * CurrencyExchangeRateWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class CurrencyExchangeRateWidget extends ChartWidget
 {
     protected ?string $heading = 'Currency Exchange Rates';
 

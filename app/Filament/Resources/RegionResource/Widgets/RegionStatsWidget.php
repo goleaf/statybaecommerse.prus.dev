@@ -8,7 +8,12 @@ use App\Models\Region;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class RegionStatsWidget extends BaseWidget
+final /**
+ * RegionStatsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class RegionStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

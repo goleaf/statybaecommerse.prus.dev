@@ -7,7 +7,12 @@ namespace App\Filament\Resources\ReviewResource\Widgets;
 use App\Models\Review;
 use Filament\Widgets\ChartWidget;
 
-final class ReviewRatingDistributionWidget extends ChartWidget
+final /**
+ * ReviewRatingDistributionWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ReviewRatingDistributionWidget extends ChartWidget
 {
     protected static ?string $heading = 'admin.reviews.widgets.rating_distribution';
 

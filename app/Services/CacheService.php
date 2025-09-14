@@ -10,7 +10,12 @@ use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
-final class CacheService
+final /**
+ * CacheService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class CacheService
 {
     private const TTL = 3600;  // 1 hour
 

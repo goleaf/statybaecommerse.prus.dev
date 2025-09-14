@@ -7,6 +7,11 @@ namespace App\Livewire\Components\Product;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
+/**
+ * Images
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Images extends Component
 {
     public ?string $thumbnail = null;

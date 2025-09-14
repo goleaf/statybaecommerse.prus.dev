@@ -8,6 +8,11 @@ use App\Filament\Resources\CampaignClickResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
+/**
+ * ViewCampaignClick
+ * 
+ * Filament resource for admin panel management.
+ */
 class ViewCampaignClick extends ViewRecord
 {
     protected static string $resource = CampaignClickResource::class;

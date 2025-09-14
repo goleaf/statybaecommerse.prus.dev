@@ -12,7 +12,12 @@ use App\Models\WishlistItem;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-final class ProductCardExtended extends Component
+final /**
+ * ProductCardExtended
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductCardExtended extends Component
 {
     public Product $product;
 

@@ -10,7 +10,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
 
-final class LegalTranslation extends Model
+final /**
+ * LegalTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class LegalTranslation extends Model
 {
     use HasFactory;
 

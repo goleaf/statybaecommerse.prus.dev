@@ -11,7 +11,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class Price extends Model
+final /**
+ * Price
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Price extends Model
 {
     use HasFactory, SoftDeletes;
 

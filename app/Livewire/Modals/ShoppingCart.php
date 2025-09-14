@@ -10,6 +10,11 @@ use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Laravelcm\LivewireSlideOvers\SlideOverComponent;
 
+/**
+ * ShoppingCart
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class ShoppingCart extends SlideOverComponent
 {
     public float $subtotal = 0;

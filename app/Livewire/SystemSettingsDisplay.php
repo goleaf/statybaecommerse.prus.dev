@@ -7,7 +7,12 @@ namespace App\Livewire;
 use App\Services\SystemSettingsService;
 use Livewire\Component;
 
-final class SystemSettingsDisplay extends Component
+final /**
+ * SystemSettingsDisplay
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class SystemSettingsDisplay extends Component
 {
     public string $group = 'general';
 

@@ -7,6 +7,11 @@ namespace App\Livewire\Shared;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
+/**
+ * LanguageSwitcher
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class LanguageSwitcher extends Component
 {
     public array $locales = [];

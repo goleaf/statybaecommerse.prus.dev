@@ -6,7 +6,12 @@ namespace App\Models\Translations;
 
 use Illuminate\Database\Eloquent\Model;
 
-final class CategoryTranslation extends Model
+final /**
+ * CategoryTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class CategoryTranslation extends Model
 {
     protected $table = 'category_translations';
 

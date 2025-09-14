@@ -8,7 +8,12 @@ use App\Models\ReferralReward;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class ReferralRewardChartWidget extends ChartWidget
+final /**
+ * ReferralRewardChartWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ReferralRewardChartWidget extends ChartWidget
 {
     protected static ?string $heading = 'Referral Rewards Over Time';
 

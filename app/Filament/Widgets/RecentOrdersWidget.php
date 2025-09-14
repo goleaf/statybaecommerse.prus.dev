@@ -8,11 +8,16 @@ use App\Models\Order;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\BadgeColumn;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
+/**
+ * RecentOrdersWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class RecentOrdersWidget extends BaseWidget
 {
     protected static ?string $heading = 'orders.widgets.recent_orders';

@@ -6,4 +6,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-final class CampaignController extends Controller {}
+final /**
+ * CampaignController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class CampaignController extends Controller {}

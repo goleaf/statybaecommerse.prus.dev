@@ -7,7 +7,12 @@ namespace App\Filament\Resources\RegionResource\Widgets;
 use App\Models\Region;
 use Filament\Widgets\ChartWidget;
 
-final class RegionsByLevelWidget extends ChartWidget
+final /**
+ * RegionsByLevelWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class RegionsByLevelWidget extends ChartWidget
 {
     protected static ?string $heading = 'Regions by Level';
 

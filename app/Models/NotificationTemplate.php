@@ -6,7 +6,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-final class NotificationTemplate extends Model
+final /**
+ * NotificationTemplate
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class NotificationTemplate extends Model
 {
     protected $fillable = [
         'name',

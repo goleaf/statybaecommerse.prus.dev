@@ -8,7 +8,12 @@ use App\Models\Product;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-final class ProductImageGallery extends Component
+final /**
+ * ProductImageGallery
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductImageGallery extends Component
 {
     public Product $product;
 

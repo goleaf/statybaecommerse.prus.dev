@@ -8,7 +8,12 @@ use App\Models\Country;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Collection;
 
-final class CountriesByRegionWidget extends ChartWidget
+final /**
+ * CountriesByRegionWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class CountriesByRegionWidget extends ChartWidget
 {
     protected static ?string $heading = 'Countries by Region';
 

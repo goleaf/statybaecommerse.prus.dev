@@ -10,6 +10,11 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('components.layouts.templates.light')]
+/**
+ * Checkout
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Checkout extends Component
 {
     public ?string $sessionKey = null;

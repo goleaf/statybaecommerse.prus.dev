@@ -8,7 +8,12 @@ use App\Models\Referral;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class ReferralTrendsWidget extends ChartWidget
+final /**
+ * ReferralTrendsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ReferralTrendsWidget extends ChartWidget
 {
     protected static ?string $heading = null;
 

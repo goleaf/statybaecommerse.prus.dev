@@ -9,6 +9,11 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Number;
 
+/**
+ * CampaignConversionStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class CampaignConversionStatsWidget extends BaseWidget
 {
     protected function getStats(): array

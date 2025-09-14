@@ -22,7 +22,12 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[ObservedBy([ProductObserver::class])]
-final class Product extends Model implements HasMedia
+final /**
+ * Product
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Product extends Model implements HasMedia
 {
     use HasFactory, SoftDeletes;
     use HasProductPricing;

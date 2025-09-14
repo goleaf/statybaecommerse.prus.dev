@@ -11,7 +11,12 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
-final class LocationInventoryWidget extends BaseWidget
+final /**
+ * LocationInventoryWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class LocationInventoryWidget extends BaseWidget
 {
     protected static ?int $sort = 3;
 

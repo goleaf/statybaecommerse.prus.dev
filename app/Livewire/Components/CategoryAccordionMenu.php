@@ -10,7 +10,12 @@ use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-final class CategoryAccordionMenu extends Component
+final /**
+ * CategoryAccordionMenu
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class CategoryAccordionMenu extends Component
 {
     public ?int $activeCategoryId = null;
 

@@ -12,7 +12,12 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-final class NavigationMenu extends Component
+final /**
+ * NavigationMenu
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class NavigationMenu extends Component
 {
     public bool $mobileMenuOpen = false;
 

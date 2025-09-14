@@ -17,7 +17,12 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-final class ProductVariant extends Model implements HasMedia
+final /**
+ * ProductVariant
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class ProductVariant extends Model implements HasMedia
 {
     use HasFactory, HasProductPricing, InteractsWithMedia, SoftDeletes;
 

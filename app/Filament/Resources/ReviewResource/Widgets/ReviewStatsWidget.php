@@ -8,7 +8,12 @@ use App\Models\Review;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class ReviewStatsWidget extends BaseWidget
+final /**
+ * ReviewStatsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ReviewStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

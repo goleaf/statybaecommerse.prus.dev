@@ -12,7 +12,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Carbon\Carbon;
 
-final class Legal extends Model
+final /**
+ * Legal
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Legal extends Model
 {
     use HasFactory, HasTranslations;
 

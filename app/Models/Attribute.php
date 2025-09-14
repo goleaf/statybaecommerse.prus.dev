@@ -14,7 +14,12 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-final class Attribute extends Model
+final /**
+ * Attribute
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Attribute extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
 

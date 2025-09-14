@@ -20,7 +20,12 @@ use Illuminate\Support\Facades\Storage;
  * for the e-commerce system. Provides comprehensive document management
  * with security validation and notification support.
  */
-final class DocumentService
+final /**
+ * DocumentService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class DocumentService
 {
     /**
      * Generate a document from a template with variables.

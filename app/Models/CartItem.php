@@ -9,7 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class CartItem extends Model
+final /**
+ * CartItem
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class CartItem extends Model
 {
     use HasFactory, SoftDeletes;
 

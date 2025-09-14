@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Filament\Resources\AttributeValueResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class VariantsRelationManager extends RelationManager
+final /**
+ * VariantsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class VariantsRelationManager extends RelationManager
 {
     protected static string $relationship = 'variants';
 

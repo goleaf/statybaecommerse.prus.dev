@@ -10,7 +10,12 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-final class TopReferrersWidget extends BaseWidget
+final /**
+ * TopReferrersWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class TopReferrersWidget extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';
 

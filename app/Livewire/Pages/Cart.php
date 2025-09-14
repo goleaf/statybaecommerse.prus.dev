@@ -9,6 +9,11 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('layouts.templates.app')]
+/**
+ * Cart
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Cart extends Component
 {
     public float $subtotal = 0.0;

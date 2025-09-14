@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-final class Menu extends Model
+final /**
+ * Menu
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Menu extends Model
 {
     use HasFactory;
 

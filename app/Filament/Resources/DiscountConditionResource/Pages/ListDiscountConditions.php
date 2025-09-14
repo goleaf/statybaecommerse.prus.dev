@@ -10,7 +10,12 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListDiscountConditions extends ListRecords
+final /**
+ * ListDiscountConditions
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListDiscountConditions extends ListRecords
 {
     protected static string $resource = DiscountConditionResource::class;
 

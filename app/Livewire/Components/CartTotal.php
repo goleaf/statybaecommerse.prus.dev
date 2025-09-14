@@ -8,6 +8,11 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+/**
+ * CartTotal
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class CartTotal extends Component
 {
     public float $subtotal = 0.0;

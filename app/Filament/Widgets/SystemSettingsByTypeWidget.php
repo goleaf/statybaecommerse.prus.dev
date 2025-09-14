@@ -7,7 +7,12 @@ namespace App\Filament\Widgets;
 use App\Models\SystemSetting;
 use Filament\Widgets\ChartWidget;
 
-final class SystemSettingsByTypeWidget extends ChartWidget
+final /**
+ * SystemSettingsByTypeWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class SystemSettingsByTypeWidget extends ChartWidget
 {
     protected ?string $heading = 'admin.system_settings.widgets.settings_by_type';
 

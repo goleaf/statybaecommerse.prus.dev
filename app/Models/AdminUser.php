@@ -9,7 +9,12 @@ use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-final class AdminUser extends Authenticatable implements FilamentUser
+final /**
+ * AdminUser
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class AdminUser extends Authenticatable implements FilamentUser
 {
     use Notifiable;
 

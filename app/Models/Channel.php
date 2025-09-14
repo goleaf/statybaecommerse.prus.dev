@@ -10,7 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class Channel extends Model
+final /**
+ * Channel
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Channel extends Model
 {
     use HasFactory, SoftDeletes;
 

@@ -8,7 +8,12 @@ use App\Filament\Resources\SeoDataResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateSeoData extends CreateRecord
+final /**
+ * CreateSeoData
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreateSeoData extends CreateRecord
 {
     protected static string $resource = SeoDataResource::class;
 

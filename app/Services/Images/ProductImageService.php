@@ -8,7 +8,12 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-final class ProductImageService
+final /**
+ * ProductImageService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class ProductImageService
 {
     private const IMAGE_WIDTH = 800;
 

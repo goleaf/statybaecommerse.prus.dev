@@ -8,7 +8,12 @@ use App\Filament\Resources\PriceListItemResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditPriceListItem extends EditRecord
+final /**
+ * EditPriceListItem
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditPriceListItem extends EditRecord
 {
     protected static string $resource = PriceListItemResource::class;
 

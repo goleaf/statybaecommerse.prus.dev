@@ -11,7 +11,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-final class ProductRequest extends Model
+final /**
+ * ProductRequest
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class ProductRequest extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
 

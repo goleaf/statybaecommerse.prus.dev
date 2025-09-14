@@ -7,7 +7,12 @@ namespace App\Filament\Resources\CartItemResource\Pages;
 use App\Filament\Resources\CartItemResource;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateCartItem extends CreateRecord
+final /**
+ * CreateCartItem
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreateCartItem extends CreateRecord
 {
     protected static string $resource = CartItemResource::class;
 

@@ -8,7 +8,12 @@ use App\Filament\Resources\AnalyticsEventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateAnalyticsEvent extends CreateRecord
+final /**
+ * CreateAnalyticsEvent
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreateAnalyticsEvent extends CreateRecord
 {
     protected static string $resource = AnalyticsEventResource::class;
 

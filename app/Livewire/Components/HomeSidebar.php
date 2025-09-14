@@ -10,7 +10,12 @@ use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-final class HomeSidebar extends Component
+final /**
+ * HomeSidebar
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class HomeSidebar extends Component
 {
     #[Computed]
     public function categoryTree()

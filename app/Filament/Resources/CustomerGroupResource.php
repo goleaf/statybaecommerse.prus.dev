@@ -13,13 +13,13 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\KeyValue;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\DateFilter;
@@ -27,8 +27,14 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
-final class CustomerGroupResource extends Resource
+final /**
+ * CustomerGroupResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class CustomerGroupResource extends Resource
 {
     protected static ?string $model = CustomerGroup::class;
 
@@ -57,7 +63,7 @@ final class CustomerGroupResource extends Resource
         return __('customer_groups.navigation_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

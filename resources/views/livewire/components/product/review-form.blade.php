@@ -1,8 +1,8 @@
 <div class="mt-8">
-    <h2 class="text-lg font-semibold">{{ __('Write a review') }}</h2>
+    <h2 class="text-lg font-semibold">{{ __('frontend.products.write_review') }}</h2>
 
     @guest
-        <p class="text-sm text-gray-500 mt-2">{{ __('You must be logged in to write a review.') }}</p>
+        <p class="text-sm text-gray-500 mt-2">{{ __('frontend.products.must_be_logged_in') }}</p>
     @endguest
 
     @auth

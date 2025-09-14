@@ -7,7 +7,12 @@ namespace App\Models\Translations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class DiscountRedemptionTranslation extends Model
+final /**
+ * DiscountRedemptionTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class DiscountRedemptionTranslation extends Model
 {
     protected $table = 'discount_redemption_translations';
 

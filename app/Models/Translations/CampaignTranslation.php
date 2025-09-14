@@ -7,7 +7,12 @@ namespace App\Models\Translations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class CampaignTranslation extends Model
+final /**
+ * CampaignTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class CampaignTranslation extends Model
 {
     protected $table = 'campaign_translations';
 

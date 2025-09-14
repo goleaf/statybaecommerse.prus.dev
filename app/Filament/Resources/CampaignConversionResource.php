@@ -6,27 +6,27 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Models\CampaignConversion;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\KeyValueEntry;
-use Filament\Infolists\Components\Section as InfolistSection;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\DateTimePicker;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\KeyValue;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\TagsInput;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Toggle;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\KeyValueEntry;
+use Filament\Schemas\Components\Section as InfolistSection;
+use Filament\Schemas\Components\TextEntry;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Columns\BadgeColumn;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
@@ -37,6 +37,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
+/**
+ * CampaignConversionResource
+ * 
+ * Filament resource for admin panel management.
+ */
 class CampaignConversionResource extends Resource
 {
     protected static ?string $model = CampaignConversion::class;
@@ -61,7 +66,7 @@ class CampaignConversionResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([
@@ -517,7 +522,7 @@ class CampaignConversionResource extends Resource
             ->defaultSort('converted_at', 'desc');
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         return $infolist
             ->schema([

@@ -8,6 +8,11 @@ use App\Filament\Resources\CampaignConversionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
+/**
+ * ViewCampaignConversion
+ * 
+ * Filament resource for admin panel management.
+ */
 class ViewCampaignConversion extends ViewRecord
 {
     protected static string $resource = CampaignConversionResource::class;

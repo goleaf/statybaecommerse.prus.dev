@@ -9,13 +9,18 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class TagsRelationManager extends RelationManager
+final /**
+ * TagsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class TagsRelationManager extends RelationManager
 {
     protected static string $relationship = 'tags';
 
     public function form(Schema $form): Schema
     {
-        return $form->components([
+        return $schema->components([
             Forms\Components\TextInput::make('name')
                 ->label(__('admin.news.tags.fields.name'))
                 ->required()

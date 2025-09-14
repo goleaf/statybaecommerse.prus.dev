@@ -14,6 +14,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Validate;
 use Spatie\LivewireWizard\Components\StepComponent;
 
+/**
+ * Payment
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Payment extends StepComponent
 {
     #[Validate('required', message: 'You must select a payment method')]

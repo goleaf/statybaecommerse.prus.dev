@@ -14,7 +14,12 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('components.layouts.templates.app')]
-final class Register extends Component implements HasSchemas
+final /**
+ * Register
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Register extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
 

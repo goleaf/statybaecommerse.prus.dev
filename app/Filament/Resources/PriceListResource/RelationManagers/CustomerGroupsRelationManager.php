@@ -5,23 +5,28 @@ declare(strict_types=1);
 namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CustomerGroupsRelationManager extends RelationManager
+final /**
+ * CustomerGroupsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class CustomerGroupsRelationManager extends RelationManager
 {
     protected static string $relationship = 'customerGroups';
 

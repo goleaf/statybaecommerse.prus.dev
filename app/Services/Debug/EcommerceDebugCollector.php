@@ -6,6 +6,11 @@ namespace App\Services\Debug;
 
 use Illuminate\Support\Facades\Log;
 
+/**
+ * EcommerceDebugCollector
+ * 
+ * Service class containing business logic and external integrations.
+ */
 class EcommerceDebugCollector
 {
     public function logCartOperation(string $operation, array $data = []): void

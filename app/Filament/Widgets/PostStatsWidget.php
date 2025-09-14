@@ -8,7 +8,12 @@ use App\Models\Post;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class PostStatsWidget extends BaseWidget
+final /**
+ * PostStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class PostStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

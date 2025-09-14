@@ -8,7 +8,12 @@ use App\Models\Review;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
-final class Reviews extends Component
+final /**
+ * Reviews
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Reviews extends Component
 {
     public $reviews;
 

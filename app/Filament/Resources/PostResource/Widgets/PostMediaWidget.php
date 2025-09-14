@@ -9,7 +9,12 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
-final class PostMediaWidget extends BaseWidget
+final /**
+ * PostMediaWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class PostMediaWidget extends BaseWidget
 {
     protected static ?string $pollingInterval = null;
 

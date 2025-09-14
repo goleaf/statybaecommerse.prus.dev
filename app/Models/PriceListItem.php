@@ -9,7 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Translatable\HasTranslations;
 
-final class PriceListItem extends Model
+final /**
+ * PriceListItem
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class PriceListItem extends Model
 {
     use HasFactory, HasTranslations;
 

@@ -9,7 +9,12 @@ use App\Models\SystemSettingCategory;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class SystemSettingsOverviewWidget extends BaseWidget
+final /**
+ * SystemSettingsOverviewWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class SystemSettingsOverviewWidget extends BaseWidget
 {
     protected static ?int $sort = 1;
 

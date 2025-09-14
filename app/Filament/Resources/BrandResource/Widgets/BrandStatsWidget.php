@@ -8,7 +8,12 @@ use App\Models\Brand;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class BrandStatsWidget extends BaseWidget
+final /**
+ * BrandStatsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class BrandStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

@@ -16,7 +16,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
-final class UserController extends Controller
+final /**
+ * UserController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class UserController extends Controller
 {
     /**
      * Display user profile page

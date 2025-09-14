@@ -9,7 +9,12 @@ use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-final class ProductController extends Controller
+final /**
+ * ProductController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class ProductController extends Controller
 {
     public function search(Request $request): JsonResponse
     {

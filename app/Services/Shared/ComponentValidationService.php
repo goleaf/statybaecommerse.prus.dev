@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Shared;
 
-final class ComponentValidationService
+final /**
+ * ComponentValidationService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class ComponentValidationService
 {
     private array $componentRules = [];
 

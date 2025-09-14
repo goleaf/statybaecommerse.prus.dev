@@ -71,9 +71,13 @@ final class ConvertBrandImagesToWebP
                     ->quality(85)
                     ->save($webpPath);
 
-                logger()->info("Generated WebP conversion: {$webpPath}");
+                if (!app()->environment('testing')) {
+                    logger()->info("Generated WebP conversion: {$webpPath}");
+                }
             } catch (\Exception $e) {
-                logger()->warning("Failed to generate WebP conversion for {$media->name}: ".$e->getMessage());
+                if (!app()->environment('testing')) {
+                    logger()->warning("Failed to generate WebP conversion for {$media->name}: ".$e->getMessage());
+                }
             }
         }
     }

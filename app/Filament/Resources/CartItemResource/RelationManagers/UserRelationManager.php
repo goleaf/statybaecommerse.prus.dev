@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CartItemResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class UserRelationManager extends RelationManager
+final /**
+ * UserRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class UserRelationManager extends RelationManager
 {
     protected static string $relationship = 'user';
 

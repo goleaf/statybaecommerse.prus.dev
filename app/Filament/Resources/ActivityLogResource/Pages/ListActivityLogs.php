@@ -10,7 +10,12 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListActivityLogs extends ListRecords
+final /**
+ * ListActivityLogs
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListActivityLogs extends ListRecords
 {
     protected static string $resource = ActivityLogResource::class;
 

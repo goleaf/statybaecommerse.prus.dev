@@ -10,7 +10,12 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
-final class ProductPerformanceWidget extends BaseWidget
+final /**
+ * ProductPerformanceWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ProductPerformanceWidget extends BaseWidget
 {
     protected static ?string $pollingInterval = null;
 

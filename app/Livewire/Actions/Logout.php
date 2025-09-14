@@ -8,6 +8,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
+/**
+ * Logout
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Logout
 {
     /**

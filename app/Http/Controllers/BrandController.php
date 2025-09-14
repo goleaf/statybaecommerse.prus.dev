@@ -9,7 +9,12 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
-final class BrandController extends Controller
+final /**
+ * BrandController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class BrandController extends Controller
 {
     public function show(Request $request, string $locale, string $slug): View|RedirectResponse
     {

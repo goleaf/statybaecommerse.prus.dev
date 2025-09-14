@@ -9,7 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class PartnerTier extends Model
+final /**
+ * PartnerTier
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class PartnerTier extends Model
 {
     use HasFactory, SoftDeletes;
 

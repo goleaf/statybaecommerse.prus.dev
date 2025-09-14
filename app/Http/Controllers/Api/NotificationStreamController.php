@@ -9,7 +9,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
-final class NotificationStreamController extends Controller
+final /**
+ * NotificationStreamController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class NotificationStreamController extends Controller
 {
     public function stream(Request $request): Response
     {

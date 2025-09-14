@@ -8,7 +8,12 @@ use App\Filament\Resources\PriceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-final class ListPrices extends ListRecords
+final /**
+ * ListPrices
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListPrices extends ListRecords
 {
     protected static string $resource = PriceResource::class;
 

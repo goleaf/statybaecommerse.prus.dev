@@ -8,7 +8,12 @@ use App\Models\News;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class NewsStatsWidget extends BaseWidget
+final /**
+ * NewsStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class NewsStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

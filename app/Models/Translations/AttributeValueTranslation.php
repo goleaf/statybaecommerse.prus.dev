@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * AttributeValueTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
 class AttributeValueTranslation extends Model
 {
     use HasFactory;

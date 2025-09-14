@@ -7,7 +7,12 @@ namespace App\Filament\Resources\ReferralRewardResource\Widgets;
 use App\Models\ReferralReward;
 use Filament\Widgets\ChartWidget;
 
-final class ReferralRewardTypeChartWidget extends ChartWidget
+final /**
+ * ReferralRewardTypeChartWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ReferralRewardTypeChartWidget extends ChartWidget
 {
     protected static ?string $heading = 'Reward Types Distribution';
 

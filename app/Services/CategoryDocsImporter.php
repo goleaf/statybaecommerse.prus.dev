@@ -8,7 +8,12 @@ use App\Models\Category;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-final class CategoryDocsImporter
+final /**
+ * CategoryDocsImporter
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class CategoryDocsImporter
 {
     public function import(string $basePath, bool $includeHeadings = false, bool $importFiles = true): array
     {

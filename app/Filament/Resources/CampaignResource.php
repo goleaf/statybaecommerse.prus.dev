@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Models\Campaign;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -15,9 +15,15 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-final class CampaignResource extends Resource
+final /**
+ * CampaignResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class CampaignResource extends Resource
 {
     use Translatable;
+use UnitEnum;
 
     protected static ?string $model = Campaign::class;
 
@@ -50,7 +56,7 @@ final class CampaignResource extends Resource
         return __('campaigns.models.campaigns');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

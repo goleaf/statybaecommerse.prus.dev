@@ -8,7 +8,12 @@ use App\Models\Campaign;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 
-final class CampaignGrowthChartWidget extends ChartWidget
+final /**
+ * CampaignGrowthChartWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class CampaignGrowthChartWidget extends ChartWidget
 {
     protected static ?string $heading = 'Campaign Growth Over Time';
 

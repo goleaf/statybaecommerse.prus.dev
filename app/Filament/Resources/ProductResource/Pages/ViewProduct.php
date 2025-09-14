@@ -8,6 +8,11 @@ use App\Filament\Resources\ProductResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
+/**
+ * ViewProduct
+ * 
+ * Filament resource for admin panel management.
+ */
 class ViewProduct extends ViewRecord
 {
     protected static string $resource = ProductResource::class;

@@ -13,7 +13,12 @@ use App\Models\Review;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 
-final class Home extends Component
+final /**
+ * Home
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Home extends Component
 {
     use WithCart, WithNotifications;
 

@@ -7,7 +7,12 @@ namespace App\Livewire\Pages\Location;
 use App\Models\Location;
 use Livewire\Component;
 
-final class Index extends Component
+final /**
+ * Index
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Index extends Component
 {
     public function getLocationsProperty()
     {

@@ -8,7 +8,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 
-final class CategoryController extends Controller
+final /**
+ * CategoryController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class CategoryController extends Controller
 {
     public function tree(): JsonResponse
     {

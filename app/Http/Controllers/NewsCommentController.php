@@ -9,7 +9,12 @@ use App\Models\News;
 use App\Models\NewsComment;
 use Illuminate\Http\RedirectResponse;
 
-final class NewsCommentController extends Controller
+final /**
+ * NewsCommentController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class NewsCommentController extends Controller
 {
     public function store(StoreNewsCommentRequest $request, string $slug): RedirectResponse
     {

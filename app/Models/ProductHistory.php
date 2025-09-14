@@ -12,7 +12,12 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-final class ProductHistory extends Model
+final /**
+ * ProductHistory
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class ProductHistory extends Model
 {
     use HasFactory, HasTranslations, LogsActivity;
 

@@ -10,6 +10,11 @@ use App\Models\Translations\LegalTranslation;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
 
+/**
+ * CreateLegal
+ * 
+ * Filament resource for admin panel management.
+ */
 class CreateLegal extends CreateRecord
 {
     protected static string $resource = LegalResource::class;

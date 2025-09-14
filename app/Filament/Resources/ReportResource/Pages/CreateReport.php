@@ -9,7 +9,12 @@ use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Str;
 
-final class CreateReport extends CreateRecord
+final /**
+ * CreateReport
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreateReport extends CreateRecord
 {
     protected static string $resource = ReportResource::class;
 

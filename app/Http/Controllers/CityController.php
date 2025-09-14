@@ -9,7 +9,12 @@ use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class CityController extends Controller
+final /**
+ * CityController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class CityController extends Controller
 {
     public function index(Request $request): View
     {

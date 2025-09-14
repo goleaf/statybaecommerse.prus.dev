@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class SystemSettingDependency extends Model
+final /**
+ * SystemSettingDependency
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class SystemSettingDependency extends Model
 {
     use HasFactory;
 

@@ -8,6 +8,11 @@ use App\Models\CampaignClick;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * CampaignClickChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class CampaignClickChartWidget extends ChartWidget
 {
     protected ?string $heading = 'Campaign Clicks Over Time';

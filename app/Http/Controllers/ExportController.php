@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
+/**
+ * ExportController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
 class ExportController extends Controller
 {
     public function index(): ViewContract

@@ -7,7 +7,12 @@ namespace App\Livewire\Components;
 use App\Models\Product;
 use Livewire\Component;
 
-final class AdvancedRelatedProducts extends Component
+final /**
+ * AdvancedRelatedProducts
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class AdvancedRelatedProducts extends Component
 {
     public Product $product;
 

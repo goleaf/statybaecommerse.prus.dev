@@ -8,7 +8,12 @@ use App\Models\UserWishlist;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
-final class Wishlist extends Component
+final /**
+ * Wishlist
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Wishlist extends Component
 {
     public array $wishlists = [];
 

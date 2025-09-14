@@ -6,12 +6,17 @@ namespace App\Filament\Resources\CountryResource\RelationManagers;
 
 use App\Models\City;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class CitiesRelationManager extends RelationManager
+final /**
+ * CitiesRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class CitiesRelationManager extends RelationManager
 {
     protected static string $relationship = 'cities';
 

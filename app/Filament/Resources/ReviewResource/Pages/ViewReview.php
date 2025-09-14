@@ -8,7 +8,12 @@ use App\Filament\Resources\ReviewResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewReview extends ViewRecord
+final /**
+ * ViewReview
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewReview extends ViewRecord
 {
     protected static string $resource = ReviewResource::class;
 

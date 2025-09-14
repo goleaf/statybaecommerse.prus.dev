@@ -17,7 +17,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
-final class DiscountRedemptionController extends Controller
+final /**
+ * DiscountRedemptionController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class DiscountRedemptionController extends Controller
 {
     /**
      * Display a listing of the user's discount redemptions

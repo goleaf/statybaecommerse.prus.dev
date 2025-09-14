@@ -8,7 +8,12 @@ use App\Filament\Resources\NewsResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditNews extends EditRecord
+final /**
+ * EditNews
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditNews extends EditRecord
 {
     protected static string $resource = NewsResource::class;
 

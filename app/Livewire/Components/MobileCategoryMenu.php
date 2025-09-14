@@ -10,7 +10,12 @@ use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-final class MobileCategoryMenu extends Component
+final /**
+ * MobileCategoryMenu
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class MobileCategoryMenu extends Component
 {
     #[Computed]
     public function categoryTree()

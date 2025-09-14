@@ -9,7 +9,12 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class CampaignsRelationManager extends RelationManager
+final /**
+ * CampaignsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class CampaignsRelationManager extends RelationManager
 {
     protected static string $relationship = 'targetCustomerGroups';
 

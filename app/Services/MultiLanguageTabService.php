@@ -11,7 +11,12 @@ use Filament\Schemas\Components\Section;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 use SolutionForest\TabLayoutPlugin\Schemas\SimpleTabSchema;
 
-final class MultiLanguageTabService
+final /**
+ * MultiLanguageTabService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class MultiLanguageTabService
 {
     /**
      * Get available languages for tabs

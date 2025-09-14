@@ -9,7 +9,12 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Activitylog\Models\Activity;
 
-final class ProductHistory extends Component
+final /**
+ * ProductHistory
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ProductHistory extends Component
 {
     use WithPagination;
 

@@ -8,7 +8,12 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class PostController extends Controller
+final /**
+ * PostController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class PostController extends Controller
 {
     public function index(Request $request): View
     {

@@ -16,7 +16,12 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-final class SystemSetting extends Model implements HasMedia
+final /**
+ * SystemSetting
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class SystemSetting extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia, LogsActivity, SoftDeletes;
 
@@ -489,7 +494,7 @@ final class SystemSetting extends Model implements HasMedia
         cache()->tags(['system_settings'])->flush();
     }
 
-    public function clearCache(): void
+    public function clearInstanceCache(): void
     {
         cache()->tags($this->getCacheTags())->forget($this->getCacheKey());
     }

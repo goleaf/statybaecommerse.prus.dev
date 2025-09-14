@@ -8,6 +8,11 @@ use App\Filament\Resources\ProductResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
+/**
+ * EditProduct
+ * 
+ * Filament resource for admin panel management.
+ */
 class EditProduct extends EditRecord
 {
     protected static string $resource = ProductResource::class;

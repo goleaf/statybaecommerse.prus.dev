@@ -11,7 +11,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class StockController extends Controller
+final /**
+ * StockController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class StockController extends Controller
 {
     public function index(Request $request): View
     {

@@ -6,6 +6,11 @@ namespace App\Services\Debug;
 
 use Illuminate\Support\Facades\Log;
 
+/**
+ * LivewireDebugCollector
+ * 
+ * Service class containing business logic and external integrations.
+ */
 class LivewireDebugCollector
 {
     public function logComponentLifecycle(string $component, string $phase, array $data = []): void

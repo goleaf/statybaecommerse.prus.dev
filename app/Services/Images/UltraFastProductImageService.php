@@ -7,7 +7,12 @@ namespace App\Services\Images;
 use App\Models\Product;
 use Illuminate\Support\Facades\Log;
 
-final class UltraFastProductImageService
+final /**
+ * UltraFastProductImageService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class UltraFastProductImageService
 {
     private const IMAGE_WIDTH = 600;
 

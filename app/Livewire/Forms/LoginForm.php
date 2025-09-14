@@ -12,6 +12,11 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
+/**
+ * LoginForm
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class LoginForm extends Form
 {
     #[Validate('required|string|email')]

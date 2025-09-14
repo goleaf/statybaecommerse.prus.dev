@@ -13,7 +13,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class DiscountCode extends Model
+final /**
+ * DiscountCode
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class DiscountCode extends Model
 {
     use HasFactory, SoftDeletes;
 

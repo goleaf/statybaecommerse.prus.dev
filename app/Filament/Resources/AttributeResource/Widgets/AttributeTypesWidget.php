@@ -7,7 +7,12 @@ namespace App\Filament\Resources\AttributeResource\Widgets;
 use App\Models\Attribute;
 use Filament\Widgets\ChartWidget;
 
-final class AttributeTypesWidget extends ChartWidget
+final /**
+ * AttributeTypesWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class AttributeTypesWidget extends ChartWidget
 {
     protected static ?int $sort = 2;
 

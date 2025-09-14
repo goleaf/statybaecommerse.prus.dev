@@ -10,7 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class DiscountConditionController extends Controller
+final /**
+ * DiscountConditionController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class DiscountConditionController extends Controller
 {
     /**
      * Display a listing of discount conditions

@@ -10,6 +10,11 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * ListCities
+ * 
+ * Filament resource for admin panel management.
+ */
 class ListCities extends ListRecords
 {
     protected static string $resource = CityResource::class;

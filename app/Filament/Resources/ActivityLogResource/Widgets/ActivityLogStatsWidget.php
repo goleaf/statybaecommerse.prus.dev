@@ -8,7 +8,12 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Spatie\Activitylog\Models\Activity;
 
-final class ActivityLogStatsWidget extends BaseWidget
+final /**
+ * ActivityLogStatsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ActivityLogStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

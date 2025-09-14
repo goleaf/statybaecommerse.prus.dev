@@ -6,11 +6,16 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\Document;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
+/**
+ * DocumentsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
 class DocumentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'documents';

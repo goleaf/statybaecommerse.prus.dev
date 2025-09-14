@@ -8,6 +8,11 @@ use App\Models\CampaignConversion;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 
+/**
+ * CampaignConversionChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class CampaignConversionChartWidget extends ChartWidget
 {
     protected ?string $heading = 'campaign_conversions.widgets.conversion_trends';

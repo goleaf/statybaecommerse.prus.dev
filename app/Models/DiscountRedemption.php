@@ -11,7 +11,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class DiscountRedemption extends Model
+final /**
+ * DiscountRedemption
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class DiscountRedemption extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
 

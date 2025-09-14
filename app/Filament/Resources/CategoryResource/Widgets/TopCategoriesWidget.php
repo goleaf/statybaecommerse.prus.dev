@@ -7,7 +7,12 @@ namespace App\Filament\Resources\CategoryResource\Widgets;
 use App\Models\Category;
 use Filament\Widgets\ChartWidget;
 
-final class TopCategoriesWidget extends ChartWidget
+final /**
+ * TopCategoriesWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class TopCategoriesWidget extends ChartWidget
 {
     protected static ?string $heading = 'Top Categories by Product Count';
 

@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class PriceTranslation extends Model
+final /**
+ * PriceTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class PriceTranslation extends Model
 {
     use HasFactory;
 

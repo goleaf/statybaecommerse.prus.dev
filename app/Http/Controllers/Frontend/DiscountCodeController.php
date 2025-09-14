@@ -14,7 +14,12 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-final class DiscountCodeController extends Controller
+final /**
+ * DiscountCodeController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class DiscountCodeController extends Controller
 {
     public function __construct(
         private readonly DocumentService $documentService

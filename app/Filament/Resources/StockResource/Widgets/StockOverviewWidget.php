@@ -9,6 +9,11 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * StockOverviewWidget
+ * 
+ * Filament resource for admin panel management.
+ */
 class StockOverviewWidget extends BaseWidget
 {
     protected function getStats(): array

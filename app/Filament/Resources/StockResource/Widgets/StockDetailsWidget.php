@@ -8,6 +8,11 @@ use App\Models\VariantInventory;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
+/**
+ * StockDetailsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
 class StockDetailsWidget extends BaseWidget
 {
     public ?VariantInventory $record = null;

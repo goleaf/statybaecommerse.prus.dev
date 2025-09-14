@@ -9,7 +9,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-final class PublicSystemSettingsWidget extends BaseWidget
+final /**
+ * PublicSystemSettingsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class PublicSystemSettingsWidget extends BaseWidget
 {
     protected static ?string $heading = 'admin.system_settings.widgets.public_settings';
 

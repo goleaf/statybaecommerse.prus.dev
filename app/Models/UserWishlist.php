@@ -10,7 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-final class UserWishlist extends Model
+final /**
+ * UserWishlist
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class UserWishlist extends Model
 {
     use HasFactory, SoftDeletes;
 

@@ -6,11 +6,11 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\CreateAction;
@@ -20,6 +20,11 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
+/**
+ * OrderItemsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
 class OrderItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'items';

@@ -20,25 +20,25 @@
         {{-- Image Information Panel --}}
         <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                {{ __('translations.image_gallery') }}
+                {{ __('frontend.images.image_gallery') }}
             </h4>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                     <span class="font-medium text-gray-700 dark:text-gray-300">
-                        {{ __('translations.images') }}:
+                        {{ __('frontend.images.images') }}:
                     </span>
                     <span class="text-gray-600 dark:text-gray-400">
-                        {{ count($images) }} {{ __('translations.images') }}
+                        {{ count($images) }} {{ __('frontend.images.images') }}
                     </span>
                 </div>
                 
                 <div>
                     <span class="font-medium text-gray-700 dark:text-gray-300">
-                        {{ __('translations.webp_format') }}:
+                        {{ __('frontend.images.webp_format') }}:
                     </span>
                     <span class="text-green-600 dark:text-green-400 font-medium">
-                        ✓ {{ __('translations.image_optimization') }}
+                        ✓ {{ __('frontend.images.image_optimization') }}
                     </span>
                 </div>
             </div>

@@ -8,7 +8,12 @@ use App\Models\DiscountCondition;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class DiscountConditionChartWidget extends ChartWidget
+final /**
+ * DiscountConditionChartWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class DiscountConditionChartWidget extends ChartWidget
 {
     protected static ?string $heading = 'Discount Conditions by Type';
 

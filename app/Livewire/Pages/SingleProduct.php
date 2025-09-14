@@ -8,7 +8,12 @@ use App\Livewire\Concerns\WithCart;
 use App\Models\Product;
 use Livewire\Component;
 
-final class SingleProduct extends Component
+final /**
+ * SingleProduct
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class SingleProduct extends Component
 {
     use WithCart;
 

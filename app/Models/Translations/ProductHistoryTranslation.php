@@ -6,7 +6,12 @@ namespace App\Models\Translations;
 
 use Illuminate\Database\Eloquent\Model;
 
-final class ProductHistoryTranslation extends Model
+final /**
+ * ProductHistoryTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class ProductHistoryTranslation extends Model
 {
     protected $fillable = [
         'product_history_id',

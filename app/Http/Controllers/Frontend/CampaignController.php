@@ -10,7 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class CampaignController extends Controller
+final /**
+ * CampaignController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class CampaignController extends Controller
 {
     public function index(Request $request): View
     {

@@ -7,6 +7,11 @@ namespace App\Livewire\Components;
 use App\Models\Attribute;
 use Illuminate\Support\Collection;
 
+/**
+ * OptionData
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class OptionData
 {
     public function __construct(

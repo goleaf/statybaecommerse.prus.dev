@@ -11,7 +11,12 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListReports extends ListRecords
+final /**
+ * ListReports
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListReports extends ListRecords
 {
     protected static string $resource = ReportResource::class;
 

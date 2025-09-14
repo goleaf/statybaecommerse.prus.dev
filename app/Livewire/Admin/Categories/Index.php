@@ -9,7 +9,12 @@ use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-final class Index extends Component
+final /**
+ * Index
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Index extends Component
 {
     use WithPagination;
 

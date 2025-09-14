@@ -8,7 +8,12 @@ use App\Filament\Resources\DocumentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateDocument extends CreateRecord
+final /**
+ * CreateDocument
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreateDocument extends CreateRecord
 {
     protected static string $resource = DocumentResource::class;
 

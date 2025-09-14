@@ -10,19 +10,25 @@ use App\Filament\Resources\AttributeResource\Widgets;
 use App\Models\Attribute;
 use App\Services\MultiLanguageTabService;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\IconEntry;
+use Filament\Schemas\Components\TextEntry;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use SolutionForest\TabLayoutPlugin\Components\Tabs;
+use UnitEnum;
 
-final class AttributeResource extends Resource
+final /**
+ * AttributeResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class AttributeResource extends Resource
 {
     protected static ?string $model = Attribute::class;
 
@@ -51,7 +57,7 @@ final class AttributeResource extends Resource
         return __('attributes.attribute');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->components([
@@ -227,7 +233,7 @@ final class AttributeResource extends Resource
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         return $infolist
             ->components([

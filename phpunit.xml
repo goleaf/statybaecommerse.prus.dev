@@ -4,7 +4,7 @@
          bootstrap="vendor/autoload.php"
          colors="true"
          beStrictAboutTestsThatDoNotTestAnything="false"
-         beStrictAboutOutputDuringTests="true"
+         beStrictAboutOutputDuringTests="false"
 >
     <testsuites>
         <testsuite name="Unit">

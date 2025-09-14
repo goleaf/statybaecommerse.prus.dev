@@ -8,7 +8,7 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\ZoneResource\Pages;
 use App\Models\Zone;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,6 +16,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
+/**
+ * ZoneResource
+ * 
+ * Filament resource for admin panel management.
+ */
 class ZoneResource extends Resource
 {
     protected static ?string $model = Zone::class;
@@ -40,7 +45,7 @@ class ZoneResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Zones';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->components([

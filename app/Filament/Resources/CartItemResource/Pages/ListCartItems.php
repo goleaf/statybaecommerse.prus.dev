@@ -11,7 +11,12 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListCartItems extends ListRecords
+final /**
+ * ListCartItems
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListCartItems extends ListRecords
 {
     protected static string $resource = CartItemResource::class;
 

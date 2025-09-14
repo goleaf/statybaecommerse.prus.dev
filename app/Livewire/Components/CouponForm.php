@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
+/**
+ * CouponForm
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class CouponForm extends Component
 {
     #[Validate('nullable|string|max:50')]

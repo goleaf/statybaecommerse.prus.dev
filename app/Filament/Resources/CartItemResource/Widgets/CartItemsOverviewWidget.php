@@ -8,7 +8,12 @@ use App\Models\CartItem;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class CartItemsOverviewWidget extends BaseWidget
+final /**
+ * CartItemsOverviewWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class CartItemsOverviewWidget extends BaseWidget
 {
     protected function getStats(): array
     {

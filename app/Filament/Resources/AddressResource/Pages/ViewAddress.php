@@ -8,13 +8,18 @@ use App\Filament\Resources\AddressResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Infolists;
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\BadgeEntry;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\TextEntry;
+use Filament\Schemas\Components\IconEntry;
+use Filament\Schemas\Components\BadgeEntry;
 
-final class ViewAddress extends ViewRecord
+final /**
+ * ViewAddress
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewAddress extends ViewRecord
 {
     protected static string $resource = AddressResource::class;
 

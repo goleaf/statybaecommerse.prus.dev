@@ -7,7 +7,12 @@ namespace App\Filament\Resources\ActivityLogResource\Widgets;
 use Filament\Widgets\ChartWidget;
 use Spatie\Activitylog\Models\Activity;
 
-final class ActivityLogChartWidget extends ChartWidget
+final /**
+ * ActivityLogChartWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ActivityLogChartWidget extends ChartWidget
 {
     protected static ?string $heading = 'Activity Logs Over Time';
 

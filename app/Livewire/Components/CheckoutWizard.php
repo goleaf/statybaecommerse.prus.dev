@@ -9,6 +9,11 @@ use App\Livewire\Components\Checkout\Payment;
 use App\Livewire\Components\Checkout\Shipping;
 use Spatie\LivewireWizard\Components\WizardComponent;
 
+/**
+ * CheckoutWizard
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class CheckoutWizard extends WizardComponent
 {
     /**

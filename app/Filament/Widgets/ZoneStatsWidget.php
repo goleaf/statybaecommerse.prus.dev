@@ -8,7 +8,12 @@ use App\Models\Zone;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class ZoneStatsWidget extends BaseWidget
+final /**
+ * ZoneStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class ZoneStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

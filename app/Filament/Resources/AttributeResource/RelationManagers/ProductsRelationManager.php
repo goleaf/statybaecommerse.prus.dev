@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace App\Filament\Resources\AttributeResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ProductsRelationManager extends RelationManager
+final /**
+ * ProductsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class ProductsRelationManager extends RelationManager
 {
     protected static string $relationship = 'products';
 

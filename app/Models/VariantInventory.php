@@ -12,7 +12,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-final class VariantInventory extends Model
+final /**
+ * VariantInventory
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class VariantInventory extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
 

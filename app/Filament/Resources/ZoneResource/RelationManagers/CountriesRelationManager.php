@@ -9,7 +9,12 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class CountriesRelationManager extends RelationManager
+final /**
+ * CountriesRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class CountriesRelationManager extends RelationManager
 {
     protected static string $relationship = 'countries';
 

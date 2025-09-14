@@ -13,7 +13,12 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-final class SystemSettingCategory extends Model
+final /**
+ * SystemSettingCategory
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class SystemSettingCategory extends Model
 {
     use HasFactory, HasSlug, LogsActivity, SoftDeletes;
 

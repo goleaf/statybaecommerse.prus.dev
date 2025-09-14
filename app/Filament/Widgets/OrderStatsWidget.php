@@ -8,6 +8,11 @@ use App\Models\Order;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
+/**
+ * OrderStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class OrderStatsWidget extends BaseWidget
 {
     protected function getStats(): array

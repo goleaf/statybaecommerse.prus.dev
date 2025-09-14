@@ -10,7 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class ZoneController extends Controller
+final /**
+ * ZoneController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class ZoneController extends Controller
 {
     public function index(Request $request): View
     {

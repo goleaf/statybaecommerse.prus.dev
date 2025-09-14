@@ -9,7 +9,12 @@ use App\Models\ReferralReward;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class ReferralStatsWidget extends BaseWidget
+final /**
+ * ReferralStatsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ReferralStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

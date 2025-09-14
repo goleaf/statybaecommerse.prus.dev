@@ -9,7 +9,12 @@ use App\Filament\Resources\CountryResource\Widgets\CountryDetailsWidget;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewCountry extends ViewRecord
+final /**
+ * ViewCountry
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewCountry extends ViewRecord
 {
     protected static string $resource = CountryResource::class;
 

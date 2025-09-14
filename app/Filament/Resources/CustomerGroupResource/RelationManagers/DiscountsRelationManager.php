@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class DiscountsRelationManager extends RelationManager
+final /**
+ * DiscountsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class DiscountsRelationManager extends RelationManager
 {
     protected static string $relationship = 'discounts';
 

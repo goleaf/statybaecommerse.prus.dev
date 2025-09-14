@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ReviewResource\Widgets;
 
 use App\Models\Review;
-use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Textarea;
 use Filament\Tables;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-final class ReviewApprovalWidget extends BaseWidget
+final /**
+ * ReviewApprovalWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ReviewApprovalWidget extends BaseWidget
 {
     protected static ?string $heading = 'admin.reviews.widgets.pending_approval';
 

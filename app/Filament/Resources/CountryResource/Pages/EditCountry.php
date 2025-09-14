@@ -8,7 +8,12 @@ use App\Filament\Resources\CountryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditCountry extends EditRecord
+final /**
+ * EditCountry
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditCountry extends EditRecord
 {
     protected static string $resource = CountryResource::class;
 

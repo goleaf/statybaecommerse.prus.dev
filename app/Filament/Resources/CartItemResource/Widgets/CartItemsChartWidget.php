@@ -7,7 +7,12 @@ namespace App\Filament\Resources\CartItemResource\Widgets;
 use App\Models\CartItem;
 use Filament\Widgets\ChartWidget;
 
-final class CartItemsChartWidget extends ChartWidget
+final /**
+ * CartItemsChartWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class CartItemsChartWidget extends ChartWidget
 {
     protected static ?string $heading = 'admin.cart_items.charts.cart_items_over_time';
 

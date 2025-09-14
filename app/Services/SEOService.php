@@ -9,7 +9,12 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Str;
 
-final class SEOService
+final /**
+ * SEOService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class SEOService
 {
     public static function getProductSEO(Product $product): array
     {

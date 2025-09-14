@@ -6,7 +6,12 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB as Database;
 
-final class DatabaseDateService
+final /**
+ * DatabaseDateService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class DatabaseDateService
 {
     /**
      * Get database-agnostic date extraction expression

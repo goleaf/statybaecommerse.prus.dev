@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CommentsRelationManager extends RelationManager
+final /**
+ * CommentsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class CommentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'comments';
 

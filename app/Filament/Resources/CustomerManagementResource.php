@@ -8,22 +8,21 @@ use App\Filament\Resources\CustomerManagementResource\Pages;
 use App\Filament\Resources\CustomerManagementResource\RelationManagers;
 use App\Filament\Resources\CustomerManagementResource\Widgets;
 use App\Models\User;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tab;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\DateTimePicker;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\KeyValue;
+use Filament\Schemas\Components\Placeholder;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\Tab;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
+
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
@@ -38,7 +37,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
-final class CustomerManagementResource extends Resource
+final /**
+ * CustomerManagementResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class CustomerManagementResource extends Resource
 {
     protected static ?string $model = User::class;
 
@@ -85,7 +89,7 @@ final class CustomerManagementResource extends Resource
             ->withCount(['orders', 'cartItems', 'reviews', 'addresses']);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->components([

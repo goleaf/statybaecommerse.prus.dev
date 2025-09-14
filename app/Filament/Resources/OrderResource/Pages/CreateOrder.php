@@ -7,6 +7,11 @@ namespace App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource;
 use Filament\Resources\Pages\CreateRecord;
 
+/**
+ * CreateOrder
+ * 
+ * Filament resource for admin panel management.
+ */
 class CreateOrder extends CreateRecord
 {
     protected static string $resource = OrderResource::class;

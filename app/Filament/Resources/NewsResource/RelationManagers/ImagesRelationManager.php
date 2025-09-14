@@ -10,13 +10,18 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ImagesRelationManager extends RelationManager
+final /**
+ * ImagesRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class ImagesRelationManager extends RelationManager
 {
     protected static string $relationship = 'images';
 
     public function form(Schema $form): Schema
     {
-        return $form->components([
+        return $schema->components([
             Forms\Components\FileUpload::make('file_path')
                 ->label(__('admin.news.images.fields.file_path'))
                 ->required()

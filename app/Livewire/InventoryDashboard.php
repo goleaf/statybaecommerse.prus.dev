@@ -7,7 +7,12 @@ namespace App\Livewire;
 use App\Services\InventoryService;
 use Livewire\Component;
 
-final class InventoryDashboard extends Component
+final /**
+ * InventoryDashboard
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class InventoryDashboard extends Component
 {
     public array $summary = [];
 

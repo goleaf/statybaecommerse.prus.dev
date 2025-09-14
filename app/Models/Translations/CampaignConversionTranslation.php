@@ -6,7 +6,12 @@ namespace App\Models\Translations;
 
 use Illuminate\Database\Eloquent\Model;
 
-final class CampaignConversionTranslation extends Model
+final /**
+ * CampaignConversionTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class CampaignConversionTranslation extends Model
 {
     protected $table = 'campaign_conversion_translations';
 

@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Shared;
 
-final class ComponentRegistryService
+final /**
+ * ComponentRegistryService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class ComponentRegistryService
 {
     private array $componentRegistry = [];
 

@@ -8,6 +8,11 @@ use App\Models\Category;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
+/**
+ * CategoryStatsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
 class CategoryStatsWidget extends BaseWidget
 {
     protected function getStats(): array

@@ -6,11 +6,16 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\ProductImage;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
+/**
+ * ImagesRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
 class ImagesRelationManager extends RelationManager
 {
     protected static string $relationship = 'images';

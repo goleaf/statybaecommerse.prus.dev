@@ -9,7 +9,12 @@ use App\Models\CustomerGroup;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class CustomerGroupController extends Controller
+final /**
+ * CustomerGroupController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class CustomerGroupController extends Controller
 {
     public function index(Request $request): View
     {

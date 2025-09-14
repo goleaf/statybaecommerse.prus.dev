@@ -10,7 +10,12 @@ use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-final class CategoryNavigation extends Component
+final /**
+ * CategoryNavigation
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class CategoryNavigation extends Component
 {
     #[Computed]
     public function categoryTree()

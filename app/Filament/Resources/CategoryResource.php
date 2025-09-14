@@ -11,17 +11,17 @@ use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Filament\Resources\CategoryResource\Widgets;
 use App\Models\Category;
 use Filament\Forms;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Repeater;
+use Filament\Schemas\Components\RichEditor;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\SpatieMediaLibraryFileUpload;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
@@ -35,7 +35,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
+
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -48,7 +48,12 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-final class CategoryResource extends Resource
+final /**
+ * CategoryResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
@@ -78,7 +83,7 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

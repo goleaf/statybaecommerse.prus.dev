@@ -9,7 +9,12 @@ use App\Models\Category;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class ProductCategoriesWidget extends ChartWidget
+final /**
+ * ProductCategoriesWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ProductCategoriesWidget extends ChartWidget
 {
     protected static ?string $heading = 'Products by Category';
 

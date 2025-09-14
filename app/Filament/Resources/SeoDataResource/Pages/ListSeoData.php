@@ -11,7 +11,12 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListSeoData extends ListRecords
+final /**
+ * ListSeoData
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListSeoData extends ListRecords
 {
     protected static string $resource = SeoDataResource::class;
 

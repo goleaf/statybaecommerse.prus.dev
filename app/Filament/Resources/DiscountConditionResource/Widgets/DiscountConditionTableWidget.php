@@ -9,7 +9,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-final class DiscountConditionTableWidget extends BaseWidget
+final /**
+ * DiscountConditionTableWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class DiscountConditionTableWidget extends BaseWidget
 {
     protected static ?string $heading = 'Recent Discount Conditions';
 

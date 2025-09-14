@@ -8,7 +8,12 @@ use App\Filament\Resources\DiscountConditionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateDiscountCondition extends CreateRecord
+final /**
+ * CreateDiscountCondition
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreateDiscountCondition extends CreateRecord
 {
     protected static string $resource = DiscountConditionResource::class;
 

@@ -6,6 +6,11 @@ namespace App\Services\Debug;
 
 use Illuminate\Support\Facades\Log;
 
+/**
+ * TranslationDebugCollector
+ * 
+ * Service class containing business logic and external integrations.
+ */
 class TranslationDebugCollector
 {
     public function logTranslationQuery(string $key, string $locale, string $value, bool $fromCache): void

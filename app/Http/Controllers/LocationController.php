@@ -9,7 +9,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class LocationController extends Controller
+final /**
+ * LocationController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class LocationController extends Controller
 {
     public function index(Request $request): View
     {

@@ -10,7 +10,12 @@ use App\Models\Product;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class RealtimeAnalyticsWidget extends BaseWidget
+final /**
+ * RealtimeAnalyticsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class RealtimeAnalyticsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

@@ -6,12 +6,17 @@ namespace App\Filament\Resources\CountryResource\RelationManagers;
 
 use App\Models\Customer;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class CustomersRelationManager extends RelationManager
+final /**
+ * CustomersRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class CustomersRelationManager extends RelationManager
 {
     protected static string $relationship = 'customers';
 

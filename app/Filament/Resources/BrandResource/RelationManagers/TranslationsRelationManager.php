@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class TranslationsRelationManager extends RelationManager
+final /**
+ * TranslationsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class TranslationsRelationManager extends RelationManager
 {
     protected static string $relationship = 'translations';
 

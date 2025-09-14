@@ -10,7 +10,12 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-final class EuMembersWidget extends BaseWidget
+final /**
+ * EuMembersWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class EuMembersWidget extends BaseWidget
 {
     protected static ?string $heading = 'admin.countries.widgets.eu_members';
 

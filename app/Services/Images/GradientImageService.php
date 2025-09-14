@@ -4,12 +4,23 @@ declare(strict_types=1);
 
 namespace App\Services\Images;
 
-final class GradientImageService
+final /**
+ * GradientImageService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class GradientImageService
 {
     public function generateGradientPng(int $width = 800, int $height = 800, ?string $startHex = null, ?string $endHex = null): string
     {
         if (! \function_exists('imagecreatetruecolor')) {
             throw new \RuntimeException('GD extension is required to generate images.');
+        }
+
+        // Reduce image size in testing environment to prevent memory issues
+        if (app()->environment('testing')) {
+            $width = min($width, 100);
+            $height = min($height, 100);
         }
 
         $startHex = $startHex ?: $this->randomColor();

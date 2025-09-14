@@ -8,7 +8,12 @@ use App\Filament\Resources\PriceListItemResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewPriceListItem extends ViewRecord
+final /**
+ * ViewPriceListItem
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewPriceListItem extends ViewRecord
 {
     protected static string $resource = PriceListItemResource::class;
 

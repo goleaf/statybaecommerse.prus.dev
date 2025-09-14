@@ -9,7 +9,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class NewsImage extends Model
+final /**
+ * NewsImage
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class NewsImage extends Model
 {
     use HasFactory;
 

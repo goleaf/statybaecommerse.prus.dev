@@ -8,6 +8,11 @@ use App\Models\VariantInventory;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * StockValueWidget
+ * 
+ * Filament resource for admin panel management.
+ */
 class StockValueWidget extends ChartWidget
 {
     protected static ?string $heading = 'inventory.stock_value_by_location';

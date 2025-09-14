@@ -8,6 +8,11 @@ use App\Models\Product;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * ProductChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class ProductChartWidget extends ChartWidget
 {
     protected ?string $heading = 'Product Status Distribution';

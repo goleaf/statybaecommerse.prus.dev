@@ -7,11 +7,16 @@ namespace App\Filament\Resources\StockResource\Widgets;
 use App\Models\VariantInventory;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Columns\BadgeColumn;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
+/**
+ * LowStockAlertWidget
+ * 
+ * Filament resource for admin panel management.
+ */
 class LowStockAlertWidget extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';

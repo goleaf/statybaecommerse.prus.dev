@@ -9,7 +9,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-final class SystemSettingsActivityWidget extends BaseWidget
+final /**
+ * SystemSettingsActivityWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class SystemSettingsActivityWidget extends BaseWidget
 {
     protected static ?string $heading = 'admin.system_settings.widgets.settings_activity';
 

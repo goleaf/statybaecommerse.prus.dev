@@ -7,7 +7,12 @@ namespace App\Filament\Widgets;
 use App\Models\Currency;
 use Filament\Widgets\ChartWidget;
 
-final class CurrencyUsageWidget extends ChartWidget
+final /**
+ * CurrencyUsageWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class CurrencyUsageWidget extends ChartWidget
 {
     protected ?string $heading = 'Currency Usage Distribution';
 

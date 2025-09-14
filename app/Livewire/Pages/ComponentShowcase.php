@@ -13,7 +13,12 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('layouts.templates.app')]
-final class ComponentShowcase extends Component
+final /**
+ * ComponentShowcase
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class ComponentShowcase extends Component
 {
     use WithNotifications;
 

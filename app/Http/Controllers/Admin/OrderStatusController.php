@@ -6,4 +6,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-final class OrderStatusController extends Controller {}
+final /**
+ * OrderStatusController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class OrderStatusController extends Controller {}

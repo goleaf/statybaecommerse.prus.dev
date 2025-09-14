@@ -9,7 +9,12 @@ use App\Enums\AddressType;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class AddressTypeChartWidget extends ChartWidget
+final /**
+ * AddressTypeChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class AddressTypeChartWidget extends ChartWidget
 {
     protected static ?int $sort = 2;
 

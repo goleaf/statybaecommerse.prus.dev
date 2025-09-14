@@ -10,7 +10,12 @@ use App\Models\Product;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 
-final class SitemapController extends Controller
+final /**
+ * SitemapController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class SitemapController extends Controller
 {
     public function index(): Response
     {

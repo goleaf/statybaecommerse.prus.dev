@@ -11,7 +11,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
-final class ProductService
+final /**
+ * ProductService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class ProductService
 {
     public function __construct(
         private CacheService $cacheService

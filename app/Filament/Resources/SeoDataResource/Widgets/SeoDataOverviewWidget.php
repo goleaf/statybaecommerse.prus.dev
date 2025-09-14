@@ -8,7 +8,12 @@ use App\Models\SeoData;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class SeoDataOverviewWidget extends BaseWidget
+final /**
+ * SeoDataOverviewWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class SeoDataOverviewWidget extends BaseWidget
 {
     protected function getStats(): array
     {

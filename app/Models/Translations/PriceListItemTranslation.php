@@ -7,7 +7,12 @@ namespace App\Models\Translations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class PriceListItemTranslation extends Model
+final /**
+ * PriceListItemTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class PriceListItemTranslation extends Model
 {
     protected $table = 'price_list_item_translations';
 

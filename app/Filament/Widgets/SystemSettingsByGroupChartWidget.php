@@ -8,7 +8,12 @@ use App\Models\SystemSetting;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class SystemSettingsByGroupChartWidget extends ChartWidget
+final /**
+ * SystemSettingsByGroupChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class SystemSettingsByGroupChartWidget extends ChartWidget
 {
     protected ?string $heading = 'System Settings by Group';
 

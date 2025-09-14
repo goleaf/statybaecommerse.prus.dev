@@ -8,7 +8,12 @@ use App\Models\Country;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class CountriesStatsWidget extends BaseWidget
+final /**
+ * CountriesStatsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class CountriesStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {

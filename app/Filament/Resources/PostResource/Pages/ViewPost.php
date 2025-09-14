@@ -8,7 +8,12 @@ use App\Filament\Resources\PostResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewPost extends ViewRecord
+final /**
+ * ViewPost
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewPost extends ViewRecord
 {
     protected static string $resource = PostResource::class;
 

@@ -8,7 +8,12 @@ use App\Models\Attribute;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-final class AttributeUsageWidget extends BaseWidget
+final /**
+ * AttributeUsageWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class AttributeUsageWidget extends BaseWidget
 {
     protected static ?int $sort = 3;
 

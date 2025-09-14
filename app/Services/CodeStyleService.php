@@ -6,7 +6,12 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\File;
 
-final class CodeStyleService
+final /**
+ * CodeStyleService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class CodeStyleService
 {
     private const IMPORT_ORDER_PATTERNS = [
         'use Illuminate\\',

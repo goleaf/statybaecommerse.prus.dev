@@ -7,7 +7,12 @@ namespace App\Filament\Resources\PriceListItemResource\Widgets;
 use App\Models\PriceListItem;
 use Filament\Widgets\ChartWidget;
 
-final class PriceListItemChartWidget extends ChartWidget
+final /**
+ * PriceListItemChartWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class PriceListItemChartWidget extends ChartWidget
 {
     protected static ?string $heading = 'Price List Items Overview';
 

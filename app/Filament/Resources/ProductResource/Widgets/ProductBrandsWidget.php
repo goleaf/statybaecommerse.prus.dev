@@ -9,7 +9,12 @@ use App\Models\Brand;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class ProductBrandsWidget extends ChartWidget
+final /**
+ * ProductBrandsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ProductBrandsWidget extends ChartWidget
 {
     protected static ?string $heading = 'Products by Brand';
 

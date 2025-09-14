@@ -8,7 +8,12 @@ use App\Filament\Resources\SeoDataResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditSeoData extends EditRecord
+final /**
+ * EditSeoData
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditSeoData extends EditRecord
 {
     protected static string $resource = SeoDataResource::class;
 

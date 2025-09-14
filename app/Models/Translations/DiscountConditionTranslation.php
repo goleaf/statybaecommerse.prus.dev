@@ -6,7 +6,12 @@ namespace App\Models\Translations;
 
 use Illuminate\Database\Eloquent\Model;
 
-final class DiscountConditionTranslation extends Model
+final /**
+ * DiscountConditionTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class DiscountConditionTranslation extends Model
 {
     protected $table = 'discount_condition_translations';
 

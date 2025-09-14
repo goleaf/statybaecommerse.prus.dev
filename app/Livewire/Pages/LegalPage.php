@@ -7,7 +7,12 @@ namespace App\Livewire\Pages;
 use App\Models\Legal as LegalModel;
 use Livewire\Component;
 
-final class LegalPage extends Component
+final /**
+ * LegalPage
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class LegalPage extends Component
 {
     public LegalModel $legal;
 

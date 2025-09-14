@@ -7,7 +7,12 @@ namespace App\Filament\Resources\AttributeValueResource\Widgets;
 use App\Models\Attribute;
 use Filament\Widgets\ChartWidget;
 
-final class AttributeValueChartWidget extends ChartWidget
+final /**
+ * AttributeValueChartWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class AttributeValueChartWidget extends ChartWidget
 {
     protected static ?string $heading = 'Attribute Values by Attribute';
 

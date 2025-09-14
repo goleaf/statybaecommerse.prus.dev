@@ -10,7 +10,12 @@ use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-final class UpdatePasswordForm extends Component
+final /**
+ * UpdatePasswordForm
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class UpdatePasswordForm extends Component
 {
     #[Validate('required|string|current_password')]
     public string $current_password = '';

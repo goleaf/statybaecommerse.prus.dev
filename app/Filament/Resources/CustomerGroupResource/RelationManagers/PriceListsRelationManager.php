@@ -9,7 +9,12 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class PriceListsRelationManager extends RelationManager
+final /**
+ * PriceListsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class PriceListsRelationManager extends RelationManager
 {
     protected static string $relationship = 'priceLists';
 

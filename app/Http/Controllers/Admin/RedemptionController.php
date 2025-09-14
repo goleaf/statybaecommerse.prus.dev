@@ -6,4 +6,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-final class RedemptionController extends Controller {}
+final /**
+ * RedemptionController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class RedemptionController extends Controller {}

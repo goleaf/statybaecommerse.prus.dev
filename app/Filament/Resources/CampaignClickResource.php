@@ -6,14 +6,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignClickResource\Pages;
 use App\Models\CampaignClick;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\DateTimePicker;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -21,8 +21,8 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
+
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Exports\ExcelExport;
 use Filament\Tables\Filters\DateFilter;
@@ -32,6 +32,11 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
+/**
+ * CampaignClickResource
+ * 
+ * Filament resource for admin panel management.
+ */
 class CampaignClickResource extends Resource
 {
     protected static ?string $model = CampaignClick::class;
@@ -56,7 +61,7 @@ class CampaignClickResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

@@ -8,7 +8,12 @@ use App\Models\Collection;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class CollectionPerformanceWidget extends ChartWidget
+final /**
+ * CollectionPerformanceWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class CollectionPerformanceWidget extends ChartWidget
 {
     protected ?string $heading = 'admin.collections.charts.performance_heading';
 

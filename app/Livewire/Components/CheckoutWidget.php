@@ -11,7 +11,12 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-final class CheckoutWidget extends Component
+final /**
+ * CheckoutWidget
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class CheckoutWidget extends Component
 {
     use WithCart, WithNotifications;
 

@@ -6,7 +6,12 @@ namespace App\Services\Shared;
 
 use Illuminate\Support\Facades\Cache;
 
-final class CacheService
+final /**
+ * CacheService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class CacheService
 {
     private const DEFAULT_TTL = 3600; // 1 hour
 

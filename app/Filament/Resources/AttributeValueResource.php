@@ -9,11 +9,11 @@ use App\Filament\Resources\AttributeValueResource\RelationManagers;
 use App\Filament\Resources\AttributeValueResource\Widgets;
 use App\Models\AttributeValue;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Repeater;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
@@ -25,7 +25,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-final class AttributeValueResource extends Resource
+final /**
+ * AttributeValueResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class AttributeValueResource extends Resource
 {
     protected static ?string $model = AttributeValue::class;
 
@@ -60,7 +65,7 @@ final class AttributeValueResource extends Resource
         return __('attributes.attribute_values');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

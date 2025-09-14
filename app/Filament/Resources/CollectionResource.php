@@ -7,21 +7,21 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use App\Services\MultiLanguageTabService;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\FileUpload;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\KeyValue;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
+
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -29,8 +29,14 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use SolutionForest\TabLayoutPlugin\Schemas\TabsWidget;
+use UnitEnum;
 
-final class CollectionResource extends Resource
+final /**
+ * CollectionResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
 
@@ -59,7 +65,7 @@ final class CollectionResource extends Resource
         return __('admin.models.collections');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

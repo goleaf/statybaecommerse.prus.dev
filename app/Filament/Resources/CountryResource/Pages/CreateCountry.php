@@ -7,7 +7,12 @@ namespace App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateCountry extends CreateRecord
+final /**
+ * CreateCountry
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreateCountry extends CreateRecord
 {
     protected static string $resource = CountryResource::class;
 

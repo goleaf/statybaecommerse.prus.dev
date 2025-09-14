@@ -9,7 +9,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-final class BrandOverviewWidget extends BaseWidget
+final /**
+ * BrandOverviewWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class BrandOverviewWidget extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';
 

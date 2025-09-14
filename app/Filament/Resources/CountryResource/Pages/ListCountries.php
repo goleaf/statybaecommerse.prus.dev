@@ -12,7 +12,12 @@ use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListCountries extends ListRecords
+final /**
+ * ListCountries
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListCountries extends ListRecords
 {
     protected static string $resource = CountryResource::class;
 

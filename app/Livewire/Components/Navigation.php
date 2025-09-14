@@ -9,6 +9,11 @@ use App\Support\FeatureState;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
+/**
+ * Navigation
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Navigation extends Component
 {
     public function render()

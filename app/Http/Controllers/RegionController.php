@@ -9,7 +9,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class RegionController extends Controller
+final /**
+ * RegionController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class RegionController extends Controller
 {
     public function index(Request $request): View
     {

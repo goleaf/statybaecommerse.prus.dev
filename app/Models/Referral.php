@@ -12,7 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
-final class Referral extends Model
+final /**
+ * Referral
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Referral extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
 

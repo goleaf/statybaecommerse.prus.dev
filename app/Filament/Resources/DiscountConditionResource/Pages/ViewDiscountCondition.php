@@ -8,7 +8,12 @@ use App\Filament\Resources\DiscountConditionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewDiscountCondition extends ViewRecord
+final /**
+ * ViewDiscountCondition
+ * 
+ * Filament resource for admin panel management.
+ */
+class ViewDiscountCondition extends ViewRecord
 {
     protected static string $resource = DiscountConditionResource::class;
 

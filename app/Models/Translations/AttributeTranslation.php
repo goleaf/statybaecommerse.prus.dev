@@ -9,7 +9,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class AttributeTranslation extends Model
+final /**
+ * AttributeTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class AttributeTranslation extends Model
 {
     use HasFactory;
     protected static string $factory = \Database\Factories\AttributeTranslationFactory::class;

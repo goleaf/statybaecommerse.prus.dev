@@ -14,7 +14,12 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-final class Partner extends Model implements HasMedia
+final /**
+ * Partner
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Partner extends Model implements HasMedia
 {
     use HasFactory, SoftDeletes;
     use InteractsWithMedia;

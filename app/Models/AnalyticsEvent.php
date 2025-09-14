@@ -10,7 +10,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-final class AnalyticsEvent extends Model
+final /**
+ * AnalyticsEvent
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class AnalyticsEvent extends Model
 {
     use HasFactory;
 

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\StockResource\RelationManagers;
 
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\DateTimePicker;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Columns\BadgeColumn;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -18,6 +18,11 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * StockMovementsRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
 class StockMovementsRelationManager extends RelationManager
 {
     protected static string $relationship = 'stockMovements';

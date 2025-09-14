@@ -8,7 +8,12 @@ use App\Models\Address;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class AddressGrowthChartWidget extends ChartWidget
+final /**
+ * AddressGrowthChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class AddressGrowthChartWidget extends ChartWidget
 {
     protected static ?int $sort = 3;
 

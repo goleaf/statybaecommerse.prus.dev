@@ -8,7 +8,12 @@ use App\Models\Country;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CountriesWithVatWidget extends ChartWidget
+final /**
+ * CountriesWithVatWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class CountriesWithVatWidget extends ChartWidget
 {
     protected static ?string $heading = 'admin.countries.widgets.countries_with_vat';
 

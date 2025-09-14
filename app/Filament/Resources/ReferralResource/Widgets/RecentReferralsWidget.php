@@ -9,7 +9,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-final class RecentReferralsWidget extends BaseWidget
+final /**
+ * RecentReferralsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class RecentReferralsWidget extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';
 

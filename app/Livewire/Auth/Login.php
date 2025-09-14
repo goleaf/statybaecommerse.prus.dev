@@ -16,7 +16,12 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('components.layouts.templates.app')]
-final class Login extends Component implements HasSchemas
+final /**
+ * Login
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Login extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
 

@@ -13,24 +13,20 @@ use App\Models\Region;
 use App\Models\Zone;
 use App\Models\City;
 use App\Models\User;
-use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Placeholder;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\Toggle;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\Placeholder;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -39,7 +35,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
-final class AddressResource extends Resource
+final /**
+ * AddressResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class AddressResource extends Resource
 {
     protected static ?string $model = Address::class;
 
@@ -67,9 +68,9 @@ final class AddressResource extends Resource
         return __('admin.models.addresses');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('translations.address_information'))
                     ->description(__('translations.basic_information'))
@@ -316,16 +317,18 @@ final class AddressResource extends Resource
                     ->sortable()
                     ->searchable(['first_name', 'last_name', 'company_name']),
 
-                BadgeColumn::make('type')
+                TextColumn::make('type')
                     ->label(__('translations.type'))
                     ->formatStateUsing(fn ($state) => $state->label())
-                    ->colors([
-                        'primary' => AddressType::SHIPPING,
-                        'success' => AddressType::BILLING,
-                        'warning' => AddressType::HOME,
-                        'info' => AddressType::WORK,
-                        'secondary' => AddressType::OTHER,
-                    ]),
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        AddressType::SHIPPING => 'primary',
+                        AddressType::BILLING => 'success',
+                        AddressType::HOME => 'warning',
+                        AddressType::WORK => 'info',
+                        AddressType::OTHER => 'secondary',
+                        default => 'gray',
+                    }),
 
                 TextColumn::make('full_address')
                     ->label(__('translations.address'))
@@ -350,26 +353,34 @@ final class AddressResource extends Resource
                     ->searchable()
                     ->toggleable(),
 
-                IconColumn::make('is_default')
+                TextColumn::make('is_default')
                     ->label(__('translations.is_default'))
-                    ->boolean()
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state ? __('translations.yes') : __('translations.no'))
+                    ->color(fn ($state) => $state ? 'success' : 'gray')
                     ->sortable(),
 
-                IconColumn::make('is_billing')
+                TextColumn::make('is_billing')
                     ->label(__('translations.is_billing'))
-                    ->boolean()
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state ? __('translations.yes') : __('translations.no'))
+                    ->color(fn ($state) => $state ? 'success' : 'gray')
                     ->sortable()
                     ->toggleable(),
 
-                IconColumn::make('is_shipping')
+                TextColumn::make('is_shipping')
                     ->label(__('translations.is_shipping'))
-                    ->boolean()
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state ? __('translations.yes') : __('translations.no'))
+                    ->color(fn ($state) => $state ? 'success' : 'gray')
                     ->sortable()
                     ->toggleable(),
 
-                IconColumn::make('is_active')
+                TextColumn::make('is_active')
                     ->label(__('translations.is_active'))
-                    ->boolean()
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state ? __('translations.yes') : __('translations.no'))
+                    ->color(fn ($state) => $state ? 'success' : 'gray')
                     ->sortable(),
 
                 TextColumn::make('created_at')

@@ -8,7 +8,12 @@ use App\Filament\Resources\AnalyticsEventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-final class ListAnalyticsEvents extends ListRecords
+final /**
+ * ListAnalyticsEvents
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListAnalyticsEvents extends ListRecords
 {
     protected static string $resource = AnalyticsEventResource::class;
 

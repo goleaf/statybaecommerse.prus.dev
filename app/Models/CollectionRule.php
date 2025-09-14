@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class CollectionRule extends Model
+final /**
+ * CollectionRule
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class CollectionRule extends Model
 {
     use HasFactory;
 

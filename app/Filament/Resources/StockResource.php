@@ -11,28 +11,27 @@ use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\BadgeEntry;
-use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Infolists\Components\Section as InfolistSection;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\DatePicker;
+use Filament\Schemas\Components\DateTimePicker;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Toggle;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\BadgeEntry;
+use Filament\Schemas\Components\RepeatableEntry;
+use Filament\Schemas\Components\Section as InfolistSection;
+use Filament\Schemas\Components\TextEntry;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
+
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -44,6 +43,11 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Collection;
 use UnitEnum;
 
+/**
+ * StockResource
+ * 
+ * Filament resource for admin panel management.
+ */
 class StockResource extends Resource
 {
     protected static ?string $model = VariantInventory::class;
@@ -97,7 +101,7 @@ class StockResource extends Resource
         return $lowStockCount > 0 ? 'warning' : 'success';
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([
@@ -595,7 +599,7 @@ class StockResource extends Resource
             ->paginated([10, 25, 50, 100]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         return $infolist
             ->schema([

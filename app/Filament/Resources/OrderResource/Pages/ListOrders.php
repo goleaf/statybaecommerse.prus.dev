@@ -10,6 +10,11 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * ListOrders
+ * 
+ * Filament resource for admin panel management.
+ */
 class ListOrders extends ListRecords
 {
     protected static string $resource = OrderResource::class;

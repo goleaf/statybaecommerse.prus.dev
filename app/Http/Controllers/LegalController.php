@@ -9,7 +9,12 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 
-final class LegalController extends Controller
+final /**
+ * LegalController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class LegalController extends Controller
 {
     public function index(): View
     {

@@ -10,7 +10,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-final class NewsTag extends Model
+final /**
+ * NewsTag
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class NewsTag extends Model
 {
     use HasFactory;
     use HasTranslations;

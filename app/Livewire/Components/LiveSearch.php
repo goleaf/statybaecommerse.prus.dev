@@ -9,7 +9,12 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-final class LiveSearch extends Component
+final /**
+ * LiveSearch
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class LiveSearch extends Component
 {
     #[Validate('nullable|string|max:255')]
     public string $query = '';

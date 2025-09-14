@@ -9,7 +9,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-final class RecentReviewsWidget extends BaseWidget
+final /**
+ * RecentReviewsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class RecentReviewsWidget extends BaseWidget
 {
     protected static ?string $heading = 'admin.reviews.widgets.recent_reviews';
 

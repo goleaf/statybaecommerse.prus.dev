@@ -13,7 +13,12 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-final class ReferralService
+final /**
+ * ReferralService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class ReferralService
 {
     public function __construct(
         private readonly ReferralCodeService $referralCodeService,

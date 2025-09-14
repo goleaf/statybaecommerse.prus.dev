@@ -7,7 +7,12 @@ namespace App\Filament\Resources\SeoDataResource\Widgets;
 use App\Models\SeoData;
 use Filament\Widgets\ChartWidget;
 
-final class SeoScoreDistributionWidget extends ChartWidget
+final /**
+ * SeoScoreDistributionWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class SeoScoreDistributionWidget extends ChartWidget
 {
     protected static ?string $heading = 'SEO Score Distribution';
 

@@ -10,6 +10,11 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * LegalRecentActivityWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class LegalRecentActivityWidget extends BaseWidget
 {
     protected static ?string $heading = 'Recent Legal Documents';

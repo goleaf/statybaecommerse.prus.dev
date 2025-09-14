@@ -7,7 +7,12 @@ namespace App\Filament\Resources\BrandResource\Widgets;
 use App\Models\Brand;
 use Filament\Widgets\ChartWidget;
 
-final class BrandPerformanceWidget extends ChartWidget
+final /**
+ * BrandPerformanceWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class BrandPerformanceWidget extends ChartWidget
 {
     protected static ?string $heading = 'admin.brands.widgets.performance_heading';
 

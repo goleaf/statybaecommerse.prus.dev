@@ -8,7 +8,12 @@ use App\Models\PriceList;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class PriceListActivityWidget extends ChartWidget
+final /**
+ * PriceListActivityWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class PriceListActivityWidget extends ChartWidget
 {
     protected static ?string $heading = 'admin.price_lists.charts.price_lists_over_time';
 

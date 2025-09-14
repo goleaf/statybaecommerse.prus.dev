@@ -10,7 +10,12 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-final class RecentCitiesTable extends BaseWidget
+final /**
+ * RecentCitiesTable
+ * 
+ * Filament resource for admin panel management.
+ */
+class RecentCitiesTable extends BaseWidget
 {
     protected static ?string $heading = 'Recent Cities';
 

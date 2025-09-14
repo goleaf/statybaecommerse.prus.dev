@@ -15,7 +15,12 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
-final class Order extends Model
+final /**
+ * Order
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class Order extends Model
 {
     use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
 

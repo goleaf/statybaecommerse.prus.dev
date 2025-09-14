@@ -10,7 +10,12 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListPriceLists extends ListRecords
+final /**
+ * ListPriceLists
+ * 
+ * Filament resource for admin panel management.
+ */
+class ListPriceLists extends ListRecords
 {
     protected static string $resource = PriceListResource::class;
 

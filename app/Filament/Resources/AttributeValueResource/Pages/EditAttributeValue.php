@@ -8,7 +8,12 @@ use App\Filament\Resources\AttributeValueResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditAttributeValue extends EditRecord
+final /**
+ * EditAttributeValue
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditAttributeValue extends EditRecord
 {
     protected static string $resource = AttributeValueResource::class;
 

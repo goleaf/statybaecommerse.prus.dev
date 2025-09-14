@@ -12,6 +12,11 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Spatie\LivewireWizard\Components\StepComponent;
 
+/**
+ * Shipping
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Shipping extends StepComponent
 {
     #[Validate('required', message: 'You need to select a delivery address')]

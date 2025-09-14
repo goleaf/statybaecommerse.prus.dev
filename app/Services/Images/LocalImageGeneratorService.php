@@ -6,7 +6,12 @@ namespace App\Services\Images;
 
 use Illuminate\Support\Str;
 
-final class LocalImageGeneratorService
+final /**
+ * LocalImageGeneratorService
+ * 
+ * Service class containing business logic and external integrations.
+ */
+class LocalImageGeneratorService
 {
     private const DEFAULT_WIDTH = 800;
 

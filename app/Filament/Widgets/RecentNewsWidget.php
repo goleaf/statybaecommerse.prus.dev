@@ -9,7 +9,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-final class RecentNewsWidget extends BaseWidget
+final /**
+ * RecentNewsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class RecentNewsWidget extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';
 

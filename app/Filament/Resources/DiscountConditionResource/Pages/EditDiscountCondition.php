@@ -8,7 +8,12 @@ use App\Filament\Resources\DiscountConditionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditDiscountCondition extends EditRecord
+final /**
+ * EditDiscountCondition
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditDiscountCondition extends EditRecord
 {
     protected static string $resource = DiscountConditionResource::class;
 

@@ -8,7 +8,12 @@ use App\Models\Post;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class PostAuthorsWidget extends ChartWidget
+final /**
+ * PostAuthorsWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class PostAuthorsWidget extends ChartWidget
 {
     protected static ?string $heading = 'Posts by Author';
 

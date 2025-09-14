@@ -8,7 +8,12 @@ use App\Models\Report;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-final class ReportTypesWidget extends ChartWidget
+final /**
+ * ReportTypesWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class ReportTypesWidget extends ChartWidget
 {
     protected static ?string $heading = 'Report Types Distribution';
 

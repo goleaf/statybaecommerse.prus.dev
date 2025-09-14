@@ -8,7 +8,12 @@ use App\Models\City;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CitiesByCountryChart extends ChartWidget
+final /**
+ * CitiesByCountryChart
+ * 
+ * Filament resource for admin panel management.
+ */
+class CitiesByCountryChart extends ChartWidget
 {
     protected static ?string $heading = 'Cities by Country';
 

@@ -9,7 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Translatable\HasTranslations;
 
-final class CustomerGroup extends Model
+final /**
+ * CustomerGroup
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class CustomerGroup extends Model
 {
     use HasFactory, HasTranslations;
 

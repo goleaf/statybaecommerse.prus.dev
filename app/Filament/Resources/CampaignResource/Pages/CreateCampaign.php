@@ -9,7 +9,12 @@ use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Pages\CreateRecord\Concerns\Translatable;
 
-final class CreateCampaign extends CreateRecord
+final /**
+ * CreateCampaign
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreateCampaign extends CreateRecord
 {
     use Translatable;
 

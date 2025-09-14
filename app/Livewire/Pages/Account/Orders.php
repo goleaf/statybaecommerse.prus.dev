@@ -10,6 +10,11 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Layout('components.layouts.templates.account')]
+/**
+ * Orders
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
 class Orders extends Component
 {
     use WithPagination;

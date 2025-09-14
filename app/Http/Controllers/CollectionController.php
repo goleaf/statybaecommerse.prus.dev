@@ -10,7 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class CollectionController extends Controller
+final /**
+ * CollectionController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class CollectionController extends Controller
 {
     public function index(Request $request): View
     {

@@ -9,7 +9,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
-final class LanguageController extends Controller
+final /**
+ * LanguageController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class LanguageController extends Controller
 {
     public function switch(Request $request): RedirectResponse
     {

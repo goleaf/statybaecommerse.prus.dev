@@ -8,7 +8,12 @@ use App\Models\Brand;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
-final class Show extends Component
+final /**
+ * Show
+ * 
+ * Livewire component for reactive frontend functionality.
+ */
+class Show extends Component
 {
     public Brand $brand;
 

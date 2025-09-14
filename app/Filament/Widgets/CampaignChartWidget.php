@@ -8,6 +8,11 @@ use App\Models\Campaign;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 
+/**
+ * CampaignChartWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class CampaignChartWidget extends ChartWidget
 {
     protected ?string $heading = 'Campaign Performance';

@@ -11,7 +11,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-final class ReferralCodeController extends Controller
+final /**
+ * ReferralCodeController
+ * 
+ * HTTP controller handling web requests and responses.
+ */
+class ReferralCodeController extends Controller
 {
     public function index(Request $request): View
     {

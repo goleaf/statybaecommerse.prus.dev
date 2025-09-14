@@ -9,7 +9,7 @@ use App\Filament\Resources\ReferralResource\Pages;
 use App\Filament\Resources\ReferralResource\Widgets;
 use App\Models\Referral;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -23,7 +23,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-final class ReferralResource extends Resource
+final /**
+ * ReferralResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class ReferralResource extends Resource
 {
     protected static ?string $model = Referral::class;
 
@@ -62,7 +67,7 @@ final class ReferralResource extends Resource
         return __('referrals.plural_model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

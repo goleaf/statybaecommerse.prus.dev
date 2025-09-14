@@ -7,7 +7,12 @@ namespace App\Models\Translations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class OrderTranslation extends Model
+final /**
+ * OrderTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class OrderTranslation extends Model
 {
     protected $table = 'order_translations';
 

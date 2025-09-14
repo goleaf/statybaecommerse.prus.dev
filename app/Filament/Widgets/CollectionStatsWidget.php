@@ -9,7 +9,12 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
-final class CollectionStatsWidget extends BaseWidget
+final /**
+ * CollectionStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class CollectionStatsWidget extends BaseWidget
 {
     protected static ?int $sort = 1;
 

@@ -8,7 +8,12 @@ use App\Filament\Resources\ActivityLogResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateActivityLog extends CreateRecord
+final /**
+ * CreateActivityLog
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreateActivityLog extends CreateRecord
 {
     protected static string $resource = ActivityLogResource::class;
 

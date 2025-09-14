@@ -7,7 +7,12 @@ namespace App\Filament\Resources\CampaignResource\Widgets;
 use App\Models\Campaign;
 use Filament\Widgets\ChartWidget;
 
-final class CampaignTypeChartWidget extends ChartWidget
+final /**
+ * CampaignTypeChartWidget
+ * 
+ * Filament resource for admin panel management.
+ */
+class CampaignTypeChartWidget extends ChartWidget
 {
     protected static ?string $heading = 'Campaign Types Distribution';
 

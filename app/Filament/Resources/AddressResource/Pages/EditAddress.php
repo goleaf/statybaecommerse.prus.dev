@@ -9,7 +9,12 @@ use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
 
-final class EditAddress extends EditRecord
+final /**
+ * EditAddress
+ * 
+ * Filament resource for admin panel management.
+ */
+class EditAddress extends EditRecord
 {
     protected static string $resource = AddressResource::class;
 

@@ -39,6 +39,11 @@ use Illuminate\Support\Str;
 use BackedEnum;
 use UnitEnum;
 
+/**
+ * LegalResource
+ * 
+ * Filament resource for admin panel management.
+ */
 class LegalResource extends Resource
 {
     protected static ?string $model = Legal::class;

@@ -8,7 +8,12 @@ use App\Filament\Resources\AddressResource;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
 
-final class CreateAddress extends CreateRecord
+final /**
+ * CreateAddress
+ * 
+ * Filament resource for admin panel management.
+ */
+class CreateAddress extends CreateRecord
 {
     protected static string $resource = AddressResource::class;
 

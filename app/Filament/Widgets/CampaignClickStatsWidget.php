@@ -8,6 +8,11 @@ use App\Models\CampaignClick;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
+/**
+ * CampaignClickStatsWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
 class CampaignClickStatsWidget extends BaseWidget
 {
     protected function getStats(): array

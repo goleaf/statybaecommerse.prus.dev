@@ -9,7 +9,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-final class SystemSettingsRecentActivityWidget extends BaseWidget
+final /**
+ * SystemSettingsRecentActivityWidget
+ * 
+ * Filament widget for admin panel dashboard.
+ */
+class SystemSettingsRecentActivityWidget extends BaseWidget
 {
     protected static ?string $heading = 'Recent System Settings Activity';
 

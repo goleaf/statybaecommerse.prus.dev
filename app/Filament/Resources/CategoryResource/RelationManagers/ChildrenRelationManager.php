@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
-final class ChildrenRelationManager extends RelationManager
+final /**
+ * ChildrenRelationManager
+ * 
+ * Filament resource for admin panel management.
+ */
+class ChildrenRelationManager extends RelationManager
 {
     protected static string $relationship = 'children';
 
