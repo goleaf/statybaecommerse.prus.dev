@@ -1,100 +1,58 @@
 <?php
 
-/**
- * Fix Filament v4 navigationIcon type compatibility issues
- * This script removes type declarations from navigationIcon properties
- */
+// Get all Filament resource files
+$resourceDir = __DIR__ . '/app/Filament/Resources';
+$resourceFiles = [];
 
-$filamentFiles = [
-    'app/Filament/Pages/Dashboard.php',
-    'app/Filament/Pages/RecommendationSystemManagement.php',
-    'app/Filament/Resources/AddressResource.php',
-    'app/Filament/Resources/CompanyResource.php',
-    'app/Filament/Resources/ProductHistoryResource.php',
-    'app/Filament/Resources/StockResource.php',
-    'app/Filament/Resources/RecommendationConfigResource.php',
-    'app/Filament/Resources/PriceResource.php',
-    'app/Filament/Resources/BrandResource.php',
-    'app/Filament/Resources/CampaignConversionResource.php',
-    'app/Filament/Resources/CityResource.php',
-    'app/Filament/Resources/CurrencyResource.php',
-    'app/Filament/Resources/ProductResource.php',
-    'app/Filament/Resources/ReferralResource.php',
-    'app/Filament/Resources/ReferralRewardResource.php',
-    'app/Filament/Resources/LegalResource.php',
-    'app/Filament/Resources/CountryResource.php',
-    'app/Filament/Resources/CustomerGroupResource.php',
-    'app/Filament/Resources/ActivityLogResource.php',
-    'app/Filament/Resources/CampaignClickResource.php',
-    'app/Filament/Resources/CampaignResource.php',
-    'app/Filament/Resources/CategoryResource.php',
-    'app/Filament/Resources/SeoDataResource.php',
-    'app/Filament/Resources/CustomerManagementResource.php',
-    'app/Filament/Resources/DiscountCodeResource.php',
-    'app/Filament/Resources/DiscountConditionResource.php',
-    'app/Filament/Resources/ReviewResource.php',
-    'app/Filament/Resources/RegionResource.php',
-    'app/Filament/Resources/SubscriberResource.php',
-    'app/Filament/Resources/AttributeResource.php',
-    'app/Filament/Resources/SystemSettingResource.php',
-    'app/Filament/Resources/MenuResource.php',
-    'app/Filament/Resources/SystemSettingsResource.php',
-    'app/Filament/Resources/ZoneResource.php',
-    'app/Filament/Resources/RecommendationBlockResource.php',
-    'app/Filament/Resources/AnalyticsEventResource.php',
-    'app/Filament/Resources/AttributeValueResource.php',
-    'app/Filament/Resources/CartItemResource.php',
-    'app/Filament/Resources/LocationResource.php',
-    'app/Filament/Resources/NewsResource.php',
-    'app/Filament/Resources/OrderResource.php',
-    'app/Filament/Resources/PostResource.php',
-    'app/Filament/Resources/PriceListItemResource.php',
-    'app/Filament/Resources/ReportResource.php',
-    'app/Filament/Resources/CollectionResource.php',
-    'app/Filament/Resources/PriceListResource.php',
-    'app/Filament/Resources/RecommendationConfigResourceSimple.php',
-];
-
-$fixedFiles = 0;
-$totalFiles = count($filamentFiles);
-
-foreach ($filamentFiles as $file) {
-    if (!file_exists($file)) {
-        echo "Skipping non-existent file: $file\n";
-        continue;
+function getAllPhpFiles($dir) {
+    $files = [];
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+    foreach ($iterator as $file) {
+        if ($file->isFile() && $file->getExtension() === 'php') {
+            $files[] = $file->getPathname();
+        }
     }
-    
+    return $files;
+}
+
+$resourceFiles = getAllPhpFiles($resourceDir);
+
+foreach ($resourceFiles as $file) {
     $content = file_get_contents($file);
     $originalContent = $content;
     
-    // Remove type declarations from navigationIcon properties
-    $patterns = [
-        // Remove typed property declarations
-        '/\s*\/\*\* @var [^*]+ \*\/\s*protected static \$navigationIcon\s*=\s*[^;]+;/',
-        '/protected static \?\w+ \$navigationIcon\s*=\s*[^;]+;/',
-        '/protected static \w+ \$navigationIcon\s*=\s*[^;]+;/',
-    ];
+    // Fix multiple duplicate docblock lines for navigationGroup
+    $content = preg_replace(
+        '/\/\*\*\s*\n\s*\*\s*@var\s+(UnitEnum|BackedEnum)\|string\|null\s*\n\s*\*\/\s*\n\s*\/\*\*\s*\n\s*\*\s*@var\s+(UnitEnum|BackedEnum)\|string\|null\s*\n\s*\*\/\s*\n\s*\/\*\*\s*\n\s*\*\s*@var\s+(UnitEnum|BackedEnum)\|string\|null\s*\n\s*\*\/\s*\n\s*\/\*\*\s*\n\s*\*\s*@var\s+(UnitEnum|BackedEnum)\|string\|null\s*\n\s*\*\/\s*/',
+        '/** @var UnitEnum|string|null */',
+        $content
+    );
     
-    foreach ($patterns as $pattern) {
-        $content = preg_replace($pattern, '', $content);
-    }
+    // Fix single duplicate docblock lines
+    $content = preg_replace(
+        '/\/\*\*\s*\n\s*\*\s*@var\s+(UnitEnum|BackedEnum)\|string\|null\s*\n\s*\*\/\s*\n\s*\/\*\*\s*\n\s*\*\s*@var\s+(UnitEnum|BackedEnum)\|string\|null\s*\n\s*\*\/\s*/',
+        '/** @var UnitEnum|string|null */',
+        $content
+    );
     
-    // Add untyped navigationIcon property if it doesn't exist
-    if (strpos($content, '$navigationIcon') === false) {
-        // Find the class declaration and add the property after it
+    // Add UnitEnum import if missing and navigationGroup is used
+    if (strpos($content, 'protected static $navigationGroup') !== false && 
+        strpos($content, 'use UnitEnum;') === false &&
+        strpos($content, 'namespace ') !== false) {
+        
+        // Find the namespace line and add the import after it
         $content = preg_replace(
-            '/(class\s+\w+[^{]*\{)/',
-            "$1\n    protected static \$navigationIcon = 'heroicon-o-document-text';",
+            '/(namespace\s+[^;]+;)/',
+            "$1\n\nuse UnitEnum;",
             $content
         );
     }
     
+    // Only write if content changed
     if ($content !== $originalContent) {
         file_put_contents($file, $content);
-        echo "Fixed: $file\n";
-        $fixedFiles++;
+        echo "Fixed: " . basename($file) . "\n";
     }
 }
 
-echo "\nFixed $fixedFiles out of $totalFiles files.\n";
-echo "Filament v4 navigationIcon compatibility issues resolved.\n";
+echo "Navigation group fixes completed!\n";

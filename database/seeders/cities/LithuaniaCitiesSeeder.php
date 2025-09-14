@@ -24,7 +24,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             // Vilnius County
             [
                 'name' => 'Vilnius',
-                'code' => 'LT-VL-VIL',
+                'code' => 'LT-VLN',
                 'is_capital' => true,
                 'is_default' => true,
                 'latitude' => 54.6872,
@@ -63,7 +63,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             // Kaunas County
             [
                 'name' => 'Kaunas',
-                'code' => 'LT-KA-KAU',
+                'code' => 'LT-KAU',
                 'latitude' => 54.8985,
                 'longitude' => 23.9036,
                 'population' => 304097,
@@ -100,7 +100,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             // Klaipėda County
             [
                 'name' => 'Klaipėda',
-                'code' => 'LT-KL-KLA',
+                'code' => 'LT-KLP',
                 'latitude' => 55.7033,
                 'longitude' => 21.1442,
                 'population' => 152008,
@@ -125,7 +125,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             // Šiauliai County
             [
                 'name' => 'Šiauliai',
-                'code' => 'LT-SA-SIA',
+                'code' => 'LT-SIA',
                 'latitude' => 55.9333,
                 'longitude' => 23.3167,
                 'population' => 101514,
@@ -150,7 +150,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             // Panevėžys County
             [
                 'name' => 'Panevėžys',
-                'code' => 'LT-PN-PAN',
+                'code' => 'LT-PNV',
                 'latitude' => 55.7333,
                 'longitude' => 24.35,
                 'population' => 87048,
@@ -163,7 +163,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             // Alytus County
             [
                 'name' => 'Alytus',
-                'code' => 'LT-AL-ALY',
+                'code' => 'LT-ALT',
                 'latitude' => 54.4,
                 'longitude' => 24.05,
                 'population' => 52000,
@@ -176,7 +176,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             // Marijampolė County
             [
                 'name' => 'Marijampolė',
-                'code' => 'LT-MR-MAR',
+                'code' => 'LT-MRJ',
                 'latitude' => 54.5667,
                 'longitude' => 23.35,
                 'population' => 35000,
@@ -189,7 +189,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             // Tauragė County
             [
                 'name' => 'Tauragė',
-                'code' => 'LT-TA-TAU',
+                'code' => 'LT-TRG',
                 'latitude' => 55.25,
                 'longitude' => 22.2833,
                 'population' => 22000,
@@ -202,7 +202,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             // Telšiai County
             [
                 'name' => 'Telšiai',
-                'code' => 'LT-TE-TEL',
+                'code' => 'LT-TLS',
                 'latitude' => 55.9833,
                 'longitude' => 22.25,
                 'population' => 22000,
@@ -215,7 +215,7 @@ final class LithuaniaCitiesSeeder extends Seeder
             // Utena County
             [
                 'name' => 'Utena',
-                'code' => 'LT-UT-UTE',
+                'code' => 'LT-UTN',
                 'latitude' => 55.5,
                 'longitude' => 25.6,
                 'population' => 25000,

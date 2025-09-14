@@ -20,16 +20,16 @@ final class EgyptCitiesSeeder extends Seeder
         }
 
         $cities = [
-            ['code' => 'EG-CAI', 'slug' => 'cairo', 'name' => ['lt' => 'Kairas', 'en' => 'Cairo'], 'description' => ['lt' => 'Egipto sostinė', 'en' => 'Capital of Egypt'], 'is_capital' => true, 'latitude' => 30.0444, 'longitude' => 31.2357, 'population' => 20484965],
-            ['code' => 'EG-ALX', 'slug' => 'alexandria', 'name' => ['lt' => 'Aleksandrija', 'en' => 'Alexandria'], 'description' => ['lt' => 'Antras pagal dydį Egipto miestas', 'en' => 'Second largest city in Egypt'], 'is_capital' => false, 'latitude' => 31.2001, 'longitude' => 29.9187, 'population' => 5200000],
-            ['code' => 'EG-GIZ', 'slug' => 'giza', 'name' => ['lt' => 'Giza', 'en' => 'Giza'], 'description' => ['lt' => 'Piramidžių miestas', 'en' => 'City of pyramids'], 'is_capital' => false, 'latitude' => 30.0131, 'longitude' => 31.2089, 'population' => 3240000],
-            ['code' => 'EG-SUE', 'slug' => 'suez', 'name' => ['lt' => 'Suezas', 'en' => 'Suez'], 'description' => ['lt' => 'Sueco kanalo miestas', 'en' => 'Suez Canal city'], 'is_capital' => false, 'latitude' => 29.9668, 'longitude' => 32.5498, 'population' => 750000],
-            ['code' => 'EG-LUX', 'slug' => 'luxor', 'name' => ['lt' => 'Luksoras', 'en' => 'Luxor'], 'description' => ['lt' => 'Senovės Egipto sostinė', 'en' => 'Ancient Egyptian capital'], 'is_capital' => false, 'latitude' => 25.6872, 'longitude' => 32.6396, 'population' => 506588],
-            ['code' => 'EG-ASW', 'slug' => 'aswan', 'name' => ['lt' => 'Asuanas', 'en' => 'Aswan'], 'description' => ['lt' => 'Pietų Egipto miestas', 'en' => 'Southern Egyptian city'], 'is_capital' => false, 'latitude' => 24.0889, 'longitude' => 32.8998, 'population' => 350000],
-            ['code' => 'EG-ASN', 'slug' => 'aswan', 'name' => ['lt' => 'Asiutas', 'en' => 'Asyut'], 'description' => ['lt' => 'Centrinio Egipto miestas', 'en' => 'Central Egyptian city'], 'is_capital' => false, 'latitude' => 27.1828, 'longitude' => 31.1828, 'population' => 389307],
-            ['code' => 'EG-ISM', 'slug' => 'ismailia', 'name' => ['lt' => 'Ismailija', 'en' => 'Ismailia'], 'description' => ['lt' => 'Sueco kanalo provincijos sostinė', 'en' => 'Capital of Suez Canal province'], 'is_capital' => false, 'latitude' => 30.6043, 'longitude' => 32.2723, 'population' => 750000],
-            ['code' => 'EG-FAY', 'slug' => 'fayyum', 'name' => ['lt' => 'Fajumas', 'en' => 'Fayyum'], 'description' => ['lt' => 'Fajumo provincijos sostinė', 'en' => 'Capital of Fayyum province'], 'is_capital' => false, 'latitude' => 29.3084, 'longitude' => 30.8428, 'population' => 350000],
-            ['code' => 'EG-POR', 'slug' => 'port-said', 'name' => ['lt' => 'Port Said', 'en' => 'Port Said'], 'description' => ['lt' => 'Uostamiestis prie Sueco kanalo', 'en' => 'Port city on Suez Canal'], 'is_capital' => false, 'latitude' => 31.2653, 'longitude' => 32.3019, 'population' => 750000],
+            ['code' => 'EG-CAI', 'slug' => 'cairo', 'name' => ['lt' => 'Kairas', 'en' => 'Cairo'], 'description' => 'Capital of ', 'is_capital' => true, 'latitude' => 30.0444, 'longitude' => 31.2357, 'population' => 20484965],
+            ['code' => 'EG-ALX', 'slug' => 'alexandria', 'name' => ['lt' => 'Aleksandrija', 'en' => 'Alexandria'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 31.2001, 'longitude' => 29.9187, 'population' => 5200000],
+            ['code' => 'EG-GIZ', 'slug' => 'giza', 'name' => ['lt' => 'Giza', 'en' => 'Giza'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 30.0131, 'longitude' => 31.2089, 'population' => 3240000],
+            ['code' => 'EG-SUE', 'slug' => 'suez', 'name' => ['lt' => 'Suezas', 'en' => 'Suez'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 29.9668, 'longitude' => 32.5498, 'population' => 750000],
+            ['code' => 'EG-LUX', 'slug' => 'luxor', 'name' => ['lt' => 'Luksoras', 'en' => 'Luxor'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 25.6872, 'longitude' => 32.6396, 'population' => 506588],
+            ['code' => 'EG-ASW', 'slug' => 'aswan', 'name' => ['lt' => 'Asuanas', 'en' => 'Aswan'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 24.0889, 'longitude' => 32.8998, 'population' => 350000],
+            ['code' => 'EG-ASN', 'slug' => 'aswan', 'name' => ['lt' => 'Asiutas', 'en' => 'Asyut'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 27.1828, 'longitude' => 31.1828, 'population' => 389307],
+            ['code' => 'EG-ISM', 'slug' => 'ismailia', 'name' => ['lt' => 'Ismailija', 'en' => 'Ismailia'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 30.6043, 'longitude' => 32.2723, 'population' => 750000],
+            ['code' => 'EG-FAY', 'slug' => 'fayyum', 'name' => ['lt' => 'Fajumas', 'en' => 'Fayyum'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 29.3084, 'longitude' => 30.8428, 'population' => 350000],
+            ['code' => 'EG-POR', 'slug' => 'port-said', 'name' => ['lt' => 'Port Said', 'en' => 'Port Said'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 31.2653, 'longitude' => 32.3019, 'population' => 750000],
         ];
 
         foreach ($cities as $cityData) {

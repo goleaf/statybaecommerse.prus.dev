@@ -20,16 +20,16 @@ final class BulgariaCitiesSeeder extends Seeder
         }
 
         $cities = [
-            ['code' => 'BG-SOF', 'slug' => 'sofia', 'name' => ['lt' => 'Sofija', 'en' => 'Sofia'], 'description' => ['lt' => 'Bulgarijos sostinė', 'en' => 'Capital of Bulgaria'], 'is_capital' => true, 'latitude' => 42.6977, 'longitude' => 23.3219, 'population' => 1241675],
-            ['code' => 'BG-PLO', 'slug' => 'plovdiv', 'name' => ['lt' => 'Plovdivas', 'en' => 'Plovdiv'], 'description' => ['lt' => 'Antras pagal dydį Bulgarijos miestas', 'en' => 'Second largest city in Bulgaria'], 'is_capital' => false, 'latitude' => 42.1354, 'longitude' => 24.7453, 'population' => 346893],
-            ['code' => 'BG-VAR', 'slug' => 'varna', 'name' => ['lt' => 'Varna', 'en' => 'Varna'], 'description' => ['lt' => 'Juodosios jūros uostamiestis', 'en' => 'Black Sea port city'], 'is_capital' => false, 'latitude' => 43.2141, 'longitude' => 27.9147, 'population' => 335177],
-            ['code' => 'BG-BUR', 'slug' => 'burgas', 'name' => ['lt' => 'Burgasas', 'en' => 'Burgas'], 'description' => ['lt' => 'Juodosios jūros uostamiestis', 'en' => 'Black Sea port city'], 'is_capital' => false, 'latitude' => 42.5048, 'longitude' => 27.4626, 'population' => 203017],
-            ['code' => 'BG-RUS', 'slug' => 'ruse', 'name' => ['lt' => 'Rusė', 'en' => 'Ruse'], 'description' => ['lt' => 'Dunojaus uostamiestis', 'en' => 'Danube port city'], 'is_capital' => false, 'latitude' => 43.8564, 'longitude' => 25.9564, 'population' => 144936],
-            ['code' => 'BG-STA', 'slug' => 'stara-zagora', 'name' => ['lt' => 'Stara Zagora', 'en' => 'Stara Zagora'], 'description' => ['lt' => 'Centrinės Bulgarijos miestas', 'en' => 'Central Bulgarian city'], 'is_capital' => false, 'latitude' => 42.4258, 'longitude' => 25.6344, 'population' => 138272],
-            ['code' => 'BG-PLE', 'slug' => 'pleven', 'name' => ['lt' => 'Plevenas', 'en' => 'Pleven'], 'description' => ['lt' => 'Šiaurės Bulgarijos miestas', 'en' => 'Northern Bulgarian city'], 'is_capital' => false, 'latitude' => 43.4170, 'longitude' => 24.6067, 'population' => 106954],
-            ['code' => 'BG-SLI', 'slug' => 'sliven', 'name' => ['lt' => 'Slivenas', 'en' => 'Sliven'], 'description' => ['lt' => 'Rytų Bulgarijos miestas', 'en' => 'Eastern Bulgarian city'], 'is_capital' => false, 'latitude' => 42.6858, 'longitude' => 26.3292, 'population' => 91000],
-            ['code' => 'BG-DOB', 'slug' => 'dobrich', 'name' => ['lt' => 'Dobričas', 'en' => 'Dobrich'], 'description' => ['lt' => 'Šiaurės rytų Bulgarijos miestas', 'en' => 'Northeastern Bulgarian city'], 'is_capital' => false, 'latitude' => 43.5726, 'longitude' => 27.8273, 'population' => 90000],
-            ['code' => 'BG-SHU', 'slug' => 'shumen', 'name' => ['lt' => 'Šumenas', 'en' => 'Shumen'], 'description' => ['lt' => 'Šiaurės rytų Bulgarijos miestas', 'en' => 'Northeastern Bulgarian city'], 'is_capital' => false, 'latitude' => 43.2706, 'longitude' => 26.9361, 'population' => 80000],
+            ['code' => 'BG-SOF', 'slug' => 'sofia', 'name' => ['lt' => 'Sofija', 'en' => 'Sofia'], 'description' => 'Capital of ', 'is_capital' => true, 'latitude' => 42.6977, 'longitude' => 23.3219, 'population' => 1241675],
+            ['code' => 'BG-PLO', 'slug' => 'plovdiv', 'name' => ['lt' => 'Plovdivas', 'en' => 'Plovdiv'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 42.1354, 'longitude' => 24.7453, 'population' => 346893],
+            ['code' => 'BG-VAR', 'slug' => 'varna', 'name' => ['lt' => 'Varna', 'en' => 'Varna'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.2141, 'longitude' => 27.9147, 'population' => 335177],
+            ['code' => 'BG-BUR', 'slug' => 'burgas', 'name' => ['lt' => 'Burgasas', 'en' => 'Burgas'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 42.5048, 'longitude' => 27.4626, 'population' => 203017],
+            ['code' => 'BG-RUS', 'slug' => 'ruse', 'name' => ['lt' => 'Rusė', 'en' => 'Ruse'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.8564, 'longitude' => 25.9564, 'population' => 144936],
+            ['code' => 'BG-STA', 'slug' => 'stara-zagora', 'name' => ['lt' => 'Stara Zagora', 'en' => 'Stara Zagora'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 42.4258, 'longitude' => 25.6344, 'population' => 138272],
+            ['code' => 'BG-PLE', 'slug' => 'pleven', 'name' => ['lt' => 'Plevenas', 'en' => 'Pleven'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.4170, 'longitude' => 24.6067, 'population' => 106954],
+            ['code' => 'BG-SLI', 'slug' => 'sliven', 'name' => ['lt' => 'Slivenas', 'en' => 'Sliven'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 42.6858, 'longitude' => 26.3292, 'population' => 91000],
+            ['code' => 'BG-DOB', 'slug' => 'dobrich', 'name' => ['lt' => 'Dobričas', 'en' => 'Dobrich'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.5726, 'longitude' => 27.8273, 'population' => 90000],
+            ['code' => 'BG-SHU', 'slug' => 'shumen', 'name' => ['lt' => 'Šumenas', 'en' => 'Shumen'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.2706, 'longitude' => 26.9361, 'population' => 80000],
         ];
 
         foreach ($cities as $cityData) {

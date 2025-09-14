@@ -33,13 +33,7 @@ use UnitEnum;
 final class CartItemResource extends Resource
 {
     protected static ?string $model = CartItem::class;
-    /**
-     * @var BackedEnum|string|null
-     */
-    /**
-     * @var UnitEnum|string|null
-     */
-    /** @var UnitEnum|string|null */
+    /** @var UnitEnum|string|null *//** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'admin.navigation.sales';
     protected static ?string $recordTitleAttribute = 'id';
