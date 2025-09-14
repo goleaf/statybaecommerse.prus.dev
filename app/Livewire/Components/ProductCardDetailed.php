@@ -12,9 +12,23 @@ final class ProductCardDetailed extends Component
 {
     public Product $product;
 
+    public bool $showQuickView = false;
+
+    public bool $showCompare = true;
+
+    public bool $showWishlist = true;
+
+    public string $layout = 'grid'; // grid, list, minimal
+
+    public bool $isInWishlist = false;
+
+    public bool $isInComparison = false;
+
     public function mount(Product $product): void
     {
         $this->product = $product->load(['brand', 'media', 'categories']);
+        $this->checkWishlistStatus();
+        $this->checkComparisonStatus();
     }
 
     public function addToCart(): void
@@ -62,8 +76,16 @@ final class ProductCardDetailed extends Component
         return $this->redirect(route('product.show', $this->product));
     }
 
-    public function addToWishlist(): void
+    public function toggleWishlist(): void
     {
+        if (! auth()->check()) {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => __('translations.login_required_for_wishlist'),
+            ]);
+            return;
+        }
+
         $this->dispatch('add-to-wishlist', productId: $this->product->id);
 
         $this->dispatch('notify', [
@@ -72,7 +94,7 @@ final class ProductCardDetailed extends Component
         ]);
     }
 
-    public function addToComparison(): void
+    public function toggleComparison(): void
     {
         $this->dispatch('add-to-comparison', productId: $this->product->id);
 
@@ -85,6 +107,21 @@ final class ProductCardDetailed extends Component
     public function quickView(): void
     {
         $this->dispatch('product-quick-view', productId: $this->product->id);
+    }
+
+    private function checkWishlistStatus(): void
+    {
+        if (! auth()->check()) {
+            $this->isInWishlist = false;
+            return;
+        }
+
+        $this->isInWishlist = false; // Simplified for now
+    }
+
+    private function checkComparisonStatus(): void
+    {
+        $this->isInComparison = false; // Simplified for now
     }
 
     public function render(): View
