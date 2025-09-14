@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ReportResource\Pages;
 use App\Filament\Resources\ReportResource\Widgets;
 use App\Models\Report;
+use UnitEnum;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\DatePicker;
 use Filament\Schemas\Components\Grid;
@@ -40,7 +41,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use BackedEnum;
-use UnitEnum;
 /**
  * ReportResource
  * 
@@ -61,8 +61,6 @@ class ReportResource extends Resource
     protected static $navigationIcon = 'heroicon-o-document-chart-bar';
     // /**
     //  * @var UnitEnum|string|null
-    //  */
-    // /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */
     protected static $navigationGroup = NavigationGroup::Reports;
     protected static ?int $navigationSort = 1;

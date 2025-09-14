@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Illuminate\Support\Arr;
 /**
  * SystemSettingResource
  * 
@@ -103,7 +104,7 @@ final class SystemSettingResource extends Resource
                 return ['key' => $record->key, 'name' => $record->name, 'value' => $record->value, 'type' => $record->type, 'group' => $record->group, 'description' => $record->description, 'help_text' => $record->help_text, 'validation_rules' => $record->validation_rules, 'options' => $record->options, 'default_value' => $record->default_value];
             });
             $filename = 'system_settings_export_' . now()->format('Y-m-d_H-i-s') . '.json';
-            return response()->json($data->toArray())->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+            return response()->json(Arr::from($data))->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
         })->deselectRecordsAfterCompletion()])])->defaultSort('sort_order')->reorderable('sort_order');
     }
     /**
