@@ -18,42 +18,29 @@ final class ReferralRewardLogFactory extends Factory
 
     public function definition(): array
     {
-        $actions = ['created', 'applied', 'expired', 'updated', 'viewed', 'deleted'];
-        $action = fake()->randomElement($actions);
-
         return [
             'referral_reward_id' => ReferralReward::factory(),
             'user_id' => User::factory(),
-            'action' => $action,
-            'data' => match ($action) {
-                'created' => ['source' => fake()->randomElement(['admin', 'system', 'api'])],
-                'applied' => ['order_id' => fake()->numberBetween(1, 1000), 'applied_by' => fake()->numberBetween(1, 100)],
-                'expired' => ['expired_reason' => fake()->randomElement(['timeout', 'manual', 'system'])],
-                'updated' => ['changes' => fake()->randomElements(['amount', 'status', 'description'], fake()->numberBetween(1, 3))],
-                'viewed' => ['viewed_by' => fake()->numberBetween(1, 100), 'ip_address' => fake()->ipv4()],
-                'deleted' => ['deleted_by' => fake()->numberBetween(1, 100), 'reason' => fake()->sentence()],
-                default => [],
-            },
-            'ip_address' => fake()->ipv4(),
-            'user_agent' => fake()->userAgent(),
+            'action' => $this->faker->randomElement(['claimed', 'expired', 'cancelled', 'pending']),
+            'data' => [
+                'amount' => $this->faker->randomFloat(2, 1, 100),
+                'currency' => 'EUR',
+                'reward_type' => $this->faker->randomElement(['discount', 'credit', 'points']),
+            ],
+            'ip_address' => $this->faker->ipv4(),
+            'user_agent' => $this->faker->userAgent(),
         ];
     }
 
-    public function created(): static
+    public function claimed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'action' => 'created',
-            'data' => ['source' => fake()->randomElement(['admin', 'system', 'api'])],
-        ]);
-    }
-
-    public function applied(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'action' => 'applied',
+            'action' => 'claimed',
             'data' => [
-                'order_id' => fake()->numberBetween(1, 1000),
-                'applied_by' => fake()->numberBetween(1, 100),
+                'amount' => $this->faker->randomFloat(2, 1, 100),
+                'currency' => 'EUR',
+                'reward_type' => 'discount',
+                'claimed_at' => now()->toISOString(),
             ],
         ]);
     }
@@ -63,19 +50,45 @@ final class ReferralRewardLogFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'action' => 'expired',
             'data' => [
-                'expired_reason' => fake()->randomElement(['timeout', 'manual', 'system']),
+                'amount' => $this->faker->randomFloat(2, 1, 100),
+                'currency' => 'EUR',
+                'reward_type' => 'credit',
+                'expired_at' => now()->toISOString(),
             ],
         ]);
     }
 
-    public function viewed(): static
+    public function cancelled(): static
     {
         return $this->state(fn (array $attributes) => [
-            'action' => 'viewed',
+            'action' => 'cancelled',
             'data' => [
-                'viewed_by' => fake()->numberBetween(1, 100),
-                'ip_address' => fake()->ipv4(),
+                'amount' => $this->faker->randomFloat(2, 1, 100),
+                'currency' => 'EUR',
+                'reward_type' => 'points',
+                'cancelled_at' => now()->toISOString(),
+                'reason' => $this->faker->sentence(),
             ],
+        ]);
+    }
+
+    public function pending(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'action' => 'pending',
+            'data' => [
+                'amount' => $this->faker->randomFloat(2, 1, 100),
+                'currency' => 'EUR',
+                'reward_type' => 'discount',
+                'pending_since' => now()->toISOString(),
+            ],
+        ]);
+    }
+
+    public function recent(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'created_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
         ]);
     }
 }

@@ -22,13 +22,11 @@ final class CampaignScheduleFactory extends Factory
             'schedule_type' => $this->faker->randomElement(['daily', 'weekly', 'monthly', 'custom']),
             'schedule_config' => [
                 'time' => $this->faker->time('H:i'),
-                'timezone' => $this->faker->timezone(),
-                'days' => $this->faker->randomElements(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'], 3),
-                'frequency' => $this->faker->numberBetween(1, 7),
-                'end_date' => $this->faker->optional(0.5)->dateTimeBetween('now', '+3 months'),
+                'timezone' => $this->faker->randomElement(['UTC', 'Europe/Vilnius', 'America/New_York']),
+                'days' => $this->faker->randomElements(['monday', 'tuesday', 'wednesday', 'thursday', 'friday'], 3),
             ],
-            'next_run_at' => $this->faker->dateTimeBetween('now', '+1 week'),
-            'last_run_at' => $this->faker->optional(0.7)->dateTimeBetween('-1 month', 'now'),
+            'next_run_at' => $this->faker->dateTimeBetween('now', '+1 month'),
+            'last_run_at' => $this->faker->optional()->dateTimeBetween('-1 month', 'now'),
             'is_active' => $this->faker->boolean(80),
         ];
     }
@@ -40,7 +38,6 @@ final class CampaignScheduleFactory extends Factory
             'schedule_config' => [
                 'time' => $this->faker->time('H:i'),
                 'timezone' => 'UTC',
-                'frequency' => 1,
             ],
         ]);
     }
@@ -52,8 +49,7 @@ final class CampaignScheduleFactory extends Factory
             'schedule_config' => [
                 'time' => $this->faker->time('H:i'),
                 'timezone' => 'UTC',
-                'days' => [$this->faker->randomElement(['monday', 'tuesday', 'wednesday', 'thursday', 'friday'])],
-                'frequency' => 1,
+                'day' => $this->faker->randomElement(['monday', 'tuesday', 'wednesday', 'thursday', 'friday']),
             ],
         ]);
     }
@@ -65,24 +61,7 @@ final class CampaignScheduleFactory extends Factory
             'schedule_config' => [
                 'time' => $this->faker->time('H:i'),
                 'timezone' => 'UTC',
-                'day_of_month' => $this->faker->numberBetween(1, 28),
-                'frequency' => 1,
-            ],
-        ]);
-    }
-
-    public function custom(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'schedule_type' => 'custom',
-            'schedule_config' => [
-                'cron_expression' => $this->faker->randomElement([
-                    '0 9 * * 1-5',  // Every weekday at 9 AM
-                    '0 18 * * 1',  // Every Monday at 6 PM
-                    '0 12 1 * *',  // First day of every month at 12 PM
-                    '0 0 * * 0',  // Every Sunday at midnight
-                ]),
-                'timezone' => 'UTC',
+                'day' => $this->faker->numberBetween(1, 28),
             ],
         ]);
     }
@@ -91,7 +70,6 @@ final class CampaignScheduleFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_active' => true,
-            'next_run_at' => $this->faker->dateTimeBetween('now', '+1 week'),
         ]);
     }
 
@@ -99,24 +77,21 @@ final class CampaignScheduleFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_active' => false,
-            'next_run_at' => null,
         ]);
     }
 
-    public function upcoming(): static
+    public function dueForExecution(): static
     {
         return $this->state(fn (array $attributes) => [
+            'next_run_at' => $this->faker->dateTimeBetween('-1 hour', 'now'),
             'is_active' => true,
-            'next_run_at' => $this->faker->dateTimeBetween('now', '+1 day'),
         ]);
     }
 
-    public function overdue(): static
+    public function recentlyExecuted(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_active' => true,
-            'next_run_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
-            'last_run_at' => $this->faker->dateTimeBetween('-2 weeks', '-1 week'),
+            'last_run_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
         ]);
     }
 }
