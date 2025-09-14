@@ -61,7 +61,15 @@ final class AttributeValueResource extends Resource
     public static function getModelLabel(): string
     {
         return __('attributes.attribute_value');
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Products->label();
+    }}
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
      * @return string

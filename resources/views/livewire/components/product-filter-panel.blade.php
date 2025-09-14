@@ -5,6 +5,7 @@
         </h3>
         <button
                 wire:click="clearFilters"
+                wire:confirm="{{ __('translations.confirm_clear_search_filters') }}"
                 class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
             {{ __('translations.clear_all') }}
         </button>

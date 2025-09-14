@@ -42,6 +42,17 @@
                     :min-query-length="2"
                 />
             </div>
+            
+            {{-- Mobile Search --}}
+            <div class="flex-1 md:hidden">
+                <livewire:components.mobile-autocomplete 
+                    :max-results="5"
+                    :search-types="['products', 'categories', 'brands']"
+                    :enable-suggestions="true"
+                    :enable-recent-searches="true"
+                    :enable-popular-searches="false"
+                />
+            </div>
 
             {{-- Right: Actions --}}
             <div class="flex items-center gap-3">

@@ -183,6 +183,8 @@ return [
     'voice_not_supported' => 'Voice search not supported',
     'voice_tip_1' => 'Click microphone to start',
     'voice_tip_2' => 'Speak clearly for best results',
+    'mobile_placeholder' => 'Search products...',
+    'view_all_results' => 'View all results',
         'live_search_module' => 'Live Search Module',
         'module_description' => 'Type in the search box below to see live results as you type. The search includes products, categories, and brands with intelligent relevance scoring.',
         'features_title' => 'Key Features',

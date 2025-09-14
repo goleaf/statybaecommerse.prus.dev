@@ -64,7 +64,15 @@ final class AddressResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('admin.navigation.addresses');
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Orders->label();
+    }}
     /**
      * Handle getModelLabel functionality with proper error handling.
      * @return string

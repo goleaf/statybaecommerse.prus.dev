@@ -2,6 +2,7 @@
     <!-- Cart Toggle Button -->
     <button 
         wire:click="toggleCart"
+        wire:confirm="{{ __('translations.confirm_toggle_cart') }}"
         class="relative p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
         aria-label="{{ __('translations.shopping_cart') }}"
     >
@@ -39,6 +40,7 @@
             </h2>
             <button 
                 wire:click="toggleCart"
+                wire:confirm="{{ __('translations.confirm_toggle_cart') }}"
                 class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

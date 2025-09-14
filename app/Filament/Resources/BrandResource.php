@@ -62,7 +62,15 @@ final class BrandResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('admin.brands.navigation.label');
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Products->label();
+    }}
     /**
      * Handle getModelLabel functionality with proper error handling.
      * @return string

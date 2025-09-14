@@ -55,7 +55,15 @@ final class RecommendationConfigResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('translations.recommendation_configs');
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::System->label();
+    }}
     /**
      * Handle getModelLabel functionality with proper error handling.
      * @return string

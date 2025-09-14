@@ -183,6 +183,8 @@ return [
     'voice_not_supported' => 'Balso paieška nepalaikoma',
     'voice_tip_1' => 'Spustelėkite mikrofoną pradėti',
     'voice_tip_2' => 'Kalbėkite aiškiai geriausiems rezultatams',
+    'mobile_placeholder' => 'Ieškoti produktų...',
+    'view_all_results' => 'Peržiūrėti visus rezultatus',
         'live_search_module' => 'Tiesioginės paieškos modulis',
         'module_description' => 'Įveskite tekstą į paieškos lauką žemiau, kad pamatytumėte tiesioginius rezultatus. Paieška apima produktus, kategorijas ir prekės ženklus su protingu aktualumo įvertinimu.',
         'features_title' => 'Pagrindinės funkcijos',

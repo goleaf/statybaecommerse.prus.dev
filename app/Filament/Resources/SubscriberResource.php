@@ -68,7 +68,15 @@ final class SubscriberResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $form->schema([Tabs::make('Subscriber Details')->tabs([Tab::make('Basic Information')->schema([Section::make('Contact Information')->schema([TextInput::make('email')->email()->required()->unique(ignoreRecord: true)->maxLength(255)->columnSpanFull(), TextInput::make('first_name')->maxLength(255)->columnSpan(1), TextInput::make('last_name')->maxLength(255)->columnSpan(1), TextInput::make('phone')->tel()->maxLength(255)->columnSpan(1), TextInput::make('company')->maxLength(255)->columnSpan(1)])->columns(2), Section::make('Subscription Details')->schema([Select::make('status')->options(['active' => 'Active', 'inactive' => 'Inactive', 'unsubscribed' => 'Unsubscribed'])->required()->default('active')->columnSpan(1), Select::make('source')->options(['website' => 'Website', 'admin' => 'Admin Panel', 'import' => 'Import', 'api' => 'API', 'social' => 'Social Media', 'referral' => 'Referral', 'event' => 'Event', 'other' => 'Other'])->required()->default('website')->columnSpan(1), TextInput::make('job_title')->maxLength(255)->columnSpanFull()])->columns(2)]), Tab::make('Interests & Preferences')->schema([Section::make('Interests')->schema([Select::make('interests')->multiple()->options(['products' => 'Products', 'news' => 'News & Updates', 'promotions' => 'Promotions & Discounts', 'events' => 'Events', 'blog' => 'Blog Posts', 'technical' => 'Technical Updates', 'business' => 'Business News', 'support' => 'Support & Help'])->searchable()->columnSpanFull()]), Section::make('Metadata')->schema([Textarea::make('metadata')->json()->columnSpanFull()->helperText('Additional JSON data for the subscriber')])]), Tab::make('Activity & Statistics')->schema([Section::make('Email Statistics')->schema([TextInput::make('email_count')->numeric()->default(0)->disabled()->columnSpan(1), TextInput::make('subscribed_at')->datetime()->disabled()->columnSpan(1), TextInput::make('unsubscribed_at')->datetime()->disabled()->columnSpan(1), TextInput::make('last_email_sent_at')->datetime()->disabled()->columnSpan(1)])->columns(2)])])->columnSpanFull()]);
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Marketing->label();
+    }}
     /**
      * Configure the Filament table with columns, filters, and actions.
      * @param Table $table

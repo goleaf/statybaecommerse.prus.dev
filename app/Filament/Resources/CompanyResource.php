@@ -55,7 +55,15 @@ final class CompanyResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $form->schema([Section::make('Company Information')->schema([TextInput::make('name')->required()->maxLength(255)->columnSpanFull(), TextInput::make('email')->email()->maxLength(255)->columnSpan(1), TextInput::make('phone')->tel()->maxLength(255)->columnSpan(1), TextInput::make('website')->url()->maxLength(255)->columnSpanFull(), Textarea::make('address')->rows(3)->columnSpanFull(), Textarea::make('description')->rows(3)->columnSpanFull()])->columns(2), Section::make('Business Details')->schema([Select::make('industry')->options(['construction' => 'Construction', 'manufacturing' => 'Manufacturing', 'technology' => 'Technology', 'retail' => 'Retail', 'services' => 'Services', 'healthcare' => 'Healthcare', 'education' => 'Education', 'finance' => 'Finance', 'other' => 'Other'])->searchable()->columnSpan(1), Select::make('size')->options(['small' => 'Small (1-50 employees)', 'medium' => 'Medium (51-200 employees)', 'large' => 'Large (200+ employees)'])->columnSpan(1), Toggle::make('is_active')->label('Active')->default(true)->columnSpanFull()])->columns(2)]);
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Settings->label();
+    }}
     /**
      * Configure the Filament table with columns, filters, and actions.
      * @param Table $table

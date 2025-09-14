@@ -193,7 +193,14 @@ final class ReferralController extends Controller
         $user = Auth::user();
         $stats = $user->referral_statistics;
         // Get monthly data for chart
-        $monthlyData = DB::table('referral_statistics')->where('user_id', $user->id)->where('date', '>=', now()->subMonths(12))->orderBy('date')->get();
+        $monthlyData = DB::table('referral_statistics')->where('user_id', $user->id)->where('date', '>=', now()->subMonths(12))->orderBy('date')->get()
+            ->skipWhile(function ($stat) {
+                // Skip statistics that are not properly configured for display
+                return empty($stat->date) || 
+                       empty($stat->user_id) ||
+                       $stat->referrals_count < 0 ||
+                       $stat->rewards_amount < 0;
+            });
         return view('referrals.statistics', compact('stats', 'monthlyData'));
     }
     /**

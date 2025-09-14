@@ -6,12 +6,19 @@ namespace App\Providers;
 
 use App\Filament\Components\LiveNotificationFeed;
 use App\Services\DocumentService;
+use App\View\Creators\CartDataCreator;
+use App\View\Creators\GlobalDataCreator;
+use App\View\Creators\LocalizationCreator;
+use App\View\Creators\NavigationCreator;
+use App\View\Creators\SeoDataCreator;
+use App\View\Creators\UserDataCreator;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -33,6 +40,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
+
+        // Register View Creators
+        // $this->registerViewCreators();
 
         // Set default currency for Number helper (EUR by default)
         try {
@@ -116,6 +126,30 @@ class AppServiceProvider extends ServiceProvider
 
         // Configure document service global variables for e-commerce
         $this->configureDocumentVariables();
+    }
+
+    /**
+     * Register View Creators for providing data to views.
+     */
+    private function registerViewCreators(): void
+    {
+        // Global data creator - applies to all views
+        View::creator('*', GlobalDataCreator::class);
+        
+        // Localization creator - applies to all views
+        View::creator('*', LocalizationCreator::class);
+        
+        // User data creator - applies to all views
+        View::creator('*', UserDataCreator::class);
+        
+        // Cart data creator - applies to all views
+        View::creator('*', CartDataCreator::class);
+        
+        // Navigation creator - applies to specific views only
+        View::creator('*', NavigationCreator::class);
+        
+        // SEO data creator - applies to all views
+        View::creator('*', SeoDataCreator::class);
     }
 
     private function configureDocumentVariables(): void

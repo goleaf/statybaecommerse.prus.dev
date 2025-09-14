@@ -1,6 +1,7 @@
 <div class="relative">
     {{-- Cart Icon Button --}}
     <button wire:click="toggleCart" 
+            wire:confirm="{{ __('translations.confirm_toggle_cart') }}"
             class="flex items-center rounded-full bg-gray-100 p-2 text-gray-600 hover:bg-gray-200 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white transition-all duration-200">
         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.1 5M7 13l-1.1 5m0 0h9.1M16 13v8a2 2 0 01-2 2H8a2 2 0 01-2-2v-8m8 0V9a2 2 0 00-2-2H8a2 2 0 00-2 2v4.01"/>

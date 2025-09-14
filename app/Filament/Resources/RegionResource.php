@@ -42,7 +42,15 @@ final class RegionResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('regions.navigation_label');
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Inventory->label();
+    }}
     /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */

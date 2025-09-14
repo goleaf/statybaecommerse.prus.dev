@@ -42,9 +42,23 @@ final class UserController extends Controller
         // Get user statistics
         $stats = ['orders_count' => $user->orders()->count(), 'total_spent' => $user->total_spent, 'reviews_count' => $user->reviews()->count(), 'wishlist_count' => $user->wishlist()->count(), 'addresses_count' => $user->addresses()->count()];
         // Get recent orders
-        $recentOrders = $user->orders()->with(['items.product'])->latest()->limit(5)->get();
+        $recentOrders = $user->orders()->with(['items.product'])->latest()->limit(5)->get()
+            ->skipWhile(function ($order) {
+                // Skip orders that are not properly configured for display
+                return empty($order->number) || 
+                       empty($order->status) ||
+                       $order->total_amount <= 0 ||
+                       empty($order->items);
+            });
         // Get recent reviews
-        $recentReviews = $user->reviews()->with('product')->latest()->limit(3)->get();
+        $recentReviews = $user->reviews()->with('product')->latest()->limit(3)->get()
+            ->skipWhile(function ($review) {
+                // Skip reviews that are not properly configured for display
+                return empty($review->title) || 
+                       empty($review->comment) ||
+                       $review->rating <= 0 ||
+                       !$review->is_approved;
+            });
         return view('users.dashboard', compact('user', 'stats', 'recentOrders', 'recentReviews'));
     }
     /**

@@ -96,6 +96,7 @@
                 <div class="flex gap-2">
                     <x-shared.button 
                         wire:click="clearFilters"
+                        wire:confirm="{{ __('translations.confirm_clear_search_filters') }}"
                         variant="secondary"
                         size="sm"
                     >

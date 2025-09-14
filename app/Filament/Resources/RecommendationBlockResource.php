@@ -61,7 +61,15 @@ final class RecommendationBlockResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([Section::make(__('translations.recommendation_block_basic_info'))->schema([TextInput::make('name')->label(__('translations.recommendation_block_name'))->required()->maxLength(255)->unique(ignoreRecord: true)->helperText(__('translations.recommendation_block_name_help')), TextInput::make('title')->label(__('translations.recommendation_block_title'))->required()->maxLength(255), Textarea::make('description')->label(__('translations.recommendation_block_description'))->maxLength(1000)->rows(3), Toggle::make('is_active')->label(__('translations.recommendation_block_is_active'))->default(true)]), Section::make(__('translations.recommendation_block_configuration'))->schema([Select::make('config_ids')->label(__('translations.recommendation_block_config_ids'))->multiple()->options(RecommendationConfig::active()->pluck('name', 'id'))->required()->helperText(__('translations.recommendation_block_config_ids_help')), Grid::make(2)->schema([TextInput::make('max_products')->label(__('translations.recommendation_block_max_products'))->numeric()->default(4)->minValue(1)->maxValue(20), TextInput::make('cache_duration')->label(__('translations.recommendation_block_cache_duration'))->numeric()->default(3600)->minValue(300)->suffix('seconds')->helperText(__('translations.recommendation_block_cache_duration_help'))])]), Section::make(__('translations.recommendation_block_display_settings'))->schema([KeyValue::make('display_settings')->label(__('translations.recommendation_block_display_settings'))->keyLabel(__('translations.setting_name'))->valueLabel(__('translations.setting_value'))->addActionLabel(__('translations.add_display_setting'))->helperText(__('translations.recommendation_block_display_settings_help'))])]);
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::System->label();
+    }}
     /**
      * Configure the Filament table with columns, filters, and actions.
      * @param Table $table

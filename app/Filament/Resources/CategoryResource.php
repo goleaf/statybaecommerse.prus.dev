@@ -80,7 +80,15 @@ final class CategoryResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('categories.title');
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Products->label();
+    }}
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
      * @return string

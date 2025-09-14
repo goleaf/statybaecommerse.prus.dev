@@ -63,7 +63,15 @@ final class ReferralResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('referrals.navigation_label');
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Referral System->label();
+    }}
     /**
      * Handle getModelLabel functionality with proper error handling.
      * @return string

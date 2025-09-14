@@ -69,7 +69,15 @@ final class PriceListResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('admin.price_lists.navigation_label');
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Products->label();
+    }}
     /**
      * Handle getModelLabel functionality with proper error handling.
      * @return string

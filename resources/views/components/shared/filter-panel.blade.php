@@ -133,6 +133,7 @@
     <div class="mt-6 flex gap-4">
         <x-shared.button 
             wire:click="clearFilters"
+            wire:confirm="{{ __('translations.confirm_clear_search_filters') }}"
             variant="secondary"
             icon="heroicon-o-x-mark"
             size="sm"

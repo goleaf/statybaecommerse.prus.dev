@@ -69,7 +69,15 @@ class MenuResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([Section::make(__('admin.menus.basic_information'))->schema([Grid::make(2)->schema([TextInput::make('key')->label(__('admin.menus.key'))->required()->unique(ignoreRecord: true)->maxLength(255)->helperText(__('admin.menus.key_helper')), TextInput::make('name')->label(__('admin.menus.name'))->required()->maxLength(255)->helperText(__('admin.menus.name_helper'))]), Select::make('location')->label(__('admin.menus.location'))->required()->options(['header' => __('admin.menus.locations.header'), 'footer' => __('admin.menus.locations.footer'), 'sidebar' => __('admin.menus.locations.sidebar'), 'mobile' => __('admin.menus.locations.mobile')])->helperText(__('admin.menus.location_helper')), Toggle::make('is_active')->label(__('admin.menus.is_active'))->default(true)->helperText(__('admin.menus.is_active_helper'))])->columns(1)]);
-    }
+    
+    /**
+     * Handle getNavigationGroup functionality with proper error handling.
+     * @return string|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::Content->label();
+    }}
     /**
      * Configure the Filament table with columns, filters, and actions.
      * @param Table $table

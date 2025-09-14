@@ -4,6 +4,8 @@ declare (strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 /**
  * RelatedProducts
@@ -41,9 +43,11 @@ final class RelatedProducts extends Component
         $this->class = $class;
     }
     /**
-     * Handle getRelatedProductsProperty functionality with proper error handling.
+     * Handle relatedProducts functionality with proper error handling.
+     * @return Collection
      */
-    public function getRelatedProductsProperty()
+    #[Computed]
+    public function relatedProducts(): Collection
     {
         return $this->product->getRelatedProducts($this->limit);
     }
