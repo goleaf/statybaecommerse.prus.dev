@@ -28,6 +28,15 @@ class CountryController extends Controller
             ->when($request->has('search'), fn ($query) => $query->where('name', 'like', '%'.$request->get('search').'%'))
             ->orderBy('sort_order')
             ->orderBy('name')
+            ->get()
+            ->skipWhile(function ($country) {
+                // Skip countries that are not properly configured for display
+                return empty($country->name) || 
+                       !$country->is_active ||
+                       !$country->is_enabled ||
+                       empty($country->cca2) ||
+                       empty($country->cca3);
+            })
             ->paginate(24);
 
         $regions = Country::distinct()->pluck('region')->filter()->sort()->values();
@@ -58,7 +67,15 @@ class CountryController extends Controller
             ->active()
             ->enabled()
             ->limit(6)
-            ->get();
+            ->get()
+            ->skipWhile(function ($relatedCountry) {
+                // Skip related countries that are not properly configured for display
+                return empty($relatedCountry->name) || 
+                       !$relatedCountry->is_active ||
+                       !$relatedCountry->is_enabled ||
+                       empty($relatedCountry->cca2) ||
+                       empty($relatedCountry->cca3);
+            });
 
         return view('countries.show', compact('country', 'relatedCountries'));
     }
@@ -72,7 +89,15 @@ class CountryController extends Controller
             ->when($request->has('region'), fn ($query) => $query->where('region', $request->get('region')))
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->get(['id', 'name', 'cca2', 'cca3', 'flag', 'region', 'currency_code']);
+            ->get(['id', 'name', 'cca2', 'cca3', 'flag', 'region', 'currency_code'])
+            ->skipWhile(function ($country) {
+                // Skip countries that are not properly configured for API response
+                return empty($country->name) || 
+                       !$country->is_active ||
+                       !$country->is_enabled ||
+                       empty($country->cca2) ||
+                       empty($country->cca3);
+            });
 
         return response()->json([
             'countries' => $countries,
@@ -94,7 +119,15 @@ class CountryController extends Controller
             ->orWhere('cca2', 'like', "%{$query}%")
             ->orWhere('cca3', 'like', "%{$query}%")
             ->limit(10)
-            ->get(['id', 'name', 'cca2', 'cca3', 'flag']);
+            ->get(['id', 'name', 'cca2', 'cca3', 'flag'])
+            ->skipWhile(function ($country) {
+                // Skip countries that are not properly configured for search results
+                return empty($country->name) || 
+                       !$country->is_active ||
+                       !$country->is_enabled ||
+                       empty($country->cca2) ||
+                       empty($country->cca3);
+            });
 
         return response()->json($countries);
     }

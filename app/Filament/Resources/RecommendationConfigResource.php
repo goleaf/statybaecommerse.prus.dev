@@ -7,7 +7,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\RecommendationConfigResource\Pages;
 use App\Models\RecommendationConfig;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -73,8 +72,8 @@ final class RecommendationConfigResource extends Resource
         };
     }
 
-    public static function form(Schema $schema): Schema {
-        return $schema->schema([
+    public static function form(Form $form): Form {
+        return $form->schema([
                 Forms\Components\Section::make(__('translations.recommendation_config_basic_info'))
                     ->schema([
                         Forms\Components\TextInput::make('name')

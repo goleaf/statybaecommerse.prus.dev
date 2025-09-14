@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -83,6 +84,16 @@ class Category extends Model implements HasMedia
     public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order');
+    }
+
+    /**
+     * Get the category's latest child.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestChild(): HasOne
+    {
+        return $this->children()->one()->latestOfMany();
     }
 
     public function products(): BelongsToMany

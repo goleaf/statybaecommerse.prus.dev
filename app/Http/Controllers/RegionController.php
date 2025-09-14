@@ -29,6 +29,14 @@ class RegionController extends Controller
             ->when($request->has('search'), fn ($query) => $query->search($request->get('search')))
             ->orderBy('sort_order')
             ->orderBy('name')
+            ->get()
+            ->skipWhile(function ($region) {
+                // Skip regions that are not properly configured for display
+                return empty($region->name) || 
+                       !$region->is_enabled ||
+                       empty($region->level) ||
+                       empty($region->country_id);
+            })
             ->paginate(24);
 
         $countries = Region::with('country')
@@ -73,7 +81,14 @@ class RegionController extends Controller
             ->where('level', $region->level)
             ->enabled()
             ->limit(6)
-            ->get();
+            ->get()
+            ->skipWhile(function ($relatedRegion) {
+                // Skip related regions that are not properly configured for display
+                return empty($relatedRegion->name) || 
+                       !$relatedRegion->is_enabled ||
+                       empty($relatedRegion->level) ||
+                       empty($relatedRegion->country_id);
+            });
 
         return view('regions.show', compact('region', 'relatedRegions'));
     }
@@ -87,7 +102,14 @@ class RegionController extends Controller
             ->when($request->has('level'), fn ($query) => $query->where('level', $request->get('level')))
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->get(['id', 'name', 'code', 'level', 'country_id', 'parent_id']);
+            ->get(['id', 'name', 'code', 'level', 'country_id', 'parent_id'])
+            ->skipWhile(function ($region) {
+                // Skip regions that are not properly configured for API response
+                return empty($region->name) || 
+                       !$region->is_enabled ||
+                       empty($region->level) ||
+                       empty($region->country_id);
+            });
 
         return response()->json([
             'regions' => $regions,

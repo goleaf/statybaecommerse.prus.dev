@@ -24,7 +24,15 @@ class LegalController extends Controller
             ->with(['translations' => function ($query) {
                 $query->where('locale', app()->getLocale());
             }])
-            ->get();
+            ->get()
+            ->skipWhile(function ($document) {
+                // Skip legal documents that are not properly configured for display
+                return empty($document->key) || 
+                       !$document->is_enabled ||
+                       !$document->is_published ||
+                       empty($document->type) ||
+                       $document->translations->isEmpty();
+            });
 
         $groupedDocuments = $documents->groupBy('type');
 
@@ -59,7 +67,15 @@ class LegalController extends Controller
                 $query->where('locale', app()->getLocale());
             }])
             ->limit(3)
-            ->get();
+            ->get()
+            ->skipWhile(function ($relatedDocument) {
+                // Skip related legal documents that are not properly configured for display
+                return empty($relatedDocument->key) || 
+                       !$relatedDocument->is_enabled ||
+                       !$relatedDocument->is_published ||
+                       empty($relatedDocument->type) ||
+                       $relatedDocument->translations->isEmpty();
+            });
 
         // Get other document types
         $otherDocuments = Legal::enabled()
@@ -70,7 +86,15 @@ class LegalController extends Controller
                 $query->where('locale', app()->getLocale());
             }])
             ->limit(5)
-            ->get();
+            ->get()
+            ->skipWhile(function ($otherDocument) {
+                // Skip other legal documents that are not properly configured for display
+                return empty($otherDocument->key) || 
+                       !$otherDocument->is_enabled ||
+                       !$otherDocument->is_published ||
+                       empty($otherDocument->type) ||
+                       $otherDocument->translations->isEmpty();
+            });
 
         return view('legal.show', compact('document', 'translation', 'relatedDocuments', 'otherDocuments'));
     }
@@ -84,7 +108,15 @@ class LegalController extends Controller
             ->with(['translations' => function ($query) {
                 $query->where('locale', app()->getLocale());
             }])
-            ->get();
+            ->get()
+            ->skipWhile(function ($document) {
+                // Skip legal documents that are not properly configured for display
+                return empty($document->key) || 
+                       !$document->is_enabled ||
+                       !$document->is_published ||
+                       empty($document->type) ||
+                       $document->translations->isEmpty();
+            });
 
         $typeName = Legal::getTypes()[$type] ?? $type;
 

@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\LazyCollection;
 
 final /**
  * SitemapController
@@ -51,30 +52,57 @@ class SitemapController extends Controller
             1.0
         );
 
-        // Categories
-        $categories = Category::where('is_active', true)->get();
-        foreach ($categories as $category) {
-            $sitemap .= $this->generateUrl(
-                route('localized.categories.show', ['locale' => $locale, 'category' => $category->slug]),
-                $category->updated_at->toISOString(),
-                'weekly',
-                0.8
-            );
-        }
+        // Categories with timeout protection
+        $timeout = now()->addSeconds(30); // 30 second timeout for sitemap generation
+        
+        $categories = Category::where('is_active', true)->get()
+            ->skipWhile(function ($category) {
+                // Skip categories that are not properly configured for sitemap
+                return empty($category->name) || 
+                       !$category->is_active ||
+                       empty($category->slug);
+            });
+        
+        LazyCollection::make($categories)
+            ->takeUntilTimeout($timeout)
+            ->each(function ($category) use (&$sitemap, $locale) {
+                $sitemap .= $this->generateUrl(
+                    route('localized.categories.show', ['locale' => $locale, 'category' => $category->slug]),
+                    $category->updated_at->toISOString(),
+                    'weekly',
+                    0.8
+                );
+            });
 
-        // Products
-        $products = Product::where('is_active', true)->get();
-        foreach ($products as $product) {
-            $sitemap .= $this->generateUrl(
-                route('product.show', $product->slug),
-                $product->updated_at->toISOString(),
-                'weekly',
-                0.7
-            );
-        }
+        // Products with timeout protection
+        $products = Product::where('is_active', true)->get()
+            ->skipWhile(function ($product) {
+                // Skip products that are not properly configured for sitemap
+                return empty($product->name) || 
+                       !$product->is_active ||
+                       empty($product->slug) ||
+                       $product->price <= 0;
+            });
+        
+        LazyCollection::make($products)
+            ->takeUntilTimeout($timeout)
+            ->each(function ($product) use (&$sitemap) {
+                $sitemap .= $this->generateUrl(
+                    route('product.show', $product->slug),
+                    $product->updated_at->toISOString(),
+                    'weekly',
+                    0.7
+                );
+            });
 
         // Brands
-        $brands = Brand::where('is_active', true)->get();
+        $brands = Brand::where('is_active', true)->get()
+            ->skipWhile(function ($brand) {
+                // Skip brands that are not properly configured for sitemap
+                return empty($brand->name) || 
+                       !$brand->is_active ||
+                       empty($brand->slug);
+            });
         foreach ($brands as $brand) {
             $sitemap .= $this->generateUrl(
                 route('brands.show', $brand->slug),

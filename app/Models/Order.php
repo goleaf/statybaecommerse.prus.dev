@@ -167,6 +167,16 @@ class Order extends Model
         return $this->hasMany(\App\Models\Translations\OrderTranslation::class);
     }
 
+    /**
+     * Get the order's latest translation.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestTranslation(): HasOne
+    {
+        return $this->translations()->one()->latestOfMany();
+    }
+
     public function scopeByStatus($query, string $status)
     {
         return $query->where('status', $status);

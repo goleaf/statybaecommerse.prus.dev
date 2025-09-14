@@ -36,6 +36,15 @@ class LocationController extends Controller
             }))
             ->orderBy('sort_order')
             ->orderBy('name')
+            ->get()
+            ->skipWhile(function ($location) {
+                // Skip locations that are not properly configured for display
+                return empty($location->name) || 
+                       !$location->is_enabled ||
+                       empty($location->type) ||
+                       empty($location->city) ||
+                       empty($location->country_code);
+            })
             ->paginate(24);
 
         $types = Location::distinct()->pluck('type')->filter()->sort()->values();
@@ -62,7 +71,15 @@ class LocationController extends Controller
             ->where('id', '!=', $location->id)
             ->enabled()
             ->limit(6)
-            ->get();
+            ->get()
+            ->skipWhile(function ($relatedLocation) {
+                // Skip related locations that are not properly configured for display
+                return empty($relatedLocation->name) || 
+                       !$relatedLocation->is_enabled ||
+                       empty($relatedLocation->type) ||
+                       empty($relatedLocation->city) ||
+                       empty($relatedLocation->country_code);
+            });
 
         return view('locations.show', compact('location', 'relatedLocations'));
     }
@@ -82,7 +99,15 @@ class LocationController extends Controller
             ->when($request->has('city'), fn ($query) => $query->where('city', $request->get('city')))
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->get(['id', 'name', 'code', 'type', 'city', 'country_code', 'latitude', 'longitude']);
+            ->get(['id', 'name', 'code', 'type', 'city', 'country_code', 'latitude', 'longitude'])
+            ->skipWhile(function ($location) {
+                // Skip locations that are not properly configured for API response
+                return empty($location->name) || 
+                       !$location->is_enabled ||
+                       empty($location->type) ||
+                       empty($location->city) ||
+                       empty($location->country_code);
+            });
 
         return response()->json([
             'locations' => $locations,

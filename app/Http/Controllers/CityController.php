@@ -63,7 +63,16 @@ class CityController extends Controller
         // Sort by default
         $query->ordered()->orderBy('name');
 
-        $cities = $query->paginate(24);
+        $cities = $query->get()
+            ->skipWhile(function ($city) {
+                // Skip cities that are not properly configured for display
+                return empty($city->name) || 
+                       !$city->is_enabled ||
+                       !$city->is_active ||
+                       empty($city->country_id) ||
+                       empty($city->code);
+            })
+            ->paginate(24);
 
         // Get countries for filter dropdown
         $countries = Country::withTranslations()

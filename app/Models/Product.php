@@ -263,6 +263,16 @@ class Product extends Model implements HasMedia
         return $this->hasMany(ProductVariant::class, 'product_id');
     }
 
+    /**
+     * Get the product's latest variant.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestVariant(): HasOne
+    {
+        return $this->variants()->one()->latestOfMany();
+    }
+
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class, 'brand_id');

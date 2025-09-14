@@ -50,6 +50,12 @@ Automatically filters records where `is_active = true`, `is_enabled = true`, or 
 - Currency
 - CustomerGroup
 - PartnerTier
+- DiscountCode
+- DiscountCondition
+- DiscountRedemption
+- Price
+- PriceList
+- PriceListItem
 
 ### PublishedScope
 Automatically filters records where `published_at` is not null and is in the past.
@@ -91,6 +97,8 @@ Automatically filters records where `is_enabled = true`.
 - Currency
 - CustomerGroup
 - PartnerTier
+- Price
+- PriceList
 
 ### ApprovedScope
 Automatically filters records where `is_approved = true`.
