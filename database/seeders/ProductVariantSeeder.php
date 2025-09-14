@@ -35,16 +35,18 @@ final class ProductVariantSeeder extends Seeder
     private function createAttributes(): void
     {
         // Size attribute
-        $sizeAttribute = Attribute::create([
-            'name' => 'Size',
-            'slug' => 'size',
-            'type' => 'select',
-            'is_required' => true,
-            'is_filterable' => true,
-            'is_searchable' => false,
-            'is_enabled' => true,
-            'sort_order' => 1,
-        ]);
+        $sizeAttribute = Attribute::firstOrCreate(
+            ['slug' => 'size'],
+            [
+                'name' => 'Size',
+                'type' => 'select',
+                'is_required' => true,
+                'is_filterable' => true,
+                'is_searchable' => false,
+                'is_enabled' => true,
+                'sort_order' => 1,
+            ]
+        );
 
         // Create size values
         $sizes = [
@@ -57,27 +59,33 @@ final class ProductVariantSeeder extends Seeder
         ];
 
         foreach ($sizes as $size) {
-            AttributeValue::create([
-                'attribute_id' => $sizeAttribute->id,
-                'value' => $size['value'],
-                'slug' => Str::slug($size['value']),
-                'display_value' => $size['display'],
-                'sort_order' => $size['sort_order'],
-                'is_enabled' => true,
-            ]);
+            AttributeValue::firstOrCreate(
+                [
+                    'attribute_id' => $sizeAttribute->id,
+                    'value' => $size['value'],
+                ],
+                [
+                    'slug' => Str::slug($size['value']),
+                    'display_value' => $size['display'],
+                    'sort_order' => $size['sort_order'],
+                    'is_enabled' => true,
+                ]
+            );
         }
 
         // Color attribute
-        $colorAttribute = Attribute::create([
-            'name' => 'Color',
-            'slug' => 'color',
-            'type' => 'select',
-            'is_required' => false,
-            'is_filterable' => true,
-            'is_searchable' => false,
-            'is_enabled' => true,
-            'sort_order' => 2,
-        ]);
+        $colorAttribute = Attribute::firstOrCreate(
+            ['slug' => 'color'],
+            [
+                'name' => 'Color',
+                'type' => 'select',
+                'is_required' => false,
+                'is_filterable' => true,
+                'is_searchable' => false,
+                'is_enabled' => true,
+                'sort_order' => 2,
+            ]
+        );
 
         // Create color values
         $colors = [
@@ -92,27 +100,33 @@ final class ProductVariantSeeder extends Seeder
         ];
 
         foreach ($colors as $color) {
-            AttributeValue::create([
-                'attribute_id' => $colorAttribute->id,
-                'value' => $color['value'],
-                'slug' => Str::slug($color['value']),
-                'hex_color' => $color['hex'],
-                'sort_order' => $color['sort_order'],
-                'is_enabled' => true,
-            ]);
+            AttributeValue::firstOrCreate(
+                [
+                    'attribute_id' => $colorAttribute->id,
+                    'value' => $color['value'],
+                ],
+                [
+                    'slug' => Str::slug($color['value']),
+                    'hex_color' => $color['hex'],
+                    'sort_order' => $color['sort_order'],
+                    'is_enabled' => true,
+                ]
+            );
         }
 
         // Material attribute
-        $materialAttribute = Attribute::create([
-            'name' => 'Material',
-            'slug' => 'material',
-            'type' => 'select',
-            'is_required' => false,
-            'is_filterable' => true,
-            'is_searchable' => false,
-            'is_enabled' => true,
-            'sort_order' => 3,
-        ]);
+        $materialAttribute = Attribute::firstOrCreate(
+            ['slug' => 'material'],
+            [
+                'name' => 'Material',
+                'type' => 'select',
+                'is_required' => false,
+                'is_filterable' => true,
+                'is_searchable' => false,
+                'is_enabled' => true,
+                'sort_order' => 3,
+            ]
+        );
 
         // Create material values
         $materials = [
@@ -125,13 +139,17 @@ final class ProductVariantSeeder extends Seeder
         ];
 
         foreach ($materials as $material) {
-            AttributeValue::create([
-                'attribute_id' => $materialAttribute->id,
-                'value' => $material['value'],
-                'slug' => Str::slug($material['value']),
-                'sort_order' => $material['sort_order'],
-                'is_enabled' => true,
-            ]);
+            AttributeValue::firstOrCreate(
+                [
+                    'attribute_id' => $materialAttribute->id,
+                    'value' => $material['value'],
+                ],
+                [
+                    'slug' => Str::slug($material['value']),
+                    'sort_order' => $material['sort_order'],
+                    'is_enabled' => true,
+                ]
+            );
         }
     }
 
@@ -262,26 +280,16 @@ final class ProductVariantSeeder extends Seeder
                     'price' => $productData['base_price'] + $variantData['price_modifier'],
                     'compare_price' => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
                     'cost_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
-                    'quantity' => $variantData['stock'],
-                    'size' => $variantData['size'],
-                    'size_display' => $variantData['size'],
-                    'size_price_modifier' => $variantData['price_modifier'],
-                    'variant_type' => 'size',
-                    'is_enabled' => true,
+                    'stock_quantity' => $variantData['stock'],
+                    'weight' => 0.5,
                     'track_inventory' => true,
-                    'position' => $index + 1,
-                    'is_default_variant' => $index === 0,
+                    'is_default' => $index === 0,
+                    'is_enabled' => true,
+                    'attributes' => json_encode(['size' => $variantData['size']]),
                 ]);
 
-                // Attach size attribute
-                $sizeAttribute = Attribute::where('slug', 'size')->first();
-                $sizeValue = AttributeValue::where('attribute_id', $sizeAttribute->id)
-                    ->where('value', $variantData['size'])
-                    ->first();
-
-                if ($sizeValue) {
-                    $variant->attributes()->attach($sizeValue->id);
-                }
+                // Note: Attributes are stored in JSON format in the attributes column
+                // The relationship will be handled by the frontend components
 
                 // Create variant inventory
                 VariantInventory::create([

@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             ChannelSeeder::class,
             // Core catalog structure with local images only
             BrandSeeder::class,
-            LithuanianCatalogSeeder::class,
+            // LithuanianCatalogSeeder::class, // Temporarily disabled due to memory issues
             AttributeSeeder::class,
             AttributeValueSeeder::class,
             // High‑performance product seeding with attributes, relations, translations, and local images

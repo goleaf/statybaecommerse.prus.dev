@@ -40,12 +40,8 @@ final class ProductVariant extends Model implements HasMedia
     protected $table = 'product_variants';
     protected $fillable = [
         'product_id', 'sku', 'name', 'price', 'compare_price', 'cost_price', 
-        'track_quantity', 'quantity', 'weight', 'length', 'width', 'height', 
-        'is_enabled', 'position', 'barcode', 'status', 'size', 'size_unit', 
-        'size_display', 'size_price_modifier', 'size_weight_modifier', 
-        'variant_type', 'is_default_variant', 'variant_sku_suffix', 
-        'track_inventory', 'allow_backorder', 'low_stock_threshold', 
-        'variant_metadata'
+        'stock_quantity', 'weight', 'track_inventory', 'is_default', 
+        'is_enabled', 'barcode', 'attributes'
     ];
     /**
      * Handle casts functionality with proper error handling.
@@ -57,21 +53,12 @@ final class ProductVariant extends Model implements HasMedia
             'price' => 'decimal:2', 
             'compare_price' => 'decimal:2', 
             'cost_price' => 'decimal:2', 
-            'weight' => 'decimal:3', 
-            'length' => 'decimal:2', 
-            'width' => 'decimal:2', 
-            'height' => 'decimal:2', 
-            'track_quantity' => 'boolean', 
-            'quantity' => 'integer', 
-            'is_enabled' => 'boolean', 
-            'position' => 'integer',
-            'size_price_modifier' => 'decimal:4',
-            'size_weight_modifier' => 'decimal:4',
-            'is_default_variant' => 'boolean',
+            'weight' => 'decimal:2', 
+            'stock_quantity' => 'integer', 
             'track_inventory' => 'boolean',
-            'allow_backorder' => 'boolean',
-            'low_stock_threshold' => 'integer',
-            'variant_metadata' => 'array'
+            'is_default' => 'boolean',
+            'is_enabled' => 'boolean',
+            'attributes' => 'array'
         ];
     }
     /**
@@ -81,8 +68,7 @@ final class ProductVariant extends Model implements HasMedia
      */
     protected $appends = [
         'display_name', 'profit_margin', 'stock', 'available_quantity', 
-        'reserved_quantity', 'is_out_of_stock', 'final_price', 'size_display_name',
-        'variant_sku', 'is_low_stock', 'needs_reorder', 'stock_status'
+        'reserved_quantity', 'is_out_of_stock'
     ];
     /**
      * Handle product functionality with proper error handling.
@@ -126,7 +112,7 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function getStockAttribute(): int
     {
-        return (int) ($this->quantity ?? 0);
+        return (int) ($this->stock_quantity ?? 0);
     }
     /**
      * Handle prices functionality with proper error handling.
