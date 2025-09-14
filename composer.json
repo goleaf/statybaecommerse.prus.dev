@@ -138,6 +138,9 @@
         "sqlite:check": [
             "@php artisan sqlite:optimize --check"
         ],
+        "sqlite:vacuum": [
+            "@php artisan sqlite:optimize --vacuum"
+        ],
         "docs:generate": [
             "php artisan docs:generate"
         ],

@@ -186,6 +186,20 @@ SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size
 
 -- Manual vacuum (if needed)
 VACUUM;
+
+-- Incremental vacuum (safer for production)
+PRAGMA incremental_vacuum;
+```
+
+### Manual Vacuum Operations
+Since `auto_vacuum` cannot be enabled on existing databases, you can run manual vacuum operations:
+
+```bash
+# Run incremental vacuum via Artisan command
+php artisan sqlite:optimize --vacuum
+
+# Or directly via SQLite
+sqlite3 database/database.sqlite "PRAGMA incremental_vacuum;"
 ```
 
 ### Performance Monitoring

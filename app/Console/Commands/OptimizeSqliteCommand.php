@@ -20,7 +20,8 @@ final class OptimizeSqliteCommand extends Command
      */
     protected $signature = 'sqlite:optimize 
                             {--check : Only check current SQLite settings without applying optimizations}
-                            {--force : Force apply optimizations even if already optimized}';
+                            {--force : Force apply optimizations even if already optimized}
+                            {--vacuum : Run incremental vacuum to reclaim space}';
 
     /**
      * The console command description.
@@ -39,6 +40,10 @@ final class OptimizeSqliteCommand extends Command
 
         if ($this->option('check')) {
             return $this->checkCurrentSettings();
+        }
+
+        if ($this->option('vacuum')) {
+            return $this->runVacuum();
         }
 
         return $this->applyOptimizations();
@@ -141,6 +146,49 @@ final class OptimizeSqliteCommand extends Command
         } catch (\Exception $e) {
             $this->error('Failed to apply SQLite optimizations: ' . $e->getMessage());
             Log::error('Failed to apply SQLite optimizations: ' . $e->getMessage());
+            return 1;
+        }
+    }
+
+    /**
+     * Run incremental vacuum to reclaim space.
+     */
+    private function runVacuum(): int
+    {
+        $this->info('Running incremental vacuum...');
+        $this->newLine();
+
+        try {
+            $pdo = DB::connection('sqlite')->getPdo();
+            
+            // Get database size before vacuum
+            $sizeBefore = $pdo->query('SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()')->fetchColumn();
+            $this->line("Database size before vacuum: " . number_format($sizeBefore / 1024 / 1024, 2) . " MB");
+
+            // Run incremental vacuum
+            $pdo->exec('PRAGMA incremental_vacuum');
+            $this->line('✅ Incremental vacuum completed');
+
+            // Get database size after vacuum
+            $sizeAfter = $pdo->query('SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()')->fetchColumn();
+            $this->line("Database size after vacuum: " . number_format($sizeAfter / 1024 / 1024, 2) . " MB");
+
+            $spaceReclaimed = $sizeBefore - $sizeAfter;
+            if ($spaceReclaimed > 0) {
+                $this->line("Space reclaimed: " . number_format($spaceReclaimed / 1024 / 1024, 2) . " MB");
+            } else {
+                $this->line("No space was reclaimed (database was already optimized)");
+            }
+
+            $this->newLine();
+            $this->info('Incremental vacuum completed successfully!');
+
+            Log::info('SQLite incremental vacuum completed via artisan command');
+
+            return 0;
+        } catch (\Exception $e) {
+            $this->error('Failed to run incremental vacuum: ' . $e->getMessage());
+            Log::error('Failed to run incremental vacuum: ' . $e->getMessage());
             return 1;
         }
     }
