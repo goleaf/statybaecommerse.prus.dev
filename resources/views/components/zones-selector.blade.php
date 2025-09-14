@@ -1,11 +1,11 @@
 <div class="mt-12 flex items-center">
-    <p class="text-gray-500 text-sm leading-5">
+    <p class="text-slate-600 text-sm leading-5">
         {{ __('Shipping to') }} :
     </p>
     <button
         onclick="Livewire.dispatch('openPanel', { component: 'modals.zone-selector' })"
         type="button"
-        class="group font-semibold ml-4 flex items-center text-gray-900 hover:underline"
+        class="group font-semibold ml-4 flex items-center text-slate-700 hover:text-blue-600 hover:underline transition-colors duration-200"
     >
         <img
             src="{{ \App\Actions\ZoneSessionManager::getSession()?->countryFlag }}"
