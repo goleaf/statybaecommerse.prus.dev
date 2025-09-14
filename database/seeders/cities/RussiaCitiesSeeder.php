@@ -6,7 +6,6 @@ namespace Database\Seeders\Cities;
 
 use App\Models\City;
 use App\Models\Country;
-use App\Models\Region;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
@@ -18,18 +17,8 @@ final class RussiaCitiesSeeder extends Seeder
         $russia = Country::where('cca2', 'RU')->first();
         $ruZone = Zone::where('code', 'RU')->first();
 
-        // Get regions
-        $moscowRegion = Region::where('code', 'RU-MOW')->first();
-        $spbRegion = Region::where('code', 'RU-SPE')->first();
-        $novosibirskRegion = Region::where('code', 'RU-NVS')->first();
-        $yekaterinburgRegion = Region::where('code', 'RU-SVE')->first();
-        $kazanRegion = Region::where('code', 'RU-TA')->first();
-        $nizhnyNovgorodRegion = Region::where('code', 'RU-NIZ')->first();
-        $chelyabinskRegion = Region::where('code', 'RU-CHE')->first();
-        $omskRegion = Region::where('code', 'RU-OMS')->first();
-        $samaraRegion = Region::where('code', 'RU-SAM')->first();
-        $rostovRegion = Region::where('code', 'RU-ROS')->first();
-
+        // Regions are no longer used in the database schema
+        
         $cities = [
             // Moscow
             [
@@ -37,141 +26,131 @@ final class RussiaCitiesSeeder extends Seeder
                 'code' => 'RU-MOW-MOS',
                 'is_capital' => true,
                 'is_default' => true,
-                'region_id' => $moscowRegion?->id,
                 'latitude' => 55.7558,
                 'longitude' => 37.6176,
                 'population' => 12615079,
                 'postal_codes' => ['101000', '101001', '101002'],
                 'translations' => [
                     'lt' => ['name' => 'Maskva', 'description' => 'Rusijos sostinė'],
-                    'en' => ['name' => 'Moscow', 'description' => 'Capital of Russia'],
-                ],
+                    'en' => ['name' => 'Moscow', 'description' => 'Capital of Russia']
+            ],
             ],
             // Saint Petersburg
             [
                 'name' => 'Saint Petersburg',
                 'code' => 'RU-SPE-SPB',
-                'region_id' => $spbRegion?->id,
                 'latitude' => 59.9311,
                 'longitude' => 30.3609,
                 'population' => 5383890,
                 'postal_codes' => ['190000', '190001', '190002'],
                 'translations' => [
                     'lt' => ['name' => 'Sankt Peterburgas', 'description' => 'Kultūros sostinė'],
-                    'en' => ['name' => 'Saint Petersburg', 'description' => 'Cultural capital'],
-                ],
+                    'en' => ['name' => 'Saint Petersburg', 'description' => 'Cultural capital']
+            ],
             ],
             // Novosibirsk
             [
                 'name' => 'Novosibirsk',
                 'code' => 'RU-NVS-NOV',
-                'region_id' => $novosibirskRegion?->id,
                 'latitude' => 55.0084,
                 'longitude' => 82.9357,
                 'population' => 1625631,
                 'postal_codes' => ['630000'],
                 'translations' => [
                     'lt' => ['name' => 'Novosibirskas', 'description' => 'Sibiro sostinė'],
-                    'en' => ['name' => 'Novosibirsk', 'description' => 'Capital of Siberia'],
-                ],
+                    'en' => ['name' => 'Novosibirsk', 'description' => 'Capital of Siberia']
+            ],
             ],
             // Yekaterinburg
             [
                 'name' => 'Yekaterinburg',
                 'code' => 'RU-SVE-YEK',
-                'region_id' => $yekaterinburgRegion?->id,
                 'latitude' => 56.8431,
                 'longitude' => 60.6454,
                 'population' => 1493749,
                 'postal_codes' => ['620000'],
                 'translations' => [
                     'lt' => ['name' => 'Jekaterinburgas', 'description' => 'Uralo sostinė'],
-                    'en' => ['name' => 'Yekaterinburg', 'description' => 'Capital of Urals'],
-                ],
+                    'en' => ['name' => 'Yekaterinburg', 'description' => 'Capital of Urals']
+            ],
             ],
             // Kazan
             [
                 'name' => 'Kazan',
                 'code' => 'RU-TA-KAZ',
-                'region_id' => $kazanRegion?->id,
                 'latitude' => 55.8304,
                 'longitude' => 49.0661,
                 'population' => 1257391,
                 'postal_codes' => ['420000'],
                 'translations' => [
                     'lt' => ['name' => 'Kazanė', 'description' => 'Tatarstano sostinė'],
-                    'en' => ['name' => 'Kazan', 'description' => 'Capital of Tatarstan'],
-                ],
+                    'en' => ['name' => 'Kazan', 'description' => 'Capital of Tatarstan']
+            ],
             ],
             // Nizhny Novgorod
             [
                 'name' => 'Nizhny Novgorod',
                 'code' => 'RU-NIZ-NIZ',
-                'region_id' => $nizhnyNovgorodRegion?->id,
                 'latitude' => 56.3269,
                 'longitude' => 44.0075,
                 'population' => 1250619,
                 'postal_codes' => ['603000'],
                 'translations' => [
                     'lt' => ['name' => 'Nižnij Novgorodas', 'description' => 'Automobilių pramonės centras'],
-                    'en' => ['name' => 'Nizhny Novgorod', 'description' => 'Automotive industry center'],
-                ],
+                    'en' => ['name' => 'Nizhny Novgorod', 'description' => 'Automotive industry center']
+            ],
             ],
             // Chelyabinsk
             [
                 'name' => 'Chelyabinsk',
                 'code' => 'RU-CHE-CHE',
-                'region_id' => $chelyabinskRegion?->id,
                 'latitude' => 55.1644,
                 'longitude' => 61.4368,
                 'population' => 1202371,
                 'postal_codes' => ['454000'],
                 'translations' => [
                     'lt' => ['name' => 'Čeliabinskas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Chelyabinsk', 'description' => 'Industrial city'],
-                ],
+                    'en' => ['name' => 'Chelyabinsk', 'description' => 'Industrial city']
+            ],
             ],
             // Omsk
             [
                 'name' => 'Omsk',
                 'code' => 'RU-OMS-OMS',
-                'region_id' => $omskRegion?->id,
                 'latitude' => 54.9885,
                 'longitude' => 73.3242,
                 'population' => 1178391,
                 'postal_codes' => ['644000'],
                 'translations' => [
                     'lt' => ['name' => 'Omskas', 'description' => 'Sibiro miestas'],
-                    'en' => ['name' => 'Omsk', 'description' => 'Siberian city'],
-                ],
+                    'en' => ['name' => 'Omsk', 'description' => 'Siberian city']
+            ],
             ],
             // Samara
             [
                 'name' => 'Samara',
                 'code' => 'RU-SAM-SAM',
-                'region_id' => $samaraRegion?->id,
                 'latitude' => 53.2001,
                 'longitude' => 50.15,
                 'population' => 1164685,
                 'postal_codes' => ['443000'],
                 'translations' => [
                     'lt' => ['name' => 'Samara', 'description' => 'Volgos miestas'],
-                    'en' => ['name' => 'Samara', 'description' => 'Volga city'],
-                ],
+                    'en' => ['name' => 'Samara', 'description' => 'Volga city']
+            ],
             ],
             // Rostov-on-Don
             [
                 'name' => 'Rostov-on-Don',
                 'code' => 'RU-ROS-ROS',
-                'region_id' => $rostovRegion?->id,
                 'latitude' => 47.2357,
                 'longitude' => 39.7015,
                 'population' => 1125299,
                 'postal_codes' => ['344000'],
                 'translations' => [
                     'lt' => ['name' => 'Rostovas prie Dono', 'description' => 'Pietų Rusijos centras'],
-                    'en' => ['name' => 'Rostov-on-Don', 'description' => 'Center of Southern Russia'],
-                ],
+                    'en' => ['name' => 'Rostov-on-Don', 'description' => 'Center of Southern Russia']
+            ],
             ],
             // Additional major cities
             [
@@ -184,8 +163,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['450000'],
                 'translations' => [
                     'lt' => ['name' => 'Ufa', 'description' => 'Baškirijos sostinė'],
-                    'en' => ['name' => 'Ufa', 'description' => 'Capital of Bashkortostan'],
-                ],
+                    'en' => ['name' => 'Ufa', 'description' => 'Capital of Bashkortostan']
+            ],
             ],
             [
                 'name' => 'Krasnoyarsk',
@@ -197,8 +176,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['660000'],
                 'translations' => [
                     'lt' => ['name' => 'Krasnojarskas', 'description' => 'Sibiro miestas'],
-                    'en' => ['name' => 'Krasnoyarsk', 'description' => 'Siberian city'],
-                ],
+                    'en' => ['name' => 'Krasnoyarsk', 'description' => 'Siberian city']
+            ],
             ],
             [
                 'name' => 'Perm',
@@ -210,8 +189,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['614000'],
                 'translations' => [
                     'lt' => ['name' => 'Permė', 'description' => 'Uralo miestas'],
-                    'en' => ['name' => 'Perm', 'description' => 'Ural city'],
-                ],
+                    'en' => ['name' => 'Perm', 'description' => 'Ural city']
+            ],
             ],
             [
                 'name' => 'Voronezh',
@@ -223,8 +202,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['394000'],
                 'translations' => [
                     'lt' => ['name' => 'Voronežas', 'description' => 'Centrinės Rusijos miestas'],
-                    'en' => ['name' => 'Voronezh', 'description' => 'Central Russian city'],
-                ],
+                    'en' => ['name' => 'Voronezh', 'description' => 'Central Russian city']
+            ],
             ],
             [
                 'name' => 'Volgograd',
@@ -236,8 +215,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['400000'],
                 'translations' => [
                     'lt' => ['name' => 'Volgogradas', 'description' => 'Stalingrado miestas'],
-                    'en' => ['name' => 'Volgograd', 'description' => 'Stalingrad city'],
-                ],
+                    'en' => ['name' => 'Volgograd', 'description' => 'Stalingrad city']
+            ],
             ],
             [
                 'name' => 'Krasnodar',
@@ -249,8 +228,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['350000'],
                 'translations' => [
                     'lt' => ['name' => 'Krasnodaras', 'description' => 'Kubanės sostinė'],
-                    'en' => ['name' => 'Krasnodar', 'description' => 'Capital of Kuban'],
-                ],
+                    'en' => ['name' => 'Krasnodar', 'description' => 'Capital of Kuban']
+            ],
             ],
             [
                 'name' => 'Saratov',
@@ -262,8 +241,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['410000'],
                 'translations' => [
                     'lt' => ['name' => 'Saratovas', 'description' => 'Volgos miestas'],
-                    'en' => ['name' => 'Saratov', 'description' => 'Volga city'],
-                ],
+                    'en' => ['name' => 'Saratov', 'description' => 'Volga city']
+            ],
             ],
             [
                 'name' => 'Tyumen',
@@ -275,21 +254,20 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['625000'],
                 'translations' => [
                     'lt' => ['name' => 'Tiumenė', 'description' => 'Naftos pramonės centras'],
-                    'en' => ['name' => 'Tyumen', 'description' => 'Oil industry center'],
-                ],
+                    'en' => ['name' => 'Tyumen', 'description' => 'Oil industry center']
+            ],
             ],
             [
                 'name' => 'Tolyatti',
                 'code' => 'RU-SAM-TOL',
-                'region_id' => $samaraRegion?->id,
                 'latitude' => 53.5303,
                 'longitude' => 49.3461,
                 'population' => 707408,
                 'postal_codes' => ['445000'],
                 'translations' => [
                     'lt' => ['name' => 'Toljatis', 'description' => 'Automobilių pramonės centras'],
-                    'en' => ['name' => 'Tolyatti', 'description' => 'Automotive industry center'],
-                ],
+                    'en' => ['name' => 'Tolyatti', 'description' => 'Automotive industry center']
+            ],
             ],
             // Additional major cities
             [
@@ -302,8 +280,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['426000'],
                 'translations' => [
                     'lt' => ['name' => 'Iževskas', 'description' => 'Udmurtijos sostinė'],
-                    'en' => ['name' => 'Izhevsk', 'description' => 'Capital of Udmurtia'],
-                ],
+                    'en' => ['name' => 'Izhevsk', 'description' => 'Capital of Udmurtia']
+            ],
             ],
             [
                 'name' => 'Barnaul',
@@ -315,8 +293,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['656000'],
                 'translations' => [
                     'lt' => ['name' => 'Barnaule', 'description' => 'Altajaus krašto sostinė'],
-                    'en' => ['name' => 'Barnaul', 'description' => 'Capital of Altai Krai'],
-                ],
+                    'en' => ['name' => 'Barnaul', 'description' => 'Capital of Altai Krai']
+            ],
             ],
             [
                 'name' => 'Ulyanovsk',
@@ -328,8 +306,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['432000'],
                 'translations' => [
                     'lt' => ['name' => 'Uljanovskas', 'description' => 'Lenino gimimo vieta'],
-                    'en' => ['name' => 'Ulyanovsk', 'description' => 'Birthplace of Lenin'],
-                ],
+                    'en' => ['name' => 'Ulyanovsk', 'description' => 'Birthplace of Lenin']
+            ],
             ],
             [
                 'name' => 'Vladivostok',
@@ -341,8 +319,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['690000'],
                 'translations' => [
                     'lt' => ['name' => 'Vladivostokas', 'description' => 'Rytų Rusijos sostinė'],
-                    'en' => ['name' => 'Vladivostok', 'description' => 'Capital of Eastern Russia'],
-                ],
+                    'en' => ['name' => 'Vladivostok', 'description' => 'Capital of Eastern Russia']
+            ],
             ],
             [
                 'name' => 'Yaroslavl',
@@ -354,8 +332,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['150000'],
                 'translations' => [
                     'lt' => ['name' => 'Jaroslavlis', 'description' => 'Aukso žiedo miestas'],
-                    'en' => ['name' => 'Yaroslavl', 'description' => 'Golden Ring city'],
-                ],
+                    'en' => ['name' => 'Yaroslavl', 'description' => 'Golden Ring city']
+            ],
             ],
             [
                 'name' => 'Makhachkala',
@@ -367,8 +345,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['367000'],
                 'translations' => [
                     'lt' => ['name' => 'Machachkala', 'description' => 'Dagestano sostinė'],
-                    'en' => ['name' => 'Makhachkala', 'description' => 'Capital of Dagestan'],
-                ],
+                    'en' => ['name' => 'Makhachkala', 'description' => 'Capital of Dagestan']
+            ],
             ],
             [
                 'name' => 'Tomsk',
@@ -380,8 +358,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['634000'],
                 'translations' => [
                     'lt' => ['name' => 'Tomskas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Tomsk', 'description' => 'University city'],
-                ],
+                    'en' => ['name' => 'Tomsk', 'description' => 'University city']
+            ],
             ],
             [
                 'name' => 'Ryazan',
@@ -393,8 +371,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['390000'],
                 'translations' => [
                     'lt' => ['name' => 'Riazanė', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Ryazan', 'description' => 'Historic city'],
-                ],
+                    'en' => ['name' => 'Ryazan', 'description' => 'Historic city']
+            ],
             ],
             [
                 'name' => 'Astrakhan',
@@ -406,8 +384,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['414000'],
                 'translations' => [
                     'lt' => ['name' => 'Astrachanė', 'description' => 'Kaspijos jūros miestas'],
-                    'en' => ['name' => 'Astrakhan', 'description' => 'Caspian Sea city'],
-                ],
+                    'en' => ['name' => 'Astrakhan', 'description' => 'Caspian Sea city']
+            ],
             ],
             [
                 'name' => 'Penza',
@@ -419,8 +397,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['440000'],
                 'translations' => [
                     'lt' => ['name' => 'Penza', 'description' => 'Centrinės Rusijos miestas'],
-                    'en' => ['name' => 'Penza', 'description' => 'Central Russian city'],
-                ],
+                    'en' => ['name' => 'Penza', 'description' => 'Central Russian city']
+            ],
             ],
             [
                 'name' => 'Lipetsk',
@@ -432,8 +410,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['398000'],
                 'translations' => [
                     'lt' => ['name' => 'Lipeckas', 'description' => 'Metalingų pramonės centras'],
-                    'en' => ['name' => 'Lipetsk', 'description' => 'Metallurgy center'],
-                ],
+                    'en' => ['name' => 'Lipetsk', 'description' => 'Metallurgy center']
+            ],
             ],
             [
                 'name' => 'Tula',
@@ -445,8 +423,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['300000'],
                 'translations' => [
                     'lt' => ['name' => 'Tula', 'description' => 'Ginklų pramonės centras'],
-                    'en' => ['name' => 'Tula', 'description' => 'Arms industry center'],
-                ],
+                    'en' => ['name' => 'Tula', 'description' => 'Arms industry center']
+            ],
             ],
             [
                 'name' => 'Kirov',
@@ -458,8 +436,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['610000'],
                 'translations' => [
                     'lt' => ['name' => 'Kirovas', 'description' => 'Kirovo srities sostinė'],
-                    'en' => ['name' => 'Kirov', 'description' => 'Capital of Kirov Oblast'],
-                ],
+                    'en' => ['name' => 'Kirov', 'description' => 'Capital of Kirov Oblast']
+            ],
             ],
             [
                 'name' => 'Cheboksary',
@@ -471,8 +449,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['428000'],
                 'translations' => [
                     'lt' => ['name' => 'Čeboksarai', 'description' => 'Čiuvašijos sostinė'],
-                    'en' => ['name' => 'Cheboksary', 'description' => 'Capital of Chuvashia'],
-                ],
+                    'en' => ['name' => 'Cheboksary', 'description' => 'Capital of Chuvashia']
+            ],
             ],
             [
                 'name' => 'Kaliningrad',
@@ -484,8 +462,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['236000'],
                 'translations' => [
                     'lt' => ['name' => 'Kaliningradas', 'description' => 'Eksklavas prie Baltijos jūros'],
-                    'en' => ['name' => 'Kaliningrad', 'description' => 'Baltic Sea exclave'],
-                ],
+                    'en' => ['name' => 'Kaliningrad', 'description' => 'Baltic Sea exclave']
+            ],
             ],
             [
                 'name' => 'Bryansk',
@@ -497,8 +475,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['241000'],
                 'translations' => [
                     'lt' => ['name' => 'Brianske', 'description' => 'Pietvakarių Rusijos miestas'],
-                    'en' => ['name' => 'Bryansk', 'description' => 'Southwestern Russian city'],
-                ],
+                    'en' => ['name' => 'Bryansk', 'description' => 'Southwestern Russian city']
+            ],
             ],
             [
                 'name' => 'Ivanovo',
@@ -510,21 +488,20 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['153000'],
                 'translations' => [
                     'lt' => ['name' => 'Ivanovas', 'description' => 'Tekstilės pramonės centras'],
-                    'en' => ['name' => 'Ivanovo', 'description' => 'Textile industry center'],
-                ],
+                    'en' => ['name' => 'Ivanovo', 'description' => 'Textile industry center']
+            ],
             ],
             [
                 'name' => 'Magnitogorsk',
                 'code' => 'RU-CHE-MAG',
-                'region_id' => $chelyabinskRegion?->id,
                 'latitude' => 53.4186,
                 'longitude' => 59.0472,
                 'population' => 413253,
                 'postal_codes' => ['455000'],
                 'translations' => [
                     'lt' => ['name' => 'Magnitogorskas', 'description' => 'Metalingų pramonės centras'],
-                    'en' => ['name' => 'Magnitogorsk', 'description' => 'Metallurgy center'],
-                ],
+                    'en' => ['name' => 'Magnitogorsk', 'description' => 'Metallurgy center']
+            ],
             ],
             [
                 'name' => 'Kurgan',
@@ -536,8 +513,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['640000'],
                 'translations' => [
                     'lt' => ['name' => 'Kurganas', 'description' => 'Sibiro miestas'],
-                    'en' => ['name' => 'Kurgan', 'description' => 'Siberian city'],
-                ],
+                    'en' => ['name' => 'Kurgan', 'description' => 'Siberian city']
+            ],
             ],
             [
                 'name' => 'Orsk',
@@ -549,8 +526,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['462400'],
                 'translations' => [
                     'lt' => ['name' => 'Orskas', 'description' => 'Uralo miestas'],
-                    'en' => ['name' => 'Orsk', 'description' => 'Ural city'],
-                ],
+                    'en' => ['name' => 'Orsk', 'description' => 'Ural city']
+            ],
             ],
             [
                 'name' => 'Sterlitamak',
@@ -562,8 +539,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['453100'],
                 'translations' => [
                     'lt' => ['name' => 'Sterlitamakas', 'description' => 'Baškirijos miestas'],
-                    'en' => ['name' => 'Sterlitamak', 'description' => 'Bashkortostan city'],
-                ],
+                    'en' => ['name' => 'Sterlitamak', 'description' => 'Bashkortostan city']
+            ],
             ],
             [
                 'name' => 'Angarsk',
@@ -575,21 +552,20 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['665800'],
                 'translations' => [
                     'lt' => ['name' => 'Angarskas', 'description' => 'Petrochemijos centras'],
-                    'en' => ['name' => 'Angarsk', 'description' => 'Petrochemical center'],
-                ],
+                    'en' => ['name' => 'Angarsk', 'description' => 'Petrochemical center']
+            ],
             ],
             [
                 'name' => 'Balakovo',
                 'code' => 'RU-SAR-BAL',
-                'region_id' => $samaraRegion?->id,
                 'latitude' => 52.0383,
                 'longitude' => 47.7822,
                 'population' => 191260,
                 'postal_codes' => ['413840'],
                 'translations' => [
                     'lt' => ['name' => 'Balakovas', 'description' => 'Volgos miestas'],
-                    'en' => ['name' => 'Balakovo', 'description' => 'Volga city'],
-                ],
+                    'en' => ['name' => 'Balakovo', 'description' => 'Volga city']
+            ],
             ],
             [
                 'name' => 'Blagoveshchensk',
@@ -601,8 +577,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['675000'],
                 'translations' => [
                     'lt' => ['name' => 'Blagoveščenskas', 'description' => 'Kinijos sienos miestas'],
-                    'en' => ['name' => 'Blagoveshchensk', 'description' => 'Chinese border city'],
-                ],
+                    'en' => ['name' => 'Blagoveshchensk', 'description' => 'Chinese border city']
+            ],
             ],
             [
                 'name' => 'Pskov',
@@ -614,8 +590,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['180000'],
                 'translations' => [
                     'lt' => ['name' => 'Pskovas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Pskov', 'description' => 'Historic city'],
-                ],
+                    'en' => ['name' => 'Pskov', 'description' => 'Historic city']
+            ],
             ],
             [
                 'name' => 'Biysk',
@@ -627,8 +603,8 @@ final class RussiaCitiesSeeder extends Seeder
                 'postal_codes' => ['659300'],
                 'translations' => [
                     'lt' => ['name' => 'Bijskas', 'description' => 'Altajaus miestas'],
-                    'en' => ['name' => 'Biysk', 'description' => 'Altai city'],
-                ],
+                    'en' => ['name' => 'Biysk', 'description' => 'Altai city']
+            ],
             ],
         ];
 
@@ -637,13 +613,12 @@ final class RussiaCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name']),
+                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
                     'country_id' => $russia->id,
                     'zone_id' => $ruZone?->id,
-                    'region_id' => $cityData['region_id'],
                     'level' => 1,
                     'latitude' => $cityData['latitude'],
                     'longitude' => $cityData['longitude'],
@@ -658,8 +633,8 @@ final class RussiaCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale,
-                    ],
+                        'locale' => $locale
+            ],
                     [
                         'name' => $translation['name'],
                         'description' => $translation['description'],
