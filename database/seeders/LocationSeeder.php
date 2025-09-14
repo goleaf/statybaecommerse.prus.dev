@@ -81,10 +81,10 @@ final class LocationSeeder extends Seeder
                 $descriptionJson[$locale] = $translationData['description'] ?? '';
             }
 
-            // Add JSON fields to data
-            $data['name'] = $nameJson;
-            $data['slug'] = $slugJson;
-            $data['description'] = $descriptionJson;
+            // Provide default values for required fields
+            $data['name'] = $data['code']; // Use code as default name
+            $data['slug'] = $data['code']; // Use code as default slug
+            $data['description'] = ''; // Empty description
 
             $location = Location::updateOrCreate(['code' => $data['code']], $data);
 

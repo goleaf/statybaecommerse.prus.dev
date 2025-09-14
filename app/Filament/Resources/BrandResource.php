@@ -45,8 +45,6 @@ use UnitEnum;
 final class BrandResource extends Resource
 {
     protected static ?string $model = Brand::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = NavigationIcon::Tag;
     /**
      * @var UnitEnum|string|null
      */

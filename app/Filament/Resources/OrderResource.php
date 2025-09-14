@@ -57,8 +57,6 @@ class OrderResource extends Resource
     /**
      * @var BackedEnum|string|null
      */
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-shopping-bag';
     protected static ?string $navigationLabel = 'orders.navigation_label';
     protected static ?string $modelLabel = 'orders.model_label';
     protected static ?string $pluralModelLabel = 'orders.plural_model_label';

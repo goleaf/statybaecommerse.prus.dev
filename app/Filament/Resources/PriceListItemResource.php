@@ -47,8 +47,6 @@ final class PriceListItemResource extends Resource
 {
     protected static ?string $model = PriceListItem::class;
     /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-currency-euro';
-    /** @var BackedEnum|string|null */
     /**
      * @var UnitEnum|string|null
      */

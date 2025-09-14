@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|RecommendationAnalytics query()
  * @mixin \Eloquent
  */
+#[ScopedBy([UserOwnedScope::class])]
 final class RecommendationAnalytics extends Model
 {
     use HasFactory;

@@ -30,8 +30,6 @@ final class NewsResource extends Resource
     /**
      * @var BackedEnum|string|null
      */
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-newspaper';
     protected static ?int $navigationSort = 1;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

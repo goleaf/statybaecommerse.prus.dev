@@ -3,6 +3,8 @@
 declare (strict_types=1);
 namespace App\Models;
 
+use App\Models\Scopes\UserOwnedScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|ReferralRewardLog query()
  * @mixin \Eloquent
  */
+#[ScopedBy([UserOwnedScope::class])]
 final class ReferralRewardLog extends Model
 {
     use HasFactory;

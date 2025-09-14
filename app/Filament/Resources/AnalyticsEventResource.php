@@ -28,8 +28,6 @@ use UnitEnum;
 final class AnalyticsEventResource extends Resource
 {
     protected static ?string $model = AnalyticsEvent::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-chart-bar';
     protected static ?string $navigationLabel = null;
     protected static ?int $navigationSort = 1;
     /**

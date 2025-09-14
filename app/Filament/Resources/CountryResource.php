@@ -60,8 +60,6 @@ use UnitEnum;
 final class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-globe-alt';
     protected static ?int $navigationSort = 1;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

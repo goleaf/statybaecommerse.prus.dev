@@ -30,8 +30,6 @@ use UnitEnum;
 final class ActivityLogResource extends Resource
 {
     protected static ?string $model = Activity::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-clipboard-document-list';
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      * @return string|null

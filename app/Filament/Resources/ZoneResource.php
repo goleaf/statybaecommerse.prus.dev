@@ -34,8 +34,6 @@ class ZoneResource extends Resource
 {
     protected static ?string $model = Zone::class;
     /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-globe-alt';
-    /** @var BackedEnum|string|null */
     /**
      * @var UnitEnum|string|null
      */

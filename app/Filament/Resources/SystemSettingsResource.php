@@ -34,8 +34,6 @@ final class SystemSettingsResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;
     /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
-    /** @var BackedEnum|string|null */
     /**
      * @var UnitEnum|string|null
      */

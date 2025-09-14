@@ -35,8 +35,6 @@ final class CampaignResource extends Resource
     /**
      * @var BackedEnum|string|null
      */
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-megaphone';
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      * @return string|null

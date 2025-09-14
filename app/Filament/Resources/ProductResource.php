@@ -61,8 +61,7 @@ class ProductResource extends Resource
      * 
      * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-cube';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-cube';
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      * @return string|null

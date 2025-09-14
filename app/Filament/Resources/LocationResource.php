@@ -48,8 +48,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 final class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-map-pin';
     protected static ?int $navigationSort = 2;
     /**
      * Handle getNavigationLabel functionality with proper error handling.

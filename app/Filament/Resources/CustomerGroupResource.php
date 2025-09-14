@@ -43,8 +43,6 @@ use UnitEnum;
 final class CustomerGroupResource extends Resource
 {
     protected static ?string $model = CustomerGroup::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-user-group';
     protected static ?int $navigationSort = 2;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

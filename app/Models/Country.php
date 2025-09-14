@@ -57,14 +57,6 @@ final class Country extends Model
         return $this->hasMany(Address::class, 'country_code', 'cca2');
     }
     /**
-     * Handle regions functionality with proper error handling.
-     * @return HasMany
-     */
-    public function regions(): HasMany
-    {
-        return $this->hasMany(Region::class);
-    }
-    /**
      * Handle cities functionality with proper error handling.
      * @return HasMany
      */

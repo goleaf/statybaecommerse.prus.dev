@@ -49,8 +49,6 @@ final class PriceResource extends Resource
     /**
      * @var BackedEnum|string|null
      */
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-currency-euro';
     protected static ?int $navigationSort = 1;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

@@ -63,8 +63,6 @@ use UnitEnum;
 final class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = NavigationIcon::RectangleStack;
     /**
      * @var UnitEnum|string|null
      */

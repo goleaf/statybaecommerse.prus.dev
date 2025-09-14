@@ -32,7 +32,7 @@ final class City extends Model
     use HasFactory, HasTranslations, SoftDeletes;
     protected string $translationModel = CityTranslation::class;
     protected $table = 'cities';
-    protected $fillable = ['name', 'slug', 'code', 'description', 'is_enabled', 'is_default', 'is_capital', 'country_id', 'zone_id', 'region_id', 'parent_id', 'level', 'latitude', 'longitude', 'population', 'postal_codes', 'sort_order', 'metadata', 'type', 'area', 'density', 'elevation', 'timezone', 'currency_code', 'currency_symbol', 'language_code', 'language_name', 'phone_code', 'postal_code', 'is_active'];
+    protected $fillable = ['name', 'slug', 'code', 'description', 'is_enabled', 'is_default', 'is_capital', 'country_id', 'zone_id', 'parent_id', 'level', 'latitude', 'longitude', 'population', 'postal_codes', 'sort_order', 'metadata', 'type', 'area', 'density', 'elevation', 'timezone', 'currency_code', 'currency_symbol', 'language_code', 'language_name', 'phone_code', 'postal_code', 'is_active'];
     /**
      * Handle casts functionality with proper error handling.
      * @return array
@@ -56,14 +56,6 @@ final class City extends Model
     public function zone(): BelongsTo
     {
         return $this->belongsTo(Zone::class);
-    }
-    /**
-     * Handle region functionality with proper error handling.
-     * @return BelongsTo
-     */
-    public function region(): BelongsTo
-    {
-        return $this->belongsTo(Region::class);
     }
     /**
      * Handle parent functionality with proper error handling.
@@ -188,15 +180,6 @@ final class City extends Model
     public function scopeByZone($query, string $zoneId)
     {
         return $query->where('zone_id', $zoneId);
-    }
-    /**
-     * Handle scopeByRegion functionality with proper error handling.
-     * @param mixed $query
-     * @param string $regionId
-     */
-    public function scopeByRegion($query, string $regionId)
-    {
-        return $query->where('region_id', $regionId);
     }
     /**
      * Handle scopeRoot functionality with proper error handling.
@@ -378,39 +361,6 @@ final class City extends Model
         });
     }
     /**
-     * Handle scopeByRegionCode functionality with proper error handling.
-     * @param mixed $query
-     * @param string $code
-     */
-    public function scopeByRegionCode($query, string $code)
-    {
-        return $query->whereHas('region', function ($q) use ($code) {
-            $q->where('code', $code);
-        });
-    }
-    /**
-     * Handle scopeByRegionCapital functionality with proper error handling.
-     * @param mixed $query
-     * @param string $capital
-     */
-    public function scopeByRegionCapital($query, string $capital)
-    {
-        return $query->whereHas('region', function ($q) use ($capital) {
-            $q->where('capital', $capital);
-        });
-    }
-    /**
-     * Handle scopeByRegionPopulation functionality with proper error handling.
-     * @param mixed $query
-     * @param int $minPopulation
-     */
-    public function scopeByRegionPopulation($query, int $minPopulation)
-    {
-        return $query->whereHas('region', function ($q) use ($minPopulation) {
-            $q->where('population', '>=', $minPopulation);
-        });
-    }
-    /**
      * Handle scopeByCountryCurrency functionality with proper error handling.
      * @param mixed $query
      * @param string $currencyCode
@@ -451,83 +401,6 @@ final class City extends Model
     public function scopeByCountryPhoneCode($query, string $phoneCode)
     {
         return $query->whereHas('country', function ($q) use ($phoneCode) {
-            $q->where('phone_code', $phoneCode);
-        });
-    }
-    /**
-     * Handle scopeByRegionType functionality with proper error handling.
-     * @param mixed $query
-     * @param string $type
-     */
-    public function scopeByRegionType($query, string $type)
-    {
-        return $query->whereHas('region', function ($q) use ($type) {
-            $q->where('type', $type);
-        });
-    }
-    /**
-     * Handle scopeByRegionArea functionality with proper error handling.
-     * @param mixed $query
-     * @param float $minArea
-     */
-    public function scopeByRegionArea($query, float $minArea)
-    {
-        return $query->whereHas('region', function ($q) use ($minArea) {
-            $q->where('area', '>=', $minArea);
-        });
-    }
-    /**
-     * Handle scopeByRegionDensity functionality with proper error handling.
-     * @param mixed $query
-     * @param float $minDensity
-     */
-    public function scopeByRegionDensity($query, float $minDensity)
-    {
-        return $query->whereHas('region', function ($q) use ($minDensity) {
-            $q->where('density', '>=', $minDensity);
-        });
-    }
-    /**
-     * Handle scopeByRegionTimezone functionality with proper error handling.
-     * @param mixed $query
-     * @param string $timezone
-     */
-    public function scopeByRegionTimezone($query, string $timezone)
-    {
-        return $query->whereHas('region', function ($q) use ($timezone) {
-            $q->where('timezone', $timezone);
-        });
-    }
-    /**
-     * Handle scopeByRegionCurrency functionality with proper error handling.
-     * @param mixed $query
-     * @param string $currencyCode
-     */
-    public function scopeByRegionCurrency($query, string $currencyCode)
-    {
-        return $query->whereHas('region', function ($q) use ($currencyCode) {
-            $q->where('currency_code', $currencyCode);
-        });
-    }
-    /**
-     * Handle scopeByRegionLanguage functionality with proper error handling.
-     * @param mixed $query
-     * @param string $languageCode
-     */
-    public function scopeByRegionLanguage($query, string $languageCode)
-    {
-        return $query->whereHas('region', function ($q) use ($languageCode) {
-            $q->where('language_code', $languageCode);
-        });
-    }
-    /**
-     * Handle scopeByRegionPhoneCode functionality with proper error handling.
-     * @param mixed $query
-     * @param string $phoneCode
-     */
-    public function scopeByRegionPhoneCode($query, string $phoneCode)
-    {
-        return $query->whereHas('region', function ($q) use ($phoneCode) {
             $q->where('phone_code', $phoneCode);
         });
     }
@@ -758,9 +631,6 @@ final class City extends Model
     public function getFullPathAttribute(): string
     {
         $path = collect([$this->translated_name]);
-        if ($this->region) {
-            $path->prepend($this->region->translated_name);
-        }
         if ($this->country) {
             $path->prepend($this->country->translated_name);
         }

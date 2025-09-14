@@ -32,7 +32,7 @@ final class Address extends Model
 {
     use HasFactory, SoftDeletes, HasTranslations;
     protected $table = 'addresses';
-    protected $fillable = ['user_id', 'type', 'first_name', 'last_name', 'company', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code', 'country_id', 'zone_id', 'region_id', 'city_id', 'phone', 'email', 'is_default', 'is_billing', 'is_shipping', 'notes', 'apartment', 'floor', 'building', 'landmark', 'instructions', 'company_name', 'company_vat', 'is_active'];
+    protected $fillable = ['user_id', 'type', 'first_name', 'last_name', 'company', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code', 'country_id', 'zone_id', 'city_id', 'phone', 'email', 'is_default', 'is_billing', 'is_shipping', 'notes', 'apartment', 'floor', 'building', 'landmark', 'instructions', 'company_name', 'company_vat', 'is_active'];
     protected $translatable = ['notes', 'instructions'];
     /**
      * Handle casts functionality with proper error handling.
@@ -79,14 +79,6 @@ final class Address extends Model
     public function zone(): BelongsTo
     {
         return $this->belongsTo(Zone::class);
-    }
-    /**
-     * Handle region functionality with proper error handling.
-     * @return BelongsTo
-     */
-    public function region(): BelongsTo
-    {
-        return $this->belongsTo(Region::class)->withDefault(['name' => 'Unknown Region']);
     }
     /**
      * Handle cityById functionality with proper error handling.
@@ -345,7 +337,7 @@ final class Address extends Model
      */
     public function getValidationRules(): array
     {
-        return ['user_id' => 'required|exists:users,id', 'type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'zone_id' => 'nullable|exists:zones,id', 'region_id' => 'nullable|exists:regions,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'is_active' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255'];
+        return ['user_id' => 'required|exists:users,id', 'type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'zone_id' => 'nullable|exists:zones,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'is_active' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255'];
     }
     /**
      * Handle getTypesForSelect functionality with proper error handling.

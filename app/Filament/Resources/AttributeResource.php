@@ -36,8 +36,6 @@ use UnitEnum;
 final class AttributeResource extends Resource
 {
     protected static ?string $model = Attribute::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-adjustments-horizontal';
     protected static ?int $navigationSort = 5;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

@@ -7,6 +7,7 @@ use App\Models\Subscriber;
 use App\Models\Company;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\LazyCollection;
 /**
  * EmailMarketingService
  * 
@@ -95,7 +96,9 @@ final class EmailMarketingService
      */
     public function bulkSyncSubscribers(): array
     {
-        $subscribers = Subscriber::active()->get();
+        // Use LazyCollection with timeout to prevent long-running bulk sync operations
+        $timeout = now()->addMinutes(10); // 10 minute timeout for bulk sync
+        $subscribers = Subscriber::active()->cursor()->takeUntilTimeout($timeout)->collect();
         $results = ['success' => 0, 'failed' => 0, 'errors' => []];
         foreach ($subscribers as $subscriber) {
             if ($this->syncSubscriberToMailchimp($subscriber)) {

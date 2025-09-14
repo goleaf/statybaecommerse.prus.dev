@@ -108,6 +108,19 @@ Route::prefix('autocomplete')->group(function () {
     Route::get('/recent', [App\Http\Controllers\Api\AutocompleteController::class, 'recent']);
     Route::get('/suggestions', [App\Http\Controllers\Api\AutocompleteController::class, 'suggestions']);
     Route::delete('/recent', [App\Http\Controllers\Api\AutocompleteController::class, 'clearRecent']);
+    
+    // Advanced search features
+    Route::get('/paginated', [App\Http\Controllers\Api\AutocompleteController::class, 'paginatedSearch']);
+    Route::get('/filters', [App\Http\Controllers\Api\AutocompleteController::class, 'getAvailableFilters']);
+    Route::post('/export', [App\Http\Controllers\Api\AutocompleteController::class, 'exportSearch']);
+    Route::get('/export/{exportId}/download', [App\Http\Controllers\Api\AutocompleteController::class, 'downloadExport'])->name('api.autocomplete.export.download');
+    Route::post('/share', [App\Http\Controllers\Api\AutocompleteController::class, 'shareSearch']);
+    Route::get('/share/{shareId}', [App\Http\Controllers\Api\AutocompleteController::class, 'viewSharedSearch'])->name('api.autocomplete.share.view');
+    
+    // Advanced analytics and insights
+    Route::get('/insights', [App\Http\Controllers\Api\AutocompleteController::class, 'getSearchInsights']);
+    Route::get('/recommendations', [App\Http\Controllers\Api\AutocompleteController::class, 'getSearchRecommendations']);
+    Route::get('/analytics', [App\Http\Controllers\Api\AutocompleteController::class, 'getSearchAnalytics']);
 });
 
 // Referral System API Routes

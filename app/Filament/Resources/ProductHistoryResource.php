@@ -31,7 +31,6 @@ use App\Enums\NavigationGroup;
 final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
     protected static ?int $navigationSort = 3;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

@@ -30,8 +30,6 @@ use UnitEnum;
 final class DiscountConditionResource extends Resource
 {
     protected static ?string $model = DiscountCondition::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
     /**
      * @var UnitEnum|string|null
      */

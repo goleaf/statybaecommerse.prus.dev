@@ -36,8 +36,6 @@ final class CartItemResource extends Resource
     /**
      * @var BackedEnum|string|null
      */
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-shopping-bag';
     /**
      * @var UnitEnum|string|null
      */

@@ -48,6 +48,7 @@
                 @if($showWishlist)
                     <button 
                         wire:click="toggleWishlist({{ $product->id }})"
+                        wire:confirm="{{ __('translations.confirm_toggle_wishlist') }}"
                         class="p-2 rounded-full bg-white/90 hover:bg-white text-gray-600 hover:text-red-500 transition-colors duration-200 shadow-sm"
                         title="{{ __('translations.add_to_wishlist') }}"
                     >

@@ -59,8 +59,6 @@ class StockResource extends Resource
 {
     protected static ?string $model = VariantInventory::class;
     /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-cube';
-    /** @var BackedEnum|string|null */
     protected static ?int $navigationSort = 1;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

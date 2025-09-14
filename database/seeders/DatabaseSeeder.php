@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             // Countries and zones for shipping/tax logic
             CountrySeeder::class,
             ZoneSeeder::class,
-            RegionSeeder::class,
+            // RegionSeeder::class, // Regions table is dropped in migration 2025_09_14_204041
             // Comprehensive cities seeding with multilingual support
             AllCountriesComprehensiveCitiesSeeder::class,
             ChannelSeeder::class,

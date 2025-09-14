@@ -40,7 +40,7 @@ use UnitEnum;
 final class CompanyResource extends Resource
 {
     protected static ?string $model = Company::class;
-    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    
     /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */

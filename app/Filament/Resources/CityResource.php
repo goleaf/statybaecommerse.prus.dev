@@ -38,8 +38,6 @@ class CityResource extends Resource
     /**
      * @var BackedEnum|string|null
      */
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-building-office';
     /**
      * @var UnitEnum|string|null
      */
@@ -95,7 +93,6 @@ class CityResource extends Resource
             }
         }), Forms\Components\TextInput::make('slug')->label(__('cities.slug'))->required()->maxLength(255)->unique(ignoreRecord: true)->rules(['alpha_dash']), Forms\Components\TextInput::make('code')->label(__('cities.code'))->required()->maxLength(10)->unique(ignoreRecord: true)->rules(['alpha_dash']), Forms\Components\Textarea::make('description')->label(__('cities.description'))->rows(3)->maxLength(1000)])->columns(2), Forms\Components\Section::make(__('cities.location'))->schema([Forms\Components\Select::make('country_id')->label(__('cities.country'))->relationship('country', 'name')->searchable()->preload()->required()->live()->afterStateUpdated(function (Forms\Set $set) {
             $set('zone_id', null);
-            $set('region_id', null);
         }), Forms\Components\Select::make('zone_id')->label(__('cities.zone'))->relationship('zone', 'name', function (Builder $query, Forms\Get $get) {
             return $query->when($get('country_id'), function (Builder $query, $countryId) {
                 $query->whereHas('countries', function (Builder $query) use ($countryId) {
@@ -103,12 +100,7 @@ class CityResource extends Resource
                 });
             });
         })->searchable()->preload()->live()->afterStateUpdated(function (Forms\Set $set) {
-            $set('region_id', null);
-        }), Forms\Components\Select::make('region_id')->label(__('cities.region'))->relationship('region', 'name', function (Builder $query, Forms\Get $get) {
-            return $query->when($get('country_id'), function (Builder $query, $countryId) {
-                $query->where('country_id', $countryId);
-            });
-        })->searchable()->preload(), Forms\Components\Select::make('parent_id')->label(__('cities.parent_city'))->relationship('parent', 'name', function (Builder $query, Forms\Get $get) {
+        }), Forms\Components\Select::make('parent_id')->label(__('cities.parent_city'))->relationship('parent', 'name', function (Builder $query, Forms\Get $get) {
             return $query->when($get('country_id'), function (Builder $query, $countryId) {
                 $query->where('country_id', $countryId);
             });
@@ -121,7 +113,7 @@ class CityResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        return $table->columns([Tables\Columns\TextColumn::make('code')->label(__('cities.code'))->searchable()->sortable()->badge()->color('primary'), Tables\Columns\TextColumn::make('name')->label(__('cities.name'))->searchable()->sortable()->weight('bold'), Tables\Columns\TextColumn::make('country.name')->label(__('cities.country'))->sortable()->toggleable(), Tables\Columns\TextColumn::make('region.name')->label(__('cities.region'))->sortable()->toggleable(), Tables\Columns\TextColumn::make('zone.name')->label(__('cities.zone'))->sortable()->toggleable(), Tables\Columns\TextColumn::make('parent.name')->label(__('cities.parent_city'))->sortable()->toggleable(isToggledHiddenByDefault: true), Tables\Columns\TextColumn::make('level')->label(__('cities.level'))->sortable()->formatStateUsing(fn(int $state): string => match ($state) {
+        return $table->columns([Tables\Columns\TextColumn::make('code')->label(__('cities.code'))->searchable()->sortable()->badge()->color('primary'), Tables\Columns\TextColumn::make('name')->label(__('cities.name'))->searchable()->sortable()->weight('bold'), Tables\Columns\TextColumn::make('country.name')->label(__('cities.country'))->sortable()->toggleable(),  Tables\Columns\TextColumn::make('zone.name')->label(__('cities.zone'))->sortable()->toggleable(), Tables\Columns\TextColumn::make('parent.name')->label(__('cities.parent_city'))->sortable()->toggleable(isToggledHiddenByDefault: true), Tables\Columns\TextColumn::make('level')->label(__('cities.level'))->sortable()->formatStateUsing(fn(int $state): string => match ($state) {
             0 => __('cities.level_city'),
             1 => __('cities.level_district'),
             2 => __('cities.level_neighborhood'),
@@ -167,7 +159,7 @@ class CityResource extends Resource
      */
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class])->with(['country', 'region', 'zone', 'parent', 'children']);
+        return parent::getEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class])->with(['country', 'zone', 'parent', 'children']);
     }
     /**
      * Handle getGlobalSearchResultTitle functionality with proper error handling.
@@ -185,7 +177,7 @@ class CityResource extends Resource
      */
     public static function getGlobalSearchResultDetails($record): array
     {
-        return [__('cities.country') => $record->country?->name, __('cities.region') => $record->region?->name, __('cities.level') => match ($record->level) {
+        return [__('cities.country') => $record->country?->name, __('cities.level') => match ($record->level) {
             0 => __('cities.level_city'),
             1 => __('cities.level_district'),
             2 => __('cities.level_neighborhood'),

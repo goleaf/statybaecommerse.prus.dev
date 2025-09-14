@@ -59,8 +59,6 @@ final class SeoDataResource extends Resource
     /**
      * @var BackedEnum|string|null
      */
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-magnifying-glass';
     protected static ?int $navigationSort = 15;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

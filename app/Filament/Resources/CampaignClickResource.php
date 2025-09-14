@@ -50,8 +50,6 @@ class CampaignClickResource extends Resource
     /**
      * @var BackedEnum|string|null
      */
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-cursor-arrow-rays';
     protected static ?string $navigationLabel = 'Campaign Clicks';
     protected static ?string $modelLabel = 'Campaign Click';
     protected static ?string $pluralModelLabel = 'Campaign Clicks';

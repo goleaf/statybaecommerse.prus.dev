@@ -142,7 +142,7 @@ final class BulkCustomerSeeder extends Seeder
                     if ($groupId) {
                         // init groups bar on first use
                         if ($this->command && ! isset($groupsBar)) {
-                            $groupsBar = $this->command->getOutput()->createProgressBar($targetCount);
+                            $groupsBar = $this->command->getOutput()->createProgressBar(100);
                             $groupsBar->setFormat('Groups: %current%/%max% [%bar%] %percent:3s%%');
                             $this->command->line('');
                             $groupsBar->start();

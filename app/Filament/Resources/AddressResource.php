@@ -51,8 +51,6 @@ use UnitEnum;
 final class AddressResource extends Resource
 {
     protected static ?string $model = Address::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-map-pin';
     /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */
     protected static $navigationGroup = NavigationGroup::Orders;

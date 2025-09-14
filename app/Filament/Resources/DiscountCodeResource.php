@@ -51,8 +51,6 @@ use UnitEnum;
 final class DiscountCodeResource extends Resource
 {
     protected static ?string $model = DiscountCode::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-ticket';
     protected static ?int $navigationSort = 4;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

@@ -3,6 +3,8 @@
 declare (strict_types=1);
 namespace App\Models;
 
+use App\Models\Scopes\ActiveScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|RecommendationBlock query()
  * @mixin \Eloquent
  */
+#[ScopedBy([ActiveScope::class])]
 final class RecommendationBlock extends Model
 {
     use HasFactory;

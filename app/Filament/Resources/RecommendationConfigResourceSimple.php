@@ -24,7 +24,6 @@ use UnitEnum;
 final class RecommendationConfigResourceSimple extends Resource
 {
     protected static ?string $model = RecommendationConfig::class;
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static ?int $navigationSort = 1;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

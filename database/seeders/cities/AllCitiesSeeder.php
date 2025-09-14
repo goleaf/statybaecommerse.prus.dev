@@ -32,6 +32,21 @@ final class AllCitiesSeeder extends Seeder
             'Norway' => NorwayCitiesSeeder::class,
             'Denmark' => DenmarkCitiesSeeder::class,
             'Finland' => FinlandCitiesSeeder::class,
+            'Austria' => AustriaCitiesSeeder::class,
+            'Switzerland' => SwitzerlandCitiesSeeder::class,
+            'Czech Republic' => CzechRepublicCitiesSeeder::class,
+            'Slovakia' => SlovakiaCitiesSeeder::class,
+            'Hungary' => HungaryCitiesSeeder::class,
+            'Romania' => RomaniaCitiesSeeder::class,
+            'Bulgaria' => BulgariaCitiesSeeder::class,
+            'Croatia' => CroatiaCitiesSeeder::class,
+            'Slovenia' => SloveniaCitiesSeeder::class,
+            'Serbia' => SerbiaCitiesSeeder::class,
+            'Ukraine' => UkraineCitiesSeeder::class,
+            'Belarus' => BelarusCitiesSeeder::class,
+            'Australia' => AustraliaCitiesSeeder::class,
+            'Japan' => JapanCitiesSeeder::class,
+            'China' => ChinaCitiesSeeder::class,
         ];
 
         foreach ($seeders as $country => $seederClass) {

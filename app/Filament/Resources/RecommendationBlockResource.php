@@ -45,8 +45,6 @@ use UnitEnum;
 final class RecommendationBlockResource extends Resource
 {
     protected static ?string $model = RecommendationBlock::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
     /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */

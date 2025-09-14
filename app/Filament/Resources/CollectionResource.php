@@ -43,8 +43,6 @@ use UnitEnum;
 final class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
     protected static ?int $navigationSort = 3;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

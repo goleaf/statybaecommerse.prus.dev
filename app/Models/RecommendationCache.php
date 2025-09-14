@@ -3,6 +3,9 @@
 declare (strict_types=1);
 namespace App\Models;
 
+use App\Models\Scopes\DateRangeScope;
+use App\Models\Scopes\UserOwnedScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|RecommendationCache query()
  * @mixin \Eloquent
  */
+#[ScopedBy([DateRangeScope::class, UserOwnedScope::class])]
 final class RecommendationCache extends Model
 {
     use HasFactory;

@@ -234,8 +234,8 @@ final class DiscountConditionTest extends TestCase
 
     public function test_discount_condition_scope_by_priority(): void
     {
-        DiscountCondition::factory()->create(['priority' => 1]);
-        DiscountCondition::factory()->create(['priority' => 10]);
+        DiscountCondition::factory()->active()->create(['priority' => 1]);
+        DiscountCondition::factory()->active()->create(['priority' => 10]);
 
         $conditions = DiscountCondition::byPriority('asc')->get();
         

@@ -43,8 +43,6 @@ use UnitEnum;
 final class CurrencyResource extends Resource
 {
     protected static ?string $model = Currency::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-banknotes';
     protected static ?int $navigationSort = 1;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

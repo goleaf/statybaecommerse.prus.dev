@@ -69,6 +69,13 @@ Automatically filters records where `is_active = true`, `is_enabled = true`, or 
 - EmailCampaign
 - SeoData
 - Referral
+- ReferralCampaign
+- ReferralCode
+- RecommendationAnalytics
+- RecommendationBlock
+- RecommendationCache
+- ReferralReward
+- ReferralRewardLog
 
 ### PublishedScope
 Automatically filters records where `published_at` is not null and is in the past.
@@ -139,6 +146,9 @@ Automatically filters records by status field with model-specific allowed status
 - DiscountRedemption
 - Document
 - Referral
+- ReferralCampaign
+- ReferralCode
+- ReferralReward
 
 ### ActiveCampaignScope
 Automatically filters campaigns that are currently active based on start/end dates.
@@ -172,6 +182,8 @@ Automatically filters records by user ownership for data privacy.
 - AnalyticsEvent
 - DiscountRedemption
 - OrderShipping
+- ReferralCode
+- RecommendationAnalytics
 
 ### DateRangeScope
 Automatically filters records by date ranges for time-sensitive content.
@@ -182,6 +194,8 @@ Automatically filters records by date ranges for time-sensitive content.
 - Price
 - PriceList
 - PriceListItem
+- ReferralCampaign
+- ReferralCode
 
 ## Usage Examples
 

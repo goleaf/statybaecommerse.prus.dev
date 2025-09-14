@@ -57,8 +57,6 @@ use BackedEnum;
 class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-document-chart-bar';
     // /**
     //  * @var UnitEnum|string|null
     /** @var UnitEnum|string|null */

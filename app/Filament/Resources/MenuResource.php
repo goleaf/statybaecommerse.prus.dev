@@ -52,7 +52,7 @@ use UnitEnum;
 class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
-    protected static ?string $navigationIcon = 'heroicon-o-bars-3';
+    
     /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */
     protected static $navigationGroup = NavigationGroup::Content;

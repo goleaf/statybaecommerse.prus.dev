@@ -53,7 +53,7 @@ use UnitEnum;
 final class SubscriberResource extends Resource
 {
     protected static ?string $model = Subscriber::class;
-    protected static ?string $navigationIcon = 'heroicon-o-envelope';
+    
     /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */

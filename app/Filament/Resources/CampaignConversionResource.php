@@ -55,8 +55,6 @@ class CampaignConversionResource extends Resource
     /**
      * @var BackedEnum|string|null
      */
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
     protected static ?string $navigationLabel = 'campaign_conversions.navigation.label';
     protected static ?string $modelLabel = 'campaign_conversions.model.label';
     protected static ?string $pluralModelLabel = 'campaign_conversions.model.plural';

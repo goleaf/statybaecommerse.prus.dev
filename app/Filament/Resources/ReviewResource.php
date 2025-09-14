@@ -35,8 +35,6 @@ use UnitEnum;
 final class ReviewResource extends Resource
 {
     protected static ?string $model = Review::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-star';
     protected static ?int $navigationSort = 6;
     /**
      * Handle getNavigationGroup functionality with proper error handling.

@@ -36,8 +36,6 @@ use UnitEnum;
 final class ReferralRewardResource extends Resource
 {
     protected static ?string $model = ReferralReward::class;
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-gift';
     /**
      * @var UnitEnum|string|null
      */

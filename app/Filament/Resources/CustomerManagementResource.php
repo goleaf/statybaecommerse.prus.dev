@@ -54,8 +54,6 @@ final class CustomerManagementResource extends Resource
      * @var BackedEnum|string|null
      */
     /** @var BackedEnum|string|null */
-    protected static $navigationIcon = 'heroicon-o-users';
-    /** @var BackedEnum|string|null */
     /**
      * @var UnitEnum|string|null
      */

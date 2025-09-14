@@ -161,7 +161,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeThisMonth(Builder $query): Builder
     {
-        return $query->whereMonth('created_at', now()->month);
+        return $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
     }
     // Accessors & Mutators
     /**
