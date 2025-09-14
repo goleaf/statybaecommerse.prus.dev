@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecommendationBlockResource\Pages;
+use BackedEnum;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationConfig;
 use Filament\Forms;
@@ -36,7 +37,7 @@ final class RecommendationBlockResource extends Resource
 {
     protected static ?string $model = RecommendationBlock::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var UnitEnum|string|null */

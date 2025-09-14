@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RegionResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\RegionResource\Widgets;
 use App\Models\Country;
 use App\Models\Region;
@@ -27,7 +28,7 @@ class RegionResource extends Resource
 {
     protected static ?string $model = Region::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-map';
 
     protected static ?int $navigationSort = 2;

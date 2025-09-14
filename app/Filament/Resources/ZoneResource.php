@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use BackedEnum;
 use App\Filament\Resources\ZoneResource\Pages;
 use App\Models\Zone;
 use Filament\Forms;
@@ -25,10 +26,10 @@ class ZoneResource extends Resource
 {
     protected static ?string $model = Zone::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-globe-alt';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     /**
      * @var UnitEnum|string|null

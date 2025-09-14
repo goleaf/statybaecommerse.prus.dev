@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CartItemResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\CartItemResource\RelationManagers;
 use App\Filament\Resources\CartItemResource\Widgets;
 use App\Models\CartItem;
@@ -28,9 +29,9 @@ class CartItemResource extends Resource
     protected static ?string $model = CartItem::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-shopping-bag';
 
     /**

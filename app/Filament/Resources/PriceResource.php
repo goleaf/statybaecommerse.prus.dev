@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceResource\Pages;
+use BackedEnum;
 use App\Models\Price;
 use Filament\Schemas\Components\DateTimePicker;
 use Filament\Schemas\Components\Grid;
@@ -44,9 +45,9 @@ class PriceResource extends Resource
     protected static ?string $model = Price::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-currency-euro';
 
     protected static ?int $navigationSort = 1;

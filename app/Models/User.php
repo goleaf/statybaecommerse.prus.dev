@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -424,6 +425,16 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreferenceC
     }
 
     /**
+     * Get the user's oldest order.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function oldestOrder(): HasOne
+    {
+        return $this->orders()->one()->oldestOfMany();
+    }
+
+    /**
      * Get the user's latest completed order.
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
@@ -508,6 +519,16 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreferenceC
     }
 
     /**
+     * Get the user's oldest review.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function oldestReview(): HasOne
+    {
+        return $this->reviews()->one()->oldestOfMany();
+    }
+
+    /**
      * Get the user's highest rated review.
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
@@ -586,6 +607,16 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreferenceC
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
+    }
+
+    /**
+     * Get the user's latest document.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function latestDocument(): MorphOne
+    {
+        return $this->morphOne(Document::class, 'documentable')->latestOfMany();
     }
 
     public function scopeWithPreferredLocale($query, string $locale)

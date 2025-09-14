@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use BackedEnum;
 use App\Filament\Resources\CityResource\Pages;
 use App\Filament\Resources\CityResource\RelationManagers;
 use App\Filament\Resources\CityResource\Widgets;
@@ -28,9 +29,9 @@ class CityResource extends Resource
     protected static ?string $model = City::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-building-office';
 
     /**

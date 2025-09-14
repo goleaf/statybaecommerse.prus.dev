@@ -26,10 +26,10 @@ class SystemSettingsResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     /**
      * @var UnitEnum|string|null

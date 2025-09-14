@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use BackedEnum;
 use App\Filament\Resources\ReferralResource\Pages;
 use App\Filament\Resources\ReferralResource\Widgets;
 use App\Models\Referral;
@@ -33,12 +34,12 @@ class ReferralResource extends Resource
     protected static ?string $model = Referral::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-users';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     /**
      * @var UnitEnum|string|null

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Filament\Forms;
@@ -62,9 +63,9 @@ class ProductResource extends Resource
     /**
      * The navigation icon for this resource.
      * 
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-cube';
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerManagementResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\CustomerManagementResource\RelationManagers;
 use App\Filament\Resources\CustomerManagementResource\Widgets;
 use App\Models\User;
@@ -47,12 +48,12 @@ class CustomerManagementResource extends Resource
     protected static ?string $model = User::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-users';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     /**
      * @var UnitEnum|string|null

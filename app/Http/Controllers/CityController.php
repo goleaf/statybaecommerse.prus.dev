@@ -111,6 +111,14 @@ class CityController extends Controller
                 ->whereNotNull('latitude')
                 ->whereNotNull('longitude')
                 ->get()
+                ->skipWhile(function ($nearbyCity) {
+                    // Skip nearby cities that are not properly configured for display
+                    return empty($nearbyCity->name) || 
+                           !$nearbyCity->is_enabled ||
+                           !$nearbyCity->is_active ||
+                           empty($nearbyCity->country_id) ||
+                           empty($nearbyCity->code);
+                })
                 ->filter(function ($nearbyCity) use ($city) {
                     $distance = $this->calculateDistance(
                         $city->latitude,
@@ -142,7 +150,15 @@ class CityController extends Controller
                   ->orWhere('level', $city->level);
             })
             ->limit(6)
-            ->get();
+            ->get()
+            ->skipWhile(function ($relatedCity) {
+                // Skip related cities that are not properly configured for display
+                return empty($relatedCity->name) || 
+                       !$relatedCity->is_enabled ||
+                       !$relatedCity->is_active ||
+                       empty($relatedCity->country_id) ||
+                       empty($relatedCity->code);
+            });
 
         return view('cities.show', compact('city', 'nearbyCities', 'relatedCities'));
     }

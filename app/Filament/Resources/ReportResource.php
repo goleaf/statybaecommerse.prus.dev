@@ -53,7 +53,7 @@ class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-document-chart-bar';
 
     // /**

@@ -43,10 +43,10 @@ class PriceListItemResource extends Resource
 {
     protected static ?string $model = PriceListItem::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-currency-euro';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     /**
      * @var UnitEnum|string|null

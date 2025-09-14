@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReviewResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\ReviewResource\Widgets;
 use App\Models\Review;
 use App\Services\MultiLanguageTabService;
@@ -31,7 +32,7 @@ class ReviewResource extends Resource
 {
     protected static ?string $model = Review::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 6;

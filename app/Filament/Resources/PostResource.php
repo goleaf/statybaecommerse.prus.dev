@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Models\Post;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Schemas\Components\SpatieMediaLibraryFileUpload;
 use Filament\Schemas\Schema;
@@ -28,12 +29,12 @@ class PostResource extends Resource
     protected static ?string $model = Post::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-document-text';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     public static function getNavigationGroup(): ?string
     {

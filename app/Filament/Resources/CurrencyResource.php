@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CurrencyResource\Pages;
+use BackedEnum;
 use App\Models\Currency;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -40,7 +41,7 @@ class CurrencyResource extends Resource
 {
     protected static ?string $model = Currency::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-banknotes';
 
     protected static ?int $navigationSort = 1;

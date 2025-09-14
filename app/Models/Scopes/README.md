@@ -119,6 +119,8 @@ Automatically filters records by status field with model-specific allowed status
 - VariantInventory
 - ProductRequest
 - CampaignConversion
+- DiscountCode
+- DiscountRedemption
 
 ### ActiveCampaignScope
 Automatically filters campaigns that are currently active based on start/end dates.
@@ -150,12 +152,17 @@ Automatically filters records by user ownership for data privacy.
 - ProductRequest
 - CouponUsage
 - AnalyticsEvent
+- DiscountRedemption
 
 ### DateRangeScope
 Automatically filters records by date ranges for time-sensitive content.
 
 **Applied to:**
 - Models with date fields like published_at, expires_at, scheduled_at
+- DiscountCode
+- Price
+- PriceList
+- PriceListItem
 
 ## Usage Examples
 

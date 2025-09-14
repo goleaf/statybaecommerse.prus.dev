@@ -23,7 +23,7 @@ class DiscountConditionResource extends Resource
 {
     protected static ?string $model = DiscountCondition::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     /**

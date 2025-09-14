@@ -23,7 +23,9 @@ class SitemapController extends Controller
         $sitemap = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
         $sitemap .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 
-        $supportedLocales = config('app.supported_locales', ['lt', 'en', 'de', 'ru']);
+        $supportedLocales = is_array(config('app.supported_locales')) 
+            ? config('app.supported_locales') 
+            : ['lt', 'en', 'de', 'ru'];
 
         foreach ($supportedLocales as $locale) {
             $sitemap .= '  <sitemap>'."\n";
@@ -95,7 +97,7 @@ class SitemapController extends Controller
                 );
             });
 
-        // Brands
+        // Brands with timeout protection
         $brands = Brand::where('is_active', true)->get()
             ->skipWhile(function ($brand) {
                 // Skip brands that are not properly configured for sitemap
@@ -103,14 +105,17 @@ class SitemapController extends Controller
                        !$brand->is_active ||
                        empty($brand->slug);
             });
-        foreach ($brands as $brand) {
-            $sitemap .= $this->generateUrl(
-                route('brands.show', $brand->slug),
-                $brand->updated_at->toISOString(),
-                'monthly',
-                0.6
-            );
-        }
+        
+        LazyCollection::make($brands)
+            ->takeUntilTimeout($timeout)
+            ->each(function ($brand) use (&$sitemap) {
+                $sitemap .= $this->generateUrl(
+                    route('brands.show', $brand->slug),
+                    $brand->updated_at->toISOString(),
+                    'monthly',
+                    0.6
+                );
+            });
 
         // Static pages
         $staticPages = [
@@ -149,7 +154,9 @@ class SitemapController extends Controller
         $urlXml .= '    <priority>'.$priority.'</priority>'."\n";
 
         // Add hreflang alternatives
-        $supportedLocales = config('app.supported_locales', ['lt', 'en', 'de', 'ru']);
+        $supportedLocales = is_array(config('app.supported_locales')) 
+            ? config('app.supported_locales') 
+            : ['lt', 'en', 'de', 'ru'];
         foreach ($supportedLocales as $locale) {
             $alternateUrl = str_replace('/'.app()->getLocale().'/', '/'.$locale.'/', $url);
             $urlXml .= '    <xhtml:link rel="alternate" hreflang="'.$locale.'" href="'.htmlspecialchars($alternateUrl).'" />'."\n";

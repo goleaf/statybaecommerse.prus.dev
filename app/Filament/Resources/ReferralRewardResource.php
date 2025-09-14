@@ -29,7 +29,7 @@ class ReferralRewardResource extends Resource
 {
     protected static ?string $model = ReferralReward::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-gift';
 
     /**

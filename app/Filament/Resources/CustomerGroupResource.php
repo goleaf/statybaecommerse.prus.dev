@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerGroupResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\CustomerGroupResource\RelationManagers;
 use App\Filament\Widgets\CustomerGroupStatsWidget;
 use App\Models\CustomerGroup;
@@ -39,7 +40,7 @@ class CustomerGroupResource extends Resource
 {
     protected static ?string $model = CustomerGroup::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?int $navigationSort = 2;

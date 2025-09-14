@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use Filament\Schemas\Components\DatePicker;
@@ -49,9 +50,9 @@ class OrderResource extends Resource
     protected static ?string $model = Order::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static ?string $navigationLabel = 'orders.navigation_label';
@@ -60,7 +61,7 @@ class OrderResource extends Resource
 
     protected static ?string $pluralModelLabel = 'orders.plural_model_label';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     /**
      * @var UnitEnum|string|null

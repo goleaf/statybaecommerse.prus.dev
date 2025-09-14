@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\AddressType;
+use BackedEnum;
 use App\Filament\Resources\AddressResource\Pages;
 use App\Filament\Resources\AddressResource\RelationManagers;
 use App\Models\Address;
@@ -45,7 +46,7 @@ class AddressResource extends Resource
 {
     protected static ?string $model = Address::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-map-pin';
 
     public static function getNavigationGroup(): ?string

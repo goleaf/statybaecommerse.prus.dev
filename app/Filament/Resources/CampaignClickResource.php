@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignClickResource\Pages;
+use BackedEnum;
 use App\Models\CampaignClick;
 use Filament\Schemas\Components\DateTimePicker;
 use Filament\Schemas\Components\Grid;
@@ -42,9 +43,9 @@ class CampaignClickResource extends Resource
     protected static ?string $model = CampaignClick::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-cursor-arrow-rays';
 
     protected static ?string $navigationLabel = 'Campaign Clicks';
@@ -53,7 +54,7 @@ class CampaignClickResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Campaign Clicks';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     /**
      * @var UnitEnum|string|null

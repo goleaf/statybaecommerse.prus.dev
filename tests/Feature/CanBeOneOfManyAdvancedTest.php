@@ -1,0 +1,206 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\Document;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\ProductImage;
+use App\Models\Review;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class CanBeOneOfManyAdvancedTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_user_oldest_order_relationship(): void
+    {
+        $user = User::factory()->create();
+        
+        // Create multiple orders
+        $oldestOrder = Order::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(10),
+        ]);
+        
+        $latestOrder = Order::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
+        // Test the oldestOrder relationship
+        $this->assertInstanceOf(Order::class, $user->oldestOrder);
+        $this->assertEquals($oldestOrder->id, $user->oldestOrder->id);
+        $this->assertNotEquals($latestOrder->id, $user->oldestOrder->id);
+    }
+
+    public function test_user_oldest_review_relationship(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+        
+        // Create multiple reviews
+        $oldestReview = Review::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'created_at' => now()->subDays(10),
+        ]);
+        
+        $latestReview = Review::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
+        // Test the oldestReview relationship
+        $this->assertInstanceOf(Review::class, $user->oldestReview);
+        $this->assertEquals($oldestReview->id, $user->oldestReview->id);
+        $this->assertNotEquals($latestReview->id, $user->oldestReview->id);
+    }
+
+    public function test_product_oldest_review_relationship(): void
+    {
+        $product = Product::factory()->create();
+        $user = User::factory()->create();
+        
+        // Create multiple reviews
+        $oldestReview = Review::factory()->create([
+            'product_id' => $product->id,
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(10),
+        ]);
+        
+        $latestReview = Review::factory()->create([
+            'product_id' => $product->id,
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the product to clear any cached relationships
+        $product->refresh();
+
+        // Test the oldestReview relationship
+        $this->assertInstanceOf(Review::class, $product->oldestReview);
+        $this->assertEquals($oldestReview->id, $product->oldestReview->id);
+        $this->assertNotEquals($latestReview->id, $product->oldestReview->id);
+    }
+
+    public function test_product_oldest_image_relationship(): void
+    {
+        $product = Product::factory()->create();
+        
+        // Create multiple images
+        $oldestImage = ProductImage::factory()->create([
+            'product_id' => $product->id,
+            'created_at' => now()->subDays(10),
+        ]);
+        
+        $latestImage = ProductImage::factory()->create([
+            'product_id' => $product->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the product to clear any cached relationships
+        $product->refresh();
+
+        // Test the oldestImage relationship
+        $this->assertInstanceOf(ProductImage::class, $product->oldestImage);
+        $this->assertEquals($oldestImage->id, $product->oldestImage->id);
+        $this->assertNotEquals($latestImage->id, $product->oldestImage->id);
+    }
+
+    public function test_order_oldest_item_relationship(): void
+    {
+        $order = Order::factory()->create();
+        
+        // Create multiple order items
+        $oldestItem = OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'name' => 'Oldest Item',
+            'sku' => 'OLD-001',
+            'created_at' => now()->subDays(10),
+        ]);
+        
+        $latestItem = OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'name' => 'Latest Item',
+            'sku' => 'LAT-001',
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the order to clear any cached relationships
+        $order->refresh();
+
+        // Test the oldestItem relationship
+        $this->assertInstanceOf(OrderItem::class, $order->oldestItem);
+        $this->assertEquals($oldestItem->id, $order->oldestItem->id);
+        $this->assertNotEquals($latestItem->id, $order->oldestItem->id);
+    }
+
+    public function test_user_latest_document_relationship(): void
+    {
+        $user = User::factory()->create();
+        
+        // Create multiple documents
+        $oldDocument = Document::factory()->create([
+            'documentable_type' => User::class,
+            'documentable_id' => $user->id,
+            'status' => 'generated',
+            'created_at' => now()->subDays(10),
+        ]);
+        
+        $latestDocument = Document::factory()->create([
+            'documentable_type' => User::class,
+            'documentable_id' => $user->id,
+            'status' => 'generated',
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
+        // Test the latestDocument relationship
+        $this->assertInstanceOf(Document::class, $user->latestDocument);
+        $this->assertEquals($latestDocument->id, $user->latestDocument->id);
+        $this->assertNotEquals($oldDocument->id, $user->latestDocument->id);
+    }
+
+    public function test_product_latest_document_relationship(): void
+    {
+        $product = Product::factory()->create();
+        
+        // Create multiple documents
+        $oldDocument = Document::factory()->create([
+            'documentable_type' => Product::class,
+            'documentable_id' => $product->id,
+            'status' => 'generated',
+            'created_at' => now()->subDays(10),
+        ]);
+        
+        $latestDocument = Document::factory()->create([
+            'documentable_type' => Product::class,
+            'documentable_id' => $product->id,
+            'status' => 'generated',
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the product to clear any cached relationships
+        $product->refresh();
+
+        // Test the latestDocument relationship
+        $this->assertInstanceOf(Document::class, $product->latestDocument);
+        $this->assertEquals($latestDocument->id, $product->latestDocument->id);
+        $this->assertNotEquals($oldDocument->id, $product->latestDocument->id);
+    }
+}

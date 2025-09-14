@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -135,6 +136,8 @@ class Product extends Model implements HasMedia
         'canonical_url',
         'sales_count',
         'revenue',
+        'formatted_price',
+        'formatted_compare_price',
     ];
 
     protected $table = 'products';
@@ -309,6 +312,16 @@ class Product extends Model implements HasMedia
     }
 
     /**
+     * Get the product's oldest review.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function oldestReview(): HasOne
+    {
+        return $this->reviews()->one()->oldestOfMany();
+    }
+
+    /**
      * Get the product's highest rated review.
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
@@ -343,6 +356,16 @@ class Product extends Model implements HasMedia
     public function latestImage(): HasOne
     {
         return $this->images()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the product's oldest image.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function oldestImage(): HasOne
+    {
+        return $this->images()->one()->oldestOfMany();
     }
 
     /**
@@ -383,6 +406,16 @@ class Product extends Model implements HasMedia
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
+    }
+
+    /**
+     * Get the product's latest document.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function latestDocument(): MorphOne
+    {
+        return $this->morphOne(Document::class, 'documentable')->latestOfMany();
     }
 
     public function requests(): HasMany
@@ -1134,5 +1167,47 @@ class Product extends Model implements HasMedia
         $name = $this->getTranslatedName($locale);
         $sku = $this->sku ? " ({$this->sku})" : '';
         return $name . $sku;
+    }
+
+    /**
+     * Get formatted price string using the current currency
+     */
+    public function getFormattedPrice(): string
+    {
+        $price = $this->getPrice();
+        if (!$price || !$price->value) {
+            return app_money_format($this->price ?? 0);
+        }
+        
+        return app_money_format($price->value->amount);
+    }
+
+    /**
+     * Get formatted compare price string using the current currency
+     */
+    public function getFormattedComparePrice(): string
+    {
+        $price = $this->getPrice();
+        if (!$price || !$price->compare) {
+            return app_money_format($this->compare_price ?? 0);
+        }
+        
+        return app_money_format($price->compare);
+    }
+
+    /**
+     * Accessor for formatted price
+     */
+    public function getFormattedPriceAttribute(): string
+    {
+        return $this->getFormattedPrice();
+    }
+
+    /**
+     * Accessor for formatted compare price
+     */
+    public function getFormattedComparePriceAttribute(): string
+    {
+        return $this->getFormattedComparePrice();
     }
 }

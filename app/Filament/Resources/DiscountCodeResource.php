@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DiscountCodeResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\DiscountCodeResource\RelationManagers;
 use App\Models\DiscountCode;
 use App\Services\MultiLanguageTabService;
@@ -47,7 +48,7 @@ class DiscountCodeResource extends Resource
 {
     protected static ?string $model = DiscountCode::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-ticket';
 
     protected static ?int $navigationSort = 4;

@@ -40,6 +40,15 @@ class SystemSettingController extends Controller
                 $query->searchable($request->search);
             })
             ->ordered()
+            ->get()
+            ->skipWhile(function ($setting) {
+                // Skip system settings that are not properly configured for display
+                return empty($setting->key) || 
+                       !$setting->is_active ||
+                       !$setting->is_public ||
+                       empty($setting->group) ||
+                       empty($setting->name);
+            })
             ->paginate(20);
 
         return view('system-settings.index', compact('categories', 'settings'));
@@ -61,7 +70,15 @@ class SystemSettingController extends Controller
             ->where('group', $setting->group)
             ->where('id', '!=', $setting->id)
             ->limit(5)
-            ->get();
+            ->get()
+            ->skipWhile(function ($relatedSetting) {
+                // Skip related system settings that are not properly configured for display
+                return empty($relatedSetting->key) || 
+                       !$relatedSetting->is_active ||
+                       !$relatedSetting->is_public ||
+                       empty($relatedSetting->group) ||
+                       empty($relatedSetting->name);
+            });
 
         return view('system-settings.show', compact('setting', 'relatedSettings'));
     }
@@ -76,6 +93,15 @@ class SystemSettingController extends Controller
             ->active()
             ->public()
             ->ordered()
+            ->get()
+            ->skipWhile(function ($setting) {
+                // Skip system settings that are not properly configured for display
+                return empty($setting->key) || 
+                       !$setting->is_active ||
+                       !$setting->is_public ||
+                       empty($setting->group) ||
+                       empty($setting->name);
+            })
             ->paginate(20);
 
         $relatedCategories = SystemSettingCategory::active()
@@ -92,6 +118,15 @@ class SystemSettingController extends Controller
             ->public()
             ->where('group', $group)
             ->ordered()
+            ->get()
+            ->skipWhile(function ($setting) {
+                // Skip system settings that are not properly configured for display
+                return empty($setting->key) || 
+                       !$setting->is_active ||
+                       !$setting->is_public ||
+                       empty($setting->group) ||
+                       empty($setting->name);
+            })
             ->paginate(20);
 
         $categories = SystemSettingCategory::active()

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CollectionResource\Pages;
+use BackedEnum;
 use App\Models\Collection;
 use App\Services\MultiLanguageTabService;
 use Filament\Schemas\Components\FileUpload;
@@ -40,7 +41,7 @@ class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?int $navigationSort = 3;

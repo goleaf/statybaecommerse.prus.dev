@@ -44,7 +44,16 @@ class AttributeController extends Controller
             });
         }
 
-        $attributes = $query->paginate(12);
+        $attributes = $query->get()
+            ->skipWhile(function ($attribute) {
+                // Skip attributes that are not properly configured for display
+                return empty($attribute->name) || 
+                       !$attribute->is_enabled ||
+                       empty($attribute->type) ||
+                       empty($attribute->group_name) ||
+                       empty($attribute->slug);
+            })
+            ->paginate(12);
 
         return view('attributes.index', compact('attributes'));
     }
@@ -60,7 +69,15 @@ class AttributeController extends Controller
             ->where('id', '!=', $attribute->id)
             ->where('group_name', $attribute->group_name)
             ->limit(4)
-            ->get();
+            ->get()
+            ->skipWhile(function ($relatedAttribute) {
+                // Skip related attributes that are not properly configured for display
+                return empty($relatedAttribute->name) || 
+                       !$relatedAttribute->is_enabled ||
+                       empty($relatedAttribute->type) ||
+                       empty($relatedAttribute->group_name) ||
+                       empty($relatedAttribute->slug);
+            });
 
         return view('attributes.show', compact('attribute', 'relatedAttributes'));
     }
@@ -79,7 +96,15 @@ class AttributeController extends Controller
             });
         }
 
-        $attributes = $query->limit(20)->get();
+        $attributes = $query->limit(20)->get()
+            ->skipWhile(function ($attribute) {
+                // Skip attributes that are not properly configured for API response
+                return empty($attribute->name) || 
+                       !$attribute->is_enabled ||
+                       empty($attribute->type) ||
+                       empty($attribute->group_name) ||
+                       empty($attribute->slug);
+            });
 
         return response()->json([
             'attributes' => $attributes->map(function ($attribute) {

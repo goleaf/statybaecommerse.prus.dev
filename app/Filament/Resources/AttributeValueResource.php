@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AttributeValueResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\AttributeValueResource\RelationManagers;
 use App\Filament\Resources\AttributeValueResource\Widgets;
 use App\Models\AttributeValue;
@@ -35,12 +36,12 @@ class AttributeValueResource extends Resource
     protected static ?string $model = AttributeValue::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-tag';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     /**
      * @var UnitEnum|string|null

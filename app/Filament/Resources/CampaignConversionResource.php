@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignConversionResource\Pages;
+use BackedEnum;
 use App\Models\CampaignConversion;
 use Filament\Schemas\Components\DateTimePicker;
 use Filament\Schemas\Components\Grid;
@@ -47,9 +48,9 @@ class CampaignConversionResource extends Resource
     protected static ?string $model = CampaignConversion::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static ?string $navigationLabel = 'campaign_conversions.navigation.label';
@@ -58,7 +59,7 @@ class CampaignConversionResource extends Resource
 
     protected static ?string $pluralModelLabel = 'campaign_conversions.model.plural';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     protected static ?int $navigationSort = 3;
 

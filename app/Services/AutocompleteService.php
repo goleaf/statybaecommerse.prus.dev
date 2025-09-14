@@ -125,7 +125,7 @@ final class AutocompleteService
                         'title' => $product->getTranslatedName($locale),
                         'subtitle' => $product->brand?->name,
                         'description' => Str::limit($product->getTranslatedDescription($locale), 100),
-                        'url' => route('localized.product.show', ['locale' => $locale, 'product' => $product->slug]),
+                        'url' => route('localized.products.show', ['locale' => $locale, 'product' => $product->slug]),
                         'image' => $product->getFirstMediaUrl('images', 'thumb'),
                         'price' => $product->getPrice(),
                         'formatted_price' => $product->getFormattedPrice(),
@@ -431,7 +431,7 @@ final class AutocompleteService
                         'type' => 'product',
                         'title' => $product->getTranslatedName($locale),
                         'subtitle' => $product->brand?->name,
-                        'url' => route('localized.product.show', ['locale' => $locale, 'product' => $product->slug]),
+                        'url' => route('localized.products.show', ['locale' => $locale, 'product' => $product->slug]),
                         'image' => $product->getFirstMediaUrl('images', 'thumb'),
                         'is_popular' => true,
                     ];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AttributeResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\AttributeResource\RelationManagers;
 use App\Filament\Resources\AttributeResource\Widgets;
 use App\Models\Attribute;
@@ -32,7 +33,7 @@ class AttributeResource extends Resource
 {
     protected static ?string $model = Attribute::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
     protected static ?int $navigationSort = 5;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\LocationResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\LocationResource\RelationManagers;
 use App\Models\Country;
 use App\Models\Location;
@@ -43,7 +44,7 @@ class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-map-pin';
 
     protected static ?int $navigationSort = 2;

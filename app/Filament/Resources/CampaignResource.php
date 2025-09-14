@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignResource\Pages;
+use BackedEnum;
 use App\Models\Campaign;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -29,9 +30,9 @@ use UnitEnum;
     protected static ?string $model = Campaign::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-megaphone';
 
     public static function getNavigationGroup(): ?string

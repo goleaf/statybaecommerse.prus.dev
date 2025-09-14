@@ -56,7 +56,15 @@ class AttributeValueController extends Controller
             $query->default();
         }
 
-        $attributeValues = $query->paginate(20);
+        $attributeValues = $query->get()
+            ->skipWhile(function ($attributeValue) {
+                // Skip attribute values that are not properly configured for display
+                return empty($attributeValue->value) || 
+                       !$attributeValue->is_enabled ||
+                       empty($attributeValue->attribute) ||
+                       empty($attributeValue->attribute_id);
+            })
+            ->paginate(20);
         $attributes = Attribute::enabled()->ordered()->get();
 
         return view('attribute-values.index', compact('attributeValues', 'attributes'));
@@ -76,6 +84,14 @@ class AttributeValueController extends Controller
             ->enabled()
             ->ordered()
             ->with('translations')
+            ->get()
+            ->skipWhile(function ($attributeValue) {
+                // Skip attribute values that are not properly configured for display
+                return empty($attributeValue->value) || 
+                       !$attributeValue->is_enabled ||
+                       empty($attributeValue->attribute) ||
+                       empty($attributeValue->attribute_id);
+            })
             ->paginate(20);
 
         return view('attribute-values.by-attribute', compact('attribute', 'attributeValues'));
@@ -105,7 +121,15 @@ class AttributeValueController extends Controller
             });
         }
 
-        $attributeValues = $query->get()->map(function ($attributeValue) {
+        $attributeValues = $query->get()
+            ->skipWhile(function ($attributeValue) {
+                // Skip attribute values that are not properly configured for API response
+                return empty($attributeValue->value) || 
+                       !$attributeValue->is_enabled ||
+                       empty($attributeValue->attribute) ||
+                       empty($attributeValue->attribute_id);
+            })
+            ->map(function ($attributeValue) {
             return [
                 'id' => $attributeValue->id,
                 'value' => $attributeValue->getDisplayValue(),

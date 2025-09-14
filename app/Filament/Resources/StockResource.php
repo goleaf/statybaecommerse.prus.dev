@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StockResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\StockResource\RelationManagers;
 use App\Models\Location;
 use App\Models\ProductVariant;
@@ -52,10 +53,10 @@ class StockResource extends Resource
 {
     protected static ?string $model = VariantInventory::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-cube';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     protected static ?int $navigationSort = 1;
 

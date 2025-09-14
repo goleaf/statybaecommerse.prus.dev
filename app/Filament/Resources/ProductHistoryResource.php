@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductHistoryResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\ProductHistoryResource\RelationManagers;
 use App\Models\ProductHistory;
 use Filament\Forms;
@@ -21,7 +22,7 @@ final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-clock';
 
     protected static ?int $navigationSort = 3;

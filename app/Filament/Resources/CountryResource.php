@@ -58,7 +58,7 @@ class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-globe-alt';
 
     protected static ?int $navigationSort = 1;

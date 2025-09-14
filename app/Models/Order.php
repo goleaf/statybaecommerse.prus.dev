@@ -113,6 +113,16 @@ class Order extends Model
     }
 
     /**
+     * Get the order's oldest item.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function oldestItem(): HasOne
+    {
+        return $this->items()->one()->oldestOfMany();
+    }
+
+    /**
      * Get the order's highest value item.
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasOne

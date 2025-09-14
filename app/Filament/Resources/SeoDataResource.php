@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SeoDataResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\SeoDataResource\Widgets;
 use App\Models\Brand;
 use App\Models\Category;
@@ -54,9 +55,9 @@ class SeoDataResource extends Resource
     protected static ?string $model = SeoData::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-magnifying-glass';
 
     protected static ?int $navigationSort = 15;

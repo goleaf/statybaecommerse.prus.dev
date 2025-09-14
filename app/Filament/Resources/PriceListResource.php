@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceListResource\Pages;
+use BackedEnum;
 use App\Filament\Resources\PriceListResource\RelationManagers;
 use App\Filament\Resources\PriceListResource\Widgets;
 use App\Models\PriceList;
@@ -44,12 +45,12 @@ class PriceListResource extends Resource
     protected static ?string $model = PriceList::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var BackedEnum|string|null
      */
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-currency-dollar';
 
-    /** @var string|\BackedEnum|null */
+    /** @var BackedEnum|string|null */
 
     /**
      * @var UnitEnum|string|null

@@ -29,6 +29,14 @@ class ReferralController extends Controller
         $referrals = $user->referrals()
             ->with(['referred', 'rewards'])
             ->latest()
+            ->get()
+            ->skipWhile(function ($referral) {
+                // Skip referrals that are not properly configured for display
+                return empty($referral->referred) || 
+                       empty($referral->referred_id) ||
+                       empty($referral->referrer_id) ||
+                       empty($referral->status);
+            })
             ->paginate(10);
 
         $stats = [
