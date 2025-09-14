@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class CampaignProductTarget extends Model
+final /**
+ * CampaignProductTarget
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class CampaignProductTarget extends Model
 {
     use HasFactory;
 
@@ -18,6 +23,15 @@ final class CampaignProductTarget extends Model
         'category_id',
         'target_type',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'campaign_id' => 'integer',
+            'product_id' => 'integer',
+            'category_id' => 'integer',
+        ];
+    }
 
     public function campaign(): BelongsTo
     {

@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class SystemSettingCategoryTranslation extends Model
+final /**
+ * SystemSettingCategoryTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class SystemSettingCategoryTranslation extends Model
 {
     use HasFactory;
 
@@ -18,6 +23,13 @@ final class SystemSettingCategoryTranslation extends Model
         'name',
         'description',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'system_setting_category_id' => 'integer',
+        ];
+    }
 
     public function systemSettingCategory(): BelongsTo
     {

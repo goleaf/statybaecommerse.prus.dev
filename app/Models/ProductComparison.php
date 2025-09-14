@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class ProductComparison extends Model
+final /**
+ * ProductComparison
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class ProductComparison extends Model
 {
     use HasFactory;
 
@@ -17,6 +22,14 @@ final class ProductComparison extends Model
         'user_id',
         'product_id',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'user_id' => 'integer',
+            'product_id' => 'integer',
+        ];
+    }
 
     public function user(): BelongsTo
     {

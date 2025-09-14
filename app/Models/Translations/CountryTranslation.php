@@ -7,7 +7,12 @@ namespace App\Models\Translations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-final class CountryTranslation extends Model
+final /**
+ * CountryTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class CountryTranslation extends Model
 {
     use HasFactory;
 
@@ -20,6 +25,13 @@ final class CountryTranslation extends Model
         'name_official',
         'description',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'country_id' => 'integer',
+        ];
+    }
 
     public $timestamps = true;
 }

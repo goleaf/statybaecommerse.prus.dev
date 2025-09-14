@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class LocationTranslation extends Model
+final /**
+ * LocationTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class LocationTranslation extends Model
 {
     use HasFactory;
 
@@ -22,6 +27,13 @@ final class LocationTranslation extends Model
         'slug',
         'description',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'location_id' => 'integer',
+        ];
+    }
 
     public function location(): BelongsTo
     {

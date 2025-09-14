@@ -7,7 +7,12 @@ namespace App\Models\Translations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-final class NewsTagTranslation extends Model
+final /**
+ * NewsTagTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class NewsTagTranslation extends Model
 {
     use HasFactory;
 
@@ -20,4 +25,11 @@ final class NewsTagTranslation extends Model
         'slug',
         'description',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'news_tag_id' => 'integer',
+        ];
+    }
 }

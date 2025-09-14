@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class RegionTranslation extends Model
+final /**
+ * RegionTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class RegionTranslation extends Model
 {
     use HasFactory;
 
@@ -22,6 +27,13 @@ final class RegionTranslation extends Model
         'name',
         'description',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'region_id' => 'integer',
+        ];
+    }
 
     public $timestamps = true;
 

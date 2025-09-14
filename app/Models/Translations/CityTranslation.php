@@ -6,7 +6,12 @@ namespace App\Models\Translations;
 
 use Illuminate\Database\Eloquent\Model;
 
-final class CityTranslation extends Model
+final /**
+ * CityTranslation
+ * 
+ * Eloquent model representing a database entity with relationships and business logic.
+ */
+class CityTranslation extends Model
 {
     protected $table = 'city_translations';
 
@@ -16,6 +21,13 @@ final class CityTranslation extends Model
         'name',
         'description',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'city_id' => 'integer',
+        ];
+    }
 
     public $timestamps = true;
 }
