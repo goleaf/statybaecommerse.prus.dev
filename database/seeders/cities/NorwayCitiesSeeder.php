@@ -17,6 +17,7 @@ final class NorwayCitiesSeeder extends Seeder
         $norway = Country::where('cca2', 'NO')->first();
         $euZone = Zone::where('code', 'EU')->first();
 
+        $cities = [
             // Oslo
             [
                 'name' => 'Oslo',
