@@ -10,7 +10,7 @@ use App\Models\Country;
 use App\Models\Region;
 use App\Models\Zone;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,7 +18,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-final class RegionResource extends Resource
+final /**
+ * RegionResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class RegionResource extends Resource
 {
     protected static ?string $model = Region::class;
 
@@ -31,7 +36,8 @@ final class RegionResource extends Resource
         return __('regions.navigation_label');
     }
 
-    protected static string | UnitEnum | null $navigationGroup = 'Content';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Content';
 
     public static function getModelLabel(): string
     {
@@ -43,7 +49,7 @@ final class RegionResource extends Resource
         return __('regions.plural_model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

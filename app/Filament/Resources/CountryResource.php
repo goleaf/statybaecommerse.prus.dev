@@ -48,13 +48,19 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use BackedEnum;
 use UnitEnum;
 
-final class CountryResource extends Resource
+final /**
+ * CountryResource
+ * 
+ * Filament resource for admin panel management.
+ */
+class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-globe-alt';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Content';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 1;
 
