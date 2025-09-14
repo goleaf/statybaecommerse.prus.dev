@@ -624,7 +624,7 @@ Route::get('/', function () {
 Route::get('/home', fn () => redirect()->route('home'));
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
 Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.show');
-// Route::get('/products/{product}/history', Pages\ProductHistory::class)->name('products.history');
+Route::get('/products/{product}/history', \App\Livewire\Pages\ProductHistory::class)->name('products.history');
 
 // Product Request routes (authenticated users only)
 Route::middleware(['auth'])->group(function () {
@@ -873,7 +873,7 @@ Route::get('/locations/{id}', function ($id) {
     $slug = $loc->code ?: $loc->name;
 
     return redirect()->route('locations.view', ['slug' => $slug]);
-})->whereNumber('id')->name('locations.show');
+})->whereNumber('id')->name('locations.show.legacy');
 
 
 // Region Module Routes
@@ -908,7 +908,7 @@ Route::prefix('{locale}')
         // Product routes
         Route::get('/products', Pages\ProductCatalog::class)->name('localized.products.index');
         Route::get('/products/{product}', Pages\SingleProduct::class)->name('localized.products.show');
-        // Route::get('/products/{product}/history', Pages\ProductHistory::class)->name('localized.products.history');
+        Route::get('/products/{product}/history', \App\Livewire\Pages\ProductHistory::class)->name('localized.products.history');
 
         // Product Request routes (authenticated users only)
         Route::middleware(['auth'])->group(function () {
@@ -927,6 +927,7 @@ Route::prefix('{locale}')
 
         // Search page
         Route::get('/search', \App\Livewire\Pages\Search::class)->name('localized.search');
+        
 
         // Brand index
         Route::get('/brands', \App\Livewire\Pages\Brand\Index::class)->name('localized.brands.index');
@@ -1339,28 +1340,8 @@ Route::prefix('countries')->name('countries.')->group(function () {
 
 
 // Region Frontend Routes
-Route::prefix('regions')->name('regions.')->group(function () {
-    Route::get('/', [App\Http\Controllers\RegionController::class, 'index'])->name('index');
-    Route::get('/{region}', [App\Http\Controllers\RegionController::class, 'show'])->name('show');
-    Route::get('/api/search', [App\Http\Controllers\RegionController::class, 'api'])->name('api.search');
-    Route::get('/api/by-country/{country}', [App\Http\Controllers\RegionController::class, 'byCountry'])->name('api.by-country');
-    Route::get('/api/by-level/{level}', [App\Http\Controllers\RegionController::class, 'byLevel'])->name('api.by-level');
-    Route::get('/api/hierarchy', [App\Http\Controllers\RegionController::class, 'hierarchy'])->name('api.hierarchy');
-    Route::get('/api/statistics', [App\Http\Controllers\RegionController::class, 'statistics'])->name('api.statistics');
-});
 
 
-// Location Frontend Routes
-Route::prefix('locations')->name('locations.')->group(function () {
-    Route::get('/', [App\Http\Controllers\LocationController::class, 'index'])->name('index');
-    Route::get('/{location}', [App\Http\Controllers\LocationController::class, 'show'])->name('show');
-    Route::get('/api/search', [App\Http\Controllers\LocationController::class, 'api'])->name('api.search');
-    Route::get('/api/by-type/{type}', [App\Http\Controllers\LocationController::class, 'byType'])->name('api.by-type');
-    Route::get('/api/by-country/{country}', [App\Http\Controllers\LocationController::class, 'byCountry'])->name('api.by-country');
-    Route::get('/api/by-city/{city}', [App\Http\Controllers\LocationController::class, 'byCity'])->name('api.by-city');
-    Route::get('/api/nearby', [App\Http\Controllers\LocationController::class, 'nearby'])->name('api.nearby');
-    Route::get('/api/statistics', [App\Http\Controllers\LocationController::class, 'statistics'])->name('api.statistics');
-});
 
 
 // Collection Frontend Routes
