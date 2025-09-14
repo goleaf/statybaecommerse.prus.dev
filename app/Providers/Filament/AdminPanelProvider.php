@@ -50,8 +50,8 @@ final class AdminPanelProvider extends PanelProvider
             // ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources([
                 \App\Filament\Resources\LegalResource::class,
+                \App\Filament\Resources\RecommendationConfigResource::class,
                 // \App\Filament\Resources\RecommendationConfigResourceSimple::class, // Disabled due to Filament v4 compatibility issues
-                // \App\Filament\Resources\RecommendationConfigResource::class, // Temporarily disabled due to type issues
                 // \App\Filament\Resources\SystemSettingResource::class, // Disabled due to Filament v4 compatibility issues
                 // \App\Filament\Resources\PostResource::class, // Temporarily disabled due to Filament v4 compatibility issues
                 // \App\Filament\Resources\SystemSettingsResource::class, // Disabled due to Filament v4 compatibility issues

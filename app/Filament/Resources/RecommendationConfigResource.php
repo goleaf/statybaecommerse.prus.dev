@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\RecommendationConfigResource\Pages;
 use App\Models\RecommendationConfig;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -27,13 +27,13 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use BackedEnum;
 
 final class RecommendationConfigResource extends Resource
 {
     protected static ?string $model = RecommendationConfig::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
+    // protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     // /** @var UnitEnum|string|null */
     // protected static $navigationGroup = 'Recommendation System';
@@ -72,8 +72,8 @@ final class RecommendationConfigResource extends Resource
         };
     }
 
-    public static function form(Form $form): Form {
-        return $form->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->schema([
                 Forms\Components\Section::make(__('translations.recommendation_config_basic_info'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
