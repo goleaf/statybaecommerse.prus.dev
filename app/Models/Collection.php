@@ -196,32 +196,38 @@ class Collection extends Model implements HasMedia
     // Advanced Translation Methods
     public function getTranslatedName(?string $locale = null): ?string
     {
-        return $this->trans('name', $locale) ?: $this->name;
+        $translated = $this->trans('name', $locale);
+        return $translated ?: $this->name;
     }
 
     public function getTranslatedDescription(?string $locale = null): ?string
     {
-        return $this->trans('description', $locale) ?: $this->description;
+        $translated = $this->trans('description', $locale);
+        return $translated ?: $this->description;
     }
 
     public function getTranslatedSlug(?string $locale = null): ?string
     {
-        return $this->trans('slug', $locale) ?: $this->slug;
+        $translated = $this->trans('slug', $locale);
+        return $translated ?: $this->slug;
     }
 
     public function getTranslatedMetaTitle(?string $locale = null): ?string
     {
-        return $this->trans('meta_title', $locale) ?: $this->meta_title;
+        $translated = $this->trans('meta_title', $locale);
+        return $translated ?: $this->meta_title;
     }
 
     public function getTranslatedMetaDescription(?string $locale = null): ?string
     {
-        return $this->trans('meta_description', $locale) ?: $this->meta_description;
+        $translated = $this->trans('meta_description', $locale);
+        return $translated ?: $this->meta_description;
     }
 
     public function getTranslatedMetaKeywords(?string $locale = null): ?array
     {
-        return $this->trans('meta_keywords', $locale) ?: $this->meta_keywords;
+        $translated = $this->trans('meta_keywords', $locale);
+        return $translated ?: $this->meta_keywords;
     }
 
     // Scope for translated collections

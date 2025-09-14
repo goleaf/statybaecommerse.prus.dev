@@ -41,7 +41,48 @@ final class CollectionTest extends TestCase
 
     public function test_collection_translation_methods(): void
     {
-        $this->markTestSkipped('Translation methods not working correctly with Spatie translatable package');
+        $collection = Collection::factory()->create([
+            'name' => 'Test Collection',
+            'slug' => 'test-collection',
+            'description' => 'Test description',
+        ]);
+
+        // Create translations
+        $ltTranslation = CollectionTranslation::factory()->create([
+            'collection_id' => $collection->id,
+            'locale' => 'lt',
+            'name' => 'Testo Kolekcija',
+            'description' => 'Testo aprašymas',
+        ]);
+
+        $enTranslation = CollectionTranslation::factory()->create([
+            'collection_id' => $collection->id,
+            'locale' => 'en',
+            'name' => 'Test Collection EN',
+            'description' => 'Test description EN',
+        ]);
+
+        // Test translation methods
+        $this->assertEquals('Testo Kolekcija', $collection->getTranslatedName('lt'));
+        $this->assertEquals('Test Collection EN', $collection->getTranslatedName('en'));
+        $this->assertEquals('Testo Kolekcija', $collection->getTranslatedName()); // Current locale (lt)
+
+        $this->assertEquals('Testo aprašymas', $collection->getTranslatedDescription('lt'));
+        $this->assertEquals('Test description EN', $collection->getTranslatedDescription('en'));
+
+        // Test trans method
+        $this->assertEquals('Testo Kolekcija', $collection->trans('name', 'lt'));
+        $this->assertEquals('Test Collection EN', $collection->trans('name', 'en'));
+
+        // Test available locales
+        $this->assertContains('lt', $collection->getAvailableLocales());
+        $this->assertTrue($collection->hasTranslationFor('lt'));
+        $this->assertFalse($collection->hasTranslationFor('de'));
+
+        // Test get or create translation
+        $newTranslation = $collection->getOrCreateTranslation('en');
+        $this->assertInstanceOf(CollectionTranslation::class, $newTranslation);
+        $this->assertEquals('en', $newTranslation->locale);
     }
 
     public function test_collection_scopes(): void

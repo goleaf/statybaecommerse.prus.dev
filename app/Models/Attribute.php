@@ -515,7 +515,8 @@ class Attribute extends Model
     // Advanced Translation Methods
     public function getTranslatedName(?string $locale = null): ?string
     {
-        return $this->trans('name', $locale) ?: $this->name;
+        $translated = $this->trans('name', $locale);
+        return $translated ?: $this->name;
     }
 
 

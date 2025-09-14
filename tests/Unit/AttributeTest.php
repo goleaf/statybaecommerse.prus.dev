@@ -45,7 +45,43 @@ final class AttributeTest extends TestCase
 
     public function test_attribute_translation_methods(): void
     {
-        $this->markTestSkipped('Translation methods not working correctly with Spatie translatable package');
+        $attribute = Attribute::factory()->create([
+            'name' => 'Test Attribute',
+            'slug' => 'test-attribute',
+            'type' => 'text',
+        ]);
+
+        // Create translations
+        $ltTranslation = AttributeTranslation::factory()->create([
+            'attribute_id' => $attribute->id,
+            'locale' => 'lt',
+            'name' => 'Testo Atributas',
+        ]);
+
+        $enTranslation = AttributeTranslation::factory()->create([
+            'attribute_id' => $attribute->id,
+            'locale' => 'en',
+            'name' => 'Test Attribute EN',
+        ]);
+
+        // Test translation methods
+        $this->assertEquals('Testo Atributas', $attribute->getTranslatedName('lt'));
+        $this->assertEquals('Test Attribute EN', $attribute->getTranslatedName('en'));
+        $this->assertEquals('Testo Atributas', $attribute->getTranslatedName()); // Current locale (lt)
+
+        // Test trans method
+        $this->assertEquals('Testo Atributas', $attribute->trans('name', 'lt'));
+        $this->assertEquals('Test Attribute EN', $attribute->trans('name', 'en'));
+
+        // Test available locales
+        $this->assertContains('lt', $attribute->getAvailableLocales());
+        $this->assertTrue($attribute->hasTranslationFor('lt'));
+        $this->assertFalse($attribute->hasTranslationFor('de'));
+
+        // Test get or create translation
+        $newTranslation = $attribute->getOrCreateTranslation('en');
+        $this->assertInstanceOf(AttributeTranslation::class, $newTranslation);
+        $this->assertEquals('en', $newTranslation->locale);
     }
 
     public function test_attribute_scopes(): void

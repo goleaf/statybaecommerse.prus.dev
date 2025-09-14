@@ -25,10 +25,6 @@ class AttributeTranslation extends Model
         'attribute_id',
         'locale',
         'name',
-        'slug',
-        'description',
-        'placeholder',
-        'help_text',
     ];
 
     protected function casts(): array
@@ -59,30 +55,10 @@ class AttributeTranslation extends Model
         return $query->whereNotNull('name');
     }
 
-    public function scopeWithDescription($query)
-    {
-        return $query->whereNotNull('description');
-    }
-
     // Accessors
     public function getFormattedNameAttribute(): string
     {
         return $this->name ?: __('attributes.untitled_attribute');
-    }
-
-    public function getFormattedDescriptionAttribute(): ?string
-    {
-        return $this->description ?: null;
-    }
-
-    public function getFormattedPlaceholderAttribute(): ?string
-    {
-        return $this->placeholder ?: null;
-    }
-
-    public function getFormattedHelpTextAttribute(): ?string
-    {
-        return $this->help_text ?: null;
     }
 
     // Helper methods
@@ -91,24 +67,9 @@ class AttributeTranslation extends Model
         return ! empty($this->name);
     }
 
-    public function hasDescription(): bool
-    {
-        return ! empty($this->description);
-    }
-
-    public function hasPlaceholder(): bool
-    {
-        return ! empty($this->placeholder);
-    }
-
-    public function hasHelpText(): bool
-    {
-        return ! empty($this->help_text);
-    }
-
     public function isEmpty(): bool
     {
-        return ! $this->hasName() && ! $this->hasDescription() && ! $this->hasPlaceholder() && ! $this->hasHelpText();
+        return ! $this->hasName();
     }
 
     public function isComplete(): bool

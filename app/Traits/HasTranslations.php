@@ -17,14 +17,29 @@ trait HasTranslations
     public function trans(string $field, ?string $locale = null): mixed
     {
         $locale = $locale ?: app()->getLocale();
-        $t = $this->translations->firstWhere('locale', $locale);
-        if ($t && isset($t->{$field})) {
-            $value = $t->{$field};
+        
+        // Load translations if not already loaded
+        if (!$this->relationLoaded('translations')) {
+            $this->load('translations');
+        }
+        
+        $translation = $this->translations->firstWhere('locale', $locale);
+        
+        if ($translation && isset($translation->{$field}) && !empty($translation->{$field})) {
+            $value = $translation->{$field};
             if (is_array($value)) {
                 return $value[$locale] ?? reset($value) ?? ($this->{$field} ?? null);
             }
-
             return $value;
+        }
+
+        // Fallback to default locale if current locale not found
+        $defaultLocale = config('app.locale', 'en');
+        if ($locale !== $defaultLocale) {
+            $defaultTranslation = $this->translations->firstWhere('locale', $defaultLocale);
+            if ($defaultTranslation && isset($defaultTranslation->{$field}) && !empty($defaultTranslation->{$field})) {
+                return $defaultTranslation->{$field};
+            }
         }
 
         return $this->{$field} ?? null;
