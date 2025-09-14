@@ -112,14 +112,16 @@ it('can filter reviews by rating', function () {
         'product_id' => $this->product->id,
         'user_id' => $this->user->id,
         'rating' => 5,
+        'is_approved' => true,
     ]);
     $threeStarReview = Review::factory()->create([
         'product_id' => $this->product->id,
         'user_id' => $this->user->id,
         'rating' => 3,
+        'is_approved' => true,
     ]);
 
-    $fiveStarReviews = Review::whereRating(5)->get();
+    $fiveStarReviews = Review::byRating(5)->get();
 
     expect($fiveStarReviews)->toHaveCount(1);
     expect($fiveStarReviews->first()->id)->toBe($fiveStarReview->id);

@@ -61,7 +61,7 @@ final class Review extends Model
         });
     }
     protected $table = 'reviews';
-    protected $fillable = ['product_id', 'user_id', 'reviewer_name', 'reviewer_email', 'rating', 'title', 'comment', 'is_approved', 'is_featured', 'locale', 'approved_at', 'rejected_at', 'metadata'];
+    protected $fillable = ['product_id', 'user_id', 'reviewer_name', 'reviewer_email', 'rating', 'title', 'content', 'is_approved', 'is_featured', 'locale', 'approved_at', 'rejected_at', 'metadata'];
     protected string $translationModel = \App\Models\Translations\ReviewTranslation::class;
     /**
      * Handle casts functionality with proper error handling.
@@ -134,7 +134,7 @@ final class Review extends Model
      */
     public function scopePending($query)
     {
-        return $query->where('is_approved', false)->whereNull('rejected_at');
+        return $query->withoutGlobalScope(ApprovedScope::class)->where('is_approved', false)->whereNull('rejected_at');
     }
     /**
      * Handle approve functionality with proper error handling.
@@ -198,7 +198,7 @@ final class Review extends Model
      * @param int $productId
      * @return float
      */
-    public function getAverageRatingForProduct(int $productId): float
+    public static function getAverageRatingForProduct(int $productId): float
     {
         return self::where('product_id', $productId)->where('is_approved', true)->avg('rating') ?? 0;
     }
@@ -207,7 +207,7 @@ final class Review extends Model
      * @param int $productId
      * @return int
      */
-    public function getReviewCountForProduct(int $productId): int
+    public static function getReviewCountForProduct(int $productId): int
     {
         return self::where('product_id', $productId)->where('is_approved', true)->count();
     }
@@ -216,7 +216,7 @@ final class Review extends Model
      * @param int $productId
      * @return array
      */
-    public function getRatingDistributionForProduct(int $productId): array
+    public static function getRatingDistributionForProduct(int $productId): array
     {
         return self::where('product_id', $productId)->where('is_approved', true)->selectRaw('rating, COUNT(*) as count')->groupBy('rating')->orderBy('rating')->pluck('count', 'rating')->toArray();
     }
@@ -237,7 +237,7 @@ final class Review extends Model
      */
     public function getTranslatedComment(?string $locale = null): ?string
     {
-        return $this->trans('comment', $locale) ?: $this->comment;
+        return $this->trans('comment', $locale) ?: $this->content;
     }
     // Scope for translated reviews
     /**

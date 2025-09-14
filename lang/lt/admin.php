@@ -2114,7 +2114,7 @@ return [
         ],
         'types' => [
             'manual' => 'Rankinė kolekcija',
-            'automatic' => 'Automatinė kolekcija',
+            'automatic' => 'automatic',
         ],
         'status' => [
             'visible' => 'Matoma',

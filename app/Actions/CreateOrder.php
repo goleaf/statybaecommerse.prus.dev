@@ -10,6 +10,7 @@ use Darryldecode\Cart\Facades\CartFacade;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Number;
 /**
  * CreateOrder
  * 
@@ -56,8 +57,8 @@ class CreateOrder
             ]) : $shippingAddress;
             // Totals
             // @phpstan-ignore-next-line
-            $subtotal = (float) CartFacade::session($sessionId)->getSubTotal();
-            $shippingTotal = (float) data_get($checkout, 'shipping_option.0.price', 0);
+            $subtotal = Number::parseFloat(CartFacade::session($sessionId)->getSubTotal());
+            $shippingTotal = Number::parseFloat(data_get($checkout, 'shipping_option.0.price', 0));
             $couponCode = strtoupper((string) data_get($checkout, 'coupon.code'));
             // Validate coupon limits if provided
             $codeRow = null;
@@ -73,7 +74,7 @@ class CreateOrder
             }
             $engine = app(\App\Services\Discounts\DiscountEngine::class);
             $result = $engine->evaluate(['zone_id' => ZoneSessionManager::getSession()->zoneId, 'currency_code' => current_currency(), 'channel_id' => null, 'user_id' => optional($customer)->id, 'now' => now(), 'code' => $codeRow ? $couponCode : null, 'cart' => ['subtotal' => $subtotal, 'items' => []]]);
-            $discountTotal = (float) data_get($result, 'discount_total_amount', 0);
+            $discountTotal = Number::parseFloat(data_get($result, 'discount_total_amount', 0));
             $zoneCode = data_get(ZoneSessionManager::getSession(), 'zoneCode');
             $taxTotal = app(\App\Services\Taxes\TaxCalculator::class)->compute(max(0.0, $subtotal - (float) $discountTotal), is_string($zoneCode) ? $zoneCode : null);
             $grandTotal = max(0, round($subtotal - $discountTotal + $shippingTotal + $taxTotal, 2));

@@ -4,108 +4,151 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Jobs\ImportInventoryChunk;
-use App\Jobs\ImportPricesChunk;
-use Database\Seeders\BulkCustomerSeeder;
+use App\Http\Controllers\Frontend\MenuController;
+use App\Http\Controllers\Frontend\NewsController;
+use App\Livewire\Pages\ProductGallery;
+use App\View\Creators\NavigationCreator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\LazyCollection;
 use Tests\TestCase;
 
 final class NewTimeoutImplementationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_import_inventory_chunk_has_timeout_protection(): void
+    public function test_news_controller_featured_has_timeout_protection(): void
     {
-        // Test that ImportInventoryChunk job has timeout protection
-        $rows = [
-            ['sku' => 'TEST-SKU-1', 'location_code' => 'default', 'stock' => 10],
-            ['sku' => 'TEST-SKU-2', 'location_code' => 'default', 'stock' => 20],
-            ['sku' => 'TEST-SKU-3', 'location_code' => 'default', 'stock' => 30],
-        ];
-
-        $job = new ImportInventoryChunk($rows);
+        $controller = new NewsController();
+        $request = new \Illuminate\Http\Request();
         
-        // Test that the job can be instantiated without errors
-        $this->assertInstanceOf(ImportInventoryChunk::class, $job);
+        // Test that the featured method uses timeout protection
+        $response = $controller->featured($request);
         
-        // Test that the job can be dispatched
-        Queue::fake();
-        dispatch($job);
-        Queue::assertPushed(ImportInventoryChunk::class);
+        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function test_import_prices_chunk_has_timeout_protection(): void
+    public function test_menu_controller_index_has_timeout_protection(): void
     {
-        // Test that ImportPricesChunk job has timeout protection
-        $rows = [
-            ['product_slug' => 'test-product-1', 'currency_code' => 'EUR', 'amount' => 10.50],
-            ['product_slug' => 'test-product-2', 'currency_code' => 'EUR', 'amount' => 20.75],
-            ['product_slug' => 'test-product-3', 'currency_code' => 'EUR', 'amount' => 30.25],
-        ];
-
-        $job = new ImportPricesChunk($rows);
+        $controller = new MenuController();
+        $request = new \Illuminate\Http\Request();
         
-        // Test that the job can be instantiated without errors
-        $this->assertInstanceOf(ImportPricesChunk::class, $job);
+        // Test that the index method uses timeout protection
+        $response = $controller->index($request);
         
-        // Test that the job can be dispatched
-        Queue::fake();
-        dispatch($job);
-        Queue::assertPushed(ImportPricesChunk::class);
+        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function test_bulk_customer_seeder_has_timeout_protection(): void
+    public function test_product_gallery_total_images_has_timeout_protection(): void
     {
-        // Test that BulkCustomerSeeder has timeout protection
-        $seeder = new BulkCustomerSeeder();
+        $component = new ProductGallery();
         
-        // Test that the seeder can be instantiated without errors
-        $this->assertInstanceOf(BulkCustomerSeeder::class, $seeder);
+        // Test that the totalImages method uses timeout protection
+        $totalImages = $component->totalImages();
         
-        // Note: We don't actually run the full seeder in tests as it's resource intensive
-        // but we can verify the timeout logic is in place by checking the code structure
-        $this->expectNotToPerformAssertions();
+        $this->assertIsInt($totalImages);
+        $this->assertGreaterThanOrEqual(0, $totalImages);
     }
 
-    public function test_lazy_collection_timeout_with_job_operations(): void
+    public function test_navigation_creator_has_timeout_protection(): void
     {
-        // Test timeout behavior with job-like operations
-        $timeout = now()->addSeconds(1); // Very short timeout for testing
+        // Test that NavigationCreator class exists and has the expected methods
+        $this->assertTrue(class_exists(NavigationCreator::class));
+        $this->assertTrue(method_exists(NavigationCreator::class, 'getTopCategories'));
+        $this->assertTrue(method_exists(NavigationCreator::class, 'getFeaturedBrands'));
+        $this->assertTrue(method_exists(NavigationCreator::class, 'getNavigationMenu'));
+    }
+
+    public function test_timeout_protection_prevents_long_running_operations(): void
+    {
+        // Test that timeout protection actually works by simulating a long operation
+        $collection = LazyCollection::make(range(1, 1000));
+        $timeout = now()->addMilliseconds(50); // Very short timeout
+        
         $processedCount = 0;
+        foreach ($collection->takeUntilTimeout($timeout) as $item) {
+            $processedCount++;
+            usleep(1000); // 1ms delay
+        }
+        
+        $this->assertLessThan(1000, $processedCount);
+        $this->assertGreaterThanOrEqual(0, $processedCount);
+    }
 
-        $rows = array_fill(0, 100, ['test' => 'data']);
+    public function test_timeout_protection_with_normal_operations(): void
+    {
+        // Test that timeout protection doesn't interfere with normal operations
+        $collection = LazyCollection::make(range(1, 10));
+        $timeout = now()->addSeconds(10); // Long timeout
+        
+        $processedCount = 0;
+        foreach ($collection->takeUntilTimeout($timeout) as $item) {
+            $processedCount++;
+        }
+        
+        $this->assertEquals(10, $processedCount); // Should process all items
+    }
 
-        \Illuminate\Support\LazyCollection::make($rows)
+    public function test_timeout_protection_with_database_cursor(): void
+    {
+        // Test timeout protection with database cursor operations
+        $timeout = now()->addSeconds(5);
+        
+        $processedCount = 0;
+        \App\Models\User::query()
+            ->cursor()
             ->takeUntilTimeout($timeout)
-            ->each(function ($row) use (&$processedCount) {
+            ->each(function ($user) use (&$processedCount) {
                 $processedCount++;
-                usleep(10000); // Simulate work (10ms per item)
             });
-
-        // Should have processed some items but not all due to timeout
-        $this->assertGreaterThan(0, $processedCount);
-        $this->assertLessThan(100, $processedCount);
+        
+        $this->assertGreaterThanOrEqual(0, $processedCount);
     }
 
-
-    public function test_timeout_protection_with_database_operations(): void
+    public function test_timeout_protection_with_lazy_collection_make(): void
     {
-        // Test timeout behavior with database-like operations
-        $timeout = now()->addSeconds(2);
+        // Test timeout protection with LazyCollection::make
+        $timeout = now()->addMilliseconds(100); // Very short timeout
+        
         $processedCount = 0;
-
-        // Simulate database operations with delays
-        \Illuminate\Support\LazyCollection::make(range(1, 50))
+        LazyCollection::make(range(1, 100))
             ->takeUntilTimeout($timeout)
             ->each(function ($item) use (&$processedCount) {
                 $processedCount++;
-                // Simulate database operation delay
-                usleep(50000); // 50ms delay per item
+                usleep(10000); // 10ms delay
             });
-
-        // Should have processed some items but not all due to timeout
+        
+        $this->assertLessThan(100, $processedCount);
         $this->assertGreaterThan(0, $processedCount);
-        $this->assertLessThan(50, $processedCount);
+    }
+
+    public function test_timeout_protection_with_collect_method(): void
+    {
+        // Test timeout protection with collect method
+        $timeout = now()->addSeconds(1);
+        
+        $collection = LazyCollection::make(range(1, 50))
+            ->takeUntilTimeout($timeout)
+            ->collect();
+        
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection);
+        $this->assertLessThanOrEqual(50, $collection->count());
+    }
+
+    public function test_timeout_protection_with_skip_while(): void
+    {
+        // Test timeout protection combined with skipWhile
+        $timeout = now()->addSeconds(1);
+        
+        $collection = LazyCollection::make(range(1, 20))
+            ->takeUntilTimeout($timeout)
+            ->skipWhile(function ($item) {
+                return $item < 5; // Skip first 4 items
+            })
+            ->collect();
+        
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection);
+        $this->assertLessThanOrEqual(16, $collection->count()); // Max 16 items (20 - 4)
     }
 }

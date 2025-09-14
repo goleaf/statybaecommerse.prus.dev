@@ -7,6 +7,7 @@ use App\Actions\ZoneSessionManager;
 use App\Models\Country;
 use App\Models\Currency;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Arr;
 use Livewire\Component;
 /**
  * CurrencySelector
@@ -30,7 +31,7 @@ class CurrencySelector extends Component
         $this->currencies = app()->environment('testing') ? [['id' => 1, 'code' => (string) config('app.currency', 'EUR'), 'symbol' => '€']] : \Cache::remember('currencies:enabled:list', now()->addHours(6), function () {
             try {
                 if (Schema::hasTable('currencies')) {
-                    return Currency::query()->where('is_enabled', true)->orderBy('code')->get(['id', 'code', 'symbol'])->map(fn($c) => ['id' => (int) $c->id, 'code' => (string) $c->code, 'symbol' => (string) $c->symbol])->all();
+                    return Arr::from(Currency::query()->where('is_enabled', true)->orderBy('code')->get(['id', 'code', 'symbol'])->map(fn($c) => ['id' => (int) $c->id, 'code' => (string) $c->code, 'symbol' => (string) $c->symbol]));
                 }
             } catch (\Throwable $e) {
                 // ignore and fallback

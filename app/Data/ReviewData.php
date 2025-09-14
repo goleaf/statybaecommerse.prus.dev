@@ -25,7 +25,7 @@ final class ReviewData extends Data
      * @param int $product_id
      * @param int $rating
      * @param string|null $title
-     * @param string|null $comment
+     * @param string|null $content
      * @param string $reviewer_name
      * @param string $reviewer_email
      */
@@ -37,7 +37,7 @@ final class ReviewData extends Data
         #[Nullable, StringType, Max(255)]
         public ?string $title,
         #[Nullable, StringType, Max(2000)]
-        public ?string $comment,
+        public ?string $content,
         #[Required, StringType, Max(255)]
         public string $reviewer_name,
         #[Required, Email, Max(255)]

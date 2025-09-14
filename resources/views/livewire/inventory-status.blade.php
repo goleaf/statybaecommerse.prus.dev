@@ -25,13 +25,13 @@
             @endif
 
             @if($showDetails)
-                <button wire:click="toggleDetails" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <button wire:click="toggleDetails" wire:confirm="{{ __('translations.confirm_toggle_details') }}" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
                     </svg>
                 </button>
             @else
-                <button wire:click="toggleDetails" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <button wire:click="toggleDetails" wire:confirm="{{ __('translations.confirm_toggle_details') }}" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>

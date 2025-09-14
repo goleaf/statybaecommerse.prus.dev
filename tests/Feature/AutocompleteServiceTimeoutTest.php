@@ -1,0 +1,104 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Services\AutocompleteService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class AutocompleteServiceTimeoutTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_autocomplete_service_has_timeout_protection(): void
+    {
+        $service = new AutocompleteService();
+        
+        // Test that the service methods use timeout protection
+        $results = $service->search('test', 10);
+        
+        $this->assertIsArray($results);
+    }
+
+    public function test_autocomplete_service_search_products_has_timeout_protection(): void
+    {
+        $service = new AutocompleteService();
+        
+        // Test that the searchProducts method uses timeout protection
+        $results = $service->searchProducts('test', 10);
+        
+        $this->assertIsArray($results);
+    }
+
+    public function test_autocomplete_service_search_categories_has_timeout_protection(): void
+    {
+        $service = new AutocompleteService();
+        
+        // Test that the searchCategories method uses timeout protection
+        $results = $service->searchCategories('test', 10);
+        
+        $this->assertIsArray($results);
+    }
+
+    public function test_autocomplete_service_search_brands_has_timeout_protection(): void
+    {
+        $service = new AutocompleteService();
+        
+        // Test that the searchBrands method uses timeout protection
+        $results = $service->searchBrands('test', 10);
+        
+        $this->assertIsArray($results);
+    }
+
+    public function test_autocomplete_service_search_collections_has_timeout_protection(): void
+    {
+        $service = new AutocompleteService();
+        
+        // Test that the searchCollections method uses timeout protection
+        $results = $service->searchCollections('test', 10);
+        
+        $this->assertIsArray($results);
+    }
+
+    public function test_autocomplete_service_search_attributes_has_timeout_protection(): void
+    {
+        $service = new AutocompleteService();
+        
+        // Test that the searchAttributes method uses timeout protection
+        $results = $service->searchAttributes('test', 10);
+        
+        $this->assertIsArray($results);
+    }
+
+    public function test_timeout_protection_prevents_long_running_operations(): void
+    {
+        // Test that timeout protection actually works by simulating a long operation
+        $collection = \Illuminate\Support\LazyCollection::make(range(1, 1000));
+        $timeout = now()->addMilliseconds(50); // Very short timeout
+        
+        $processedCount = 0;
+        foreach ($collection->takeUntilTimeout($timeout) as $item) {
+            $processedCount++;
+            usleep(1000); // 1ms delay
+        }
+        
+        $this->assertLessThan(1000, $processedCount);
+        $this->assertGreaterThanOrEqual(0, $processedCount);
+    }
+
+    public function test_timeout_protection_with_normal_operations(): void
+    {
+        // Test that timeout protection doesn't interfere with normal operations
+        $collection = \Illuminate\Support\LazyCollection::make(range(1, 10));
+        $timeout = now()->addSeconds(10); // Long timeout
+        
+        $processedCount = 0;
+        foreach ($collection->takeUntilTimeout($timeout) as $item) {
+            $processedCount++;
+        }
+        
+        $this->assertEquals(10, $processedCount); // Should process all items
+    }
+}

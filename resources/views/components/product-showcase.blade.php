@@ -305,6 +305,7 @@
                                                     </button>
 
                                                     <button wire:click="toggleWishlist({{ $product->id }})"
+                                                            wire:confirm="{{ __('translations.confirm_toggle_wishlist') }}"
                                                             class="w-full border border-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200">
                                                         {{ __('Add to Wishlist') }}
                                                     </button>

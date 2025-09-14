@@ -5,6 +5,7 @@ namespace App\Services\Discounts;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Number;
 /**
  * DiscountEngine
  * 
@@ -370,7 +371,7 @@ class DiscountEngine
      */
     protected function compareOperator($left, string $operator, $rawValue): bool
     {
-        $value = is_numeric($rawValue) ? (float) $rawValue : (float) (is_string($rawValue) ? json_decode($rawValue, true) : $rawValue);
+        $value = is_numeric($rawValue) ? Number::parseFloat($rawValue) : Number::parseFloat(is_string($rawValue) ? json_decode($rawValue, true) : $rawValue);
         return match ($operator) {
             'equals_to' => (float) $left == $value,
             'not_equals_to' => (float) $left != $value,

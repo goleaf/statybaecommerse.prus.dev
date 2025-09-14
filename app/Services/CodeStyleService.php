@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace App\Services;
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Number;
 /**
  * CodeStyleService
  * 
@@ -243,8 +244,8 @@ final class CodeStyleService
     {
         $originalContent = $content;
         $content = preg_replace_callback(self::NUMERIC_PATTERN, function ($matches) {
-            $number = floatval($matches[1]);
-            return $number == intval($number) ? (string) intval($number) : $matches[1];
+            $number = Number::parseFloat($matches[1]);
+            return $number == (int) $number ? (string) (int) $number : $matches[1];
         }, $content);
         if ($content !== $originalContent) {
             $fixes[] = ['type' => 'numeric_formatting', 'file' => $filePath, 'message' => 'Fixed numeric formatting'];

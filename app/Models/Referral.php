@@ -3,6 +3,9 @@
 declare (strict_types=1);
 namespace App\Models;
 
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\StatusScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +27,7 @@ use Spatie\Translatable\HasTranslations;
  * @method static \Illuminate\Database\Eloquent\Builder|Referral query()
  * @mixin \Eloquent
  */
+#[ScopedBy([ActiveScope::class, StatusScope::class])]
 final class Referral extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;

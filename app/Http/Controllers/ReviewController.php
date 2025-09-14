@@ -66,7 +66,7 @@ final class ReviewController extends Controller
      */
     public function store(ReviewData $data): RedirectResponse
     {
-        $review = Review::create(['product_id' => $data->product_id, 'user_id' => Auth::id(), 'rating' => $data->rating, 'title' => $data->title, 'comment' => $data->comment, 'reviewer_name' => $data->reviewer_name, 'reviewer_email' => $data->reviewer_email, 'locale' => app()->getLocale(), 'is_approved' => false]);
+        $review = Review::create(['product_id' => $data->product_id, 'user_id' => Auth::id(), 'rating' => $data->rating, 'title' => $data->title, 'content' => $data->content, 'reviewer_name' => $data->reviewer_name, 'reviewer_email' => $data->reviewer_email, 'locale' => app()->getLocale(), 'is_approved' => false]);
         return redirect()->route('reviews.show', $review)->with('success', __('reviews.review_submitted_successfully'));
     }
     /**
@@ -92,11 +92,11 @@ final class ReviewController extends Controller
         if (Auth::id() !== $review->user_id) {
             abort(403);
         }
-        $validator = Validator::make($request->all(), ['rating' => 'required|integer|min:1|max:5', 'title' => 'nullable|string|max:255', 'comment' => 'nullable|string|max:2000']);
+        $validator = Validator::make($request->all(), ['rating' => 'required|integer|min:1|max:5', 'title' => 'nullable|string|max:255', 'content' => 'nullable|string|max:2000']);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        $review->update(['rating' => $request->rating, 'title' => $request->title, 'comment' => $request->comment, 'is_approved' => false]);
+        $review->update(['rating' => $request->rating, 'title' => $request->title, 'content' => $request->content, 'is_approved' => false]);
         return redirect()->route('reviews.show', $review)->with('success', __('reviews.review_updated_successfully'));
     }
     /**

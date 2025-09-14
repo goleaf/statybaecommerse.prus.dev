@@ -52,6 +52,7 @@
                         </select>
                     </div>
                     <button type="button" wire:click="$toggle('sidebarOpen')"
+                            wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
                             class="md:hidden inline-flex items-center gap-2 px-3 py-2 border rounded-lg text-sm shadow-sm">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -163,13 +164,13 @@
             <!-- Mobile filters drawer -->
             @if ($sidebarOpen)
                 <div class="fixed inset-0 z-40 md:hidden">
-                    <div class="absolute inset-0 bg-black/30" aria-hidden="true" wire:click="$toggle('sidebarOpen')">
+                    <div class="absolute inset-0 bg-black/30" aria-hidden="true" wire:click="$toggle('sidebarOpen')" wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}">
                     </div>
                     <div class="absolute inset-y-0 left-0 w-11/12 max-w-sm bg-white shadow-xl p-4 overflow-y-auto">
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="text-base font-semibold">{{ __('Filters') }}</h3>
                             <button type="button" class="p-2 rounded-lg hover:bg-gray-100"
-                                    wire:click="$toggle('sidebarOpen')" aria-label="{{ __('Close') }}">
+                                    wire:click="$toggle('sidebarOpen')" wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}" aria-label="{{ __('Close') }}">
                                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M6 18 18 6M6 6l12 12" />

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\LazyCollection;
 /**
  * MenuController
  * 
@@ -29,7 +30,12 @@ final class MenuController extends Controller
         if ($location) {
             $query->where('location', $location);
         }
-        $menus = $query->where('is_active', true)->get();
+        $timeout = now()->addSeconds(5);
+        // 5 second timeout for menu loading
+        $menus = $query->where('is_active', true)->cursor()->takeUntilTimeout($timeout)->collect()->skipWhile(function ($menu) {
+            // Skip menus that are not properly configured for display
+            return empty($menu->name) || empty($menu->key) || !$menu->is_active || empty($menu->allItems);
+        });
         return response()->json(['success' => true, 'data' => $menus->map(function ($menu) {
             return ['id' => $menu->id, 'key' => $menu->key, 'name' => $menu->name, 'location' => $menu->location, 'items' => $this->formatMenuItems($menu->allItems)];
         })]);

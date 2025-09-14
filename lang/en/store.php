@@ -60,4 +60,10 @@ return [
         'empty' => 'No products found.',
         'help' => 'Search products across categories, brands, and collections.',
     ],
+    'collections' => [
+        'types' => [
+            'automatic' => 'automatic',
+            'manual' => 'manual',
+        ],
+    ],
 ];

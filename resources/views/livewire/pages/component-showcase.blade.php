@@ -252,6 +252,7 @@
             <x-shared.card>
                 <x-shared.button 
                     wire:click="toggleModal"
+                    wire:confirm="{{ __('translations.confirm_toggle_modal') }}"
                     variant="primary"
                 >
                     Open Modal
@@ -269,6 +270,7 @@
                     <x-slot name="footer">
                         <x-shared.button 
                             wire:click="toggleModal"
+                            wire:confirm="{{ __('translations.confirm_toggle_modal') }}"
                             variant="secondary"
                         >
                             Close

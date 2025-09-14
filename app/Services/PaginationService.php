@@ -24,7 +24,10 @@ final class PaginationService
      */
     public static function paginateWithOnEachSide(Builder $query, int $perPage = 12, int $onEachSide = 2, string $pageName = 'page'): LengthAwarePaginator
     {
-        return $query->paginate($perPage, ['*'], $pageName)->onEachSide($onEachSide);
+        $paginator = $query->paginate($perPage, ['*'], $pageName);
+        // Store onEachSide value for use in views
+        $paginator->onEachSide = $onEachSide;
+        return $paginator;
     }
     /**
      * Handle getPaginationConfig functionality with proper error handling.
@@ -75,8 +78,9 @@ final class PaginationService
      */
     public static function smartPaginate(Builder $query, int $perPage = 12, int $maxOnEachSide = 3): LengthAwarePaginator
     {
-        $paginator = $query->paginate($perPage);
-        $totalPages = $paginator->lastPage();
+        // First get the total count to determine onEachSide
+        $totalCount = $query->count();
+        $totalPages = (int) ceil($totalCount / $perPage);
         // Adjust onEachSide based on total pages
         $onEachSide = match (true) {
             $totalPages <= 5 => 2,
@@ -84,7 +88,10 @@ final class PaginationService
             $totalPages <= 20 => 2,
             default => min($maxOnEachSide, 3),
         };
-        return $paginator->onEachSide($onEachSide);
+        $paginator = $query->paginate($perPage);
+        // Store onEachSide value for use in views
+        $paginator->onEachSide = $onEachSide;
+        return $paginator;
     }
     /**
      * Handle paginateWithSkipWhile functionality with proper error handling.

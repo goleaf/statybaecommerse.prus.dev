@@ -25,6 +25,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Translatable\HasTranslations;
+use Illuminate\Support\Arr;
 /**
  * User
  * 
@@ -113,7 +114,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     protected function rolesLabel(): Attribute
     {
         return Attribute::make(get: function (): string {
-            $roles = $this->roles()->pluck('name')->filter(fn($value) => is_string($value) && $value !== '')->values()->all();
+            $roles = Arr::from($this->roles()->pluck('name')->filter(fn($value) => is_string($value) && $value !== '')->values());
             if (count($roles) === 0) {
                 return 'N/A';
             }

@@ -120,7 +120,8 @@ describe('Brand Model', function () {
     });
 
     it('has media collections', function () {
-        $brand = Brand::factory()->create();
+        $brand = new Brand();
+        $brand->registerMediaCollections();
 
         expect($brand->getMediaCollections())->toHaveCount(2);
         expect($brand->getMediaCollections()->pluck('name'))->toContain('logo', 'banner');
@@ -133,7 +134,7 @@ describe('Brand Model', function () {
 
         $activity = \Spatie\Activitylog\Models\Activity::where('subject_id', $brand->id)
             ->where('subject_type', Brand::class)
-            ->latest()
+            ->where('event', 'updated')
             ->first();
 
         expect($activity)->not->toBeNull();

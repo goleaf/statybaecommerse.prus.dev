@@ -17,7 +17,7 @@ it('can create a review', function () {
         'product_id' => $this->product->id,
         'rating' => 5,
         'title' => 'Great product!',
-        'comment' => 'This product exceeded my expectations.',
+        'content' => 'This product exceeded my expectations.',
         'reviewer_name' => 'John Doe',
         'reviewer_email' => 'john@example.com',
     ];
@@ -28,7 +28,7 @@ it('can create a review', function () {
     expect($review->product_id)->toBe($this->product->id);
     expect($review->rating)->toBe(5);
     expect($review->title)->toBe('Great product!');
-    expect($review->comment)->toBe('This product exceeded my expectations.');
+    expect($review->content)->toBe('This product exceeded my expectations.');
     expect($review->reviewer_name)->toBe('John Doe');
     expect($review->reviewer_email)->toBe('john@example.com');
     expect($review->is_approved)->toBeFalse();

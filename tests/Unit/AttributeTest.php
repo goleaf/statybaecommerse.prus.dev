@@ -248,6 +248,7 @@ final class AttributeTest extends TestCase
     public function test_attribute_with_translations_scope(): void
     {
         $attribute = Attribute::factory()->create([
+            'is_active' => true, // Ensure the attribute is active so it passes the ActiveScope
             'is_enabled' => true, // Ensure the attribute is enabled so it passes the EnabledScope
             'is_visible' => true, // Ensure the attribute is visible so it passes the VisibleScope
         ]);

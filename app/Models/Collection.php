@@ -24,6 +24,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property mixed $table
  * @property mixed $fillable
  * @property mixed $translatable
+ * @property mixed $appends
  * @property string $translationModel
  * @method static \Illuminate\Database\Eloquent\Builder|Collection newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Collection newQuery()
@@ -47,6 +48,12 @@ final class Collection extends Model implements HasMedia
     {
         return ['is_visible' => 'boolean', 'sort_order' => 'integer', 'is_automatic' => 'boolean', 'rules' => 'array', 'is_active' => 'boolean', 'products_per_page' => 'integer', 'show_filters' => 'boolean', 'meta_keywords' => 'array'];
     }
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = ['products_count', 'image'];
     protected string $translationModel = \App\Models\Translations\CollectionTranslation::class;
     /**
      * Handle booted functionality with proper error handling.

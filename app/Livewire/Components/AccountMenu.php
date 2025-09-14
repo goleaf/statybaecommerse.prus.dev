@@ -4,6 +4,8 @@ declare (strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Livewire\Actions\Logout;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 /**
  * AccountMenu
@@ -13,6 +15,24 @@ use Livewire\Component;
  */
 class AccountMenu extends Component
 {
+    /**
+     * Handle isAuthenticated functionality with proper error handling.
+     * @return bool
+     */
+    #[Computed]
+    public function isAuthenticated(): bool
+    {
+        return Auth::check();
+    }
+    /**
+     * Handle user functionality with proper error handling.
+     * @return mixed
+     */
+    #[Computed]
+    public function user(): mixed
+    {
+        return Auth::user();
+    }
     /**
      * Handle logout functionality with proper error handling.
      * @param Logout $logout

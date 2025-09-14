@@ -22,44 +22,32 @@ final class ReferralController extends Controller
 {
     use AuthorizesRequests;
     /**
-     * Get referral code statistics
-     * @return \Illuminate\Http\JsonResponse
+     * Handle codeStatistics functionality with proper error handling.
+     * @return Illuminate\Http\JsonResponse
      */
     public function codeStatistics(): \Illuminate\Http\JsonResponse
     {
-        $stats = [
-            'total_codes' => ReferralCode::count(),
-            'active_codes' => ReferralCode::where('is_active', true)->count(),
-            'total_usage' => ReferralCode::sum('usage_count'),
-            'total_rewards' => ReferralCode::sum('total_rewards'),
-        ];
-        
+        $stats = ['total_codes' => ReferralCode::count(), 'active_codes' => ReferralCode::where('is_active', true)->count(), 'total_usage' => ReferralCode::sum('usage_count'), 'total_rewards' => ReferralCode::sum('total_rewards')];
         return response()->json($stats);
     }
-
     /**
-     * Get referral URL
-     * @return \Illuminate\Http\JsonResponse
+     * Handle getReferralUrl functionality with proper error handling.
+     * @return Illuminate\Http\JsonResponse
      */
     public function getReferralUrl(): \Illuminate\Http\JsonResponse
     {
         $user = Auth::user();
-        
         if (!$user) {
             return response()->json(['url' => null]);
         }
-        
         $referralCode = $user->activeReferralCode();
-        
         if ($referralCode) {
             $url = route('referrals.track', ['code' => $referralCode->code]);
         } else {
             $url = null;
         }
-        
         return response()->json(['url' => $url]);
     }
-
     /**
      * Display a listing of the resource with pagination and filtering.
      * @return View
@@ -193,14 +181,10 @@ final class ReferralController extends Controller
         $user = Auth::user();
         $stats = $user->referral_statistics;
         // Get monthly data for chart
-        $monthlyData = DB::table('referral_statistics')->where('user_id', $user->id)->where('date', '>=', now()->subMonths(12))->orderBy('date')->get()
-            ->skipWhile(function ($stat) {
-                // Skip statistics that are not properly configured for display
-                return empty($stat->date) || 
-                       empty($stat->user_id) ||
-                       $stat->referrals_count < 0 ||
-                       $stat->rewards_amount < 0;
-            });
+        $monthlyData = DB::table('referral_statistics')->where('user_id', $user->id)->where('date', '>=', now()->subMonths(12))->orderBy('date')->get()->skipWhile(function ($stat) {
+            // Skip statistics that are not properly configured for display
+            return empty($stat->date) || empty($stat->user_id) || $stat->referrals_count < 0 || $stat->rewards_amount < 0;
+        });
         return view('referrals.statistics', compact('stats', 'monthlyData'));
     }
     /**

@@ -2463,7 +2463,7 @@ return [
         ],
         'types' => [
             'manual' => 'Manual Collection',
-            'automatic' => 'Automatic Collection',
+            'automatic' => 'automatic',
         ],
         'status' => [
             'visible' => 'Visible',

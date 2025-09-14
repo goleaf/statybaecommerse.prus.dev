@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', $collection->getTranslatedName())
-@section('description', $collection->getTranslatedDescription())
+@section('title', $collection->meta_title ?: $collection->getTranslatedName())
+@section('description', $collection->meta_description ?: $collection->getTranslatedDescription())
 
 @section('content')
 <div class="container mx-auto px-4 py-8">

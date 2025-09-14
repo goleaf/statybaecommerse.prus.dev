@@ -84,6 +84,7 @@
         <div wire:loading.remove class="absolute inset-y-0 right-0 flex items-center pr-3">
             <button
                 wire:click="clearQuery"
+                wire:confirm="{{ __('translations.confirm_clear_search_query') }}"
                 x-show="query.length > 0"
                 type="button"
                 class="text-gray-400 hover:text-gray-600 focus:outline-none"
@@ -136,6 +137,7 @@
                 <div wire:loading.remove class="absolute inset-y-0 right-0 flex items-center pr-3">
                     <button
                         wire:click="clearQuery"
+                        wire:confirm="{{ __('translations.confirm_clear_search_query') }}"
                         x-show="query.length > 0"
                         type="button"
                         class="text-gray-400 hover:text-gray-600 focus:outline-none"

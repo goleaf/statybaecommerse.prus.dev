@@ -6,6 +6,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Arr;
 
 class AdminUserResource extends JsonResource
 {
@@ -47,39 +48,39 @@ class AdminUserResource extends JsonResource
             
             // Add relationships if loaded
             'addresses' => $this->whenLoaded('addresses', function () {
-                return $this->resource->addresses->map(function ($address) {
-                    return $address->except(['user_id'])->toArray();
-                });
+                return Arr::from($this->resource->addresses->map(function ($address) {
+                    return $address->except(['user_id']);
+                }));
             }),
             
             'orders' => $this->whenLoaded('orders', function () {
-                return $this->resource->orders->map(function ($order) {
-                    return $order->except(['user_id'])->toArray();
-                });
+                return Arr::from($this->resource->orders->map(function ($order) {
+                    return $order->except(['user_id']);
+                }));
             }),
             
             'wishlist' => $this->whenLoaded('wishlist', function () {
-                return $this->resource->wishlist->map(function ($product) {
-                    return $product->toArray();
-                });
+                return Arr::from($this->resource->wishlist->map(function ($product) {
+                    return $product;
+                }));
             }),
             
             'reviews' => $this->whenLoaded('reviews', function () {
-                return $this->resource->reviews->map(function ($review) {
-                    return $review->except(['user_id'])->toArray();
-                });
+                return Arr::from($this->resource->reviews->map(function ($review) {
+                    return $review->except(['user_id']);
+                }));
             }),
             
             'partners' => $this->whenLoaded('partners', function () {
-                return $this->resource->partners->map(function ($partner) {
-                    return $partner->toArray();
-                });
+                return Arr::from($this->resource->partners->map(function ($partner) {
+                    return $partner;
+                }));
             }),
             
             'referrals' => $this->whenLoaded('referrals', function () {
-                return $this->resource->referrals->map(function ($referral) {
-                    return $referral->except(['referrer_id', 'referred_id'])->toArray();
-                });
+                return Arr::from($this->resource->referrals->map(function ($referral) {
+                    return $referral->except(['referrer_id', 'referred_id']);
+                }));
             }),
         ]);
     }

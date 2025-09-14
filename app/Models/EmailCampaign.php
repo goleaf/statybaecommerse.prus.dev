@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\ActiveScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
 /**
  * EmailCampaign
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|EmailCampaign query()
  * @mixin \Eloquent
  */
+#[ScopedBy([ActiveScope::class])]
 class EmailCampaign extends Model
 {
     //

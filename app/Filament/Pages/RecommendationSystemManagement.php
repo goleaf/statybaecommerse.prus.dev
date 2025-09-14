@@ -20,7 +20,6 @@ use UnitEnum;
  * 
  * Filament v4 page component for RecommendationSystemManagement with reactive functionality and user interface management.
  * 
- * @property string|UnitEnum|null $navigationGroup
  * @property int|null $navigationSort
  * @property string $view
  * @property string|null $title
@@ -28,7 +27,8 @@ use UnitEnum;
 final class RecommendationSystemManagement extends Page
 {
     // protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
+    // /** @var UnitEnum|string|null */
+    // protected static $navigationGroup = 'System';
     protected static ?int $navigationSort = 3;
     protected string $view = 'filament.pages.recommendation-system-management';
     protected static ?string $title = 'Recommendation System Management';

@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace App\Collections;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
 /**
  * EnumCollection
  * 
@@ -79,7 +80,7 @@ final class EnumCollection extends Collection
      */
     public function values(): array
     {
-        return $this->map(fn($enum) => $enum->value)->toArray();
+        return Arr::from($this->map(fn($enum) => $enum->value));
     }
     /**
      * Handle labels functionality with proper error handling.
@@ -87,7 +88,7 @@ final class EnumCollection extends Collection
      */
     public function labels(): array
     {
-        return $this->map(fn($enum) => $enum->label())->toArray();
+        return Arr::from($this->map(fn($enum) => $enum->label()));
     }
     /**
      * Handle descriptions functionality with proper error handling.
@@ -95,7 +96,7 @@ final class EnumCollection extends Collection
      */
     public function descriptions(): array
     {
-        return $this->map(fn($enum) => $enum->description())->toArray();
+        return Arr::from($this->map(fn($enum) => $enum->description()));
     }
     /**
      * Handle icons functionality with proper error handling.
@@ -103,7 +104,7 @@ final class EnumCollection extends Collection
      */
     public function icons(): array
     {
-        return $this->map(fn($enum) => $enum->icon())->toArray();
+        return Arr::from($this->map(fn($enum) => $enum->icon()));
     }
     /**
      * Handle colors functionality with proper error handling.
@@ -111,7 +112,7 @@ final class EnumCollection extends Collection
      */
     public function colors(): array
     {
-        return $this->map(fn($enum) => $enum->color())->toArray();
+        return Arr::from($this->map(fn($enum) => $enum->color()));
     }
     /**
      * Handle priorities functionality with proper error handling.
@@ -119,7 +120,7 @@ final class EnumCollection extends Collection
      */
     public function priorities(): array
     {
-        return $this->map(fn($enum) => $enum->priority())->toArray();
+        return Arr::from($this->map(fn($enum) => $enum->priority()));
     }
     /**
      * Handle options functionality with proper error handling.
@@ -127,7 +128,7 @@ final class EnumCollection extends Collection
      */
     public function options(): array
     {
-        return $this->mapWithKeys(fn($enum) => [$enum->value => $enum->label()])->toArray();
+        return Arr::from($this->mapWithKeys(fn($enum) => [$enum->value => $enum->label()]));
     }
     /**
      * Handle optionsWithDescriptions functionality with proper error handling.
@@ -135,7 +136,7 @@ final class EnumCollection extends Collection
      */
     public function optionsWithDescriptions(): array
     {
-        return $this->mapWithKeys(fn($enum) => [$enum->value => $enum->toArray()])->toArray();
+        return Arr::from($this->mapWithKeys(fn($enum) => [$enum->value => $enum->toArray()]));
     }
     /**
      * Handle toArrays functionality with proper error handling.
@@ -143,7 +144,7 @@ final class EnumCollection extends Collection
      */
     public function toArrays(): array
     {
-        return $this->map(fn($enum) => $enum->toArray())->toArray();
+        return Arr::from($this->map(fn($enum) => $enum->toArray()));
     }
     /**
      * Convert the instance to a JSON representation.
@@ -160,7 +161,7 @@ final class EnumCollection extends Collection
      */
     public function forApi(): array
     {
-        return $this->map(fn($enum) => ['value' => $enum->value, 'label' => $enum->label(), 'description' => $enum->description(), 'icon' => $enum->icon(), 'color' => $enum->color()])->toArray();
+        return Arr::from($this->map(fn($enum) => ['value' => $enum->value, 'label' => $enum->label(), 'description' => $enum->description(), 'icon' => $enum->icon(), 'color' => $enum->color()]));
     }
     /**
      * Handle forGraphQL functionality with proper error handling.
@@ -168,7 +169,7 @@ final class EnumCollection extends Collection
      */
     public function forGraphQL(): array
     {
-        return $this->map(fn($enum) => ['name' => strtoupper($enum->value), 'value' => $enum->value, 'description' => $enum->description()])->toArray();
+        return Arr::from($this->map(fn($enum) => ['name' => strtoupper($enum->value), 'value' => $enum->value, 'description' => $enum->description()]));
     }
     /**
      * Handle forTypeScript functionality with proper error handling.

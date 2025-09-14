@@ -15,6 +15,9 @@
     $from = $paginator->firstItem() ?? 0;
     $to = $paginator->lastItem() ?? 0;
     
+    // Get onEachSide from paginator or use default
+    $onEachSide = $paginator->onEachSide ?? $onEachSide ?? 2;
+    
     // Calculate the range based on onEachSide
     $start = max(1, $currentPage - $onEachSide);
     $end = min($lastPage, $currentPage + $onEachSide);

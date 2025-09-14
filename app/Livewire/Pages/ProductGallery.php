@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace App\Livewire\Pages;
 
 use App\Models\Product;
+use Illuminate\Support\LazyCollection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -68,7 +69,10 @@ final class ProductGallery extends Component
             $q->where('collection_name', 'images');
         })->withCount(['media' => function ($q) {
             $q->where('collection_name', 'images');
-        }])->get()->sum('media_count');
+        }])->cursor()->takeUntilTimeout(now()->addSeconds(15))->collect()->skipWhile(function ($product) {
+            // Skip products that are not properly configured for media counting
+            return empty($product->name) || !$product->is_visible || $product->media_count < 0;
+        })->sum('media_count');
     }
     /**
      * Handle generatedImages functionality with proper error handling.

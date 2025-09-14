@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Number;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -26,6 +27,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * 
  * @property mixed $table
  * @property mixed $fillable
+ * @property mixed $appends
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant query()
@@ -46,6 +48,12 @@ final class ProductVariant extends Model implements HasMedia
         return ['price' => 'decimal:2', 'compare_price' => 'decimal:2', 'cost_price' => 'decimal:2', 'weight' => 'decimal:3', 'length' => 'decimal:2', 'width' => 'decimal:2', 'height' => 'decimal:2', 'track_quantity' => 'boolean', 'quantity' => 'integer', 'is_enabled' => 'boolean', 'position' => 'integer'];
     }
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = ['display_name', 'profit_margin', 'stock', 'available_quantity', 'reserved_quantity', 'is_out_of_stock'];
+    /**
      * Handle product functionality with proper error handling.
      * @return BelongsTo
      */
@@ -59,8 +67,8 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function reservedQuantity(): int
     {
-        $variantId = (int) $this->id;
-        $sum = (int) DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum('vi.reserved');
+        $variantId = Number::parseFloat($this->id);
+        $sum = Number::parseFloat(DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum('vi.reserved'));
         return max($sum, 0);
     }
     /**
@@ -69,8 +77,8 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function availableQuantity(): int
     {
-        $variantId = (int) $this->id;
-        $sum = (int) DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END'));
+        $variantId = Number::parseFloat($this->id);
+        $sum = Number::parseFloat(DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END')));
         return max($sum, 0);
     }
     /**

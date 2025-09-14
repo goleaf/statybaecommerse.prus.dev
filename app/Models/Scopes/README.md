@@ -65,6 +65,10 @@ Automatically filters records where `is_active = true`, `is_enabled = true`, or 
 - Setting
 - SystemSetting
 - SystemSettingCategory
+- Company
+- EmailCampaign
+- SeoData
+- Referral
 
 ### PublishedScope
 Automatically filters records where `published_at` is not null and is in the past.
@@ -134,6 +138,7 @@ Automatically filters records by status field with model-specific allowed status
 - DiscountCode
 - DiscountRedemption
 - Document
+- Referral
 
 ### ActiveCampaignScope
 Automatically filters campaigns that are currently active based on start/end dates.

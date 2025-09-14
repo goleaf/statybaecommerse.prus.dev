@@ -28,12 +28,14 @@ class Search extends Component
     public string $q = '';
     #[Url]
     public ?string $sort = null;
+    
+    private SearchService $searchService;
     /**
      * Initialize the class instance with required dependencies.
-     * @param SearchService $searchService
      */
-    public function __construct(private readonly SearchService $searchService)
+    public function mount(): void
     {
+        $this->searchService = app(SearchService::class);
     }
     /**
      * Handle searchResults functionality with proper error handling.

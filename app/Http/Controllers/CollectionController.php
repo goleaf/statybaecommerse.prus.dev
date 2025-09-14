@@ -63,7 +63,9 @@ final class CollectionController extends Controller
         // Use splitIn method for better product organization
         $galleryService = new ProductGalleryService();
         $organizedProducts = $galleryService->arrangeForCollection($collection->products, (int) ($collection->display_type ?? 1));
-        return view('collections.show', compact('collection', 'relatedCollections', 'organizedProducts'));
+        $products = $collection->products;
+        // For backward compatibility with tests
+        return view('collections.show', compact('collection', 'relatedCollections', 'organizedProducts', 'products'));
     }
     // API Endpoints
     /**

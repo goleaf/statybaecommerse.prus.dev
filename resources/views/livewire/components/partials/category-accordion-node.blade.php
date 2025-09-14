@@ -52,7 +52,8 @@
             <a
                href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category['slug']]) }}"
                class="{{ $textSizeClass }} text-gray-800 hover:text-indigo-600 transition-colors truncate flex-1"
-               wire:click="toggleCategory({{ $category['id'] }})">
+               wire:click="toggleCategory({{ $category['id'] }})"
+               wire:confirm="{{ __('translations.confirm_toggle_category') }}">
                 {{ $category['name'] }}
             </a>
         </div>

@@ -198,6 +198,7 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <button wire:click="toggleWishlist({{ $product->id }})" @click="toggleWishlist()"
+                                    wire:confirm="{{ __('translations.confirm_toggle_wishlist') }}"
                                     class="flex items-center justify-center gap-2 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors duration-200">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

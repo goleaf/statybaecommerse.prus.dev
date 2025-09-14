@@ -3,6 +3,10 @@
 declare (strict_types=1);
 namespace App\Models;
 
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\DateRangeScope;
+use App\Models\Scopes\UserOwnedScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +27,7 @@ use Spatie\Translatable\HasTranslations;
  * @method static \Illuminate\Database\Eloquent\Builder|ReferralCode query()
  * @mixin \Eloquent
  */
+#[ScopedBy([ActiveScope::class, DateRangeScope::class, UserOwnedScope::class])]
 final class ReferralCode extends Model
 {
     use HasFactory, HasTranslations, LogsActivity;

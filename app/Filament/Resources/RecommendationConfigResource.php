@@ -45,6 +45,7 @@ final class RecommendationConfigResource extends Resource
     protected static ?string $model = RecommendationConfig::class;
     /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'Recommendation System';
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'name';

@@ -16,7 +16,7 @@ use UnitEnum;
  * Filament v4 resource for RecommendationConfigResourceSimple management in the admin panel with comprehensive CRUD operations, filters, and actions.
  * 
  * @property string|null $model
- * @property mixed $navigationIcon
+ * @property string|BackedEnum|null $navigationIcon
  * @property int|null $navigationSort
  * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
  * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)

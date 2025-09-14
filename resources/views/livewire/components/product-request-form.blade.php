@@ -23,6 +23,7 @@
                 </div>
                 <button 
                     wire:click="toggleForm"
+                    wire:confirm="{{ __('translations.confirm_toggle_product_request_form') }}"
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                     {{ $showForm ? __('frontend.product.cancel_request') : __('frontend.product.request_product') }}
@@ -124,6 +125,7 @@
                         <button 
                             type="button"
                             wire:click="toggleForm"
+                            wire:confirm="{{ __('translations.confirm_toggle_product_request_form') }}"
                             class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                         >
                             {{ __('frontend.product.cancel') }}

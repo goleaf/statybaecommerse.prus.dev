@@ -9,6 +9,7 @@ use App\Models\NewsCategory;
 use App\Models\NewsTag;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\LazyCollection;
 /**
  * NewsController
  * 
@@ -93,7 +94,12 @@ final class NewsController extends Controller
     public function featured(Request $request): JsonResponse
     {
         $limit = min((int) $request->get('limit', 5), 10);
-        $featuredNews = News::published()->where('is_featured', true)->with(['categories', 'tags'])->orderBy('published_at', 'desc')->limit($limit)->get();
+        $timeout = now()->addSeconds(10);
+        // 10 second timeout for featured news
+        $featuredNews = News::published()->where('is_featured', true)->with(['categories', 'tags'])->orderBy('published_at', 'desc')->limit($limit)->cursor()->takeUntilTimeout($timeout)->collect()->skipWhile(function ($news) {
+            // Skip news items that are not properly configured for display
+            return empty($news->title) || empty($news->slug) || !$news->is_published || empty($news->excerpt);
+        });
         return response()->json(['success' => true, 'data' => $featuredNews->map(function ($news) {
             return ['id' => $news->id, 'title' => $news->title, 'slug' => $news->slug, 'excerpt' => $news->excerpt, 'featured_image' => $news->featured_image, 'published_at' => $news->published_at, 'categories' => $news->categories->pluck('name')];
         })]);
@@ -104,7 +110,10 @@ final class NewsController extends Controller
      */
     public function categories(): JsonResponse
     {
-        $categories = NewsCategory::active()->withCount('news')->orderBy('name')->get();
+        $categories = NewsCategory::active()->withCount('news')->orderBy('name')->get()->skipWhile(function ($category) {
+            // Skip categories that are not properly configured for display
+            return empty($category->name) || empty($category->slug) || !$category->is_active || $category->news_count <= 0;
+        });
         return response()->json(['success' => true, 'data' => $categories->map(function ($category) {
             return ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'description' => $category->description, 'news_count' => $category->news_count];
         })]);
@@ -115,7 +124,10 @@ final class NewsController extends Controller
      */
     public function tags(): JsonResponse
     {
-        $tags = NewsTag::active()->withCount('news')->orderBy('name')->get();
+        $tags = NewsTag::active()->withCount('news')->orderBy('name')->get()->skipWhile(function ($tag) {
+            // Skip tags that are not properly configured for display
+            return empty($tag->name) || empty($tag->slug) || !$tag->is_active || $tag->news_count <= 0;
+        });
         return response()->json(['success' => true, 'data' => $tags->map(function ($tag) {
             return ['id' => $tag->id, 'name' => $tag->name, 'slug' => $tag->slug, 'news_count' => $tag->news_count];
         })]);
@@ -136,7 +148,10 @@ final class NewsController extends Controller
         $categoryIds = $news->categories->pluck('id');
         $relatedNews = News::published()->where('id', '!=', $news->id)->whereHas('categories', function ($query) use ($categoryIds) {
             $query->whereIn('id', $categoryIds);
-        })->with(['categories'])->orderBy('published_at', 'desc')->limit($limit)->get();
+        })->with(['categories'])->orderBy('published_at', 'desc')->limit($limit)->get()->skipWhile(function ($related) {
+            // Skip related news items that are not properly configured for display
+            return empty($related->title) || empty($related->slug) || !$related->is_published || empty($related->excerpt);
+        });
         return response()->json(['success' => true, 'data' => $relatedNews->map(function ($related) {
             return ['id' => $related->id, 'title' => $related->title, 'slug' => $related->slug, 'excerpt' => $related->excerpt, 'featured_image' => $related->featured_image, 'published_at' => $related->published_at, 'categories' => $related->categories->pluck('name')];
         })]);

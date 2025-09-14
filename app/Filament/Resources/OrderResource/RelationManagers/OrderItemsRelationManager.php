@@ -43,23 +43,16 @@ class OrderItemsRelationManager extends RelationManager
      */
     public function form(Form $form): Form
     {
-        return $schema->schema([Section::make('orders.item_information')->schema([Grid::make(2)->schema([\App\Filament\Components\AutocompleteSelect::make('product_id')
-            ->label('orders.product')
-            ->autocompleteType('products')
-            ->maxResults(20)
-            ->enableFuzzy(true)
-            ->required()
-            ->reactive()
-            ->afterStateUpdated(function ($state, callable $set) {
-                if ($state) {
-                    $product = Product::find($state);
-                    if ($product) {
-                        $set('name', $product->name);
-                        $set('sku', $product->sku);
-                        $set('unit_price', $product->price);
-                    }
+        return $schema->schema([Section::make('orders.item_information')->schema([Grid::make(2)->schema([\App\Filament\Components\AutocompleteSelect::make('product_id')->label('orders.product')->autocompleteType('products')->maxResults(20)->enableFuzzy(true)->required()->reactive()->afterStateUpdated(function ($state, callable $set) {
+            if ($state) {
+                $product = Product::find($state);
+                if ($product) {
+                    $set('name', $product->name);
+                    $set('sku', $product->sku);
+                    $set('unit_price', $product->price);
                 }
-            }), Select::make('product_variant_id')->label('orders.product_variant')->relationship('productVariant', 'name')->searchable()->preload()->reactive()->afterStateUpdated(function ($state, callable $set) {
+            }
+        }), Select::make('product_variant_id')->label('orders.product_variant')->relationship('productVariant', 'name')->searchable()->preload()->reactive()->afterStateUpdated(function ($state, callable $set) {
             if ($state) {
                 $variant = ProductVariant::find($state);
                 if ($variant) {

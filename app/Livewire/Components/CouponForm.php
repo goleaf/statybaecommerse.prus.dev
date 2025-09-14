@@ -5,6 +5,7 @@ namespace App\Livewire\Components;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 /**
@@ -25,6 +26,24 @@ class CouponForm extends Component
     public function mount(): void
     {
         $this->code = session('checkout.coupon.code');
+    }
+    /**
+     * Handle isCouponApplied functionality with proper error handling.
+     * @return bool
+     */
+    #[Computed]
+    public function isCouponApplied(): bool
+    {
+        return session()->has('checkout.coupon');
+    }
+    /**
+     * Handle appliedCouponCode functionality with proper error handling.
+     * @return string|null
+     */
+    #[Computed]
+    public function appliedCouponCode(): ?string
+    {
+        return session('checkout.coupon.code');
     }
     /**
      * Handle apply functionality with proper error handling.

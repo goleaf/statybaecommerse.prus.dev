@@ -211,344 +211,162 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to get suggestions', 'error' => $e->getMessage()], 500);
         }
     }
-
     /**
-     * Fuzzy search with typo tolerance
+     * Handle fuzzySearch functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
      */
     public function fuzzySearch(Request $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'q' => 'required|string|min:2|max:255',
-                'limit' => 'integer|min:1|max:50',
-                'types' => 'array',
-                'types.*' => 'string|in:products,categories,brands,collections,attributes',
-            ]);
-
+            $validated = $request->validate(['q' => 'required|string|min:2|max:255', 'limit' => 'integer|min:1|max:50', 'types' => 'array', 'types.*' => 'string|in:products,categories,brands,collections,attributes']);
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $types = $validated['types'] ?? [];
-
             // Add to recent searches
             $this->autocompleteService->addToRecentSearches($query);
-
             $results = $this->autocompleteService->searchWithFuzzy($query, $limit, $types);
-
-            return response()->json([
-                'success' => true,
-                'data' => $results,
-                'meta' => [
-                    'query' => $query,
-                    'total' => count($results),
-                    'limit' => $limit,
-                    'types' => $types,
-                    'fuzzy' => true,
-                ],
-            ]);
+            return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'types' => $types, 'fuzzy' => true]]);
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Fuzzy search failed',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Fuzzy search failed', 'error' => $e->getMessage()], 500);
         }
     }
-
     /**
-     * Get personalized suggestions
+     * Handle personalized functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
      */
     public function personalized(Request $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'limit' => 'integer|min:1|max:20',
-            ]);
-
+            $validated = $request->validate(['limit' => 'integer|min:1|max:20']);
             $limit = $validated['limit'] ?? 5;
             $userId = auth()->id();
-
             if (!$userId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Authentication required',
-                ], 401);
+                return response()->json(['success' => false, 'message' => 'Authentication required'], 401);
             }
-
             $suggestions = $this->autocompleteService->getPersonalizedSuggestions($userId, $limit);
-
-            return response()->json([
-                'success' => true,
-                'data' => $suggestions,
-                'meta' => [
-                    'total' => count($suggestions),
-                    'limit' => $limit,
-                    'user_id' => $userId,
-                ],
-            ]);
+            return response()->json(['success' => true, 'data' => $suggestions, 'meta' => ['total' => count($suggestions), 'limit' => $limit, 'user_id' => $userId]]);
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to get personalized suggestions',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to get personalized suggestions', 'error' => $e->getMessage()], 500);
         }
     }
-
     /**
-     * Search customers
+     * Handle customers functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
      */
     public function customers(Request $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'q' => 'required|string|min:2|max:255',
-                'limit' => 'integer|min:1|max:50',
-            ]);
-
+            $validated = $request->validate(['q' => 'required|string|min:2|max:255', 'limit' => 'integer|min:1|max:50']);
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
-
             $results = $this->autocompleteService->searchCustomers($query, $limit);
-
-            return response()->json([
-                'success' => true,
-                'data' => $results,
-                'meta' => [
-                    'query' => $query,
-                    'total' => count($results),
-                    'limit' => $limit,
-                    'type' => 'customers',
-                ],
-            ]);
+            return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'customers']]);
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Customer search failed',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Customer search failed', 'error' => $e->getMessage()], 500);
         }
     }
-
     /**
-     * Search addresses
+     * Handle addresses functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
      */
     public function addresses(Request $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'q' => 'required|string|min:2|max:255',
-                'limit' => 'integer|min:1|max:50',
-            ]);
-
+            $validated = $request->validate(['q' => 'required|string|min:2|max:255', 'limit' => 'integer|min:1|max:50']);
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
-
             $results = $this->autocompleteService->searchAddresses($query, $limit);
-
-            return response()->json([
-                'success' => true,
-                'data' => $results,
-                'meta' => [
-                    'query' => $query,
-                    'total' => count($results),
-                    'limit' => $limit,
-                    'type' => 'addresses',
-                ],
-            ]);
+            return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'addresses']]);
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Address search failed',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Address search failed', 'error' => $e->getMessage()], 500);
         }
     }
-
     /**
-     * Search locations
+     * Handle locations functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
      */
     public function locations(Request $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'q' => 'required|string|min:2|max:255',
-                'limit' => 'integer|min:1|max:50',
-            ]);
-
+            $validated = $request->validate(['q' => 'required|string|min:2|max:255', 'limit' => 'integer|min:1|max:50']);
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
-
             $results = $this->autocompleteService->searchLocations($query, $limit);
-
-            return response()->json([
-                'success' => true,
-                'data' => $results,
-                'meta' => [
-                    'query' => $query,
-                    'total' => count($results),
-                    'limit' => $limit,
-                    'type' => 'locations',
-                ],
-            ]);
+            return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'locations']]);
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Location search failed',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Location search failed', 'error' => $e->getMessage()], 500);
         }
     }
-
     /**
-     * Search countries
+     * Handle countries functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
      */
     public function countries(Request $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'q' => 'required|string|min:2|max:255',
-                'limit' => 'integer|min:1|max:50',
-            ]);
-
+            $validated = $request->validate(['q' => 'required|string|min:2|max:255', 'limit' => 'integer|min:1|max:50']);
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
-
             $results = $this->autocompleteService->searchCountries($query, $limit);
-
-            return response()->json([
-                'success' => true,
-                'data' => $results,
-                'meta' => [
-                    'query' => $query,
-                    'total' => count($results),
-                    'limit' => $limit,
-                    'type' => 'countries',
-                ],
-            ]);
+            return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'countries']]);
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Country search failed',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Country search failed', 'error' => $e->getMessage()], 500);
         }
     }
-
     /**
-     * Search cities
+     * Handle cities functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
      */
     public function cities(Request $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'q' => 'required|string|min:2|max:255',
-                'limit' => 'integer|min:1|max:50',
-            ]);
-
+            $validated = $request->validate(['q' => 'required|string|min:2|max:255', 'limit' => 'integer|min:1|max:50']);
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
-
             $results = $this->autocompleteService->searchCities($query, $limit);
-
-            return response()->json([
-                'success' => true,
-                'data' => $results,
-                'meta' => [
-                    'query' => $query,
-                    'total' => count($results),
-                    'limit' => $limit,
-                    'type' => 'cities',
-                ],
-            ]);
+            return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'cities']]);
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'City search failed',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'City search failed', 'error' => $e->getMessage()], 500);
         }
     }
-
     /**
-     * Search orders
+     * Handle orders functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
      */
     public function orders(Request $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'q' => 'required|string|min:2|max:255',
-                'limit' => 'integer|min:1|max:50',
-            ]);
-
+            $validated = $request->validate(['q' => 'required|string|min:2|max:255', 'limit' => 'integer|min:1|max:50']);
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
-
             $results = $this->autocompleteService->searchOrders($query, $limit);
-
-            return response()->json([
-                'success' => true,
-                'data' => $results,
-                'meta' => [
-                    'query' => $query,
-                    'total' => count($results),
-                    'limit' => $limit,
-                    'type' => 'orders',
-                ],
-            ]);
+            return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'orders']]);
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Order search failed',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Order search failed', 'error' => $e->getMessage()], 500);
         }
     }
 }

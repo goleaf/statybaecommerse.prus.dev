@@ -10,7 +10,8 @@
                      alt="{{ $this->currentImage['alt'] }}"
                      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-zoom-in"
                      loading="lazy"
-                     wire:click="toggleLightbox" />
+                     wire:click="toggleLightbox" 
+                     wire:confirm="{{ __('translations.confirm_toggle_lightbox') }}" />
 
                 {{-- Image Navigation Arrows --}}
                 @if (count($this->images) > 1)
@@ -90,6 +91,7 @@
             <div
                  class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 transition-opacity duration-200"
                  wire:click="toggleLightbox"
+                 wire:confirm="{{ __('translations.confirm_toggle_lightbox') }}"
                  wire:keydown.escape="toggleLightbox"
                  wire:keydown.arrow-left="previousImage"
                  wire:keydown.arrow-right="nextImage"
@@ -107,6 +109,7 @@
                     {{-- Close Button --}}
                     <button
                             wire:click="toggleLightbox"
+                            wire:confirm="{{ __('translations.confirm_toggle_lightbox') }}"
                             class="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

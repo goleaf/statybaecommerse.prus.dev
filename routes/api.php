@@ -91,11 +91,19 @@ Route::prefix('news')->group(function () {
 // Autocomplete API Routes
 Route::prefix('autocomplete')->group(function () {
     Route::get('/search', [App\Http\Controllers\Api\AutocompleteController::class, 'search']);
+    Route::get('/fuzzy', [App\Http\Controllers\Api\AutocompleteController::class, 'fuzzySearch']);
+    Route::get('/personalized', [App\Http\Controllers\Api\AutocompleteController::class, 'personalized'])->middleware('auth:sanctum');
     Route::get('/products', [App\Http\Controllers\Api\AutocompleteController::class, 'products']);
     Route::get('/categories', [App\Http\Controllers\Api\AutocompleteController::class, 'categories']);
     Route::get('/brands', [App\Http\Controllers\Api\AutocompleteController::class, 'brands']);
     Route::get('/collections', [App\Http\Controllers\Api\AutocompleteController::class, 'collections']);
     Route::get('/attributes', [App\Http\Controllers\Api\AutocompleteController::class, 'attributes']);
+    Route::get('/customers', [App\Http\Controllers\Api\AutocompleteController::class, 'customers'])->middleware('auth:sanctum');
+    Route::get('/addresses', [App\Http\Controllers\Api\AutocompleteController::class, 'addresses'])->middleware('auth:sanctum');
+    Route::get('/locations', [App\Http\Controllers\Api\AutocompleteController::class, 'locations'])->middleware('auth:sanctum');
+    Route::get('/countries', [App\Http\Controllers\Api\AutocompleteController::class, 'countries'])->middleware('auth:sanctum');
+    Route::get('/cities', [App\Http\Controllers\Api\AutocompleteController::class, 'cities'])->middleware('auth:sanctum');
+    Route::get('/orders', [App\Http\Controllers\Api\AutocompleteController::class, 'orders'])->middleware('auth:sanctum');
     Route::get('/popular', [App\Http\Controllers\Api\AutocompleteController::class, 'popular']);
     Route::get('/recent', [App\Http\Controllers\Api\AutocompleteController::class, 'recent']);
     Route::get('/suggestions', [App\Http\Controllers\Api\AutocompleteController::class, 'suggestions']);

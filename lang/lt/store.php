@@ -60,4 +60,10 @@ return [
         'empty' => 'Produktų nerasta.',
         'help' => 'Ieškokite produktų pagal kategorijas, prekės ženklus ir kolekcijas.',
     ],
+    'collections' => [
+        'types' => [
+            'automatic' => 'automatic',
+            'manual' => 'manual',
+        ],
+    ],
 ];

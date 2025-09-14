@@ -22,7 +22,7 @@ use Illuminate\Support\Arr;
  * Filament v4 resource for SystemSettingResource management in the admin panel with comprehensive CRUD operations, filters, and actions.
  * 
  * @property string|null $model
- * @property mixed $navigationIcon
+ * @property string|BackedEnum|null $navigationIcon
  * @property int|null $navigationSort
  * @property string|null $navigationLabel
  * @property string|null $modelLabel

@@ -221,6 +221,7 @@ test('email marketing service can get campaign analytics', function () {
 
     $analytics = $emailService->getCampaignAnalytics($campaignId);
     
-    // Analytics should return an array or null
-    expect($analytics)->toBeNull();
+    // Analytics should return an array with campaign data
+    expect($analytics)->toBeArray()
+        ->and($analytics)->toHaveKey('stats');
 });

@@ -85,22 +85,15 @@ final class CartItemResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([Forms\Components\Section::make(__('admin.sections.basic_information'))->schema([Forms\Components\Select::make('user_id')->label(__('admin.cart_items.fields.user'))->relationship('user', 'name')->searchable()->preload()->required()->createOptionForm([Forms\Components\TextInput::make('name')->label(__('admin.users.fields.name'))->required()->maxLength(255), Forms\Components\TextInput::make('email')->label(__('admin.users.fields.email'))->email()->required()->maxLength(255)]),         \App\Filament\Components\AutocompleteSelect::make('product_id')
-            ->label(__('admin.cart_items.fields.product'))
-            ->autocompleteType('products')
-            ->maxResults(20)
-            ->enableFuzzy(true)
-            ->required()
-            ->reactive()
-            ->afterStateUpdated(function ($state, callable $set) {
-                if ($state) {
-                    $product = Product::find($state);
-                    if ($product) {
-                        $set('unit_price', $product->price);
-                        $set('minimum_quantity', $product->minimum_quantity ?? 1);
-                    }
+        return $schema->schema([Forms\Components\Section::make(__('admin.sections.basic_information'))->schema([Forms\Components\Select::make('user_id')->label(__('admin.cart_items.fields.user'))->relationship('user', 'name')->searchable()->preload()->required()->createOptionForm([Forms\Components\TextInput::make('name')->label(__('admin.users.fields.name'))->required()->maxLength(255), Forms\Components\TextInput::make('email')->label(__('admin.users.fields.email'))->email()->required()->maxLength(255)]), \App\Filament\Components\AutocompleteSelect::make('product_id')->label(__('admin.cart_items.fields.product'))->autocompleteType('products')->maxResults(20)->enableFuzzy(true)->required()->reactive()->afterStateUpdated(function ($state, callable $set) {
+            if ($state) {
+                $product = Product::find($state);
+                if ($product) {
+                    $set('unit_price', $product->price);
+                    $set('minimum_quantity', $product->minimum_quantity ?? 1);
                 }
-            }), Forms\Components\Select::make('variant_id')->label(__('admin.cart_items.fields.variant'))->relationship('variant', 'name')->searchable()->preload()->reactive()->afterStateUpdated(function ($state, callable $set) {
+            }
+        }), Forms\Components\Select::make('variant_id')->label(__('admin.cart_items.fields.variant'))->relationship('variant', 'name')->searchable()->preload()->reactive()->afterStateUpdated(function ($state, callable $set) {
             if ($state) {
                 $variant = \App\Models\ProductVariant::find($state);
                 if ($variant) {

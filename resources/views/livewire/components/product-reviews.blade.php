@@ -8,6 +8,7 @@
             @auth
                 <button
                         wire:click="toggleReviewForm"
+                        wire:confirm="{{ __('translations.confirm_toggle_review_form') }}"
                         class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-md transition-colors duration-200">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -138,6 +139,7 @@
                     <button
                             type="button"
                             wire:click="toggleReviewForm"
+                            wire:confirm="{{ __('translations.confirm_toggle_review_form') }}"
                             class="inline-flex items-center px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 text-sm font-medium rounded-md transition-colors duration-200">
                         {{ __('translations.cancel') }}
                     </button>

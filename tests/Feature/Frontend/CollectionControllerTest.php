@@ -193,6 +193,6 @@ final class CollectionControllerTest extends TestCase
         
         $response->assertOk();
         // The page should load successfully with pagination
-        $response->assertTrue(true);
+        $this->assertTrue(true);
     }
 }

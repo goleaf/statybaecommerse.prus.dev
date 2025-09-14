@@ -22,7 +22,8 @@ final class DataImportExport extends Page
 {
     /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-arrows-up-down';
-    protected static \UnitEnum|string|null $navigationGroup = \App\Enums\NavigationGroup::System;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = \App\Enums\NavigationGroup::System;
     protected static ?int $navigationSort = 3;
 
     public static function getNavigationGroup(): ?string

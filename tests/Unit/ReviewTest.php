@@ -42,7 +42,7 @@ final class ReviewTest extends TestCase
             'reviewer_email' => 'john@example.com',
             'rating' => 5,
             'title' => 'Great Product',
-            'comment' => 'This product is amazing!',
+            'content' => 'This product is amazing!',
             'is_approved' => false,
             'is_featured' => false,
             'locale' => 'en',
@@ -55,7 +55,7 @@ final class ReviewTest extends TestCase
         $this->assertEquals('john@example.com', $review->reviewer_email);
         $this->assertEquals(5, $review->rating);
         $this->assertEquals('Great Product', $review->title);
-        $this->assertEquals('This product is amazing!', $review->comment);
+        $this->assertEquals('This product is amazing!', $review->content);
         $this->assertFalse($review->is_approved);
         $this->assertFalse($review->is_featured);
         $this->assertEquals('en', $review->locale);
@@ -67,7 +67,7 @@ final class ReviewTest extends TestCase
         $review = Review::factory()->create([
             'product_id' => $product->id,
             'title' => 'Original Title',
-            'comment' => 'Original Comment',
+            'content' => 'Original Comment',
         ]);
         
         // Test translation methods
@@ -77,7 +77,7 @@ final class ReviewTest extends TestCase
         // Test with translation
         $review->updateTranslation('en', [
             'title' => 'English Title',
-            'comment' => 'English Comment',
+            'content' => 'English Comment',
         ]);
         
         $this->assertEquals('English Title', $review->getTranslatedTitle('en'));
@@ -313,7 +313,7 @@ final class ReviewTest extends TestCase
         $review = Review::factory()->create([
             'product_id' => $product->id,
             'title' => 'Original Title',
-            'comment' => 'Original Comment',
+            'content' => 'Original Comment',
         ]);
 
         // Test available locales (should be empty initially)
@@ -330,7 +330,7 @@ final class ReviewTest extends TestCase
         // Test update translation
         $this->assertTrue($review->updateTranslation('en', [
             'title' => 'English Title',
-            'comment' => 'English Comment',
+            'content' => 'English Comment',
         ]));
 
         // Test available locales now includes 'en'

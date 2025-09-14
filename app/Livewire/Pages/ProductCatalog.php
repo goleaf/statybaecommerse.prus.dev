@@ -51,7 +51,10 @@ final class ProductCatalog extends Component
     #[Computed]
     public function categories(): Collection
     {
-        return Category::where('is_visible', true)->orderBy('name')->get();
+        return Category::where('is_visible', true)->orderBy('name')->get()->skipWhile(function ($category) {
+            // Skip categories that are not properly configured for display
+            return empty($category->name) || !$category->is_visible || empty($category->slug);
+        });
     }
     /**
      * Handle brands functionality with proper error handling.
@@ -60,7 +63,10 @@ final class ProductCatalog extends Component
     #[Computed]
     public function brands(): Collection
     {
-        return Brand::where('is_visible', true)->orderBy('name')->get();
+        return Brand::where('is_visible', true)->orderBy('name')->get()->skipWhile(function ($brand) {
+            // Skip brands that are not properly configured for display
+            return empty($brand->name) || !$brand->is_visible || empty($brand->slug);
+        });
     }
     /**
      * Handle applyFilters functionality with proper error handling.

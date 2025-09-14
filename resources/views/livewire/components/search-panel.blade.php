@@ -74,6 +74,7 @@
                                     <input 
                                         type="checkbox" 
                                         wire:click="toggleCategory({{ $category->id }})"
+                                        wire:confirm="{{ __('translations.confirm_toggle_category') }}"
                                         @if(in_array($category->id, $selectedCategories)) checked @endif
                                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                     >
@@ -96,6 +97,7 @@
                                     <input 
                                         type="checkbox" 
                                         wire:click="toggleBrand({{ $brand->id }})"
+                                        wire:confirm="{{ __('translations.confirm_toggle_brand') }}"
                                         @if(in_array($brand->id, $selectedBrands)) checked @endif
                                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                     >
@@ -119,6 +121,7 @@
                                         <input 
                                             type="checkbox" 
                                             wire:click="toggleAttribute({{ $value->id }})"
+                                            wire:confirm="{{ __('translations.confirm_toggle_attribute') }}"
                                             @if(in_array($value->id, $selectedAttributes)) checked @endif
                                             class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                         >
