@@ -1,48 +1,55 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Models\Product;
 use Livewire\Component;
-
-final /**
+/**
  * RelatedProducts
  * 
- * Livewire component for reactive frontend functionality.
+ * Livewire component for RelatedProducts with reactive frontend functionality, real-time updates, and user interaction handling.
+ * 
+ * @property Product $product
+ * @property int $limit
+ * @property string $title
+ * @property bool $showTitle
+ * @property string $class
  */
-class RelatedProducts extends Component
+final class RelatedProducts extends Component
 {
     public Product $product;
-
     public int $limit = 4;
-
     public string $title = '';
-
     public bool $showTitle = true;
-
     public string $class = '';
-
-    public function mount(
-        Product $product,
-        int $limit = 4,
-        string $title = '',
-        bool $showTitle = true,
-        string $class = ''
-    ): void {
+    /**
+     * Initialize the Livewire component with parameters.
+     * @param Product $product
+     * @param int $limit
+     * @param string $title
+     * @param bool $showTitle
+     * @param string $class
+     * @return void
+     */
+    public function mount(Product $product, int $limit = 4, string $title = '', bool $showTitle = true, string $class = ''): void
+    {
         $this->product = $product;
         $this->limit = $limit;
         $this->title = $title;
         $this->showTitle = $showTitle;
         $this->class = $class;
     }
-
+    /**
+     * Handle getRelatedProductsProperty functionality with proper error handling.
+     */
     public function getRelatedProductsProperty()
     {
         return $this->product->getRelatedProducts($this->limit);
     }
-
+    /**
+     * Render the Livewire component view with current state.
+     */
     public function render()
     {
         return view('livewire.components.related-products');

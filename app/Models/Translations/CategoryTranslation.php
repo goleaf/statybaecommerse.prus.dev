@@ -1,34 +1,27 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Models\Translations;
 
 use Illuminate\Database\Eloquent\Model;
-
-final /**
+/**
  * CategoryTranslation
  * 
- * Eloquent model representing a database entity with relationships and business logic.
+ * Eloquent model representing the CategoryTranslation entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * 
+ * @property mixed $table
+ * @property mixed $fillable
+ * @property mixed $casts
+ * @property mixed $timestamps
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryTranslation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryTranslation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryTranslation query()
+ * @mixin \Eloquent
  */
-class CategoryTranslation extends Model
+final class CategoryTranslation extends Model
 {
     protected $table = 'category_translations';
-
-    protected $fillable = [
-        'category_id',
-        'locale',
-        'name',
-        'description',
-        'short_description',
-        'seo_title',
-        'seo_description',
-        'seo_keywords',
-    ];
-
-    protected $casts = [
-        'category_id' => 'integer',
-    ];
-
+    protected $fillable = ['category_id', 'locale', 'name', 'description', 'short_description', 'seo_title', 'seo_description', 'seo_keywords'];
+    protected $casts = ['category_id' => 'integer'];
     public $timestamps = true;
 }

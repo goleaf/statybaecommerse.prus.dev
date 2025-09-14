@@ -39,9 +39,10 @@ SQLite can be a suitable choice for certain Laravel applications, particularly w
 - **Impact**: Better performance and storage efficiency
 
 ### 7. Incremental Auto-Vacuum
-- **Setting**: `PRAGMA auto_vacuum = incremental`
+- **Setting**: `PRAGMA auto_vacuum = incremental` (only on empty databases)
 - **Benefit**: Automatically reclaims space from deleted records
 - **Impact**: Maintains database performance over time
+- **Note**: Cannot be changed on existing databases with data. Use `PRAGMA incremental_vacuum` manually when needed.
 
 ### 8. Synchronous Mode
 - **Setting**: `PRAGMA synchronous = normal`

@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Validators;
 
 use App\Enums\AddressType;
@@ -10,411 +9,415 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentType;
 use App\Enums\ProductStatus;
 use App\Enums\UserRole;
-
+/**
+ * EnumValidator
+ * 
+ * Validation class for EnumValidator data validation with comprehensive rules and custom error messages.
+ * 
+ */
 final class EnumValidator
 {
     /**
-     * Validate enum value
+     * Handle validateEnumValue functionality with proper error handling.
+     * @param string $enumName
+     * @param string $value
+     * @return bool
      */
     public static function validateEnumValue(string $enumName, string $value): bool
     {
         $enumClass = self::getEnumClass($enumName);
-
-        if (! $enumClass) {
+        if (!$enumClass) {
             return false;
         }
-
         return in_array($value, $enumClass::values());
     }
-
     /**
-     * Validate enum label
+     * Handle validateEnumLabel functionality with proper error handling.
+     * @param string $enumName
+     * @param string $label
+     * @return bool
      */
     public static function validateEnumLabel(string $enumName, string $label): bool
     {
         $enumClass = self::getEnumClass($enumName);
-
-        if (! $enumClass) {
+        if (!$enumClass) {
             return false;
         }
-
         return in_array($label, $enumClass::labels());
     }
-
     /**
-     * Validate enum case
+     * Handle validateEnumCase functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $case
+     * @return bool
      */
     public static function validateEnumCase(string $enumName, mixed $case): bool
     {
         $enumClass = self::getEnumClass($enumName);
-
-        if (! $enumClass) {
+        if (!$enumClass) {
             return false;
         }
-
         if (is_string($case)) {
             return self::validateEnumValue($enumName, $case);
         }
-
         if (is_object($case) && $case instanceof $enumClass) {
             return true;
         }
-
         return false;
     }
-
     /**
-     * Validate enum array
+     * Handle validateEnumArray functionality with proper error handling.
+     * @param string $enumName
+     * @param array $values
+     * @return bool
      */
     public static function validateEnumArray(string $enumName, array $values): bool
     {
         $enumClass = self::getEnumClass($enumName);
-
-        if (! $enumClass) {
+        if (!$enumClass) {
             return false;
         }
-
         $validValues = $enumClass::values();
-
         foreach ($values as $value) {
-            if (! in_array($value, $validValues)) {
+            if (!in_array($value, $validValues)) {
                 return false;
             }
         }
-
         return true;
     }
-
     /**
-     * Validate enum object
+     * Handle validateEnumObject functionality with proper error handling.
+     * @param string $enumName
+     * @param object $object
+     * @return bool
      */
     public static function validateEnumObject(string $enumName, object $object): bool
     {
         $enumClass = self::getEnumClass($enumName);
-
-        if (! $enumClass) {
+        if (!$enumClass) {
             return false;
         }
-
         return $object instanceof $enumClass;
     }
-
     /**
-     * Validate enum collection
+     * Handle validateEnumCollection functionality with proper error handling.
+     * @param string $enumName
+     * @param iterable $collection
+     * @return bool
      */
     public static function validateEnumCollection(string $enumName, iterable $collection): bool
     {
         $enumClass = self::getEnumClass($enumName);
-
-        if (! $enumClass) {
+        if (!$enumClass) {
             return false;
         }
-
         foreach ($collection as $item) {
-            if (! ($item instanceof $enumClass)) {
+            if (!$item instanceof $enumClass) {
                 return false;
             }
         }
-
         return true;
     }
-
     /**
-     * Validate enum request data
+     * Handle validateEnumRequest functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $requestData
+     * @return bool
      */
     public static function validateEnumRequest(string $enumName, mixed $requestData): bool
     {
         if (is_string($requestData)) {
             return self::validateEnumValue($enumName, $requestData);
         }
-
         if (is_array($requestData)) {
             if (isset($requestData['value'])) {
                 return self::validateEnumValue($enumName, $requestData['value']);
             }
-
             if (isset($requestData['label'])) {
                 return self::validateEnumLabel($enumName, $requestData['label']);
             }
-
             return self::validateEnumArray($enumName, $requestData);
         }
-
         if (is_object($requestData)) {
             return self::validateEnumObject($enumName, $requestData);
         }
-
         return false;
     }
-
     /**
-     * Validate enum database value
+     * Handle validateEnumDatabase functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $databaseValue
+     * @return bool
      */
     public static function validateEnumDatabase(string $enumName, mixed $databaseValue): bool
     {
         if ($databaseValue === null) {
-            return true; // Null values are allowed
+            return true;
+            // Null values are allowed
         }
-
         return self::validateEnumValue($enumName, (string) $databaseValue);
     }
-
     /**
-     * Validate enum API data
+     * Handle validateEnumApi functionality with proper error handling.
+     * @param string $enumName
+     * @param array $apiData
+     * @return bool
      */
     public static function validateEnumApi(string $enumName, array $apiData): bool
     {
         if (isset($apiData['value'])) {
             return self::validateEnumValue($enumName, $apiData['value']);
         }
-
         if (isset($apiData['label'])) {
             return self::validateEnumLabel($enumName, $apiData['label']);
         }
-
         return false;
     }
-
     /**
-     * Validate enum form data
+     * Handle validateEnumForm functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $formData
+     * @return bool
      */
     public static function validateEnumForm(string $enumName, mixed $formData): bool
     {
-        if (is_string($formData) && ! empty($formData)) {
+        if (is_string($formData) && !empty($formData)) {
             return self::validateEnumValue($enumName, $formData);
         }
-
-        return true; // Empty values are allowed
+        return true;
+        // Empty values are allowed
     }
-
     /**
-     * Validate enum query parameter
+     * Handle validateEnumQuery functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $queryValue
+     * @return bool
      */
     public static function validateEnumQuery(string $enumName, mixed $queryValue): bool
     {
-        if (is_string($queryValue) && ! empty($queryValue)) {
+        if (is_string($queryValue) && !empty($queryValue)) {
             return self::validateEnumValue($enumName, $queryValue);
         }
-
-        return true; // Empty values are allowed
+        return true;
+        // Empty values are allowed
     }
-
     /**
-     * Validate enum session data
+     * Handle validateEnumSession functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $sessionValue
+     * @return bool
      */
     public static function validateEnumSession(string $enumName, mixed $sessionValue): bool
     {
-        if (is_string($sessionValue) && ! empty($sessionValue)) {
+        if (is_string($sessionValue) && !empty($sessionValue)) {
             return self::validateEnumValue($enumName, $sessionValue);
         }
-
-        return true; // Empty values are allowed
+        return true;
+        // Empty values are allowed
     }
-
     /**
-     * Validate enum cookie data
+     * Handle validateEnumCookie functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $cookieValue
+     * @return bool
      */
     public static function validateEnumCookie(string $enumName, mixed $cookieValue): bool
     {
-        if (is_string($cookieValue) && ! empty($cookieValue)) {
+        if (is_string($cookieValue) && !empty($cookieValue)) {
             return self::validateEnumValue($enumName, $cookieValue);
         }
-
-        return true; // Empty values are allowed
+        return true;
+        // Empty values are allowed
     }
-
     /**
-     * Validate enum configuration
+     * Handle validateEnumConfig functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $configValue
+     * @return bool
      */
     public static function validateEnumConfig(string $enumName, mixed $configValue): bool
     {
         if ($configValue === null) {
-            return true; // Null values are allowed
+            return true;
+            // Null values are allowed
         }
-
         return self::validateEnumValue($enumName, (string) $configValue);
     }
-
     /**
-     * Validate enum environment variable
+     * Handle validateEnumEnv functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $envValue
+     * @return bool
      */
     public static function validateEnumEnv(string $enumName, mixed $envValue): bool
     {
         if ($envValue === null) {
-            return true; // Null values are allowed
+            return true;
+            // Null values are allowed
         }
-
         return self::validateEnumValue($enumName, (string) $envValue);
     }
-
     /**
-     * Validate enum with custom rules
+     * Handle validateEnumWithRules functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $value
+     * @param array $rules
+     * @return bool
      */
     public static function validateEnumWithRules(string $enumName, mixed $value, array $rules): bool
     {
-        if (! self::validateEnumValue($enumName, (string) $value)) {
+        if (!self::validateEnumValue($enumName, (string) $value)) {
             return false;
         }
-
         $enumClass = self::getEnumClass($enumName);
         $enum = $enumClass::from((string) $value);
-
         foreach ($rules as $rule => $expected) {
-            $method = 'is'.ucfirst($rule);
-
+            $method = 'is' . ucfirst($rule);
             if (method_exists($enum, $method)) {
-                $actual = $enum->$method();
-
+                $actual = $enum->{$method}();
                 if ($actual !== $expected) {
                     return false;
                 }
             }
         }
-
         return true;
     }
-
     /**
-     * Validate enum with multiple rules
+     * Handle validateEnumWithMultipleRules functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $value
+     * @param array $rules
+     * @return bool
      */
     public static function validateEnumWithMultipleRules(string $enumName, mixed $value, array $rules): bool
     {
-        if (! self::validateEnumValue($enumName, (string) $value)) {
+        if (!self::validateEnumValue($enumName, (string) $value)) {
             return false;
         }
-
         $enumClass = self::getEnumClass($enumName);
         $enum = $enumClass::from((string) $value);
-
         foreach ($rules as $rule) {
-            $method = 'is'.ucfirst($rule);
-
+            $method = 'is' . ucfirst($rule);
             if (method_exists($enum, $method)) {
-                if (! $enum->$method()) {
+                if (!$enum->{$method}()) {
                     return false;
                 }
             }
         }
-
         return true;
     }
-
     /**
-     * Validate enum with any rule
+     * Handle validateEnumWithAnyRule functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $value
+     * @param array $rules
+     * @return bool
      */
     public static function validateEnumWithAnyRule(string $enumName, mixed $value, array $rules): bool
     {
-        if (! self::validateEnumValue($enumName, (string) $value)) {
+        if (!self::validateEnumValue($enumName, (string) $value)) {
             return false;
         }
-
         $enumClass = self::getEnumClass($enumName);
         $enum = $enumClass::from((string) $value);
-
         foreach ($rules as $rule) {
-            $method = 'is'.ucfirst($rule);
-
+            $method = 'is' . ucfirst($rule);
             if (method_exists($enum, $method)) {
-                if ($enum->$method()) {
+                if ($enum->{$method}()) {
                     return true;
                 }
             }
         }
-
         return false;
     }
-
     /**
-     * Validate enum with custom callback
+     * Handle validateEnumWithCallback functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $value
+     * @param callable $callback
+     * @return bool
      */
     public static function validateEnumWithCallback(string $enumName, mixed $value, callable $callback): bool
     {
-        if (! self::validateEnumValue($enumName, (string) $value)) {
+        if (!self::validateEnumValue($enumName, (string) $value)) {
             return false;
         }
-
         $enumClass = self::getEnumClass($enumName);
         $enum = $enumClass::from((string) $value);
-
         return $callback($enum);
     }
-
     /**
-     * Validate enum with custom validation
+     * Handle validateEnumWithValidation functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $value
+     * @param array $validation
+     * @return bool
      */
     public static function validateEnumWithValidation(string $enumName, mixed $value, array $validation): bool
     {
-        if (! self::validateEnumValue($enumName, (string) $value)) {
+        if (!self::validateEnumValue($enumName, (string) $value)) {
             return false;
         }
-
         $enumClass = self::getEnumClass($enumName);
         $enum = $enumClass::from((string) $value);
-
         foreach ($validation as $rule => $expected) {
             if (is_string($rule)) {
-                $method = 'is'.ucfirst($rule);
-
+                $method = 'is' . ucfirst($rule);
                 if (method_exists($enum, $method)) {
-                    $actual = $enum->$method();
-
+                    $actual = $enum->{$method}();
                     if ($actual !== $expected) {
                         return false;
                     }
                 }
             } else {
-                $method = 'is'.ucfirst($rule);
-
+                $method = 'is' . ucfirst($rule);
                 if (method_exists($enum, $method)) {
-                    if (! $enum->$method()) {
+                    if (!$enum->{$method}()) {
                         return false;
                     }
                 }
             }
         }
-
         return true;
     }
-
     /**
-     * Validate enum with custom validation rules
+     * Handle validateEnumWithValidationRules functionality with proper error handling.
+     * @param string $enumName
+     * @param mixed $value
+     * @param array $validationRules
+     * @return bool
      */
     public static function validateEnumWithValidationRules(string $enumName, mixed $value, array $validationRules): bool
     {
-        if (! self::validateEnumValue($enumName, (string) $value)) {
+        if (!self::validateEnumValue($enumName, (string) $value)) {
             return false;
         }
-
         $enumClass = self::getEnumClass($enumName);
         $enum = $enumClass::from((string) $value);
-
         foreach ($validationRules as $rule => $expected) {
             if (is_string($rule)) {
-                $method = 'is'.ucfirst($rule);
-
+                $method = 'is' . ucfirst($rule);
                 if (method_exists($enum, $method)) {
-                    $actual = $enum->$method();
-
+                    $actual = $enum->{$method}();
                     if ($actual !== $expected) {
                         return false;
                     }
                 }
             } else {
-                $method = 'is'.ucfirst($rule);
-
+                $method = 'is' . ucfirst($rule);
                 if (method_exists($enum, $method)) {
-                    if (! $enum->$method()) {
+                    if (!$enum->{$method}()) {
                         return false;
                     }
                 }
             }
         }
-
         return true;
     }
-
     /**
-     * Get enum class by name
+     * Handle getEnumClass functionality with proper error handling.
+     * @param string $enumName
+     * @return string|null
      */
     private static function getEnumClass(string $enumName): ?string
     {
@@ -428,201 +431,211 @@ final class EnumValidator
             default => null,
         };
     }
-
     /**
-     * Get all available enum names
+     * Handle getAvailableEnums functionality with proper error handling.
+     * @return array
      */
     public static function getAvailableEnums(): array
     {
-        return [
-            'address_type',
-            'navigation_group',
-            'order_status',
-            'payment_type',
-            'product_status',
-            'user_role',
-        ];
+        return ['address_type', 'navigation_group', 'order_status', 'payment_type', 'product_status', 'user_role'];
     }
-
     /**
-     * Check if enum exists
+     * Handle exists functionality with proper error handling.
+     * @param string $enumName
+     * @return bool
      */
     public static function exists(string $enumName): bool
     {
         return self::getEnumClass($enumName) !== null;
     }
-
     /**
-     * Get enum class name
+     * Handle getEnumClassName functionality with proper error handling.
+     * @param string $enumName
+     * @return string|null
      */
     public static function getEnumClassName(string $enumName): ?string
     {
         return self::getEnumClass($enumName);
     }
-
     /**
-     * Get enum values
+     * Handle getEnumValues functionality with proper error handling.
+     * @param string $enumName
+     * @return array
      */
     public static function getEnumValues(string $enumName): array
     {
         $enumClass = self::getEnumClass($enumName);
-
-        if (! $enumClass) {
+        if (!$enumClass) {
             return [];
         }
-
         return $enumClass::values();
     }
-
     /**
-     * Get enum labels
+     * Handle getEnumLabels functionality with proper error handling.
+     * @param string $enumName
+     * @return array
      */
     public static function getEnumLabels(string $enumName): array
     {
         $enumClass = self::getEnumClass($enumName);
-
-        if (! $enumClass) {
+        if (!$enumClass) {
             return [];
         }
-
         return $enumClass::labels();
     }
-
     /**
-     * Get enum options
+     * Handle getEnumOptions functionality with proper error handling.
+     * @param string $enumName
+     * @return array
      */
     public static function getEnumOptions(string $enumName): array
     {
         $enumClass = self::getEnumClass($enumName);
-
-        if (! $enumClass) {
+        if (!$enumClass) {
             return [];
         }
-
         return $enumClass::options();
     }
-
     /**
-     * Get enum validation rules
+     * Handle getEnumValidationRules functionality with proper error handling.
+     * @param string $enumName
+     * @return string
      */
     public static function getEnumValidationRules(string $enumName): string
     {
         $enumClass = self::getEnumClass($enumName);
-
-        if (! $enumClass) {
+        if (!$enumClass) {
             return '';
         }
-
         return $enumClass::forValidation();
     }
-
     /**
-     * Get enum database rules
+     * Handle getEnumDatabaseRules functionality with proper error handling.
+     * @param string $enumName
+     * @return string
      */
     public static function getEnumDatabaseRules(string $enumName): string
     {
         $enumClass = self::getEnumClass($enumName);
-
-        if (! $enumClass) {
+        if (!$enumClass) {
             return '';
         }
-
         return $enumClass::forDatabase();
     }
-
     /**
-     * Get enum validation rules for Laravel
+     * Handle getLaravelValidationRules functionality with proper error handling.
+     * @param string $enumName
+     * @return string
      */
     public static function getLaravelValidationRules(string $enumName): string
     {
         return self::getEnumValidationRules($enumName);
     }
-
     /**
-     * Get enum validation rules for Laravel with nullable
+     * Handle getLaravelValidationRulesNullable functionality with proper error handling.
+     * @param string $enumName
+     * @return string
      */
     public static function getLaravelValidationRulesNullable(string $enumName): string
     {
-        return 'nullable|'.self::getEnumValidationRules($enumName);
+        return 'nullable|' . self::getEnumValidationRules($enumName);
     }
-
     /**
-     * Get enum validation rules for Laravel with required
+     * Handle getLaravelValidationRulesRequired functionality with proper error handling.
+     * @param string $enumName
+     * @return string
      */
     public static function getLaravelValidationRulesRequired(string $enumName): string
     {
-        return 'required|'.self::getEnumValidationRules($enumName);
+        return 'required|' . self::getEnumValidationRules($enumName);
     }
-
     /**
-     * Get enum validation rules for Laravel with sometimes
+     * Handle getLaravelValidationRulesSometimes functionality with proper error handling.
+     * @param string $enumName
+     * @return string
      */
     public static function getLaravelValidationRulesSometimes(string $enumName): string
     {
-        return 'sometimes|'.self::getEnumValidationRules($enumName);
+        return 'sometimes|' . self::getEnumValidationRules($enumName);
     }
-
     /**
-     * Get enum validation rules for Laravel with present
+     * Handle getLaravelValidationRulesPresent functionality with proper error handling.
+     * @param string $enumName
+     * @return string
      */
     public static function getLaravelValidationRulesPresent(string $enumName): string
     {
-        return 'present|'.self::getEnumValidationRules($enumName);
+        return 'present|' . self::getEnumValidationRules($enumName);
     }
-
     /**
-     * Get enum validation rules for Laravel with filled
+     * Handle getLaravelValidationRulesFilled functionality with proper error handling.
+     * @param string $enumName
+     * @return string
      */
     public static function getLaravelValidationRulesFilled(string $enumName): string
     {
-        return 'filled|'.self::getEnumValidationRules($enumName);
+        return 'filled|' . self::getEnumValidationRules($enumName);
     }
-
     /**
-     * Get enum validation rules for Laravel with required if
+     * Handle getLaravelValidationRulesRequiredIf functionality with proper error handling.
+     * @param string $enumName
+     * @param string $field
+     * @param mixed $value
+     * @return string
      */
     public static function getLaravelValidationRulesRequiredIf(string $enumName, string $field, mixed $value): string
     {
-        return 'required_if:'.$field.','.$value.'|'.self::getEnumValidationRules($enumName);
+        return 'required_if:' . $field . ',' . $value . '|' . self::getEnumValidationRules($enumName);
     }
-
     /**
-     * Get enum validation rules for Laravel with required unless
+     * Handle getLaravelValidationRulesRequiredUnless functionality with proper error handling.
+     * @param string $enumName
+     * @param string $field
+     * @param mixed $value
+     * @return string
      */
     public static function getLaravelValidationRulesRequiredUnless(string $enumName, string $field, mixed $value): string
     {
-        return 'required_unless:'.$field.','.$value.'|'.self::getEnumValidationRules($enumName);
+        return 'required_unless:' . $field . ',' . $value . '|' . self::getEnumValidationRules($enumName);
     }
-
     /**
-     * Get enum validation rules for Laravel with required with
+     * Handle getLaravelValidationRulesRequiredWith functionality with proper error handling.
+     * @param string $enumName
+     * @param string $field
+     * @return string
      */
     public static function getLaravelValidationRulesRequiredWith(string $enumName, string $field): string
     {
-        return 'required_with:'.$field.'|'.self::getEnumValidationRules($enumName);
+        return 'required_with:' . $field . '|' . self::getEnumValidationRules($enumName);
     }
-
     /**
-     * Get enum validation rules for Laravel with required with all
+     * Handle getLaravelValidationRulesRequiredWithAll functionality with proper error handling.
+     * @param string $enumName
+     * @param array $fields
+     * @return string
      */
     public static function getLaravelValidationRulesRequiredWithAll(string $enumName, array $fields): string
     {
-        return 'required_with_all:'.implode(',', $fields).'|'.self::getEnumValidationRules($enumName);
+        return 'required_with_all:' . implode(',', $fields) . '|' . self::getEnumValidationRules($enumName);
     }
-
     /**
-     * Get enum validation rules for Laravel with required without
+     * Handle getLaravelValidationRulesRequiredWithout functionality with proper error handling.
+     * @param string $enumName
+     * @param string $field
+     * @return string
      */
     public static function getLaravelValidationRulesRequiredWithout(string $enumName, string $field): string
     {
-        return 'required_without:'.$field.'|'.self::getEnumValidationRules($enumName);
+        return 'required_without:' . $field . '|' . self::getEnumValidationRules($enumName);
     }
-
     /**
-     * Get enum validation rules for Laravel with required without all
+     * Handle getLaravelValidationRulesRequiredWithoutAll functionality with proper error handling.
+     * @param string $enumName
+     * @param array $fields
+     * @return string
      */
     public static function getLaravelValidationRulesRequiredWithoutAll(string $enumName, array $fields): string
     {
-        return 'required_without_all:'.implode(',', $fields).'|'.self::getEnumValidationRules($enumName);
+        return 'required_without_all:' . implode(',', $fields) . '|' . self::getEnumValidationRules($enumName);
     }
 }

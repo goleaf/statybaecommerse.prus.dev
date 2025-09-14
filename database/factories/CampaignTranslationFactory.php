@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Campaign;
-use App\Models\CampaignTranslation;
+use App\Models\Translations\CampaignTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\CampaignTranslation>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Translations\CampaignTranslation>
  */
 final class CampaignTranslationFactory extends Factory
 {

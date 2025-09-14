@@ -92,7 +92,8 @@ final class AttributeTest extends TestCase
         // Create test attributes with specific attributes
         $enabledAttribute = Attribute::factory()->create([
             'is_enabled' => true,
-            'is_visible' => true
+            'is_visible' => true,
+            'is_active' => true
         ]);
         $disabledAttribute = Attribute::factory()->create([
             'is_enabled' => false,
@@ -101,27 +102,32 @@ final class AttributeTest extends TestCase
         $requiredAttribute = Attribute::factory()->create([
             'is_required' => true,
             'is_enabled' => true,
-            'is_visible' => true
+            'is_visible' => true,
+            'is_active' => true
         ]);
         $filterableAttribute = Attribute::factory()->create([
             'is_filterable' => true,
             'is_enabled' => true,
-            'is_visible' => true
+            'is_visible' => true,
+            'is_active' => true
         ]);
         $searchableAttribute = Attribute::factory()->create([
             'is_searchable' => true,
             'is_enabled' => true,
-            'is_visible' => true
+            'is_visible' => true,
+            'is_active' => true
         ]);
         $orderedAttribute1 = Attribute::factory()->create([
             'sort_order' => 2,
             'is_enabled' => true,
-            'is_visible' => true
+            'is_visible' => true,
+            'is_active' => true
         ]);
         $orderedAttribute2 = Attribute::factory()->create([
             'sort_order' => 1,
             'is_enabled' => true,
-            'is_visible' => true
+            'is_visible' => true,
+            'is_active' => true
         ]);
 
         // Test enabled scope

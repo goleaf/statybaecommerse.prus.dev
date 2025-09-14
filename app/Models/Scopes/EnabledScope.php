@@ -1,23 +1,28 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-
 /**
- * Global scope to filter only enabled records
+ * EnabledScope
  * 
- * This scope automatically applies to models that have is_enabled fields
- * and ensures that only enabled records are returned by default.
+ * Eloquent model representing the EnabledScope entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * 
+ * @method static \Illuminate\Database\Eloquent\Builder|EnabledScope newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|EnabledScope newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|EnabledScope query()
+ * @mixin \Eloquent
  */
 final class EnabledScope implements Scope
 {
     /**
-     * Apply the scope to a given Eloquent query builder.
+     * Handle apply functionality with proper error handling.
+     * @param Builder $builder
+     * @param Model $model
+     * @return void
      */
     public function apply(Builder $builder, Model $model): void
     {

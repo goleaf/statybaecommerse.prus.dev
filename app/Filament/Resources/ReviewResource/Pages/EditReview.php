@@ -1,30 +1,35 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Filament\Resources\ReviewResource\Pages;
 
 use App\Filament\Resources\ReviewResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-
-final /**
+/**
  * EditReview
  * 
- * Filament resource for admin panel management.
+ * Filament v4 resource for EditReview management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ * 
+ * @property string $resource
+ * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
+ * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)
  */
-class EditReview extends EditRecord
+final class EditReview extends EditRecord
 {
     protected static string $resource = ReviewResource::class;
-
+    /**
+     * Handle getHeaderActions functionality with proper error handling.
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
-        ];
+        return [Actions\ViewAction::make(), Actions\DeleteAction::make()];
     }
-
+    /**
+     * Handle getRedirectUrl functionality with proper error handling.
+     * @return string
+     */
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

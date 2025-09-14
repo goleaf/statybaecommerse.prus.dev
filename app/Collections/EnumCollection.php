@@ -1,44 +1,49 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Collections;
 
 use Illuminate\Support\Collection;
-
+/**
+ * EnumCollection
+ * 
+ * Custom collection class for EnumCollection data manipulation with enhanced methods and type safety.
+ * 
+ */
 final class EnumCollection extends Collection
 {
     /**
-     * Create a new enum collection instance
+     * Initialize the class instance with required dependencies.
+     * @param mixed $items
      */
     public function __construct($items = [])
     {
         parent::__construct($items);
     }
-
     /**
-     * Create a new enum collection from enum cases
+     * Handle fromEnum functionality with proper error handling.
+     * @param string $enumClass
+     * @return self
      */
     public static function fromEnum(string $enumClass): self
     {
-        if (! class_exists($enumClass)) {
+        if (!class_exists($enumClass)) {
             throw new \InvalidArgumentException("Enum class '{$enumClass}' not found");
         }
-
         return new self($enumClass::cases());
     }
-
     /**
-     * Create a new enum collection from enum values
+     * Handle fromValues functionality with proper error handling.
+     * @param string $enumClass
+     * @param array $values
+     * @return self
      */
     public static function fromValues(string $enumClass, array $values): self
     {
-        if (! class_exists($enumClass)) {
+        if (!class_exists($enumClass)) {
             throw new \InvalidArgumentException("Enum class '{$enumClass}' not found");
         }
-
         $enums = [];
-
         foreach ($values as $value) {
             try {
                 $enums[] = $enumClass::from($value);
@@ -46,1030 +51,1014 @@ final class EnumCollection extends Collection
                 // Skip invalid values
             }
         }
-
         return new self($enums);
     }
-
     /**
-     * Create a new enum collection from enum labels
+     * Handle fromLabels functionality with proper error handling.
+     * @param string $enumClass
+     * @param array $labels
+     * @return self
      */
     public static function fromLabels(string $enumClass, array $labels): self
     {
-        if (! class_exists($enumClass)) {
+        if (!class_exists($enumClass)) {
             throw new \InvalidArgumentException("Enum class '{$enumClass}' not found");
         }
-
         $enums = [];
-
         foreach ($labels as $label) {
             $enum = $enumClass::fromLabel($label);
-
             if ($enum) {
                 $enums[] = $enum;
             }
         }
-
         return new self($enums);
     }
-
     /**
-     * Get enum values
+     * Handle values functionality with proper error handling.
+     * @return array
      */
     public function values(): array
     {
-        return $this->map(fn ($enum) => $enum->value)->toArray();
+        return $this->map(fn($enum) => $enum->value)->toArray();
     }
-
     /**
-     * Get enum labels
+     * Handle labels functionality with proper error handling.
+     * @return array
      */
     public function labels(): array
     {
-        return $this->map(fn ($enum) => $enum->label())->toArray();
+        return $this->map(fn($enum) => $enum->label())->toArray();
     }
-
     /**
-     * Get enum descriptions
+     * Handle descriptions functionality with proper error handling.
+     * @return array
      */
     public function descriptions(): array
     {
-        return $this->map(fn ($enum) => $enum->description())->toArray();
+        return $this->map(fn($enum) => $enum->description())->toArray();
     }
-
     /**
-     * Get enum icons
+     * Handle icons functionality with proper error handling.
+     * @return array
      */
     public function icons(): array
     {
-        return $this->map(fn ($enum) => $enum->icon())->toArray();
+        return $this->map(fn($enum) => $enum->icon())->toArray();
     }
-
     /**
-     * Get enum colors
+     * Handle colors functionality with proper error handling.
+     * @return array
      */
     public function colors(): array
     {
-        return $this->map(fn ($enum) => $enum->color())->toArray();
+        return $this->map(fn($enum) => $enum->color())->toArray();
     }
-
     /**
-     * Get enum priorities
+     * Handle priorities functionality with proper error handling.
+     * @return array
      */
     public function priorities(): array
     {
-        return $this->map(fn ($enum) => $enum->priority())->toArray();
+        return $this->map(fn($enum) => $enum->priority())->toArray();
     }
-
     /**
-     * Get enum options for select dropdowns
+     * Handle options functionality with proper error handling.
+     * @return array
      */
     public function options(): array
     {
-        return $this->mapWithKeys(fn ($enum) => [$enum->value => $enum->label()])->toArray();
+        return $this->mapWithKeys(fn($enum) => [$enum->value => $enum->label()])->toArray();
     }
-
     /**
-     * Get enum options with descriptions
+     * Handle optionsWithDescriptions functionality with proper error handling.
+     * @return array
      */
     public function optionsWithDescriptions(): array
     {
-        return $this->mapWithKeys(fn ($enum) => [
-            $enum->value => $enum->toArray(),
-        ])->toArray();
+        return $this->mapWithKeys(fn($enum) => [$enum->value => $enum->toArray()])->toArray();
     }
-
     /**
-     * Get enum cases as arrays
+     * Handle toArrays functionality with proper error handling.
+     * @return array
      */
     public function toArrays(): array
     {
-        return $this->map(fn ($enum) => $enum->toArray())->toArray();
+        return $this->map(fn($enum) => $enum->toArray())->toArray();
     }
-
     /**
-     * Get enum cases as JSON
+     * Convert the instance to a JSON representation.
+     * @param mixed $options
+     * @return string
      */
     public function toJson($options = 0): string
     {
         return json_encode($this->toArrays(), $options);
     }
-
     /**
-     * Get enum cases for API responses
+     * Handle forApi functionality with proper error handling.
+     * @return array
      */
     public function forApi(): array
     {
-        return $this->map(fn ($enum) => [
-            'value' => $enum->value,
-            'label' => $enum->label(),
-            'description' => $enum->description(),
-            'icon' => $enum->icon(),
-            'color' => $enum->color(),
-        ])->toArray();
+        return $this->map(fn($enum) => ['value' => $enum->value, 'label' => $enum->label(), 'description' => $enum->description(), 'icon' => $enum->icon(), 'color' => $enum->color()])->toArray();
     }
-
     /**
-     * Get enum cases for GraphQL
+     * Handle forGraphQL functionality with proper error handling.
+     * @return array
      */
     public function forGraphQL(): array
     {
-        return $this->map(fn ($enum) => [
-            'name' => strtoupper($enum->value),
-            'value' => $enum->value,
-            'description' => $enum->description(),
-        ])->toArray();
+        return $this->map(fn($enum) => ['name' => strtoupper($enum->value), 'value' => $enum->value, 'description' => $enum->description()])->toArray();
     }
-
     /**
-     * Get enum cases for TypeScript
+     * Handle forTypeScript functionality with proper error handling.
+     * @return string
      */
     public function forTypeScript(): string
     {
         $enumName = class_basename($this->first()::class);
         $enum = "export enum {$enumName} {\n";
-
         foreach ($this as $enumCase) {
-            $enum .= '  '.strtoupper($enumCase->value)." = '".$enumCase->value."',\n";
+            $enum .= '  ' . strtoupper($enumCase->value) . " = '" . $enumCase->value . "',\n";
         }
-
-        return $enum.'}';
+        return $enum . '}';
     }
-
     /**
-     * Get enum cases for JavaScript
+     * Handle forJavaScript functionality with proper error handling.
+     * @return string
      */
     public function forJavaScript(): string
     {
         $enumName = class_basename($this->first()::class);
         $object = "const {$enumName} = {\n";
-
         foreach ($this as $enumCase) {
-            $object .= '  '.strtoupper($enumCase->value).": '".$enumCase->value."',\n";
+            $object .= '  ' . strtoupper($enumCase->value) . ": '" . $enumCase->value . "',\n";
         }
-
-        return $object.'};';
+        return $object . '};';
     }
-
     /**
-     * Get enum cases for CSS
+     * Handle forCss functionality with proper error handling.
+     * @return string
      */
     public function forCss(): string
     {
         $css = ":root {\n";
-
         foreach ($this as $enumCase) {
-            $css .= '  --'.str_replace('_', '-', $enumCase->value).": '".$enumCase->value."';\n";
+            $css .= '  --' . str_replace('_', '-', $enumCase->value) . ": '" . $enumCase->value . "';\n";
         }
-
-        return $css.'}';
+        return $css . '}';
     }
-
     /**
-     * Get enum cases for documentation
+     * Handle forDocumentation functionality with proper error handling.
+     * @return array
      */
     public function forDocumentation(): array
     {
-        return $this->map(fn ($enum) => [
-            'value' => $enum->value,
-            'label' => $enum->label(),
-            'description' => $enum->description(),
-            'icon' => $enum->icon(),
-            'color' => $enum->color(),
-            'priority' => $enum->priority(),
-        ])->toArray();
+        return $this->map(fn($enum) => ['value' => $enum->value, 'label' => $enum->label(), 'description' => $enum->description(), 'icon' => $enum->icon(), 'color' => $enum->color(), 'priority' => $enum->priority()])->toArray();
     }
-
     /**
-     * Get enum cases for form validation
+     * Handle forValidation functionality with proper error handling.
+     * @return string
      */
     public function forValidation(): string
     {
-        return 'in:'.implode(',', $this->values());
+        return 'in:' . implode(',', $this->values());
     }
-
     /**
-     * Get enum cases for database enum column
+     * Handle forDatabase functionality with proper error handling.
+     * @return string
      */
     public function forDatabase(): string
     {
-        return "enum('".implode("','", $this->values())."')";
+        return "enum('" . implode("','", $this->values()) . "')";
     }
-
     /**
-     * Filter enum cases by a property
+     * Handle filterBy functionality with proper error handling.
+     * @param string $property
+     * @param mixed $value
+     * @return self
      */
     public function filterBy(string $property, mixed $value): self
     {
-        return $this->filter(fn ($enum) => $enum->$property() === $value);
+        return $this->filter(fn($enum) => $enum->{$property}() === $value);
     }
-
     /**
-     * Filter enum cases by multiple properties
+     * Handle filterByMultiple functionality with proper error handling.
+     * @param array $filters
+     * @return self
      */
     public function filterByMultiple(array $filters): self
     {
         return $this->filter(function ($enum) use ($filters) {
             foreach ($filters as $property => $value) {
-                if ($enum->$property() !== $value) {
+                if ($enum->{$property}() !== $value) {
                     return false;
                 }
             }
-
             return true;
         });
     }
-
     /**
-     * Sort enum cases by a property
+     * Handle sortByProperty functionality with proper error handling.
+     * @param string $property
+     * @param bool $descending
+     * @return self
      */
     public function sortByProperty(string $property, bool $descending = false): self
     {
-        $sorted = $this->sortBy(fn ($enum) => $enum->$property());
-
+        $sorted = $this->sortBy(fn($enum) => $enum->{$property}());
         return $descending ? $sorted->reverse() : $sorted;
     }
-
     /**
-     * Sort enum cases by priority
+     * Handle sortByPriority functionality with proper error handling.
+     * @param bool $descending
+     * @return self
      */
     public function sortByPriority(bool $descending = false): self
     {
         return $this->sortByProperty('priority', $descending);
     }
-
     /**
-     * Sort enum cases by label
+     * Handle sortByLabel functionality with proper error handling.
+     * @param bool $descending
+     * @return self
      */
     public function sortByLabel(bool $descending = false): self
     {
         return $this->sortByProperty('label', $descending);
     }
-
     /**
-     * Sort enum cases by value
+     * Handle sortByValue functionality with proper error handling.
+     * @param bool $descending
+     * @return self
      */
     public function sortByValue(bool $descending = false): self
     {
-        return $this->sortBy(fn ($enum) => $enum->value, $descending);
+        return $this->sortBy(fn($enum) => $enum->value, $descending);
     }
-
     /**
-     * Group enum cases by a property
+     * Handle groupByProperty functionality with proper error handling.
+     * @param string $property
+     * @return Collection
      */
     public function groupByProperty(string $property): Collection
     {
-        return $this->groupBy(fn ($enum) => $enum->$property());
+        return $this->groupBy(fn($enum) => $enum->{$property}());
     }
-
     /**
-     * Group enum cases by color
+     * Handle groupByColor functionality with proper error handling.
+     * @return Collection
      */
     public function groupByColor(): Collection
     {
         return $this->groupByProperty('color');
     }
-
     /**
-     * Group enum cases by priority
+     * Handle groupByPriority functionality with proper error handling.
+     * @return Collection
      */
     public function groupByPriority(): Collection
     {
         return $this->groupByProperty('priority');
     }
-
     /**
-     * Get enum cases with specific property value
+     * Handle whereProperty functionality with proper error handling.
+     * @param string $property
+     * @param mixed $value
+     * @return self
      */
     public function whereProperty(string $property, mixed $value): self
     {
-        return $this->filter(fn ($enum) => $enum->$property() === $value);
+        return $this->filter(fn($enum) => $enum->{$property}() === $value);
     }
-
     /**
-     * Get enum cases with specific color
+     * Handle whereColor functionality with proper error handling.
+     * @param string $color
+     * @return self
      */
     public function whereColor(string $color): self
     {
         return $this->whereProperty('color', $color);
     }
-
     /**
-     * Get enum cases with specific priority
+     * Handle wherePriority functionality with proper error handling.
+     * @param int $priority
+     * @return self
      */
     public function wherePriority(int $priority): self
     {
         return $this->whereProperty('priority', $priority);
     }
-
     /**
-     * Get enum cases with priority greater than
+     * Handle wherePriorityGreaterThan functionality with proper error handling.
+     * @param int $priority
+     * @return self
      */
     public function wherePriorityGreaterThan(int $priority): self
     {
-        return $this->filter(fn ($enum) => $enum->priority() > $priority);
+        return $this->filter(fn($enum) => $enum->priority() > $priority);
     }
-
     /**
-     * Get enum cases with priority less than
+     * Handle wherePriorityLessThan functionality with proper error handling.
+     * @param int $priority
+     * @return self
      */
     public function wherePriorityLessThan(int $priority): self
     {
-        return $this->filter(fn ($enum) => $enum->priority() < $priority);
+        return $this->filter(fn($enum) => $enum->priority() < $priority);
     }
-
     /**
-     * Get enum cases with priority between
+     * Handle wherePriorityBetween functionality with proper error handling.
+     * @param int $min
+     * @param int $max
+     * @return self
      */
     public function wherePriorityBetween(int $min, int $max): self
     {
-        return $this->filter(fn ($enum) => $enum->priority() >= $min && $enum->priority() <= $max);
+        return $this->filter(fn($enum) => $enum->priority() >= $min && $enum->priority() <= $max);
     }
-
     /**
-     * Get enum cases with specific icon
+     * Handle whereIcon functionality with proper error handling.
+     * @param string $icon
+     * @return self
      */
     public function whereIcon(string $icon): self
     {
         return $this->whereProperty('icon', $icon);
     }
-
     /**
-     * Get enum cases with specific label
+     * Handle whereLabel functionality with proper error handling.
+     * @param string $label
+     * @return self
      */
     public function whereLabel(string $label): self
     {
         return $this->whereProperty('label', $label);
     }
-
     /**
-     * Get enum cases with specific value
+     * Handle whereValue functionality with proper error handling.
+     * @param string $value
+     * @return self
      */
     public function whereValue(string $value): self
     {
         return $this->whereProperty('value', $value);
     }
-
     /**
-     * Get enum cases with specific description
+     * Handle whereDescription functionality with proper error handling.
+     * @param string $description
+     * @return self
      */
     public function whereDescription(string $description): self
     {
         return $this->whereProperty('description', $description);
     }
-
     /**
-     * Get enum cases that contain text in label
+     * Handle whereLabelContains functionality with proper error handling.
+     * @param string $text
+     * @return self
      */
     public function whereLabelContains(string $text): self
     {
-        return $this->filter(fn ($enum) => str_contains($enum->label(), $text));
+        return $this->filter(fn($enum) => str_contains($enum->label(), $text));
     }
-
     /**
-     * Get enum cases that contain text in description
+     * Handle whereDescriptionContains functionality with proper error handling.
+     * @param string $text
+     * @return self
      */
     public function whereDescriptionContains(string $text): self
     {
-        return $this->filter(fn ($enum) => str_contains($enum->description(), $text));
+        return $this->filter(fn($enum) => str_contains($enum->description(), $text));
     }
-
     /**
-     * Get enum cases that contain text in value
+     * Handle whereValueContains functionality with proper error handling.
+     * @param string $text
+     * @return self
      */
     public function whereValueContains(string $text): self
     {
-        return $this->filter(fn ($enum) => str_contains($enum->value, $text));
+        return $this->filter(fn($enum) => str_contains($enum->value, $text));
     }
-
     /**
-     * Get enum cases that start with text
+     * Handle whereValueStartsWith functionality with proper error handling.
+     * @param string $text
+     * @return self
      */
     public function whereValueStartsWith(string $text): self
     {
-        return $this->filter(fn ($enum) => str_starts_with($enum->value, $text));
+        return $this->filter(fn($enum) => str_starts_with($enum->value, $text));
     }
-
     /**
-     * Get enum cases that end with text
+     * Handle whereValueEndsWith functionality with proper error handling.
+     * @param string $text
+     * @return self
      */
     public function whereValueEndsWith(string $text): self
     {
-        return $this->filter(fn ($enum) => str_ends_with($enum->value, $text));
+        return $this->filter(fn($enum) => str_ends_with($enum->value, $text));
     }
-
     /**
-     * Get enum cases that match pattern
+     * Handle whereValueMatches functionality with proper error handling.
+     * @param string $pattern
+     * @return self
      */
     public function whereValueMatches(string $pattern): self
     {
-        return $this->filter(fn ($enum) => preg_match($pattern, $enum->value));
+        return $this->filter(fn($enum) => preg_match($pattern, $enum->value));
     }
-
     /**
-     * Get enum cases that match label pattern
+     * Handle whereLabelMatches functionality with proper error handling.
+     * @param string $pattern
+     * @return self
      */
     public function whereLabelMatches(string $pattern): self
     {
-        return $this->filter(fn ($enum) => preg_match($pattern, $enum->label()));
+        return $this->filter(fn($enum) => preg_match($pattern, $enum->label()));
     }
-
     /**
-     * Get enum cases that match description pattern
+     * Handle whereDescriptionMatches functionality with proper error handling.
+     * @param string $pattern
+     * @return self
      */
     public function whereDescriptionMatches(string $pattern): self
     {
-        return $this->filter(fn ($enum) => preg_match($pattern, $enum->description()));
+        return $this->filter(fn($enum) => preg_match($pattern, $enum->description()));
     }
-
     /**
-     * Get enum cases with pagination
+     * Handle paginate functionality with proper error handling.
+     * @param int $perPage
+     * @param int $page
+     * @return array
      */
     public function paginate(int $perPage, int $page = 1): array
     {
         $offset = ($page - 1) * $perPage;
         $items = $this->slice($offset, $perPage)->values();
-
-        return [
-            'data' => $items->toArrays(),
-            'current_page' => $page,
-            'per_page' => $perPage,
-            'total' => $this->count(),
-            'last_page' => ceil($this->count() / $perPage),
-            'from' => $offset + 1,
-            'to' => min($offset + $perPage, $this->count()),
-        ];
+        return ['data' => $items->toArrays(), 'current_page' => $page, 'per_page' => $perPage, 'total' => $this->count(), 'last_page' => ceil($this->count() / $perPage), 'from' => $offset + 1, 'to' => min($offset + $perPage, $this->count())];
     }
-
     /**
-     * Get enum cases with search
+     * Handle searchEnum functionality with proper error handling.
+     * @param string $query
+     * @return self
      */
     public function searchEnum(string $query): self
     {
         return $this->filter(function ($enum) use ($query) {
             $query = strtolower($query);
-
-            return str_contains(strtolower($enum->value), $query) ||
-                   str_contains(strtolower($enum->label()), $query) ||
-                   str_contains(strtolower($enum->description()), $query);
+            return str_contains(strtolower($enum->value), $query) || str_contains(strtolower($enum->label()), $query) || str_contains(strtolower($enum->description()), $query);
         });
     }
-
     /**
-     * Get enum cases with random selection
+     * Handle random functionality with proper error handling.
+     * @param mixed $number
+     * @param mixed $preserveKeys
+     * @return self
      */
     public function random($number = null, $preserveKeys = false): self
     {
         return new self(parent::random($number, $preserveKeys));
     }
-
     /**
-     * Get enum cases with unique values
+     * Handle unique functionality with proper error handling.
+     * @param mixed $key
+     * @param mixed $strict
+     * @return self
      */
     public function unique($key = null, $strict = false): self
     {
         if ($key === null) {
-            $key = fn ($enum) => $enum->value;
+            $key = fn($enum) => $enum->value;
         }
         return new self(parent::unique($key, $strict));
     }
-
     /**
-     * Get enum cases with unique labels
+     * Handle uniqueByLabel functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabel(): self
     {
-        return $this->unique(fn ($enum) => $enum->label());
+        return $this->unique(fn($enum) => $enum->label());
     }
-
     /**
-     * Get enum cases with unique colors
+     * Handle uniqueByColor functionality with proper error handling.
+     * @return self
      */
     public function uniqueByColor(): self
     {
-        return $this->unique(fn ($enum) => $enum->color());
+        return $this->unique(fn($enum) => $enum->color());
     }
-
     /**
-     * Get enum cases with unique icons
+     * Handle uniqueByIcon functionality with proper error handling.
+     * @return self
      */
     public function uniqueByIcon(): self
     {
-        return $this->unique(fn ($enum) => $enum->icon());
+        return $this->unique(fn($enum) => $enum->icon());
     }
-
     /**
-     * Get enum cases with unique priorities
+     * Handle uniqueByPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->priority());
+        return $this->unique(fn($enum) => $enum->priority());
     }
-
     /**
-     * Get enum cases with unique descriptions
+     * Handle uniqueByDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->description());
+        return $this->unique(fn($enum) => $enum->description());
     }
-
     /**
-     * Get enum cases with unique values and labels
+     * Handle uniqueByValueAndLabel functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueAndLabel(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label());
     }
-
     /**
-     * Get enum cases with unique values and colors
+     * Handle uniqueByValueAndColor functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueAndColor(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color());
     }
-
     /**
-     * Get enum cases with unique values and icons
+     * Handle uniqueByValueAndIcon functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueAndIcon(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->icon());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->icon());
     }
-
     /**
-     * Get enum cases with unique values and priorities
+     * Handle uniqueByValueAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique values and descriptions
+     * Handle uniqueByValueAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique labels and colors
+     * Handle uniqueByLabelAndColor functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelAndColor(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color());
     }
-
     /**
-     * Get enum cases with unique labels and icons
+     * Handle uniqueByLabelAndIcon functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelAndIcon(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->icon());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->icon());
     }
-
     /**
-     * Get enum cases with unique labels and priorities
+     * Handle uniqueByLabelAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique labels and descriptions
+     * Handle uniqueByLabelAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique colors and icons
+     * Handle uniqueByColorAndIcon functionality with proper error handling.
+     * @return self
      */
     public function uniqueByColorAndIcon(): self
     {
-        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->icon());
+        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->icon());
     }
-
     /**
-     * Get enum cases with unique colors and priorities
+     * Handle uniqueByColorAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByColorAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique colors and descriptions
+     * Handle uniqueByColorAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByColorAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique icons and priorities
+     * Handle uniqueByIconAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByIconAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->icon().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->icon() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique icons and descriptions
+     * Handle uniqueByIconAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByIconAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->icon().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->icon() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique priorities and descriptions
+     * Handle uniqueByPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, labels, and colors
+     * Handle uniqueByValueLabelAndColor functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelAndColor(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color());
     }
-
     /**
-     * Get enum cases with unique values, labels, and icons
+     * Handle uniqueByValueLabelAndIcon functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelAndIcon(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->icon());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->icon());
     }
-
     /**
-     * Get enum cases with unique values, labels, and priorities
+     * Handle uniqueByValueLabelAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique values, labels, and descriptions
+     * Handle uniqueByValueLabelAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, colors, and icons
+     * Handle uniqueByValueColorAndIcon functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueColorAndIcon(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->icon());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->icon());
     }
-
     /**
-     * Get enum cases with unique values, colors, and priorities
+     * Handle uniqueByValueColorAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueColorAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique values, colors, and descriptions
+     * Handle uniqueByValueColorAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueColorAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, icons, and priorities
+     * Handle uniqueByValueIconAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueIconAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->icon().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->icon() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique values, icons, and descriptions
+     * Handle uniqueByValueIconAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueIconAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->icon().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->icon() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, priorities, and descriptions
+     * Handle uniqueByValuePriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValuePriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique labels, colors, and icons
+     * Handle uniqueByLabelColorAndIcon functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelColorAndIcon(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->icon());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->icon());
     }
-
     /**
-     * Get enum cases with unique labels, colors, and priorities
+     * Handle uniqueByLabelColorAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelColorAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique labels, colors, and descriptions
+     * Handle uniqueByLabelColorAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelColorAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique labels, icons, and priorities
+     * Handle uniqueByLabelIconAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelIconAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->icon().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->icon() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique labels, icons, and descriptions
+     * Handle uniqueByLabelIconAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelIconAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->icon().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->icon() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique labels, priorities, and descriptions
+     * Handle uniqueByLabelPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique colors, icons, and priorities
+     * Handle uniqueByColorIconAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByColorIconAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->icon().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->icon() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique colors, icons, and descriptions
+     * Handle uniqueByColorIconAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByColorIconAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->icon().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->icon() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique colors, priorities, and descriptions
+     * Handle uniqueByColorPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByColorPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique icons, priorities, and descriptions
+     * Handle uniqueByIconPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByIconPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->icon().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, labels, colors, and icons
+     * Handle uniqueByValueLabelColorAndIcon functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelColorAndIcon(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->icon());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->icon());
     }
-
     /**
-     * Get enum cases with unique values, labels, colors, and priorities
+     * Handle uniqueByValueLabelColorAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelColorAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique values, labels, colors, and descriptions
+     * Handle uniqueByValueLabelColorAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelColorAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, labels, icons, and priorities
+     * Handle uniqueByValueLabelIconAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelIconAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->icon().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->icon() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique values, labels, icons, and descriptions
+     * Handle uniqueByValueLabelIconAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelIconAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->icon().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->icon() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, labels, priorities, and descriptions
+     * Handle uniqueByValueLabelPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, colors, icons, and priorities
+     * Handle uniqueByValueColorIconAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueColorIconAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique values, colors, icons, and descriptions
+     * Handle uniqueByValueColorIconAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueColorIconAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->icon().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, colors, priorities, and descriptions
+     * Handle uniqueByValueColorPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueColorPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, icons, priorities, and descriptions
+     * Handle uniqueByValueIconPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueIconPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique labels, colors, icons, and priorities
+     * Handle uniqueByLabelColorIconAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelColorIconAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique labels, colors, icons, and descriptions
+     * Handle uniqueByLabelColorIconAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelColorIconAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique labels, colors, priorities, and descriptions
+     * Handle uniqueByLabelColorPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelColorPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique labels, icons, priorities, and descriptions
+     * Handle uniqueByLabelIconPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelIconPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique colors, icons, priorities, and descriptions
+     * Handle uniqueByColorIconPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByColorIconPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->color().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->color() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, labels, colors, icons, and priorities
+     * Handle uniqueByValueLabelColorIconAndPriority functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelColorIconAndPriority(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority());
     }
-
     /**
-     * Get enum cases with unique values, labels, colors, icons, and descriptions
+     * Handle uniqueByValueLabelColorIconAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelColorIconAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, labels, colors, priorities, and descriptions
+     * Handle uniqueByValueLabelColorPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelColorPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, labels, icons, priorities, and descriptions
+     * Handle uniqueByValueLabelIconPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueLabelIconPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, colors, icons, priorities, and descriptions
+     * Handle uniqueByValueColorIconPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByValueColorIconPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique labels, colors, icons, priorities, and descriptions
+     * Handle uniqueByLabelColorIconPriorityAndDescription functionality with proper error handling.
+     * @return self
      */
     public function uniqueByLabelColorIconPriorityAndDescription(): self
     {
-        return $this->unique(fn ($enum) => $enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Get enum cases with unique values, labels, colors, icons, priorities, and descriptions
+     * Handle uniqueByAll functionality with proper error handling.
+     * @return self
      */
     public function uniqueByAll(): self
     {
-        return $this->unique(fn ($enum) => $enum->value.'|'.$enum->label().'|'.$enum->color().'|'.$enum->icon().'|'.$enum->priority().'|'.$enum->description());
+        return $this->unique(fn($enum) => $enum->value . '|' . $enum->label() . '|' . $enum->color() . '|' . $enum->icon() . '|' . $enum->priority() . '|' . $enum->description());
     }
-
     /**
-     * Split the collection into a given number of groups
-     * 
-     * This method divides the collection into the specified number of groups,
-     * distributing items as evenly as possible across all groups.
-     * 
-     * @param int $numberOfGroups The number of groups to split into
-     * @return \Illuminate\Support\Collection
+     * Handle splitIn functionality with proper error handling.
+     * @param mixed $numberOfGroups
+     * @return Illuminate\Support\Collection
      */
     public function splitIn($numberOfGroups): \Illuminate\Support\Collection
     {
         return parent::splitIn($numberOfGroups);
     }
-
     /**
-     * Split enum cases into groups for display purposes
-     * 
-     * @param int $columns Number of columns to display
-     * @return \Illuminate\Support\Collection
+     * Handle splitForDisplay functionality with proper error handling.
+     * @param int $columns
+     * @return Illuminate\Support\Collection
      */
     public function splitForDisplay(int $columns = 3): \Illuminate\Support\Collection
     {
         return $this->splitIn($columns);
     }
-
     /**
-     * Split enum cases into groups for form layouts
-     * 
-     * @param int $columns Number of form columns
-     * @return \Illuminate\Support\Collection
+     * Handle splitForForm functionality with proper error handling.
+     * @param int $columns
+     * @return Illuminate\Support\Collection
      */
     public function splitForForm(int $columns = 2): \Illuminate\Support\Collection
     {
         return $this->splitIn($columns);
     }
-
     /**
-     * Split enum cases into groups for API responses
-     * 
-     * @param int $groups Number of groups for API pagination
-     * @return \Illuminate\Support\Collection
+     * Handle splitForApi functionality with proper error handling.
+     * @param int $groups
+     * @return Illuminate\Support\Collection
      */
     public function splitForApi(int $groups = 4): \Illuminate\Support\Collection
     {

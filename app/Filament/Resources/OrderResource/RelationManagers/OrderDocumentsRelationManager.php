@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use Filament\Schemas\Components\FileUpload;
@@ -20,141 +19,50 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-
 /**
  * OrderDocumentsRelationManager
  * 
- * Filament resource for admin panel management.
+ * Filament v4 resource for OrderDocumentsRelationManager management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ * 
+ * @property string $relationship
+ * @property string|null $title
+ * @property string|null $modelLabel
+ * @property string|null $pluralModelLabel
+ * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
+ * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)
  */
 class OrderDocumentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'documents';
-
     protected static ?string $title = 'orders.documents';
-
     protected static ?string $modelLabel = 'orders.document';
-
     protected static ?string $pluralModelLabel = 'orders.documents';
-
+    /**
+     * Configure the Filament form schema with fields and validation.
+     * @param Form $form
+     * @return Form
+     */
     public function form(Form $form): Form
     {
-        return $schema->schema([
-                Section::make('orders.document_information')
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label('orders.document_name')
-                                    ->required()
-                                    ->maxLength(255),
-
-                                Select::make('type')
-                                    ->label('orders.document_type')
-                                    ->options([
-                                        'invoice' => 'orders.document_types.invoice',
-                                        'receipt' => 'orders.document_types.receipt',
-                                        'shipping_label' => 'orders.document_types.shipping_label',
-                                        'return_label' => 'orders.document_types.return_label',
-                                        'warranty' => 'orders.document_types.warranty',
-                                        'manual' => 'orders.document_types.manual',
-                                        'other' => 'orders.document_types.other',
-                                    ])
-                                    ->required(),
-                            ]),
-
-                        Textarea::make('description')
-                            ->label('orders.description')
-                            ->rows(3)
-                            ->columnSpanFull(),
-
-                        FileUpload::make('file_path')
-                            ->label('orders.document_file')
-                            ->acceptedFileTypes(['application/pdf', 'image/*', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
-                            ->maxSize(10240) // 10MB
-                            ->directory('order-documents')
-                            ->visibility('private')
-                            ->required(),
-
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('file_size')
-                                    ->label('orders.file_size')
-                                    ->numeric()
-                                    ->suffix('bytes')
-                                    ->disabled(),
-
-                                TextInput::make('mime_type')
-                                    ->label('orders.mime_type')
-                                    ->maxLength(255)
-                                    ->disabled(),
-                            ]),
-                    ]),
-            ]);
+        return $schema->schema([Section::make('orders.document_information')->schema([Grid::make(2)->schema([TextInput::make('name')->label('orders.document_name')->required()->maxLength(255), Select::make('type')->label('orders.document_type')->options(['invoice' => 'orders.document_types.invoice', 'receipt' => 'orders.document_types.receipt', 'shipping_label' => 'orders.document_types.shipping_label', 'return_label' => 'orders.document_types.return_label', 'warranty' => 'orders.document_types.warranty', 'manual' => 'orders.document_types.manual', 'other' => 'orders.document_types.other'])->required()]), Textarea::make('description')->label('orders.description')->rows(3)->columnSpanFull(), FileUpload::make('file_path')->label('orders.document_file')->acceptedFileTypes(['application/pdf', 'image/*', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])->maxSize(10240)->directory('order-documents')->visibility('private')->required(), Grid::make(2)->schema([TextInput::make('file_size')->label('orders.file_size')->numeric()->suffix('bytes')->disabled(), TextInput::make('mime_type')->label('orders.mime_type')->maxLength(255)->disabled()])])]);
     }
-
+    /**
+     * Configure the Filament table with columns, filters, and actions.
+     * @param Table $table
+     * @return Table
+     */
     public function table(Table $table): Table
     {
-        return $table
-            ->recordTitleAttribute('name')
-            ->columns([
-                TextColumn::make('name')
-                    ->label('orders.document_name')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('type')
-                    ->label('orders.document_type')
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => __("orders.document_types.{$state}")),
-
-                TextColumn::make('description')
-                    ->label('orders.description')
-                    ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        return strlen($state) > 50 ? $state : null;
-                    }),
-
-                TextColumn::make('file_size')
-                    ->label('orders.file_size')
-                    ->formatStateUsing(fn (?int $state): string => $state ? $this->formatFileSize($state) : '-')
-                    ->sortable(),
-
-                TextColumn::make('mime_type')
-                    ->label('orders.mime_type')
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('created_at')
-                    ->label('orders.created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
-            ])
-            ->headerActions([
-                CreateAction::make(),
-            ])
-            ->actions([
-                Action::make('download')
-                    ->label('orders.download')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('info')
-                    ->url(fn ($record) => route('documents.download', $record))
-                    ->openUrlInNewTab(),
-                EditAction::make(),
-                DeleteAction::make(),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ])
-            ->defaultSort('created_at', 'desc');
+        return $table->recordTitleAttribute('name')->columns([TextColumn::make('name')->label('orders.document_name')->searchable()->sortable(), TextColumn::make('type')->label('orders.document_type')->badge()->formatStateUsing(fn(string $state): string => __("orders.document_types.{$state}")), TextColumn::make('description')->label('orders.description')->limit(50)->tooltip(function (TextColumn $column): ?string {
+            $state = $column->getState();
+            return strlen($state) > 50 ? $state : null;
+        }), TextColumn::make('file_size')->label('orders.file_size')->formatStateUsing(fn(?int $state): string => $state ? $this->formatFileSize($state) : '-')->sortable(), TextColumn::make('mime_type')->label('orders.mime_type')->toggleable(isToggledHiddenByDefault: true), TextColumn::make('created_at')->label('orders.created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true)])->filters([])->headerActions([CreateAction::make()])->actions([Action::make('download')->label('orders.download')->icon('heroicon-o-arrow-down-tray')->color('info')->url(fn($record) => route('documents.download', $record))->openUrlInNewTab(), EditAction::make(), DeleteAction::make()])->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])])->defaultSort('created_at', 'desc');
     }
-
+    /**
+     * Handle formatFileSize functionality with proper error handling.
+     * @param int $bytes
+     * @return string
+     */
     private function formatFileSize(int $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB'];
@@ -162,7 +70,6 @@ class OrderDocumentsRelationManager extends RelationManager
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
         $bytes /= pow(1024, $pow);
-
-        return round($bytes, 2).' '.$units[$pow];
+        return round($bytes, 2) . ' ' . $units[$pow];
     }
 }

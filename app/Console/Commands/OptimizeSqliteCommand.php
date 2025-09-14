@@ -106,7 +106,6 @@ final class OptimizeSqliteCommand extends Command
                 'temp_store' => 2, // memory
                 'mmap_size' => 268435456,
                 'page_size' => 4096,
-                'auto_vacuum' => 2, // incremental
                 'synchronous' => 1, // normal
                 'foreign_keys' => 1, // on
             ];
@@ -116,6 +115,16 @@ final class OptimizeSqliteCommand extends Command
             foreach ($optimizations as $setting => $value) {
                 $pdo->exec("PRAGMA {$setting} = {$value}");
                 $this->line("✅ Set {$setting} = {$value}");
+            }
+
+            // Check if auto_vacuum can be set (only works on empty databases)
+            $autoVacuumResult = $pdo->query('PRAGMA auto_vacuum')->fetchColumn();
+            if ($autoVacuumResult == 0) {
+                $this->line("⚠️  auto_vacuum cannot be changed on existing database (current: {$autoVacuumResult})");
+                $this->line("   To enable auto_vacuum, you would need to recreate the database.");
+                $this->line("   For now, you can run 'PRAGMA incremental_vacuum' manually when needed.");
+            } else {
+                $this->line("✅ auto_vacuum is already set to: {$autoVacuumResult}");
             }
 
             // Run optimize command

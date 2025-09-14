@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Filament\Resources\StockResource\RelationManagers;
 
 use Filament\Schemas\Components\DateTimePicker;
@@ -10,271 +9,108 @@ use Filament\Schemas\Components\Textarea;
 use Filament\Schemas\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-
 /**
  * StockMovementsRelationManager
  * 
- * Filament resource for admin panel management.
+ * Filament v4 resource for StockMovementsRelationManager management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ * 
+ * @property string $relationship
+ * @property string|null $title
+ * @property string|null $modelLabel
+ * @property string|null $pluralModelLabel
+ * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
+ * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)
  */
 class StockMovementsRelationManager extends RelationManager
 {
     protected static string $relationship = 'stockMovements';
-
     protected static ?string $title = 'inventory.stock_movements';
-
     protected static ?string $modelLabel = 'inventory.stock_movement';
-
     protected static ?string $pluralModelLabel = 'inventory.stock_movements';
-
+    /**
+     * Handle getTitle functionality with proper error handling.
+     * @return string
+     */
     public function getTitle(): string
     {
         return __('inventory.stock_movements');
     }
-
+    /**
+     * Handle getModelLabel functionality with proper error handling.
+     * @return string
+     */
     public function getModelLabel(): string
     {
         return __('inventory.stock_movement');
     }
-
+    /**
+     * Handle getPluralModelLabel functionality with proper error handling.
+     * @return string
+     */
     public function getPluralModelLabel(): string
     {
         return __('inventory.stock_movements');
     }
-
+    /**
+     * Configure the Filament form schema with fields and validation.
+     * @param Schema $form
+     * @return Schema
+     */
     public function form(Schema $form): Schema
     {
-        return $schema->schema([
-                TextInput::make('quantity')
-                    ->label(__('inventory.quantity'))
-                    ->numeric()
-                    ->required()
-                    ->helperText(__('inventory.quantity_help')),
-
-                Select::make('type')
-                    ->label(__('inventory.movement_type'))
-                    ->options([
-                        'in' => __('inventory.stock_in'),
-                        'out' => __('inventory.stock_out'),
-                    ])
-                    ->required()
-                    ->live(),
-
-                Select::make('reason')
-                    ->label(__('inventory.reason'))
-                    ->options([
-                        'sale' => __('inventory.reason_sale'),
-                        'return' => __('inventory.reason_return'),
-                        'adjustment' => __('inventory.reason_adjustment'),
-                        'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-                        'restock' => __('inventory.reason_restock'),
-                        'damage' => __('inventory.reason_damage'),
-                        'theft' => __('inventory.reason_theft'),
-                        'transfer' => __('inventory.reason_transfer'),
-                    ])
-                    ->required()
-                    ->searchable(),
-
-                TextInput::make('reference')
-                    ->label(__('inventory.reference'))
-                    ->maxLength(255)
-                    ->helperText(__('inventory.reference_help')),
-
-                Textarea::make('notes')
-                    ->label(__('inventory.notes'))
-                    ->rows(3)
-                    ->maxLength(1000),
-
-                DateTimePicker::make('moved_at')
-                    ->label(__('inventory.moved_at'))
-                    ->default(now())
-                    ->required(),
-            ]);
+        return $schema->schema([TextInput::make('quantity')->label(__('inventory.quantity'))->numeric()->required()->helperText(__('inventory.quantity_help')), Select::make('type')->label(__('inventory.movement_type'))->options(['in' => __('inventory.stock_in'), 'out' => __('inventory.stock_out')])->required()->live(), Select::make('reason')->label(__('inventory.reason'))->options(['sale' => __('inventory.reason_sale'), 'return' => __('inventory.reason_return'), 'adjustment' => __('inventory.reason_adjustment'), 'manual_adjustment' => __('inventory.reason_manual_adjustment'), 'restock' => __('inventory.reason_restock'), 'damage' => __('inventory.reason_damage'), 'theft' => __('inventory.reason_theft'), 'transfer' => __('inventory.reason_transfer')])->required()->searchable(), TextInput::make('reference')->label(__('inventory.reference'))->maxLength(255)->helperText(__('inventory.reference_help')), Textarea::make('notes')->label(__('inventory.notes'))->rows(3)->maxLength(1000), DateTimePicker::make('moved_at')->label(__('inventory.moved_at'))->default(now())->required()]);
     }
-
+    /**
+     * Configure the Filament table with columns, filters, and actions.
+     * @param Table $table
+     * @return Table
+     */
     public function table(Table $table): Table
     {
-        return $table
-            ->recordTitleAttribute('reference')
-            ->columns([
-                TextColumn::make('moved_at')
-                    ->label(__('inventory.moved_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->weight('bold'),
-
-                BadgeColumn::make('type')
-                    ->label(__('inventory.movement_type'))
-                    ->colors([
-                        'success' => 'in',
-                        'danger' => 'out',
-                    ])
-                    ->formatStateUsing(fn (string $state): string => __('inventory.'.$state)
-                    ),
-
-                TextColumn::make('quantity')
-                    ->label(__('inventory.quantity'))
-                    ->sortable()
-                    ->alignEnd()
-                    ->weight('bold')
-                    ->color(fn ($record): string => $record->type === 'in' ? 'success' : 'danger'
-                    ),
-
-                BadgeColumn::make('reason')
-                    ->label(__('inventory.reason'))
-                    ->colors([
-                        'primary' => 'sale',
-                        'success' => 'return',
-                        'warning' => 'adjustment',
-                        'info' => 'manual_adjustment',
-                        'success' => 'restock',
-                        'danger' => 'damage',
-                        'danger' => 'theft',
-                        'info' => 'transfer',
-                    ])
-                    ->formatStateUsing(fn (string $state): string => __('inventory.reason_'.$state)
-                    ),
-
-                TextColumn::make('reference')
-                    ->label(__('inventory.reference'))
-                    ->searchable()
-                    ->limit(30)
-                    ->placeholder(__('inventory.no_reference')),
-
-                TextColumn::make('user.name')
-                    ->label(__('inventory.user'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
-                    ->color('gray')
-                    ->placeholder(__('inventory.system')),
-
-                TextColumn::make('notes')
-                    ->label(__('inventory.notes'))
-                    ->limit(50)
-                    ->placeholder(__('inventory.no_notes'))
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                SelectFilter::make('type')
-                    ->label(__('inventory.movement_type'))
-                    ->options([
-                        'in' => __('inventory.stock_in'),
-                        'out' => __('inventory.stock_out'),
-                    ]),
-
-                SelectFilter::make('reason')
-                    ->label(__('inventory.reason'))
-                    ->options([
-                        'sale' => __('inventory.reason_sale'),
-                        'return' => __('inventory.reason_return'),
-                        'adjustment' => __('inventory.reason_adjustment'),
-                        'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-                        'restock' => __('inventory.reason_restock'),
-                        'damage' => __('inventory.reason_damage'),
-                        'theft' => __('inventory.reason_theft'),
-                        'transfer' => __('inventory.reason_transfer'),
-                    ])
-                    ->multiple(),
-
-                Filter::make('recent')
-                    ->label(__('inventory.recent_movements'))
-                    ->query(fn (Builder $query): Builder => $query->recent(7)),
-
-                Filter::make('this_month')
-                    ->label(__('inventory.this_month'))
-                    ->query(fn (Builder $query): Builder => $query->where('moved_at', '>=', now()->startOfMonth())
-                    ),
-
-                Filter::make('this_year')
-                    ->label(__('inventory.this_year'))
-                    ->query(fn (Builder $query): Builder => $query->where('moved_at', '>=', now()->startOfYear())
-                    ),
-            ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make()
-                    ->mutateFormDataUsing(function (array $data): array {
-                        $data['user_id'] = auth()->id();
-
-                        return $data;
-                    })
-                    ->after(function ($record) {
-                        // Update the variant inventory stock based on movement
-                        $variantInventory = $this->ownerRecord;
-                        $quantity = $record->quantity;
-
-                        if ($record->type === 'in') {
-                            $variantInventory->increment('stock', $quantity);
-                        } else {
-                            $variantInventory->decrement('stock', $quantity);
-                        }
-
-                        // Update last restocked/sold timestamps
-                        if ($record->type === 'in' && in_array($record->reason, ['restock', 'return'])) {
-                            $variantInventory->update(['last_restocked_at' => $record->moved_at]);
-                        } elseif ($record->type === 'out' && $record->reason === 'sale') {
-                            $variantInventory->update(['last_sold_at' => $record->moved_at]);
-                        }
-                    }),
-            ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->after(function ($record) {
-                        // Reverse the stock movement when deleting
-                        $variantInventory = $this->ownerRecord;
-                        $quantity = $record->quantity;
-
-                        if ($record->type === 'in') {
-                            $variantInventory->decrement('stock', $quantity);
-                        } else {
-                            $variantInventory->increment('stock', $quantity);
-                        }
-                    }),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->after(function ($records) {
-                            // Reverse all stock movements when bulk deleting
-                            $variantInventory = $this->ownerRecord;
-
-                            foreach ($records as $record) {
-                                $quantity = $record->quantity;
-
-                                if ($record->type === 'in') {
-                                    $variantInventory->decrement('stock', $quantity);
-                                } else {
-                                    $variantInventory->increment('stock', $quantity);
-                                }
-                            }
-                        }),
-                ]),
-            ])
-            ->groups([
-                Group::make('type')
-                    ->label(__('inventory.group_by_type'))
-                    ->collapsible(),
-
-                Group::make('reason')
-                    ->label(__('inventory.group_by_reason'))
-                    ->collapsible(),
-
-                Group::make('moved_at')
-                    ->label(__('inventory.group_by_date'))
-                    ->date()
-                    ->collapsible(),
-            ])
-            ->defaultSort('moved_at', 'desc')
-            ->poll('30s')
-            ->deferLoading()
-            ->striped();
+        return $table->recordTitleAttribute('reference')->columns([TextColumn::make('moved_at')->label(__('inventory.moved_at'))->dateTime()->sortable()->weight('bold'), BadgeColumn::make('type')->label(__('inventory.movement_type'))->colors(['success' => 'in', 'danger' => 'out'])->formatStateUsing(fn(string $state): string => __('inventory.' . $state)), TextColumn::make('quantity')->label(__('inventory.quantity'))->sortable()->alignEnd()->weight('bold')->color(fn($record): string => $record->type === 'in' ? 'success' : 'danger'), BadgeColumn::make('reason')->label(__('inventory.reason'))->colors(['primary' => 'sale', 'success' => 'return', 'warning' => 'adjustment', 'info' => 'manual_adjustment', 'success' => 'restock', 'danger' => 'damage', 'danger' => 'theft', 'info' => 'transfer'])->formatStateUsing(fn(string $state): string => __('inventory.reason_' . $state)), TextColumn::make('reference')->label(__('inventory.reference'))->searchable()->limit(30)->placeholder(__('inventory.no_reference')), TextColumn::make('user.name')->label(__('inventory.user'))->searchable()->sortable()->badge()->color('gray')->placeholder(__('inventory.system')), TextColumn::make('notes')->label(__('inventory.notes'))->limit(50)->placeholder(__('inventory.no_notes'))->toggleable(isToggledHiddenByDefault: true)])->filters([SelectFilter::make('type')->label(__('inventory.movement_type'))->options(['in' => __('inventory.stock_in'), 'out' => __('inventory.stock_out')]), SelectFilter::make('reason')->label(__('inventory.reason'))->options(['sale' => __('inventory.reason_sale'), 'return' => __('inventory.reason_return'), 'adjustment' => __('inventory.reason_adjustment'), 'manual_adjustment' => __('inventory.reason_manual_adjustment'), 'restock' => __('inventory.reason_restock'), 'damage' => __('inventory.reason_damage'), 'theft' => __('inventory.reason_theft'), 'transfer' => __('inventory.reason_transfer')])->multiple(), Filter::make('recent')->label(__('inventory.recent_movements'))->query(fn(Builder $query): Builder => $query->recent(7)), Filter::make('this_month')->label(__('inventory.this_month'))->query(fn(Builder $query): Builder => $query->where('moved_at', '>=', now()->startOfMonth())), Filter::make('this_year')->label(__('inventory.this_year'))->query(fn(Builder $query): Builder => $query->where('moved_at', '>=', now()->startOfYear()))])->headerActions([Tables\Actions\CreateAction::make()->mutateFormDataUsing(function (array $data): array {
+            $data['user_id'] = auth()->id();
+            return $data;
+        })->after(function ($record) {
+            // Update the variant inventory stock based on movement
+            $variantInventory = $this->ownerRecord;
+            $quantity = $record->quantity;
+            if ($record->type === 'in') {
+                $variantInventory->increment('stock', $quantity);
+            } else {
+                $variantInventory->decrement('stock', $quantity);
+            }
+            // Update last restocked/sold timestamps
+            if ($record->type === 'in' && in_array($record->reason, ['restock', 'return'])) {
+                $variantInventory->update(['last_restocked_at' => $record->moved_at]);
+            } elseif ($record->type === 'out' && $record->reason === 'sale') {
+                $variantInventory->update(['last_sold_at' => $record->moved_at]);
+            }
+        })])->actions([Tables\Actions\ViewAction::make(), Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()->after(function ($record) {
+            // Reverse the stock movement when deleting
+            $variantInventory = $this->ownerRecord;
+            $quantity = $record->quantity;
+            if ($record->type === 'in') {
+                $variantInventory->decrement('stock', $quantity);
+            } else {
+                $variantInventory->increment('stock', $quantity);
+            }
+        })])->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()->after(function ($records) {
+            // Reverse all stock movements when bulk deleting
+            $variantInventory = $this->ownerRecord;
+            foreach ($records as $record) {
+                $quantity = $record->quantity;
+                if ($record->type === 'in') {
+                    $variantInventory->decrement('stock', $quantity);
+                } else {
+                    $variantInventory->increment('stock', $quantity);
+                }
+            }
+        })])])->groups([Group::make('type')->label(__('inventory.group_by_type'))->collapsible(), Group::make('reason')->label(__('inventory.group_by_reason'))->collapsible(), Group::make('moved_at')->label(__('inventory.group_by_date'))->date()->collapsible()])->defaultSort('moved_at', 'desc')->poll('30s')->deferLoading()->striped();
     }
 }

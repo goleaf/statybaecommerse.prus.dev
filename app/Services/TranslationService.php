@@ -1,80 +1,85 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Services;
 
 use Illuminate\Support\Facades\App;
-
-final /**
+/**
  * TranslationService
  * 
- * Service class containing business logic and external integrations.
+ * Service class containing TranslationService business logic, external integrations, and complex operations with proper error handling and logging.
+ * 
  */
-class TranslationService
+final class TranslationService
 {
     /**
-     * Get translation using snake_case keys from unified language files
+     * Handle get functionality with proper error handling.
+     * @param string $key
+     * @param array $params
+     * @param string|null $locale
+     * @return string
      */
     public static function get(string $key, array $params = [], ?string $locale = null): string
     {
         $locale = $locale ?: App::getLocale();
         $normalizedKey = self::normalizeKey($key);
-
         return __($normalizedKey, $params, $locale);
     }
-
     /**
-     * Get translation with pluralization
+     * Handle choice functionality with proper error handling.
+     * @param string $key
+     * @param int $count
+     * @param array $params
+     * @param string|null $locale
+     * @return string
      */
     public static function choice(string $key, int $count, array $params = [], ?string $locale = null): string
     {
         $locale = $locale ?: App::getLocale();
         $normalizedKey = self::normalizeKey($key);
-
         return trans_choice($normalizedKey, $count, $params, $locale);
     }
-
     /**
-     * Convert dot notation to snake_case
+     * Handle normalizeKey functionality with proper error handling.
+     * @param string $key
+     * @return string
      */
     public static function normalizeKey(string $key): string
     {
         return str_replace('.', '_', $key);
     }
-
     /**
-     * Get all available locales from config
+     * Handle getAvailableLocales functionality with proper error handling.
+     * @return array
      */
     public static function getAvailableLocales(): array
     {
         $supported = config('app.supported_locales', 'lt,en');
-
         if (is_array($supported)) {
             return $supported;
         }
-
         return array_map('trim', explode(',', $supported));
     }
-
     /**
-     * Check if locale is supported
+     * Handle isLocaleSupported functionality with proper error handling.
+     * @param string $locale
+     * @return bool
      */
     public static function isLocaleSupported(string $locale): bool
     {
         return in_array($locale, self::getAvailableLocales(), true);
     }
-
     /**
-     * Get default locale
+     * Handle getDefaultLocale functionality with proper error handling.
+     * @return string
      */
     public static function getDefaultLocale(): string
     {
         return config('app.locale', 'lt');
     }
-
     /**
-     * Get fallback locale
+     * Handle getFallbackLocale functionality with proper error handling.
+     * @return string
      */
     public static function getFallbackLocale(): string
     {

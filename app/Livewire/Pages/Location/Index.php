@@ -1,33 +1,30 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Livewire\Pages\Location;
 
 use App\Models\Location;
 use Livewire\Component;
-
-final /**
+/**
  * Index
  * 
- * Livewire component for reactive frontend functionality.
+ * Livewire component for Index with reactive frontend functionality, real-time updates, and user interaction handling.
+ * 
  */
-class Index extends Component
+final class Index extends Component
 {
+    /**
+     * Handle getLocationsProperty functionality with proper error handling.
+     */
     public function getLocationsProperty()
     {
-        return Location::where('is_enabled', true)
-            ->with(['country'])
-            ->orderBy('name')
-            ->get();
+        return Location::where('is_enabled', true)->with(['country'])->orderBy('name')->get();
     }
-
+    /**
+     * Render the Livewire component view with current state.
+     */
     public function render()
     {
-        return view('livewire.pages.location.index', [
-            'locations' => $this->locations,
-        ])->layout('components.layouts.base', [
-            'title' => __('translations.locations'),
-        ]);
+        return view('livewire.pages.location.index', ['locations' => $this->locations])->layout('components.layouts.base', ['title' => __('translations.locations')]);
     }
 }

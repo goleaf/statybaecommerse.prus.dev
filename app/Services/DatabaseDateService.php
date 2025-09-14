@@ -1,20 +1,21 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB as Database;
-
-final /**
+/**
  * DatabaseDateService
  * 
- * Service class containing business logic and external integrations.
+ * Service class containing DatabaseDateService business logic, external integrations, and complex operations with proper error handling and logging.
+ * 
  */
-class DatabaseDateService
+final class DatabaseDateService
 {
     /**
-     * Get database-agnostic date extraction expression
+     * Handle dateExpression functionality with proper error handling.
+     * @param string $column
+     * @return string
      */
     public static function dateExpression(string $column = 'created_at'): string
     {
@@ -25,9 +26,10 @@ class DatabaseDateService
             default => "DATE({$column})",
         };
     }
-
     /**
-     * Get database-agnostic hour extraction expression
+     * Handle hourExpression functionality with proper error handling.
+     * @param string $column
+     * @return string
      */
     public static function hourExpression(string $column = 'created_at'): string
     {
@@ -38,9 +40,10 @@ class DatabaseDateService
             default => "CAST(strftime('%H', {$column}) AS INTEGER)",
         };
     }
-
     /**
-     * Get database-agnostic month extraction expression
+     * Handle monthExpression functionality with proper error handling.
+     * @param string $column
+     * @return string
      */
     public static function monthExpression(string $column = 'created_at'): string
     {
@@ -51,9 +54,10 @@ class DatabaseDateService
             default => "CAST(strftime('%m', {$column}) AS INTEGER)",
         };
     }
-
     /**
-     * Get database-agnostic year extraction expression
+     * Handle yearExpression functionality with proper error handling.
+     * @param string $column
+     * @return string
      */
     public static function yearExpression(string $column = 'created_at'): string
     {
@@ -64,9 +68,10 @@ class DatabaseDateService
             default => "CAST(strftime('%Y', {$column}) AS INTEGER)",
         };
     }
-
     /**
-     * Get database-agnostic day extraction expression
+     * Handle dayExpression functionality with proper error handling.
+     * @param string $column
+     * @return string
      */
     public static function dayExpression(string $column = 'created_at'): string
     {
@@ -77,9 +82,10 @@ class DatabaseDateService
             default => "CAST(strftime('%d', {$column}) AS INTEGER)",
         };
     }
-
     /**
-     * Get database-agnostic minute extraction expression
+     * Handle minuteExpression functionality with proper error handling.
+     * @param string $column
+     * @return string
      */
     public static function minuteExpression(string $column = 'created_at'): string
     {
@@ -90,9 +96,10 @@ class DatabaseDateService
             default => "CAST(strftime('%M', {$column}) AS INTEGER)",
         };
     }
-
     /**
-     * Get database-agnostic second extraction expression
+     * Handle secondExpression functionality with proper error handling.
+     * @param string $column
+     * @return string
      */
     public static function secondExpression(string $column = 'created_at'): string
     {

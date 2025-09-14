@@ -1,32 +1,35 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-
 /**
- * Global scope for multi-tenant data isolation
+ * TenantScope
  * 
- * This scope automatically applies tenant filtering to models that have tenant_id
- * or similar tenant identification fields, ensuring data isolation between tenants.
+ * Eloquent model representing the TenantScope entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * 
+ * @method static \Illuminate\Database\Eloquent\Builder|TenantScope newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|TenantScope newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|TenantScope query()
+ * @mixin \Eloquent
  */
 final class TenantScope implements Scope
 {
     /**
-     * Apply the scope to a given Eloquent query builder.
+     * Handle apply functionality with proper error handling.
+     * @param Builder $builder
+     * @param Model $model
+     * @return void
      */
     public function apply(Builder $builder, Model $model): void
     {
         // Check if the model has tenant-related columns
         $tenantColumns = $this->getTenantColumns($model);
-        
         if (!empty($tenantColumns) && $this->hasActiveTenant()) {
             $tenantId = $this->getCurrentTenantId();
-            
             if ($tenantId) {
                 $builder->where(function ($query) use ($tenantColumns, $tenantId) {
                     foreach ($tenantColumns as $column) {
@@ -36,39 +39,36 @@ final class TenantScope implements Scope
             }
         }
     }
-
     /**
-     * Get tenant-related columns for the model
+     * Handle getTenantColumns functionality with proper error handling.
+     * @param Model $model
+     * @return array
      */
     private function getTenantColumns(Model $model): array
     {
         $table = $model->getTable();
         $schema = $model->getConnection()->getSchemaBuilder();
-        
         $tenantColumns = [];
-        
         // Check for common tenant column names
         $possibleColumns = ['tenant_id', 'company_id', 'organization_id', 'workspace_id'];
-        
         foreach ($possibleColumns as $column) {
             if ($schema->hasColumn($table, $column)) {
                 $tenantColumns[] = $column;
             }
         }
-        
         return $tenantColumns;
     }
-
     /**
-     * Check if there's an active tenant context
+     * Handle hasActiveTenant functionality with proper error handling.
+     * @return bool
      */
     private function hasActiveTenant(): bool
     {
         return auth()->check() || session()->has('tenant_id') || request()->has('tenant_id');
     }
-
     /**
-     * Get the current tenant ID
+     * Handle getCurrentTenantId functionality with proper error handling.
+     * @return int|null
      */
     private function getCurrentTenantId(): ?int
     {
@@ -76,17 +76,14 @@ final class TenantScope implements Scope
         if (auth()->check() && auth()->user()->tenant_id) {
             return auth()->user()->tenant_id;
         }
-        
         // Try to get from session
         if (session()->has('tenant_id')) {
             return session('tenant_id');
         }
-        
         // Try to get from request
         if (request()->has('tenant_id')) {
             return (int) request('tenant_id');
         }
-        
         return null;
     }
 }

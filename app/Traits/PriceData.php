@@ -1,16 +1,24 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Traits;
 
 // Legacy Shopper Price helper removed - using native Laravel decimal handling
-
+/**
+ * PriceData
+ * 
+ * Trait providing PriceData functionality that can be reused across multiple classes with consistent behavior.
+ * 
+ */
 class PriceData
 {
-    public function __construct(
-        public float $value,
-        public ?float $compare,
-        public ?float $percentage,
-    ) {}
+    /**
+     * Initialize the class instance with required dependencies.
+     * @param float $value
+     * @param float|null $compare
+     * @param float|null $percentage
+     */
+    public function __construct(public float $value, public ?float $compare, public ?float $percentage)
+    {
+    }
 }

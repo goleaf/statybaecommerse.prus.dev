@@ -73,6 +73,7 @@
                 
                 <!-- Auto Refresh Toggle -->
                 <button wire:click="toggleAutoRefresh"
+                        wire:confirm="{{ __('translations.confirm_toggle_auto_refresh') }}"
                         :class="autoRefresh ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'"
                         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200">
                     <svg class="w-4 h-4" :class="autoRefresh ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -93,15 +93,19 @@ final class CollectionTest extends TestCase
         // Create test collections with specific attributes
         $visibleCollection = Collection::factory()->create(['is_visible' => true, 'is_automatic' => false]);
         $hiddenCollection = Collection::factory()->create(['is_visible' => false, 'is_automatic' => false]);
-        $automaticCollection = Collection::factory()->create(['is_automatic' => true, 'is_visible' => false]);
-        $manualCollection = Collection::factory()->create(['is_automatic' => false, 'is_visible' => false]);
-        $orderedCollection1 = Collection::factory()->create(['sort_order' => 2, 'is_visible' => false, 'is_automatic' => false]);
-        $orderedCollection2 = Collection::factory()->create(['sort_order' => 1, 'is_visible' => false, 'is_automatic' => false]);
+        $automaticCollection = Collection::factory()->create(['is_automatic' => true, 'is_visible' => true]);
+        $manualCollection = Collection::factory()->create(['is_automatic' => false, 'is_visible' => true]);
+        $orderedCollection1 = Collection::factory()->create(['sort_order' => 2, 'is_visible' => true, 'is_automatic' => false]);
+        $orderedCollection2 = Collection::factory()->create(['sort_order' => 1, 'is_visible' => true, 'is_automatic' => false]);
 
         // Test visible scope
         $visibleCollections = Collection::visible()->get();
-        $this->assertCount(1, $visibleCollections);
-        $this->assertEquals($visibleCollection->id, $visibleCollections->first()->id);
+        $this->assertCount(5, $visibleCollections);
+        $this->assertTrue($visibleCollections->contains($visibleCollection));
+        $this->assertTrue($visibleCollections->contains($automaticCollection));
+        $this->assertTrue($visibleCollections->contains($manualCollection));
+        $this->assertTrue($visibleCollections->contains($orderedCollection1));
+        $this->assertTrue($visibleCollections->contains($orderedCollection2));
 
         // Test automatic scope
         $automaticCollections = Collection::automatic()->get();
@@ -110,12 +114,12 @@ final class CollectionTest extends TestCase
 
         // Test manual scope
         $manualCollections = Collection::manual()->get();
-        $this->assertCount(5, $manualCollections);
+        $this->assertCount(4, $manualCollections);
         $this->assertTrue($manualCollections->contains($manualCollection));
 
         // Test ordered scope
         $orderedCollections = Collection::ordered()->get();
-        $this->assertGreaterThanOrEqual(6, $orderedCollections->count());
+        $this->assertGreaterThanOrEqual(5, $orderedCollections->count());
         $this->assertTrue($orderedCollections->contains($orderedCollection2)); // sort_order = 1 should be in the results
     }
 

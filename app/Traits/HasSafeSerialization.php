@@ -1,9 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Traits;
 
+/**
+ * HasSafeSerialization
+ * 
+ * Trait providing reusable functionality across multiple classes.
+ */
 trait HasSafeSerialization
 {
     /**
@@ -16,10 +20,8 @@ trait HasSafeSerialization
     {
         $defaultExclusions = $this->getDefaultSensitiveFields();
         $exclusions = array_merge($defaultExclusions, $additionalExclusions);
-        
         return $this->except($exclusions);
     }
-
     /**
      * Get safe attributes for API responses
      * 
@@ -30,10 +32,8 @@ trait HasSafeSerialization
     {
         $defaultExclusions = $this->getApiSensitiveFields();
         $exclusions = array_merge($defaultExclusions, $additionalExclusions);
-        
         return $this->except($exclusions);
     }
-
     /**
      * Get safe attributes for admin display (excludes most sensitive fields)
      * 
@@ -44,10 +44,8 @@ trait HasSafeSerialization
     {
         $defaultExclusions = $this->getAdminSensitiveFields();
         $exclusions = array_merge($defaultExclusions, $additionalExclusions);
-        
         return $this->except($exclusions);
     }
-
     /**
      * Get default sensitive fields that should be excluded from public display
      * 
@@ -55,23 +53,8 @@ trait HasSafeSerialization
      */
     protected function getDefaultSensitiveFields(): array
     {
-        return [
-            'password',
-            'remember_token',
-            'api_token',
-            'two_factor_secret',
-            'two_factor_recovery_codes',
-            'verification_token',
-            'password_reset_token',
-            'password_reset_expires_at',
-            'stripe_customer_id',
-            'stripe_account_id',
-            'last_login_ip',
-            'phone_verified_at',
-            'two_factor_confirmed_at',
-        ];
+        return ['password', 'remember_token', 'api_token', 'two_factor_secret', 'two_factor_recovery_codes', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'stripe_customer_id', 'stripe_account_id', 'last_login_ip', 'phone_verified_at', 'two_factor_confirmed_at'];
     }
-
     /**
      * Get API sensitive fields that should be excluded from API responses
      * 
@@ -79,27 +62,8 @@ trait HasSafeSerialization
      */
     protected function getApiSensitiveFields(): array
     {
-        return array_merge($this->getDefaultSensitiveFields(), [
-            'email',
-            'phone_number',
-            'phone',
-            'birth_date',
-            'date_of_birth',
-            'preferences',
-            'privacy_settings',
-            'marketing_preferences',
-            'social_links',
-            'notification_preferences',
-            'referral_code',
-            'referral_settings',
-            'subscription_status',
-            'subscription_plan',
-            'subscription_ends_at',
-            'trial_ends_at',
-            'status',
-        ]);
+        return array_merge($this->getDefaultSensitiveFields(), ['email', 'phone_number', 'phone', 'birth_date', 'date_of_birth', 'preferences', 'privacy_settings', 'marketing_preferences', 'social_links', 'notification_preferences', 'referral_code', 'referral_settings', 'subscription_status', 'subscription_plan', 'subscription_ends_at', 'trial_ends_at', 'status']);
     }
-
     /**
      * Get admin sensitive fields that should be excluded from admin display
      * 
@@ -107,18 +71,8 @@ trait HasSafeSerialization
      */
     protected function getAdminSensitiveFields(): array
     {
-        return [
-            'password',
-            'remember_token',
-            'api_token',
-            'two_factor_secret',
-            'two_factor_recovery_codes',
-            'verification_token',
-            'password_reset_token',
-            'password_reset_expires_at',
-        ];
+        return ['password', 'remember_token', 'api_token', 'two_factor_secret', 'two_factor_recovery_codes', 'verification_token', 'password_reset_token', 'password_reset_expires_at'];
     }
-
     /**
      * Convert model to array with safe attributes for public display
      * 
@@ -129,7 +83,6 @@ trait HasSafeSerialization
     {
         return $this->getSafeAttributes($additionalExclusions);
     }
-
     /**
      * Convert model to array with safe attributes for API responses
      * 
@@ -140,7 +93,6 @@ trait HasSafeSerialization
     {
         return $this->getApiSafeAttributes($additionalExclusions);
     }
-
     /**
      * Convert model to array with safe attributes for admin display
      * 

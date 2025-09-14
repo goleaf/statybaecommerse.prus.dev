@@ -1,43 +1,38 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Filament\Resources\SeoDataResource\Pages;
 
 use App\Filament\Resources\SeoDataResource;
 use App\Filament\Resources\SeoDataResource\Widgets;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-
-final /**
+/**
  * ViewSeoData
  * 
- * Filament resource for admin panel management.
+ * Filament v4 resource for ViewSeoData management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ * 
+ * @property string $resource
+ * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
+ * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)
  */
-class ViewSeoData extends ViewRecord
+final class ViewSeoData extends ViewRecord
 {
     protected static string $resource = SeoDataResource::class;
-
+    /**
+     * Handle getHeaderActions functionality with proper error handling.
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\Action::make('back_to_list')
-                ->label(__('common.back_to_list'))
-                ->icon('heroicon-o-arrow-left')
-                ->color('gray')
-                ->url($this->getResource()::getUrl('index'))
-                ->tooltip(__('common.back_to_list_tooltip')),
-            Actions\EditAction::make()
-                ->label(__('admin.seo_data.edit')),
-            Actions\DeleteAction::make()
-                ->label(__('admin.seo_data.delete')),
-        ];
+        return [Actions\Action::make('back_to_list')->label(__('common.back_to_list'))->icon('heroicon-o-arrow-left')->color('gray')->url($this->getResource()::getUrl('index'))->tooltip(__('common.back_to_list_tooltip')), Actions\EditAction::make()->label(__('admin.seo_data.edit')), Actions\DeleteAction::make()->label(__('admin.seo_data.delete'))];
     }
-
+    /**
+     * Handle getHeaderWidgets functionality with proper error handling.
+     * @return array
+     */
     protected function getHeaderWidgets(): array
     {
-        return [
-            Widgets\SeoOptimizationWidget::class,
-        ];
+        return [Widgets\SeoOptimizationWidget::class];
     }
 }

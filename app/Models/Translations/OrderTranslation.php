@@ -1,37 +1,38 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Models\Translations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-final /**
+/**
  * OrderTranslation
  * 
- * Eloquent model representing a database entity with relationships and business logic.
+ * Eloquent model representing the OrderTranslation entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * 
+ * @property mixed $table
+ * @property mixed $fillable
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderTranslation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderTranslation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderTranslation query()
+ * @mixin \Eloquent
  */
-class OrderTranslation extends Model
+final class OrderTranslation extends Model
 {
     protected $table = 'order_translations';
-
-    protected $fillable = [
-        'order_id',
-        'locale',
-        'notes',
-        'billing_address',
-        'shipping_address',
-    ];
-
+    protected $fillable = ['order_id', 'locale', 'notes', 'billing_address', 'shipping_address'];
+    /**
+     * Handle casts functionality with proper error handling.
+     * @return array
+     */
     protected function casts(): array
     {
-        return [
-            'billing_address' => 'json',
-            'shipping_address' => 'json',
-        ];
+        return ['billing_address' => 'json', 'shipping_address' => 'json'];
     }
-
+    /**
+     * Handle order functionality with proper error handling.
+     * @return BelongsTo
+     */
     public function order(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Order::class);

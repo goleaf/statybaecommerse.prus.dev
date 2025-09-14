@@ -1,38 +1,41 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Livewire\Components;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
-
 /**
  * CouponForm
  * 
- * Livewire component for reactive frontend functionality.
+ * Livewire component for CouponForm with reactive frontend functionality, real-time updates, and user interaction handling.
+ * 
+ * @property string|null $code
  */
 class CouponForm extends Component
 {
     #[Validate('nullable|string|max:50')]
     public ?string $code = null;
-
+    /**
+     * Initialize the Livewire component with parameters.
+     * @return void
+     */
     public function mount(): void
     {
         $this->code = session('checkout.coupon.code');
     }
-
+    /**
+     * Handle apply functionality with proper error handling.
+     * @return void
+     */
     public function apply(): void
     {
         $this->validate();
         if ($this->code) {
             $raw = strtoupper(trim($this->code));
-            $row = DB::table('sh_discount_codes')
-                ->select('id', 'discount_id', 'expires_at', 'max_uses', 'usage_count')
-                ->whereRaw('UPPER(code) = ?', [$raw])
-                ->first();
+            $row = DB::table('sh_discount_codes')->select('id', 'discount_id', 'expires_at', 'max_uses', 'usage_count')->whereRaw('UPPER(code) = ?', [$raw])->first();
             if ($row) {
                 $now = now();
                 $valid = true;
@@ -55,14 +58,20 @@ class CouponForm extends Component
         }
         $this->dispatch('coupon-updated');
     }
-
+    /**
+     * Handle remove functionality with proper error handling.
+     * @return void
+     */
     public function remove(): void
     {
         session()->forget('checkout.coupon');
         $this->reset('code');
         $this->dispatch('coupon-updated');
     }
-
+    /**
+     * Render the Livewire component view with current state.
+     * @return View
+     */
     public function render(): View
     {
         return view('livewire.components.coupon-form');

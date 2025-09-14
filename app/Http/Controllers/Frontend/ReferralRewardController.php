@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
@@ -11,172 +10,106 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-
-final /**
+/**
  * ReferralRewardController
  * 
- * HTTP controller handling web requests and responses.
+ * HTTP controller handling ReferralRewardController related web requests, responses, and business logic with proper validation and error handling.
+ * 
  */
-class ReferralRewardController extends Controller
+final class ReferralRewardController extends Controller
 {
     /**
-     * Display the user's referral rewards
+     * Display a listing of the resource with pagination and filtering.
+     * @return View
      */
     public function index(): View
     {
         $user = Auth::user();
-
-        if (! $user) {
+        if (!$user) {
             abort(401);
         }
-
-        $rewards = ReferralReward::forUser($user->id)
-            ->with(['referral', 'order'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
-
-        $stats = [
-            'total_rewards' => ReferralReward::forUser($user->id)->count(),
-            'pending_rewards' => ReferralReward::forUser($user->id)->pending()->count(),
-            'applied_rewards' => ReferralReward::forUser($user->id)->applied()->count(),
-            'expired_rewards' => ReferralReward::forUser($user->id)->expired()->count(),
-            'total_amount' => ReferralReward::forUser($user->id)->sum('amount'),
-            'pending_amount' => ReferralReward::forUser($user->id)->pending()->sum('amount'),
-            'applied_amount' => ReferralReward::forUser($user->id)->applied()->sum('amount'),
-        ];
-
+        $rewards = ReferralReward::forUser($user->id)->with(['referral', 'order'])->orderBy('created_at', 'desc')->paginate(15);
+        $stats = ['total_rewards' => ReferralReward::forUser($user->id)->count(), 'pending_rewards' => ReferralReward::forUser($user->id)->pending()->count(), 'applied_rewards' => ReferralReward::forUser($user->id)->applied()->count(), 'expired_rewards' => ReferralReward::forUser($user->id)->expired()->count(), 'total_amount' => ReferralReward::forUser($user->id)->sum('amount'), 'pending_amount' => ReferralReward::forUser($user->id)->pending()->sum('amount'), 'applied_amount' => ReferralReward::forUser($user->id)->applied()->sum('amount')];
         return view('referral-rewards.index', compact('rewards', 'stats'));
     }
-
     /**
-     * Display a specific referral reward
+     * Display the specified resource with related data.
+     * @param ReferralReward $reward
+     * @return View
      */
     public function show(ReferralReward $reward): View
     {
         $user = Auth::user();
-
-        if (! $user || $reward->user_id !== $user->id) {
+        if (!$user || $reward->user_id !== $user->id) {
             abort(403);
         }
-
         $reward->load(['referral', 'order', 'logs']);
-
         return view('referral-rewards.show', compact('reward'));
     }
-
     /**
-     * Get user's referral rewards as JSON
+     * Handle apiIndex functionality with proper error handling.
+     * @return JsonResponse
      */
     public function apiIndex(): JsonResponse
     {
         $user = Auth::user();
-
-        if (! $user) {
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        $rewards = ReferralReward::forUser($user->id)
-            ->with(['referral', 'order'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(fn ($reward) => $reward->display_data);
-
-        return response()->json([
-            'success' => true,
-            'data' => $rewards,
-        ]);
+        $rewards = ReferralReward::forUser($user->id)->with(['referral', 'order'])->orderBy('created_at', 'desc')->get()->map(fn($reward) => $reward->display_data);
+        return response()->json(['success' => true, 'data' => $rewards]);
     }
-
     /**
-     * Get user's referral reward statistics
+     * Handle apiStats functionality with proper error handling.
+     * @return JsonResponse
      */
     public function apiStats(): JsonResponse
     {
         $user = Auth::user();
-
-        if (! $user) {
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        $stats = [
-            'total_rewards' => ReferralReward::forUser($user->id)->count(),
-            'pending_rewards' => ReferralReward::forUser($user->id)->pending()->count(),
-            'applied_rewards' => ReferralReward::forUser($user->id)->applied()->count(),
-            'expired_rewards' => ReferralReward::forUser($user->id)->expired()->count(),
-            'total_amount' => ReferralReward::forUser($user->id)->sum('amount'),
-            'pending_amount' => ReferralReward::forUser($user->id)->pending()->sum('amount'),
-            'applied_amount' => ReferralReward::forUser($user->id)->applied()->sum('amount'),
-            'referrer_bonuses' => ReferralReward::forUser($user->id)->referrerBonus()->count(),
-            'referred_discounts' => ReferralReward::forUser($user->id)->referredDiscount()->count(),
-        ];
-
-        return response()->json([
-            'success' => true,
-            'data' => $stats,
-        ]);
+        $stats = ['total_rewards' => ReferralReward::forUser($user->id)->count(), 'pending_rewards' => ReferralReward::forUser($user->id)->pending()->count(), 'applied_rewards' => ReferralReward::forUser($user->id)->applied()->count(), 'expired_rewards' => ReferralReward::forUser($user->id)->expired()->count(), 'total_amount' => ReferralReward::forUser($user->id)->sum('amount'), 'pending_amount' => ReferralReward::forUser($user->id)->pending()->sum('amount'), 'applied_amount' => ReferralReward::forUser($user->id)->applied()->sum('amount'), 'referrer_bonuses' => ReferralReward::forUser($user->id)->referrerBonus()->count(), 'referred_discounts' => ReferralReward::forUser($user->id)->referredDiscount()->count()];
+        return response()->json(['success' => true, 'data' => $stats]);
     }
-
     /**
-     * Get pending rewards for the user
+     * Handle apiPending functionality with proper error handling.
+     * @return JsonResponse
      */
     public function apiPending(): JsonResponse
     {
         $user = Auth::user();
-
-        if (! $user) {
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        $rewards = ReferralReward::forUser($user->id)
-            ->pending()
-            ->with(['referral', 'order'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(fn ($reward) => $reward->display_data);
-
-        return response()->json([
-            'success' => true,
-            'data' => $rewards,
-        ]);
+        $rewards = ReferralReward::forUser($user->id)->pending()->with(['referral', 'order'])->orderBy('created_at', 'desc')->get()->map(fn($reward) => $reward->display_data);
+        return response()->json(['success' => true, 'data' => $rewards]);
     }
-
     /**
-     * Get applied rewards for the user
+     * Handle apiApplied functionality with proper error handling.
+     * @return JsonResponse
      */
     public function apiApplied(): JsonResponse
     {
         $user = Auth::user();
-
-        if (! $user) {
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        $rewards = ReferralReward::forUser($user->id)
-            ->applied()
-            ->with(['referral', 'order'])
-            ->orderBy('applied_at', 'desc')
-            ->get()
-            ->map(fn ($reward) => $reward->display_data);
-
-        return response()->json([
-            'success' => true,
-            'data' => $rewards,
-        ]);
+        $rewards = ReferralReward::forUser($user->id)->applied()->with(['referral', 'order'])->orderBy('applied_at', 'desc')->get()->map(fn($reward) => $reward->display_data);
+        return response()->json(['success' => true, 'data' => $rewards]);
     }
-
     /**
-     * Get rewards by type
+     * Handle apiByType functionality with proper error handling.
+     * @param string $type
+     * @return JsonResponse
      */
     public function apiByType(string $type): JsonResponse
     {
         $user = Auth::user();
-
-        if (! $user) {
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
         $query = ReferralReward::forUser($user->id);
-
         if ($type === 'referrer_bonus') {
             $query->referrerBonus();
         } elseif ($type === 'referred_discount') {
@@ -184,44 +117,22 @@ class ReferralRewardController extends Controller
         } else {
             return response()->json(['error' => 'Invalid type'], 400);
         }
-
-        $rewards = $query->with(['referral', 'order'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(fn ($reward) => $reward->display_data);
-
-        return response()->json([
-            'success' => true,
-            'data' => $rewards,
-        ]);
+        $rewards = $query->with(['referral', 'order'])->orderBy('created_at', 'desc')->get()->map(fn($reward) => $reward->display_data);
+        return response()->json(['success' => true, 'data' => $rewards]);
     }
-
     /**
-     * Get rewards by date range
+     * Handle apiByDateRange functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
      */
     public function apiByDateRange(Request $request): JsonResponse
     {
         $user = Auth::user();
-
-        if (! $user) {
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-        ]);
-
-        $rewards = ReferralReward::forUser($user->id)
-            ->byDateRange($request->start_date, $request->end_date)
-            ->with(['referral', 'order'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(fn ($reward) => $reward->display_data);
-
-        return response()->json([
-            'success' => true,
-            'data' => $rewards,
-        ]);
+        $request->validate(['start_date' => 'required|date', 'end_date' => 'required|date|after_or_equal:start_date']);
+        $rewards = ReferralReward::forUser($user->id)->byDateRange($request->start_date, $request->end_date)->with(['referral', 'order'])->orderBy('created_at', 'desc')->get()->map(fn($reward) => $reward->display_data);
+        return response()->json(['success' => true, 'data' => $rewards]);
     }
 }

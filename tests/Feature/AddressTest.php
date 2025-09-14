@@ -200,7 +200,8 @@ final class AddressTest extends TestCase
 
         $response = $this->actingAs($user1)->get(route('frontend.addresses.show', $address));
 
-        $response->assertStatus(403);
+        // The UserOwnedScope prevents the address from being found, resulting in 404
+        $response->assertStatus(404);
     }
 
     public function test_user_cannot_update_other_users_addresses(): void
@@ -221,7 +222,8 @@ final class AddressTest extends TestCase
 
         $response = $this->actingAs($user1)->put(route('frontend.addresses.update', $address), $updateData);
 
-        $response->assertStatus(403);
+        // The UserOwnedScope prevents the address from being found, resulting in 404
+        $response->assertStatus(404);
     }
 
     public function test_user_cannot_delete_other_users_addresses(): void
@@ -232,7 +234,8 @@ final class AddressTest extends TestCase
 
         $response = $this->actingAs($user1)->delete(route('frontend.addresses.destroy', $address));
 
-        $response->assertStatus(403);
+        // The UserOwnedScope prevents the address from being found, resulting in 404
+        $response->assertStatus(404);
     }
 
     public function test_address_creation_validation(): void

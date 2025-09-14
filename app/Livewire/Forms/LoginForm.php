@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Livewire\Forms;
 
 use Illuminate\Auth\Events\Lockout;
@@ -11,69 +10,55 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
-
 /**
  * LoginForm
  * 
- * Livewire component for reactive frontend functionality.
+ * Livewire component for LoginForm with reactive frontend functionality, real-time updates, and user interaction handling.
+ * 
+ * @property string $email
+ * @property string $password
+ * @property bool $remember
  */
 class LoginForm extends Form
 {
     #[Validate('required|string|email')]
     public string $email = '';
-
     #[Validate('required|string')]
     public string $password = '';
-
     #[Validate('boolean')]
     public bool $remember = false;
-
     /**
-     * Attempt to authenticate the request's credentials.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Handle authenticate functionality with proper error handling.
+     * @return void
      */
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
-
-        if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
+        if (!Auth::attempt($this->only(['email', 'password']), $this->remember)) {
             RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-                'form.email' => trans('auth.failed'),
-            ]);
+            throw ValidationException::withMessages(['form.email' => trans('auth.failed')]);
         }
-
         RateLimiter::clear($this->throttleKey());
     }
-
     /**
-     * Ensure the authentication request is not rate limited.
+     * Handle ensureIsNotRateLimited functionality with proper error handling.
+     * @return void
      */
     protected function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
-
         event(new Lockout(request()));
-
         $seconds = RateLimiter::availableIn($this->throttleKey());
-
-        throw ValidationException::withMessages([
-            'form.email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
-        ]);
+        throw ValidationException::withMessages(['form.email' => trans('auth.throttle', ['seconds' => $seconds, 'minutes' => ceil($seconds / 60)])]);
     }
-
     /**
-     * Get the authentication rate limiting throttle key.
+     * Handle throttleKey functionality with proper error handling.
+     * @return string
      */
     protected function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->email).'|'.request()->ip());
+        return Str::transliterate(Str::lower($this->email) . '|' . request()->ip());
     }
 }

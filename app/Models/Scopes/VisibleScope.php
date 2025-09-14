@@ -1,23 +1,28 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-
 /**
- * Global scope to filter only visible records
+ * VisibleScope
  * 
- * This scope automatically applies to models that have is_visible fields
- * and ensures that only visible records are returned by default.
+ * Eloquent model representing the VisibleScope entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * 
+ * @method static \Illuminate\Database\Eloquent\Builder|VisibleScope newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|VisibleScope newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|VisibleScope query()
+ * @mixin \Eloquent
  */
 final class VisibleScope implements Scope
 {
     /**
-     * Apply the scope to a given Eloquent query builder.
+     * Handle apply functionality with proper error handling.
+     * @param Builder $builder
+     * @param Model $model
+     * @return void
      */
     public function apply(Builder $builder, Model $model): void
     {

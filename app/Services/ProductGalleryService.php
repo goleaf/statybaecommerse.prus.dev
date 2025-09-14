@@ -1,17 +1,20 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Services;
 
 use App\Models\Product;
 use Illuminate\Support\Collection;
-
+/**
+ * ProductGalleryService
+ * 
+ * Service class containing ProductGalleryService business logic, external integrations, and complex operations with proper error handling and logging.
+ * 
+ */
 final class ProductGalleryService
 {
     /**
-     * Arrange products for gallery layout using splitIn method
-     * 
+     * Handle arrangeForGallery functionality with proper error handling.
      * @param Collection $products
      * @param int $columnCount
      * @return Collection
@@ -20,34 +23,15 @@ final class ProductGalleryService
     {
         // Use skipWhile to filter out invalid products from the beginning
         $validProducts = $products->skipWhile(function ($product) {
-            return empty($product->name) || 
-                   (property_exists($product, 'is_visible') && !$product->is_visible) ||
-                   (property_exists($product, 'price') && $product->price <= 0) ||
-                   (property_exists($product, 'slug') && empty($product->slug));
+            return empty($product->name) || property_exists($product, 'is_visible') && !$product->is_visible || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
         });
-
         $productColumns = $validProducts->splitIn($columnCount);
-        
         return $productColumns->map(function ($columnProducts, $columnIndex) {
-            return [
-                'column_id' => $columnIndex + 1,
-                'item_count' => $columnProducts->count(),
-                'products' => $columnProducts->map(fn($product) => [
-                    'id' => $product->id ?? null,
-                    'name' => $product->name ?? 'Unknown',
-                    'slug' => $product->slug ?? 'unknown',
-                    'price' => $product->formatted_price ?? $product->price ?? 0,
-                    'image_url' => method_exists($product, 'getFirstMediaUrl') ? $product->getFirstMediaUrl('images') : null,
-                    'category' => $product->category?->name ?? null,
-                    'is_featured' => $product->is_featured ?? false,
-                ])
-            ];
+            return ['column_id' => $columnIndex + 1, 'item_count' => $columnProducts->count(), 'products' => $columnProducts->map(fn($product) => ['id' => $product->id ?? null, 'name' => $product->name ?? 'Unknown', 'slug' => $product->slug ?? 'unknown', 'price' => $product->formatted_price ?? $product->price ?? 0, 'image_url' => method_exists($product, 'getFirstMediaUrl') ? $product->getFirstMediaUrl('images') : null, 'category' => $product->category?->name ?? null, 'is_featured' => $product->is_featured ?? false])];
         });
     }
-
     /**
-     * Split products into balanced columns for masonry layout
-     * 
+     * Handle arrangeForMasonry functionality with proper error handling.
      * @param Collection $products
      * @param int $columns
      * @return Collection
@@ -56,25 +40,19 @@ final class ProductGalleryService
     {
         // Use skipWhile to filter out invalid products from the beginning
         $validProducts = $products->skipWhile(function ($product) {
-            return empty($product->name) || 
-                   (property_exists($product, 'is_visible') && !$product->is_visible) ||
-                   (property_exists($product, 'price') && $product->price <= 0) ||
-                   (property_exists($product, 'slug') && empty($product->slug));
+            return empty($product->name) || property_exists($product, 'is_visible') && !$product->is_visible || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
         });
-
         return $validProducts->splitIn($columns);
     }
-
     /**
-     * Split products for responsive grid layout
-     * 
+     * Handle arrangeForResponsiveGrid functionality with proper error handling.
      * @param Collection $products
      * @param string $breakpoint
      * @return Collection
      */
     public function arrangeForResponsiveGrid(Collection $products, string $breakpoint = 'lg'): Collection
     {
-        $columnCount = match($breakpoint) {
+        $columnCount = match ($breakpoint) {
             'sm' => 2,
             'md' => 3,
             'lg' => 4,
@@ -82,13 +60,10 @@ final class ProductGalleryService
             '2xl' => 6,
             default => 4,
         };
-
         return $this->arrangeForGallery($products, $columnCount);
     }
-
     /**
-     * Split products for category showcase
-     * 
+     * Handle arrangeForCategoryShowcase functionality with proper error handling.
      * @param Collection $products
      * @param int $featuredCount
      * @return array
@@ -97,66 +72,51 @@ final class ProductGalleryService
     {
         // Use skipWhile to filter out invalid products from the beginning
         $validProducts = $products->skipWhile(function ($product) {
-            return empty($product->name) || 
-                   (property_exists($product, 'is_visible') && !$product->is_visible) ||
-                   (property_exists($product, 'price') && $product->price <= 0) ||
-                   (property_exists($product, 'slug') && empty($product->slug));
+            return empty($product->name) || property_exists($product, 'is_visible') && !$product->is_visible || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
         });
-
         $featuredProducts = $validProducts->take($featuredCount);
         $remainingProducts = $validProducts->skip($featuredCount);
-        
-        return [
-            'featured' => $this->arrangeForGallery($featuredProducts, 4),
-            'remaining' => $remainingProducts->count() > 0 ? $this->arrangeForGallery($remainingProducts, 3) : collect(),
-            'total_count' => $validProducts->count(),
-            'featured_count' => $featuredProducts->count(),
-            'remaining_count' => $remainingProducts->count(),
-        ];
+        return ['featured' => $this->arrangeForGallery($featuredProducts, 4), 'remaining' => $remainingProducts->count() > 0 ? $this->arrangeForGallery($remainingProducts, 3) : collect(), 'total_count' => $validProducts->count(), 'featured_count' => $featuredProducts->count(), 'remaining_count' => $remainingProducts->count()];
     }
-
     /**
-     * Split products for collection display
-     * 
+     * Handle arrangeForCollection functionality with proper error handling.
      * @param Collection $products
      * @param int $displayType
      * @return Collection
      */
     public function arrangeForCollection(Collection $products, int $displayType = 1): Collection
     {
-        $columnCount = match($displayType) {
-            1 => 4, // Grid
-            2 => 3, // Masonry
-            3 => 2, // List
-            4 => 5, // Carousel
+        $columnCount = match ($displayType) {
+            1 => 4,
+            // Grid
+            2 => 3,
+            // Masonry
+            3 => 2,
+            // List
+            4 => 5,
+            // Carousel
             default => 4,
         };
-
         return $this->arrangeForGallery($products, $columnCount);
     }
-
     /**
-     * Split products for search results
-     * 
+     * Handle arrangeForSearchResults functionality with proper error handling.
      * @param Collection $products
      * @param int $resultsPerPage
      * @return Collection
      */
     public function arrangeForSearchResults(Collection $products, int $resultsPerPage = 20): Collection
     {
-        $columnCount = match(true) {
+        $columnCount = match (true) {
             $resultsPerPage <= 12 => 3,
             $resultsPerPage <= 20 => 4,
             $resultsPerPage <= 30 => 5,
             default => 4,
         };
-
         return $this->arrangeForGallery($products, $columnCount);
     }
-
     /**
-     * Split products for related products section
-     * 
+     * Handle arrangeForRelatedProducts functionality with proper error handling.
      * @param Collection $products
      * @param int $maxProducts
      * @return Collection
@@ -166,10 +126,8 @@ final class ProductGalleryService
         $limitedProducts = $products->take($maxProducts);
         return $this->arrangeForGallery($limitedProducts, 4);
     }
-
     /**
-     * Split products for homepage featured section
-     * 
+     * Handle arrangeForHomepageFeatured functionality with proper error handling.
      * @param Collection $products
      * @return array
      */
@@ -177,27 +135,15 @@ final class ProductGalleryService
     {
         // Use skipWhile to filter out invalid products from the beginning
         $validProducts = $products->skipWhile(function ($product) {
-            return empty($product->name) || 
-                   (property_exists($product, 'is_visible') && !$product->is_visible) ||
-                   (property_exists($product, 'price') && $product->price <= 0) ||
-                   (property_exists($product, 'slug') && empty($product->slug));
+            return empty($product->name) || property_exists($product, 'is_visible') && !$product->is_visible || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
         });
-
         $heroProducts = $validProducts->take(1);
         $featuredProducts = $validProducts->skip(1)->take(6);
         $additionalProducts = $validProducts->skip(7)->take(8);
-        
-        return [
-            'hero' => $heroProducts->first(),
-            'featured' => $this->arrangeForGallery($featuredProducts, 3),
-            'additional' => $this->arrangeForGallery($additionalProducts, 4),
-            'total_count' => $validProducts->count(),
-        ];
+        return ['hero' => $heroProducts->first(), 'featured' => $this->arrangeForGallery($featuredProducts, 3), 'additional' => $this->arrangeForGallery($additionalProducts, 4), 'total_count' => $validProducts->count()];
     }
-
     /**
-     * Split products for mobile view
-     * 
+     * Handle arrangeForMobile functionality with proper error handling.
      * @param Collection $products
      * @return Collection
      */
@@ -205,10 +151,8 @@ final class ProductGalleryService
     {
         return $this->arrangeForGallery($products, 2);
     }
-
     /**
-     * Split products for tablet view
-     * 
+     * Handle arrangeForTablet functionality with proper error handling.
      * @param Collection $products
      * @return Collection
      */
@@ -216,10 +160,8 @@ final class ProductGalleryService
     {
         return $this->arrangeForGallery($products, 3);
     }
-
     /**
-     * Split products for desktop view
-     * 
+     * Handle arrangeForDesktop functionality with proper error handling.
      * @param Collection $products
      * @return Collection
      */
@@ -227,10 +169,8 @@ final class ProductGalleryService
     {
         return $this->arrangeForGallery($products, 4);
     }
-
     /**
-     * Advanced filtering with multiple skipWhile conditions
-     * 
+     * Handle arrangeWithAdvancedFiltering functionality with proper error handling.
      * @param Collection $products
      * @param array $filters
      * @return Collection
@@ -242,45 +182,36 @@ final class ProductGalleryService
         $minRating = $filters['min_rating'] ?? 0;
         $hasImages = $filters['has_images'] ?? true;
         $isFeatured = $filters['is_featured'] ?? null;
-
         return $products->skipWhile(function ($product) use ($minPrice, $maxPrice, $minRating, $hasImages, $isFeatured) {
             // Skip products that don't meet basic requirements
             if (empty($product->name) || !$product->is_visible || empty($product->slug)) {
                 return true;
             }
-
             // Skip products with invalid prices
             if ($product->price <= 0 || $product->price < $minPrice) {
                 return true;
             }
-
             // Skip products above maximum price
             if ($maxPrice !== null && $product->price > $maxPrice) {
                 return true;
             }
-
             // Skip products without images if required
             if ($hasImages && !$product->getFirstMediaUrl('images')) {
                 return true;
             }
-
             // Skip products based on featured status
             if ($isFeatured !== null && $product->is_featured !== $isFeatured) {
                 return true;
             }
-
             // Skip products with low ratings
             if ($minRating > 0 && ($product->average_rating ?? 0) < $minRating) {
                 return true;
             }
-
             return false;
         });
     }
-
     /**
-     * Split products with quality-based filtering using skipWhile
-     * 
+     * Handle arrangeWithQualityFiltering functionality with proper error handling.
      * @param Collection $products
      * @param int $columnCount
      * @param float $qualityThreshold
@@ -292,44 +223,54 @@ final class ProductGalleryService
             $qualityScore = $this->calculateProductQualityScore($product);
             return $qualityScore < $qualityThreshold;
         });
-
         return $this->arrangeForGallery($qualityProducts, $columnCount);
     }
-
     /**
-     * Calculate product quality score for filtering
-     * 
+     * Handle calculateProductQualityScore functionality with proper error handling.
      * @param mixed $product
      * @return float
      */
     private function calculateProductQualityScore($product): float
     {
         $score = 0.0;
-
         // Basic requirements (40% of score)
-        if (!empty($product->name)) $score += 0.1;
-        if (!empty($product->slug)) $score += 0.1;
-        if ($product->is_visible) $score += 0.1;
-        if ($product->price > 0) $score += 0.1;
-
+        if (!empty($product->name)) {
+            $score += 0.1;
+        }
+        if (!empty($product->slug)) {
+            $score += 0.1;
+        }
+        if ($product->is_visible) {
+            $score += 0.1;
+        }
+        if ($product->price > 0) {
+            $score += 0.1;
+        }
         // Media quality (30% of score)
-        if (method_exists($product, 'getFirstMediaUrl') && $product->getFirstMediaUrl('images')) $score += 0.2;
-        if (method_exists($product, 'getFirstMediaUrl') && $product->getFirstMediaUrl('images', 'large')) $score += 0.1;
-
+        if (method_exists($product, 'getFirstMediaUrl') && $product->getFirstMediaUrl('images')) {
+            $score += 0.2;
+        }
+        if (method_exists($product, 'getFirstMediaUrl') && $product->getFirstMediaUrl('images', 'large')) {
+            $score += 0.1;
+        }
         // Content quality (20% of score)
-        if (!empty($product->description)) $score += 0.1;
-        if ($product->is_featured) $score += 0.1;
-
+        if (!empty($product->description)) {
+            $score += 0.1;
+        }
+        if ($product->is_featured) {
+            $score += 0.1;
+        }
         // Engagement metrics (10% of score)
-        if (($product->views_count ?? 0) > 0) $score += 0.05;
-        if (($product->average_rating ?? 0) > 0) $score += 0.05;
-
+        if (($product->views_count ?? 0) > 0) {
+            $score += 0.05;
+        }
+        if (($product->average_rating ?? 0) > 0) {
+            $score += 0.05;
+        }
         return min($score, 1.0);
     }
-
     /**
-     * Advanced filtering with multiple skipWhile conditions for complex scenarios
-     * 
+     * Handle arrangeWithAdvancedSkipWhile functionality with proper error handling.
      * @param Collection $products
      * @param array $filters
      * @return Collection
@@ -342,53 +283,40 @@ final class ProductGalleryService
         $hasImages = $filters['has_images'] ?? true;
         $isFeatured = $filters['is_featured'] ?? null;
         $categoryId = $filters['category_id'] ?? null;
-
         return $products->skipWhile(function ($product) use ($minPrice, $maxPrice, $minRating, $hasImages, $isFeatured, $categoryId) {
             // Skip products that don't meet basic requirements
-            if (empty($product->name) || 
-                (property_exists($product, 'is_visible') && !$product->is_visible) ||
-                (property_exists($product, 'slug') && empty($product->slug))) {
+            if (empty($product->name) || property_exists($product, 'is_visible') && !$product->is_visible || property_exists($product, 'slug') && empty($product->slug)) {
                 return true;
             }
-
             // Skip products with invalid prices
-            if ((property_exists($product, 'price') && $product->price <= 0) || 
-                (property_exists($product, 'price') && $product->price < $minPrice)) {
+            if (property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'price') && $product->price < $minPrice) {
                 return true;
             }
-
             // Skip products above maximum price
             if ($maxPrice !== null && property_exists($product, 'price') && $product->price > $maxPrice) {
                 return true;
             }
-
             // Skip products without images if required
             if ($hasImages && method_exists($product, 'getFirstMediaUrl') && !$product->getFirstMediaUrl('images')) {
                 return true;
             }
-
             // Skip products based on featured status
             if ($isFeatured !== null && property_exists($product, 'is_featured') && $product->is_featured !== $isFeatured) {
                 return true;
             }
-
             // Skip products with low ratings
             if ($minRating > 0 && property_exists($product, 'average_rating') && ($product->average_rating ?? 0) < $minRating) {
                 return true;
             }
-
             // Skip products not in specified category
             if ($categoryId !== null && property_exists($product, 'category_id') && $product->category_id !== $categoryId) {
                 return true;
             }
-
             return false;
         });
     }
-
     /**
-     * Skip products based on availability and stock levels
-     * 
+     * Handle arrangeWithStockFiltering functionality with proper error handling.
      * @param Collection $products
      * @param bool $inStockOnly
      * @param int $minStock
@@ -402,20 +330,16 @@ final class ProductGalleryService
                 if (property_exists($product, 'stock_quantity') && $product->stock_quantity < $minStock) {
                     return true;
                 }
-                
                 // Skip products that are not available
                 if (property_exists($product, 'is_available') && !$product->is_available) {
                     return true;
                 }
             }
-
             return false;
         });
     }
-
     /**
-     * Skip products based on date ranges (new arrivals, seasonal, etc.)
-     * 
+     * Handle arrangeWithDateFiltering functionality with proper error handling.
      * @param Collection $products
      * @param array $dateFilters
      * @return Collection
@@ -426,10 +350,8 @@ final class ProductGalleryService
         $seasonalStart = $dateFilters['seasonal_start'] ?? null;
         $seasonalEnd = $dateFilters['seasonal_end'] ?? null;
         $excludeOld = $dateFilters['exclude_old'] ?? false;
-
         return $products->skipWhile(function ($product) use ($newArrivalsDays, $seasonalStart, $seasonalEnd, $excludeOld) {
             $now = now();
-
             // Skip old products if requested
             if ($excludeOld && property_exists($product, 'created_at')) {
                 $productDate = $product->created_at;
@@ -437,7 +359,6 @@ final class ProductGalleryService
                     return true;
                 }
             }
-
             // Skip products not in new arrivals range
             if ($newArrivalsDays !== null && property_exists($product, 'created_at')) {
                 $productDate = $product->created_at;
@@ -445,7 +366,6 @@ final class ProductGalleryService
                     return true;
                 }
             }
-
             // Skip products not in seasonal range
             if ($seasonalStart !== null && $seasonalEnd !== null && property_exists($product, 'created_at')) {
                 $productDate = $product->created_at;
@@ -453,14 +373,11 @@ final class ProductGalleryService
                     return true;
                 }
             }
-
             return false;
         });
     }
-
     /**
-     * Skip products based on user preferences and behavior
-     * 
+     * Handle arrangeWithUserPreferences functionality with proper error handling.
      * @param Collection $products
      * @param array $userPreferences
      * @return Collection
@@ -472,41 +389,33 @@ final class ProductGalleryService
         $excludedBrands = $userPreferences['excluded_brands'] ?? [];
         $excludedCategories = $userPreferences['excluded_categories'] ?? [];
         $priceRange = $userPreferences['price_range'] ?? null;
-
         return $products->skipWhile(function ($product) use ($preferredBrands, $preferredCategories, $excludedBrands, $excludedCategories, $priceRange) {
             // Skip products from excluded brands
             if (!empty($excludedBrands) && property_exists($product, 'brand_id') && in_array($product->brand_id, $excludedBrands)) {
                 return true;
             }
-
             // Skip products from excluded categories
             if (!empty($excludedCategories) && property_exists($product, 'category_id') && in_array($product->category_id, $excludedCategories)) {
                 return true;
             }
-
             // Skip products outside price range
             if ($priceRange !== null && property_exists($product, 'price')) {
                 if ($product->price < $priceRange['min'] || $product->price > $priceRange['max']) {
                     return true;
                 }
             }
-
             // If user has preferences, skip products that don't match
             if (!empty($preferredBrands) && property_exists($product, 'brand_id') && !in_array($product->brand_id, $preferredBrands)) {
                 return true;
             }
-
             if (!empty($preferredCategories) && property_exists($product, 'category_id') && !in_array($product->category_id, $preferredCategories)) {
                 return true;
             }
-
             return false;
         });
     }
-
     /**
-     * Skip products based on performance metrics
-     * 
+     * Handle arrangeWithPerformanceFiltering functionality with proper error handling.
      * @param Collection $products
      * @param array $performanceFilters
      * @return Collection
@@ -518,33 +427,27 @@ final class ProductGalleryService
         $minRating = $performanceFilters['min_rating'] ?? 0;
         $maxRating = $performanceFilters['max_rating'] ?? 5.0;
         $trendingOnly = $performanceFilters['trending_only'] ?? false;
-
         return $products->skipWhile(function ($product) use ($minViews, $minSales, $minRating, $maxRating, $trendingOnly) {
             // Skip products with low views
             if ($minViews > 0 && property_exists($product, 'views_count') && ($product->views_count ?? 0) < $minViews) {
                 return true;
             }
-
             // Skip products with low sales
             if ($minSales > 0 && property_exists($product, 'sales_count') && ($product->sales_count ?? 0) < $minSales) {
                 return true;
             }
-
             // Skip products with low ratings
             if ($minRating > 0 && property_exists($product, 'average_rating') && ($product->average_rating ?? 0) < $minRating) {
                 return true;
             }
-
             // Skip products with high ratings (for testing low-rated products)
             if ($maxRating < 5.0 && property_exists($product, 'average_rating') && ($product->average_rating ?? 0) > $maxRating) {
                 return true;
             }
-
             // Skip non-trending products
             if ($trendingOnly && property_exists($product, 'is_trending') && !$product->is_trending) {
                 return true;
             }
-
             return false;
         });
     }

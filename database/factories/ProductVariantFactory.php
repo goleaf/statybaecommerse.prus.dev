@@ -29,9 +29,9 @@ class ProductVariantFactory extends Factory
             'weight' => $this->faker->randomFloat(3, 0.1, 10.0),
             'track_inventory' => $this->faker->boolean(80),
             'is_default' => $this->faker->boolean(10),
-            'is_enabled' => $this->faker->boolean(90),
+            'is_enabled' => true,
             'attributes' => null,
-            'status' => $this->faker->randomElement(['active', 'inactive']),
+            'status' => 'active',
         ];
     }
 }

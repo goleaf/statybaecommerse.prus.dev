@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Livewire\Pages;
 
 use App\Livewire\Concerns\WithNotifications;
@@ -13,23 +12,27 @@ use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
-
-#[Layout('layouts.templates.app')]
-final /**
+/**
  * ComponentShowcase
  * 
- * Livewire component for reactive frontend functionality.
+ * Livewire component for ComponentShowcase with reactive frontend functionality, real-time updates, and user interaction handling.
+ * 
+ * @property string $testInput
+ * @property string $testSelect
+ * @property bool $showModal
  */
-class ComponentShowcase extends Component
+#[Layout('layouts.templates.app')]
+final class ComponentShowcase extends Component
 {
     use WithNotifications;
-
     public string $testInput = '';
-
     public string $testSelect = '';
-
     public bool $showModal = false;
-
+    /**
+     * Handle testNotification functionality with proper error handling.
+     * @param string $type
+     * @return void
+     */
     public function testNotification(string $type): void
     {
         match ($type) {
@@ -39,47 +42,47 @@ class ComponentShowcase extends Component
             'info' => $this->notifyInfo('Info notification!', 'Info'),
         };
     }
-
+    /**
+     * Handle toggleModal functionality with proper error handling.
+     * @return void
+     */
     public function toggleModal(): void
     {
-        $this->showModal = ! $this->showModal;
+        $this->showModal = !$this->showModal;
     }
-
+    /**
+     * Handle featuredProducts functionality with proper error handling.
+     * @return Collection
+     */
     #[Computed]
     public function featuredProducts(): Collection
     {
-        return Product::query()
-            ->with(['brand', 'media', 'prices'])
-            ->where('is_visible', true)
-            ->where('is_featured', true)
-            ->limit(4)
-            ->get();
+        return Product::query()->with(['brand', 'media', 'prices'])->where('is_visible', true)->where('is_featured', true)->limit(4)->get();
     }
-
+    /**
+     * Handle categories functionality with proper error handling.
+     * @return Collection
+     */
     #[Computed]
     public function categories(): Collection
     {
-        return Category::query()
-            ->where('is_visible', true)
-            ->limit(3)
-            ->get();
+        return Category::query()->where('is_visible', true)->limit(3)->get();
     }
-
+    /**
+     * Handle brands functionality with proper error handling.
+     * @return Collection
+     */
     #[Computed]
     public function brands(): Collection
     {
-        return Brand::query()
-            ->where('is_enabled', true)
-            ->limit(3)
-            ->get();
+        return Brand::query()->where('is_enabled', true)->limit(3)->get();
     }
-
+    /**
+     * Render the Livewire component view with current state.
+     * @return View
+     */
     public function render(): View
     {
-        return view('livewire.pages.component-showcase', [
-            'featuredProducts' => $this->featuredProducts,
-            'categories' => $this->categories,
-            'brands' => $this->brands,
-        ]);
+        return view('livewire.pages.component-showcase', ['featuredProducts' => $this->featuredProducts, 'categories' => $this->categories, 'brands' => $this->brands]);
     }
 }

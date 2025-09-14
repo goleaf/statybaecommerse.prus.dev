@@ -155,7 +155,7 @@ final class ProductHistoryTest extends TestCase
             'new_value' => true,
         ]);
 
-        $this->assertStringContainsString('Yes', $history->formatted_new_value);
+        $this->assertStringContainsString(__('admin.common.yes'), $history->formatted_new_value);
     }
 
     public function test_action_display_attribute(): void

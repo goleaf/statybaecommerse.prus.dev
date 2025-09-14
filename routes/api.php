@@ -71,6 +71,23 @@ Route::prefix('categories')->group(function () {
     Route::get('/{category}', [App\Http\Controllers\Api\CategoryController::class, 'show']);
 });
 
+// Menu API Routes
+Route::prefix('menus')->group(function () {
+    Route::get('/', [App\Http\Controllers\Frontend\MenuController::class, 'index']);
+    Route::get('/location/{location}', [App\Http\Controllers\Frontend\MenuController::class, 'byLocation']);
+    Route::get('/{key}', [App\Http\Controllers\Frontend\MenuController::class, 'show']);
+});
+
+// News API Routes
+Route::prefix('news')->group(function () {
+    Route::get('/', [App\Http\Controllers\Frontend\NewsController::class, 'index']);
+    Route::get('/featured', [App\Http\Controllers\Frontend\NewsController::class, 'featured']);
+    Route::get('/categories', [App\Http\Controllers\Frontend\NewsController::class, 'categories']);
+    Route::get('/tags', [App\Http\Controllers\Frontend\NewsController::class, 'tags']);
+    Route::get('/{slug}/related', [App\Http\Controllers\Frontend\NewsController::class, 'related']);
+    Route::get('/{slug}', [App\Http\Controllers\Frontend\NewsController::class, 'show']);
+});
+
 // Autocomplete API Routes
 Route::prefix('autocomplete')->group(function () {
     Route::get('/search', [App\Http\Controllers\Api\AutocompleteController::class, 'search']);

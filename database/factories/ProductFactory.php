@@ -91,10 +91,10 @@ class ProductFactory extends Factory
             'is_visible' => true,
             'is_featured' => $this->faker->boolean(15),
             'manage_stock' => $this->faker->boolean(85),
-            'status' => $this->faker->randomElement(['published', 'published', 'published', 'draft']),
+            'status' => 'published',
             'seo_title' => $name.' - Profesionalūs statybos įrankiai',
             'seo_description' => 'Pirkite '.strtolower($name).' geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje.',
-            'published_at' => $this->faker->dateTimeBetween('-30 days', '+5 days'),
+            'published_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
         ];
     }
 

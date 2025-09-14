@@ -30,6 +30,7 @@
                     @if($activeFiltersCount > 0)
                         <button 
                             wire:click="clearFilters"
+                            wire:confirm="{{ __('translations.confirm_clear_search_filters') }}"
                             class="text-sm text-blue-600 hover:text-blue-800"
                         >
                             {{ __('Clear All') }}
@@ -253,6 +254,7 @@
                     @if($activeFiltersCount > 0)
                         <button 
                             wire:click="clearFilters"
+                            wire:confirm="{{ __('translations.confirm_clear_search_filters') }}"
                             class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                         >
                             {{ __('Clear Filters') }}

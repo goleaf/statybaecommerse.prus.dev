@@ -35,6 +35,7 @@ class AttributeFactory extends Factory
             'is_sortable' => $this->faker->boolean(70),
             'sort_order' => $this->faker->numberBetween(0, 100),
             'is_enabled' => $this->faker->boolean(95),
+            'is_active' => $this->faker->boolean(95),
             'category_id' => null,
             'group_name' => $this->faker->optional(0.6)->randomElement($groupNames),
             'icon' => $this->faker->optional(0.4)->randomElement([

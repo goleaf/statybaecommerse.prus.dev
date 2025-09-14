@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
@@ -9,111 +8,78 @@ use App\Models\Zone;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-
-final /**
+/**
  * ZoneController
  * 
- * HTTP controller handling web requests and responses.
+ * HTTP controller handling ZoneController related web requests, responses, and business logic with proper validation and error handling.
+ * 
  */
-class ZoneController extends Controller
+final class ZoneController extends Controller
 {
+    /**
+     * Display a listing of the resource with pagination and filtering.
+     * @param Request $request
+     * @return View
+     */
     public function index(Request $request): View
     {
-        $zones = Zone::active()
-            ->enabled()
-            ->with(['currency', 'countries'])
-            ->withCount('countries')
-            ->ordered()
-            ->paginate(12);
-
+        $zones = Zone::active()->enabled()->with(['currency', 'countries'])->withCount('countries')->ordered()->paginate(12);
         return view('zones.index', compact('zones'));
     }
-
+    /**
+     * Display the specified resource with related data.
+     * @param Zone $zone
+     * @return View
+     */
     public function show(Zone $zone): View
     {
         $zone->load(['currency', 'countries', 'translations']);
-
         return view('zones.show', compact('zone'));
     }
-
+    /**
+     * Handle getZonesByCountry functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getZonesByCountry(Request $request): JsonResponse
     {
         $countryId = $request->get('country_id');
-
-        if (! $countryId) {
+        if (!$countryId) {
             return response()->json(['zones' => []]);
         }
-
-        $zones = Zone::active()
-            ->enabled()
-            ->whereHas('countries', function ($query) use ($countryId) {
-                $query->where('countries.id', $countryId);
-            })
-            ->with(['currency'])
-            ->ordered()
-            ->get();
-
-        return response()->json([
-            'zones' => $zones->map(function ($zone) {
-                return [
-                    'id' => $zone->id,
-                    'name' => $zone->translated_name,
-                    'code' => $zone->code,
-                    'type' => $zone->type,
-                    'tax_rate' => $zone->tax_rate,
-                    'shipping_rate' => $zone->shipping_rate,
-                    'free_shipping_threshold' => $zone->free_shipping_threshold,
-                    'currency' => $zone->currency->code ?? 'EUR',
-                ];
-            }),
-        ]);
+        $zones = Zone::active()->enabled()->whereHas('countries', function ($query) use ($countryId) {
+            $query->where('countries.id', $countryId);
+        })->with(['currency'])->ordered()->get();
+        return response()->json(['zones' => $zones->map(function ($zone) {
+            return ['id' => $zone->id, 'name' => $zone->translated_name, 'code' => $zone->code, 'type' => $zone->type, 'tax_rate' => $zone->tax_rate, 'shipping_rate' => $zone->shipping_rate, 'free_shipping_threshold' => $zone->free_shipping_threshold, 'currency' => $zone->currency->code ?? 'EUR'];
+        })]);
     }
-
+    /**
+     * Handle calculateShipping functionality with proper error handling.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function calculateShipping(Request $request): JsonResponse
     {
-        $request->validate([
-            'zone_id' => 'required|exists:zones,id',
-            'order_amount' => 'required|numeric|min:0',
-            'weight' => 'nullable|numeric|min:0',
-        ]);
-
+        $request->validate(['zone_id' => 'required|exists:zones,id', 'order_amount' => 'required|numeric|min:0', 'weight' => 'nullable|numeric|min:0']);
         $zone = Zone::findOrFail($request->zone_id);
         $orderAmount = (float) $request->order_amount;
         $weight = (float) ($request->weight ?? 0);
-
         $shippingCost = $zone->calculateShipping($weight, $orderAmount);
         $taxAmount = $zone->calculateTax($orderAmount);
         $hasFreeShipping = $zone->hasFreeShipping($orderAmount);
-
-        return response()->json([
-            'shipping_cost' => $shippingCost,
-            'tax_amount' => $taxAmount,
-            'has_free_shipping' => $hasFreeShipping,
-            'total_with_tax' => $orderAmount + $taxAmount,
-            'total_with_shipping' => $orderAmount + $shippingCost + $taxAmount,
-            'currency' => $zone->currency->code ?? 'EUR',
-        ]);
+        return response()->json(['shipping_cost' => $shippingCost, 'tax_amount' => $taxAmount, 'has_free_shipping' => $hasFreeShipping, 'total_with_tax' => $orderAmount + $taxAmount, 'total_with_shipping' => $orderAmount + $shippingCost + $taxAmount, 'currency' => $zone->currency->code ?? 'EUR']);
     }
-
+    /**
+     * Handle getDefaultZone functionality with proper error handling.
+     * @return JsonResponse
+     */
     public function getDefaultZone(): JsonResponse
     {
         $zone = Zone::getDefaultZone();
-
-        if (! $zone) {
+        if (!$zone) {
             return response()->json(['zone' => null]);
         }
-
-        return response()->json([
-            'zone' => [
-                'id' => $zone->id,
-                'name' => $zone->translated_name,
-                'code' => $zone->code,
-                'type' => $zone->type,
-                'tax_rate' => $zone->tax_rate,
-                'shipping_rate' => $zone->shipping_rate,
-                'free_shipping_threshold' => $zone->free_shipping_threshold,
-                'currency' => $zone->currency->code ?? 'EUR',
-            ],
-        ]);
+        return response()->json(['zone' => ['id' => $zone->id, 'name' => $zone->translated_name, 'code' => $zone->code, 'type' => $zone->type, 'tax_rate' => $zone->tax_rate, 'shipping_rate' => $zone->shipping_rate, 'free_shipping_threshold' => $zone->free_shipping_threshold, 'currency' => $zone->currency->code ?? 'EUR']]);
     }
 }

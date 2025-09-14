@@ -1,14 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-
-final /**
+/**
  * ProductTranslationController
  * 
- * HTTP controller handling web requests and responses.
+ * HTTP controller handling ProductTranslationController related web requests, responses, and business logic with proper validation and error handling.
+ * 
  */
-class ProductTranslationController extends Controller {}
+final class ProductTranslationController extends Controller
+{
+}

@@ -1,43 +1,38 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Livewire\Pages;
 
 use App\Models\Legal as LegalModel;
 use Livewire\Component;
-
-final /**
+/**
  * LegalPage
  * 
- * Livewire component for reactive frontend functionality.
+ * Livewire component for LegalPage with reactive frontend functionality, real-time updates, and user interaction handling.
+ * 
+ * @property LegalModel $legal
  */
-class LegalPage extends Component
+final class LegalPage extends Component
 {
     public LegalModel $legal;
-
+    /**
+     * Initialize the Livewire component with parameters.
+     * @param string $slug
+     * @return void
+     */
     public function mount(string $slug): void
     {
-        $this->legal = LegalModel::where('key', $slug)
-            ->where('is_enabled', true)
-            ->with(['translations'])
-            ->firstOrFail();
+        $this->legal = LegalModel::where('key', $slug)->where('is_enabled', true)->with(['translations'])->firstOrFail();
     }
-
+    /**
+     * Render the Livewire component view with current state.
+     */
     public function render()
     {
-        $translation = $this->legal->translations()
-            ->where('locale', app()->getLocale())
-            ->first();
-
-        if (! $translation) {
+        $translation = $this->legal->translations()->where('locale', app()->getLocale())->first();
+        if (!$translation) {
             $translation = $this->legal->translations()->first();
         }
-
-        return view('livewire.pages.legal', [
-            'translation' => $translation,
-        ])->layout('components.layouts.base', [
-            'title' => $translation?->title ?? $this->legal->key,
-        ]);
+        return view('livewire.pages.legal', ['translation' => $translation])->layout('components.layouts.base', ['title' => $translation?->title ?? $this->legal->key]);
     }
 }

@@ -40,7 +40,10 @@ final class SqliteOptimizationServiceProvider extends ServiceProvider
     private function optimizeSqlite(): void
     {
         try {
-            DB::connection('sqlite')->getPdo()->exec('
+            $pdo = DB::connection('sqlite')->getPdo();
+            
+            // Apply optimizations that can be set on existing databases
+            $pdo->exec('
                 -- Enable Write-Ahead Logging (WAL) mode for better concurrency
                 PRAGMA journal_mode = WAL;
                 
@@ -59,9 +62,6 @@ final class SqliteOptimizationServiceProvider extends ServiceProvider
                 -- Set page size to 4KB for optimal performance
                 PRAGMA page_size = 4096;
                 
-                -- Enable incremental auto-vacuum for better space management
-                PRAGMA auto_vacuum = incremental;
-                
                 -- Set synchronous mode to normal (balance between safety and performance)
                 PRAGMA synchronous = normal;
                 
@@ -72,7 +72,13 @@ final class SqliteOptimizationServiceProvider extends ServiceProvider
                 PRAGMA optimize;
             ');
 
-            Log::info('SQLite optimizations applied successfully');
+            // Check auto_vacuum status (can only be set on empty databases)
+            $autoVacuumResult = $pdo->query('PRAGMA auto_vacuum')->fetchColumn();
+            if ($autoVacuumResult == 0) {
+                Log::info('SQLite optimizations applied successfully (auto_vacuum cannot be changed on existing database)');
+            } else {
+                Log::info('SQLite optimizations applied successfully (auto_vacuum: ' . $autoVacuumResult . ')');
+            }
         } catch (\Exception $e) {
             Log::error('Failed to apply SQLite optimizations: ' . $e->getMessage());
         }

@@ -126,7 +126,7 @@ class CampaignConversionTest extends TestCase
         CampaignConversion::factory()->create([
             'campaign_id' => $campaign->id,
             'conversion_type' => 'signup',
-            'status' => 'pending',
+            'status' => 'confirmed',
             'conversion_value' => 50,
             'device_type' => 'desktop',
             'source' => 'facebook',
@@ -142,7 +142,7 @@ class CampaignConversionTest extends TestCase
 
         // Test byStatus scope
         $this->assertEquals(1, CampaignConversion::byStatus('completed')->count());
-        $this->assertEquals(1, CampaignConversion::byStatus('pending')->count());
+        $this->assertEquals(1, CampaignConversion::byStatus('confirmed')->count());
 
         // Test byDeviceType scope
         $this->assertEquals(1, CampaignConversion::byDeviceType('mobile')->count());

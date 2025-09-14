@@ -68,11 +68,11 @@ class RouteTest extends TestCase
      */
     private function seedEssentialData(): void
     {
-        // Create countries
+        // Create countries with unique codes
         Country::factory()->create(['cca2' => 'LT', 'cca3' => 'LTU']);
         Country::factory()->create(['cca2' => 'US', 'cca3' => 'USA']);
         
-        // Create zones
+        // Create zones with unique codes
         Zone::factory()->create(['code' => 'LT', 'is_default' => true]);
         Zone::factory()->create(['code' => 'US']);
         

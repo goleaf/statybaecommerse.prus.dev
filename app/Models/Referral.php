@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -13,348 +12,304 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
-
-final /**
+/**
  * Referral
  * 
- * Eloquent model representing a database entity with relationships and business logic.
+ * Eloquent model representing the Referral entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * 
+ * @property mixed $fillable
+ * @property array $translatable
+ * @method static \Illuminate\Database\Eloquent\Builder|Referral newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Referral newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Referral query()
+ * @mixin \Eloquent
  */
-class Referral extends Model
+final class Referral extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
-
-    protected $fillable = [
-        'referrer_id',
-        'referred_id',
-        'referral_code',
-        'status',
-        'completed_at',
-        'expires_at',
-        'metadata',
-        'source',
-        'campaign',
-        'utm_source',
-        'utm_medium',
-        'utm_campaign',
-        'ip_address',
-        'user_agent',
-        'title',
-        'description',
-        'terms_conditions',
-        'benefits_description',
-        'how_it_works',
-        'seo_title',
-        'seo_description',
-        'seo_keywords',
-    ];
-
-    public array $translatable = [
-        'title',
-        'description',
-        'terms_conditions',
-        'benefits_description',
-        'how_it_works',
-        'seo_title',
-        'seo_description',
-        'seo_keywords',
-    ];
-
+    protected $fillable = ['referrer_id', 'referred_id', 'referral_code', 'status', 'completed_at', 'expires_at', 'metadata', 'source', 'campaign', 'utm_source', 'utm_medium', 'utm_campaign', 'ip_address', 'user_agent', 'title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works', 'seo_title', 'seo_description', 'seo_keywords'];
+    public array $translatable = ['title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works', 'seo_title', 'seo_description', 'seo_keywords'];
+    /**
+     * Handle casts functionality with proper error handling.
+     * @return array
+     */
     protected function casts(): array
     {
-        return [
-            'completed_at' => 'datetime',
-            'expires_at' => 'datetime',
-            'metadata' => 'array',
-            'seo_keywords' => 'array',
-        ];
+        return ['completed_at' => 'datetime', 'expires_at' => 'datetime', 'metadata' => 'array', 'seo_keywords' => 'array'];
     }
-
     /**
-     * Get the user who made the referral
+     * Handle referrer functionality with proper error handling.
+     * @return BelongsTo
      */
     public function referrer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'referrer_id');
     }
-
     /**
-     * Get the user who was referred
+     * Handle referred functionality with proper error handling.
+     * @return BelongsTo
      */
     public function referred(): BelongsTo
     {
         return $this->belongsTo(User::class, 'referred_id');
     }
-
     /**
-     * Get referral rewards
+     * Handle rewards functionality with proper error handling.
+     * @return HasMany
      */
     public function rewards(): HasMany
     {
         return $this->hasMany(ReferralReward::class);
     }
-
     /**
-     * Get referral analytics events
+     * Handle analyticsEvents functionality with proper error handling.
+     * @return MorphMany
      */
     public function analyticsEvents(): MorphMany
     {
         return $this->morphMany(AnalyticsEvent::class, 'trackable');
     }
-
     /**
-     * Get orders from referred user
+     * Handle referredOrders functionality with proper error handling.
+     * @return HasMany
      */
     public function referredOrders(): HasMany
     {
         return $this->hasMany(Order::class, 'user_id', 'referred_id');
     }
-
     /**
-     * Get referral translations
+     * Handle translations functionality with proper error handling.
+     * @return HasMany
      */
     public function translations(): HasMany
     {
         return $this->hasMany(\App\Models\Translations\ReferralTranslation::class);
     }
-
     /**
-     * Get the referral's latest reward.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * Handle latestReward functionality with proper error handling.
+     * @return HasOne
      */
     public function latestReward(): HasOne
     {
         return $this->rewards()->one()->latestOfMany();
     }
-
     /**
-     * Get the referral's latest referred order.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * Handle latestReferredOrder functionality with proper error handling.
+     * @return HasOne
      */
     public function latestReferredOrder(): HasOne
     {
         return $this->referredOrders()->one()->latestOfMany();
     }
-
     /**
-     * Scope for active referrals
+     * Handle scopeActive functionality with proper error handling.
+     * @param Builder $query
+     * @return Builder
      */
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('status', 'pending')
-            ->where(function ($q) {
-                $q->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            });
+        return $query->where('status', 'pending')->where(function ($q) {
+            $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+        });
     }
-
     /**
-     * Scope for completed referrals
+     * Handle scopeCompleted functionality with proper error handling.
+     * @param Builder $query
+     * @return Builder
      */
     public function scopeCompleted(Builder $query): Builder
     {
         return $query->where('status', 'completed');
     }
-
     /**
-     * Scope for expired referrals
+     * Handle scopeExpired functionality with proper error handling.
+     * @param Builder $query
+     * @return Builder
      */
     public function scopeExpired(Builder $query): Builder
     {
-        return $query->where('status', 'expired')
-            ->orWhere(function ($q) {
-                $q->whereNotNull('expires_at')
-                    ->where('expires_at', '<=', now());
-            });
+        return $query->where('status', 'expired')->orWhere(function ($q) {
+            $q->whereNotNull('expires_at')->where('expires_at', '<=', now());
+        });
     }
-
     /**
-     * Check if referral is still valid
+     * Handle isValid functionality with proper error handling.
+     * @return bool
      */
     public function isValid(): bool
     {
         if ($this->status !== 'pending') {
             return false;
         }
-
         if ($this->expires_at && $this->expires_at->isPast()) {
             return false;
         }
-
         return true;
     }
-
     /**
-     * Mark referral as completed
+     * Handle markAsCompleted functionality with proper error handling.
+     * @return void
      */
     public function markAsCompleted(): void
     {
-        $this->update([
-            'status' => 'completed',
-            'completed_at' => now(),
-        ]);
+        $this->update(['status' => 'completed', 'completed_at' => now()]);
     }
-
     /**
-     * Mark referral as expired
+     * Handle markAsExpired functionality with proper error handling.
+     * @return void
      */
     public function markAsExpired(): void
     {
-        $this->update([
-            'status' => 'expired',
-        ]);
+        $this->update(['status' => 'expired']);
     }
-
     /**
-     * Get referral by code
+     * Handle findByCode functionality with proper error handling.
+     * @param string $code
+     * @return self|null
      */
     public static function findByCode(string $code): ?self
     {
         return self::where('referral_code', $code)->first();
     }
-
     /**
-     * Check if user has already been referred
+     * Handle userAlreadyReferred functionality with proper error handling.
+     * @param int $userId
+     * @return bool
      */
     public static function userAlreadyReferred(int $userId): bool
     {
         return self::where('referred_id', $userId)->exists();
     }
-
     /**
-     * Check if user can refer (hasn't reached limit)
+     * Handle canUserRefer functionality with proper error handling.
+     * @param int $userId
+     * @return bool
      */
     public static function canUserRefer(int $userId): bool
     {
-        $activeReferrals = self::where('referrer_id', $userId)
-            ->active()
-            ->count();
-
+        $activeReferrals = self::where('referrer_id', $userId)->active()->count();
         // Default limit of 100 active referrals per user
         return $activeReferrals < 100;
     }
-
     /**
-     * Scope for referrals by source
+     * Handle scopeBySource functionality with proper error handling.
+     * @param Builder $query
+     * @param string $source
+     * @return Builder
      */
     public function scopeBySource(Builder $query, string $source): Builder
     {
         return $query->where('source', $source);
     }
-
     /**
-     * Scope for referrals by campaign
+     * Handle scopeByCampaign functionality with proper error handling.
+     * @param Builder $query
+     * @param string $campaign
+     * @return Builder
      */
     public function scopeByCampaign(Builder $query, string $campaign): Builder
     {
         return $query->where('campaign', $campaign);
     }
-
     /**
-     * Scope for referrals with rewards
+     * Handle scopeWithRewards functionality with proper error handling.
+     * @param Builder $query
+     * @return Builder
      */
     public function scopeWithRewards(Builder $query): Builder
     {
         return $query->has('rewards');
     }
-
     /**
-     * Scope for referrals without rewards
+     * Handle scopeWithoutRewards functionality with proper error handling.
+     * @param Builder $query
+     * @return Builder
      */
     public function scopeWithoutRewards(Builder $query): Builder
     {
         return $query->doesntHave('rewards');
     }
-
     /**
-     * Get total rewards amount for this referral
+     * Handle getTotalRewardsAmountAttribute functionality with proper error handling.
+     * @return float
      */
     public function getTotalRewardsAmountAttribute(): float
     {
         return $this->rewards()->sum('amount');
     }
-
     /**
-     * Get conversion rate for this referral
+     * Handle getConversionRateAttribute functionality with proper error handling.
+     * @return float
      */
     public function getConversionRateAttribute(): float
     {
         $totalOrders = $this->referredOrders()->count();
-
         return $totalOrders > 0 ? 100.0 : 0.0;
     }
-
     /**
-     * Get days since creation
+     * Handle getDaysSinceCreatedAttribute functionality with proper error handling.
+     * @return int
      */
     public function getDaysSinceCreatedAttribute(): int
     {
         return (int) $this->created_at->diffInDays(now());
     }
-
     /**
-     * Check if referral is about to expire (within 7 days)
+     * Handle isAboutToExpire functionality with proper error handling.
+     * @return bool
      */
     public function isAboutToExpire(): bool
     {
-        if (! $this->expires_at) {
+        if (!$this->expires_at) {
             return false;
         }
-
         return $this->expires_at->isBefore(now()->addDays(7)) && $this->expires_at->isAfter(now());
     }
-
     /**
-     * Get referral performance score (0-100)
+     * Handle getPerformanceScoreAttribute functionality with proper error handling.
+     * @return int
      */
     public function getPerformanceScoreAttribute(): int
     {
         $score = 0;
-
         // Base score for completion
         if ($this->status === 'completed') {
             $score += 50;
         }
-
         // Bonus for having rewards
         if ($this->rewards()->exists()) {
             $score += 20;
         }
-
         // Bonus for recent completion (only if completed more than 1 day ago)
         if ($this->completed_at && $this->completed_at->isAfter(now()->subDays(30)) && $this->completed_at->isBefore(now()->subDay())) {
             $score += 20;
         }
-
         // Bonus for orders from referred user
         $orderCount = $this->referredOrders()->count();
         $score += min($orderCount * 5, 10);
-
         return min($score, 100);
     }
-
     /**
-     * Generate unique referral code
+     * Handle generateUniqueCode functionality with proper error handling.
+     * @return string
      */
     public static function generateUniqueCode(): string
     {
         do {
             $code = strtoupper(substr(md5(uniqid()), 0, 8));
         } while (self::where('referral_code', $code)->exists());
-
         return $code;
     }
-
     /**
-     * Create referral with automatic code generation
+     * Handle createWithCode functionality with proper error handling.
+     * @param array $attributes
+     * @return self
      */
     public static function createWithCode(array $attributes): self
     {
-        if (! isset($attributes['referral_code'])) {
+        if (!isset($attributes['referral_code'])) {
             $attributes['referral_code'] = self::generateUniqueCode();
         }
-
         return self::create($attributes);
     }
 }

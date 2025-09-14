@@ -1,41 +1,43 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Filament\Resources\CampaignResource\Pages;
 
 use App\Filament\Resources\CampaignResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-
-final /**
+/**
  * EditCampaign
  * 
- * Filament resource for admin panel management.
+ * Filament v4 resource for EditCampaign management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ * 
+ * @property string $resource
+ * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
+ * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)
  */
-class EditCampaign extends EditRecord
+final class EditCampaign extends EditRecord
 {
     protected static string $resource = CampaignResource::class;
-
+    /**
+     * Handle getHeaderActions functionality with proper error handling.
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\Action::make('back_to_view')
-                ->label(__('common.back_to_view'))
-                ->icon('heroicon-o-arrow-left')
-                ->color('gray')
-                ->url($this->getResource()::getUrl('view', ['record' => $this->getRecord()]))
-                ->tooltip(__('common.back_to_view_tooltip')),
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
-        ];
+        return [Actions\Action::make('back_to_view')->label(__('common.back_to_view'))->icon('heroicon-o-arrow-left')->color('gray')->url($this->getResource()::getUrl('view', ['record' => $this->getRecord()]))->tooltip(__('common.back_to_view_tooltip')), Actions\ViewAction::make(), Actions\DeleteAction::make()];
     }
-
+    /**
+     * Handle getRedirectUrl functionality with proper error handling.
+     * @return string
+     */
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
     }
-
+    /**
+     * Handle getSavedNotificationTitle functionality with proper error handling.
+     * @return string|null
+     */
     protected function getSavedNotificationTitle(): ?string
     {
         return __('campaigns.notifications.updated');

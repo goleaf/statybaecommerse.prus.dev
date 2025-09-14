@@ -1,0 +1,292 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Unit;
+
+use App\Models\ReferralCode;
+use App\Models\ReferralCodeStatistics;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class ReferralCodeStatisticsTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_referral_code_statistics_can_be_created(): void
+    {
+        $referralCode = ReferralCode::factory()->create();
+        
+        $statistics = ReferralCodeStatistics::factory()->create([
+            'referral_code_id' => $referralCode->id,
+            'date' => '2024-01-01',
+            'total_views' => 100,
+            'total_clicks' => 50,
+            'total_signups' => 25,
+            'total_conversions' => 10,
+            'total_revenue' => 500.00,
+            'metadata' => ['source' => 'email', 'campaign' => 'winter_sale'],
+        ]);
+
+        $this->assertInstanceOf(ReferralCodeStatistics::class, $statistics);
+        $this->assertEquals($referralCode->id, $statistics->referral_code_id);
+        $this->assertEquals('2024-01-01', $statistics->date->format('Y-m-d'));
+        $this->assertEquals(100, $statistics->total_views);
+        $this->assertEquals(50, $statistics->total_clicks);
+        $this->assertEquals(25, $statistics->total_signups);
+        $this->assertEquals(10, $statistics->total_conversions);
+        $this->assertEquals(500.00, $statistics->total_revenue);
+        $this->assertIsArray($statistics->metadata);
+        $this->assertEquals('email', $statistics->metadata['source']);
+        $this->assertEquals('winter_sale', $statistics->metadata['campaign']);
+    }
+
+    public function test_referral_code_statistics_fillable_attributes(): void
+    {
+        $statistics = new ReferralCodeStatistics();
+        $fillable = $statistics->getFillable();
+
+        $expectedFillable = [
+            'referral_code_id',
+            'date',
+            'total_views',
+            'total_clicks',
+            'total_signups',
+            'total_conversions',
+            'total_revenue',
+            'metadata',
+        ];
+
+        foreach ($expectedFillable as $field) {
+            $this->assertContains($field, $fillable);
+        }
+    }
+
+    public function test_referral_code_statistics_casts(): void
+    {
+        $statistics = ReferralCodeStatistics::factory()->create([
+            'date' => '2024-01-01',
+            'total_revenue' => '250.75',
+            'metadata' => ['test' => 'data'],
+        ]);
+
+        $this->assertInstanceOf(\Carbon\Carbon::class, $statistics->date);
+        $this->assertIsFloat($statistics->total_revenue);
+        $this->assertEquals(250.75, $statistics->total_revenue);
+        $this->assertIsArray($statistics->metadata);
+    }
+
+    public function test_referral_code_statistics_belongs_to_referral_code(): void
+    {
+        $referralCode = ReferralCode::factory()->create();
+        $statistics = ReferralCodeStatistics::factory()->create(['referral_code_id' => $referralCode->id]);
+
+        $this->assertInstanceOf(ReferralCode::class, $statistics->referralCode);
+        $this->assertEquals($referralCode->id, $statistics->referralCode->id);
+    }
+
+    public function test_referral_code_statistics_scope_by_date_range(): void
+    {
+        $referralCode = ReferralCode::factory()->create();
+        
+        $janStats = ReferralCodeStatistics::factory()->create([
+            'referral_code_id' => $referralCode->id,
+            'date' => '2024-01-15',
+        ]);
+        
+        $febStats = ReferralCodeStatistics::factory()->create([
+            'referral_code_id' => $referralCode->id,
+            'date' => '2024-02-15',
+        ]);
+        
+        $marStats = ReferralCodeStatistics::factory()->create([
+            'referral_code_id' => $referralCode->id,
+            'date' => '2024-03-15',
+        ]);
+
+        $janFebStats = ReferralCodeStatistics::byDateRange('2024-01-01', '2024-02-28')->get();
+        $this->assertTrue($janFebStats->contains($janStats));
+        $this->assertTrue($janFebStats->contains($febStats));
+        $this->assertFalse($janFebStats->contains($marStats));
+    }
+
+    public function test_referral_code_statistics_scope_by_referral_code(): void
+    {
+        $referralCode1 = ReferralCode::factory()->create();
+        $referralCode2 = ReferralCode::factory()->create();
+        
+        $stats1 = ReferralCodeStatistics::factory()->create(['referral_code_id' => $referralCode1->id]);
+        $stats2 = ReferralCodeStatistics::factory()->create(['referral_code_id' => $referralCode2->id]);
+
+        $code1Stats = ReferralCodeStatistics::byReferralCode($referralCode1->id)->get();
+        $this->assertTrue($code1Stats->contains($stats1));
+        $this->assertFalse($code1Stats->contains($stats2));
+    }
+
+    public function test_referral_code_statistics_scope_this_month(): void
+    {
+        $thisMonthStats = ReferralCodeStatistics::factory()->create(['date' => now()]);
+        $lastMonthStats = ReferralCodeStatistics::factory()->create(['date' => now()->subMonth()]);
+
+        $thisMonthStatistics = ReferralCodeStatistics::thisMonth()->get();
+        $this->assertTrue($thisMonthStatistics->contains($thisMonthStats));
+        $this->assertFalse($thisMonthStatistics->contains($lastMonthStats));
+    }
+
+    public function test_referral_code_statistics_scope_this_week(): void
+    {
+        $thisWeekStats = ReferralCodeStatistics::factory()->create(['date' => now()]);
+        $lastWeekStats = ReferralCodeStatistics::factory()->create(['date' => now()->subWeek()]);
+
+        $thisWeekStatistics = ReferralCodeStatistics::thisWeek()->get();
+        $this->assertTrue($thisWeekStatistics->contains($thisWeekStats));
+        $this->assertFalse($thisWeekStatistics->contains($lastWeekStats));
+    }
+
+    public function test_referral_code_statistics_scope_today(): void
+    {
+        $todayStats = ReferralCodeStatistics::factory()->create(['date' => now()]);
+        $yesterdayStats = ReferralCodeStatistics::factory()->create(['date' => now()->subDay()]);
+
+        $todayStatistics = ReferralCodeStatistics::today()->get();
+        $this->assertTrue($todayStatistics->contains($todayStats));
+        $this->assertFalse($todayStatistics->contains($yesterdayStats));
+    }
+
+    public function test_referral_code_statistics_scope_with_conversions(): void
+    {
+        $withConversions = ReferralCodeStatistics::factory()->create(['total_conversions' => 5]);
+        $withoutConversions = ReferralCodeStatistics::factory()->create(['total_conversions' => 0]);
+
+        $conversionStats = ReferralCodeStatistics::withConversions()->get();
+        $this->assertTrue($conversionStats->contains($withConversions));
+        $this->assertFalse($conversionStats->contains($withoutConversions));
+    }
+
+    public function test_referral_code_statistics_scope_with_revenue(): void
+    {
+        $withRevenue = ReferralCodeStatistics::factory()->create(['total_revenue' => 100.00]);
+        $withoutRevenue = ReferralCodeStatistics::factory()->create(['total_revenue' => 0.00]);
+
+        $revenueStats = ReferralCodeStatistics::withRevenue()->get();
+        $this->assertTrue($revenueStats->contains($withRevenue));
+        $this->assertFalse($revenueStats->contains($withoutRevenue));
+    }
+
+    public function test_referral_code_statistics_scope_high_performing(): void
+    {
+        $highPerforming = ReferralCodeStatistics::factory()->create([
+            'total_conversions' => 10,
+            'total_revenue' => 500.00,
+        ]);
+        
+        $lowPerforming = ReferralCodeStatistics::factory()->create([
+            'total_conversions' => 1,
+            'total_revenue' => 50.00,
+        ]);
+
+        $highPerformingStats = ReferralCodeStatistics::highPerforming()->get();
+        $this->assertTrue($highPerformingStats->contains($highPerforming));
+        $this->assertFalse($highPerformingStats->contains($lowPerforming));
+    }
+
+    public function test_referral_code_statistics_get_conversion_rate_method(): void
+    {
+        $statistics = ReferralCodeStatistics::factory()->create([
+            'total_clicks' => 100,
+            'total_conversions' => 25,
+        ]);
+
+        $this->assertEquals(25.0, $statistics->getConversionRate());
+    }
+
+    public function test_referral_code_statistics_get_conversion_rate_with_zero_clicks(): void
+    {
+        $statistics = ReferralCodeStatistics::factory()->create([
+            'total_clicks' => 0,
+            'total_conversions' => 0,
+        ]);
+
+        $this->assertEquals(0.0, $statistics->getConversionRate());
+    }
+
+    public function test_referral_code_statistics_get_signup_rate_method(): void
+    {
+        $statistics = ReferralCodeStatistics::factory()->create([
+            'total_views' => 200,
+            'total_signups' => 40,
+        ]);
+
+        $this->assertEquals(20.0, $statistics->getSignupRate());
+    }
+
+    public function test_referral_code_statistics_get_signup_rate_with_zero_views(): void
+    {
+        $statistics = ReferralCodeStatistics::factory()->create([
+            'total_views' => 0,
+            'total_signups' => 0,
+        ]);
+
+        $this->assertEquals(0.0, $statistics->getSignupRate());
+    }
+
+    public function test_referral_code_statistics_get_click_through_rate_method(): void
+    {
+        $statistics = ReferralCodeStatistics::factory()->create([
+            'total_views' => 1000,
+            'total_clicks' => 150,
+        ]);
+
+        $this->assertEquals(15.0, $statistics->getClickThroughRate());
+    }
+
+    public function test_referral_code_statistics_get_click_through_rate_with_zero_views(): void
+    {
+        $statistics = ReferralCodeStatistics::factory()->create([
+            'total_views' => 0,
+            'total_clicks' => 0,
+        ]);
+
+        $this->assertEquals(0.0, $statistics->getClickThroughRate());
+    }
+
+    public function test_referral_code_statistics_get_average_revenue_per_conversion_method(): void
+    {
+        $statistics = ReferralCodeStatistics::factory()->create([
+            'total_conversions' => 10,
+            'total_revenue' => 500.00,
+        ]);
+
+        $this->assertEquals(50.0, $statistics->getAverageRevenuePerConversion());
+    }
+
+    public function test_referral_code_statistics_get_average_revenue_per_conversion_with_zero_conversions(): void
+    {
+        $statistics = ReferralCodeStatistics::factory()->create([
+            'total_conversions' => 0,
+            'total_revenue' => 0.00,
+        ]);
+
+        $this->assertEquals(0.0, $statistics->getAverageRevenuePerConversion());
+    }
+
+    public function test_referral_code_statistics_table_name(): void
+    {
+        $statistics = new ReferralCodeStatistics();
+        $this->assertEquals('referral_code_statistics', $statistics->getTable());
+    }
+
+    public function test_referral_code_statistics_factory(): void
+    {
+        $statistics = ReferralCodeStatistics::factory()->create();
+
+        $this->assertInstanceOf(ReferralCodeStatistics::class, $statistics);
+        $this->assertNotEmpty($statistics->referral_code_id);
+        $this->assertNotNull($statistics->date);
+        $this->assertIsInt($statistics->total_views);
+        $this->assertIsInt($statistics->total_clicks);
+        $this->assertIsInt($statistics->total_signups);
+        $this->assertIsInt($statistics->total_conversions);
+        $this->assertIsFloat($statistics->total_revenue);
+    }
+}

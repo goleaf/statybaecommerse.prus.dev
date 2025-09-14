@@ -1,12 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Enums;
 
 use Illuminate\Support\Collection;
-
-enum ProductStatus: string
+/**
+ * ProductStatus
+ * 
+ * Enumeration defining a set of named constants with type safety.
+ */
+enum ProductStatus : string
 {
     case DRAFT = 'draft';
     case ACTIVE = 'active';
@@ -16,7 +19,6 @@ enum ProductStatus: string
     case ARCHIVED = 'archived';
     case PENDING_REVIEW = 'pending_review';
     case REJECTED = 'rejected';
-
     public function label(): string
     {
         return match ($this) {
@@ -30,7 +32,6 @@ enum ProductStatus: string
             self::REJECTED => __('translations.product_status_rejected'),
         };
     }
-
     public function description(): string
     {
         return match ($this) {
@@ -44,7 +45,6 @@ enum ProductStatus: string
             self::REJECTED => __('translations.product_status_rejected_description'),
         };
     }
-
     public function icon(): string
     {
         return match ($this) {
@@ -58,7 +58,6 @@ enum ProductStatus: string
             self::REJECTED => 'heroicon-o-exclamation-triangle',
         };
     }
-
     public function color(): string
     {
         return match ($this) {
@@ -72,7 +71,6 @@ enum ProductStatus: string
             self::REJECTED => 'red',
         };
     }
-
     public function priority(): int
     {
         return match ($this) {
@@ -86,7 +84,6 @@ enum ProductStatus: string
             self::ARCHIVED => 8,
         };
     }
-
     public function isVisible(): bool
     {
         return match ($this) {
@@ -94,7 +91,6 @@ enum ProductStatus: string
             default => false,
         };
     }
-
     public function isPurchasable(): bool
     {
         return match ($this) {
@@ -102,7 +98,6 @@ enum ProductStatus: string
             default => false,
         };
     }
-
     public function isEditable(): bool
     {
         return match ($this) {
@@ -110,7 +105,6 @@ enum ProductStatus: string
             default => false,
         };
     }
-
     public function isPublishable(): bool
     {
         return match ($this) {
@@ -118,7 +112,6 @@ enum ProductStatus: string
             default => false,
         };
     }
-
     public function isArchivable(): bool
     {
         return match ($this) {
@@ -126,7 +119,6 @@ enum ProductStatus: string
             default => false,
         };
     }
-
     public function isDiscontinuable(): bool
     {
         return match ($this) {
@@ -134,7 +126,6 @@ enum ProductStatus: string
             default => false,
         };
     }
-
     public function requiresReview(): bool
     {
         return match ($this) {
@@ -142,7 +133,6 @@ enum ProductStatus: string
             default => false,
         };
     }
-
     public function canBeActivated(): bool
     {
         return match ($this) {
@@ -150,7 +140,6 @@ enum ProductStatus: string
             default => false,
         };
     }
-
     public function canBeDeactivated(): bool
     {
         return match ($this) {
@@ -158,7 +147,6 @@ enum ProductStatus: string
             default => false,
         };
     }
-
     public function nextStatuses(): array
     {
         return match ($this) {
@@ -172,7 +160,6 @@ enum ProductStatus: string
             self::ARCHIVED => [],
         };
     }
-
     public function previousStatuses(): array
     {
         return match ($this) {
@@ -186,7 +173,6 @@ enum ProductStatus: string
             default => [],
         };
     }
-
     public function seoImpact(): string
     {
         return match ($this) {
@@ -198,112 +184,48 @@ enum ProductStatus: string
             default => 'none',
         };
     }
-
     public static function options(): array
     {
-        return collect(self::cases())
-            ->sortBy('priority')
-            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
-            ->toArray();
+        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn($case) => [$case->value => $case->label()])->toArray();
     }
-
     public static function optionsWithDescriptions(): array
     {
-        return collect(self::cases())
-            ->sortBy('priority')
-            ->mapWithKeys(fn ($case) => [
-                $case->value => [
-                    'label' => $case->label(),
-                    'description' => $case->description(),
-                    'icon' => $case->icon(),
-                    'color' => $case->color(),
-                    'priority' => $case->priority(),
-                    'is_visible' => $case->isVisible(),
-                    'is_purchasable' => $case->isPurchasable(),
-                    'is_editable' => $case->isEditable(),
-                    'is_publishable' => $case->isPublishable(),
-                    'is_archivable' => $case->isArchivable(),
-                    'is_discontinuable' => $case->isDiscontinuable(),
-                    'requires_review' => $case->requiresReview(),
-                    'can_be_activated' => $case->canBeActivated(),
-                    'can_be_deactivated' => $case->canBeDeactivated(),
-                    'next_statuses' => $case->nextStatuses(),
-                    'previous_statuses' => $case->previousStatuses(),
-                    'seo_impact' => $case->seoImpact(),
-                ],
-            ])
-            ->toArray();
+        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn($case) => [$case->value => ['label' => $case->label(), 'description' => $case->description(), 'icon' => $case->icon(), 'color' => $case->color(), 'priority' => $case->priority(), 'is_visible' => $case->isVisible(), 'is_purchasable' => $case->isPurchasable(), 'is_editable' => $case->isEditable(), 'is_publishable' => $case->isPublishable(), 'is_archivable' => $case->isArchivable(), 'is_discontinuable' => $case->isDiscontinuable(), 'requires_review' => $case->requiresReview(), 'can_be_activated' => $case->canBeActivated(), 'can_be_deactivated' => $case->canBeDeactivated(), 'next_statuses' => $case->nextStatuses(), 'previous_statuses' => $case->previousStatuses(), 'seo_impact' => $case->seoImpact()]])->toArray();
     }
-
     public static function visible(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->isVisible());
+        return collect(self::cases())->filter(fn($case) => $case->isVisible());
     }
-
     public static function purchasable(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->isPurchasable());
+        return collect(self::cases())->filter(fn($case) => $case->isPurchasable());
     }
-
     public static function editable(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->isEditable());
+        return collect(self::cases())->filter(fn($case) => $case->isEditable());
     }
-
     public static function publishable(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->isPublishable());
+        return collect(self::cases())->filter(fn($case) => $case->isPublishable());
     }
-
     public static function ordered(): Collection
     {
-        return collect(self::cases())
-            ->sortBy('priority');
+        return collect(self::cases())->sortBy('priority');
     }
-
     public static function fromLabel(string $label): ?self
     {
-        return collect(self::cases())
-            ->first(fn ($case) => $case->label() === $label);
+        return collect(self::cases())->first(fn($case) => $case->label() === $label);
     }
-
     public static function values(): array
     {
         return array_column(self::cases(), 'value');
     }
-
     public static function labels(): array
     {
-        return collect(self::cases())
-            ->map(fn ($case) => $case->label())
-            ->toArray();
+        return collect(self::cases())->map(fn($case) => $case->label())->toArray();
     }
-
     public function toArray(): array
     {
-        return [
-            'value' => $this->value,
-            'label' => $this->label(),
-            'description' => $this->description(),
-            'icon' => $this->icon(),
-            'color' => $this->color(),
-            'priority' => $this->priority(),
-            'is_visible' => $this->isVisible(),
-            'is_purchasable' => $this->isPurchasable(),
-            'is_editable' => $this->isEditable(),
-            'is_publishable' => $this->isPublishable(),
-            'is_archivable' => $this->isArchivable(),
-            'is_discontinuable' => $this->isDiscontinuable(),
-            'requires_review' => $this->requiresReview(),
-            'can_be_activated' => $this->canBeActivated(),
-            'can_be_deactivated' => $this->canBeDeactivated(),
-            'next_statuses' => $this->nextStatuses(),
-            'previous_statuses' => $this->previousStatuses(),
-            'seo_impact' => $this->seoImpact(),
-        ];
+        return ['value' => $this->value, 'label' => $this->label(), 'description' => $this->description(), 'icon' => $this->icon(), 'color' => $this->color(), 'priority' => $this->priority(), 'is_visible' => $this->isVisible(), 'is_purchasable' => $this->isPurchasable(), 'is_editable' => $this->isEditable(), 'is_publishable' => $this->isPublishable(), 'is_archivable' => $this->isArchivable(), 'is_discontinuable' => $this->isDiscontinuable(), 'requires_review' => $this->requiresReview(), 'can_be_activated' => $this->canBeActivated(), 'can_be_deactivated' => $this->canBeDeactivated(), 'next_statuses' => $this->nextStatuses(), 'previous_statuses' => $this->previousStatuses(), 'seo_impact' => $this->seoImpact()];
     }
 }

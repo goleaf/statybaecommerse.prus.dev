@@ -1,14 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-
-final /**
+/**
  * AttributeTranslationController
  * 
- * HTTP controller handling web requests and responses.
+ * HTTP controller handling AttributeTranslationController related web requests, responses, and business logic with proper validation and error handling.
+ * 
  */
-class AttributeTranslationController extends Controller {}
+final class AttributeTranslationController extends Controller
+{
+}

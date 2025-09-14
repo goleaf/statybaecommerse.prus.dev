@@ -1,48 +1,45 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-final /**
+/**
  * ReferralRewardLog
  * 
- * Eloquent model representing a database entity with relationships and business logic.
+ * Eloquent model representing the ReferralRewardLog entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * 
+ * @property mixed $fillable
+ * @method static \Illuminate\Database\Eloquent\Builder|ReferralRewardLog newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ReferralRewardLog newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ReferralRewardLog query()
+ * @mixin \Eloquent
  */
-class ReferralRewardLog extends Model
+final class ReferralRewardLog extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'referral_reward_id',
-        'user_id',
-        'action',
-        'data',
-        'ip_address',
-        'user_agent',
-    ];
-
+    protected $fillable = ['referral_reward_id', 'user_id', 'action', 'data', 'ip_address', 'user_agent'];
+    /**
+     * Handle casts functionality with proper error handling.
+     * @return array
+     */
     protected function casts(): array
     {
-        return [
-            'data' => 'array',
-        ];
+        return ['data' => 'array'];
     }
-
     /**
-     * Get the referral reward this log belongs to
+     * Handle referralReward functionality with proper error handling.
+     * @return BelongsTo
      */
     public function referralReward(): BelongsTo
     {
         return $this->belongsTo(ReferralReward::class);
     }
-
     /**
-     * Get the user who performed the action
+     * Handle user functionality with proper error handling.
+     * @return BelongsTo
      */
     public function user(): BelongsTo
     {

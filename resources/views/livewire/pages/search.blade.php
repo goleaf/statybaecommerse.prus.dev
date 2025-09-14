@@ -31,11 +31,17 @@
         {{ __('loading') }}
     </div>
 
-    <form method="GET" action="{{ route('search', ['locale' => app()->getLocale()]) }}" class="mb-6">
-        <input type="text" name="q" value="{{ $term }}" placeholder="{{ __('search_products') }}"
-               aria-label="{{ __('search_products') }}"
-               class="w-full md:w-1/2 rounded-md border-gray-300" />
-    </form>
+    {{-- Enhanced Search with Autocomplete --}}
+    <div class="mb-6">
+        <livewire:components.live-search 
+            :max-results="20"
+            :search-types="['products', 'categories', 'brands', 'collections']"
+            :enable-suggestions="true"
+            :enable-recent-searches="true"
+            :enable-popular-searches="true"
+            placeholder="{{ __('search_products') }}"
+        />
+    </div>
 
     <div wire:loading class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6" role="status"
          aria-live="polite">

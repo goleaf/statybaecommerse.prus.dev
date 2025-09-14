@@ -76,7 +76,7 @@ final class ProductHistoryTest extends TestCase
             'product_id' => $this->product->id,
         ]);
 
-        $response = $this->getJson("/api/products/{$this->product->id}/history");
+        $response = $this->getJson("/api/products/{$this->product->slug}/history");
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -110,7 +110,7 @@ final class ProductHistoryTest extends TestCase
             'action' => 'stock_updated',
         ]);
 
-        $response = $this->getJson("/api/products/{$this->product->id}/history?action=price_changed");
+        $response = $this->getJson("/api/products/{$this->product->slug}/history?action=price_changed");
 
         $response->assertStatus(200);
         $response->assertJsonCount(1, 'data');
@@ -123,7 +123,7 @@ final class ProductHistoryTest extends TestCase
             'product_id' => $this->product->id,
         ]);
 
-        $response = $this->getJson("/api/products/{$this->product->id}/history?per_page=10");
+        $response = $this->getJson("/api/products/{$this->product->slug}/history?per_page=10");
 
         $response->assertStatus(200);
         $response->assertJsonCount(10, 'data');
@@ -233,7 +233,7 @@ final class ProductHistoryTest extends TestCase
             'description' => 'Stock updated after inventory check',
         ]);
 
-        $response = $this->getJson("/api/products/{$this->product->id}/history?search=price");
+        $response = $this->getJson("/api/products/{$this->product->slug}/history?search=price");
 
         $response->assertStatus(200);
         $response->assertJsonCount(1, 'data');
@@ -252,7 +252,7 @@ final class ProductHistoryTest extends TestCase
             'created_at' => now()->subDays(2),
         ]);
 
-        $response = $this->getJson("/api/products/{$this->product->id}/history?date_from=" . now()->subDays(5)->toDateString());
+        $response = $this->getJson("/api/products/{$this->product->slug}/history?date_from=" . now()->subDays(5)->toDateString());
 
         $response->assertStatus(200);
         $response->assertJsonCount(1, 'data');
@@ -265,7 +265,7 @@ final class ProductHistoryTest extends TestCase
             'product_id' => $this->product->id,
         ]);
 
-        $response = $this->get("/api/products/{$this->product->id}/history/export");
+        $response = $this->get("/api/products/{$this->product->slug}/history/export");
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
@@ -288,7 +288,7 @@ final class ProductHistoryTest extends TestCase
             'action' => 'price_changed',
         ]);
 
-        $response = $this->getJson("/api/products/{$this->product->id}/history/statistics");
+        $response = $this->getJson("/api/products/{$this->product->slug}/history/statistics");
 
         $response->assertStatus(200);
         $response->assertJsonStructure([

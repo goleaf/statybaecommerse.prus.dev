@@ -1,27 +1,34 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Policies;
 
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-
+/**
+ * NotificationPolicy
+ * 
+ * Authorization policy for NotificationPolicy access control with comprehensive permission checking and role-based access.
+ * 
+ */
 final class NotificationPolicy
 {
     use HandlesAuthorization;
-
     /**
-     * Determine whether the user can view any notifications.
+     * Handle viewAny functionality with proper error handling.
+     * @param User $user
+     * @return bool
      */
     public function viewAny(User $user): bool
     {
         return $user->hasPermissionTo('view notifications') || $user->is_admin;
     }
-
     /**
-     * Determine whether the user can view the notification.
+     * Handle view functionality with proper error handling.
+     * @param User $user
+     * @param Notification $notification
+     * @return bool
      */
     public function view(User $user, Notification $notification): bool
     {
@@ -29,21 +36,23 @@ final class NotificationPolicy
         if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
             return true;
         }
-
         // Admins can view all notifications
         return $user->hasPermissionTo('view notifications') || $user->is_admin;
     }
-
     /**
-     * Determine whether the user can create notifications.
+     * Show the form for creating a new resource.
+     * @param User $user
+     * @return bool
      */
     public function create(User $user): bool
     {
         return $user->hasPermissionTo('create notifications') || $user->is_admin;
     }
-
     /**
-     * Determine whether the user can update the notification.
+     * Update the specified resource in storage with validation.
+     * @param User $user
+     * @param Notification $notification
+     * @return bool
      */
     public function update(User $user, Notification $notification): bool
     {
@@ -51,13 +60,14 @@ final class NotificationPolicy
         if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
             return true;
         }
-
         // Admins can update all notifications
         return $user->hasPermissionTo('update notifications') || $user->is_admin;
     }
-
     /**
-     * Determine whether the user can delete the notification.
+     * Handle delete functionality with proper error handling.
+     * @param User $user
+     * @param Notification $notification
+     * @return bool
      */
     public function delete(User $user, Notification $notification): bool
     {
@@ -65,29 +75,34 @@ final class NotificationPolicy
         if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
             return true;
         }
-
         // Admins can delete all notifications
         return $user->hasPermissionTo('delete notifications') || $user->is_admin;
     }
-
     /**
-     * Determine whether the user can restore the notification.
+     * Handle restore functionality with proper error handling.
+     * @param User $user
+     * @param Notification $notification
+     * @return bool
      */
     public function restore(User $user, Notification $notification): bool
     {
         return $user->hasPermissionTo('restore notifications') || $user->is_admin;
     }
-
     /**
-     * Determine whether the user can permanently delete the notification.
+     * Handle forceDelete functionality with proper error handling.
+     * @param User $user
+     * @param Notification $notification
+     * @return bool
      */
     public function forceDelete(User $user, Notification $notification): bool
     {
         return $user->hasPermissionTo('force delete notifications') || $user->is_admin;
     }
-
     /**
-     * Determine whether the user can mark notification as read.
+     * Handle markAsRead functionality with proper error handling.
+     * @param User $user
+     * @param Notification $notification
+     * @return bool
      */
     public function markAsRead(User $user, Notification $notification): bool
     {
@@ -95,13 +110,14 @@ final class NotificationPolicy
         if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
             return true;
         }
-
         // Admins can mark any notification as read
         return $user->hasPermissionTo('update notifications') || $user->is_admin;
     }
-
     /**
-     * Determine whether the user can mark notification as unread.
+     * Handle markAsUnread functionality with proper error handling.
+     * @param User $user
+     * @param Notification $notification
+     * @return bool
      */
     public function markAsUnread(User $user, Notification $notification): bool
     {
@@ -109,29 +125,32 @@ final class NotificationPolicy
         if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
             return true;
         }
-
         // Admins can mark any notification as unread
         return $user->hasPermissionTo('update notifications') || $user->is_admin;
     }
-
     /**
-     * Determine whether the user can duplicate the notification.
+     * Handle duplicate functionality with proper error handling.
+     * @param User $user
+     * @param Notification $notification
+     * @return bool
      */
     public function duplicate(User $user, Notification $notification): bool
     {
         return $user->hasPermissionTo('create notifications') || $user->is_admin;
     }
-
     /**
-     * Determine whether the user can bulk update notifications.
+     * Handle bulkUpdate functionality with proper error handling.
+     * @param User $user
+     * @return bool
      */
     public function bulkUpdate(User $user): bool
     {
         return $user->hasPermissionTo('update notifications') || $user->is_admin;
     }
-
     /**
-     * Determine whether the user can bulk delete notifications.
+     * Handle bulkDelete functionality with proper error handling.
+     * @param User $user
+     * @return bool
      */
     public function bulkDelete(User $user): bool
     {

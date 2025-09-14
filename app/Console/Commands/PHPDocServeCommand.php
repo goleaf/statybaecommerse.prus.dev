@@ -38,7 +38,7 @@ class PHPDocServeCommand extends Command
         }
 
         // Check if port is available
-        if (!$this->isPortAvailable($host, $port)) {
+        if (!$this->isPortAvailable($host, (int) $port)) {
             $this->error("❌ Port {$port} is already in use. Please choose a different port.");
             return Command::FAILURE;
         }

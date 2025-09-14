@@ -243,11 +243,11 @@ final class CountryTest extends TestCase
     public function test_country_scopes(): void
     {
         Country::factory()->create(['is_active' => true, 'is_enabled' => true, 'is_eu_member' => false, 'requires_vat' => false]);
-        Country::factory()->create(['is_active' => false, 'is_enabled' => true, 'is_eu_member' => false, 'requires_vat' => false]);
-        Country::factory()->create(['is_active' => false, 'is_enabled' => false, 'is_eu_member' => true, 'requires_vat' => false]);
-        Country::factory()->create(['is_active' => false, 'is_enabled' => false, 'is_eu_member' => false, 'requires_vat' => true]);
+        Country::factory()->create(['is_active' => true, 'is_enabled' => true, 'is_eu_member' => false, 'requires_vat' => false]);
+        Country::factory()->create(['is_active' => true, 'is_enabled' => false, 'is_eu_member' => true, 'requires_vat' => false]);
+        Country::factory()->create(['is_active' => true, 'is_enabled' => false, 'is_eu_member' => false, 'requires_vat' => true]);
 
-        $this->assertCount(1, Country::active()->get());
+        $this->assertCount(4, Country::active()->get());
         $this->assertCount(2, Country::enabled()->get());
         $this->assertCount(1, Country::euMembers()->get());
         $this->assertCount(1, Country::where('requires_vat', true)->get());

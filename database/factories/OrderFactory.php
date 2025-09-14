@@ -34,7 +34,7 @@ class OrderFactory extends Factory
         return [
             'number' => 'ORD-'.strtoupper($this->faker->unique()->bothify('######')),
             'user_id' => User::factory(),
-            'status' => $this->faker->randomElement(['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'completed', 'cancelled']),
+            'status' => $this->faker->randomElement(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed']),
             'subtotal' => $subtotal,
             'tax_amount' => $taxAmount,
             'shipping_amount' => $shippingAmount,

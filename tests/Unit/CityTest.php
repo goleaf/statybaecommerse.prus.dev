@@ -75,6 +75,8 @@ final class CityTest extends TestCase
 
         $this->assertSoftDeleted('cities', ['id' => $cityId]);
         $this->assertCount(0, City::all());
-        $this->assertCount(1, City::withTrashed()->get());
+        
+        // Use withoutGlobalScopes to check soft-deleted records
+        $this->assertCount(1, City::withoutGlobalScopes()->onlyTrashed()->get());
     }
 }

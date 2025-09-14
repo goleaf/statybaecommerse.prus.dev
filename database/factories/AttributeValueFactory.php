@@ -24,7 +24,8 @@ final class AttributeValueFactory extends Factory
             'slug' => str($value)->slug()->toString(),
             'color_code' => $this->faker->boolean(40) ? $this->faker->hexColor() : null,
             'sort_order' => $this->faker->numberBetween(0, 50),
-            'is_enabled' => $this->faker->boolean(90),
+            'is_enabled' => true,
+            'is_active' => true,
         ];
     }
 

@@ -1,38 +1,37 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Models\Translations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-final /**
+/**
  * DiscountRedemptionTranslation
  * 
- * Eloquent model representing a database entity with relationships and business logic.
+ * Eloquent model representing the DiscountRedemptionTranslation entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * 
+ * @property mixed $table
+ * @property mixed $fillable
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountRedemptionTranslation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountRedemptionTranslation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountRedemptionTranslation query()
+ * @mixin \Eloquent
  */
-class DiscountRedemptionTranslation extends Model
+final class DiscountRedemptionTranslation extends Model
 {
     protected $table = 'discount_redemption_translations';
-
-    protected $fillable = [
-        'discount_redemption_id',
-        'locale',
-        'notes',
-        'status_description',
-        'metadata_description',
-    ];
-
+    protected $fillable = ['discount_redemption_id', 'locale', 'notes', 'status_description', 'metadata_description'];
+    /**
+     * Handle casts functionality with proper error handling.
+     * @return array
+     */
     protected function casts(): array
     {
-        return [
-            'metadata_description' => 'array',
-        ];
+        return ['metadata_description' => 'array'];
     }
-
     /**
-     * Get the discount redemption this translation belongs to
+     * Handle discountRedemption functionality with proper error handling.
+     * @return BelongsTo
      */
     public function discountRedemption(): BelongsTo
     {

@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Filament\Resources\CurrencyResource\RelationManagers;
 
 use Filament\Forms;
@@ -11,140 +10,49 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
-final /**
+/**
  * PricesRelationManager
  * 
- * Filament resource for admin panel management.
+ * Filament v4 resource for PricesRelationManager management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ * 
+ * @property string $relationship
+ * @property string|null $title
+ * @property string|null $modelLabel
+ * @property string|null $pluralModelLabel
+ * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
+ * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)
  */
-class PricesRelationManager extends RelationManager
+final class PricesRelationManager extends RelationManager
 {
     protected static string $relationship = 'prices';
-
     protected static ?string $title = 'Prices';
-
     protected static ?string $modelLabel = 'Price';
-
     protected static ?string $pluralModelLabel = 'Prices';
-
+    /**
+     * Configure the Filament form schema with fields and validation.
+     * @param Form $form
+     * @return Form
+     */
     public function form(Form $form): Form
     {
-        return $schema->schema([
-                Forms\Components\Select::make('priceable_type')
-                    ->options([
-                        'App\Models\Product' => 'Product',
-                        'App\Models\Variant' => 'Variant',
-                    ])
-                    ->required(),
-                Forms\Components\TextInput::make('priceable_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('amount')
-                    ->required()
-                    ->numeric()
-                    ->step(0.01),
-                Forms\Components\TextInput::make('compare_amount')
-                    ->numeric()
-                    ->step(0.01),
-                Forms\Components\TextInput::make('cost_amount')
-                    ->numeric()
-                    ->step(0.01),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'regular' => 'Regular',
-                        'sale' => 'Sale',
-                        'wholesale' => 'Wholesale',
-                    ])
-                    ->default('regular'),
-                Forms\Components\DateTimePicker::make('starts_at'),
-                Forms\Components\DateTimePicker::make('ends_at'),
-                Forms\Components\Toggle::make('is_enabled')
-                    ->default(true),
-                Forms\Components\KeyValue::make('metadata')
-                    ->columnSpanFull(),
-            ]);
+        return $schema->schema([Forms\Components\Select::make('priceable_type')->options(['App\Models\Product' => 'Product', 'App\Models\Variant' => 'Variant'])->required(), Forms\Components\TextInput::make('priceable_id')->required()->numeric(), Forms\Components\TextInput::make('amount')->required()->numeric()->step(0.01), Forms\Components\TextInput::make('compare_amount')->numeric()->step(0.01), Forms\Components\TextInput::make('cost_amount')->numeric()->step(0.01), Forms\Components\Select::make('type')->options(['regular' => 'Regular', 'sale' => 'Sale', 'wholesale' => 'Wholesale'])->default('regular'), Forms\Components\DateTimePicker::make('starts_at'), Forms\Components\DateTimePicker::make('ends_at'), Forms\Components\Toggle::make('is_enabled')->default(true), Forms\Components\KeyValue::make('metadata')->columnSpanFull()]);
     }
-
+    /**
+     * Configure the Filament table with columns, filters, and actions.
+     * @param Table $table
+     * @return Table
+     */
     public function table(Table $table): Table
     {
-        return $table
-            ->recordTitleAttribute('amount')
-            ->columns([
-                Tables\Columns\TextColumn::make('priceable_type')
-                    ->badge()
-                    ->color('primary'),
-                Tables\Columns\TextColumn::make('priceable_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('amount')
-                    ->money('EUR')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('compare_amount')
-                    ->money('EUR')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('cost_amount')
-                    ->money('EUR')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('type')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'regular' => 'gray',
-                        'sale' => 'success',
-                        'wholesale' => 'warning',
-                        default => 'gray',
-                    }),
-                Tables\Columns\TextColumn::make('starts_at')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('ends_at')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('is_enabled')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                Tables\Filters\TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('type')
-                    ->options([
-                        'regular' => 'Regular',
-                        'sale' => 'Sale',
-                        'wholesale' => 'Wholesale',
-                    ]),
-                Tables\Filters\TernaryFilter::make('is_enabled'),
-                Tables\Filters\Filter::make('active')
-                    ->query(fn (Builder $query): Builder => $query->where('is_enabled', true)
-                        ->where(function ($q) {
-                            $q->whereNull('starts_at')
-                                ->orWhere('starts_at', '<=', now());
-                        })
-                        ->where(function ($q) {
-                            $q->whereNull('ends_at')
-                                ->orWhere('ends_at', '>=', now());
-                        })),
-            ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make(),
-            ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                ]),
-            ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]));
+        return $table->recordTitleAttribute('amount')->columns([Tables\Columns\TextColumn::make('priceable_type')->badge()->color('primary'), Tables\Columns\TextColumn::make('priceable_id')->numeric()->sortable(), Tables\Columns\TextColumn::make('amount')->money('EUR')->sortable(), Tables\Columns\TextColumn::make('compare_amount')->money('EUR')->sortable(), Tables\Columns\TextColumn::make('cost_amount')->money('EUR')->sortable(), Tables\Columns\TextColumn::make('type')->badge()->color(fn(string $state): string => match ($state) {
+            'regular' => 'gray',
+            'sale' => 'success',
+            'wholesale' => 'warning',
+            default => 'gray',
+        }), Tables\Columns\TextColumn::make('starts_at')->dateTime()->sortable(), Tables\Columns\TextColumn::make('ends_at')->dateTime()->sortable(), Tables\Columns\IconColumn::make('is_enabled')->boolean(), Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true)])->filters([Tables\Filters\TrashedFilter::make(), Tables\Filters\SelectFilter::make('type')->options(['regular' => 'Regular', 'sale' => 'Sale', 'wholesale' => 'Wholesale']), Tables\Filters\TernaryFilter::make('is_enabled'), Tables\Filters\Filter::make('active')->query(fn(Builder $query): Builder => $query->where('is_enabled', true)->where(function ($q) {
+            $q->whereNull('starts_at')->orWhere('starts_at', '<=', now());
+        })->where(function ($q) {
+            $q->whereNull('ends_at')->orWhere('ends_at', '>=', now());
+        }))])->headerActions([Tables\Actions\CreateAction::make()])->actions([Tables\Actions\ViewAction::make(), Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make(), Tables\Actions\RestoreAction::make(), Tables\Actions\ForceDeleteAction::make()])->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make(), Tables\Actions\RestoreBulkAction::make(), Tables\Actions\ForceDeleteBulkAction::make()])])->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([SoftDeletingScope::class]));
     }
 }

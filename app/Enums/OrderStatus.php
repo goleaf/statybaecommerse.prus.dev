@@ -1,12 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Enums;
 
 use Illuminate\Support\Collection;
-
-enum OrderStatus: string
+/**
+ * OrderStatus
+ * 
+ * Enumeration defining a set of named constants with type safety.
+ */
+enum OrderStatus : string
 {
     case PENDING = 'pending';
     case CONFIRMED = 'confirmed';
@@ -18,7 +21,6 @@ enum OrderStatus: string
     case PARTIALLY_REFUNDED = 'partially_refunded';
     case FAILED = 'failed';
     case ON_HOLD = 'on_hold';
-
     public function label(): string
     {
         return match ($this) {
@@ -34,7 +36,6 @@ enum OrderStatus: string
             self::ON_HOLD => __('translations.order_status_on_hold'),
         };
     }
-
     public function description(): string
     {
         return match ($this) {
@@ -50,7 +51,6 @@ enum OrderStatus: string
             self::ON_HOLD => __('translations.order_status_on_hold_description'),
         };
     }
-
     public function icon(): string
     {
         return match ($this) {
@@ -66,7 +66,6 @@ enum OrderStatus: string
             self::ON_HOLD => 'heroicon-o-pause-circle',
         };
     }
-
     public function color(): string
     {
         return match ($this) {
@@ -82,7 +81,6 @@ enum OrderStatus: string
             self::ON_HOLD => 'gray',
         };
     }
-
     public function priority(): int
     {
         return match ($this) {
@@ -98,7 +96,6 @@ enum OrderStatus: string
             self::REFUNDED => 10,
         };
     }
-
     public function isActive(): bool
     {
         return match ($this) {
@@ -106,7 +103,6 @@ enum OrderStatus: string
             default => false,
         };
     }
-
     public function isCompleted(): bool
     {
         return match ($this) {
@@ -114,7 +110,6 @@ enum OrderStatus: string
             default => false,
         };
     }
-
     public function isCancelled(): bool
     {
         return match ($this) {
@@ -122,7 +117,6 @@ enum OrderStatus: string
             default => false,
         };
     }
-
     public function isRefunded(): bool
     {
         return match ($this) {
@@ -130,7 +124,6 @@ enum OrderStatus: string
             default => false,
         };
     }
-
     public function canBeCancelled(): bool
     {
         return match ($this) {
@@ -138,7 +131,6 @@ enum OrderStatus: string
             default => false,
         };
     }
-
     public function canBeRefunded(): bool
     {
         return match ($this) {
@@ -146,7 +138,6 @@ enum OrderStatus: string
             default => false,
         };
     }
-
     public function canBeShipped(): bool
     {
         return match ($this) {
@@ -154,7 +145,6 @@ enum OrderStatus: string
             default => false,
         };
     }
-
     public function canBeDelivered(): bool
     {
         return match ($this) {
@@ -162,7 +152,6 @@ enum OrderStatus: string
             default => false,
         };
     }
-
     public function nextStatuses(): array
     {
         return match ($this) {
@@ -175,7 +164,6 @@ enum OrderStatus: string
             default => [],
         };
     }
-
     public function previousStatuses(): array
     {
         return match ($this) {
@@ -188,7 +176,6 @@ enum OrderStatus: string
             default => [],
         };
     }
-
     public function estimatedDays(): ?int
     {
         return match ($this) {
@@ -200,110 +187,48 @@ enum OrderStatus: string
             default => null,
         };
     }
-
     public static function options(): array
     {
-        return collect(self::cases())
-            ->sortBy('priority')
-            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
-            ->toArray();
+        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn($case) => [$case->value => $case->label()])->toArray();
     }
-
     public static function optionsWithDescriptions(): array
     {
-        return collect(self::cases())
-            ->sortBy('priority')
-            ->mapWithKeys(fn ($case) => [
-                $case->value => [
-                    'label' => $case->label(),
-                    'description' => $case->description(),
-                    'icon' => $case->icon(),
-                    'color' => $case->color(),
-                    'priority' => $case->priority(),
-                    'is_active' => $case->isActive(),
-                    'is_completed' => $case->isCompleted(),
-                    'is_cancelled' => $case->isCancelled(),
-                    'is_refunded' => $case->isRefunded(),
-                    'can_be_cancelled' => $case->canBeCancelled(),
-                    'can_be_refunded' => $case->canBeRefunded(),
-                    'can_be_shipped' => $case->canBeShipped(),
-                    'can_be_delivered' => $case->canBeDelivered(),
-                    'next_statuses' => $case->nextStatuses(),
-                    'previous_statuses' => $case->previousStatuses(),
-                    'estimated_days' => $case->estimatedDays(),
-                ],
-            ])
-            ->toArray();
+        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn($case) => [$case->value => ['label' => $case->label(), 'description' => $case->description(), 'icon' => $case->icon(), 'color' => $case->color(), 'priority' => $case->priority(), 'is_active' => $case->isActive(), 'is_completed' => $case->isCompleted(), 'is_cancelled' => $case->isCancelled(), 'is_refunded' => $case->isRefunded(), 'can_be_cancelled' => $case->canBeCancelled(), 'can_be_refunded' => $case->canBeRefunded(), 'can_be_shipped' => $case->canBeShipped(), 'can_be_delivered' => $case->canBeDelivered(), 'next_statuses' => $case->nextStatuses(), 'previous_statuses' => $case->previousStatuses(), 'estimated_days' => $case->estimatedDays()]])->toArray();
     }
-
     public static function active(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->isActive());
+        return collect(self::cases())->filter(fn($case) => $case->isActive());
     }
-
     public static function completed(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->isCompleted());
+        return collect(self::cases())->filter(fn($case) => $case->isCompleted());
     }
-
     public static function cancelled(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->isCancelled());
+        return collect(self::cases())->filter(fn($case) => $case->isCancelled());
     }
-
     public static function refunded(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->isRefunded());
+        return collect(self::cases())->filter(fn($case) => $case->isRefunded());
     }
-
     public static function ordered(): Collection
     {
-        return collect(self::cases())
-            ->sortBy('priority');
+        return collect(self::cases())->sortBy('priority');
     }
-
     public static function fromLabel(string $label): ?self
     {
-        return collect(self::cases())
-            ->first(fn ($case) => $case->label() === $label);
+        return collect(self::cases())->first(fn($case) => $case->label() === $label);
     }
-
     public static function values(): array
     {
         return array_column(self::cases(), 'value');
     }
-
     public static function labels(): array
     {
-        return collect(self::cases())
-            ->map(fn ($case) => $case->label())
-            ->toArray();
+        return collect(self::cases())->map(fn($case) => $case->label())->toArray();
     }
-
     public function toArray(): array
     {
-        return [
-            'value' => $this->value,
-            'label' => $this->label(),
-            'description' => $this->description(),
-            'icon' => $this->icon(),
-            'color' => $this->color(),
-            'priority' => $this->priority(),
-            'is_active' => $this->isActive(),
-            'is_completed' => $this->isCompleted(),
-            'is_cancelled' => $this->isCancelled(),
-            'is_refunded' => $this->isRefunded(),
-            'can_be_cancelled' => $this->canBeCancelled(),
-            'can_be_refunded' => $this->canBeRefunded(),
-            'can_be_shipped' => $this->canBeShipped(),
-            'can_be_delivered' => $this->canBeDelivered(),
-            'next_statuses' => $this->nextStatuses(),
-            'previous_statuses' => $this->previousStatuses(),
-            'estimated_days' => $this->estimatedDays(),
-        ];
+        return ['value' => $this->value, 'label' => $this->label(), 'description' => $this->description(), 'icon' => $this->icon(), 'color' => $this->color(), 'priority' => $this->priority(), 'is_active' => $this->isActive(), 'is_completed' => $this->isCompleted(), 'is_cancelled' => $this->isCancelled(), 'is_refunded' => $this->isRefunded(), 'can_be_cancelled' => $this->canBeCancelled(), 'can_be_refunded' => $this->canBeRefunded(), 'can_be_shipped' => $this->canBeShipped(), 'can_be_delivered' => $this->canBeDelivered(), 'next_statuses' => $this->nextStatuses(), 'previous_statuses' => $this->previousStatuses(), 'estimated_days' => $this->estimatedDays()];
     }
 }

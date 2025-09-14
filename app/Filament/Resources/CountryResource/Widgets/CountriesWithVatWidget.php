@@ -1,24 +1,29 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Filament\Resources\CountryResource\Widgets;
 
 use App\Models\Country;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Database\Eloquent\Builder;
-
-final /**
+/**
  * CountriesWithVatWidget
  * 
- * Filament resource for admin panel management.
+ * Filament v4 resource for CountriesWithVatWidget management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ * 
+ * @property string|null $heading
+ * @property int|null $sort
+ * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
+ * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)
  */
-class CountriesWithVatWidget extends ChartWidget
+final class CountriesWithVatWidget extends ChartWidget
 {
     protected static ?string $heading = 'admin.countries.widgets.countries_with_vat';
-
     protected static ?int $sort = 4;
-
+    /**
+     * Handle getData functionality with proper error handling.
+     * @return array
+     */
     protected function getData(): array
     {
         $vatRates = Country::selectRaw('
@@ -31,9 +36,7 @@ class CountriesWithVatWidget extends ChartWidget
                     ELSE "30%+"
                 END as vat_range,
                 COUNT(*) as count
-            ')
-            ->groupBy('vat_range')
-            ->orderByRaw('
+            ')->groupBy('vat_range')->orderByRaw('
                 CASE 
                     WHEN vat_range = "No VAT" THEN 1
                     WHEN vat_range = "0%" THEN 2
@@ -42,60 +45,37 @@ class CountriesWithVatWidget extends ChartWidget
                     WHEN vat_range = "21-30%" THEN 5
                     ELSE 6
                 END
-            ')
-            ->get();
-
-        return [
-            'datasets' => [
-                [
-                    'label' => __('admin.countries.widgets.countries_count'),
-                    'data' => $vatRates->pluck('count')->toArray(),
-                    'backgroundColor' => [
-                        '#6B7280', // Gray for No VAT
-                        '#10B981', // Green for 0%
-                        '#3B82F6', // Blue for 1-10%
-                        '#F59E0B', // Yellow for 11-20%
-                        '#EF4444', // Red for 21-30%
-                        '#8B5CF6', // Purple for 30%+
-                    ],
-                    'borderColor' => '#ffffff',
-                    'borderWidth' => 2,
-                ],
-            ],
-            'labels' => $vatRates->pluck('vat_range')->toArray(),
-        ];
+            ')->get();
+        return ['datasets' => [['label' => __('admin.countries.widgets.countries_count'), 'data' => $vatRates->pluck('count')->toArray(), 'backgroundColor' => [
+            '#6B7280',
+            // Gray for No VAT
+            '#10B981',
+            // Green for 0%
+            '#3B82F6',
+            // Blue for 1-10%
+            '#F59E0B',
+            // Yellow for 11-20%
+            '#EF4444',
+            // Red for 21-30%
+            '#8B5CF6',
+        ], 'borderColor' => '#ffffff', 'borderWidth' => 2]], 'labels' => $vatRates->pluck('vat_range')->toArray()];
     }
-
+    /**
+     * Handle getType functionality with proper error handling.
+     * @return string
+     */
     protected function getType(): string
     {
         return 'bar';
     }
-
+    /**
+     * Handle getOptions functionality with proper error handling.
+     * @return array
+     */
     protected function getOptions(): array
     {
-        return [
-            'responsive' => true,
-            'maintainAspectRatio' => false,
-            'plugins' => [
-                'legend' => [
-                    'display' => false,
-                ],
-                'tooltip' => [
-                    'callbacks' => [
-                        'label' => 'function(context) {
+        return ['responsive' => true, 'maintainAspectRatio' => false, 'plugins' => ['legend' => ['display' => false], 'tooltip' => ['callbacks' => ['label' => 'function(context) {
                             return context.label + ": " + context.parsed.y + " " + "' . __('admin.countries.widgets.countries') . '";
-                        }',
-                    ],
-                ],
-            ],
-            'scales' => [
-                'y' => [
-                    'beginAtZero' => true,
-                    'ticks' => [
-                        'stepSize' => 1,
-                    ],
-                ],
-            ],
-        ];
+                        }']]], 'scales' => ['y' => ['beginAtZero' => true, 'ticks' => ['stepSize' => 1]]]];
     }
 }

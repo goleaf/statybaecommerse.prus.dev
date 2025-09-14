@@ -1,32 +1,28 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Models\Category;
 use App\Support\FeatureState;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
-
 /**
  * Navigation
  * 
- * Livewire component for reactive frontend functionality.
+ * Livewire component for Navigation with reactive frontend functionality, real-time updates, and user interaction handling.
+ * 
  */
 class Navigation extends Component
 {
+    /**
+     * Render the Livewire component view with current state.
+     */
     public function render()
     {
         $features = config('app-features.features', []);
-
         $categoryFeature = $features['category'] ?? null;
-        $enableCategory = $categoryFeature instanceof FeatureState
-            ? $categoryFeature === FeatureState::Enabled
-            : (is_string($categoryFeature)
-                ? strtolower($categoryFeature) === strtolower(FeatureState::Enabled->value)
-                : (bool) $categoryFeature);
-
+        $enableCategory = $categoryFeature instanceof FeatureState ? $categoryFeature === FeatureState::Enabled : (is_string($categoryFeature) ? strtolower($categoryFeature) === strtolower(FeatureState::Enabled->value) : (bool) $categoryFeature);
         $categories = collect();
         if ($enableCategory && class_exists(Category::class)) {
             $locale = app()->getLocale();
@@ -44,13 +40,9 @@ class Navigation extends Component
                 } else {
                     $query->where('is_enabled', true);
                 }
-
                 return $query->orderBy('position')->get();
             });
         }
-
-        return view('livewire.components.navigation', [
-            'categories' => $categories,
-        ]);
+        return view('livewire.components.navigation', ['categories' => $categories]);
     }
 }

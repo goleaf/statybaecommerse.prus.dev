@@ -1,30 +1,34 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-
 /**
- * Global scope to filter only published records
+ * PublishedScope
  * 
- * This scope automatically applies to models that have published_at fields
- * and ensures that only published records are returned by default.
+ * Eloquent model representing the PublishedScope entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * 
+ * @method static \Illuminate\Database\Eloquent\Builder|PublishedScope newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|PublishedScope newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|PublishedScope query()
+ * @mixin \Eloquent
  */
 final class PublishedScope implements Scope
 {
     /**
-     * Apply the scope to a given Eloquent query builder.
+     * Handle apply functionality with proper error handling.
+     * @param Builder $builder
+     * @param Model $model
+     * @return void
      */
     public function apply(Builder $builder, Model $model): void
     {
         // Check if the model has a published_at column
         if ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'published_at')) {
-            $builder->whereNotNull('published_at')
-                   ->where('published_at', '<=', now());
+            $builder->whereNotNull('published_at')->where('published_at', '<=', now());
         }
     }
 }

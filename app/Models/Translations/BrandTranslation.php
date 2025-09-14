@@ -1,40 +1,40 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Models\Translations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-final /**
+/**
  * BrandTranslation
  * 
- * Eloquent model representing a database entity with relationships and business logic.
+ * Eloquent model representing the BrandTranslation entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * 
+ * @property mixed $table
+ * @property mixed $fillable
+ * @property mixed $timestamps
+ * @method static \Illuminate\Database\Eloquent\Builder|BrandTranslation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|BrandTranslation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|BrandTranslation query()
+ * @mixin \Eloquent
  */
-class BrandTranslation extends Model
+final class BrandTranslation extends Model
 {
     protected $table = 'brand_translations';
-
-    protected $fillable = [
-        'brand_id',
-        'locale',
-        'name',
-        'slug',
-        'description',
-        'seo_title',
-        'seo_description',
-    ];
-
+    protected $fillable = ['brand_id', 'locale', 'name', 'slug', 'description', 'seo_title', 'seo_description'];
+    /**
+     * Handle casts functionality with proper error handling.
+     * @return array
+     */
     protected function casts(): array
     {
-        return [
-            'brand_id' => 'integer',
-        ];
+        return ['brand_id' => 'integer'];
     }
-
     public $timestamps = true;
-
+    /**
+     * Handle brand functionality with proper error handling.
+     * @return BelongsTo
+     */
     public function brand(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Brand::class);

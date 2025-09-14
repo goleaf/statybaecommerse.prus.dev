@@ -1,42 +1,41 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Data\NewsCommentData;
 use App\Models\News;
 use App\Models\NewsComment;
 use Illuminate\Http\RedirectResponse;
-
-final /**
+/**
  * NewsCommentController
  * 
- * HTTP controller handling web requests and responses.
+ * HTTP controller handling NewsCommentController related web requests, responses, and business logic with proper validation and error handling.
+ * 
  */
-class NewsCommentController extends Controller
+final class NewsCommentController extends Controller
 {
+    /**
+     * Store a newly created resource in storage with validation.
+     * @param NewsCommentData $data
+     * @param string $slug
+     * @return RedirectResponse
+     */
     public function store(NewsCommentData $data, string $slug): RedirectResponse
     {
-        $news = News::published()
-            ->whereHas('translations', function ($query) use ($slug) {
-                $query->where('slug', $slug)
-                    ->where('locale', app()->getLocale());
-            })
-            ->firstOrFail();
-
+        $news = News::published()->whereHas('translations', function ($query) use ($slug) {
+            $query->where('slug', $slug)->where('locale', app()->getLocale());
+        })->firstOrFail();
         $comment = NewsComment::create([
             'news_id' => $news->id,
             'parent_id' => $data->parent_id,
             'author_name' => $data->author_name,
             'author_email' => $data->author_email,
             'content' => $data->content,
-            'is_approved' => false, // Comments need approval
+            'is_approved' => false,
+            // Comments need approval
             'is_visible' => true,
         ]);
-
-        return redirect()
-            ->route('news.show', $slug)
-            ->with('success', __('news.comment_success'));
+        return redirect()->route('news.show', $slug)->with('success', __('news.comment_success'));
     }
 }

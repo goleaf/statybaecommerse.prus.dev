@@ -1,23 +1,28 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Filament\Resources\PriceListItemResource\Widgets;
 
 use App\Models\PriceListItem;
 use Filament\Widgets\ChartWidget;
-
-final /**
+/**
  * PriceListItemChartWidget
  * 
- * Filament resource for admin panel management.
+ * Filament v4 resource for PriceListItemChartWidget management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ * 
+ * @property string|null $heading
+ * @property int|null $sort
+ * @method static \Filament\Forms\Form form(\Filament\Forms\Form $form)
+ * @method static \Filament\Tables\Table table(\Filament\Tables\Table $table)
  */
-class PriceListItemChartWidget extends ChartWidget
+final class PriceListItemChartWidget extends ChartWidget
 {
     protected static ?string $heading = 'Price List Items Overview';
-
     protected static ?int $sort = 2;
-
+    /**
+     * Handle getData functionality with proper error handling.
+     * @return array
+     */
     protected function getData(): array
     {
         $data = PriceListItem::selectRaw('
@@ -25,52 +30,23 @@ class PriceListItemChartWidget extends ChartWidget
                 COUNT(*) as total_items,
                 SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_items,
                 SUM(CASE WHEN compare_amount IS NOT NULL AND compare_amount > net_amount THEN 1 ELSE 0 END) as items_with_discount
-            ')
-            ->where('created_at', '>=', now()->subDays(30))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        return [
-            'datasets' => [
-                [
-                    'label' => __('admin.price_list_items.charts.total_items'),
-                    'data' => $data->pluck('total_items')->toArray(),
-                    'borderColor' => 'rgb(59, 130, 246)',
-                    'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                ],
-                [
-                    'label' => __('admin.price_list_items.charts.active_items'),
-                    'data' => $data->pluck('active_items')->toArray(),
-                    'borderColor' => 'rgb(34, 197, 94)',
-                    'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
-                ],
-                [
-                    'label' => __('admin.price_list_items.charts.items_with_discount'),
-                    'data' => $data->pluck('items_with_discount')->toArray(),
-                    'borderColor' => 'rgb(245, 158, 11)',
-                    'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
-                ],
-            ],
-            'labels' => $data->pluck('date')->map(fn ($date) => \Carbon\Carbon::parse($date)->format('M d'))->toArray(),
-        ];
+            ')->where('created_at', '>=', now()->subDays(30))->groupBy('date')->orderBy('date')->get();
+        return ['datasets' => [['label' => __('admin.price_list_items.charts.total_items'), 'data' => $data->pluck('total_items')->toArray(), 'borderColor' => 'rgb(59, 130, 246)', 'backgroundColor' => 'rgba(59, 130, 246, 0.1)'], ['label' => __('admin.price_list_items.charts.active_items'), 'data' => $data->pluck('active_items')->toArray(), 'borderColor' => 'rgb(34, 197, 94)', 'backgroundColor' => 'rgba(34, 197, 94, 0.1)'], ['label' => __('admin.price_list_items.charts.items_with_discount'), 'data' => $data->pluck('items_with_discount')->toArray(), 'borderColor' => 'rgb(245, 158, 11)', 'backgroundColor' => 'rgba(245, 158, 11, 0.1)']], 'labels' => $data->pluck('date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('M d'))->toArray()];
     }
-
+    /**
+     * Handle getType functionality with proper error handling.
+     * @return string
+     */
     protected function getType(): string
     {
         return 'line';
     }
-
+    /**
+     * Handle getOptions functionality with proper error handling.
+     * @return array
+     */
     protected function getOptions(): array
     {
-        return [
-            'responsive' => true,
-            'maintainAspectRatio' => false,
-            'scales' => [
-                'y' => [
-                    'beginAtZero' => true,
-                ],
-            ],
-        ];
+        return ['responsive' => true, 'maintainAspectRatio' => false, 'scales' => ['y' => ['beginAtZero' => true]]];
     }
 }

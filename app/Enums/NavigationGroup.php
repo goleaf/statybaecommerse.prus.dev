@@ -1,12 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Enums;
 
 use Illuminate\Support\Collection;
-
-enum NavigationGroup: string
+/**
+ * NavigationGroup
+ * 
+ * Enumeration defining a set of named constants with type safety.
+ */
+enum NavigationGroup : string
 {
     case Referral = 'Referral System';
     case Products = 'Products';
@@ -19,7 +22,6 @@ enum NavigationGroup: string
     case Marketing = 'Marketing';
     case Inventory = 'Inventory';
     case Reports = 'Reports';
-
     public function label(): string
     {
         return match ($this) {
@@ -36,7 +38,6 @@ enum NavigationGroup: string
             self::Reports => __('translations.nav_group_reports'),
         };
     }
-
     public function description(): string
     {
         return match ($this) {
@@ -53,7 +54,6 @@ enum NavigationGroup: string
             self::Reports => __('translations.nav_group_reports_description'),
         };
     }
-
     public function icon(): string
     {
         return match ($this) {
@@ -70,7 +70,6 @@ enum NavigationGroup: string
             self::Reports => 'heroicon-o-document-chart-bar',
         };
     }
-
     public function color(): string
     {
         return match ($this) {
@@ -87,7 +86,6 @@ enum NavigationGroup: string
             self::Reports => 'cyan',
         };
     }
-
     public function priority(): int
     {
         return match ($this) {
@@ -104,7 +102,6 @@ enum NavigationGroup: string
             self::System => 11,
         };
     }
-
     public function isCore(): bool
     {
         return match ($this) {
@@ -112,7 +109,6 @@ enum NavigationGroup: string
             default => false,
         };
     }
-
     public function isAdminOnly(): bool
     {
         return match ($this) {
@@ -120,7 +116,6 @@ enum NavigationGroup: string
             default => false,
         };
     }
-
     public function isPublic(): bool
     {
         return match ($this) {
@@ -128,7 +123,6 @@ enum NavigationGroup: string
             default => false,
         };
     }
-
     public function requiresPermission(): bool
     {
         return match ($this) {
@@ -136,7 +130,6 @@ enum NavigationGroup: string
             default => false,
         };
     }
-
     public function getPermission(): string
     {
         return match ($this) {
@@ -145,100 +138,51 @@ enum NavigationGroup: string
             self::System => 'manage_system',
             self::Analytics => 'view_analytics',
             self::Reports => 'view_reports',
-            default => 'view_'.strtolower($this->value),
+            default => 'view_' . strtolower($this->value),
         };
     }
-
     public static function options(): array
     {
-        return collect(self::cases())
-            ->sortBy('priority')
-            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
-            ->toArray();
+        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn($case) => [$case->value => $case->label()])->toArray();
     }
-
     public static function optionsWithDescriptions(): array
     {
-        return collect(self::cases())
-            ->sortBy('priority')
-            ->mapWithKeys(fn ($case) => [
-                $case->value => [
-                    'label' => $case->label(),
-                    'description' => $case->description(),
-                    'icon' => $case->icon(),
-                    'color' => $case->color(),
-                    'is_core' => $case->isCore(),
-                    'is_admin_only' => $case->isAdminOnly(),
-                    'is_public' => $case->isPublic(),
-                    'requires_permission' => $case->requiresPermission(),
-                    'permission' => $case->getPermission(),
-                ],
-            ])
-            ->toArray();
+        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn($case) => [$case->value => ['label' => $case->label(), 'description' => $case->description(), 'icon' => $case->icon(), 'color' => $case->color(), 'is_core' => $case->isCore(), 'is_admin_only' => $case->isAdminOnly(), 'is_public' => $case->isPublic(), 'requires_permission' => $case->requiresPermission(), 'permission' => $case->getPermission()]])->toArray();
     }
-
     public static function core(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->isCore());
+        return collect(self::cases())->filter(fn($case) => $case->isCore());
     }
-
     public static function adminOnly(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->isAdminOnly());
+        return collect(self::cases())->filter(fn($case) => $case->isAdminOnly());
     }
-
     public static function public(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->isPublic());
+        return collect(self::cases())->filter(fn($case) => $case->isPublic());
     }
-
     public static function withPermissions(): Collection
     {
-        return collect(self::cases())
-            ->filter(fn ($case) => $case->requiresPermission());
+        return collect(self::cases())->filter(fn($case) => $case->requiresPermission());
     }
-
     public static function ordered(): Collection
     {
-        return collect(self::cases())
-            ->sortBy('priority');
+        return collect(self::cases())->sortBy('priority');
     }
-
     public static function fromLabel(string $label): ?self
     {
-        return collect(self::cases())
-            ->first(fn ($case) => $case->label() === $label);
+        return collect(self::cases())->first(fn($case) => $case->label() === $label);
     }
-
     public static function values(): array
     {
         return array_column(self::cases(), 'value');
     }
-
     public static function labels(): array
     {
-        return collect(self::cases())
-            ->map(fn ($case) => $case->label())
-            ->toArray();
+        return collect(self::cases())->map(fn($case) => $case->label())->toArray();
     }
-
     public function toArray(): array
     {
-        return [
-            'value' => $this->value,
-            'label' => $this->label(),
-            'description' => $this->description(),
-            'icon' => $this->icon(),
-            'color' => $this->color(),
-            'priority' => $this->priority(),
-            'is_core' => $this->isCore(),
-            'is_admin_only' => $this->isAdminOnly(),
-            'is_public' => $this->isPublic(),
-            'requires_permission' => $this->requiresPermission(),
-            'permission' => $this->getPermission(),
-        ];
+        return ['value' => $this->value, 'label' => $this->label(), 'description' => $this->description(), 'icon' => $this->icon(), 'color' => $this->color(), 'priority' => $this->priority(), 'is_core' => $this->isCore(), 'is_admin_only' => $this->isAdminOnly(), 'is_public' => $this->isPublic(), 'requires_permission' => $this->requiresPermission(), 'permission' => $this->getPermission()];
     }
 }

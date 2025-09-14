@@ -105,6 +105,7 @@
             <div wire:loading.remove>
                 <button
                     wire:click="clearQuery"
+                    wire:confirm="{{ __('translations.confirm_clear_search_query') }}"
                     x-show="query.length > 0"
                     type="button"
                     class="p-2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200"
@@ -201,6 +202,7 @@
                 </button>
                 
                 <button wire:click="resetFilters" 
+                        wire:confirm="{{ __('translations.confirm_reset_search_filters') }}"
                         class="px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs font-medium hover:bg-red-200 transition-colors duration-200">
                     {{ __('frontend.search.clear_filters') }}
                 </button>
@@ -375,6 +377,7 @@
                 </p>
                 <div class="mt-4">
                     <button wire:click="clearQuery" 
+                            wire:confirm="{{ __('translations.confirm_clear_search_query') }}"
                             class="text-sm text-blue-600 hover:text-blue-800 font-medium">
                         {{ __('frontend.search.clear_search') }}
                     </button>

@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Data;
 
 use Spatie\LaravelData\Attributes\Validation\Email;
@@ -13,27 +12,37 @@ use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Data;
-
+/**
+ * ReviewData
+ * 
+ * Data transfer object for ReviewData structured data handling with validation and type safety.
+ * 
+ */
 final class ReviewData extends Data
 {
+    /**
+     * Initialize the class instance with required dependencies.
+     * @param int $product_id
+     * @param int $rating
+     * @param string|null $title
+     * @param string|null $comment
+     * @param string $reviewer_name
+     * @param string $reviewer_email
+     */
     public function __construct(
         #[Required, IntegerType, Exists('products', 'id')]
         public int $product_id,
-
         #[Required, IntegerType, Min(1), Max(5)]
         public int $rating,
-
         #[Nullable, StringType, Max(255)]
         public ?string $title,
-
         #[Nullable, StringType, Max(2000)]
         public ?string $comment,
-
         #[Required, StringType, Max(255)]
         public string $reviewer_name,
-
         #[Required, Email, Max(255)]
-        public string $reviewer_email,
-    ) {
+        public string $reviewer_email
+    )
+    {
     }
 }

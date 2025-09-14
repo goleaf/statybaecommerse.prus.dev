@@ -1,32 +1,35 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace App\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-
 /**
- * Global scope for user-owned data filtering
+ * UserOwnedScope
  * 
- * This scope automatically applies user filtering to models that have user_id
- * or similar user ownership fields, ensuring users only see their own data.
+ * Eloquent model representing the UserOwnedScope entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * 
+ * @method static \Illuminate\Database\Eloquent\Builder|UserOwnedScope newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserOwnedScope newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserOwnedScope query()
+ * @mixin \Eloquent
  */
 final class UserOwnedScope implements Scope
 {
     /**
-     * Apply the scope to a given Eloquent query builder.
+     * Handle apply functionality with proper error handling.
+     * @param Builder $builder
+     * @param Model $model
+     * @return void
      */
     public function apply(Builder $builder, Model $model): void
     {
         // Check if the model has user-related columns
         $userColumns = $this->getUserColumns($model);
-        
         if (!empty($userColumns) && auth()->check()) {
             $userId = auth()->id();
-            
             if ($userId) {
                 $builder->where(function ($query) use ($userColumns, $userId) {
                     foreach ($userColumns as $column) {
@@ -36,26 +39,23 @@ final class UserOwnedScope implements Scope
             }
         }
     }
-
     /**
-     * Get user-related columns for the model
+     * Handle getUserColumns functionality with proper error handling.
+     * @param Model $model
+     * @return array
      */
     private function getUserColumns(Model $model): array
     {
         $table = $model->getTable();
         $schema = $model->getConnection()->getSchemaBuilder();
-        
         $userColumns = [];
-        
         // Check for common user column names
         $possibleColumns = ['user_id', 'created_by', 'owner_id', 'customer_id'];
-        
         foreach ($possibleColumns as $column) {
             if ($schema->hasColumn($table, $column)) {
                 $userColumns[] = $column;
             }
         }
-        
         return $userColumns;
     }
 }

@@ -23,11 +23,12 @@ final class CampaignFactory extends Factory
         return [
             'name' => $name,
             'slug' => \Illuminate\Support\Str::slug($name),
-            'starts_at' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
-            'ends_at' => $this->faker->dateTimeBetween('+1 month', '+3 months'),
+            'starts_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
+            'ends_at' => $this->faker->dateTimeBetween('now', '+3 months'),
             'channel_id' => Channel::factory(),
             'zone_id' => Zone::factory(),
-            'status' => $this->faker->randomElement(['draft', 'scheduled', 'active', 'paused', 'completed', 'cancelled']),
+            'status' => 'active',
+            'is_active' => true,
             'metadata' => [
                 'source' => $this->faker->randomElement(['manual', 'automated', 'imported']),
                 'tags' => $this->faker->words(3),

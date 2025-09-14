@@ -37,8 +37,8 @@ final class ZoneFactory extends Factory
             'min_order_amount' => $this->faker->optional(0.3)->randomFloat(2, 10, 100),
             'max_order_amount' => $this->faker->optional(0.2)->randomFloat(2, 500, 2000),
             'free_shipping_threshold' => $this->faker->optional(0.4)->randomFloat(2, 50, 200),
-            'is_enabled' => $this->faker->boolean(80),
-            'is_active' => $this->faker->boolean(90),
+            'is_enabled' => true,
+            'is_active' => true,
             'is_default' => false,
             'sort_order' => $this->faker->numberBetween(0, 100),
             'metadata' => $this->faker->optional(0.2)->randomElements([
