@@ -112,6 +112,21 @@ if (! function_exists('app_money_format')) {
     }
 }
 
+if (! function_exists('format_price')) {
+    function format_price(float|int|string|null $amount, ?string $currency = null, ?string $locale = null): string
+    {
+        if ($amount === null || $amount === '') {
+            return '';
+        }
+        
+        $currency = $currency ?: current_currency();
+        $locale = $locale ?: app()->getLocale();
+        
+        // Use the existing format_money function for consistency
+        return format_money((float) $amount, $currency, $locale);
+    }
+}
+
 if (! function_exists('format_date')) {
     function format_date(\DateTimeInterface|string|null $date, ?string $locale = null, int $dateType = \IntlDateFormatter::MEDIUM): string
     {
