@@ -11,7 +11,8 @@ use UnitEnum;
 
 final class EmailMarketingPage extends Page
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-envelope-open';
+    /** @var BackedEnum|string|null */
+    protected static $navigationIcon = 'heroicon-o-envelope-open';
 
     protected static string $view = 'filament.pages.email-marketing-page';
 
