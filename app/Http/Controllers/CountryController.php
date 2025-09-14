@@ -79,15 +79,6 @@ final class CountryController extends Controller
         return response()->json($countries);
     }
     /**
-     * Handle byRegion functionality with proper error handling.
-     * @param string $region
-     */
-    public function byRegion(string $region)
-    {
-        $countries = Country::query()->where('region', $region)->orderBy('name')->get(['id', 'name', 'cca2', 'cca3', 'flag', 'currency_code']);
-        return response()->json($countries);
-    }
-    /**
      * Handle euMembers functionality with proper error handling.
      */
     public function euMembers()

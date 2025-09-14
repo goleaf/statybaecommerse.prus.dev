@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Models\Country;
-use App\Models\Region;
 use App\Models\Zone;
 use App\Models\City;
 use App\Enums\AddressType;
@@ -52,7 +51,7 @@ final class AddressController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $validator = Validator::make($request->all(), ['type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'zone_id' => 'nullable|exists:zones,id', 'region_id' => 'nullable|exists:regions,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255']);
+        $validator = Validator::make($request->all(), ['type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'zone_id' => 'nullable|exists:zones,id',  'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255']);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -97,7 +96,7 @@ final class AddressController extends Controller
     public function update(Request $request, Address $address): RedirectResponse
     {
         $this->authorize('update', $address);
-        $validator = Validator::make($request->all(), ['type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'zone_id' => 'nullable|exists:zones,id', 'region_id' => 'nullable|exists:regions,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255']);
+        $validator = Validator::make($request->all(), ['type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'zone_id' => 'nullable|exists:zones,id',  'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255']);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -152,16 +151,6 @@ final class AddressController extends Controller
         return response()->json($countries);
     }
     /**
-     * Handle getRegions functionality with proper error handling.
-     * @param Request $request
-     * @return Illuminate\Http\JsonResponse
-     */
-    public function getRegions(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $regions = Region::where('country_id', $request->country_id)->orderBy('name')->get(['id', 'name']);
-        return response()->json($regions);
-    }
-    /**
      * Handle getZones functionality with proper error handling.
      * @param Request $request
      * @return Illuminate\Http\JsonResponse
@@ -178,7 +167,7 @@ final class AddressController extends Controller
      */
     public function getCities(Request $request): \Illuminate\Http\JsonResponse
     {
-        $cities = City::where('region_id', $request->region_id)->orderBy('name')->get(['id', 'name']);
+        $cities = City::where('country_id', $request->country_id)->orderBy('name')->get(['id', 'name']);
         return response()->json($cities);
     }
 }

@@ -70,14 +70,15 @@ class AddressTest extends TestCase
         $this->assertEquals($country->id, $address->country->id);
     }
 
-    public function test_address_belongs_to_region(): void
-    {
-        $region = Region::factory()->enabled()->create();
-        $address = Address::factory()->create(['region_id' => $region->id]);
-
-        $this->assertInstanceOf(Region::class, $address->region);
-        $this->assertEquals($region->id, $address->region->id);
-    }
+    // Region functionality removed - test disabled
+    // public function test_address_belongs_to_region(): void
+    // {
+    //     $region = Region::factory()->enabled()->create();
+    //     $address = Address::factory()->create(['region_id' => $region->id]);
+    //
+    //     $this->assertInstanceOf(Region::class, $address->region);
+    //     $this->assertEquals($region->id, $address->region->id);
+    // }
 
     public function test_address_belongs_to_city(): void
     {

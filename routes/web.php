@@ -76,7 +76,6 @@ Route::prefix('campaigns')->name('frontend.campaigns.')->group(function () {
         
         // AJAX routes for dynamic loading
         Route::get('/api/countries', [App\Http\Controllers\Frontend\AddressController::class, 'getCountries'])->name('api.countries');
-        Route::get('/api/regions', [App\Http\Controllers\Frontend\AddressController::class, 'getRegions'])->name('api.regions');
         Route::get('/api/zones', [App\Http\Controllers\Frontend\AddressController::class, 'getZones'])->name('api.zones');
         Route::get('/api/cities', [App\Http\Controllers\Frontend\AddressController::class, 'getCities'])->name('api.cities');
     });
@@ -878,22 +877,6 @@ Route::get('/locations/{id}', function ($id) {
 })->whereNumber('id')->name('locations.show.legacy');
 
 
-// Region Module Routes
-Route::prefix('regions')->name('regions.')->group(function () {
-    Route::get('/', [App\Http\Controllers\RegionController::class, 'index'])->name('index');
-    Route::get('/{region}', [App\Http\Controllers\RegionController::class, 'show'])->name('show');
-    
-    // API Routes
-    Route::prefix('api')->name('api.')->group(function () {
-        Route::get('/search', [App\Http\Controllers\RegionController::class, 'search'])->name('search');
-        Route::get('/by-country/{countryId}', [App\Http\Controllers\RegionController::class, 'byCountry'])->name('by-country');
-        Route::get('/by-zone/{zoneId}', [App\Http\Controllers\RegionController::class, 'byZone'])->name('by-zone');
-        Route::get('/by-level/{level}', [App\Http\Controllers\RegionController::class, 'byLevel'])->name('by-level');
-        Route::get('/children/{regionId}', [App\Http\Controllers\RegionController::class, 'children'])->name('children');
-        Route::get('/statistics', [App\Http\Controllers\RegionController::class, 'statistics'])->name('statistics');
-        Route::get('/data', [App\Http\Controllers\RegionController::class, 'api'])->name('data');
-    });
-});
 // --- Locale-prefixed public routes used in tests ---
 Route::prefix('{locale}')
     ->where(['locale' => '[A-Za-z\-_]+'])
@@ -1314,7 +1297,6 @@ Route::prefix('posts')->name('posts.')->group(function () {
         Route::get('/', [App\Http\Controllers\CityController::class, 'index'])->name('index');
         Route::get('/search', [App\Http\Controllers\CityController::class, 'search'])->name('search');
         Route::get('/country/{country}', [App\Http\Controllers\CityController::class, 'byCountry'])->name('by-country');
-        Route::get('/region/{region}', [App\Http\Controllers\CityController::class, 'byRegion'])->name('by-region');
         Route::get('/{city}', [App\Http\Controllers\CityController::class, 'show'])->name('show');
     });
 
@@ -1333,7 +1315,6 @@ Route::prefix('countries')->name('countries.')->group(function () {
     Route::get('/', [App\Http\Controllers\CountryController::class, 'index'])->name('index');
     Route::get('/{country}', [App\Http\Controllers\CountryController::class, 'show'])->name('show');
         Route::get('/api/search', [App\Http\Controllers\CountryController::class, 'api'])->name('api.search');
-    Route::get('/api/by-region/{region}', [App\Http\Controllers\CountryController::class, 'byRegion'])->name('api.by-region');
     Route::get('/api/eu-members', [App\Http\Controllers\CountryController::class, 'euMembers'])->name('api.eu-members');
     Route::get('/api/with-vat', [App\Http\Controllers\CountryController::class, 'withVat'])->name('api.with-vat');
     Route::get('/api/statistics', [App\Http\Controllers\CountryController::class, 'statistics'])->name('api.statistics');

@@ -35,7 +35,6 @@ class CityFactory extends Factory
             'is_capital' => fake()->boolean(5),
             'is_active' => fake()->boolean(95),
             'country_id' => Country::factory(),
-            'region_id' => Region::factory(),
             'zone_id' => Zone::factory(),
             'level' => fake()->numberBetween(0, 3),
             'latitude' => fake()->optional(0.8)->latitude(),

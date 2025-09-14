@@ -22,7 +22,7 @@ final class CityController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = City::with(['country', 'region', 'zone', 'parent'])->withTranslations()->enabled()->active();
+        $query = City::with(['country', 'zone', 'parent'])->withTranslations()->enabled()->active();
         // Search
         if ($request->filled('search')) {
             $search = $request->get('search');
@@ -123,19 +123,8 @@ final class CityController extends Controller
      */
     public function byCountry(Country $country): View
     {
-        $cities = City::with(['region', 'zone'])->withTranslations()->enabled()->active()->byCountry($country->id)->ordered()->orderBy('name')->paginate(24);
+        $cities = City::with(['zone'])->withTranslations()->enabled()->active()->byCountry($country->id)->ordered()->orderBy('name')->paginate(24);
         return view('cities.by-country', compact('cities', 'country'));
-    }
-    /**
-     * Handle byRegion functionality with proper error handling.
-     * @param mixed $regionId
-     * @return View
-     */
-    public function byRegion($regionId): View
-    {
-        $cities = City::with(['country', 'zone'])->withTranslations()->enabled()->active()->byRegion($regionId)->ordered()->orderBy('name')->paginate(24);
-        $region = $cities->first()?->region;
-        return view('cities.by-region', compact('cities', 'region'));
     }
     /**
      * Handle calculateDistance functionality with proper error handling.

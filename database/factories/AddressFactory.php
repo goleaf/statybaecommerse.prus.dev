@@ -7,7 +7,6 @@ namespace Database\Factories;
 use App\Models\Address;
 use App\Models\City;
 use App\Models\Country;
-use App\Models\Region;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -43,7 +42,6 @@ final class AddressFactory extends Factory
             'country_code' => $this->faker->countryCode(),
             'country_id' => null,
             'zone_id' => null,
-            'region_id' => null,
             'city_id' => null,
             'phone' => $this->faker->optional(0.8)->phoneNumber(),
             'email' => $this->faker->optional(0.6)->safeEmail(),

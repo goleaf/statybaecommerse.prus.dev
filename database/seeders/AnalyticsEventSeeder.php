@@ -181,12 +181,12 @@ final class AnalyticsEventSeeder extends Seeder
                     'shipping_method' => fake()->randomElement(['standard', 'express', 'pickup']),
                 ];
                 if ($products->isNotEmpty()) {
-                    $purchasedProducts = fake()->randomElements($products->toArray(), rand(1, 3));
-                    $properties['products'] = array_map(fn ($p) => [
-                        'id' => $p['id'],
-                        'name' => $p['name'],
-                        'price' => $p['price'],
-                    ], $purchasedProducts);
+                    $purchasedProducts = $products->random(rand(1, 3));
+                    $properties['products'] = $purchasedProducts->map(fn ($p) => [
+                        'id' => $p->id,
+                        'name' => $p->name,
+                        'price' => $p->price,
+                    ])->toArray();
                 }
                 break;
         }
