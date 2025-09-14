@@ -72,6 +72,16 @@ class Order extends Model
         ];
     }
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'total_items_count',
+        'formatted_total',
+    ];
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -90,6 +100,26 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Get the order's latest item.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestItem(): HasOne
+    {
+        return $this->items()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the order's highest value item.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function highestValueItem(): HasOne
+    {
+        return $this->items()->one()->ofMany('total', 'max');
     }
 
     public function shipping(): HasOne

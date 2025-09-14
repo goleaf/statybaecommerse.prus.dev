@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
@@ -109,6 +110,31 @@ class Product extends Model implements HasMedia
         'download_limit' => 'integer',
         'download_expiry' => 'integer',
         'metadata' => 'array',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'average_rating',
+        'reviews_count',
+        'main_image',
+        'thumbnail',
+        'stock_status',
+        'is_in_stock',
+        'is_low_stock',
+        'is_out_of_stock',
+        'available_quantity',
+        'discount_percentage',
+        'profit_margin',
+        'markup_percentage',
+        'dimensions',
+        'volume',
+        'canonical_url',
+        'sales_count',
+        'revenue',
     ];
 
     protected $table = 'products';
@@ -262,6 +288,38 @@ class Product extends Model implements HasMedia
         return $this->hasMany(Review::class);
     }
 
+    /**
+     * Get the product's latest review.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestReview(): HasOne
+    {
+        return $this->reviews()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the product's highest rated review.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function highestRatedReview(): HasOne
+    {
+        return $this->reviews()->one()->ofMany('rating', 'max');
+    }
+
+    /**
+     * Get the product's latest approved review.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestApprovedReview(): HasOne
+    {
+        return $this->reviews()->one()->ofMany(['created_at' => 'max'], function ($query) {
+            $query->where('is_approved', true);
+        });
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
@@ -307,6 +365,40 @@ class Product extends Model implements HasMedia
         return $this->hasMany(ProductHistory::class);
     }
 
+    /**
+     * Get the product's latest history entry.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestHistory(): HasOne
+    {
+        return $this->histories()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the product's latest price change.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestPriceChange(): HasOne
+    {
+        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query) {
+            $query->where('field_name', 'price');
+        });
+    }
+
+    /**
+     * Get the product's latest stock update.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestStockUpdate(): HasOne
+    {
+        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query) {
+            $query->where('field_name', 'stock_quantity');
+        });
+    }
+
     public function recentHistories(): HasMany
     {
         return $this->hasMany(ProductHistory::class)->recent(30);
@@ -336,12 +428,12 @@ class Product extends Model implements HasMedia
 
     public function getLastPriceChange(): ?ProductHistory
     {
-        return $this->priceHistories()->latest()->first();
+        return $this->latestPriceChange;
     }
 
     public function getLastStockUpdate(): ?ProductHistory
     {
-        return $this->stockHistories()->latest()->first();
+        return $this->latestStockUpdate;
     }
 
     public function getLastStatusChange(): ?ProductHistory

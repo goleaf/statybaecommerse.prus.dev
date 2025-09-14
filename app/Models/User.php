@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
+use App\Traits\HasSafeSerialization;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -169,7 +171,7 @@ final /**
  */
 class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
-    use HasFactory, HasRoles, HasTranslations, LogsActivity, Notifiable, SoftDeletes;
+    use HasFactory, HasRoles, HasTranslations, HasSafeSerialization, LogsActivity, Notifiable, SoftDeletes;
 
     /**
      * Boot the model and register event listeners.
@@ -268,6 +270,34 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreferenceC
         'verification_token',
         'password_reset_token',
         'api_token',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'full_name',
+        'initials',
+        'total_spent',
+        'average_order_value',
+        'last_order_date',
+        'orders_count',
+        'reviews_count',
+        'average_rating',
+        'subscription_status_color',
+        'status_color',
+        'status_text',
+        'age',
+        'gender_text',
+        'locale_text',
+        'avatar_url',
+        'social_links',
+        'notification_preferences',
+        'privacy_settings',
+        'marketing_preferences',
+        'roles_label',
     ];
 
     protected function casts(): array
@@ -384,6 +414,38 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreferenceC
     }
 
     /**
+     * Get the user's latest order.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestOrder(): HasOne
+    {
+        return $this->orders()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the user's latest completed order.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestCompletedOrder(): HasOne
+    {
+        return $this->orders()->one()->ofMany(['created_at' => 'max'], function ($query) {
+            $query->whereIn('status', ['delivered', 'completed']);
+        });
+    }
+
+    /**
+     * Get the user's highest value order.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function highestValueOrder(): HasOne
+    {
+        return $this->orders()->one()->ofMany('total', 'max');
+    }
+
+    /**
      * Get the user's wishlist products.
      * 
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -433,6 +495,26 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreferenceC
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Get the user's latest review.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestReview(): HasOne
+    {
+        return $this->reviews()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the user's highest rated review.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function highestRatedReview(): HasOne
+    {
+        return $this->reviews()->one()->ofMany('rating', 'max');
     }
 
     // Explicit alias for clarity in code: reviews authored by this customer
@@ -718,7 +800,7 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreferenceC
 
     public function getLastOrderDateAttribute(): ?string
     {
-        $lastOrder = $this->orders()->latest()->first();
+        $lastOrder = $this->latestOrder;
 
         return $lastOrder ? $lastOrder->created_at->format('Y-m-d') : null;
     }
