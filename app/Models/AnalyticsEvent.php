@@ -163,6 +163,47 @@ final class AnalyticsEvent extends Model
     {
         return $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
     }
+    /**
+     * Handle scopeOfType functionality with proper error handling.
+     * @param Builder $query
+     * @param string $eventType
+     * @return Builder
+     */
+    public function scopeOfType(Builder $query, string $eventType): Builder
+    {
+        return $query->where('event_type', $eventType);
+    }
+    /**
+     * Handle scopeForSession functionality with proper error handling.
+     * @param Builder $query
+     * @param string $sessionId
+     * @return Builder
+     */
+    public function scopeForSession(Builder $query, string $sessionId): Builder
+    {
+        return $query->where('session_id', $sessionId);
+    }
+    /**
+     * Handle scopeForUser functionality with proper error handling.
+     * @param Builder $query
+     * @param int $userId
+     * @return Builder
+     */
+    public function scopeForUser(Builder $query, int $userId): Builder
+    {
+        return $query->where('user_id', $userId);
+    }
+    /**
+     * Handle scopeInDateRange functionality with proper error handling.
+     * @param Builder $query
+     * @param string $startDate
+     * @param string $endDate
+     * @return Builder
+     */
+    public function scopeInDateRange(Builder $query, string $startDate, string $endDate): Builder
+    {
+        return $query->whereBetween('created_at', [$startDate, $endDate]);
+    }
     // Accessors & Mutators
     /**
      * Handle getEventTypeLabelAttribute functionality with proper error handling.
@@ -269,5 +310,51 @@ final class AnalyticsEvent extends Model
     public static function getRevenueStats(): array
     {
         return self::whereNotNull('value')->selectRaw('DATE(created_at) as date, SUM(value) as revenue')->groupBy('date')->orderBy('date', 'desc')->limit(30)->pluck('revenue', 'date')->toArray();
+    }
+    /**
+     * Handle track functionality with proper error handling.
+     * @param string $eventType
+     * @param array $data
+     * @param mixed $trackable
+     * @return self
+     */
+    public static function track(string $eventType, array $data = [], $trackable = null): self
+    {
+        $eventData = [
+            'event_type' => $eventType,
+            'session_id' => session()->getId(),
+            'user_id' => auth()->id(),
+            'url' => request()->url(),
+            'referrer' => request()->header('referer'),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        // If data contains properties, use them; otherwise treat the entire data as properties
+        if (isset($data['properties'])) {
+            $eventData['properties'] = $data['properties'];
+            unset($data['properties']);
+        } else {
+            // Treat the data array as properties if it's not empty
+            if (!empty($data)) {
+                $eventData['properties'] = $data;
+                $data = []; // Clear data so it doesn't get merged again
+            }
+        }
+
+        // Merge remaining data
+        $eventData = array_merge($eventData, $data);
+
+        if ($trackable && is_object($trackable)) {
+            $eventData['trackable_type'] = get_class($trackable);
+            $eventData['trackable_id'] = $trackable->id;
+        } elseif ($trackable && is_string($trackable)) {
+            // If trackable is a string (like URL), use it as URL
+            $eventData['url'] = $trackable;
+        }
+
+        return self::create($eventData);
     }
 }
