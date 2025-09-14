@@ -6,7 +6,6 @@ namespace Database\Seeders\Cities;
 
 use App\Models\City;
 use App\Models\Country;
-use App\Models\Region;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
@@ -18,12 +17,7 @@ final class LatviaCitiesSeeder extends Seeder
         $latvia = Country::where('cca2', 'LV')->first();
         $euZone = Zone::where('code', 'EU')->first();
 
-        // Get regions
-        $rigaRegion = Region::where('code', 'LV-RI')->first();
-        $kurzemeRegion = Region::where('code', 'LV-KU')->first();
-        $latgaleRegion = Region::where('code', 'LV-LG')->first();
-        $vidzemeRegion = Region::where('code', 'LV-VI')->first();
-        $zemgaleRegion = Region::where('code', 'LV-ZM')->first();
+        // Regions are no longer used in the database schema
 
         $cities = [
             // Riga region
@@ -32,7 +26,6 @@ final class LatviaCitiesSeeder extends Seeder
                 'code' => 'LV-RI-RIG',
                 'is_capital' => true,
                 'is_default' => true,
-                'region_id' => $rigaRegion?->id,
                 'latitude' => 56.9496,
                 'longitude' => 24.1052,
                 'population' => 614618,
@@ -45,7 +38,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Jurmala',
                 'code' => 'LV-RI-JUR',
-                'region_id' => $rigaRegion?->id,
                 'latitude' => 56.968,
                 'longitude' => 23.7703,
                 'population' => 57409,
@@ -59,7 +51,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Liepaja',
                 'code' => 'LV-KU-LIE',
-                'region_id' => $kurzemeRegion?->id,
                 'latitude' => 56.5084,
                 'longitude' => 21.0132,
                 'population' => 67964,
@@ -72,7 +63,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Ventspils',
                 'code' => 'LV-KU-VEN',
-                'region_id' => $kurzemeRegion?->id,
                 'latitude' => 57.3937,
                 'longitude' => 21.5647,
                 'population' => 34420,
@@ -86,7 +76,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Daugavpils',
                 'code' => 'LV-LG-DAU',
-                'region_id' => $latgaleRegion?->id,
                 'latitude' => 55.8752,
                 'longitude' => 26.5362,
                 'population' => 82946,
@@ -99,7 +88,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Rezekne',
                 'code' => 'LV-LG-REZ',
-                'region_id' => $latgaleRegion?->id,
                 'latitude' => 56.5103,
                 'longitude' => 27.3319,
                 'population' => 25694,
@@ -113,7 +101,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Valmiera',
                 'code' => 'LV-VI-VAL',
-                'region_id' => $vidzemeRegion?->id,
                 'latitude' => 57.5408,
                 'longitude' => 25.4275,
                 'population' => 23556,
@@ -127,7 +114,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Jelgava',
                 'code' => 'LV-ZM-JEL',
-                'region_id' => $zemgaleRegion?->id,
                 'latitude' => 56.6511,
                 'longitude' => 23.7214,
                 'population' => 55897,
@@ -140,7 +126,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Bauska',
                 'code' => 'LV-ZM-BAU',
-                'region_id' => $zemgaleRegion?->id,
                 'latitude' => 56.4069,
                 'longitude' => 24.1908,
                 'population' => 10000,
@@ -153,7 +138,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Dobele',
                 'code' => 'LV-ZM-DOB',
-                'region_id' => $zemgaleRegion?->id,
                 'latitude' => 56.6258,
                 'longitude' => 23.2789,
                 'population' => 9000,
@@ -166,7 +150,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Jēkabpils',
                 'code' => 'LV-ZM-JEK',
-                'region_id' => $zemgaleRegion?->id,
                 'latitude' => 56.4997,
                 'longitude' => 25.8572,
                 'population' => 23000,
@@ -179,7 +162,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Ogre',
                 'code' => 'LV-ZM-OGR',
-                'region_id' => $zemgaleRegion?->id,
                 'latitude' => 56.8181,
                 'longitude' => 24.6053,
                 'population' => 25000,
@@ -193,7 +175,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Sigulda',
                 'code' => 'LV-RI-SIG',
-                'region_id' => $rigaRegion?->id,
                 'latitude' => 57.1522,
                 'longitude' => 24.8647,
                 'population' => 16000,
@@ -206,7 +187,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Cesis',
                 'code' => 'LV-RI-CES',
-                'region_id' => $rigaRegion?->id,
                 'latitude' => 57.3128,
                 'longitude' => 25.2744,
                 'population' => 16000,
@@ -219,7 +199,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Salaspils',
                 'code' => 'LV-RI-SAL',
-                'region_id' => $rigaRegion?->id,
                 'latitude' => 56.8589,
                 'longitude' => 24.3583,
                 'population' => 18000,
@@ -232,7 +211,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Olaine',
                 'code' => 'LV-RI-OLA',
-                'region_id' => $rigaRegion?->id,
                 'latitude' => 56.7856,
                 'longitude' => 23.9389,
                 'population' => 12000,
@@ -245,7 +223,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Baldone',
                 'code' => 'LV-RI-BAL',
-                'region_id' => $rigaRegion?->id,
                 'latitude' => 56.7425,
                 'longitude' => 24.3958,
                 'population' => 5000,
@@ -258,7 +235,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Kekava',
                 'code' => 'LV-RI-KEK',
-                'region_id' => $rigaRegion?->id,
                 'latitude' => 56.8286,
                 'longitude' => 24.2375,
                 'population' => 25000,
@@ -272,7 +248,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Kuldiga',
                 'code' => 'LV-KU-KUL',
-                'region_id' => $kurzemeRegion?->id,
                 'latitude' => 56.9667,
                 'longitude' => 21.9833,
                 'population' => 11000,
@@ -285,7 +260,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Talsi',
                 'code' => 'LV-KU-TAL',
-                'region_id' => $kurzemeRegion?->id,
                 'latitude' => 57.2431,
                 'longitude' => 22.5936,
                 'population' => 10000,
@@ -298,7 +272,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Saldus',
                 'code' => 'LV-KU-SAL',
-                'region_id' => $kurzemeRegion?->id,
                 'latitude' => 56.6667,
                 'longitude' => 22.4833,
                 'population' => 11000,
@@ -311,7 +284,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Dundaga',
                 'code' => 'LV-KU-DUN',
-                'region_id' => $kurzemeRegion?->id,
                 'latitude' => 57.5167,
                 'longitude' => 22.3500,
                 'population' => 3000,
@@ -324,7 +296,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Grobiņa',
                 'code' => 'LV-KU-GRO',
-                'region_id' => $kurzemeRegion?->id,
                 'latitude' => 56.5333,
                 'longitude' => 21.1667,
                 'population' => 4000,
@@ -337,7 +308,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Aizpute',
                 'code' => 'LV-KU-AIZ',
-                'region_id' => $kurzemeRegion?->id,
                 'latitude' => 56.7167,
                 'longitude' => 21.6000,
                 'population' => 5000,
@@ -351,7 +321,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Ludza',
                 'code' => 'LV-LG-LUD',
-                'region_id' => $latgaleRegion?->id,
                 'latitude' => 56.5417,
                 'longitude' => 27.7194,
                 'population' => 8000,
@@ -364,7 +333,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Kraslava',
                 'code' => 'LV-LG-KRA',
-                'region_id' => $latgaleRegion?->id,
                 'latitude' => 55.8944,
                 'longitude' => 27.1667,
                 'population' => 9000,
@@ -377,7 +345,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Preili',
                 'code' => 'LV-LG-PRE',
-                'region_id' => $latgaleRegion?->id,
                 'latitude' => 56.2944,
                 'longitude' => 26.7250,
                 'population' => 7000,
@@ -390,7 +357,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Balvi',
                 'code' => 'LV-LG-BAL',
-                'region_id' => $latgaleRegion?->id,
                 'latitude' => 57.1333,
                 'longitude' => 27.2667,
                 'population' => 6000,
@@ -403,7 +369,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Vilaka',
                 'code' => 'LV-LG-VIL',
-                'region_id' => $latgaleRegion?->id,
                 'latitude' => 57.1833,
                 'longitude' => 27.6833,
                 'population' => 1500,
@@ -416,7 +381,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Zilupe',
                 'code' => 'LV-LG-ZIL',
-                'region_id' => $latgaleRegion?->id,
                 'latitude' => 56.3833,
                 'longitude' => 28.1167,
                 'population' => 1500,
@@ -430,7 +394,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Cesis',
                 'code' => 'LV-VI-CES',
-                'region_id' => $vidzemeRegion?->id,
                 'latitude' => 57.3128,
                 'longitude' => 25.2744,
                 'population' => 16000,
@@ -443,7 +406,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Gulbene',
                 'code' => 'LV-VI-GUL',
-                'region_id' => $vidzemeRegion?->id,
                 'latitude' => 57.1778,
                 'longitude' => 26.7528,
                 'population' => 8000,
@@ -456,7 +418,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Madona',
                 'code' => 'LV-VI-MAD',
-                'region_id' => $vidzemeRegion?->id,
                 'latitude' => 56.8500,
                 'longitude' => 26.2167,
                 'population' => 8000,
@@ -469,7 +430,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Aluksne',
                 'code' => 'LV-VI-ALU',
-                'region_id' => $vidzemeRegion?->id,
                 'latitude' => 57.4167,
                 'longitude' => 27.0500,
                 'population' => 7000,
@@ -482,7 +442,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Smiltene',
                 'code' => 'LV-VI-SMI',
-                'region_id' => $vidzemeRegion?->id,
                 'latitude' => 57.4333,
                 'longitude' => 25.9000,
                 'population' => 5000,
@@ -495,7 +454,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Valka',
                 'code' => 'LV-VI-VAL',
-                'region_id' => $vidzemeRegion?->id,
                 'latitude' => 57.7833,
                 'longitude' => 26.0167,
                 'population' => 5000,
@@ -508,7 +466,6 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Strenci',
                 'code' => 'LV-VI-STR',
-                'region_id' => $vidzemeRegion?->id,
                 'latitude' => 57.6167,
                 'longitude' => 25.7167,
                 'population' => 1200,
@@ -525,13 +482,12 @@ final class LatviaCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name']),
+                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
                     'country_id' => $latvia->id,
                     'zone_id' => $euZone?->id,
-                    'region_id' => $cityData['region_id'],
                     'level' => 1,
                     'latitude' => $cityData['latitude'],
                     'longitude' => $cityData['longitude'],

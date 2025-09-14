@@ -6,7 +6,6 @@ namespace Database\Seeders\Cities;
 
 use App\Models\City;
 use App\Models\Country;
-use App\Models\Region;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
@@ -18,22 +17,7 @@ final class EstoniaCitiesSeeder extends Seeder
         $estonia = Country::where('cca2', 'EE')->first();
         $euZone = Zone::where('code', 'EU')->first();
 
-        // Get regions
-        $harjuRegion = Region::where('code', 'EE-37')->first();
-        $tartuRegion = Region::where('code', 'EE-78')->first();
-        $idaViruRegion = Region::where('code', 'EE-44')->first();
-        $pärnuRegion = Region::where('code', 'EE-67')->first();
-        $lääneViruRegion = Region::where('code', 'EE-59')->first();
-        $valgaRegion = Region::where('code', 'EE-82')->first();
-        $viljandiRegion = Region::where('code', 'EE-84')->first();
-        $võruRegion = Region::where('code', 'EE-86')->first();
-        $jõgevaRegion = Region::where('code', 'EE-49')->first();
-        $järvaRegion = Region::where('code', 'EE-51')->first();
-        $lääneRegion = Region::where('code', 'EE-57')->first();
-        $põlvaRegion = Region::where('code', 'EE-65')->first();
-        $raplaRegion = Region::where('code', 'EE-70')->first();
-        $saareRegion = Region::where('code', 'EE-74')->first();
-        $hiiuRegion = Region::where('code', 'EE-39')->first();
+        // Regions are no longer used in the database schema
 
         $cities = [
             // Harju County (Tallinn region)
@@ -42,7 +26,6 @@ final class EstoniaCitiesSeeder extends Seeder
                 'code' => 'EE-37-TAL',
                 'is_capital' => true,
                 'is_default' => true,
-                'region_id' => $harjuRegion?->id,
                 'latitude' => 59.437,
                 'longitude' => 24.7536,
                 'population' => 437619,
@@ -55,7 +38,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Keila',
                 'code' => 'EE-37-KEI',
-                'region_id' => $harjuRegion?->id,
                 'latitude' => 59.3036,
                 'longitude' => 24.4131,
                 'population' => 10000,
@@ -68,7 +50,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Maardu',
                 'code' => 'EE-37-MAA',
-                'region_id' => $harjuRegion?->id,
                 'latitude' => 59.4764,
                 'longitude' => 25.025,
                 'population' => 17000,
@@ -82,7 +63,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Tartu',
                 'code' => 'EE-78-TAR',
-                'region_id' => $tartuRegion?->id,
                 'latitude' => 58.378,
                 'longitude' => 26.729,
                 'population' => 91407,
@@ -95,7 +75,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Elva',
                 'code' => 'EE-78-ELV',
-                'region_id' => $tartuRegion?->id,
                 'latitude' => 58.2225,
                 'longitude' => 26.4211,
                 'population' => 5500,
@@ -109,7 +88,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Narva',
                 'code' => 'EE-44-NAR',
-                'region_id' => $idaViruRegion?->id,
                 'latitude' => 59.3753,
                 'longitude' => 28.1903,
                 'population' => 54024,
@@ -122,7 +100,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kohtla-Järve',
                 'code' => 'EE-44-KOH',
-                'region_id' => $idaViruRegion?->id,
                 'latitude' => 59.3986,
                 'longitude' => 27.2731,
                 'population' => 35000,
@@ -135,7 +112,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Sillamäe',
                 'code' => 'EE-44-SIL',
-                'region_id' => $idaViruRegion?->id,
                 'latitude' => 59.3908,
                 'longitude' => 27.7744,
                 'population' => 12000,
@@ -149,7 +125,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Pärnu',
                 'code' => 'EE-67-PAR',
-                'region_id' => $pärnuRegion?->id,
                 'latitude' => 58.3859,
                 'longitude' => 24.4971,
                 'population' => 39179,
@@ -163,7 +138,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Rakvere',
                 'code' => 'EE-59-RAK',
-                'region_id' => $lääneViruRegion?->id,
                 'latitude' => 59.3464,
                 'longitude' => 26.3558,
                 'population' => 15000,
@@ -177,7 +151,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Valga',
                 'code' => 'EE-82-VAL',
-                'region_id' => $valgaRegion?->id,
                 'latitude' => 57.7778,
                 'longitude' => 26.0472,
                 'population' => 12000,
@@ -191,7 +164,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Viljandi',
                 'code' => 'EE-84-VIL',
-                'region_id' => $viljandiRegion?->id,
                 'latitude' => 58.3639,
                 'longitude' => 25.59,
                 'population' => 17000,
@@ -205,7 +177,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Võru',
                 'code' => 'EE-86-VOR',
-                'region_id' => $võruRegion?->id,
                 'latitude' => 57.8333,
                 'longitude' => 27.0167,
                 'population' => 12000,
@@ -219,7 +190,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Jõgeva',
                 'code' => 'EE-49-JOG',
-                'region_id' => $jõgevaRegion?->id,
                 'latitude' => 58.7469,
                 'longitude' => 26.3939,
                 'population' => 5000,
@@ -233,7 +203,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Paide',
                 'code' => 'EE-51-PAI',
-                'region_id' => $järvaRegion?->id,
                 'latitude' => 58.8856,
                 'longitude' => 25.5572,
                 'population' => 8000,
@@ -247,7 +216,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Haapsalu',
                 'code' => 'EE-57-HAA',
-                'region_id' => $lääneRegion?->id,
                 'latitude' => 58.9431,
                 'longitude' => 23.5414,
                 'population' => 10000,
@@ -261,7 +229,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Põlva',
                 'code' => 'EE-65-POL',
-                'region_id' => $põlvaRegion?->id,
                 'latitude' => 58.0531,
                 'longitude' => 27.0519,
                 'population' => 5000,
@@ -275,7 +242,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Rapla',
                 'code' => 'EE-70-RAP',
-                'region_id' => $raplaRegion?->id,
                 'latitude' => 59.0072,
                 'longitude' => 24.7928,
                 'population' => 5000,
@@ -289,7 +255,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kuressaare',
                 'code' => 'EE-74-KUR',
-                'region_id' => $saareRegion?->id,
                 'latitude' => 58.2528,
                 'longitude' => 22.4853,
                 'population' => 13000,
@@ -303,7 +268,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kärdla',
                 'code' => 'EE-39-KAR',
-                'region_id' => $hiiuRegion?->id,
                 'latitude' => 58.9978,
                 'longitude' => 22.7492,
                 'population' => 3000,
@@ -317,7 +281,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Saue',
                 'code' => 'EE-37-SAU',
-                'region_id' => $harjuRegion?->id,
                 'latitude' => 59.3167,
                 'longitude' => 24.5667,
                 'population' => 6000,
@@ -330,7 +293,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kiili',
                 'code' => 'EE-37-KII',
-                'region_id' => $harjuRegion?->id,
                 'latitude' => 59.3167,
                 'longitude' => 24.8333,
                 'population' => 2000,
@@ -343,7 +305,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Rae',
                 'code' => 'EE-37-RAE',
-                'region_id' => $harjuRegion?->id,
                 'latitude' => 59.3833,
                 'longitude' => 24.9333,
                 'population' => 2000,
@@ -356,7 +317,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Viimsi',
                 'code' => 'EE-37-VII',
-                'region_id' => $harjuRegion?->id,
                 'latitude' => 59.5000,
                 'longitude' => 24.8333,
                 'population' => 20000,
@@ -369,7 +329,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Harku',
                 'code' => 'EE-37-HAR',
-                'region_id' => $harjuRegion?->id,
                 'latitude' => 59.4167,
                 'longitude' => 24.5833,
                 'population' => 15000,
@@ -383,7 +342,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kallaste',
                 'code' => 'EE-78-KAL',
-                'region_id' => $tartuRegion?->id,
                 'latitude' => 58.6667,
                 'longitude' => 27.1667,
                 'population' => 900,
@@ -396,7 +354,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Mustvee',
                 'code' => 'EE-78-MUS',
-                'region_id' => $tartuRegion?->id,
                 'latitude' => 58.8333,
                 'longitude' => 26.9333,
                 'population' => 1300,
@@ -409,7 +366,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Otepää',
                 'code' => 'EE-78-OTE',
-                'region_id' => $tartuRegion?->id,
                 'latitude' => 58.0500,
                 'longitude' => 26.5000,
                 'population' => 2000,
@@ -422,7 +378,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Põltsamaa',
                 'code' => 'EE-78-POL',
-                'region_id' => $tartuRegion?->id,
                 'latitude' => 58.6500,
                 'longitude' => 25.9667,
                 'population' => 4000,
@@ -435,7 +390,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Põlva',
                 'code' => 'EE-78-POV',
-                'region_id' => $tartuRegion?->id,
                 'latitude' => 58.0531,
                 'longitude' => 27.0519,
                 'population' => 5000,
@@ -449,7 +403,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Jõhvi',
                 'code' => 'EE-44-JOH',
-                'region_id' => $idaViruRegion?->id,
                 'latitude' => 59.3592,
                 'longitude' => 27.4211,
                 'population' => 12000,
@@ -462,7 +415,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kiviõli',
                 'code' => 'EE-44-KIV',
-                'region_id' => $idaViruRegion?->id,
                 'latitude' => 59.3528,
                 'longitude' => 26.9708,
                 'population' => 5000,
@@ -475,7 +427,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Püssi',
                 'code' => 'EE-44-PUS',
-                'region_id' => $idaViruRegion?->id,
                 'latitude' => 59.3600,
                 'longitude' => 27.0500,
                 'population' => 1000,
@@ -488,7 +439,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Toila',
                 'code' => 'EE-44-TOI',
-                'region_id' => $idaViruRegion?->id,
                 'latitude' => 59.4167,
                 'longitude' => 27.5000,
                 'population' => 800,
@@ -502,7 +452,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Haapsalu',
                 'code' => 'EE-67-HAA',
-                'region_id' => $pärnuRegion?->id,
                 'latitude' => 58.9431,
                 'longitude' => 23.5414,
                 'population' => 10000,
@@ -515,7 +464,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kihnu',
                 'code' => 'EE-67-KIH',
-                'region_id' => $pärnuRegion?->id,
                 'latitude' => 58.1333,
                 'longitude' => 24.0000,
                 'population' => 500,
@@ -528,7 +476,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Lihula',
                 'code' => 'EE-67-LIH',
-                'region_id' => $pärnuRegion?->id,
                 'latitude' => 58.6833,
                 'longitude' => 23.8333,
                 'population' => 1500,
@@ -541,7 +488,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Tori',
                 'code' => 'EE-67-TOR',
-                'region_id' => $pärnuRegion?->id,
                 'latitude' => 58.4833,
                 'longitude' => 24.8167,
                 'population' => 1000,
@@ -555,7 +501,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Tapa',
                 'code' => 'EE-59-TAP',
-                'region_id' => $lääneViruRegion?->id,
                 'latitude' => 59.2667,
                 'longitude' => 25.9500,
                 'population' => 5000,
@@ -568,7 +513,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kunda',
                 'code' => 'EE-59-KUN',
-                'region_id' => $lääneViruRegion?->id,
                 'latitude' => 59.5167,
                 'longitude' => 26.5333,
                 'population' => 3000,
@@ -581,7 +525,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Väike-Maarja',
                 'code' => 'EE-59-VAI',
-                'region_id' => $lääneViruRegion?->id,
                 'latitude' => 59.1333,
                 'longitude' => 26.2500,
                 'population' => 2000,
@@ -595,7 +538,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Tõrva',
                 'code' => 'EE-82-TOR',
-                'region_id' => $valgaRegion?->id,
                 'latitude' => 58.0000,
                 'longitude' => 25.9167,
                 'population' => 2000,
@@ -608,7 +550,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Otepää',
                 'code' => 'EE-82-OTE',
-                'region_id' => $valgaRegion?->id,
                 'latitude' => 58.0500,
                 'longitude' => 26.5000,
                 'population' => 2000,
@@ -622,7 +563,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Suure-Jaani',
                 'code' => 'EE-84-SUU',
-                'region_id' => $viljandiRegion?->id,
                 'latitude' => 58.5333,
                 'longitude' => 25.4667,
                 'population' => 1000,
@@ -635,7 +575,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Võhma',
                 'code' => 'EE-84-VOH',
-                'region_id' => $viljandiRegion?->id,
                 'latitude' => 58.6333,
                 'longitude' => 25.5500,
                 'population' => 1300,
@@ -648,7 +587,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Mõisaküla',
                 'code' => 'EE-84-MOI',
-                'region_id' => $viljandiRegion?->id,
                 'latitude' => 58.0833,
                 'longitude' => 25.1833,
                 'population' => 800,
@@ -662,7 +600,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Antsla',
                 'code' => 'EE-86-ANT',
-                'region_id' => $võruRegion?->id,
                 'latitude' => 57.8333,
                 'longitude' => 26.5333,
                 'population' => 1400,
@@ -675,7 +612,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Rõuge',
                 'code' => 'EE-86-ROU',
-                'region_id' => $võruRegion?->id,
                 'latitude' => 57.7333,
                 'longitude' => 26.9167,
                 'population' => 500,
@@ -688,7 +624,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Setomaa',
                 'code' => 'EE-86-SET',
-                'region_id' => $võruRegion?->id,
                 'latitude' => 57.9333,
                 'longitude' => 27.4667,
                 'population' => 300,
@@ -702,7 +637,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Mustvee',
                 'code' => 'EE-49-MUS',
-                'region_id' => $jõgevaRegion?->id,
                 'latitude' => 58.8333,
                 'longitude' => 26.9333,
                 'population' => 1300,
@@ -715,7 +649,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Põltsamaa',
                 'code' => 'EE-49-POL',
-                'region_id' => $jõgevaRegion?->id,
                 'latitude' => 58.6500,
                 'longitude' => 25.9667,
                 'population' => 4000,
@@ -729,7 +662,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Türi',
                 'code' => 'EE-51-TUR',
-                'region_id' => $järvaRegion?->id,
                 'latitude' => 58.8167,
                 'longitude' => 25.4333,
                 'population' => 5000,
@@ -742,7 +674,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Aravete',
                 'code' => 'EE-51-ARA',
-                'region_id' => $järvaRegion?->id,
                 'latitude' => 59.1333,
                 'longitude' => 25.7667,
                 'population' => 1000,
@@ -756,7 +687,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Lihula',
                 'code' => 'EE-57-LIH',
-                'region_id' => $lääneRegion?->id,
                 'latitude' => 58.6833,
                 'longitude' => 23.8333,
                 'population' => 1500,
@@ -769,7 +699,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Vormsi',
                 'code' => 'EE-57-VOR',
-                'region_id' => $lääneRegion?->id,
                 'latitude' => 59.0000,
                 'longitude' => 23.2500,
                 'population' => 400,
@@ -783,7 +712,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kanepi',
                 'code' => 'EE-65-KAN',
-                'region_id' => $põlvaRegion?->id,
                 'latitude' => 58.0000,
                 'longitude' => 26.7500,
                 'population' => 500,
@@ -796,7 +724,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Räpina',
                 'code' => 'EE-65-RAP',
-                'region_id' => $põlvaRegion?->id,
                 'latitude' => 58.1000,
                 'longitude' => 27.4667,
                 'population' => 2000,
@@ -810,7 +737,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kehtna',
                 'code' => 'EE-70-KEH',
-                'region_id' => $raplaRegion?->id,
                 'latitude' => 58.9333,
                 'longitude' => 24.8833,
                 'population' => 1000,
@@ -823,7 +749,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kohila',
                 'code' => 'EE-70-KOH',
-                'region_id' => $raplaRegion?->id,
                 'latitude' => 59.1667,
                 'longitude' => 24.7500,
                 'population' => 3000,
@@ -836,7 +761,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Märjamaa',
                 'code' => 'EE-70-MAR',
-                'region_id' => $raplaRegion?->id,
                 'latitude' => 58.9000,
                 'longitude' => 24.4333,
                 'population' => 1000,
@@ -850,7 +774,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Valjala',
                 'code' => 'EE-74-VAL',
-                'region_id' => $saareRegion?->id,
                 'latitude' => 58.4167,
                 'longitude' => 22.7833,
                 'population' => 400,
@@ -863,7 +786,6 @@ final class EstoniaCitiesSeeder extends Seeder
             [
                 'name' => 'Orissaare',
                 'code' => 'EE-74-ORI',
-                'region_id' => $saareRegion?->id,
                 'latitude' => 58.5667,
                 'longitude' => 23.0833,
                 'population' => 800,
@@ -880,13 +802,12 @@ final class EstoniaCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name']),
+                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
                     'country_id' => $estonia->id,
                     'zone_id' => $euZone?->id,
-                    'region_id' => $cityData['region_id'],
                     'level' => 1,
                     'latitude' => $cityData['latitude'],
                     'longitude' => $cityData['longitude'],

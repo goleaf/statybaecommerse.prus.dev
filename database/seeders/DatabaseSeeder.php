@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
             // Normal settings for /admin/normal-settings CRUD
             NormalSettingSeeder::class,
             // Comprehensive orders for analytics (current and previous month, with paid statuses)
-            ComprehensiveOrderSeeder::class,
+            // ComprehensiveOrderSeeder::class, // Temporarily disabled due to memory issues
             // Collections for admin/collections CRUD
             CollectionSeeder::class,
             // Product reviews for admin/reviews CRUD

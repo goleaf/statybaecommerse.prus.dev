@@ -6,7 +6,6 @@ namespace Database\Seeders\Cities;
 
 use App\Models\City;
 use App\Models\Country;
-use App\Models\Region;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
@@ -1068,13 +1067,12 @@ final class PolandCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name']),
+                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
                     'country_id' => $poland->id,
                     'zone_id' => $euZone?->id,
-                    'region_id' => $cityData['region_id'],
                     'level' => 1,
                     'latitude' => $cityData['latitude'],
                     'longitude' => $cityData['longitude'],

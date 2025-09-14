@@ -28,7 +28,7 @@ final class NewZealandCitiesSeeder extends Seeder
             ['code' => 'NZ-LOW', 'slug' => 'lower-hutt', 'name' => ['lt' => 'Žemesnysis Hatas', 'en' => 'Lower Hutt'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => -41.2167, 'longitude' => 174.9167, 'population' => 110700],
             ['code' => 'NZ-DUN', 'slug' => 'dunedin', 'name' => ['lt' => 'Dunedinas', 'en' => 'Dunedin'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => -45.8788, 'longitude' => 170.5028, 'population' => 130400],
             ['code' => 'NZ-PAL', 'slug' => 'palmerston-north', 'name' => ['lt' => 'Palmerston Nortas', 'en' => 'Palmerston North'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => -40.3523, 'longitude' => 175.6082, 'population' => 87000],
-            ['code' => 'NZ-NAP', 'slug' => 'napier', 'name' => ['lt' => 'Neipieris', 'en' => 'Napier'], 'description' => ['lt' => 'Hokso Bėjaus regiono miestas', 'en' => 'Hawke\'s Bay region city'], 'is_capital' => false, 'latitude' => -39.4928, 'longitude' => 176.9120, 'population' => 64000],
+            ['code' => 'NZ-NAP', 'slug' => 'napier', 'name' => ['lt' => 'Neipieris', 'en' => 'Napier'], 'description' => 'Hawke\'s Bay region city', 'is_capital' => false, 'latitude' => -39.4928, 'longitude' => 176.9120, 'population' => 64000],
             ['code' => 'NZ-ROT', 'slug' => 'rotorua', 'name' => ['lt' => 'Rotorua', 'en' => 'Rotorua'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => -38.1368, 'longitude' => 176.2497, 'population' => 56000],
         ];
 
