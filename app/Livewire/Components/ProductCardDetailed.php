@@ -31,7 +31,11 @@ class ProductCardDetailed extends Component
 
     public function mount(Product $product): void
     {
-        $this->product = $product->load(['brand', 'media', 'categories']);
+        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
+        if (!$product->relationLoaded('brand') || !$product->relationLoaded('media') || !$product->relationLoaded('categories')) {
+            $product->load(['brand', 'media', 'categories']);
+        }
+        $this->product = $product;
         $this->checkWishlistStatus();
         $this->checkComparisonStatus();
     }

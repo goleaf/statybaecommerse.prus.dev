@@ -30,7 +30,14 @@ Schedule::call(function () {
     \App\Services\CacheService::warmupCaches();
 })->hourly();
 
-// Clear old activity logs (keep 90 days)
+// Clear old activity logs (keep 90 days) with timeout protection
 Schedule::call(function () {
-    \Spatie\Activitylog\Models\Activity::where('created_at', '<', now()->subDays(90))->delete();
+    $timeout = now()->addMinutes(5); // 5 minute timeout for log cleanup
+    
+    \Spatie\Activitylog\Models\Activity::where('created_at', '<', now()->subDays(90))
+        ->cursor()
+        ->takeUntilTimeout($timeout)
+        ->each(function ($activity) {
+            $activity->delete();
+        });
 })->daily();

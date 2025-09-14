@@ -52,6 +52,27 @@ class Category extends Model implements HasMedia
         'product_limit' => 'integer',
     ];
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'full_name',
+        'breadcrumb',
+        'canonical_url',
+        'meta_tags',
+        'total_revenue',
+        'average_product_price',
+        'is_root',
+        'is_leaf',
+        'depth',
+        'level',
+        'ancestors_count',
+        'descendants_count',
+        'full_path',
+    ];
+
     protected string $translationModel = \App\Models\Translations\CategoryTranslation::class;
 
     public function parent(): BelongsTo

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Concerns;
 
+use Illuminate\Support\Str;
+
 trait WithValidation
 {
     protected function getValidationMessages(): array
@@ -85,5 +87,10 @@ trait WithValidation
         }
 
         return $value !== null;
+    }
+
+    public function validateUrl(string $url, array $protocols = ['http', 'https']): bool
+    {
+        return Str::isUrl($url, $protocols);
     }
 }

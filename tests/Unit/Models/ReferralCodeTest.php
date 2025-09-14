@@ -292,8 +292,10 @@ final class ReferralCodeTest extends TestCase
         $this->assertNotEquals($code1, $code2);
         $this->assertEquals(8, strlen($code1));
         $this->assertEquals(8, strlen($code2));
-        $this->assertTrue(ctype_upper($code1));
-        $this->assertTrue(ctype_upper($code2));
+        $this->assertTrue(ctype_alnum($code1));
+        $this->assertTrue(ctype_alnum($code2));
+        $this->assertEquals(strtoupper($code1), $code1);
+        $this->assertEquals(strtoupper($code2), $code2);
     }
 
     public function test_referral_url_attribute(): void

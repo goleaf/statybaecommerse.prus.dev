@@ -73,7 +73,11 @@ class OrderController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $order->load(['items.product', 'items.productVariant', 'shipping', 'documents']);
+        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
+        if (!$order->relationLoaded('items.product') || !$order->relationLoaded('items.productVariant') || 
+            !$order->relationLoaded('shipping') || !$order->relationLoaded('documents')) {
+            $order->load(['items.product', 'items.productVariant', 'shipping', 'documents']);
+        }
 
         return view('orders.show', compact('order'));
     }
@@ -188,7 +192,10 @@ class OrderController extends Controller
             abort(403, __('orders.messages.cannot_edit'));
         }
 
-        $order->load(['items.product', 'items.productVariant']);
+        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
+        if (!$order->relationLoaded('items.product') || !$order->relationLoaded('items.productVariant')) {
+            $order->load(['items.product', 'items.productVariant']);
+        }
         $products = Product::with('variants')->where('is_visible', true)->get();
 
         return view('orders.edit', compact('order', 'products'));

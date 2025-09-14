@@ -77,7 +77,11 @@ class StockController extends Controller
 
     public function show(VariantInventory $stock): View
     {
-        $stock->load(['variant.product', 'location', 'supplier', 'stockMovements.user']);
+        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
+        if (!$stock->relationLoaded('variant.product') || !$stock->relationLoaded('location') || 
+            !$stock->relationLoaded('supplier') || !$stock->relationLoaded('stockMovements.user')) {
+            $stock->load(['variant.product', 'location', 'supplier', 'stockMovements.user']);
+        }
 
         return view('stock.show', compact('stock'));
     }

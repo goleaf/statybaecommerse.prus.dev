@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
@@ -74,6 +75,21 @@ class Address extends Model
         ];
     }
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'full_name',
+        'full_address',
+        'formatted_address',
+        'display_name',
+        'type_label',
+        'type_icon',
+        'type_color',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -106,12 +122,32 @@ class Address extends Model
 
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class, 'billing_address_id');
+        return $this->hasMany(Order::class, 'user_id', 'user_id');
     }
 
     public function shippingOrders(): HasMany
     {
-        return $this->hasMany(Order::class, 'shipping_address_id');
+        return $this->hasMany(Order::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Get the address's latest order.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestOrder(): HasOne
+    {
+        return $this->orders()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the address's latest shipping order.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestShippingOrder(): HasOne
+    {
+        return $this->shippingOrders()->one()->latestOfMany();
     }
 
     public function scopeDefault($query)

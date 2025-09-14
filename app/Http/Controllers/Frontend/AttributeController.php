@@ -65,17 +65,21 @@ class AttributeController extends Controller
 
     public function show(Attribute $attribute): View
     {
-        $attribute->load([
-            'values' => function ($query) {
-                $query->where('is_enabled', true)->orderBy('sort_order');
-            },
-            'products' => function ($query) {
-                $query->where('is_visible', true)
-                    ->whereNotNull('published_at')
-                    ->with(['media', 'brand', 'category'])
-                    ->orderBy('name');
-            },
-        ]);
+        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
+        if (!$attribute->relationLoaded('values') || !$attribute->relationLoaded('products.media') || 
+            !$attribute->relationLoaded('products.brand') || !$attribute->relationLoaded('products.category')) {
+            $attribute->load([
+                'values' => function ($query) {
+                    $query->where('is_enabled', true)->orderBy('sort_order');
+                },
+                'products' => function ($query) {
+                    $query->where('is_visible', true)
+                        ->whereNotNull('published_at')
+                        ->with(['media', 'brand', 'category'])
+                        ->orderBy('name');
+                },
+            ]);
+        }
 
         // Get related attributes from the same group
         $relatedAttributes = collect();

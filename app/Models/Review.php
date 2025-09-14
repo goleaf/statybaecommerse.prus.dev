@@ -89,6 +89,25 @@ class Review extends Model
         ];
     }
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'status',
+        'status_color',
+        'status_label',
+        'rating_stars',
+        'rating_label',
+        'rating_color',
+        'is_high_rated',
+        'is_low_rated',
+        'is_recent',
+        'days_old',
+        'reviewer_type',
+    ];
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

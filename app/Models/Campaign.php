@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -130,6 +131,46 @@ class Campaign extends Model
     public function schedules(): HasMany
     {
         return $this->hasMany(CampaignSchedule::class);
+    }
+
+    /**
+     * Get the campaign's latest view.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestView(): HasOne
+    {
+        return $this->views()->one()->ofMany('viewed_at', 'max');
+    }
+
+    /**
+     * Get the campaign's latest click.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestClick(): HasOne
+    {
+        return $this->clicks()->one()->ofMany('clicked_at', 'max');
+    }
+
+    /**
+     * Get the campaign's latest conversion.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestConversion(): HasOne
+    {
+        return $this->conversions()->one()->ofMany('converted_at', 'max');
+    }
+
+    /**
+     * Get the campaign's latest schedule.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestSchedule(): HasOne
+    {
+        return $this->schedules()->one()->latestOfMany();
     }
 
     public function orders(): HasManyThrough

@@ -6,6 +6,8 @@ namespace App\Livewire\Components;
 
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -90,7 +92,8 @@ class ProductComparison extends Component
         $this->isOpen = ! $this->isOpen;
     }
 
-    public function getCompareProductsDataProperty()
+    #[Computed]
+    public function compareProductsData(): Collection
     {
         if (empty($this->compareProducts)) {
             return collect();
@@ -101,7 +104,8 @@ class ProductComparison extends Component
             ->get();
     }
 
-    public function getComparisonAttributesProperty()
+    #[Computed]
+    public function comparisonAttributes(): Collection
     {
         if ($this->compareProductsData->isEmpty()) {
             return collect();

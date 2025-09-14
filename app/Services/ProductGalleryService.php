@@ -18,12 +18,12 @@ final class ProductGalleryService
      */
     public function arrangeForGallery(Collection $products, int $columnCount = 4): Collection
     {
-        // Filter out invalid products - check if properties exist before accessing them
-        $validProducts = $products->filter(function ($product) {
-            return !empty($product->name) && 
-                   (!property_exists($product, 'is_visible') || $product->is_visible) &&
-                   (!property_exists($product, 'price') || $product->price > 0) &&
-                   (!property_exists($product, 'slug') || !empty($product->slug));
+        // Use skipWhile to filter out invalid products from the beginning
+        $validProducts = $products->skipWhile(function ($product) {
+            return empty($product->name) || 
+                   (property_exists($product, 'is_visible') && !$product->is_visible) ||
+                   (property_exists($product, 'price') && $product->price <= 0) ||
+                   (property_exists($product, 'slug') && empty($product->slug));
         });
 
         $productColumns = $validProducts->splitIn($columnCount);
@@ -54,12 +54,12 @@ final class ProductGalleryService
      */
     public function arrangeForMasonry(Collection $products, int $columns = 3): Collection
     {
-        // Filter out invalid products - check if properties exist before accessing them
-        $validProducts = $products->filter(function ($product) {
-            return !empty($product->name) && 
-                   (!property_exists($product, 'is_visible') || $product->is_visible) &&
-                   (!property_exists($product, 'price') || $product->price > 0) &&
-                   (!property_exists($product, 'slug') || !empty($product->slug));
+        // Use skipWhile to filter out invalid products from the beginning
+        $validProducts = $products->skipWhile(function ($product) {
+            return empty($product->name) || 
+                   (property_exists($product, 'is_visible') && !$product->is_visible) ||
+                   (property_exists($product, 'price') && $product->price <= 0) ||
+                   (property_exists($product, 'slug') && empty($product->slug));
         });
 
         return $validProducts->splitIn($columns);
@@ -95,12 +95,12 @@ final class ProductGalleryService
      */
     public function arrangeForCategoryShowcase(Collection $products, int $featuredCount = 8): array
     {
-        // Filter out invalid products - check if properties exist before accessing them
-        $validProducts = $products->filter(function ($product) {
-            return !empty($product->name) && 
-                   (!property_exists($product, 'is_visible') || $product->is_visible) &&
-                   (!property_exists($product, 'price') || $product->price > 0) &&
-                   (!property_exists($product, 'slug') || !empty($product->slug));
+        // Use skipWhile to filter out invalid products from the beginning
+        $validProducts = $products->skipWhile(function ($product) {
+            return empty($product->name) || 
+                   (property_exists($product, 'is_visible') && !$product->is_visible) ||
+                   (property_exists($product, 'price') && $product->price <= 0) ||
+                   (property_exists($product, 'slug') && empty($product->slug));
         });
 
         $featuredProducts = $validProducts->take($featuredCount);
@@ -175,12 +175,12 @@ final class ProductGalleryService
      */
     public function arrangeForHomepageFeatured(Collection $products): array
     {
-        // Filter out invalid products - check if properties exist before accessing them
-        $validProducts = $products->filter(function ($product) {
-            return !empty($product->name) && 
-                   (!property_exists($product, 'is_visible') || $product->is_visible) &&
-                   (!property_exists($product, 'price') || $product->price > 0) &&
-                   (!property_exists($product, 'slug') || !empty($product->slug));
+        // Use skipWhile to filter out invalid products from the beginning
+        $validProducts = $products->skipWhile(function ($product) {
+            return empty($product->name) || 
+                   (property_exists($product, 'is_visible') && !$product->is_visible) ||
+                   (property_exists($product, 'price') && $product->price <= 0) ||
+                   (property_exists($product, 'slug') && empty($product->slug));
         });
 
         $heroProducts = $validProducts->take(1);
@@ -313,8 +313,8 @@ final class ProductGalleryService
         if ($product->price > 0) $score += 0.1;
 
         // Media quality (30% of score)
-        if ($product->getFirstMediaUrl('images')) $score += 0.2;
-        if ($product->getFirstMediaUrl('images', 'large')) $score += 0.1;
+        if (method_exists($product, 'getFirstMediaUrl') && $product->getFirstMediaUrl('images')) $score += 0.2;
+        if (method_exists($product, 'getFirstMediaUrl') && $product->getFirstMediaUrl('images', 'large')) $score += 0.1;
 
         // Content quality (20% of score)
         if (!empty($product->description)) $score += 0.1;
@@ -325,5 +325,227 @@ final class ProductGalleryService
         if (($product->average_rating ?? 0) > 0) $score += 0.05;
 
         return min($score, 1.0);
+    }
+
+    /**
+     * Advanced filtering with multiple skipWhile conditions for complex scenarios
+     * 
+     * @param Collection $products
+     * @param array $filters
+     * @return Collection
+     */
+    public function arrangeWithAdvancedSkipWhile(Collection $products, array $filters = []): Collection
+    {
+        $minPrice = $filters['min_price'] ?? 0;
+        $maxPrice = $filters['max_price'] ?? null;
+        $minRating = $filters['min_rating'] ?? 0;
+        $hasImages = $filters['has_images'] ?? true;
+        $isFeatured = $filters['is_featured'] ?? null;
+        $categoryId = $filters['category_id'] ?? null;
+
+        return $products->skipWhile(function ($product) use ($minPrice, $maxPrice, $minRating, $hasImages, $isFeatured, $categoryId) {
+            // Skip products that don't meet basic requirements
+            if (empty($product->name) || 
+                (property_exists($product, 'is_visible') && !$product->is_visible) ||
+                (property_exists($product, 'slug') && empty($product->slug))) {
+                return true;
+            }
+
+            // Skip products with invalid prices
+            if ((property_exists($product, 'price') && $product->price <= 0) || 
+                (property_exists($product, 'price') && $product->price < $minPrice)) {
+                return true;
+            }
+
+            // Skip products above maximum price
+            if ($maxPrice !== null && property_exists($product, 'price') && $product->price > $maxPrice) {
+                return true;
+            }
+
+            // Skip products without images if required
+            if ($hasImages && method_exists($product, 'getFirstMediaUrl') && !$product->getFirstMediaUrl('images')) {
+                return true;
+            }
+
+            // Skip products based on featured status
+            if ($isFeatured !== null && property_exists($product, 'is_featured') && $product->is_featured !== $isFeatured) {
+                return true;
+            }
+
+            // Skip products with low ratings
+            if ($minRating > 0 && property_exists($product, 'average_rating') && ($product->average_rating ?? 0) < $minRating) {
+                return true;
+            }
+
+            // Skip products not in specified category
+            if ($categoryId !== null && property_exists($product, 'category_id') && $product->category_id !== $categoryId) {
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Skip products based on availability and stock levels
+     * 
+     * @param Collection $products
+     * @param bool $inStockOnly
+     * @param int $minStock
+     * @return Collection
+     */
+    public function arrangeWithStockFiltering(Collection $products, bool $inStockOnly = true, int $minStock = 1): Collection
+    {
+        return $products->skipWhile(function ($product) use ($inStockOnly, $minStock) {
+            if ($inStockOnly) {
+                // Skip products that are out of stock
+                if (property_exists($product, 'stock_quantity') && $product->stock_quantity < $minStock) {
+                    return true;
+                }
+                
+                // Skip products that are not available
+                if (property_exists($product, 'is_available') && !$product->is_available) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Skip products based on date ranges (new arrivals, seasonal, etc.)
+     * 
+     * @param Collection $products
+     * @param array $dateFilters
+     * @return Collection
+     */
+    public function arrangeWithDateFiltering(Collection $products, array $dateFilters = []): Collection
+    {
+        $newArrivalsDays = $dateFilters['new_arrivals_days'] ?? null;
+        $seasonalStart = $dateFilters['seasonal_start'] ?? null;
+        $seasonalEnd = $dateFilters['seasonal_end'] ?? null;
+        $excludeOld = $dateFilters['exclude_old'] ?? false;
+
+        return $products->skipWhile(function ($product) use ($newArrivalsDays, $seasonalStart, $seasonalEnd, $excludeOld) {
+            $now = now();
+
+            // Skip old products if requested
+            if ($excludeOld && property_exists($product, 'created_at')) {
+                $productDate = $product->created_at;
+                if ($productDate && $productDate->diffInDays($now) > 365) {
+                    return true;
+                }
+            }
+
+            // Skip products not in new arrivals range
+            if ($newArrivalsDays !== null && property_exists($product, 'created_at')) {
+                $productDate = $product->created_at;
+                if ($productDate && $productDate->diffInDays($now) > $newArrivalsDays) {
+                    return true;
+                }
+            }
+
+            // Skip products not in seasonal range
+            if ($seasonalStart !== null && $seasonalEnd !== null && property_exists($product, 'created_at')) {
+                $productDate = $product->created_at;
+                if ($productDate && ($productDate->lt($seasonalStart) || $productDate->gt($seasonalEnd))) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Skip products based on user preferences and behavior
+     * 
+     * @param Collection $products
+     * @param array $userPreferences
+     * @return Collection
+     */
+    public function arrangeWithUserPreferences(Collection $products, array $userPreferences = []): Collection
+    {
+        $preferredBrands = $userPreferences['preferred_brands'] ?? [];
+        $preferredCategories = $userPreferences['preferred_categories'] ?? [];
+        $excludedBrands = $userPreferences['excluded_brands'] ?? [];
+        $excludedCategories = $userPreferences['excluded_categories'] ?? [];
+        $priceRange = $userPreferences['price_range'] ?? null;
+
+        return $products->skipWhile(function ($product) use ($preferredBrands, $preferredCategories, $excludedBrands, $excludedCategories, $priceRange) {
+            // Skip products from excluded brands
+            if (!empty($excludedBrands) && property_exists($product, 'brand_id') && in_array($product->brand_id, $excludedBrands)) {
+                return true;
+            }
+
+            // Skip products from excluded categories
+            if (!empty($excludedCategories) && property_exists($product, 'category_id') && in_array($product->category_id, $excludedCategories)) {
+                return true;
+            }
+
+            // Skip products outside price range
+            if ($priceRange !== null && property_exists($product, 'price')) {
+                if ($product->price < $priceRange['min'] || $product->price > $priceRange['max']) {
+                    return true;
+                }
+            }
+
+            // If user has preferences, skip products that don't match
+            if (!empty($preferredBrands) && property_exists($product, 'brand_id') && !in_array($product->brand_id, $preferredBrands)) {
+                return true;
+            }
+
+            if (!empty($preferredCategories) && property_exists($product, 'category_id') && !in_array($product->category_id, $preferredCategories)) {
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Skip products based on performance metrics
+     * 
+     * @param Collection $products
+     * @param array $performanceFilters
+     * @return Collection
+     */
+    public function arrangeWithPerformanceFiltering(Collection $products, array $performanceFilters = []): Collection
+    {
+        $minViews = $performanceFilters['min_views'] ?? 0;
+        $minSales = $performanceFilters['min_sales'] ?? 0;
+        $minRating = $performanceFilters['min_rating'] ?? 0;
+        $maxRating = $performanceFilters['max_rating'] ?? 5.0;
+        $trendingOnly = $performanceFilters['trending_only'] ?? false;
+
+        return $products->skipWhile(function ($product) use ($minViews, $minSales, $minRating, $maxRating, $trendingOnly) {
+            // Skip products with low views
+            if ($minViews > 0 && property_exists($product, 'views_count') && ($product->views_count ?? 0) < $minViews) {
+                return true;
+            }
+
+            // Skip products with low sales
+            if ($minSales > 0 && property_exists($product, 'sales_count') && ($product->sales_count ?? 0) < $minSales) {
+                return true;
+            }
+
+            // Skip products with low ratings
+            if ($minRating > 0 && property_exists($product, 'average_rating') && ($product->average_rating ?? 0) < $minRating) {
+                return true;
+            }
+
+            // Skip products with high ratings (for testing low-rated products)
+            if ($maxRating < 5.0 && property_exists($product, 'average_rating') && ($product->average_rating ?? 0) > $maxRating) {
+                return true;
+            }
+
+            // Skip non-trending products
+            if ($trendingOnly && property_exists($product, 'is_trending') && !$product->is_trending) {
+                return true;
+            }
+
+            return false;
+        });
     }
 }

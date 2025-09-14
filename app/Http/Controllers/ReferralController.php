@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,7 @@ final /**
  */
 class ReferralController extends Controller
 {
+    use AuthorizesRequests;
     public function index(): View
     {
         $user = Auth::user();
@@ -224,11 +226,12 @@ class ReferralController extends Controller
         \App\Models\AnalyticsEvent::create([
             'user_id' => $referralCode->user_id,
             'event_type' => 'referral_click',
-            'event_data' => [
+            'session_id' => $request->session()->getId(),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'referrer' => $request->header('referer'),
+            'properties' => [
                 'referral_code' => $referralCode->code,
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'referrer' => $request->header('referer'),
             ],
         ]);
     }

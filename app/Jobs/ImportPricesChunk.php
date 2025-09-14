@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\LazyCollection;
 
 class ImportPricesChunk implements ShouldQueue
 {
@@ -27,19 +28,24 @@ class ImportPricesChunk implements ShouldQueue
 
     public function handle(): void
     {
-        foreach ($this->rows as $row) {
+        // Use LazyCollection with timeout to prevent long-running price import operations
+        $timeout = now()->addMinutes(10); // 10 minute timeout for price imports
+        
+        LazyCollection::make($this->rows)
+            ->takeUntilTimeout($timeout)
+            ->each(function ($row) {
             $productSlug = (string) ($row['product_slug'] ?? '');
             $currencyCode = strtoupper((string) ($row['currency_code'] ?? ''));
             $amount = isset($row['amount']) ? (float) $row['amount'] : null;
             $compare = isset($row['compare_amount']) ? (float) $row['compare_amount'] : null;
             if ($productSlug === '' || $currencyCode === '' || $amount === null) {
-                continue;
+                return;
             }
 
             $productId = DB::table('products')->where('slug', $productSlug)->value('id');
             $currencyId = DB::table('currencies')->where('code', $currencyCode)->value('id');
             if (! $productId || ! $currencyId) {
-                continue;
+                return;
             }
 
             $data = [
@@ -61,6 +67,6 @@ class ImportPricesChunk implements ShouldQueue
             } catch (\Throwable $e) {
                 // continue
             }
-        }
+            });
     }
 }

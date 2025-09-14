@@ -6,6 +6,7 @@ namespace App\Livewire\Components;
 
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 final /**
@@ -19,7 +20,11 @@ class ProductCard extends Component
 
     public function mount(Product $product): void
     {
-        $this->product = $product->load(['brand', 'media']);
+        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
+        if (!$product->relationLoaded('brand') || !$product->relationLoaded('media')) {
+            $product->load(['brand', 'media']);
+        }
+        $this->product = $product;
     }
 
     public function addToCart(): void
@@ -177,7 +182,8 @@ class ProductCard extends Component
         return null;
     }
 
-    public function getIsInWishlistProperty(): bool
+    #[Computed]
+    public function isInWishlist(): bool
     {
         if (! auth()->check()) {
             return false;
@@ -193,7 +199,8 @@ class ProductCard extends Component
         return $wishlist->hasProduct($this->product->id);
     }
 
-    public function getIsInComparisonProperty(): bool
+    #[Computed]
+    public function isInComparison(): bool
     {
         $sessionId = session()->getId();
 
@@ -202,7 +209,8 @@ class ProductCard extends Component
             ->exists();
     }
 
-    public function getDiscountPercentageProperty(): ?int
+    #[Computed]
+    public function discountPercentage(): ?int
     {
         // Check for sale_price first (if product is on sale)
         if ($this->product->sale_price && $this->product->price) {
@@ -217,7 +225,8 @@ class ProductCard extends Component
         return null;
     }
 
-    public function getStockStatusProperty(): string
+    #[Computed]
+    public function stockStatus(): string
     {
         if (! $this->product->track_inventory) {
             return __('translations.in_stock');
@@ -234,7 +243,8 @@ class ProductCard extends Component
         return __('translations.in_stock');
     }
 
-    public function getIsOutOfStockProperty(): bool
+    #[Computed]
+    public function isOutOfStock(): bool
     {
         return $this->product->track_inventory && $this->product->stock_quantity <= 0;
     }

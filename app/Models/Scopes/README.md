@@ -25,6 +25,25 @@ Automatically filters records where `is_active = true`, `is_enabled = true`, or 
 - Order
 - Channel
 - Zone
+- Menu
+- Inventory
+- VariantInventory
+- ProductImage
+- ProductFeature
+- ProductSimilarity
+- NewsCategory
+- NewsTag
+- NewsComment
+- NewsImage
+- AttributeValue
+- CollectionRule
+- AdminUser
+- CampaignClick
+- CampaignConversion
+- CampaignCustomerSegment
+- CampaignProductTarget
+- CampaignSchedule
+- CampaignView
 
 ### PublishedScope
 Automatically filters records where `published_at` is not null and is in the past.
@@ -43,6 +62,8 @@ Automatically filters records where `is_visible = true`.
 - Collection
 - News
 - Attribute
+- MenuItem
+- NewsComment
 
 ### EnabledScope
 Automatically filters records where `is_enabled = true`.
@@ -57,12 +78,15 @@ Automatically filters records where `is_enabled = true`.
 - Attribute
 - Channel
 - Zone
+- ProductVariant
+- AttributeValue
 
 ### ApprovedScope
 Automatically filters records where `is_approved = true`.
 
 **Applied to:**
 - Review
+- NewsComment
 
 ### StatusScope
 Automatically filters records by status field with model-specific allowed statuses.
@@ -72,6 +96,10 @@ Automatically filters records by status field with model-specific allowed status
 - Campaign
 - Channel
 - Zone
+- ProductVariant
+- VariantInventory
+- ProductRequest
+- CampaignConversion
 
 ### ActiveCampaignScope
 Automatically filters campaigns that are currently active based on start/end dates.
@@ -91,6 +119,18 @@ Automatically filters records by user ownership for data privacy.
 **Applied to:**
 - CartItem
 - Address
+- UserWishlist
+- WishlistItem
+- OrderItem
+- StockMovement
+- UserBehavior
+- UserPreference
+- UserProductInteraction
+- ProductHistory
+- ProductComparison
+- ProductRequest
+- CouponUsage
+- AnalyticsEvent
 
 ### DateRangeScope
 Automatically filters records by date ranges for time-sensitive content.

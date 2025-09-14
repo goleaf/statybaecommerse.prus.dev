@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
@@ -94,9 +96,9 @@ class Referral extends Model
     /**
      * Get referral analytics events
      */
-    public function analyticsEvents(): HasMany
+    public function analyticsEvents(): MorphMany
     {
-        return $this->hasMany(AnalyticsEvent::class, 'referral_id');
+        return $this->morphMany(AnalyticsEvent::class, 'trackable');
     }
 
     /**
@@ -113,6 +115,26 @@ class Referral extends Model
     public function translations(): HasMany
     {
         return $this->hasMany(\App\Models\Translations\ReferralTranslation::class);
+    }
+
+    /**
+     * Get the referral's latest reward.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestReward(): HasOne
+    {
+        return $this->rewards()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the referral's latest referred order.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestReferredOrder(): HasOne
+    {
+        return $this->referredOrders()->one()->latestOfMany();
     }
 
     /**
@@ -268,7 +290,7 @@ class Referral extends Model
      */
     public function getDaysSinceCreatedAttribute(): int
     {
-        return $this->created_at->diffInDays(now());
+        return (int) $this->created_at->diffInDays(now());
     }
 
     /**
@@ -300,8 +322,8 @@ class Referral extends Model
             $score += 20;
         }
 
-        // Bonus for recent completion
-        if ($this->completed_at && $this->completed_at->isAfter(now()->subDays(30))) {
+        // Bonus for recent completion (only if completed more than 1 day ago)
+        if ($this->completed_at && $this->completed_at->isAfter(now()->subDays(30)) && $this->completed_at->isBefore(now()->subDay())) {
             $score += 20;
         }
 

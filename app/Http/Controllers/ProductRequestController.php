@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProductRequestFormRequest;
+use App\Data\ProductRequestData;
 use App\Models\Product;
 use App\Models\ProductRequest;
 use Illuminate\Http\RedirectResponse;
@@ -33,9 +33,9 @@ class ProductRequestController extends Controller
     /**
      * Store a new product request.
      */
-    public function store(ProductRequestFormRequest $request): RedirectResponse
+    public function store(ProductRequestData $data): RedirectResponse
     {
-        $product = Product::findOrFail($request->product_id);
+        $product = Product::findOrFail($data->product_id);
 
         if (! $product->isRequestable()) {
             return redirect()->back()
@@ -45,11 +45,11 @@ class ProductRequestController extends Controller
         $productRequest = ProductRequest::create([
             'product_id' => $product->id,
             'user_id' => auth()->id(),
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'message' => $request->message,
-            'requested_quantity' => $request->requested_quantity,
+            'name' => $data->name,
+            'email' => $data->email,
+            'phone' => $data->phone,
+            'message' => $data->message,
+            'requested_quantity' => $data->requested_quantity,
             'status' => 'pending',
         ]);
 

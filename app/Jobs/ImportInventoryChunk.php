@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\LazyCollection;
 
 class ImportInventoryChunk implements ShouldQueue
 {
@@ -27,12 +28,17 @@ class ImportInventoryChunk implements ShouldQueue
 
     public function handle(): void
     {
-        foreach ($this->rows as $row) {
+        // Use LazyCollection with timeout to prevent long-running inventory import operations
+        $timeout = now()->addMinutes(15); // 15 minute timeout for inventory imports
+        
+        LazyCollection::make($this->rows)
+            ->takeUntilTimeout($timeout)
+            ->each(function ($row) {
             $sku = (string) ($row['sku'] ?? '');
             $locationCode = (string) ($row['location_code'] ?? 'default');
             $stock = isset($row['stock']) ? (int) $row['stock'] : null;
             if ($sku === '' || $stock === null) {
-                continue;
+                return;
             }
 
             $variantId = DB::table('sh_product_variants')->where('sku', $sku)->value('id');
@@ -42,10 +48,10 @@ class ImportInventoryChunk implements ShouldQueue
                     // Interpret as product-level inventory if variant not found
                     $existing = DB::table('sh_variant_inventories')->where('variant_id', $variantId)->first();
                     if ($existing) {
-                        continue;
+                        return;
                     }
                 } else {
-                    continue;
+                    return;
                 }
             }
 
@@ -81,6 +87,6 @@ class ImportInventoryChunk implements ShouldQueue
             } catch (\Throwable $e) {
                 // continue
             }
-        }
+            });
     }
 }

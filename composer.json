@@ -28,6 +28,7 @@
         "pxlrbt/filament-excel": "*",
         "solution-forest/tab-layout-plugin": "^3.2",
         "spatie/laravel-activitylog": "^4.10",
+        "spatie/laravel-data": "^4.17",
         "spatie/laravel-medialibrary": "^11",
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-translatable": "^6.11"

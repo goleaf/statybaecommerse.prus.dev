@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Data\ReviewData;
 use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
@@ -52,31 +53,16 @@ class ReviewController extends Controller
         return view('reviews.create', compact('product'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(ReviewData $data): RedirectResponse
     {
-        $validator = Validator::make($request->all(), [
-            'product_id' => 'required|exists:products,id',
-            'rating' => 'required|integer|min:1|max:5',
-            'title' => 'nullable|string|max:255',
-            'comment' => 'nullable|string|max:2000',
-            'reviewer_name' => 'required|string|max:255',
-            'reviewer_email' => 'required|email|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         $review = Review::create([
-            'product_id' => $request->product_id,
+            'product_id' => $data->product_id,
             'user_id' => Auth::id(),
-            'rating' => $request->rating,
-            'title' => $request->title,
-            'comment' => $request->comment,
-            'reviewer_name' => $request->reviewer_name,
-            'reviewer_email' => $request->reviewer_email,
+            'rating' => $data->rating,
+            'title' => $data->title,
+            'comment' => $data->comment,
+            'reviewer_name' => $data->reviewer_name,
+            'reviewer_email' => $data->reviewer_email,
             'locale' => app()->getLocale(),
             'is_approved' => false,
         ]);

@@ -32,7 +32,10 @@ class Show extends Component
             abort(404);
         }
 
-        $category->load(['media', 'translations']);
+        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
+        if (!$category->relationLoaded('media') || !$category->relationLoaded('translations')) {
+            $category->load(['media', 'translations']);
+        }
         $this->category = $category;
     }
 

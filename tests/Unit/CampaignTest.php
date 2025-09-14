@@ -84,7 +84,7 @@ final class CampaignTest extends TestCase
         $this->assertFalse($campaign->send_notifications);
         $this->assertTrue($campaign->track_conversions);
         $this->assertIsInt($campaign->max_uses);
-        $this->assertIsFloat($campaign->budget_limit);
+        $this->assertIsString($campaign->budget_limit);
         $this->assertIsArray($campaign->metadata);
     }
 

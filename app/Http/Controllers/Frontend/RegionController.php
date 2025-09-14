@@ -44,7 +44,12 @@ class RegionController extends Controller
 
     public function show(Region $region): View
     {
-        $region->load(['country', 'zone', 'parent', 'children', 'cities', 'translations']);
+        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
+        if (!$region->relationLoaded('country') || !$region->relationLoaded('zone') || 
+            !$region->relationLoaded('parent') || !$region->relationLoaded('children') || 
+            !$region->relationLoaded('cities') || !$region->relationLoaded('translations')) {
+            $region->load(['country', 'zone', 'parent', 'children', 'cities', 'translations']);
+        }
 
         return view('regions.show', compact('region'));
     }

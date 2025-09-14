@@ -87,16 +87,42 @@ final class AttributeTest extends TestCase
     public function test_attribute_scopes(): void
     {
         // Clear any existing attributes first
-        Attribute::query()->delete();
+        Attribute::withoutGlobalScopes()->delete();
 
         // Create test attributes with specific attributes
-        $enabledAttribute = Attribute::factory()->create(['is_enabled' => true]);
-        $disabledAttribute = Attribute::factory()->create(['is_enabled' => false]);
-        $requiredAttribute = Attribute::factory()->create(['is_required' => true]);
-        $filterableAttribute = Attribute::factory()->create(['is_filterable' => true]);
-        $searchableAttribute = Attribute::factory()->create(['is_searchable' => true]);
-        $orderedAttribute1 = Attribute::factory()->create(['sort_order' => 2]);
-        $orderedAttribute2 = Attribute::factory()->create(['sort_order' => 1]);
+        $enabledAttribute = Attribute::factory()->create([
+            'is_enabled' => true,
+            'is_visible' => true
+        ]);
+        $disabledAttribute = Attribute::factory()->create([
+            'is_enabled' => false,
+            'is_visible' => true
+        ]);
+        $requiredAttribute = Attribute::factory()->create([
+            'is_required' => true,
+            'is_enabled' => true,
+            'is_visible' => true
+        ]);
+        $filterableAttribute = Attribute::factory()->create([
+            'is_filterable' => true,
+            'is_enabled' => true,
+            'is_visible' => true
+        ]);
+        $searchableAttribute = Attribute::factory()->create([
+            'is_searchable' => true,
+            'is_enabled' => true,
+            'is_visible' => true
+        ]);
+        $orderedAttribute1 = Attribute::factory()->create([
+            'sort_order' => 2,
+            'is_enabled' => true,
+            'is_visible' => true
+        ]);
+        $orderedAttribute2 = Attribute::factory()->create([
+            'sort_order' => 1,
+            'is_enabled' => true,
+            'is_visible' => true
+        ]);
 
         // Test enabled scope
         $enabledAttributes = Attribute::enabled()->get();
@@ -215,7 +241,10 @@ final class AttributeTest extends TestCase
 
     public function test_attribute_with_translations_scope(): void
     {
-        $attribute = Attribute::factory()->create();
+        $attribute = Attribute::factory()->create([
+            'is_enabled' => true, // Ensure the attribute is enabled so it passes the EnabledScope
+            'is_visible' => true, // Ensure the attribute is visible so it passes the VisibleScope
+        ]);
         $attribute->updateTranslation('en', ['name' => 'English Name']);
 
         $attributesWithTranslations = Attribute::withTranslations('en')->get();

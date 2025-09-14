@@ -8,6 +8,7 @@ use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -97,7 +98,8 @@ class ProductQuickView extends Component
         $this->notifySuccess(__('ecommerce.added_to_wishlist'));
     }
 
-    public function getAverageRating(): float
+    #[Computed]
+    public function averageRating(): float
     {
         if (! $this->product) {
             return 0;
@@ -108,7 +110,8 @@ class ProductQuickView extends Component
             ->avg('rating') ?? 0;
     }
 
-    public function getReviewsCount(): int
+    #[Computed]
+    public function reviewsCount(): int
     {
         if (! $this->product) {
             return 0;
@@ -119,7 +122,8 @@ class ProductQuickView extends Component
             ->count();
     }
 
-    public function getCurrentPrice(): float
+    #[Computed]
+    public function currentPrice(): float
     {
         if (! $this->product) {
             return 0;

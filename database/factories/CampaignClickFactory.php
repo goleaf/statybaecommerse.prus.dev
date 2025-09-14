@@ -6,7 +6,7 @@ namespace Database\Factories;
 
 use App\Models\Campaign;
 use App\Models\CampaignClick;
-use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,7 +25,7 @@ final class CampaignClickFactory extends Factory
             'user_agent' => $this->faker->userAgent(),
             'click_type' => $this->faker->randomElement(['cta', 'banner', 'link', 'button']),
             'clicked_url' => $this->faker->optional(0.8)->url(),
-            'customer_id' => $this->faker->optional(0.4)->randomElement(Customer::pluck('id')->toArray()),
+            'customer_id' => $this->faker->optional(0.4)->randomElement(User::pluck('id')->toArray()),
             'clicked_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
     }

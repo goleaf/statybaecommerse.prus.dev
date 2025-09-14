@@ -11,6 +11,7 @@ use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\LazyCollection;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -288,15 +289,21 @@ final class ComprehensiveFilamentSeeder extends Seeder
 
     private function enhanceExistingData(): void
     {
-        // Update existing products with enhanced fields if they exist
-        Product::where('is_visible', true)->chunk(50, function ($products): void {
-            foreach ($products as $product) {
-                $updateData = [];
+        // Update existing products with enhanced fields if they exist with timeout protection
+        $timeout = now()->addMinutes(10); // 10 minute timeout for product enhancement
+        
+        Product::where('is_visible', true)
+            ->cursor()
+            ->takeUntilTimeout($timeout)
+            ->chunk(50)
+            ->each(function ($products): void {
+                foreach ($products as $product) {
+                    $updateData = [];
 
-                // Only update columns that exist
-                if (! $product->meta_title && $product->name) {
-                    $updateData['meta_title'] = $product->name;
-                }
+                    // Only update columns that exist
+                    if (! $product->meta_title && $product->name) {
+                        $updateData['meta_title'] = $product->name;
+                    }
 
                 if (! $product->is_featured) {
                     $updateData['is_featured'] = fake()->boolean(15); // 15% featured
@@ -321,34 +328,46 @@ final class ComprehensiveFilamentSeeder extends Seeder
             }
         });
 
-        // Update existing categories
-        Category::where('is_visible', true)->chunk(50, function ($categories): void {
-            foreach ($categories as $category) {
-                try {
-                    $category->update([
-                        'is_featured' => $category->is_featured ?? fake()->boolean(25),
-                        'sort_order' => $category->sort_order ?? fake()->numberBetween(1, 100),
-                    ]);
-                } catch (\Exception $e) {
-                    // Skip if columns don't exist yet
-                    continue;
+        // Update existing categories with timeout protection
+        $categoryTimeout = now()->addMinutes(5); // 5 minute timeout for category updates
+        
+        Category::where('is_visible', true)
+            ->cursor()
+            ->takeUntilTimeout($categoryTimeout)
+            ->chunk(50)
+            ->each(function ($categories): void {
+                foreach ($categories as $category) {
+                    try {
+                        $category->update([
+                            'is_featured' => $category->is_featured ?? fake()->boolean(25),
+                            'sort_order' => $category->sort_order ?? fake()->numberBetween(1, 100),
+                        ]);
+                    } catch (\Exception $e) {
+                        // Skip if columns don't exist yet
+                        continue;
+                    }
                 }
-            }
-        });
+            });
 
-        // Update existing brands
-        Brand::where('is_visible', true)->chunk(50, function ($brands): void {
-            foreach ($brands as $brand) {
-                try {
-                    $brand->update([
-                        'is_featured' => $brand->is_featured ?? fake()->boolean(20),
-                        'sort_order' => $brand->sort_order ?? fake()->numberBetween(1, 100),
-                    ]);
-                } catch (\Exception $e) {
-                    // Skip if columns don't exist yet
-                    continue;
+        // Update existing brands with timeout protection
+        $brandTimeout = now()->addMinutes(5); // 5 minute timeout for brand updates
+        
+        Brand::where('is_visible', true)
+            ->cursor()
+            ->takeUntilTimeout($brandTimeout)
+            ->chunk(50)
+            ->each(function ($brands): void {
+                foreach ($brands as $brand) {
+                    try {
+                        $brand->update([
+                            'is_featured' => $brand->is_featured ?? fake()->boolean(20),
+                            'sort_order' => $brand->sort_order ?? fake()->numberBetween(1, 100),
+                        ]);
+                    } catch (\Exception $e) {
+                        // Skip if columns don't exist yet
+                        continue;
+                    }
                 }
-            }
-        });
+            });
     }
 }

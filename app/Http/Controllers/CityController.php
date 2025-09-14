@@ -78,14 +78,19 @@ class CityController extends Controller
 
     public function show(City $city): View
     {
-        $city->load([
-            'country.translations',
-            'region.translations',
-            'zone.translations',
-            'parent.translations',
-            'children.translations',
-            'translations'
-        ]);
+        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
+        if (!$city->relationLoaded('country.translations') || !$city->relationLoaded('region.translations') || 
+            !$city->relationLoaded('zone.translations') || !$city->relationLoaded('parent.translations') || 
+            !$city->relationLoaded('children.translations') || !$city->relationLoaded('translations')) {
+            $city->load([
+                'country.translations',
+                'region.translations',
+                'zone.translations',
+                'parent.translations',
+                'children.translations',
+                'translations'
+            ]);
+        }
 
         // Get nearby cities (within 50km radius if coordinates available)
         $nearbyCities = collect();

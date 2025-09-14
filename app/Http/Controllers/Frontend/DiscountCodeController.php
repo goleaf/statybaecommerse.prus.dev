@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Data\DiscountCodeValidationData;
 use App\Http\Controllers\Controller;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
@@ -28,13 +29,9 @@ class DiscountCodeController extends Controller
     /**
      * Validate a discount code
      */
-    public function validate(Request $request): JsonResponse
+    public function validate(DiscountCodeValidationData $data): JsonResponse
     {
-        $request->validate([
-            'code' => 'required|string|max:50',
-        ]);
-
-        $code = DiscountCode::where('code', $request->code)->first();
+        $code = DiscountCode::where('code', $data->code)->first();
 
         if (! $code) {
             return response()->json([

@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\User;
+use App\Rules\UrlRule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -89,7 +90,7 @@ class UserController extends Controller
             'bio' => 'nullable|string|max:1000',
             'company' => 'nullable|string|max:255',
             'position' => 'nullable|string|max:255',
-            'website' => 'nullable|url|max:255',
+            'website' => ['nullable', new UrlRule(), 'max:255'],
             'preferred_locale' => 'required|in:en,lt',
             'timezone' => 'nullable|string|max:255',
         ]);
@@ -168,7 +169,7 @@ class UserController extends Controller
         $request->validate([
             'social_links' => 'nullable|array',
             'social_links.*.platform' => 'required|string|in:facebook,twitter,instagram,linkedin,youtube,tiktok,github,website',
-            'social_links.*.url' => 'required|url',
+            'social_links.*.url' => ['required', new UrlRule()],
         ]);
 
         Auth::user()->update([

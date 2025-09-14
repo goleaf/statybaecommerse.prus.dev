@@ -31,6 +31,9 @@ final class CanBeOneOfManyTest extends TestCase
             'created_at' => now()->subDays(1),
         ]);
 
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
         // Test the latestOrder relationship
         $this->assertInstanceOf(Order::class, $user->latestOrder);
         $this->assertEquals($latestOrder->id, $user->latestOrder->id);
@@ -86,6 +89,9 @@ final class CanBeOneOfManyTest extends TestCase
             'total' => 250.00,
         ]);
 
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
         // Test the highestValueOrder relationship
         $this->assertInstanceOf(Order::class, $user->highestValueOrder);
         $this->assertEquals($highValueOrder->id, $user->highestValueOrder->id);
@@ -110,8 +116,22 @@ final class CanBeOneOfManyTest extends TestCase
             'created_at' => now()->subDays(1),
         ]);
 
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
         // Test the latestReview relationship
         $this->assertInstanceOf(Review::class, $user->latestReview);
+        
+        // Debug: Let's see what we're actually getting
+        $actualLatestReview = $user->latestReview;
+        $this->assertNotNull($actualLatestReview, 'Latest review should not be null');
+        
+        // Check if the relationship is working by comparing created_at dates
+        $this->assertTrue(
+            $actualLatestReview->created_at->gte($oldReview->created_at),
+            'Latest review should be newer than old review'
+        );
+        
         $this->assertEquals($latestReview->id, $user->latestReview->id);
         $this->assertNotEquals($oldReview->id, $user->latestReview->id);
     }
@@ -140,6 +160,9 @@ final class CanBeOneOfManyTest extends TestCase
             'rating' => 3,
         ]);
 
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
         // Test the highestRatedReview relationship
         $this->assertInstanceOf(Review::class, $user->highestRatedReview);
         $this->assertEquals($highRatingReview->id, $user->highestRatedReview->id);
@@ -164,6 +187,9 @@ final class CanBeOneOfManyTest extends TestCase
             'created_at' => now()->subDays(1),
         ]);
 
+        // Refresh the product to clear any cached relationships
+        $product->refresh();
+
         // Test the latestReview relationship
         $this->assertInstanceOf(Review::class, $product->latestReview);
         $this->assertEquals($latestReview->id, $product->latestReview->id);
@@ -187,6 +213,9 @@ final class CanBeOneOfManyTest extends TestCase
             'user_id' => $user->id,
             'rating' => 5,
         ]);
+
+        // Refresh the product to clear any cached relationships
+        $product->refresh();
 
         // Test the highestRatedReview relationship
         $this->assertInstanceOf(Review::class, $product->highestRatedReview);
@@ -289,7 +318,14 @@ final class CanBeOneOfManyTest extends TestCase
             'created_at' => now()->subDays(2),
         ]);
 
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
         // Test that the attribute uses the latestOrder relationship
         $this->assertEquals($order->created_at->format('Y-m-d'), $user->last_order_date);
+        
+        // Also test that the latestOrder relationship works directly
+        $this->assertInstanceOf(Order::class, $user->latestOrder);
+        $this->assertEquals($order->id, $user->latestOrder->id);
     }
 }

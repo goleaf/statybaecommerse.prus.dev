@@ -34,7 +34,13 @@ class CategoryController extends Controller
             ->whereNull('parent_id')
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->skipWhile(function (Category $category) {
+                // Skip categories that are not properly configured
+                return empty($category->name) || 
+                       !$category->is_visible ||
+                       empty($category->slug);
+            });
 
         return $this->handleCategoryContentNegotiation($request, $categories);
     }

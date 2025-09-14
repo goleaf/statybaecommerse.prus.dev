@@ -77,6 +77,24 @@ class Attribute extends Model
         ];
     }
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'formatted_type',
+        'validation_rules_array',
+        'meta_data_array',
+        'display_name',
+        'formatted_description',
+        'type_icon',
+        'type_color',
+        'status_badge',
+        'status_color',
+        'status_label',
+    ];
+
     protected string $translationModel = \App\Models\Translations\AttributeTranslation::class;
 
     protected $translatable = [

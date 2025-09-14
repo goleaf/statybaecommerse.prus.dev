@@ -9,6 +9,8 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
@@ -124,7 +126,8 @@ class ProductFilterWidget extends Component
         $this->maxPrice = $priceRange->max_price ?? 10000;
     }
 
-    public function getAvailableCategoriesProperty()
+    #[Computed]
+    public function availableCategories(): Collection
     {
         return Category::where('is_visible', true)
             ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
@@ -132,7 +135,8 @@ class ProductFilterWidget extends Component
             ->get();
     }
 
-    public function getAvailableBrandsProperty()
+    #[Computed]
+    public function availableBrands(): Collection
     {
         return Brand::where('is_visible', true)
             ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
@@ -140,7 +144,8 @@ class ProductFilterWidget extends Component
             ->get();
     }
 
-    public function getAvailableAttributesProperty()
+    #[Computed]
+    public function availableAttributes(): Collection
     {
         return Attribute::with(['values' => function ($query) {
             $query->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])->orderBy('sort_order');

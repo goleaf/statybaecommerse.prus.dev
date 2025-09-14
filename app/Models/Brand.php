@@ -49,6 +49,21 @@ class Brand extends Model implements HasMedia
         ];
     }
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'products_count',
+        'logo',
+        'canonical_url',
+        'meta_tags',
+        'total_revenue',
+        'average_product_price',
+        'website_domain',
+    ];
+
     protected $table = 'brands';
 
     protected string $translationModel = \App\Models\Translations\BrandTranslation::class;

@@ -30,7 +30,13 @@ class SingleProduct extends Component
             abort(404);
         }
 
-        $product->load(['brand', 'categories', 'media', 'variants', 'reviews', 'translations', 'histories']);
+        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
+        if (!$product->relationLoaded('brand') || !$product->relationLoaded('categories') || 
+            !$product->relationLoaded('media') || !$product->relationLoaded('variants') || 
+            !$product->relationLoaded('reviews') || !$product->relationLoaded('translations') || 
+            !$product->relationLoaded('histories')) {
+            $product->load(['brand', 'categories', 'media', 'variants', 'reviews', 'translations', 'histories']);
+        }
         $this->product = $product;
 
         // Track product view for recommendations

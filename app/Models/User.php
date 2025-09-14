@@ -533,6 +533,46 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreferenceC
         return $this->hasMany(DiscountRedemption::class);
     }
 
+    /**
+     * Get the user's latest address.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestAddress(): HasOne
+    {
+        return $this->addresses()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the user's latest cart item.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestCartItem(): HasOne
+    {
+        return $this->cartItems()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the user's latest notification.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestNotification(): HasOne
+    {
+        return $this->notifications()->one()->latestOfMany();
+    }
+
+    /**
+     * Get the user's latest referral.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestReferral(): HasOne
+    {
+        return $this->referrals()->one()->latestOfMany();
+    }
+
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');

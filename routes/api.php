@@ -20,6 +20,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// User API Routes with safe serialization using except() method
+Route::prefix('users')->middleware('auth:sanctum')->group(function () {
+    Route::get('/profile', [App\Http\Controllers\Api\UserController::class, 'profile']);
+    Route::put('/profile', [App\Http\Controllers\Api\UserController::class, 'updateProfile']);
+});
+
+// Admin User API Routes
+Route::prefix('admin/users')->middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/', [App\Http\Controllers\Api\UserController::class, 'index']);
+    Route::get('/statistics', [App\Http\Controllers\Api\UserController::class, 'statistics']);
+    Route::get('/{user}', [App\Http\Controllers\Api\UserController::class, 'show']);
+    Route::get('/{user}/activity', [App\Http\Controllers\Api\UserController::class, 'activity']);
+});
+
 // Live notification stream for Server-Sent Events
 Route::middleware(['auth:web'])->group(function () {
     Route::get('/notifications/stream', [NotificationStreamController::class, 'stream']);

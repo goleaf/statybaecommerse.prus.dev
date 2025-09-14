@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Order;
 use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\ReferralReward;
@@ -219,12 +220,13 @@ final class ReferralTest extends TestCase
 
     public function test_referral_reward_application(): void
     {
+        $order = Order::factory()->create();
         $reward = ReferralReward::factory()->create(['status' => 'pending']);
 
-        $reward->apply(123);
+        $reward->apply($order->id);
 
         $this->assertEquals('applied', $reward->fresh()->status);
-        $this->assertEquals(123, $reward->fresh()->order_id);
+        $this->assertEquals($order->id, $reward->fresh()->order_id);
         $this->assertNotNull($reward->fresh()->applied_at);
     }
 }

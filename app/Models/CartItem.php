@@ -47,6 +47,17 @@ class CartItem extends Model
         'attributes' => 'array',
     ];
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'formatted_total_price',
+        'formatted_unit_price',
+        'subtotal',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

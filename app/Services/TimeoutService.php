@@ -102,7 +102,7 @@ final class TimeoutService
      */
     public static function getRemainingTime(Carbon $timeout): int
     {
-        $remaining = $timeout->diffInSeconds(now());
+        $remaining = $timeout->timestamp - now()->timestamp;
         return max(0, $remaining);
     }
 

@@ -37,8 +37,16 @@ class ProductController extends Controller
             ->limit($limit)
             ->get();
 
+        // Apply skipWhile to filter out products that are not properly configured
+        $filteredProducts = $products->skipWhile(function (Product $product) {
+            return empty($product->name) || 
+                   !$product->is_visible ||
+                   $product->price <= 0 ||
+                   empty($product->slug);
+        });
+
         $data = [
-            'products' => $products->map(function (Product $product) {
+            'products' => $filteredProducts->map(function (Product $product) {
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
@@ -54,7 +62,7 @@ class ProductController extends Controller
                 ];
             })->toArray(),
             'query' => $query,
-            'total' => $products->count(),
+            'total' => $filteredProducts->count(),
             'limit' => $limit,
         ];
 

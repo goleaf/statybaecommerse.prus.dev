@@ -6,7 +6,7 @@ namespace Database\Factories;
 
 use App\Models\Campaign;
 use App\Models\CampaignView;
-use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,7 +24,7 @@ final class CampaignViewFactory extends Factory
             'ip_address' => $this->faker->ipv4(),
             'user_agent' => $this->faker->userAgent(),
             'referer' => $this->faker->optional(0.7)->url(),
-            'customer_id' => $this->faker->optional(0.3)->randomElement(Customer::pluck('id')->toArray()),
+            'customer_id' => $this->faker->optional(0.3)->randomElement(User::pluck('id')->toArray()),
             'viewed_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
     }

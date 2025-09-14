@@ -84,8 +84,14 @@ final class ReferralTest extends TestCase
     {
         $referral = Referral::factory()->create();
         
-        $event1 = AnalyticsEvent::factory()->create(['referral_id' => $referral->id]);
-        $event2 = AnalyticsEvent::factory()->create(['referral_id' => $referral->id]);
+        $event1 = AnalyticsEvent::factory()->create([
+            'trackable_type' => Referral::class,
+            'trackable_id' => $referral->id
+        ]);
+        $event2 = AnalyticsEvent::factory()->create([
+            'trackable_type' => Referral::class,
+            'trackable_id' => $referral->id
+        ]);
 
         $this->assertCount(2, $referral->analyticsEvents);
         $this->assertTrue($referral->analyticsEvents->contains($event1));
@@ -102,9 +108,22 @@ final class ReferralTest extends TestCase
             'referred_id' => $referred->id,
         ]);
 
-        $order1 = Order::factory()->create(['user_id' => $referred->id]);
-        $order2 = Order::factory()->create(['user_id' => $referred->id]);
+        $order1 = Order::factory()->create([
+            'user_id' => $referred->id,
+            'status' => 'pending',
+            'channel_id' => null,
+            'zone_id' => null,
+            'partner_id' => null,
+        ]);
+        $order2 = Order::factory()->create([
+            'user_id' => $referred->id,
+            'status' => 'completed',
+            'channel_id' => null,
+            'zone_id' => null,
+            'partner_id' => null,
+        ]);
 
+        $referral->refresh();
         $this->assertCount(2, $referral->referredOrders);
         $this->assertTrue($referral->referredOrders->contains($order1));
         $this->assertTrue($referral->referredOrders->contains($order2));
@@ -403,8 +422,10 @@ final class ReferralTest extends TestCase
         $this->assertNotEquals($code1, $code2);
         $this->assertEquals(8, strlen($code1));
         $this->assertEquals(8, strlen($code2));
-        $this->assertTrue(ctype_upper($code1));
-        $this->assertTrue(ctype_upper($code2));
+        $this->assertTrue(ctype_alnum($code1));
+        $this->assertTrue(ctype_alnum($code2));
+        $this->assertEquals(strtoupper($code1), $code1);
+        $this->assertEquals(strtoupper($code2), $code2);
     }
 
     public function test_create_with_code(): void

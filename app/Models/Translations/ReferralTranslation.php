@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Translations;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -14,6 +15,7 @@ final /**
  */
 class ReferralTranslation extends Model
 {
+    use HasFactory;
     protected $table = 'referral_translations';
 
     protected $fillable = [

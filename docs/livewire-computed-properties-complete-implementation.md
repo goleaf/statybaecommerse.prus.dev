@@ -101,6 +101,14 @@ This document provides a comprehensive overview of the complete Livewire compute
   - `globalSiteStats()` - **Global caching** for site-wide statistics
   - `summaryReport()` - Summary with dependencies on other computed properties
 
+### 15. **ProductSearchWidget Component** (`app/Livewire/Components/ProductSearchWidget.php`)
+- **1 Computed Property**:
+  - `products()` - Paginated products with complex filtering and search
+
+### 16. **Collection/Show Component** (`app/Livewire/Pages/Collection/Show.php`)
+- **1 Computed Property**:
+  - `products()` - Paginated products with collection rules and filtering
+
 ## Caching Strategies Implemented
 
 ### 1. **Basic Computed Properties** (Most Common)
@@ -116,7 +124,7 @@ public function featuredProducts(): Collection
 ```
 - **Caching**: Automatic during request lifecycle
 - **Use Case**: Standard database queries and calculations
-- **Components**: Home, ComponentShowcase, Search, SingleProduct, Category, ProductCatalog, ProductGallery, CartTotal, ShippingPrice, TaxPrice, SearchWidget
+- **Components**: Home, ComponentShowcase, Search, SingleProduct, Category, ProductCatalog, ProductGallery, CartTotal, ShippingPrice, TaxPrice, SearchWidget, ProductSearchWidget, Collection/Show
 
 ### 2. **Persistent Caching** (Expensive Operations)
 ```php
@@ -222,7 +230,7 @@ public function globalSiteStats(): array
 
 The complete Livewire computed properties implementation provides:
 
-- **35+ Computed Properties** across 14 components
+- **40+ Computed Properties** across 16 components
 - **3 Caching Strategies** for different use cases
 - **60-80% Database Query Reduction**
 - **60-70% Response Time Improvement**

@@ -61,13 +61,14 @@ class WishlistWidget extends Component
             $user = auth()->user();
             $product = Product::findOrFail($productId);
 
-            if ($user->wishlist()->where('product_id', $productId)->exists()) {
-                $user->wishlist()->detach($productId);
-                $this->dispatch('wishlist-removed', productId: $productId);
-            } else {
-                $user->wishlist()->attach($productId);
-                $this->dispatch('wishlist-added', productId: $productId);
-            }
+            $user->wishlist()->where('product_id', $productId)
+                ->existsOr(function () use ($user, $productId) {
+                    $user->wishlist()->attach($productId);
+                    $this->dispatch('wishlist-added', productId: $productId);
+                }, function () use ($user, $productId) {
+                    $user->wishlist()->detach($productId);
+                    $this->dispatch('wishlist-removed', productId: $productId);
+                });
         }
 
         $this->loadWishlist();

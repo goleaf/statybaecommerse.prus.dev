@@ -88,7 +88,7 @@ class CollectionControllerTest extends TestCase
             'is_visible' => true,
             'is_active' => true,
         ]);
-        $products = Product::factory()->count(3)->create(['is_published' => true]);
+        $products = Product::factory()->count(3)->create(['status' => 'published', 'published_at' => now()]);
         $collection->products()->attach($products->pluck('id'));
 
         $response = $this->get("/collections/{$collection->slug}");
@@ -106,7 +106,8 @@ class CollectionControllerTest extends TestCase
         ]);
         $category = Category::factory()->create();
         $products = Product::factory()->count(3)->create([
-            'is_published' => true,
+            'status' => 'published',
+            'published_at' => now(),
         ]);
         $products->first()->categories()->attach($category->id);
         $collection->products()->attach($products->pluck('id'));
@@ -123,9 +124,10 @@ class CollectionControllerTest extends TestCase
             'is_visible' => true,
             'is_active' => true,
         ]);
-        $products = Product::factory()->count(3)->create([
-            'is_published' => true,
-            'price' => [100, 200, 300],
+        $products = collect([
+            Product::factory()->create(['status' => 'published', 'published_at' => now(), 'price' => 100]),
+            Product::factory()->create(['status' => 'published', 'published_at' => now(), 'price' => 200]),
+            Product::factory()->create(['status' => 'published', 'published_at' => now(), 'price' => 300]),
         ]);
         $collection->products()->attach($products->pluck('id'));
 
@@ -141,9 +143,10 @@ class CollectionControllerTest extends TestCase
             'is_visible' => true,
             'is_active' => true,
         ]);
-        $products = Product::factory()->count(3)->create([
-            'is_published' => true,
-            'price' => [50, 150, 250],
+        $products = collect([
+            Product::factory()->create(['status' => 'published', 'published_at' => now(), 'price' => 50]),
+            Product::factory()->create(['status' => 'published', 'published_at' => now(), 'price' => 150]),
+            Product::factory()->create(['status' => 'published', 'published_at' => now(), 'price' => 250]),
         ]);
         $collection->products()->attach($products->pluck('id'));
 
@@ -243,7 +246,7 @@ class CollectionControllerTest extends TestCase
             'is_visible' => true,
             'is_active' => true,
         ]);
-        $products = Product::factory()->count(2)->create(['is_published' => true]);
+        $products = Product::factory()->count(2)->create(['status' => 'published', 'published_at' => now()]);
         $collection->products()->attach($products->pluck('id'));
         $relatedCollection->products()->attach($products->pluck('id'));
 
@@ -273,7 +276,7 @@ class CollectionControllerTest extends TestCase
             'is_active' => true,
             'products_per_page' => 5,
         ]);
-        $products = Product::factory()->count(10)->create(['is_published' => true]);
+        $products = Product::factory()->count(10)->create(['status' => 'published', 'published_at' => now()]);
         $collection->products()->attach($products->pluck('id'));
 
         $response = $this->get("/collections/{$collection->slug}");
@@ -332,7 +335,7 @@ class CollectionControllerTest extends TestCase
             'is_visible' => true,
             'is_active' => true,
         ]);
-        $products = Product::factory()->count(5)->create(['is_published' => true]);
+        $products = Product::factory()->count(5)->create(['status' => 'published', 'published_at' => now()]);
         $collection->products()->attach($products->pluck('id'));
 
         $response = $this->get("/collections/{$collection->slug}");

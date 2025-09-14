@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Rules\UrlRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCampaignClickRequest extends FormRequest
@@ -28,10 +29,10 @@ class UpdateCampaignClickRequest extends FormRequest
             'ip_address' => ['sometimes', 'ip', 'max:45'],
             'user_agent' => ['sometimes', 'string', 'max:500'],
             'click_type' => ['sometimes', 'string', 'in:cta,banner,link,button,image'],
-            'clicked_url' => ['sometimes', 'url', 'max:500'],
+            'clicked_url' => ['sometimes', new UrlRule(), 'max:500'],
             'customer_id' => ['sometimes', 'integer', 'exists:users,id'],
             'clicked_at' => ['sometimes', 'date'],
-            'referer' => ['sometimes', 'url', 'max:500'],
+            'referer' => ['sometimes', new UrlRule(), 'max:500'],
             'device_type' => ['sometimes', 'string', 'in:desktop,mobile,tablet'],
             'browser' => ['sometimes', 'string', 'max:100'],
             'os' => ['sometimes', 'string', 'max:100'],

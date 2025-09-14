@@ -8,5 +8,6 @@ return [
     App\Providers\SharedComponentServiceProvider::class,
     App\Providers\CodeStyleServiceProvider::class,
     App\Providers\SqliteOptimizationServiceProvider::class,
+    App\Providers\ExistsOrServiceProvider::class,
     BezhanSalleh\FilamentShield\FilamentShieldServiceProvider::class,
 ];

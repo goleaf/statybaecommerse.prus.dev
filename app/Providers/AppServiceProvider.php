@@ -71,11 +71,15 @@ class AppServiceProvider extends ServiceProvider
                 }
             })->dailyAt('03:00')->name('imports:nightly')->withoutOverlapping();
             $schedule->call(function (): void {
-                // Rotate exports older than 7 days
+                // Rotate exports older than 7 days with timeout protection
+                $timeout = now()->addMinutes(3); // 3 minute timeout for export rotation
                 $disk = \Storage::disk('public');
                 $dir = 'exports';
                 if ($disk->exists($dir)) {
-                    foreach ($disk->files($dir) as $path) {
+                    $files = collect($disk->files($dir))
+                        ->takeUntilTimeout($timeout);
+                    
+                    foreach ($files as $path) {
                         $lastModified = $disk->lastModified($path);
                         if ($lastModified && $lastModified < now()->subDays(7)->getTimestamp()) {
                             $disk->delete($path);

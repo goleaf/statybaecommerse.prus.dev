@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreNewsCommentRequest;
+use App\Data\NewsCommentData;
 use App\Models\News;
 use App\Models\NewsComment;
 use Illuminate\Http\RedirectResponse;
@@ -16,7 +16,7 @@ final /**
  */
 class NewsCommentController extends Controller
 {
-    public function store(StoreNewsCommentRequest $request, string $slug): RedirectResponse
+    public function store(NewsCommentData $data, string $slug): RedirectResponse
     {
         $news = News::published()
             ->whereHas('translations', function ($query) use ($slug) {
@@ -27,10 +27,10 @@ class NewsCommentController extends Controller
 
         $comment = NewsComment::create([
             'news_id' => $news->id,
-            'parent_id' => $request->validated('parent_id'),
-            'author_name' => $request->validated('author_name'),
-            'author_email' => $request->validated('author_email'),
-            'content' => $request->validated('content'),
+            'parent_id' => $data->parent_id,
+            'author_name' => $data->author_name,
+            'author_email' => $data->author_email,
+            'content' => $data->content,
             'is_approved' => false, // Comments need approval
             'is_visible' => true,
         ]);

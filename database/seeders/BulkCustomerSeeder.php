@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 
 final class BulkCustomerSeeder extends Seeder
@@ -57,9 +58,16 @@ final class BulkCustomerSeeder extends Seeder
             $addressesBar->start();
         }
 
-        DB::transaction(function () use ($targetCount, $chunkSize, $now, &$baseIndex): void {
-            while ($baseIndex <= $targetCount) {
-                $end = min($baseIndex + $chunkSize - 1, $targetCount);
+        // Use timeout protection for large customer seeding operations
+        $timeout = now()->addMinutes(30); // 30 minute timeout for bulk customer seeding
+        
+        DB::transaction(function () use ($targetCount, $chunkSize, $now, &$baseIndex, $timeout): void {
+            LazyCollection::make(range($baseIndex, $targetCount))
+                ->takeUntilTimeout($timeout)
+                ->chunk($chunkSize)
+                ->each(function ($chunk) use ($now, &$baseIndex) {
+                    $baseIndex = $chunk->first();
+                    $end = $chunk->last();
 
                 // Users batch
                 $usersBatch = [];
@@ -157,7 +165,7 @@ final class BulkCustomerSeeder extends Seeder
                 }
 
                 $baseIndex = $end + 1;
-            }
+                });
         });
 
         // Finish detailed bars and step 2–4

@@ -14,6 +14,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 
 /**
@@ -86,12 +87,16 @@ final class TurboEcommerceSeeder extends Seeder
         // Prepare a shared pool of images used across all products
         $this->buildSharedImagePool(100);
 
-        // Generate products per brand in fast upserted chunks
-        foreach ($brandIds->chunk(100) as $brandChunk) {
-            foreach ($brandChunk as $brandId) {
-                $this->seedProductsForBrand((int) $brandId, $categoryIds, $attributes, $locales);
-            }
-        }
+        // Generate products per brand in fast upserted chunks with timeout protection
+        $timeout = now()->addMinutes(60); // 60 minute timeout for seeder operations
+        
+        LazyCollection::make($brandIds->chunk(100))
+            ->takeUntilTimeout($timeout)
+            ->each(function ($brandChunk) use ($categoryIds, $attributes, $locales) {
+                foreach ($brandChunk as $brandId) {
+                    $this->seedProductsForBrand((int) $brandId, $categoryIds, $attributes, $locales);
+                }
+            });
 
         // Cleanup shared images after attachments are done
         $this->cleanupSharedImagePool();
@@ -229,9 +234,14 @@ final class TurboEcommerceSeeder extends Seeder
             }
         }
 
-        foreach (array_chunk($rows, 2000) as $chunk) {
-            DB::table('product_categories')->insertOrIgnore($chunk);
-        }
+        // Use LazyCollection with timeout for bulk category attachments
+        $timeout = now()->addMinutes(5); // 5 minute timeout for category attachments
+        
+        LazyCollection::make(array_chunk($rows, 2000))
+            ->takeUntilTimeout($timeout)
+            ->each(function ($chunk) {
+                DB::table('product_categories')->insertOrIgnore($chunk);
+            });
     }
 
     private function attachAttributes($productIds, $attributes): void
@@ -262,9 +272,14 @@ final class TurboEcommerceSeeder extends Seeder
             }
         }
 
-        foreach (array_chunk($rows, 2000) as $chunk) {
-            DB::table('product_attributes')->insertOrIgnore($chunk);
-        }
+        // Use LazyCollection with timeout for bulk attribute attachments
+        $timeout = now()->addMinutes(5); // 5 minute timeout for attribute attachments
+        
+        LazyCollection::make(array_chunk($rows, 2000))
+            ->takeUntilTimeout($timeout)
+            ->each(function ($chunk) {
+                DB::table('product_attributes')->insertOrIgnore($chunk);
+            });
     }
 
     private function seedProductTranslations($productIds, array $locales): void
@@ -294,13 +309,18 @@ final class TurboEcommerceSeeder extends Seeder
             }
         }
 
-        foreach (array_chunk($rows, 2000) as $chunk) {
-            DB::table('product_translations')->upsert(
-                $chunk,
-                ['product_id', 'locale'],
-                ['name', 'slug', 'summary', 'description', 'seo_title', 'seo_description', 'updated_at']
-            );
-        }
+        // Use LazyCollection with timeout for bulk translation seeding
+        $timeout = now()->addMinutes(10); // 10 minute timeout for translation seeding
+        
+        LazyCollection::make(array_chunk($rows, 2000))
+            ->takeUntilTimeout($timeout)
+            ->each(function ($chunk) {
+                DB::table('product_translations')->upsert(
+                    $chunk,
+                    ['product_id', 'locale'],
+                    ['name', 'slug', 'summary', 'description', 'seo_title', 'seo_description', 'updated_at']
+                );
+            });
     }
 
     private function ensureImagesForProducts($productIds): void
