@@ -674,3 +674,11 @@ Type: Complex System
 - **Frontend Integration**: Created notification dropdown for navigation and full notification center page
 - **Test Results**: All 6 unit tests passing (22 assertions) - notification model fully functional
 - **Status**: Complete notification system implemented with comprehensive testing and multi-language support
+
+### ✅ Free Shipping Text Removal - January 2025
+- **Removed free shipping banner**: Completely removed banner.blade.php component content
+- **Updated stats component**: Removed free shipping section from stats.blade.php and changed grid from 4 to 3 columns
+- **Cleaned configuration**: Removed 'free_shipping_amount' setting from config/starterkit.php
+- **Removed translations**: Deleted "Free shipping from" translation strings from all language files (lang/en.json, lang/lt.json, resources/lang/en.json, resources/lang/lt.json)
+- **Files modified**: 6 files updated to completely remove free shipping text display from frontend
+- **Status**: Free shipping text completely removed from user-facing interface

@@ -439,6 +439,7 @@ return [
         'view' => 'View',
         'click_details' => 'Click Details',
         'back_to_list' => 'Back to List',
+        'back_to_list_tooltip' => 'Return to the list view',
         'conversions' => 'Conversions',
     ],
 ];

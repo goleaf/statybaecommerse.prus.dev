@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,7 +15,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class Post extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, LogsActivity, HasTranslations;
+    use HasFactory, InteractsWithMedia, LogsActivity;
 
     protected $fillable = [
         'title',
@@ -43,7 +42,6 @@ final class Post extends Model implements HasMedia
         'is_pinned',
     ];
 
-    protected string $translationModel = \App\Models\Translations\PostTranslation::class;
 
     protected function casts(): array
     {
@@ -134,6 +132,19 @@ final class Post extends Model implements HasMedia
         return $translations[$locale] ?? $this->meta_title;
     }
 
+    public function trans(string $field, ?string $locale = null): mixed
+    {
+        $locale = $locale ?? app()->getLocale();
+        $translationField = $field . '_translations';
+        
+        if (property_exists($this, $translationField)) {
+            $translations = $this->{$translationField} ?? [];
+            return $translations[$locale] ?? $this->{$field};
+        }
+        
+        return $this->{$field} ?? null;
+    }
+
     public function getTranslatedMetaDescription(?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
@@ -196,44 +207,75 @@ final class Post extends Model implements HasMedia
     // Scope for translated posts
     public function scopeWithTranslations($query, ?string $locale = null)
     {
-        $locale = $locale ?: app()->getLocale();
-        return $query->with(['translations' => function ($q) use ($locale) {
-            $q->where('locale', $locale);
-        }]);
+        // Since we're using JSON-based translations, this scope doesn't need to do anything special
+        // The translations are already loaded with the model
+        return $query;
     }
 
     // Translation Management Methods
     public function getAvailableLocales(): array
     {
-        return $this->translations()->pluck('locale')->unique()->values()->toArray();
+        $locales = [];
+        $translationFields = ['title_translations', 'content_translations', 'excerpt_translations', 'meta_title_translations', 'meta_description_translations', 'tags_translations'];
+        
+        foreach ($translationFields as $field) {
+            if (isset($this->{$field}) && is_array($this->{$field})) {
+                $locales = array_merge($locales, array_keys($this->{$field}));
+            }
+        }
+        
+        return array_unique($locales);
     }
 
     public function hasTranslationFor(string $locale): bool
     {
-        return $this->translations()->where('locale', $locale)->exists();
-    }
-
-    public function getOrCreateTranslation(string $locale): \App\Models\Translations\PostTranslation
-    {
-        return $this->translations()->firstOrCreate(
-            ['locale' => $locale],
-            [
-                'title' => $this->title,
-                'slug' => $this->slug,
-                'content' => $this->content,
-                'excerpt' => $this->excerpt,
-                'meta_title' => $this->meta_title,
-                'meta_description' => $this->meta_description,
-                'tags' => $this->tags,
-            ]
-        );
+        $translationFields = ['title_translations', 'content_translations', 'excerpt_translations', 'meta_title_translations', 'meta_description_translations', 'tags_translations'];
+        
+        foreach ($translationFields as $field) {
+            if (isset($this->{$field}) && is_array($this->{$field}) && isset($this->{$field}[$locale])) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     public function updateTranslation(string $locale, array $data): bool
     {
-        $translation = $this->getOrCreateTranslation($locale);
-        return $translation->update($data);
+        $translationFields = ['title', 'content', 'excerpt', 'meta_title', 'meta_description', 'tags'];
+        
+        foreach ($translationFields as $field) {
+            if (isset($data[$field])) {
+                $translationField = $field . '_translations';
+                $translations = $this->{$translationField} ?? [];
+                $translations[$locale] = $data[$field];
+                $this->{$translationField} = $translations;
+            }
+        }
+        
+        return $this->save();
     }
+
+    public function getOrCreateTranslation(string $locale): array
+    {
+        $translation = [];
+        $translationFields = ['title', 'content', 'excerpt', 'meta_title', 'meta_description', 'tags'];
+        
+        foreach ($translationFields as $field) {
+            $translationField = $field . '_translations';
+            $translations = $this->{$translationField} ?? [];
+            
+            if (!isset($translations[$locale])) {
+                $translations[$locale] = $this->{$field};
+                $this->{$translationField} = $translations;
+            }
+            
+            $translation[$field] = $translations[$locale];
+        }
+        
+        return $translation;
+    }
+
 
     public function updateTranslations(array $translations): bool
     {
@@ -423,12 +465,12 @@ final class Post extends Model implements HasMedia
 
     public function getDaysSinceCreated(): int
     {
-        return $this->created_at->diffInDays(now());
+        return (int) $this->created_at->diffInDays(now());
     }
 
     public function getDaysSincePublished(): ?int
     {
-        return $this->published_at?->diffInDays(now());
+        return $this->published_at ? (int) $this->published_at->diffInDays(now()) : null;
     }
 
     public function getFullDisplayName(?string $locale = null): string
@@ -450,12 +492,8 @@ final class Post extends Model implements HasMedia
 
     public function scopeWithHighEngagement($query, float $minRate = 5.0)
     {
-        return $query->whereRaw('((likes_count + comments_count) / GREATEST(views_count, 1)) * 100 >= ?', [$minRate]);
-    }
-
-    public function scopeByAuthor($query, int $userId)
-    {
-        return $query->where('user_id', $userId);
+        return $query->where('views_count', '>', 0)
+                    ->whereRaw('(likes_count + comments_count) * 100 >= views_count * ?', [$minRate]);
     }
 
     public function scopeAllowComments($query)

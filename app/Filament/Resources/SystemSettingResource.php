@@ -9,7 +9,7 @@ use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,17 +20,7 @@ final class SystemSettingResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
-
-    /** @var string|\BackedEnum|null */
-
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static $navigationGroup = NavigationGroup::System;
+    // Navigation icon and group are set via methods
 
     protected static ?int $navigationSort = 1;
 
@@ -40,9 +30,9 @@ final class SystemSettingResource extends Resource
 
     protected static ?string $pluralModelLabel = 'System Settings';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make(__('admin.system_settings.setting_information'))
                     ->schema([

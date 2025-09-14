@@ -13,8 +13,30 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Document Service
+ * 
+ * Handles document generation, template processing, and PDF creation
+ * for the e-commerce system. Provides comprehensive document management
+ * with security validation and notification support.
+ */
 final class DocumentService
 {
+    /**
+     * Generate a document from a template with variables.
+     * 
+     * Creates a new document instance with processed content based on
+     * the provided template and variables. Validates template content
+     * for security and sanitizes variables to prevent XSS attacks.
+     * 
+     * @param \App\Models\DocumentTemplate $template The document template to use
+     * @param \Illuminate\Database\Eloquent\Model $relatedModel The model this document relates to
+     * @param array $variables Variables to replace in the template
+     * @param string|null $title Custom title for the document
+     * @param bool $sendNotification Whether to send notification after generation
+     * @return \App\Models\Document The generated document instance
+     * @throws \InvalidArgumentException If template content contains dangerous elements
+     */
     public function generateDocument(
         DocumentTemplate $template,
         Model $relatedModel,
@@ -51,6 +73,16 @@ final class DocumentService
         return $document;
     }
 
+    /**
+     * Generate PDF from a document.
+     * 
+     * Converts the document content to PDF format using DomPDF,
+     * applies template print settings, and saves to storage.
+     * Updates the document record with PDF information and sends notification.
+     * 
+     * @param \App\Models\Document $document The document to convert to PDF
+     * @return string The public URL of the generated PDF file
+     */
     public function generatePdf(Document $document): string
     {
         $template = $document->template;
@@ -102,6 +134,15 @@ final class DocumentService
         return $processedContent;
     }
 
+    /**
+     * Get available template variables.
+     * 
+     * Returns a cached list of all available variables that can be used
+     * in document templates, including global system variables and
+     * e-commerce specific variables.
+     * 
+     * @return array Associative array of variable names and descriptions
+     */
     public function getAvailableVariables(): array
     {
         return Cache::remember('document_variables_'.app()->getLocale(), 3600, function () {

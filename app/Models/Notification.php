@@ -20,6 +20,7 @@ final class Notification extends DatabaseNotification
         'type',
         'notifiable_type',
         'notifiable_id',
+        'user_id',
         'data',
         'read_at',
     ];
@@ -38,6 +39,23 @@ final class Notification extends DatabaseNotification
         'formatted_created_at',
         'formatted_read_at',
     ];
+
+    protected $keyType = 'string';
+    public $incrementing = false;
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (Notification $notification): void {
+            if (! $notification->id) {
+                $notification->id = (string) \Illuminate\Support\Str::uuid();
+            }
+            if ($notification->notifiable_type === User::class && ! $notification->user_id) {
+                $notification->user_id = $notification->notifiable_id;
+            }
+        });
+    }
 
     // Relationships
     public function notifiable(): MorphTo

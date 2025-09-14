@@ -28,6 +28,11 @@ final class StockMovementTest extends TestCase
     {
         parent::setUp();
 
+        // Create required countries first
+        \App\Models\Country::factory()->create(['cca2' => 'LT', 'name' => 'Lithuania']);
+        \App\Models\Country::factory()->create(['cca2' => 'US', 'name' => 'United States']);
+        \App\Models\Country::factory()->create(['cca2' => 'GB', 'name' => 'United Kingdom']);
+
         $this->user = User::factory()->create();
         $this->product = Product::factory()->create();
         $this->variant = ProductVariant::factory()->create(['product_id' => $this->product->id]);
@@ -213,21 +218,27 @@ final class StockMovementTest extends TestCase
 
     public function test_returns_unknown_for_invalid_type(): void
     {
+        // Create a movement with valid type first, then modify it in memory to test the logic
         $movement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'type' => 'invalid',
+            'type' => 'in',
         ]);
-
+        
+        // Test the logic by setting an invalid type in memory (not saving to DB)
+        $movement->type = 'invalid';
         $this->assertEquals(__('inventory.unknown'), $movement->type_label);
     }
 
     public function test_returns_reason_for_unknown_reason(): void
     {
+        // Create a movement with valid reason first, then modify it in memory to test the logic
         $movement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'unknown_reason',
+            'reason' => 'sale',
         ]);
-
+        
+        // Test the logic by setting an unknown reason in memory (not saving to DB)
+        $movement->reason = 'unknown_reason';
         $this->assertEquals('unknown_reason', $movement->reason_label);
     }
 

@@ -26,10 +26,10 @@ final class NewsResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static $navigationGroup = 'Content Management';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.content');
+    }
 
     public static function getModelLabel(): string
     {

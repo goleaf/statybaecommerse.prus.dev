@@ -48,26 +48,54 @@ class DiscountEngine
             $now->format('YmdHi')
         );
 
-        $cached = Cache::tags(['discounts'])->get($cacheKey);
-        $isHit = $cached !== null;
+        // Check if cache store supports tagging
+        $cacheStore = Cache::getStore();
+        $supportsTags = method_exists($cacheStore, 'tags');
+        
+        if ($supportsTags) {
+            $cached = Cache::tags(['discounts'])->get($cacheKey);
+            $isHit = $cached !== null;
 
-        // Debug cache operation
-        if (app()->bound('debugbar.discount')) {
-            app('debugbar.discount')->logCacheOperation($cacheKey, $isHit, $cached);
+            // Debug cache operation
+            if (app()->bound('debugbar.discount') && method_exists(app('debugbar.discount'), 'logCacheOperation')) {
+                app('debugbar.discount')->logCacheOperation($cacheKey, $isHit, $cached);
+            }
+
+            return Cache::tags(['discounts'])->remember($cacheKey, now()->addMinutes(3), function () use ($now) {
+                return collect(DB::table('sh_discounts')
+                    ->where('status', 'active')
+                    ->where(function ($q) use ($now) {
+                        $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+                    })
+                    ->where(function ($q) use ($now) {
+                        $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
+                    })
+                    ->orderBy('priority')
+                    ->get());
+            });
+        } else {
+            // Fallback for cache stores that don't support tagging
+            $cached = Cache::get($cacheKey);
+            $isHit = $cached !== null;
+
+            // Debug cache operation
+            if (app()->bound('debugbar.discount') && method_exists(app('debugbar.discount'), 'logCacheOperation')) {
+                app('debugbar.discount')->logCacheOperation($cacheKey, $isHit, $cached);
+            }
+
+            return Cache::remember($cacheKey, now()->addMinutes(3), function () use ($now) {
+                return collect(DB::table('sh_discounts')
+                    ->where('status', 'active')
+                    ->where(function ($q) use ($now) {
+                        $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+                    })
+                    ->where(function ($q) use ($now) {
+                        $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
+                    })
+                    ->orderBy('priority')
+                    ->get());
+            });
         }
-
-        return Cache::tags(['discounts'])->remember($cacheKey, now()->addMinutes(3), function () use ($now) {
-            return collect(DB::table('discounts')
-                ->where('status', 'active')
-                ->where(function ($q) use ($now) {
-                    $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
-                })
-                ->where(function ($q) use ($now) {
-                    $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
-                })
-                ->orderBy('priority')
-                ->get());
-        });
     }
 
     protected function filterEligibility(Collection $discounts, array $context, $now): Collection
@@ -131,7 +159,7 @@ class DiscountEngine
                 }
             }
             if (! empty($d->first_order_only) && $userId) {
-                $hasOrder = DB::table('orders')->where('customer_id', $userId)->whereIn('status', ['placed', 'paid', 'fulfilled', 'completed'])->exists();
+                $hasOrder = DB::table('sh_orders')->where('customer_id', $userId)->whereIn('status', ['placed', 'paid', 'fulfilled', 'completed'])->exists();
                 if ($hasOrder) {
                     return false;
                 }
@@ -215,7 +243,7 @@ class DiscountEngine
         foreach ($eligible as $d) {
             // If a code is provided, require a matching code record for this discount
             if ($code) {
-                $hasCode = DB::table('discount_codes')
+                $hasCode = DB::table('sh_discount_codes')
                     ->where('discount_id', $d->id)
                     ->whereRaw('UPPER(code) = ?', [$code])
                     ->exists();
@@ -441,7 +469,7 @@ class DiscountEngine
         // If any exclusive discount applied, keep only that one with max amount
         // (requires discount record; re-fetch minimal info)
         $appliedWithFlags = $applied->map(function ($a) {
-            $d = DB::table('discounts')->select('id', 'exclusive', 'stacking_policy')->where('id', (int) $a['id'])->first();
+            $d = DB::table('sh_discounts')->select('id', 'exclusive', 'stacking_policy')->where('id', (int) $a['id'])->first();
 
             return array_merge($a, [
                 'exclusive' => (bool) data_get($d, 'exclusive', false),

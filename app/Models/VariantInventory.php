@@ -236,6 +236,7 @@ final class VariantInventory extends Model
             'reason' => $reason,
             'reference' => 'manual_adjustment',
             'user_id' => auth()->id(),
+            'moved_at' => now(),
         ]);
     }
 

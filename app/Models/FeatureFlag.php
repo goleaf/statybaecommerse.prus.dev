@@ -4,28 +4,56 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 final class FeatureFlag extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'key',
         'description',
         'is_active',
+        'is_enabled',
+        'is_global',
         'conditions',
         'rollout_percentage',
         'environment',
         'starts_at',
         'ends_at',
+        'start_date',
+        'end_date',
+        'metadata',
+        'priority',
+        'category',
+        'impact_level',
+        'rollout_strategy',
+        'rollback_plan',
+        'success_metrics',
+        'approval_status',
+        'approval_notes',
+        'created_by',
+        'updated_by',
+        'last_activated',
+        'last_deactivated',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_enabled' => 'boolean',
+        'is_global' => 'boolean',
         'conditions' => 'json',
         'rollout_percentage' => 'json',
+        'metadata' => 'json',
+        'success_metrics' => 'json',
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'last_activated' => 'datetime',
+        'last_deactivated' => 'datetime',
     ];
 
     public function isEnabled(?User $user = null): bool
@@ -122,8 +150,33 @@ final class FeatureFlag extends Model
         return $query->where('is_active', true);
     }
 
+    public function scopeEnabled($query)
+    {
+        return $query->where('is_enabled', true);
+    }
+
+    public function scopeDisabled($query)
+    {
+        return $query->where('is_enabled', false);
+    }
+
+    public function scopeGlobal($query)
+    {
+        return $query->where('is_global', true);
+    }
+
+    public function scopeByKey($query, string $key)
+    {
+        return $query->where('key', $key);
+    }
+
     public function scopeEnvironment($query, string $environment)
     {
         return $query->where('environment', $environment);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'feature_flag_users');
     }
 }

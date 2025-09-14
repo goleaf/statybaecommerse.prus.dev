@@ -194,4 +194,23 @@ return [
     'key' => 'Raktas',
     'value' => 'Reikšmė',
     'days' => 'dienos',
+    
+    // Address specific translations
+    'address_information' => 'Adreso informacija',
+    'address_details' => 'Adreso detalės',
+    'first_name' => 'Vardas',
+    'last_name' => 'Pavardė',
+    'company' => 'Įmonė',
+    'company_vat' => 'Įmonės PVM kodas',
+    'address_line_1' => 'Adreso eilutė 1',
+    'address_line_2' => 'Adreso eilutė 2',
+    'city' => 'Miestas',
+    'postal_code' => 'Pašto kodas',
+    'country' => 'Šalis',
+    'state' => 'Rajonas',
+    'phone' => 'Telefonas',
+    'email' => 'El. paštas',
+    'type' => 'Tipas',
+    'user' => 'Naudotojas',
+    'basic_information' => 'Pagrindinė informacija',
 ];

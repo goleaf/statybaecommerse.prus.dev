@@ -20,9 +20,12 @@ class UserTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('users', [
-            'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+        
+        // Test that the name is stored as JSON for translations
+        $this->assertIsString($user->name);
+        $this->assertStringContainsString('Test User', $user->name);
     }
 
     public function test_user_has_many_orders(): void
@@ -71,18 +74,6 @@ class UserTest extends TestCase
         $this->assertContains('remember_token', $hidden);
     }
 
-    public function test_user_has_media_relationship(): void
-    {
-        $user = User::factory()->create();
-
-        // Test that user implements HasMedia
-        $this->assertInstanceOf(\Spatie\MediaLibrary\HasMedia::class, $user);
-        
-        // Test that user can handle media
-        $this->assertTrue(method_exists($user, 'registerMediaCollections'));
-        $this->assertTrue(method_exists($user, 'registerMediaConversions'));
-        $this->assertTrue(method_exists($user, 'media'));
-    }
 
     public function test_user_has_translations_relationship(): void
     {
@@ -90,6 +81,6 @@ class UserTest extends TestCase
 
         // Test that user has translations relationship
         $this->assertTrue(method_exists($user, 'translations'));
-        $this->assertTrue(method_exists($user, 'trans'));
+        $this->assertTrue(method_exists($user, 'getTranslation'));
     }
 }

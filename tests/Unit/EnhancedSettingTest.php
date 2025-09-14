@@ -172,6 +172,7 @@ final class EnhancedSettingTest extends TestCase
         EnhancedSetting::factory()->create([
             'key' => 'test_key',
             'value' => 'test_value',
+            'type' => 'text',
             'locale' => 'en',
         ]);
 

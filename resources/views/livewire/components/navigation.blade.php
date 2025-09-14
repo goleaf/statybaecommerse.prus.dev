@@ -34,51 +34,13 @@
                 </a>
             </div>
 
-            {{-- Center: Enhanced Search with modern design --}}
+            {{-- Center: Live Search Module --}}
             <div class="flex-1 max-w-2xl hidden md:block">
-                <form wire:submit.prevent="search" role="search" aria-label="{{ __('nav_search') }}">
-                    <div class="relative group">
-                        <input
-                               type="search"
-                               wire:model.live.debounce.300ms="searchQuery"
-                               placeholder="{{ __('search_placeholder') }}"
-                               class="block w-full rounded-2xl border border-gray-200 bg-white/90 backdrop-blur-xl pl-12 pr-12 py-4 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-300 shadow-sm focus:shadow-lg hover:shadow-md"
-                               aria-label="{{ __('search_placeholder') }}"
-                               autocomplete="off"
-                               spellcheck="false" />
-                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-300"
-                             aria-hidden="true">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                        <button type="submit"
-                                class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-blue-600 transition-colors duration-300 hover:scale-110"
-                                aria-label="{{ __('nav_search') }}">
-                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path fill-rule="evenodd"
-                                      d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z"
-                                      clip-rule="evenodd"></path>
-                            </svg>
-                        </button>
-                        {{-- Search suggestions overlay --}}
-                        @if ($searchQuery && strlen($searchQuery) > 2)
-                            <div
-                                 class="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-lg z-50 max-h-96 overflow-y-auto">
-                                <div class="p-4">
-                                    <div class="text-sm text-gray-500 mb-2">{{ __('Search suggestions') }}</div>
-                                    <div class="space-y-2">
-                                        <div
-                                             class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors duration-200">
-                                            <span class="text-gray-700">{{ $searchQuery }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                </form>
+                <x-search-module 
+                    class="w-full"
+                    :max-results="8"
+                    :min-query-length="2"
+                />
             </div>
 
             {{-- Right: Actions --}}
@@ -142,11 +104,11 @@
         @if ($mobileMenuOpen)
             <div class="lg:hidden border-t border-gray-200 py-3">
                 <div class="mb-3">
-                    <form wire:submit.prevent="search">
-                        <input type="search" wire:model.live.debounce.300ms="searchQuery"
-                               placeholder="{{ __('search_placeholder') }}"
-                               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500" />
-                    </form>
+                    <x-search-module 
+                        class="w-full"
+                        :max-results="5"
+                        :min-query-length="2"
+                    />
                 </div>
                 <nav class="grid gap-2">
                     @if (Route::has('brands.index'))

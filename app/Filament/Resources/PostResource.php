@@ -29,10 +29,10 @@ final class PostResource extends Resource
 
     /** @var string|\BackedEnum|null */
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static $navigationGroup = 'Content';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.content');
+    }
 
     protected static ?int $navigationSort = 1;
 

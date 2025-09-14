@@ -36,26 +36,66 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use UnitEnum;
 
+/**
+ * Product Resource
+ * 
+ * Filament resource for managing products in the e-commerce system.
+ * Provides comprehensive CRUD operations, filtering, searching, and
+ * bulk actions for product management.
+ * 
+ * @property-read string $model The model class this resource manages
+ * @property-read string $navigationIcon The navigation icon for this resource
+ * @property-read string|null $navigationGroup The navigation group this resource belongs to
+ */
 class ProductResource extends Resource
 {
+    /**
+     * The model that this resource corresponds to.
+     * 
+     * @var string
+     */
     protected static ?string $model = Product::class;
 
     /**
+     * The navigation icon for this resource.
+     * 
      * @var string|\BackedEnum|null
      */
     protected static $navigationIcon = 'heroicon-o-cube';
 
-    /** @var string|\BackedEnum|null */
+    /**
+     * Get the navigation group for this resource.
+     * 
+     * @return string|null The navigation group name
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.catalog');
+    }
 
     /**
-     * @var UnitEnum|string|null
+     * The sort order for this resource in navigation.
+     * 
+     * @var int|null
      */
-    protected static $navigationGroup = 'E-commerce';
-
     protected static ?int $navigationSort = 1;
 
+    /**
+     * The attribute to use as the record title.
+     * 
+     * @var string|null
+     */
     protected static ?string $recordTitleAttribute = 'name';
 
+    /**
+     * Configure the form schema for creating and editing products.
+     * 
+     * Defines the form fields and validation rules for product management,
+     * including basic information, pricing, inventory, SEO, and media sections.
+     * 
+     * @param \Filament\Forms\Form $form The form instance
+     * @return \Filament\Forms\Form The configured form
+     */
     public static function form(Form $form): Form
     {
         return $form
@@ -293,6 +333,15 @@ class ProductResource extends Resource
             ]);
     }
 
+    /**
+     * Configure the table schema for listing products.
+     * 
+     * Defines the table columns, filters, actions, and bulk actions
+     * for the product listing page in the admin panel.
+     * 
+     * @param \Filament\Tables\Table $table The table instance
+     * @return \Filament\Tables\Table The configured table
+     */
     public static function table(Table $table): Table
     {
         return $table

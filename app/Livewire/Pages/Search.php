@@ -5,19 +5,27 @@ declare(strict_types=1);
 namespace App\Livewire\Pages;
 
 use App\Models\Product;
+use App\Services\SearchService;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Layout('layouts.templates.app')]
 class Search extends Component
 {
+    use WithPagination;
+
     #[Url]
     public string $q = '';
 
     #[Url]
     public ?string $sort = null;
+
+    public function __construct(
+        private readonly SearchService $searchService
+    ) {}
 
     public function render(): View
     {
@@ -37,8 +45,8 @@ class Search extends Component
                         ->orWhereExists(function ($sq) use ($term, $locale) {
                             $sq
                                 ->selectRaw('1')
-                                ->from('sh_product_translations as t')
-                                ->whereColumn('t.product_id', 'sh_products.id')
+                                ->from('product_translations as t')
+                                ->whereColumn('t.product_id', 'products.id')
                                 ->where('t.locale', $locale)
                                 ->where(function ($tw) use ($term) {
                                     $tw
@@ -74,6 +82,6 @@ class Search extends Component
         return view('livewire.pages.search', [
             'products' => $products,
             'term' => $this->q,
-        ])->title(__('Search'));
+        ])->title(__('frontend.search.results'));
     }
 }

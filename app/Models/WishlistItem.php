@@ -63,4 +63,21 @@ final class WishlistItem extends Model
     {
         return app_money_format($this->current_price ?? 0);
     }
+
+    public function scopeForUser($query, int $userId)
+    {
+        return $query->whereHas('wishlist', function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+        });
+    }
+
+    public function scopeForProduct($query, int $productId)
+    {
+        return $query->where('product_id', $productId);
+    }
+
+    public function scopeRecent($query, int $days = 7)
+    {
+        return $query->where('created_at', '>=', now()->subDays($days));
+    }
 }

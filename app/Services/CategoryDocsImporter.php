@@ -132,7 +132,9 @@ final class CategoryDocsImporter
             return;
         }
 
-        $lines = preg_split('/\r\n|\r|\n/', $content) ?: [];
+        // Normalize line endings and split
+        $normalizedContent = str_replace(["\r\n", "\r"], "\n", $content);
+        $lines = explode("\n", $normalizedContent);
         foreach ($lines as $line) {
             $line = trim($line);
             if ($line === '' || ! Str::startsWith($line, ['# ', '## ', '### '])) {

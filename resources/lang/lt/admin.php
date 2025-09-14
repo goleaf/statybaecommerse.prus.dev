@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    // Brand
+    'brand_name' => 'Logotipas',
+    
     // Navigation
     'navigation' => [
         'dashboard' => 'Valdymo skydas',
@@ -765,7 +768,7 @@ return [
     ],
     // Filament UI
     'filament' => [
-        'search' => 'Ieškoti...',
+        'search' => 'Paieška',
         'no_search_results' => 'Paieškos rezultatų nerasta',
         'global_search' => 'Globali paieška',
         'sidebar' => [
@@ -777,6 +780,8 @@ return [
             'profile' => 'Profilis',
             'settings' => 'Nustatymai',
             'logout' => 'Atsijungti',
+            'avatar' => 'Avataras',
+            'super_administrator' => 'Super Administrator',
         ],
         'theme' => [
             'light' => 'Šviesus',
@@ -789,10 +794,11 @@ return [
         'pagination' => [
             'previous' => 'Ankstesnis',
             'next' => 'Kitas',
-            'showing' => 'Rodoma',
+            'showing' => 'Rodomi nuo',
             'to' => 'iki',
-            'of' => 'iš',
+            'of' => 'rezultatai iš',
             'results' => 'rezultatų',
+            'per_page' => 'puslapyje',
         ],
         'table' => [
             'empty' => 'Nėra duomenų',
@@ -803,6 +809,10 @@ return [
             'bulk_actions' => 'Masiniai veiksmai',
             'select_all' => 'Pažymėti visus',
             'deselect_all' => 'Atžymėti visus',
+            'list' => 'Sąrašas',
+            'create' => 'Sukurti',
+            'edit' => 'Redaguoti',
+            'delete' => 'Ištrinti',
         ],
         'form' => [
             'save' => 'Išsaugoti',
@@ -1081,6 +1091,8 @@ return [
         'news_comments' => 'Naujienų komentarai',
         'news_image' => 'Naujienų paveikslėlis',
         'news_images' => 'Naujienų paveikslėliai',
+        'seo_data' => 'SEO duomenys',
+        'seo_entries' => 'SEO įrašai',
     ],
 
     // SEO Data
@@ -1098,11 +1110,12 @@ return [
         'import' => 'Importuoti SEO duomenis',
         'bulk_actions' => 'Masiniai veiksmai',
         'fields' => [
+            'basic_information' => 'Pagrindinė informacija',
             'seoable_type' => 'Objekto tipas',
             'seoable_id' => 'Objekto ID',
             'seoable_name' => 'Objekto pavadinimas',
             'locale' => 'Kalba',
-            'locale_name' => 'Kalbos pavadinimas',
+            'locale_name' => 'Lietuvių kalba',
             'title' => 'Pavadinimas',
             'description' => 'Aprašymas',
             'keywords' => 'Raktažodžiai',

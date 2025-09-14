@@ -11,10 +11,10 @@ it('has discount and redemptions relations', function (): void {
 });
 
 it('validation helpers behave logically', function (): void {
-    $m = new DiscountCode(['max_uses' => 1, 'usage_count' => 1]);
+    $m = new DiscountCode(['usage_limit' => 1, 'usage_count' => 1]);
     expect($m->hasReachedLimit())->toBeTrue();
 
-    $m = new DiscountCode(['max_uses' => 2, 'usage_count' => 1]);
+    $m = new DiscountCode(['usage_limit' => 2, 'usage_count' => 1]);
     expect($m->hasReachedLimit())->toBeFalse();
 
     $m = new DiscountCode(['expires_at' => now()->subDay()]);

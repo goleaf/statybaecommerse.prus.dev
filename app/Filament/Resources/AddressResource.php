@@ -45,16 +45,27 @@ final class AddressResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-map-pin';
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = 'Users';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.users');
+    }
 
     protected static ?int $navigationSort = 3;
 
-    protected static ?string $navigationLabel = 'Addresses';
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.addresses');
+    }
 
-    protected static ?string $modelLabel = 'Address';
+    public static function getModelLabel(): string
+    {
+        return __('admin.models.address');
+    }
 
-    protected static ?string $pluralModelLabel = 'Addresses';
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.models.addresses');
+    }
 
     public static function form(Form $form): Form
     {

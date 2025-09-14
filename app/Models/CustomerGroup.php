@@ -26,7 +26,6 @@ final class CustomerGroup extends Model
         'description',
         'discount_percentage',
         'is_enabled',
-        'is_active',
         'conditions',
     ];
 

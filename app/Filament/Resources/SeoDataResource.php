@@ -54,17 +54,6 @@ final class SeoDataResource extends Resource
 
     protected static ?int $navigationSort = 15;
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static $navigationGroup = 'Content';
-
-    protected static ?string $navigationLabel = 'SEO Data';
-
-    protected static ?string $modelLabel = 'SEO Data';
-
-    protected static ?string $pluralModelLabel = 'SEO Data';
-
     public static function getNavigationGroup(): ?string
     {
         return __('admin.navigation.content');
@@ -77,12 +66,12 @@ final class SeoDataResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('admin.seo_data.title');
+        return __('admin.models.seo_data');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('admin.seo_data.title');
+        return __('admin.models.seo_entries');
     }
 
     public static function form(Form $form): Form

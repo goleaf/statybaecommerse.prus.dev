@@ -17,5 +17,5 @@ it('casts attributes correctly', function (): void {
 it('fillable allows mass assignment', function (): void {
     $data = Report::factory()->make()->toArray();
     $report = new Report($data);
-    expect($report->name)->toBe($data['name']);
+    expect($report->getTranslation('name', 'lt'))->toBe($data['name']['lt']);
 });

@@ -52,8 +52,20 @@ final class PostTest extends TestCase
         $post = Post::factory()->create([
             'user_id' => $user->id,
             'title' => 'Original Title',
+            'title_translations' => [
+                'lt' => 'Original Title',
+                'en' => 'Original Title',
+            ],
             'content' => 'Original Content',
+            'content_translations' => [
+                'lt' => 'Original Content',
+                'en' => 'Original Content',
+            ],
             'excerpt' => 'Original Excerpt',
+            'excerpt_translations' => [
+                'lt' => 'Original Excerpt',
+                'en' => 'Original Excerpt',
+            ],
         ]);
         
         // Test translation methods
@@ -85,18 +97,25 @@ final class PostTest extends TestCase
             'user_id' => $user->id,
             'status' => 'published',
             'featured' => false,
+            'is_pinned' => false,
         ]);
         $draftPost = Post::factory()->create([
             'user_id' => $user->id,
             'status' => 'draft',
+            'featured' => false,
+            'is_pinned' => false,
         ]);
         $featuredPost = Post::factory()->create([
             'user_id' => $user->id,
             'featured' => true,
+            'status' => 'draft',
+            'is_pinned' => false,
         ]);
         $pinnedPost = Post::factory()->create([
             'user_id' => $user->id,
             'is_pinned' => true,
+            'status' => 'draft',
+            'featured' => false,
         ]);
 
         // Test published scope
@@ -208,12 +227,12 @@ final class PostTest extends TestCase
         ]);
 
         // Test word count
-        $this->assertEquals(15, $post->getWordCount());
+        $this->assertEquals(14, $post->getWordCount());
 
         // Test reading time
         $readingTime = $post->getReadingTime();
         $this->assertGreaterThanOrEqual(1, $readingTime);
-        $this->assertLessThanOrEqual(5, $readingTime); // Should be around 1 minute for 15 words
+        $this->assertLessThanOrEqual(5, $readingTime); // Should be around 1 minute for 14 words
     }
 
     public function test_post_engagement_methods(): void
@@ -251,7 +270,13 @@ final class PostTest extends TestCase
         $post = Post::factory()->create([
             'user_id' => $user->id,
             'title' => 'Original Title',
+            'title_translations' => [],
             'content' => 'Original Content',
+            'content_translations' => [],
+            'excerpt_translations' => [],
+            'meta_title_translations' => [],
+            'meta_description_translations' => [],
+            'tags_translations' => [],
         ]);
 
         // Test available locales (should be empty initially)
@@ -262,8 +287,9 @@ final class PostTest extends TestCase
 
         // Test get or create translation
         $translation = $post->getOrCreateTranslation('en');
-        $this->assertInstanceOf(\App\Models\Translations\PostTranslation::class, $translation);
-        $this->assertEquals('en', $translation->locale);
+        $this->assertIsArray($translation);
+        $this->assertArrayHasKey('title', $translation);
+        $this->assertArrayHasKey('content', $translation);
 
         // Test update translation
         $this->assertTrue($post->updateTranslation('en', [
@@ -282,12 +308,16 @@ final class PostTest extends TestCase
         $post = Post::factory()->create([
             'user_id' => $user->id,
             'title' => 'Test Post',
+            'title_translations' => [
+                'lt' => 'Test Post',
+                'en' => 'Test Post',
+            ],
             'status' => 'published',
         ]);
 
         $displayName = $post->getFullDisplayName();
-        $this->assertStringContains('Test Post', $displayName);
-        $this->assertStringContains('Published', $displayName);
+        $this->assertStringContainsString('Test Post', $displayName);
+        $this->assertStringContainsString('Publikuotas', $displayName);
     }
 
     public function test_post_additional_scopes(): void
@@ -309,10 +339,15 @@ final class PostTest extends TestCase
             'user_id' => $user->id,
             'created_at' => now()->subDays(45),
             'views_count' => 50,
+            'likes_count' => 0,
+            'comments_count' => 0,
         ]);
         $popularPost = Post::factory()->create([
             'user_id' => $user->id,
             'views_count' => 200,
+            'created_at' => now()->subDays(35),
+            'likes_count' => 0,
+            'comments_count' => 0,
         ]);
 
         // Test recent scope

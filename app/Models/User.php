@@ -22,10 +22,155 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Translatable\HasTranslations;
 
+/**
+ * User Model
+ * 
+ * Represents a user in the e-commerce system with comprehensive functionality
+ * including authentication, authorization, profile management, and business relationships.
+ * 
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string|null $password
+ * @property string|null $preferred_locale
+ * @property \Carbon\Carbon|null $email_verified_at
+ * @property string|null $first_name
+ * @property string|null $last_name
+ * @property string|null $gender
+ * @property string|null $phone_number
+ * @property \Carbon\Carbon|null $birth_date
+ * @property string|null $timezone
+ * @property bool $opt_in
+ * @property string|null $phone
+ * @property \Carbon\Carbon|null $date_of_birth
+ * @property bool $is_active
+ * @property bool $accepts_marketing
+ * @property bool $two_factor_enabled
+ * @property \Carbon\Carbon|null $last_login_at
+ * @property array|null $preferences
+ * @property string|null $avatar_url
+ * @property string|null $last_login_ip
+ * @property bool $is_admin
+ * @property bool $is_verified
+ * @property string|null $company
+ * @property string|null $job_title
+ * @property string|null $bio
+ * @property string|null $position
+ * @property string|null $website
+ * @property array|null $social_links
+ * @property array|null $notification_preferences
+ * @property array|null $privacy_settings
+ * @property array|null $marketing_preferences
+ * @property int $login_count
+ * @property \Carbon\Carbon|null $last_activity_at
+ * @property \Carbon\Carbon|null $phone_verified_at
+ * @property string|null $two_factor_secret
+ * @property array|null $two_factor_recovery_codes
+ * @property \Carbon\Carbon|null $two_factor_confirmed_at
+ * @property string|null $remember_token
+ * @property string|null $api_token
+ * @property string|null $stripe_customer_id
+ * @property string|null $stripe_account_id
+ * @property string|null $subscription_status
+ * @property string|null $subscription_plan
+ * @property \Carbon\Carbon|null $subscription_ends_at
+ * @property \Carbon\Carbon|null $trial_ends_at
+ * @property string|null $status
+ * @property string|null $verification_token
+ * @property string|null $password_reset_token
+ * @property \Carbon\Carbon|null $password_reset_expires_at
+ * @property string|null $referral_code
+ * @property \Carbon\Carbon|null $referral_code_generated_at
+ * @property array|null $referral_settings
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ * 
+ * @property-read string $full_name
+ * @property-read string $initials
+ * @property-read float $total_spent
+ * @property-read float $average_order_value
+ * @property-read string|null $last_order_date
+ * @property-read int $orders_count
+ * @property-read int $reviews_count
+ * @property-read float $average_rating
+ * @property-read string $subscription_status_color
+ * @property-read string $status_color
+ * @property-read string $status_text
+ * @property-read int|null $age
+ * @property-read string|null $gender_text
+ * @property-read string $locale_text
+ * @property-read string $avatar_url
+ * @property-read array $social_links
+ * @property-read array $notification_preferences
+ * @property-read array $privacy_settings
+ * @property-read array $marketing_preferences
+ * @property-read \App\Models\Address|null $default_address
+ * @property-read \App\Models\Address|null $billing_address
+ * @property-read \App\Models\Address|null $shipping_address
+ * @property-read \App\Models\Partner|null $active_partner
+ * @property-read float $partner_discount_rate
+ * @property-read string|null $referral_code
+ * @property-read string|null $referral_url
+ * @property-read array $referral_stats
+ * @property-read string $roles_label
+ * 
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $wishlist
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserWishlist> $wishlists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Address> $addresses
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CartItem> $cartItems
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Review> $reviews
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Review> $authoredReviews
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CustomerGroup> $customerGroups
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DiscountRedemption> $discountRedemptions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Partner> $partners
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Referral> $referrals
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Referral> $referredBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReferralCode> $referralCodes
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReferralReward> $referralRewards
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReferralStatistics> $referralStatistics
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Notification> $notifications
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LoginLog> $loginLogs
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Session> $sessions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activityLogs
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Subscription> $subscriptions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Payment> $payments
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Refund> $refunds
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupportTicket> $supportTickets
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Feedback> $feedback
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Newsletter> $newsletters
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Tag> $tags
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\File> $files
+ * 
+ * @method static \Illuminate\Database\Eloquent\Builder|User active()
+ * @method static \Illuminate\Database\Eloquent\Builder|User inactive()
+ * @method static \Illuminate\Database\Eloquent\Builder|User admins()
+ * @method static \Illuminate\Database\Eloquent\Builder|User withOrders()
+ * @method static \Illuminate\Database\Eloquent\Builder|User withoutOrders()
+ * @method static \Illuminate\Database\Eloquent\Builder|User recentlyActive(int $days = 30)
+ * @method static \Illuminate\Database\Eloquent\Builder|User byRole(string $role)
+ * @method static \Illuminate\Database\Eloquent\Builder|User byGender(string $gender)
+ * @method static \Illuminate\Database\Eloquent\Builder|User byLocale(string $locale)
+ * @method static \Illuminate\Database\Eloquent\Builder|User subscribed()
+ * @method static \Illuminate\Database\Eloquent\Builder|User onTrial()
+ * @method static \Illuminate\Database\Eloquent\Builder|User withPreferredLocale(string $locale)
+ * 
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ */
 final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
     use HasFactory, HasRoles, HasTranslations, LogsActivity, Notifiable, SoftDeletes;
 
+    /**
+     * Boot the model and register event listeners.
+     * 
+     * Automatically sets the user's name based on first_name and last_name
+     * or falls back to email if name is empty.
+     * 
+     * @return void
+     */
     protected static function booted(): void
     {
         self::saving(function (self $user): void {
@@ -145,6 +290,13 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         ];
     }
 
+    /**
+     * Get the user's preferred locale.
+     * 
+     * Returns the user's preferred locale setting or null if not set.
+     * 
+     * @return string|null The preferred locale code or null
+     */
     public function preferredLocale(): ?string
     {
         $locale = $this->getAttribute('preferred_locale');
@@ -152,6 +304,12 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         return $locale ? (string) $locale : null;
     }
 
+    /**
+     * Send password reset notification in user's preferred locale.
+     * 
+     * @param string $token The password reset token
+     * @return void
+     */
     public function sendPasswordResetNotification($token): void
     {
         $notification = new ResetPasswordNotification($token);
@@ -159,6 +317,11 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         $this->notify($notification->locale($locale));
     }
 
+    /**
+     * Send email verification notification in user's preferred locale.
+     * 
+     * @return void
+     */
     public function sendEmailVerificationNotification(): void
     {
         $notification = new VerifyEmailNotification;
@@ -202,11 +365,21 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
             ->useLogName('user');
     }
 
+    /**
+     * Get the user's orders.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
+    /**
+     * Get the user's wishlist products.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function wishlist(): BelongsToMany
     {
         return $this
@@ -214,21 +387,41 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
             ->withTimestamps();
     }
 
+    /**
+     * Get the user's wishlist items.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function wishlists(): HasMany
     {
         return $this->hasMany(UserWishlist::class);
     }
 
+    /**
+     * Get the user's addresses.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
     }
 
+    /**
+     * Get the user's cart items.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function cartItems(): HasMany
     {
         return $this->hasMany(CartItem::class);
     }
 
+    /**
+     * Get the user's reviews.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);

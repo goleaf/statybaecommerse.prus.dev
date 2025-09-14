@@ -9,6 +9,17 @@ uses()->group('engine');
 beforeEach(function () {
     // Run the package/app migrations to ensure tables exist
     $this->artisan('migrate', ['--force' => true]);
+    
+    // Clean up any existing data
+    if (Schema::hasTable('sh_discount_codes')) {
+        DB::table('sh_discount_codes')->truncate();
+    }
+    if (Schema::hasTable('sh_discounts')) {
+        DB::table('sh_discounts')->truncate();
+    }
+    if (Schema::hasTable('sh_orders')) {
+        DB::table('sh_orders')->truncate();
+    }
     if (!Schema::hasTable('sh_discounts')) {
         Schema::create('sh_discounts', function ($table) {
             $table->id();
@@ -62,12 +73,21 @@ beforeEach(function () {
         Schema::create('sh_discount_codes', function ($table) {
             $table->id();
             $table->unsignedBigInteger('discount_id');
-            $table->string('code')->unique();
+            $table->string('code');
             $table->timestamp('expires_at')->nullable();
             $table->unsignedInteger('max_uses')->nullable();
             $table->unsignedInteger('usage_count')->default(0);
             $table->timestamps();
         });
+        
+        // Add unique index if it doesn't exist
+        try {
+            Schema::table('sh_discount_codes', function ($table) {
+                $table->unique('code', 'sh_discount_codes_code_unique');
+            });
+        } catch (Exception $e) {
+            // Index already exists, ignore the error
+        }
     }
     if (!Schema::hasTable('sh_orders')) {
         Schema::create('sh_orders', function ($table) {

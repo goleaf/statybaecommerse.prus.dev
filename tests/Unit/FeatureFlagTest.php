@@ -101,6 +101,16 @@ class FeatureFlagTest extends TestCase
         $featureFlag = FeatureFlag::factory()->create();
         $users = User::factory()->count(3)->create();
 
+        // Create the pivot table if it doesn't exist
+        if (!\Illuminate\Support\Facades\Schema::hasTable('feature_flag_users')) {
+            \Illuminate\Support\Facades\Schema::create('feature_flag_users', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('feature_flag_id');
+                $table->unsignedBigInteger('user_id');
+                $table->timestamps();
+            });
+        }
+
         $featureFlag->users()->attach($users->pluck('id'));
 
         $this->assertCount(3, $featureFlag->users);

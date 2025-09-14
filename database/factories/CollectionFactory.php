@@ -36,19 +36,7 @@ class CollectionFactory extends Factory
 
     public function configure(): static
     {
-        return $this->afterCreating(function (Collection $collection): void {
-            if (app()->environment('testing')) {
-                return;  // skip media in tests to avoid GD errors
-            }
-            $paths = ['demo/collection.jpg', 'demo/collection.png', 'demo/tshirt.jpg'];
-            foreach ($paths as $path) {
-                if (Storage::disk('public')->exists($path)) {
-                    $collection
-                        ->addMedia(Storage::disk('public')->path($path))
-                        ->toMediaCollection('images');
-                    break;
-                }
-            }
-        });
+        // Skip media creation to avoid GD errors in testing
+        return $this;
     }
 }

@@ -37,20 +37,20 @@ it('discount validity respects status and dates', function () {
 });
 
 it('discount code validity and limits work', function () {
-    $c = new DiscountCode(['max_uses' => 1, 'usage_count' => 0]);
+    $c = new DiscountCode(['usage_limit' => 1, 'usage_count' => 0, 'is_active' => true]);
     expect($c->hasReachedLimit())->toBeFalse()->and($c->isValid())->toBeTrue();
 
     $c->usage_count = 1;
     expect($c->hasReachedLimit())->toBeTrue()->and($c->isValid())->toBeFalse();
 
-    $c->max_uses = null;
+    $c->usage_limit = null;
     $c->usage_count = 5;
     $c->expires_at = now()->subMinute();
     expect($c->isValid())->toBeFalse();
 });
 
 it('discount condition operators behave correctly', function () {
-    $cond = new DiscountCondition(['operator' => 'equals_to', 'value' => 'abc']);
+    $cond = new DiscountCondition(['operator' => 'equals_to', 'value' => 'abc', 'is_active' => true]);
     expect($cond->matches('abc'))->toBeTrue();
 
     $cond->operator = 'not_equals_to';

@@ -439,6 +439,7 @@ return [
         'view' => 'Peržiūrėti',
         'click_details' => 'Paspaudimo detalės',
         'back_to_list' => 'Grįžti į sąrašą',
+        'back_to_list_tooltip' => 'Grįžti į sąrašo rodinį',
         'conversions' => 'Konversijos',
     ],
 ];
