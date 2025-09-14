@@ -151,7 +151,15 @@ final class LiveInventoryTracker extends Component
                 default => $query->orderBy('stock_quantity'),
             };
             
-            return $query->limit(50)->get()->map(function ($product) {
+            return $query->limit(50)->get()
+                ->skipWhile(function ($product) {
+                    // Skip products that are not properly configured for inventory tracking
+                    return empty($product->name) || 
+                           !$product->is_visible ||
+                           empty($product->sku) ||
+                           $product->price <= 0;
+                })
+                ->map(function ($product) {
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
@@ -183,6 +191,14 @@ final class LiveInventoryTracker extends Component
                 ->orderBy('stock_quantity')
                 ->limit(20)
                 ->get()
+                ->skipWhile(function ($product) {
+                    // Skip products that are not properly configured for low stock alerts
+                    return empty($product->name) || 
+                           !$product->is_visible ||
+                           empty($product->sku) ||
+                           $product->price <= 0 ||
+                           $product->stock_quantity <= 0;
+                })
                 ->map(function ($product) {
                     return [
                         'id' => $product->id,

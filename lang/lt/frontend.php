@@ -1,6 +1,24 @@
 <?php
 
 return [
+    'navigation' => [
+        'products' => 'Produktai',
+        'campaigns' => 'Kampanijos',
+        'orders' => 'Užsakymai',
+        'addresses' => 'Adresai',
+        'countries' => 'Šalys',
+        'categories' => 'Kategorijos',
+        'brands' => 'Prekės ženklai',
+        'news' => 'Naujienos',
+        'locations' => 'Vietos',
+        'referrals' => 'Rekomendacijos',
+        'reviews' => 'Atsiliepimai',
+        'search' => 'Paieška',
+        'cart' => 'Krepšelis',
+        'checkout' => 'Atsiskaitymas',
+        'account' => 'Paskyra',
+        'notifications' => 'Pranešimai',
+    ],
     'products' => [
         'history_title' => ':product istorija',
         'history_description' => 'Peržiūrėkite :product keitimų istoriją ir visus atliktus pakeitimus.',

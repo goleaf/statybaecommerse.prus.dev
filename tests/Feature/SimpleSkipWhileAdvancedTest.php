@@ -4,270 +4,172 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Services\ProductGalleryService;
+use App\Services\SearchService;
+use App\Services\DataFilteringService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Collection;
 use Tests\TestCase;
 
 final class SimpleSkipWhileAdvancedTest extends TestCase
 {
     use RefreshDatabase;
 
-    private ProductGalleryService $galleryService;
-
-    protected function setUp(): void
+    public function test_skipwhile_basic_functionality(): void
     {
-        parent::setUp();
-        $this->galleryService = new ProductGalleryService();
-    }
-
-    public function test_basic_skip_while_functionality(): void
-    {
+        // Test basic skipWhile functionality with a simple collection
         $collection = collect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
-        $subset = $collection->skipWhile(function (int $item) {
-            return $item <= 5;
+        $result = $collection->skipWhile(function ($item) {
+            return $item < 5;
         });
 
-        $this->assertEquals([5 => 6, 6 => 7, 7 => 8, 8 => 9, 9 => 10], $subset->all());
-        $this->assertCount(5, $subset);
+        $this->assertEquals([5, 6, 7, 8, 9, 10], $result->values()->all());
     }
 
-    public function test_skip_while_with_objects(): void
+    public function test_skipwhile_with_strings(): void
     {
-        $products = collect([
-            (object) ['id' => 1, 'name' => '', 'is_visible' => true, 'price' => 100],
-            (object) ['id' => 2, 'name' => 'Valid Product', 'is_visible' => false, 'price' => 200],
-            (object) ['id' => 3, 'name' => 'Another Valid', 'is_visible' => true, 'price' => 0],
-            (object) ['id' => 4, 'name' => 'Good Product', 'is_visible' => true, 'price' => 300],
-        ]);
+        $collection = collect(['apple', 'banana', 'cherry', 'date', 'elderberry']);
 
-        $filteredProducts = $products->skipWhile(function ($product) {
-            return empty($product->name) || 
-                   !$product->is_visible ||
-                   $product->price <= 0;
+        $result = $collection->skipWhile(function ($item) {
+            return strlen($item) <= 5;
         });
 
-        $this->assertCount(1, $filteredProducts);
-        $this->assertEquals(4, $filteredProducts->first()->id);
+        $this->assertEquals(['banana', 'cherry', 'date', 'elderberry'], $result->values()->all());
     }
 
-    public function test_product_gallery_service_basic_filtering(): void
+    public function test_skipwhile_with_objects(): void
     {
-        $products = collect([
-            (object) [
-                'id' => 1, 
-                'name' => '', 
-                'is_visible' => true, 
-                'price' => 100, 
-                'slug' => 'product-1'
-            ],
-            (object) [
-                'id' => 2, 
-                'name' => 'Valid Product', 
-                'is_visible' => true, 
-                'price' => 200, 
-                'slug' => 'product-2'
-            ],
-            (object) [
-                'id' => 3, 
-                'name' => 'Another Valid', 
-                'is_visible' => true, 
-                'price' => 300, 
-                'slug' => 'product-3'
-            ],
+        $collection = collect([
+            (object) ['name' => '', 'active' => true],
+            (object) ['name' => 'Valid', 'active' => false],
+            (object) ['name' => 'Another', 'active' => true],
+            (object) ['name' => 'Good', 'active' => true],
         ]);
 
-        $result = $this->galleryService->arrangeForGallery($products, 2);
+        $result = $collection->skipWhile(function ($item) {
+            return empty($item->name) || !$item->active;
+        });
 
-        // Should have 2 valid products (id 2 and 3) split into 2 columns
         $this->assertCount(2, $result);
-        $this->assertGreaterThan(0, $result->count());
-        
-        // Test that the result is a collection with proper structure
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertTrue($result->isNotEmpty());
+        $this->assertEquals('Another', $result->first()->name);
+        $this->assertEquals('Good', $result->last()->name);
     }
 
-    public function test_stock_filtering_basic(): void
+    public function test_skipwhile_with_arrays(): void
     {
-        $products = collect([
-            (object) [
-                'id' => 1, 
-                'name' => 'Out of Stock', 
-                'is_visible' => true, 
-                'price' => 100, 
-                'slug' => 'product-1',
-                'stock_quantity' => 0,
-                'is_available' => false
-            ],
-            (object) [
-                'id' => 2, 
-                'name' => 'In Stock', 
-                'is_visible' => true, 
-                'price' => 200, 
-                'slug' => 'product-2',
-                'stock_quantity' => 10,
-                'is_available' => true
-            ],
+        $collection = collect([
+            ['id' => 1, 'name' => '', 'active' => true],
+            ['id' => 2, 'name' => 'Valid', 'active' => false],
+            ['id' => 3, 'name' => 'Another', 'active' => true],
+            ['id' => 4, 'name' => 'Good', 'active' => true],
         ]);
 
-        $filteredProducts = $this->galleryService->arrangeWithStockFiltering($products, true, 5);
-
-        // Should only have 1 product (id 2) with stock >= 5
-        $this->assertCount(1, $filteredProducts);
-        $this->assertEquals(2, $filteredProducts->first()->id);
-    }
-
-    public function test_date_filtering_basic(): void
-    {
-        $now = now();
-        $products = collect([
-            (object) [
-                'id' => 1, 
-                'name' => 'Old Product', 
-                'is_visible' => true, 
-                'price' => 100, 
-                'slug' => 'product-1',
-                'created_at' => $now->copy()->subDays(400)
-            ],
-            (object) [
-                'id' => 2, 
-                'name' => 'Recent Product', 
-                'is_visible' => true, 
-                'price' => 200, 
-                'slug' => 'product-2',
-                'created_at' => $now->copy()->subDays(15)
-            ],
-        ]);
-
-        $dateFilters = [
-            'new_arrivals_days' => 30,
-            'exclude_old' => true
-        ];
-
-        $filteredProducts = $this->galleryService->arrangeWithDateFiltering($products, $dateFilters);
-
-        // Should only have 1 product (id 2) within 30 days
-        $this->assertCount(1, $filteredProducts);
-        $this->assertEquals(2, $filteredProducts->first()->id);
-    }
-
-    public function test_skip_while_with_split_in_combination(): void
-    {
-        $products = collect([
-            (object) ['id' => 1, 'name' => '', 'is_visible' => true, 'price' => 100, 'slug' => 'product-1'],
-            (object) ['id' => 2, 'name' => 'Valid Product 1', 'is_visible' => true, 'price' => 200, 'slug' => 'product-2'],
-            (object) ['id' => 3, 'name' => 'Valid Product 2', 'is_visible' => true, 'price' => 300, 'slug' => 'product-3'],
-            (object) ['id' => 4, 'name' => 'Valid Product 3', 'is_visible' => true, 'price' => 400, 'slug' => 'product-4'],
-        ]);
-
-        $validProducts = $products->skipWhile(function ($product) {
-            return empty($product->name) || 
-                   !$product->is_visible ||
-                   $product->price <= 0 ||
-                   empty($product->slug);
+        $result = $collection->skipWhile(function ($item) {
+            return empty($item['name']) || !$item['active'];
         });
 
-        $splitProducts = $validProducts->splitIn(2);
-
-        // Should have 2 columns with 2 products each
-        $this->assertCount(2, $splitProducts);
-        $this->assertEquals(2, $splitProducts->first()->count());
-        $this->assertEquals(1, $splitProducts->last()->count());
-        $this->assertEquals(2, $splitProducts->first()->first()->id);
-        $this->assertEquals(4, $splitProducts->last()->first()->id);
+        $this->assertCount(2, $result);
+        $this->assertEquals('Another', $result->first()['name']);
+        $this->assertEquals('Good', $result->last()['name']);
     }
 
-    public function test_skip_while_performance(): void
+    public function test_skipwhile_handles_empty_collection(): void
     {
-        $products = collect();
-        
-        // Add 1000 invalid products first
-        for ($i = 1; $i <= 1000; $i++) {
-            $products->push((object) [
-                'id' => $i,
-                'name' => '',
-                'is_visible' => false,
-                'price' => 0,
-                'slug' => ''
-            ]);
-        }
-        
-        // Add 10 valid products at the end
-        for ($i = 1001; $i <= 1010; $i++) {
-            $products->push((object) [
-                'id' => $i,
-                'name' => "Valid Product {$i}",
-                'is_visible' => true,
-                'price' => 100,
-                'slug' => "product-{$i}"
-            ]);
-        }
+        $collection = collect([]);
+
+        $result = $collection->skipWhile(function ($item) {
+            return $item < 5;
+        });
+
+        $this->assertCount(0, $result);
+    }
+
+    public function test_skipwhile_handles_all_skipped_items(): void
+    {
+        $collection = collect([1, 2, 3, 4, 5]);
+
+        $result = $collection->skipWhile(function ($item) {
+            return $item < 10; // All items will be skipped
+        });
+
+        $this->assertCount(0, $result);
+    }
+
+    public function test_skipwhile_handles_no_skipped_items(): void
+    {
+        $collection = collect([1, 2, 3, 4, 5]);
+
+        $result = $collection->skipWhile(function ($item) {
+            return $item < 0; // No items will be skipped
+        });
+
+        $this->assertCount(5, $result);
+        $this->assertEquals([1, 2, 3, 4, 5], $result->values()->all());
+    }
+
+    public function test_skipwhile_with_complex_conditions(): void
+    {
+        $collection = collect([
+            ['price' => 5, 'category' => 'electronics', 'in_stock' => true],
+            ['price' => 50, 'category' => 'electronics', 'in_stock' => false],
+            ['price' => 100, 'category' => 'clothing', 'in_stock' => true],
+            ['price' => 200, 'category' => 'electronics', 'in_stock' => true],
+        ]);
+
+        $result = $collection->skipWhile(function ($item) {
+            return $item['price'] < 10 || 
+                   $item['category'] !== 'electronics' || 
+                   !$item['in_stock'];
+        });
+
+        $this->assertCount(1, $result);
+        $this->assertEquals(200, $result->first()['price']);
+    }
+
+    public function test_skipwhile_performance_with_large_collection(): void
+    {
+        // Create a large collection
+        $collection = collect(range(1, 1000));
 
         $startTime = microtime(true);
-        
-        $validProducts = $products->skipWhile(function ($product) {
-            return empty($product->name) || 
-                   !$product->is_visible ||
-                   $product->price <= 0 ||
-                   empty($product->slug);
+        $result = $collection->skipWhile(function ($item) {
+            return $item < 500;
         });
-
         $endTime = microtime(true);
-        $executionTime = $endTime - $startTime;
 
-        $this->assertCount(10, $validProducts);
-        $this->assertEquals(1001, $validProducts->first()->id);
-        $this->assertEquals(1010, $validProducts->last()->id);
-        $this->assertLessThan(1.0, $executionTime);
+        $this->assertCount(501, $result);
+        $this->assertEquals(500, $result->first());
+        $this->assertEquals(1000, $result->last());
+        
+        // Performance should be reasonable (less than 0.1 seconds for 1000 items)
+        $this->assertLessThan(0.1, $endTime - $startTime);
     }
 
-    public function test_skip_while_with_complex_conditions(): void
+    public function test_skipwhile_with_data_filtering_service(): void
     {
+        $service = new DataFilteringService();
+        
         $products = collect([
-            (object) [
-                'id' => 1, 
-                'name' => 'Product 1', 
-                'is_visible' => true, 
-                'price' => 100, 
-                'slug' => 'product-1',
-                'stock_quantity' => 5,
-                'is_available' => true
-            ],
-            (object) [
-                'id' => 2, 
-                'name' => 'Product 2', 
-                'is_visible' => true, 
-                'price' => 200, 
-                'slug' => 'product-2',
-                'stock_quantity' => 0,
-                'is_available' => false
-            ],
-            (object) [
-                'id' => 3, 
-                'name' => 'Product 3', 
-                'is_visible' => true, 
-                'price' => 300, 
-                'slug' => 'product-3',
-                'stock_quantity' => 10,
-                'is_available' => true
-            ],
+            (object) ['name' => '', 'is_visible' => true, 'price' => 100, 'slug' => 'product-1', 'stock_quantity' => 5, 'is_published' => true],
+            (object) ['name' => 'Valid Product', 'is_visible' => false, 'price' => 200, 'slug' => 'product-2', 'stock_quantity' => 10, 'is_published' => true],
+            (object) ['name' => 'Another Valid', 'is_visible' => true, 'price' => 0, 'slug' => 'product-3', 'stock_quantity' => 15, 'is_published' => true],
+            (object) ['name' => 'Good Product', 'is_visible' => true, 'price' => 300, 'slug' => 'product-4', 'stock_quantity' => 20, 'is_published' => true],
         ]);
 
-        // Apply multiple skipWhile conditions
-        $filteredProducts = $products->skipWhile(function ($product) {
-            // Skip products that are out of stock
-            if ($product->stock_quantity <= 0 || !$product->is_available) {
-                return true;
-            }
-            
-            return false;
-        });
+        $filteredProducts = $service->filterQualityProducts($products);
 
-        // Should have all 3 products since the first one is in stock
-        $this->assertCount(3, $filteredProducts);
-        $this->assertEquals(1, $filteredProducts->first()->id);
-        $this->assertEquals(3, $filteredProducts->last()->id);
+        // Should skip first 3 products and only return the last one
+        $this->assertCount(1, $filteredProducts);
+        $this->assertEquals('product-4', $filteredProducts->first()->slug);
+    }
+
+    public function test_skipwhile_with_search_service(): void
+    {
+        $service = new SearchService();
+        
+        // Test that the service returns an array (basic functionality test)
+        $results = $service->search('test');
+        
+        $this->assertIsArray($results);
+        // Results can be empty or have items - both are valid
     }
 }

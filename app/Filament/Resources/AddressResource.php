@@ -49,10 +49,8 @@ class AddressResource extends Resource
     /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-map-pin';
 
-    public static function getNavigationGroup(): ?string
-    {
-        return NavigationGroup::Orders->label();
-    }
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Orders;
 
     protected static ?int $navigationSort = 3;
 

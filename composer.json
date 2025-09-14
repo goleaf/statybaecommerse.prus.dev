@@ -47,6 +47,7 @@
         "pestphp/pest": "^3.8",
         "pestphp/pest-plugin-laravel": "^3.2",
         "pestphp/pest-plugin-livewire": "^3.0",
+        "phpdocumentor/phpdocumentor": "^3.4",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.5.3"
     },
@@ -137,6 +138,21 @@
         ],
         "sqlite:check": [
             "@php artisan sqlite:optimize --check"
+        ],
+        "docs:generate": [
+            "php artisan docs:generate"
+        ],
+        "docs:upgrade": [
+            "php artisan docs:upgrade"
+        ],
+        "docs:serve": [
+            "php artisan docs:serve"
+        ],
+        "docs:clean": [
+            "php artisan docs:clean"
+        ],
+        "docs:full": [
+            "php artisan docs:full"
         ]
     },
     "extra": {

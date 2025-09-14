@@ -54,7 +54,7 @@ class AddressTest extends TestCase
 
     public function test_address_belongs_to_country(): void
     {
-        $country = Country::factory()->create();
+        $country = Country::factory()->create(['is_active' => true]);
         $address = Address::factory()->create(['country_id' => $country->id]);
 
         $this->assertInstanceOf(Country::class, $address->countryById);
@@ -63,7 +63,7 @@ class AddressTest extends TestCase
 
     public function test_address_belongs_to_country_by_code(): void
     {
-        $country = Country::factory()->create();
+        $country = Country::factory()->create(['is_active' => true]);
         $address = Address::factory()->create(['country_code' => $country->cca2]);
 
         $this->assertInstanceOf(Country::class, $address->country);
@@ -72,7 +72,7 @@ class AddressTest extends TestCase
 
     public function test_address_belongs_to_region(): void
     {
-        $region = Region::factory()->create();
+        $region = Region::factory()->enabled()->create();
         $address = Address::factory()->create(['region_id' => $region->id]);
 
         $this->assertInstanceOf(Region::class, $address->region);
@@ -81,7 +81,7 @@ class AddressTest extends TestCase
 
     public function test_address_belongs_to_city(): void
     {
-        $city = City::factory()->create();
+        $city = City::factory()->enabled()->create();
         $address = Address::factory()->create(['city_id' => $city->id]);
 
         $this->assertInstanceOf(City::class, $address->cityById);

@@ -185,8 +185,8 @@ final class Subscriber extends Model
         return static::active()->count();
     }
 
-    public static function getRecentSubscribers(int $days = 30): int
+    public static function getRecentSubscribers(int $days = 30): \Illuminate\Database\Eloquent\Collection
     {
-        return static::recent($days)->count();
+        return static::recent($days)->get();
     }
 }

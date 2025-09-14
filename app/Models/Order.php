@@ -132,6 +132,16 @@ class Order extends Model
         return $this->items()->one()->ofMany('total', 'max');
     }
 
+    /**
+     * Get the order's lowest value item.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function lowestValueItem(): HasOne
+    {
+        return $this->items()->one()->ofMany('total', 'min');
+    }
+
     public function shipping(): HasOne
     {
         return $this->hasOne(OrderShipping::class);

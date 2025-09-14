@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor
+    configVersion="3"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://www.phpdoc.org"
+    xsi:schemaLocation="https://www.phpdoc.org https://raw.githubusercontent.com/phpDocumentor/phpDocumentor/master/data/xsd/phpdoc.xsd"
+>
+    <title>Statyba E-commerce Documentation</title>
+    <description>
+        <![CDATA[
+        Complete API documentation for the Statyba E-commerce Laravel application.
+        This documentation covers all models, services, controllers, Filament resources,
+        Livewire components, and other PHP classes in the system.
+        ]]>
+    </description>
+
+    <paths>
+        <output>docs</output>
+        <cache>docs/cache</cache>
+    </paths>
+
+    <version number="1.0.0">
+        <folder>docs/html</folder>
+        <api>
+            <source dsn=".">
+                <path>app</path>
+            </source>
+            <output>docs/html</output>
+            <ignore>
+                <path>app/helpers.php</path>
+                <path>vendor</path>
+                <path>node_modules</path>
+                <path>storage</path>
+                <path>bootstrap/cache</path>
+                <path>tests</path>
+            </ignore>
+            <extensions>
+                <extension>php</extension>
+            </extensions>
+            <visibility>public</visibility>
+            <visibility>protected</visibility>
+            <visibility>private</visibility>
+            <default-package-name>Statyba\Ecommerce</default-package-name>
+            <include-source>true</include-source>
+        </api>
+        <guide>
+            <source dsn=".">
+                <path>docs</path>
+            </source>
+            <output>docs/html</output>
+        </guide>
+    </version>
+
+    <setting name="graphs.enabled" value="true" />
+    <setting name="graphs.format" value="svg" />
+    <setting name="ui.enabled" value="true" />
+    <setting name="ui.theme.name" value="default" />
+
+    <template name="default" />
+</phpdocumentor>

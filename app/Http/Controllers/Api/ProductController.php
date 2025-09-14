@@ -104,9 +104,7 @@ class ProductController extends Controller
                 return empty($product->name) || 
                        !$product->is_visible ||
                        $product->price <= 0 ||
-                       empty($product->slug) ||
-                       empty($product->brand) ||
-                       empty($product->category);
+                       empty($product->slug);
             });
 
         // Apply pagination manually after skipWhile filtering

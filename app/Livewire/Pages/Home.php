@@ -35,7 +35,15 @@ class Home extends Component
             ->where('published_at', '<=', now())
             ->orderBy('created_at', 'desc')
             ->limit(8)
-            ->get();
+            ->get()
+            ->skipWhile(function ($product) {
+                // Skip products that are not properly configured for homepage display
+                return empty($product->name) || 
+                       !$product->is_visible ||
+                       $product->price <= 0 ||
+                       empty($product->slug) ||
+                       !$product->getFirstMediaUrl('images');
+            });
     }
 
     #[Computed]
@@ -48,7 +56,15 @@ class Home extends Component
             ->where('published_at', '<=', now())
             ->orderBy('created_at', 'desc')
             ->limit(8)
-            ->get();
+            ->get()
+            ->skipWhile(function ($product) {
+                // Skip products that are not properly configured for homepage display
+                return empty($product->name) || 
+                       !$product->is_visible ||
+                       $product->price <= 0 ||
+                       empty($product->slug) ||
+                       !$product->getFirstMediaUrl('images');
+            });
     }
 
     #[Computed]
@@ -63,7 +79,16 @@ class Home extends Component
             ->withCount('reviews')
             ->orderBy('reviews_count', 'desc')
             ->limit(8)
-            ->get();
+            ->get()
+            ->skipWhile(function ($product) {
+                // Skip products that are not properly configured for homepage display
+                return empty($product->name) || 
+                       !$product->is_visible ||
+                       $product->price <= 0 ||
+                       empty($product->slug) ||
+                       !$product->getFirstMediaUrl('images') ||
+                       $product->reviews_count <= 0;
+            });
     }
 
     #[Computed]
@@ -81,7 +106,15 @@ class Home extends Component
             }])
             ->orderBy('id')
             ->limit(6)
-            ->get();
+            ->get()
+            ->skipWhile(function ($category) {
+                // Skip categories that are not properly configured for homepage display
+                return empty($category->name) || 
+                       !$category->is_visible ||
+                       empty($category->slug) ||
+                       $category->products_count <= 0 ||
+                       !$category->getFirstMediaUrl('images');
+            });
     }
 
     #[Computed]
@@ -99,7 +132,15 @@ class Home extends Component
             }])
             ->orderBy('sort_order')
             ->limit(8)
-            ->get();
+            ->get()
+            ->skipWhile(function ($brand) {
+                // Skip brands that are not properly configured for homepage display
+                return empty($brand->name) || 
+                       !$brand->is_enabled ||
+                       empty($brand->slug) ||
+                       $brand->products_count <= 0 ||
+                       !$brand->getFirstMediaUrl('logo');
+            });
     }
 
     #[Computed]
@@ -113,7 +154,15 @@ class Home extends Component
             })
             ->orderBy('created_at', 'desc')
             ->limit(6)
-            ->get();
+            ->get()
+            ->skipWhile(function ($review) {
+                // Skip reviews that are not properly configured for homepage display
+                return empty($review->title) || 
+                       empty($review->comment) ||
+                       !$review->is_approved ||
+                       $review->rating <= 0 ||
+                       empty($review->product);
+            });
     }
 
     #[Computed]

@@ -59,8 +59,14 @@
 <link rel="canonical" href="{{ $canonical }}">
 
 {{-- Hreflang for multi-language support --}}
-@if (config('app.supported_locales'))
-    @foreach (config('app.supported_locales') as $locale)
+@php
+    $supportedLocales = config('app.supported_locales');
+    if (is_string($supportedLocales)) {
+        $supportedLocales = array_map('trim', explode(',', $supportedLocales));
+    }
+@endphp
+@if ($supportedLocales && is_array($supportedLocales))
+    @foreach ($supportedLocales as $locale)
         @if ($locale !== $currentLocale)
             <link rel="alternate" hreflang="{{ $locale }}"
                   href="{{ route('localized.home', ['locale' => $locale]) ?? url('/?locale=' . $locale) }}">
@@ -100,5 +106,4 @@
         ]
     }
     </script>
-@endif
 @endif

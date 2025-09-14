@@ -1,6 +1,24 @@
 <?php
 
 return [
+    'navigation' => [
+        'products' => 'Products',
+        'campaigns' => 'Campaigns',
+        'orders' => 'Orders',
+        'addresses' => 'Addresses',
+        'countries' => 'Countries',
+        'categories' => 'Categories',
+        'brands' => 'Brands',
+        'news' => 'News',
+        'locations' => 'Locations',
+        'referrals' => 'Referrals',
+        'reviews' => 'Reviews',
+        'search' => 'Search',
+        'cart' => 'Cart',
+        'checkout' => 'Checkout',
+        'account' => 'Account',
+        'notifications' => 'Notifications',
+    ],
     'products' => [
         'history_title' => ':product history',
         'history_description' => 'View the change history and all modifications made to :product.',

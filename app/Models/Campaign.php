@@ -175,6 +175,16 @@ class Campaign extends Model
     }
 
     /**
+     * Get the campaign's lowest value conversion.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function lowestValueConversion(): HasOne
+    {
+        return $this->conversions()->one()->ofMany('conversion_value', 'min');
+    }
+
+    /**
      * Get the campaign's latest schedule.
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasOne

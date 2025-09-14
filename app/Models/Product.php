@@ -342,6 +342,16 @@ class Product extends Model implements HasMedia
     }
 
     /**
+     * Get the product's lowest rated review.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function lowestRatedReview(): HasOne
+    {
+        return $this->reviews()->one()->ofMany('rating', 'min');
+    }
+
+    /**
      * Get the product's latest approved review.
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasOne

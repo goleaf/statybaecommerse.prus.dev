@@ -538,6 +538,16 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreferenceC
         return $this->reviews()->one()->ofMany('rating', 'max');
     }
 
+    /**
+     * Get the user's lowest rated review.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function lowestRatedReview(): HasOne
+    {
+        return $this->reviews()->one()->ofMany('rating', 'min');
+    }
+
     // Explicit alias for clarity in code: reviews authored by this customer
     public function authoredReviews(): HasMany
     {

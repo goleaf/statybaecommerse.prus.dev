@@ -97,7 +97,10 @@ class Address extends Model
 
     public function country(): BelongsTo
     {
-        return $this->belongsTo(Country::class, 'country_code', 'cca2');
+        return $this->belongsTo(Country::class, 'country_code', 'cca2')->withDefault([
+            'name' => 'Unknown Country',
+            'cca2' => 'XX',
+        ]);
     }
 
     public function countryById(): BelongsTo
@@ -112,7 +115,9 @@ class Address extends Model
 
     public function region(): BelongsTo
     {
-        return $this->belongsTo(Region::class);
+        return $this->belongsTo(Region::class)->withDefault([
+            'name' => 'Unknown Region',
+        ]);
     }
 
     public function cityById(): BelongsTo
