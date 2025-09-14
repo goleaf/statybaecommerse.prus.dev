@@ -60,6 +60,12 @@ final class AllCitiesSeeder extends Seeder
             'Israel' => IsraelCitiesSeeder::class,
             'Thailand' => ThailandCitiesSeeder::class,
             'Vietnam' => VietnamCitiesSeeder::class,
+            'Kenya' => KenyaCitiesSeeder::class,
+            'Malaysia' => MalaysiaCitiesSeeder::class,
+            'Nigeria' => NigeriaCitiesSeeder::class,
+            'Philippines' => PhilippinesCitiesSeeder::class,
+            'Saudi Arabia' => SaudiArabiaCitiesSeeder::class,
+            'Singapore' => SingaporeCitiesSeeder::class,
         ];
 
         foreach ($seeders as $country => $seederClass) {

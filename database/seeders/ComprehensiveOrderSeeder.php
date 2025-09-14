@@ -351,8 +351,11 @@ final class ComprehensiveOrderSeeder extends Seeder
 
     private function generateOrderNumber(): string
     {
+        static $counter = 0;
+        $counter++;
+        
         do {
-            $number = 'ORD-'.date('Y').'-'.str_pad((string) fake()->numberBetween(1000, 99999), 5, '0', STR_PAD_LEFT);
+            $number = 'ORD-'.date('Y').'-'.str_pad((string) (10000 + $counter), 5, '0', STR_PAD_LEFT);
         } while (Order::where('number', $number)->exists());
 
         return $number;

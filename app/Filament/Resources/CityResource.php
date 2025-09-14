@@ -38,10 +38,6 @@ class CityResource extends Resource
     /**
      * @var BackedEnum|string|null
      */
-    /**
-     * @var UnitEnum|string|null
-     */
-    /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */
     protected static $navigationGroup = NavigationGroup::Content;
     protected static ?int $navigationSort = 3;

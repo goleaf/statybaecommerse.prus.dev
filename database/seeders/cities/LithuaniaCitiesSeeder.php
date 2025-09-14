@@ -6,7 +6,6 @@ namespace Database\Seeders\Cities;
 
 use App\Models\City;
 use App\Models\Country;
-use App\Models\Region;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
@@ -19,17 +18,7 @@ final class LithuaniaCitiesSeeder extends Seeder
         $euZone = Zone::where('code', 'EU')->first();
         $ltZone = Zone::where('code', 'LT')->first();
 
-        // Get regions
-        $vilniusRegion = Region::where('code', 'LT-VL')->first();
-        $kaunasRegion = Region::where('code', 'LT-KA')->first();
-        $klaipedaRegion = Region::where('code', 'LT-KL')->first();
-        $siauliaiRegion = Region::where('code', 'LT-SA')->first();
-        $panevezysRegion = Region::where('code', 'LT-PN')->first();
-        $alytusRegion = Region::where('code', 'LT-AL')->first();
-        $marijampoleRegion = Region::where('code', 'LT-MR')->first();
-        $taurageRegion = Region::where('code', 'LT-TA')->first();
-        $telsiaiRegion = Region::where('code', 'LT-TE')->first();
-        $utenaRegion = Region::where('code', 'LT-UT')->first();
+        // Regions are no longer used in the database schema
 
         $cities = [
             // Vilnius County
@@ -38,7 +27,6 @@ final class LithuaniaCitiesSeeder extends Seeder
                 'code' => 'LT-VL-VIL',
                 'is_capital' => true,
                 'is_default' => true,
-                'region_id' => $vilniusRegion?->id,
                 'latitude' => 54.6872,
                 'longitude' => 25.2797,
                 'population' => 588412,
@@ -51,7 +39,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Trakai',
                 'code' => 'LT-VL-TRA',
-                'region_id' => $vilniusRegion?->id,
                 'latitude' => 54.6333,
                 'longitude' => 24.9333,
                 'population' => 5406,
@@ -64,7 +51,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Elektrėnai',
                 'code' => 'LT-VL-ELE',
-                'region_id' => $vilniusRegion?->id,
                 'latitude' => 54.7833,
                 'longitude' => 24.6667,
                 'population' => 11000,
@@ -78,7 +64,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kaunas',
                 'code' => 'LT-KA-KAU',
-                'region_id' => $kaunasRegion?->id,
                 'latitude' => 54.8985,
                 'longitude' => 23.9036,
                 'population' => 304097,
@@ -91,7 +76,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Jonava',
                 'code' => 'LT-KA-JON',
-                'region_id' => $kaunasRegion?->id,
                 'latitude' => 55.0833,
                 'longitude' => 24.2833,
                 'population' => 26000,
@@ -104,7 +88,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kėdainiai',
                 'code' => 'LT-KA-KED',
-                'region_id' => $kaunasRegion?->id,
                 'latitude' => 55.2833,
                 'longitude' => 23.9833,
                 'population' => 23000,
@@ -118,7 +101,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Klaipėda',
                 'code' => 'LT-KL-KLA',
-                'region_id' => $klaipedaRegion?->id,
                 'latitude' => 55.7033,
                 'longitude' => 21.1442,
                 'population' => 152008,
@@ -131,7 +113,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Šilutė',
                 'code' => 'LT-KL-SIL',
-                'region_id' => $klaipedaRegion?->id,
                 'latitude' => 55.35,
                 'longitude' => 21.4833,
                 'population' => 17000,
@@ -145,7 +126,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Šiauliai',
                 'code' => 'LT-SA-SIA',
-                'region_id' => $siauliaiRegion?->id,
                 'latitude' => 55.9333,
                 'longitude' => 23.3167,
                 'population' => 101514,
@@ -158,7 +138,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Radviliškis',
                 'code' => 'LT-SA-RAD',
-                'region_id' => $siauliaiRegion?->id,
                 'latitude' => 55.8167,
                 'longitude' => 23.5333,
                 'population' => 16000,
@@ -172,7 +151,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Panevėžys',
                 'code' => 'LT-PN-PAN',
-                'region_id' => $panevezysRegion?->id,
                 'latitude' => 55.7333,
                 'longitude' => 24.35,
                 'population' => 87048,
@@ -186,7 +164,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Alytus',
                 'code' => 'LT-AL-ALY',
-                'region_id' => $alytusRegion?->id,
                 'latitude' => 54.4,
                 'longitude' => 24.05,
                 'population' => 52000,
@@ -200,7 +177,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Marijampolė',
                 'code' => 'LT-MR-MAR',
-                'region_id' => $marijampoleRegion?->id,
                 'latitude' => 54.5667,
                 'longitude' => 23.35,
                 'population' => 35000,
@@ -214,7 +190,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Tauragė',
                 'code' => 'LT-TA-TAU',
-                'region_id' => $taurageRegion?->id,
                 'latitude' => 55.25,
                 'longitude' => 22.2833,
                 'population' => 22000,
@@ -228,7 +203,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Telšiai',
                 'code' => 'LT-TE-TEL',
-                'region_id' => $telsiaiRegion?->id,
                 'latitude' => 55.9833,
                 'longitude' => 22.25,
                 'population' => 22000,
@@ -242,7 +216,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Utena',
                 'code' => 'LT-UT-UTE',
-                'region_id' => $utenaRegion?->id,
                 'latitude' => 55.5,
                 'longitude' => 25.6,
                 'population' => 25000,
@@ -255,7 +228,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Visaginas',
                 'code' => 'LT-UT-VIS',
-                'region_id' => $utenaRegion?->id,
                 'latitude' => 55.6,
                 'longitude' => 26.4167,
                 'population' => 19000,
@@ -268,7 +240,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Anykščiai',
                 'code' => 'LT-UT-ANY',
-                'region_id' => $utenaRegion?->id,
                 'latitude' => 55.5333,
                 'longitude' => 25.1,
                 'population' => 9000,
@@ -281,7 +252,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Ignalina',
                 'code' => 'LT-UT-IGN',
-                'region_id' => $utenaRegion?->id,
                 'latitude' => 55.35,
                 'longitude' => 26.1667,
                 'population' => 6000,
@@ -294,7 +264,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Zarasai',
                 'code' => 'LT-UT-ZAR',
-                'region_id' => $utenaRegion?->id,
                 'latitude' => 55.7333,
                 'longitude' => 26.25,
                 'population' => 7000,
@@ -307,7 +276,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Molėtai',
                 'code' => 'LT-UT-MOL',
-                'region_id' => $utenaRegion?->id,
                 'latitude' => 55.2333,
                 'longitude' => 25.4167,
                 'population' => 6000,
@@ -321,7 +289,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Ukmergė',
                 'code' => 'LT-VL-UKM',
-                'region_id' => $vilniusRegion?->id,
                 'latitude' => 55.25,
                 'longitude' => 24.75,
                 'population' => 22000,
@@ -334,7 +301,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Šalčininkai',
                 'code' => 'LT-VL-SAL',
-                'region_id' => $vilniusRegion?->id,
                 'latitude' => 54.3167,
                 'longitude' => 25.3833,
                 'population' => 6000,
@@ -347,7 +313,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Švenčionys',
                 'code' => 'LT-VL-SVE',
-                'region_id' => $vilniusRegion?->id,
                 'latitude' => 55.1333,
                 'longitude' => 26.1667,
                 'population' => 5000,
@@ -360,7 +325,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Vievis',
                 'code' => 'LT-VL-VIE',
-                'region_id' => $vilniusRegion?->id,
                 'latitude' => 54.7667,
                 'longitude' => 24.8,
                 'population' => 4000,
@@ -373,7 +337,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Nemenčinė',
                 'code' => 'LT-VL-NEM',
-                'region_id' => $vilniusRegion?->id,
                 'latitude' => 54.85,
                 'longitude' => 25.4833,
                 'population' => 5000,
@@ -387,7 +350,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Raseiniai',
                 'code' => 'LT-KA-RAS',
-                'region_id' => $kaunasRegion?->id,
                 'latitude' => 55.3667,
                 'longitude' => 23.1167,
                 'population' => 11000,
@@ -400,7 +362,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Prienai',
                 'code' => 'LT-KA-PRI',
-                'region_id' => $kaunasRegion?->id,
                 'latitude' => 54.6333,
                 'longitude' => 23.95,
                 'population' => 9000,
@@ -413,7 +374,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Birštonas',
                 'code' => 'LT-KA-BIR',
-                'region_id' => $kaunasRegion?->id,
                 'latitude' => 54.6167,
                 'longitude' => 24.0333,
                 'population' => 2500,
@@ -426,7 +386,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Jurbarkas',
                 'code' => 'LT-KA-JUR',
-                'region_id' => $kaunasRegion?->id,
                 'latitude' => 55.0833,
                 'longitude' => 22.7667,
                 'population' => 10000,
@@ -439,7 +398,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kaišiadorys',
                 'code' => 'LT-KA-KAI',
-                'region_id' => $kaunasRegion?->id,
                 'latitude' => 54.8667,
                 'longitude' => 24.45,
                 'population' => 8000,
@@ -453,7 +411,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Neringa',
                 'code' => 'LT-KL-NER',
-                'region_id' => $klaipedaRegion?->id,
                 'latitude' => 55.3667,
                 'longitude' => 21.0667,
                 'population' => 3500,
@@ -466,7 +423,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kretinga',
                 'code' => 'LT-KL-KRE',
-                'region_id' => $klaipedaRegion?->id,
                 'latitude' => 55.9,
                 'longitude' => 21.2333,
                 'population' => 18000,
@@ -479,7 +435,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Plungė',
                 'code' => 'LT-KL-PLU',
-                'region_id' => $klaipedaRegion?->id,
                 'latitude' => 55.9167,
                 'longitude' => 21.85,
                 'population' => 17000,
@@ -492,7 +447,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Skuodas',
                 'code' => 'LT-KL-SKU',
-                'region_id' => $klaipedaRegion?->id,
                 'latitude' => 56.2667,
                 'longitude' => 21.5333,
                 'population' => 6000,
@@ -506,7 +460,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Joniškis',
                 'code' => 'LT-SA-JON',
-                'region_id' => $siauliaiRegion?->id,
                 'latitude' => 56.2333,
                 'longitude' => 23.6167,
                 'population' => 9000,
@@ -519,7 +472,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kelmė',
                 'code' => 'LT-SA-KEL',
-                'region_id' => $siauliaiRegion?->id,
                 'latitude' => 55.6333,
                 'longitude' => 22.9333,
                 'population' => 8000,
@@ -532,7 +484,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Pakruojis',
                 'code' => 'LT-SA-PAK',
-                'region_id' => $siauliaiRegion?->id,
                 'latitude' => 56.0667,
                 'longitude' => 23.8667,
                 'population' => 5000,
@@ -546,7 +497,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Biržai',
                 'code' => 'LT-PN-BIR',
-                'region_id' => $panevezysRegion?->id,
                 'latitude' => 56.2,
                 'longitude' => 24.75,
                 'population' => 12000,
@@ -559,7 +509,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kupiškis',
                 'code' => 'LT-PN-KUP',
-                'region_id' => $panevezysRegion?->id,
                 'latitude' => 55.8333,
                 'longitude' => 24.9667,
                 'population' => 6000,
@@ -572,7 +521,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Pasvalys',
                 'code' => 'LT-PN-PAS',
-                'region_id' => $panevezysRegion?->id,
                 'latitude' => 56.0667,
                 'longitude' => 24.4,
                 'population' => 7000,
@@ -585,7 +533,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Rokiškis',
                 'code' => 'LT-PN-ROK',
-                'region_id' => $panevezysRegion?->id,
                 'latitude' => 55.9667,
                 'longitude' => 25.5833,
                 'population' => 14000,
@@ -599,7 +546,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Druskininkai',
                 'code' => 'LT-AL-DRU',
-                'region_id' => $alytusRegion?->id,
                 'latitude' => 54.0167,
                 'longitude' => 23.9667,
                 'population' => 13000,
@@ -612,7 +558,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Lazdijai',
                 'code' => 'LT-AL-LAZ',
-                'region_id' => $alytusRegion?->id,
                 'latitude' => 54.2333,
                 'longitude' => 23.5167,
                 'population' => 4000,
@@ -625,7 +570,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Varėna',
                 'code' => 'LT-AL-VAR',
-                'region_id' => $alytusRegion?->id,
                 'latitude' => 54.2167,
                 'longitude' => 24.5667,
                 'population' => 9000,
@@ -639,7 +583,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kalvarija',
                 'code' => 'LT-MR-KAL',
-                'region_id' => $marijampoleRegion?->id,
                 'latitude' => 54.4167,
                 'longitude' => 23.2333,
                 'population' => 4000,
@@ -652,7 +595,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Kazlų Rūda',
                 'code' => 'LT-MR-KAZ',
-                'region_id' => $marijampoleRegion?->id,
                 'latitude' => 54.75,
                 'longitude' => 23.4833,
                 'population' => 6000,
@@ -665,7 +607,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Vilkaviškis',
                 'code' => 'LT-MR-VIL',
-                'region_id' => $marijampoleRegion?->id,
                 'latitude' => 54.65,
                 'longitude' => 23.0333,
                 'population' => 10000,
@@ -679,7 +620,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Jurbarkas',
                 'code' => 'LT-TA-JUR',
-                'region_id' => $taurageRegion?->id,
                 'latitude' => 55.0833,
                 'longitude' => 22.7667,
                 'population' => 10000,
@@ -692,7 +632,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Pagėgiai',
                 'code' => 'LT-TA-PAG',
-                'region_id' => $taurageRegion?->id,
                 'latitude' => 55.1333,
                 'longitude' => 21.9167,
                 'population' => 2000,
@@ -705,7 +644,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Šilalė',
                 'code' => 'LT-TA-SIL',
-                'region_id' => $taurageRegion?->id,
                 'latitude' => 55.4833,
                 'longitude' => 22.1833,
                 'population' => 5000,
@@ -719,7 +657,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Mažeikiai',
                 'code' => 'LT-TE-MAZ',
-                'region_id' => $telsiaiRegion?->id,
                 'latitude' => 56.3167,
                 'longitude' => 22.3333,
                 'population' => 35000,
@@ -732,7 +669,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Plungė',
                 'code' => 'LT-TE-PLU',
-                'region_id' => $telsiaiRegion?->id,
                 'latitude' => 55.9167,
                 'longitude' => 21.85,
                 'population' => 17000,
@@ -745,7 +681,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Rietavas',
                 'code' => 'LT-TE-RIE',
-                'region_id' => $telsiaiRegion?->id,
                 'latitude' => 55.7167,
                 'longitude' => 21.9333,
                 'population' => 3000,
@@ -758,7 +693,6 @@ final class LithuaniaCitiesSeeder extends Seeder
             [
                 'name' => 'Skuodas',
                 'code' => 'LT-TE-SKU',
-                'region_id' => $telsiaiRegion?->id,
                 'latitude' => 56.2667,
                 'longitude' => 21.5333,
                 'population' => 6000,
@@ -781,7 +715,6 @@ final class LithuaniaCitiesSeeder extends Seeder
                     'is_capital' => $cityData['is_capital'] ?? false,
                     'country_id' => $lithuania->id,
                     'zone_id' => $ltZone?->id ?? $euZone?->id,
-                    'region_id' => $cityData['region_id'],
                     'level' => 1,
                     'latitude' => $cityData['latitude'],
                     'longitude' => $cityData['longitude'],
