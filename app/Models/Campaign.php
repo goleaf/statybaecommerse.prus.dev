@@ -165,6 +165,16 @@ class Campaign extends Model
     }
 
     /**
+     * Get the campaign's highest value conversion.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function highestValueConversion(): HasOne
+    {
+        return $this->conversions()->one()->ofMany('conversion_value', 'max');
+    }
+
+    /**
      * Get the campaign's latest schedule.
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasOne

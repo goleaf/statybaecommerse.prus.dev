@@ -98,9 +98,32 @@ class ProductController extends Controller
             });
         }
 
-        $products = $query->orderBy($sortBy, $sortOrder)->paginate($perPage);
+        $products = $query->orderBy($sortBy, $sortOrder)->get()
+            ->skipWhile(function (Product $product) {
+                // Skip products that are not properly configured for catalog display
+                return empty($product->name) || 
+                       !$product->is_visible ||
+                       $product->price <= 0 ||
+                       empty($product->slug) ||
+                       empty($product->brand) ||
+                       empty($product->category);
+            });
 
-        return $this->handleProductContentNegotiation($request, $products);
+        // Apply pagination manually after skipWhile filtering
+        $total = $products->count();
+        $currentPage = (int) $request->get('page', 1);
+        $offset = ($currentPage - 1) * $perPage;
+        $paginatedProducts = $products->slice($offset, $perPage);
+
+        $paginatedData = new \Illuminate\Pagination\LengthAwarePaginator(
+            $paginatedProducts,
+            $total,
+            $perPage,
+            $currentPage,
+            ['path' => $request->url(), 'pageName' => 'page']
+        );
+
+        return $this->handleProductContentNegotiation($request, $paginatedData);
     }
 
     public function show(Request $request, Product $product): JsonResponse|View|Response

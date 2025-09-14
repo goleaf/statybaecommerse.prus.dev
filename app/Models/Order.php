@@ -152,6 +152,16 @@ class Order extends Model
         return $this->discountRedemptions()->one()->latestOfMany();
     }
 
+    /**
+     * Get the order's highest value discount redemption.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function highestValueDiscountRedemption(): HasOne
+    {
+        return $this->discountRedemptions()->one()->ofMany('discount_amount', 'max');
+    }
+
     public function zone(): BelongsTo
     {
         return $this->belongsTo(Zone::class);

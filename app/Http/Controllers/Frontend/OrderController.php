@@ -90,7 +90,15 @@ class OrderController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $products = Product::with('variants')->where('is_visible', true)->get();
+        $products = Product::with('variants')->where('is_visible', true)->get()
+            ->skipWhile(function (Product $product) {
+                // Skip products that are not properly configured for order creation
+                return empty($product->name) || 
+                       !$product->is_visible ||
+                       $product->price <= 0 ||
+                       empty($product->slug) ||
+                       $product->stock_quantity <= 0;
+            });
 
         return view('orders.create', compact('products'));
     }

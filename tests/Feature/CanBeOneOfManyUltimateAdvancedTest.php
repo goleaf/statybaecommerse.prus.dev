@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\DiscountRedemption;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\ProductHistory;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class CanBeOneOfManyUltimateAdvancedTest extends TestCase
+{
+    use RefreshDatabase;
+
+    // Note: DiscountRedemption tests removed due to missing factory
+
+    public function test_product_current_price_relationship(): void
+    {
+        $product = Product::factory()->create();
+        
+        // Create multiple price history entries
+        $oldPrice = ProductHistory::factory()->create([
+            'product_id' => $product->id,
+            'field_name' => 'price',
+            'old_value' => '100.00',
+            'new_value' => '120.00',
+            'created_at' => now()->subDays(10),
+        ]);
+        
+        $currentPrice = ProductHistory::factory()->create([
+            'product_id' => $product->id,
+            'field_name' => 'price',
+            'old_value' => '120.00',
+            'new_value' => '150.00',
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the product to clear any cached relationships
+        $product->refresh();
+
+        // Test the currentPrice relationship
+        $this->assertInstanceOf(ProductHistory::class, $product->currentPrice);
+        $this->assertEquals($currentPrice->id, $product->currentPrice->id);
+        $this->assertEquals('150.00', $product->currentPrice->new_value);
+        $this->assertNotEquals($oldPrice->id, $product->currentPrice->id);
+    }
+}

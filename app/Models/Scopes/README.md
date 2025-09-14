@@ -61,6 +61,10 @@ Automatically filters records where `is_active = true`, `is_enabled = true`, or 
 - Legal
 - Location
 - OrderShipping
+- NotificationTemplate
+- Setting
+- SystemSetting
+- SystemSettingCategory
 
 ### PublishedScope
 Automatically filters records where `published_at` is not null and is in the past.

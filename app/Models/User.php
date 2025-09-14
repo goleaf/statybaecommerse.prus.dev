@@ -565,6 +565,16 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreferenceC
     }
 
     /**
+     * Get the user's highest value discount redemption.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function highestValueDiscountRedemption(): HasOne
+    {
+        return $this->discountRedemptions()->one()->ofMany('discount_amount', 'max');
+    }
+
+    /**
      * Get the user's latest address.
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasOne

@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -163,6 +164,65 @@ class Home extends Component
         $this->notifySuccess(__('Product added to cart'));
     }
 
+    #[Computed(persist: true, seconds: 300)]
+    public function liveAnalytics(): array
+    {
+        return Cache::remember('home_live_analytics', 300, function () {
+            return [
+                'online_users' => rand(50, 200), // Mock data - replace with real analytics
+                'page_views_today' => rand(1000, 5000),
+                'conversion_rate' => rand(2, 8),
+                'avg_session_duration' => rand(120, 600),
+                'bounce_rate' => rand(30, 70),
+                'top_products' => Product::where('is_visible', true)
+                    ->whereHas('reviews')
+                    ->withCount('reviews')
+                    ->orderBy('reviews_count', 'desc')
+                    ->limit(5)
+                    ->get()
+                    ->map(fn($product) => [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'views' => rand(100, 1000),
+                        'conversions' => rand(5, 50),
+                    ]),
+            ];
+        });
+    }
+
+    #[Computed(persist: true, seconds: 180)]
+    public function realTimeActivity(): array
+    {
+        return Cache::remember('home_real_time_activity', 180, function () {
+            return [
+                'recent_orders' => \App\Models\Order::with(['user'])
+                    ->where('created_at', '>=', now()->subHours(24))
+                    ->orderBy('created_at', 'desc')
+                    ->limit(5)
+                    ->get()
+                    ->map(fn($order) => [
+                        'id' => $order->id,
+                        'user_name' => $order->user?->name ?? 'Guest',
+                        'total' => $order->total_amount,
+                        'created_at' => $order->created_at->diffForHumans(),
+                    ]),
+                'recent_reviews' => Review::with(['product', 'user'])
+                    ->where('is_approved', true)
+                    ->where('created_at', '>=', now()->subHours(24))
+                    ->orderBy('created_at', 'desc')
+                    ->limit(5)
+                    ->get()
+                    ->map(fn($review) => [
+                        'id' => $review->id,
+                        'product_name' => $review->product?->name ?? 'Unknown',
+                        'user_name' => $review->user?->name ?? 'Anonymous',
+                        'rating' => $review->rating,
+                        'created_at' => $review->created_at->diffForHumans(),
+                    ]),
+            ];
+        });
+    }
+
     public function render()
     {
         return view('livewire.pages.home', [
@@ -173,6 +233,8 @@ class Home extends Component
             'featuredBrands' => $this->featuredBrands,
             'latestReviews' => $this->latestReviews,
             'stats' => $this->stats,
+            'liveAnalytics' => $this->liveAnalytics,
+            'realTimeActivity' => $this->realTimeActivity,
         ])->layout('components.layouts.base', [
             'title' => __('Home').' - '.config('app.name'),
         ]);

@@ -7,6 +7,8 @@ use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web'])->group(function () {
+    // Live Demo Route
+    Route::get('/live-demo', App\Livewire\Pages\LiveDemo::class)->name('live-demo');
     // Campaign Frontend Routes
 Route::prefix('campaigns')->name('frontend.campaigns.')->group(function () {
     Route::get('/', [App\Http\Controllers\Frontend\CampaignController::class, 'index'])->name('index');

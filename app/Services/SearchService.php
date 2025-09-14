@@ -80,6 +80,13 @@ class SearchService
             ", ["%{$query}%", "%{$query}%", "%{$query}%"])
             ->cursor()
             ->takeUntilTimeout($timeout)
+            ->skipWhile(function (Product $product) {
+                // Skip products that are not properly configured for search results
+                return empty($product->name) || 
+                       !$product->is_visible ||
+                       $product->price <= 0 ||
+                       empty($product->slug);
+            })
             ->take($limit)
             ->map(function (Product $product) use ($query) {
                 return [
@@ -127,6 +134,13 @@ class SearchService
             ->having('products_count', '>', 0)
             ->limit($limit)
             ->get()
+            ->skipWhile(function (Category $category) {
+                // Skip categories that are not properly configured for search results
+                return empty($category->name) || 
+                       !$category->is_visible ||
+                       empty($category->slug) ||
+                       $category->products_count <= 0;
+            })
             ->map(function (Category $category) use ($query) {
                 return [
                     'id' => $category->id,
@@ -171,6 +185,13 @@ class SearchService
             ->having('products_count', '>', 0)
             ->limit($limit)
             ->get()
+            ->skipWhile(function (Brand $brand) {
+                // Skip brands that are not properly configured for search results
+                return empty($brand->name) || 
+                       !$brand->is_enabled ||
+                       empty($brand->slug) ||
+                       $brand->products_count <= 0;
+            })
             ->map(function (Brand $brand) use ($query) {
                 return [
                     'id' => $brand->id,

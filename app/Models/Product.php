@@ -492,6 +492,22 @@ class Product extends Model implements HasMedia
         });
     }
 
+    /**
+     * Get the product's current active price.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function currentPrice(): HasOne
+    {
+        return $this->histories()->one()->ofMany([
+            'created_at' => 'max',
+            'id' => 'max',
+        ], function ($query) {
+            $query->where('field_name', 'price')
+                  ->where('created_at', '<=', now());
+        });
+    }
+
     public function recentHistories(): HasMany
     {
         return $this->hasMany(ProductHistory::class)->recent(30);
