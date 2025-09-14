@@ -34,6 +34,7 @@ class SystemSettingsResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 1;

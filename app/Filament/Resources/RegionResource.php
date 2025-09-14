@@ -39,6 +39,7 @@ class RegionResource extends Resource
     }
 
     /** @var UnitEnum|string|null */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'Content';
 
     public static function getModelLabel(): string

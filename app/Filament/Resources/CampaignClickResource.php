@@ -59,6 +59,7 @@ class CampaignClickResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'Campaigns';
 
     protected static ?int $navigationSort = 3;

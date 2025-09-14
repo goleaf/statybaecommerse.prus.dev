@@ -8,7 +8,7 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,16 +16,17 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\BulkAction;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\Toggle;
+use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
+
+
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 final class CompanyResource extends Resource
 {
@@ -34,13 +35,14 @@ final class CompanyResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
     /** @var UnitEnum|string|null */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = NavigationGroup::Marketing;
 
     protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $form
             ->schema([

@@ -37,6 +37,7 @@ class CartItemResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'admin.navigation.sales';
 
     protected static ?string $recordTitleAttribute = 'id';

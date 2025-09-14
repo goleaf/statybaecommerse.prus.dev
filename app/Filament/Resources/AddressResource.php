@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\AddressType;
 use BackedEnum;
+use UnitEnum;
 use App\Filament\Resources\AddressResource\Pages;
 use App\Filament\Resources\AddressResource\RelationManagers;
 use App\Models\Address;
@@ -49,6 +50,7 @@ class AddressResource extends Resource
     /** @var BackedEnum|string|null */
     protected static $navigationIcon = 'heroicon-o-map-pin';
 
+    /** @var UnitEnum|string|null */
     /** @var UnitEnum|string|null */
     protected static $navigationGroup = NavigationGroup::Orders;
 

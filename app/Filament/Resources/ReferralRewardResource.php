@@ -35,6 +35,7 @@ class ReferralRewardResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = NavigationGroup::Referral;
 
     protected static ?string $navigationLabel = 'referrals.navigation.rewards';

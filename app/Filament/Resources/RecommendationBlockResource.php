@@ -41,6 +41,7 @@ final class RecommendationBlockResource extends Resource
     protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var UnitEnum|string|null */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'Recommendation System';
 
     protected static ?int $navigationSort = 2;

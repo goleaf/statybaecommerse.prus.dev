@@ -55,6 +55,7 @@ class LocationResource extends Resource
     }
 
     /** @var UnitEnum|string|null */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'E-commerce';
 
     public static function getModelLabel(): string

@@ -59,7 +59,8 @@ class ReportResource extends Resource
     // /**
     //  * @var UnitEnum|string|null
     //  */
-    // protected static $navigationGroup = NavigationGroup::Reports;
+    // /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Reports;
 
     protected static ?int $navigationSort = 1;
 

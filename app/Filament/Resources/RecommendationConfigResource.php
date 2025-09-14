@@ -36,7 +36,8 @@ final class RecommendationConfigResource extends Resource
     protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     // /** @var UnitEnum|string|null */
-    // protected static $navigationGroup = 'Recommendation System';
+    // /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Recommendation System';
 
     protected static ?int $navigationSort = 1;
 

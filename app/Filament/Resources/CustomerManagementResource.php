@@ -58,6 +58,7 @@ class CustomerManagementResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'Customer Management';
 
     protected static ?int $navigationSort = 2;

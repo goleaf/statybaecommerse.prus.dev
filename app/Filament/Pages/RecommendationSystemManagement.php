@@ -9,7 +9,7 @@ use App\Models\RecommendationBlock;
 use App\Models\RecommendationConfig;
 use App\Services\RecommendationService;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;

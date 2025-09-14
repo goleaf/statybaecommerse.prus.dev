@@ -29,6 +29,7 @@ class DiscountConditionResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'Discounts';
 
     protected static ?int $navigationSort = 2;

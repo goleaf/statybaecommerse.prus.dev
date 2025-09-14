@@ -51,6 +51,7 @@ class PriceListItemResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'Pricing';
 
     protected static ?int $navigationSort = 3;
