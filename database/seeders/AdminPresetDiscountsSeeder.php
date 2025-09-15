@@ -138,8 +138,8 @@ class AdminPresetDiscountsSeeder extends Seeder
     {
         // Shopper core requires a unique code; prefer provided code or derive from name
         $code = $data['code'] ?? Str::upper(Str::slug($data['name'] ?? Str::random(6)));
-        $existing = DB::table('sh_discounts')->where('code', $code)->first();
-        $columns = $this->getColumns('sh_discounts');
+        $existing = DB::table('discounts')->where('code', $code)->first();
+        $columns = $this->getColumns('discounts');
         $base = [
             'code' => $code,
             'type' => $data['type'] ?? 'percentage',
@@ -170,14 +170,14 @@ class AdminPresetDiscountsSeeder extends Seeder
             $base['status'] = 'active';
         }
         if ($existing) {
-            DB::table('sh_discounts')->where('id', $existing->id)->update(array_merge($base, [
+            DB::table('discounts')->where('id', $existing->id)->update(array_merge($base, [
                 'updated_at' => now(),
             ]));
 
             return (int) $existing->id;
         }
 
-        return (int) DB::table('sh_discounts')->insertGetId(array_merge($base, [
+        return (int) DB::table('discounts')->insertGetId(array_merge($base, [
             'created_at' => now(),
             'updated_at' => now(),
         ]));

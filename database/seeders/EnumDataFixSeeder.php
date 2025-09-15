@@ -20,7 +20,7 @@ class EnumDataFixSeeder extends Seeder
 
     protected function fixDiscountEnums(): void
     {
-        if (! DB::getSchemaBuilder()->hasTable('sh_discounts')) {
+        if (! DB::getSchemaBuilder()->hasTable('discounts')) {
             return;
         }
 
@@ -47,7 +47,7 @@ class EnumDataFixSeeder extends Seeder
             'customer' => 'customers',
         ];
 
-        $rows = DB::table('sh_discounts')->select('id', 'type', 'apply_to', 'eligibility')->get();
+        $rows = DB::table('discounts')->select('id', 'type', 'apply_to', 'eligibility')->get();
         foreach ($rows as $row) {
             $updates = [];
             // type
@@ -82,7 +82,7 @@ class EnumDataFixSeeder extends Seeder
             }
 
             if (! empty($updates)) {
-                DB::table('sh_discounts')->where('id', $row->id)->update($updates);
+                DB::table('discounts')->where('id', $row->id)->update($updates);
             }
         }
     }

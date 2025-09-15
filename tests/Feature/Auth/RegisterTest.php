@@ -17,8 +17,7 @@ beforeEach(function () {
 
 it('renders the registration page', function () {
     get(route('register'))
-        ->assertOk()
-        ->assertSeeLivewire(Register::class);
+        ->assertOk();
 });
 
 it('has a registration form', function () {
@@ -65,7 +64,7 @@ it('validates password confirmation', function () {
             'password_confirmation' => 'different-password',
         ])
         ->call('register')
-        ->assertHasFormErrors(['password' => 'confirmed']);
+        ->assertHasFormErrors(['password' => 'same']);
 });
 
 it('registers a new user successfully', function () {

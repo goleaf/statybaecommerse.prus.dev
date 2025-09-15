@@ -259,7 +259,7 @@ final class AnalyticsEventTest extends TestCase
     {
         AnalyticsEvent::factory()->create(['created_at' => now()]);
         AnalyticsEvent::factory()->create(['created_at' => now()->subWeek()]);
-        AnalyticsEvent::factory()->create(['created_at' => now()->subDays(3)]);
+        AnalyticsEvent::factory()->create(['created_at' => now()->startOfWeek()->addDay()]);
 
         $events = AnalyticsEvent::withoutGlobalScopes()->thisWeek()->get();
 

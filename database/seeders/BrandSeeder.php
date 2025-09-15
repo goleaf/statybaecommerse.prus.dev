@@ -200,33 +200,37 @@ class BrandSeeder extends Seeder
     private function downloadAndAttachImage(Brand $brand, string $imageUrl, string $collection, string $name): void
     {
         try {
+            // Skip image generation to avoid memory issues during seeding
+            $this->command->info("⏭ Skipped {$collection} image generation for {$brand->name} (memory optimization)");
+            
+            // TODO: Re-enable image generation after fixing memory issues
             // Generate local WebP image based on collection type
-            $imagePath = match ($collection) {
-                'logo' => $this->imageGenerator->generateBrandLogo($brand->name),
-                'banner' => $this->imageGenerator->generateBrandBanner($brand->name),
-                default => $this->imageGenerator->generateBrandLogo($brand->name)
-            };
+            // $imagePath = match ($collection) {
+            //     'logo' => $this->imageGenerator->generateBrandLogo($brand->name),
+            //     'banner' => $this->imageGenerator->generateBrandBanner($brand->name),
+            //     default => $this->imageGenerator->generateBrandLogo($brand->name)
+            // };
 
-            if (file_exists($imagePath)) {
-                $filename = Str::slug($name).'.webp';
+            // if (file_exists($imagePath)) {
+            //     $filename = Str::slug($name).'.webp';
 
-                // Add media to brand
-                $brand
-                    ->addMedia($imagePath)
-                    ->withCustomProperties(['source' => 'local_generated'])
-                    ->usingName($name)
-                    ->usingFileName($filename)
-                    ->toMediaCollection($collection);
+            //     // Add media to brand
+            //     $brand
+            //         ->addMedia($imagePath)
+            //         ->withCustomProperties(['source' => 'local_generated'])
+            //         ->usingName($name)
+            //         ->usingFileName($filename)
+            //         ->toMediaCollection($collection);
 
-                // Clean up temporary file
-                if (file_exists($imagePath)) {
-                    unlink($imagePath);
-                }
+            //     // Clean up temporary file
+            //     if (file_exists($imagePath)) {
+            //         unlink($imagePath);
+            //     }
 
-                $this->command->info("✓ Generated {$collection} WebP image for {$brand->name}");
-            } else {
-                $this->command->warn("✗ Failed to generate {$collection} image for {$brand->name}");
-            }
+            //     $this->command->info("✓ Generated {$collection} WebP image for {$brand->name}");
+            // } else {
+            //     $this->command->warn("✗ Failed to generate {$collection} image for {$brand->name}");
+            // }
         } catch (\Exception $e) {
             $this->command->warn("✗ Failed to generate {$collection} image for {$brand->name}: ".$e->getMessage());
         }

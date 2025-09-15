@@ -11,14 +11,14 @@ class DiscountCodeSeeder extends Seeder
     public function run(): void
     {
         // For each existing discount, generate a small batch of codes
-        $columns = DB::getSchemaBuilder()->getColumnListing('sh_discounts');
+        $columns = DB::getSchemaBuilder()->getColumnListing('discounts');
         $select = ['id'];
         if (in_array('name', $columns, true)) {
             $select[] = 'name';
         } elseif (in_array('code', $columns, true)) {
             $select[] = 'code as name';
         }
-        $discounts = DB::table('sh_discounts')->get($select);
+        $discounts = DB::table('discounts')->get($select);
         foreach ($discounts as $discount) {
             // Generate 20 codes per discount, if not already present
             for ($i = 0; $i < 20; $i++) {

@@ -38,7 +38,58 @@ final class Register extends Component implements HasSchemas
      */
     public function form(Schema $schema): Schema
     {
-        return $schema->components([TextInput::make('form.last_name')->label(__('Lastname'))->required()->maxLength(255)->autocomplete('family-name')->autofocus(), TextInput::make('form.first_name')->label(__('Firstname'))->required()->maxLength(255)->autocomplete('given-name'), TextInput::make('form.email')->label(__('E-mail Address'))->email()->required()->maxLength(255)->unique('users', 'email')->autocomplete('email'), TextInput::make('form.password')->label(__('Password'))->password()->required()->autocomplete('new-password')->revealable(), TextInput::make('form.password_confirmation')->label(__('Confirm Password'))->password()->required()->same('form.password')->autocomplete('new-password')->revealable()])->statePath('form');
+        return $schema->components([
+            TextInput::make('first_name')
+                ->label(__('Firstname'))
+                ->required()
+                ->maxLength(255)
+                ->autocomplete('given-name')
+                ->autofocus()
+                ->extraInputAttributes(['class' => 'rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200'])
+                ->prefixIcon('heroicon-o-user')
+                ->placeholder(__('Enter your first name')),
+            
+            TextInput::make('last_name')
+                ->label(__('Lastname'))
+                ->required()
+                ->maxLength(255)
+                ->autocomplete('family-name')
+                ->extraInputAttributes(['class' => 'rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200'])
+                ->prefixIcon('heroicon-o-user')
+                ->placeholder(__('Enter your last name')),
+            
+            TextInput::make('email')
+                ->label(__('E-mail Address'))
+                ->email()
+                ->required()
+                ->maxLength(255)
+                ->unique('users', 'email')
+                ->autocomplete('email')
+                ->extraInputAttributes(['class' => 'rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200'])
+                ->prefixIcon('heroicon-o-envelope')
+                ->placeholder(__('Enter your email address')),
+            
+            TextInput::make('password')
+                ->label(__('Password'))
+                ->password()
+                ->required()
+                ->autocomplete('new-password')
+                ->revealable()
+                ->extraInputAttributes(['class' => 'rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200'])
+                ->prefixIcon('heroicon-o-lock-closed')
+                ->placeholder(__('Create a strong password')),
+            
+            TextInput::make('password_confirmation')
+                ->label(__('Confirm Password'))
+                ->password()
+                ->required()
+                ->same('password')
+                ->autocomplete('new-password')
+                ->revealable()
+                ->extraInputAttributes(['class' => 'rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200'])
+                ->prefixIcon('heroicon-o-lock-closed')
+                ->placeholder(__('Confirm your password'))
+        ])->statePath('form');
     }
     /**
      * Handle register functionality with proper error handling.
