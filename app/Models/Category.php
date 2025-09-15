@@ -201,6 +201,127 @@ final class Category extends Model implements HasMedia
         }
         return $breadcrumb;
     }
+
+    /**
+     * Handle getCanonicalUrlAttribute functionality with proper error handling.
+     * @return string
+     */
+    public function getCanonicalUrlAttribute(): string
+    {
+        return route('categories.show', $this->slug);
+    }
+
+    /**
+     * Handle getMetaTagsAttribute functionality with proper error handling.
+     * @return array
+     */
+    public function getMetaTagsAttribute(): array
+    {
+        return [
+            'title' => $this->seo_title ?? $this->name,
+            'description' => $this->seo_description ?? $this->description,
+            'keywords' => $this->seo_keywords ?? [],
+            'canonical' => $this->canonical_url,
+        ];
+    }
+
+    /**
+     * Handle getTotalRevenueAttribute functionality with proper error handling.
+     * @return float
+     */
+    public function getTotalRevenueAttribute(): float
+    {
+        return $this->products()->sum('price') ?? 0.0;
+    }
+
+    /**
+     * Handle getAverageProductPriceAttribute functionality with proper error handling.
+     * @return float
+     */
+    public function getAverageProductPriceAttribute(): float
+    {
+        $productCount = $this->products()->count();
+        return $productCount > 0 ? $this->total_revenue / $productCount : 0.0;
+    }
+
+    /**
+     * Handle getIsRootAttribute functionality with proper error handling.
+     * @return bool
+     */
+    public function getIsRootAttribute(): bool
+    {
+        return $this->parent_id === null;
+    }
+
+    /**
+     * Handle getIsLeafAttribute functionality with proper error handling.
+     * @return bool
+     */
+    public function getIsLeafAttribute(): bool
+    {
+        return $this->children()->count() === 0;
+    }
+
+    /**
+     * Handle getDepthAttribute functionality with proper error handling.
+     * @return int
+     */
+    public function getDepthAttribute(): int
+    {
+        $depth = 0;
+        $category = $this;
+        while ($category->parent) {
+            $depth++;
+            $category = $category->parent;
+        }
+        return $depth;
+    }
+
+    /**
+     * Handle getLevelAttribute functionality with proper error handling.
+     * @return int
+     */
+    public function getLevelAttribute(): int
+    {
+        return $this->depth + 1;
+    }
+
+    /**
+     * Handle getAncestorsCountAttribute functionality with proper error handling.
+     * @return int
+     */
+    public function getAncestorsCountAttribute(): int
+    {
+        return $this->depth;
+    }
+
+    /**
+     * Handle getDescendantsCountAttribute functionality with proper error handling.
+     * @return int
+     */
+    public function getDescendantsCountAttribute(): int
+    {
+        $count = 0;
+        foreach ($this->children as $child) {
+            $count += 1 + $child->descendants_count;
+        }
+        return $count;
+    }
+
+    /**
+     * Handle getFullPathAttribute functionality with proper error handling.
+     * @return string
+     */
+    public function getFullPathAttribute(): string
+    {
+        $path = [];
+        $category = $this;
+        while ($category) {
+            array_unshift($path, $category->slug);
+            $category = $category->parent;
+        }
+        return implode('/', $path);
+    }
     // Enhanced Translation Methods
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
