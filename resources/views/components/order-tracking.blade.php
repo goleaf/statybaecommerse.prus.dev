@@ -72,7 +72,7 @@
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('Order Date') }}</h3>
                     <p class="text-lg font-semibold text-gray-900">
-                        {{ $order->created_at ? $order->created_at->format('M d, Y') : 'N/A' }}
+                        {{ $order->created_at ? $order->created_at->format('Y-m-d') : 'N/A' }}
                     </p>
                 </div>
 

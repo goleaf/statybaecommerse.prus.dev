@@ -31,9 +31,27 @@
     @if($selectedVariant)
         <div class="variant-details bg-gray-50 rounded-lg p-4 mb-6">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">
-                    {{ $selectedVariant->name }}
-                </h3>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        {{ $this->getVariantLocalizedName() }}
+                    </h3>
+                    
+                    {{-- Badges --}}
+                    @if(!empty($this->getVariantBadges()))
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            @foreach($this->getVariantBadges() as $badge)
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                    {{ $badge['type'] === 'new' ? 'bg-green-100 text-green-800' : '' }}
+                                    {{ $badge['type'] === 'featured' ? 'bg-blue-100 text-blue-800' : '' }}
+                                    {{ $badge['type'] === 'bestseller' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                    {{ $badge['type'] === 'sale' ? 'bg-red-100 text-red-800' : '' }}
+                                ">
+                                    {{ $badge['label'] }}
+                                </span>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
                 <span class="text-sm text-gray-500">
                     SKU: {{ $selectedVariant->variant_sku }}
                 </span>
@@ -42,14 +60,23 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <span class="text-sm text-gray-600">{{ __('product_variants.fields.price') }}:</span>
-                    <span class="text-xl font-bold text-gray-900 ml-2">
-                        €{{ number_format($this->getVariantPrice(), 2) }}
-                    </span>
-                    @if($selectedVariant->compare_price && $selectedVariant->compare_price > $selectedVariant->price)
-                        <span class="text-sm text-gray-500 line-through ml-2">
-                            €{{ number_format($selectedVariant->compare_price, 2) }}
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl font-bold text-gray-900">
+                            €{{ number_format($this->getVariantPrice(), 2) }}
                         </span>
-                    @endif
+                        
+                        @if($this->isVariantOnSale() && $this->getVariantDiscountPercentage())
+                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
+                                -{{ $this->getVariantDiscountPercentage() }}%
+                            </span>
+                        @endif
+                        
+                        @if($this->getVariantOriginalPrice() > $this->getVariantPrice())
+                            <span class="text-sm text-gray-500 line-through">
+                                €{{ number_format($this->getVariantOriginalPrice(), 2) }}
+                            </span>
+                        @endif
+                    </div>
                 </div>
 
                 <div>
@@ -63,6 +90,14 @@
                     </span>
                 </div>
             </div>
+
+            {{-- Localized Description --}}
+            @if($this->getVariantLocalizedDescription())
+                <div class="mb-4">
+                    <span class="text-sm text-gray-600">{{ __('product_variants.fields.description') }}:</span>
+                    <p class="mt-1 text-sm text-gray-700">{{ $this->getVariantLocalizedDescription() }}</p>
+                </div>
+            @endif
 
             @if($selectedVariant->size_display_name)
                 <div class="mb-4">

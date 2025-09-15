@@ -134,24 +134,62 @@ if (! function_exists('format_date')) {
             return '';
         }
         $dt = $date instanceof \DateTimeInterface ? $date : new \DateTime($date);
-        $locale = $locale ?: app()->getLocale();
-        $fmt = new \IntlDateFormatter($locale, $dateType, \IntlDateFormatter::NONE);
-
-        return $fmt->format($dt);
+        
+        // Use year-month-day format for all locales
+        return $dt->format(config('datetime.formats.date', 'Y-m-d'));
     }
 }
 
 // Removed legacy shopper_money_format - use app_money_format instead
 
 if (! function_exists('format_datetime')) {
-    function format_datetime(\DateTimeInterface|string|null $dateTime): string
+    function format_datetime(\DateTimeInterface|string|null $dateTime, ?string $locale = null): string
     {
         if (! $dateTime) {
             return '';
         }
         $dt = $dateTime instanceof \DateTimeInterface ? $dateTime : new \DateTime((string) $dateTime);
 
-        return $dt->format('Y-m-d H:i');
+        // Use year-month-day format for all locales
+        return $dt->format(config('datetime.formats.datetime', 'Y-m-d H:i'));
+    }
+}
+
+if (! function_exists('format_date_short')) {
+    function format_date_short(\DateTimeInterface|string|null $date, ?string $locale = null): string
+    {
+        if (! $date) {
+            return '';
+        }
+        $dt = $date instanceof \DateTimeInterface ? $date : new \DateTime($date);
+
+        // Use year-month-day format for all locales
+        return $dt->format(config('datetime.formats.date_short', 'y-m-d'));
+    }
+}
+
+if (! function_exists('format_datetime_full')) {
+    function format_datetime_full(\DateTimeInterface|string|null $dateTime, ?string $locale = null): string
+    {
+        if (! $dateTime) {
+            return '';
+        }
+        $dt = $dateTime instanceof \DateTimeInterface ? $dateTime : new \DateTime((string) $dateTime);
+
+        // Use year-month-day format for all locales
+        return $dt->format(config('datetime.formats.datetime_full', 'Y-m-d H:i:s'));
+    }
+}
+
+if (! function_exists('format_time')) {
+    function format_time(\DateTimeInterface|string|null $dateTime, ?string $locale = null): string
+    {
+        if (! $dateTime) {
+            return '';
+        }
+        $dt = $dateTime instanceof \DateTimeInterface ? $dateTime : new \DateTime((string) $dateTime);
+        
+        return $dt->format(config('datetime.formats.time', 'H:i'));
     }
 }
 

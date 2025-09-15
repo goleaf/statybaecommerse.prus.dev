@@ -45,10 +45,10 @@ final class GlobalDataCreator
             // Cache keys for performance
             'cachePrefix' => config('cache.prefix', 'laravel'),
             
-            // Global timestamps
+            // Global timestamps (year-month-day format)
             'currentTimestamp' => now()->timestamp,
-            'currentDate' => now()->format('Y-m-d'),
-            'currentDateTime' => now()->format('Y-m-d H:i:s'),
+            'currentDate' => now()->format(config('datetime.formats.date', 'Y-m-d')),
+            'currentDateTime' => now()->format(config('datetime.formats.datetime_full', 'Y-m-d H:i:s')),
         ]);
     }
 }

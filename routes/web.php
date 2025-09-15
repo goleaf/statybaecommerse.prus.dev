@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['web'])->group(function () {
     // Live Demo Route
     Route::get('/live-demo', App\Livewire\Pages\LiveDemo::class)->name('live-demo');
+    
+    // Product Variants Showcase
+    Route::get('/variant-showcase', App\Livewire\ProductVariantShowcase::class)->name('variant-showcase');
     // Campaign Frontend Routes
 Route::prefix('campaigns')->name('frontend.campaigns.')->group(function () {
     Route::get('/', [App\Http\Controllers\Frontend\CampaignController::class, 'index'])->name('index');

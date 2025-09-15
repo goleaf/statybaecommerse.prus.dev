@@ -136,6 +136,32 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
 
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextInput::make('variant_name_lt')
+                                                ->label(__('product_variants.fields.variant_name_lt'))
+                                                ->maxLength(255)
+                                                ->columnSpan(1),
+
+                                            TextInput::make('variant_name_en')
+                                                ->label(__('product_variants.fields.variant_name_en'))
+                                                ->maxLength(255)
+                                                ->columnSpan(1),
+                                        ]),
+
+                                    Grid::make(2)
+                                        ->schema([
+                                            Textarea::make('description_lt')
+                                                ->label(__('product_variants.fields.description_lt'))
+                                                ->rows(3)
+                                                ->columnSpan(1),
+
+                                            Textarea::make('description_en')
+                                                ->label(__('product_variants.fields.description_en'))
+                                                ->rows(3)
+                                                ->columnSpan(1),
+                                        ]),
+
                                     Grid::make(3)
                                         ->schema([
                                             TextInput::make('sku')
@@ -258,6 +284,47 @@ final class ProductVariantResource extends Resource
                                                 ->prefix('€')
                                                 ->columnSpan(1),
                                         ]),
+
+                                    Grid::make(3)
+                                        ->schema([
+                                            TextInput::make('wholesale_price')
+                                                ->label(__('product_variants.fields.wholesale_price'))
+                                                ->numeric()
+                                                ->step(0.01)
+                                                ->prefix('€')
+                                                ->columnSpan(1),
+
+                                            TextInput::make('member_price')
+                                                ->label(__('product_variants.fields.member_price'))
+                                                ->numeric()
+                                                ->step(0.01)
+                                                ->prefix('€')
+                                                ->columnSpan(1),
+
+                                            TextInput::make('promotional_price')
+                                                ->label(__('product_variants.fields.promotional_price'))
+                                                ->numeric()
+                                                ->step(0.01)
+                                                ->prefix('€')
+                                                ->columnSpan(1),
+                                        ]),
+
+                                    Grid::make(3)
+                                        ->schema([
+                                            Toggle::make('is_on_sale')
+                                                ->label(__('product_variants.fields.is_on_sale'))
+                                                ->columnSpan(1),
+
+                                            TextInput::make('sale_start_date')
+                                                ->label(__('product_variants.fields.sale_start_date'))
+                                                ->dateTime()
+                                                ->columnSpan(1),
+
+                                            TextInput::make('sale_end_date')
+                                                ->label(__('product_variants.fields.sale_end_date'))
+                                                ->dateTime()
+                                                ->columnSpan(1),
+                                        ]),
                                 ])
                                 ->columns(1),
                         ]),
@@ -279,10 +346,22 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
 
-                                    Grid::make(2)
+                                    Grid::make(4)
                                         ->schema([
-                                            TextInput::make('quantity')
-                                                ->label(__('product_variants.fields.quantity'))
+                                            TextInput::make('stock_quantity')
+                                                ->label(__('product_variants.fields.stock_quantity'))
+                                                ->numeric()
+                                                ->default(0)
+                                                ->columnSpan(1),
+
+                                            TextInput::make('reserved_quantity')
+                                                ->label(__('product_variants.fields.reserved_quantity'))
+                                                ->numeric()
+                                                ->default(0)
+                                                ->columnSpan(1),
+
+                                            TextInput::make('available_quantity')
+                                                ->label(__('product_variants.fields.available_quantity'))
                                                 ->numeric()
                                                 ->default(0)
                                                 ->columnSpan(1),
@@ -356,6 +435,89 @@ final class ProductVariantResource extends Resource
                                         ->columns(2)
                                         ->addActionLabel(__('product_variants.actions.add_image'))
                                         ->collapsible(),
+                                ])
+                                ->columns(1),
+                        ]),
+
+                    Tab::make(__('product_variants.tabs.analytics'))
+                        ->icon('heroicon-o-chart-bar')
+                        ->schema([
+                            Section::make(__('product_variants.sections.analytics'))
+                                ->schema([
+                                    Grid::make(3)
+                                        ->schema([
+                                            Toggle::make('is_featured')
+                                                ->label(__('product_variants.fields.is_featured'))
+                                                ->default(false)
+                                                ->columnSpan(1),
+
+                                            Toggle::make('is_new')
+                                                ->label(__('product_variants.fields.is_new'))
+                                                ->default(false)
+                                                ->columnSpan(1),
+
+                                            Toggle::make('is_bestseller')
+                                                ->label(__('product_variants.fields.is_bestseller'))
+                                                ->default(false)
+                                                ->columnSpan(1),
+                                        ]),
+
+                                    Grid::make(3)
+                                        ->schema([
+                                            TextInput::make('views_count')
+                                                ->label(__('product_variants.fields.views_count'))
+                                                ->numeric()
+                                                ->default(0)
+                                                ->columnSpan(1),
+
+                                            TextInput::make('clicks_count')
+                                                ->label(__('product_variants.fields.clicks_count'))
+                                                ->numeric()
+                                                ->default(0)
+                                                ->columnSpan(1),
+
+                                            TextInput::make('conversion_rate')
+                                                ->label(__('product_variants.fields.conversion_rate'))
+                                                ->numeric()
+                                                ->step(0.01)
+                                                ->suffix('%')
+                                                ->default(0)
+                                                ->columnSpan(1),
+                                        ]),
+                                ])
+                                ->columns(1),
+                        ]),
+
+                    Tab::make(__('product_variants.tabs.seo'))
+                        ->icon('heroicon-o-magnifying-glass')
+                        ->schema([
+                            Section::make(__('product_variants.sections.seo'))
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextInput::make('seo_title_lt')
+                                                ->label(__('product_variants.fields.seo_title_lt'))
+                                                ->maxLength(255)
+                                                ->columnSpan(1),
+
+                                            TextInput::make('seo_title_en')
+                                                ->label(__('product_variants.fields.seo_title_en'))
+                                                ->maxLength(255)
+                                                ->columnSpan(1),
+                                        ]),
+
+                                    Grid::make(2)
+                                        ->schema([
+                                            Textarea::make('seo_description_lt')
+                                                ->label(__('product_variants.fields.seo_description_lt'))
+                                                ->rows(3)
+                                                ->columnSpan(1),
+
+                                            Textarea::make('seo_description_en')
+                                                ->label(__('product_variants.fields.seo_description_en'))
+                                                ->rows(3)
+                                                ->columnSpan(1),
+                                        ]),
                                 ])
                                 ->columns(1),
                         ]),
@@ -436,6 +598,18 @@ final class ProductVariantResource extends Resource
                     ->numeric()
                     ->sortable(),
 
+                TextColumn::make('views_count')
+                    ->label(__('product_variants.fields.views_count'))
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('conversion_rate')
+                    ->label(__('product_variants.fields.conversion_rate'))
+                    ->formatStateUsing(fn (float $state): string => number_format($state, 2) . '%')
+                    ->sortable()
+                    ->toggleable(),
+
                 BadgeColumn::make('stock_status')
                     ->label(__('product_variants.fields.stock_status'))
                     ->colors([
@@ -459,6 +633,16 @@ final class ProductVariantResource extends Resource
                 IconColumn::make('is_default_variant')
                     ->label(__('product_variants.fields.is_default_variant'))
                     ->boolean(),
+
+                IconColumn::make('is_featured')
+                    ->label(__('product_variants.fields.is_featured'))
+                    ->boolean()
+                    ->toggleable(),
+
+                IconColumn::make('is_on_sale')
+                    ->label(__('product_variants.fields.is_on_sale'))
+                    ->boolean()
+                    ->toggleable(),
 
                 TextColumn::make('created_at')
                     ->label(__('product_variants.fields.created_at'))
@@ -497,6 +681,18 @@ final class ProductVariantResource extends Resource
 
                 TernaryFilter::make('is_default_variant')
                     ->label(__('product_variants.fields.is_default_variant')),
+
+                TernaryFilter::make('is_featured')
+                    ->label(__('product_variants.fields.is_featured')),
+
+                TernaryFilter::make('is_on_sale')
+                    ->label(__('product_variants.fields.is_on_sale')),
+
+                TernaryFilter::make('is_new')
+                    ->label(__('product_variants.fields.is_new')),
+
+                TernaryFilter::make('is_bestseller')
+                    ->label(__('product_variants.fields.is_bestseller')),
             ])
             ->actions([
                 TableAction::make('set_default')

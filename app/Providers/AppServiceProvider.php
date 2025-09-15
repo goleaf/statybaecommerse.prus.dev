@@ -166,9 +166,9 @@ class AppServiceProvider extends ServiceProvider
                 '$COMPANY_EMAIL' => config('app.company_email', config('mail.from.address')),
                 '$COMPANY_WEBSITE' => config('app.url'),
                 '$COMPANY_VAT' => config('app.company_vat', ''),
-                // Current date/time variables
-                '$CURRENT_DATE' => now()->format('Y-m-d'),
-                '$CURRENT_DATETIME' => now()->format('Y-m-d H:i:s'),
+                // Current date/time variables (year-month-day format)
+                '$CURRENT_DATE' => now()->format(config('datetime.formats.date', 'Y-m-d')),
+                '$CURRENT_DATETIME' => now()->format(config('datetime.formats.datetime_full', 'Y-m-d H:i:s')),
                 '$CURRENT_YEAR' => now()->year,
                 '$CURRENT_MONTH' => now()->format('F'),
                 '$CURRENT_DAY' => now()->format('d'),

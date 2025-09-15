@@ -78,14 +78,14 @@
             @if($campaign->starts_at)
                 <div class="flex items-center mb-1">
                     <i class="fas fa-play text-green-500 mr-2"></i>
-                    <span>{{ __('campaigns.starts_at') }}: {{ $campaign->starts_at->format('d/m/Y') }}</span>
+                    <span>{{ __('campaigns.starts_at') }}: {{ $campaign->starts_at->format('Y-m-d') }}</span>
                 </div>
             @endif
             
             @if($campaign->ends_at)
                 <div class="flex items-center">
                     <i class="fas fa-stop text-red-500 mr-2"></i>
-                    <span>{{ __('campaigns.ends_at') }}: {{ $campaign->ends_at->format('d/m/Y') }}</span>
+                    <span>{{ __('campaigns.ends_at') }}: {{ $campaign->ends_at->format('Y-m-d') }}</span>
                 </div>
             @endif
         </div>

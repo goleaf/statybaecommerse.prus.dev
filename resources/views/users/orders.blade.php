@@ -118,7 +118,7 @@ title(__('users.orders'));
                                     </span>
                                 </div>
                                 <div class="mt-2 sm:mt-0 text-sm text-gray-500">
-                                    {{ __('users.ordered_on') }} {{ $order->created_at->format('M d, Y') }}
+                                    {{ __('users.ordered_on') }} {{ $order->created_at->format('Y-m-d') }}
                                 </div>
                             </div>
                         </div>
@@ -216,7 +216,7 @@ title(__('users.orders'));
                                         <p>{{ __('users.tracking_number') }}: {{ $order->tracking_number }}</p>
                                     @endif
                                     @if($order->estimated_delivery_date)
-                                        <p>{{ __('users.estimated_delivery') }}: {{ $order->estimated_delivery_date->format('M d, Y') }}</p>
+                                        <p>{{ __('users.estimated_delivery') }}: {{ $order->estimated_delivery_date->format('Y-m-d') }}</p>
                                     @endif
                                 </div>
                             </div>

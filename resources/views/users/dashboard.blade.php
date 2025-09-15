@@ -158,7 +158,7 @@ title(__('users.dashboard'));
                                                         {{ __('users.order') }} #{{ $order->id }}
                                                     </p>
                                                     <p class="text-sm text-gray-500">
-                                                        {{ $order->created_at->format('M d, Y') }} • {{ $order->status_text }}
+                                                        {{ $order->created_at->format('Y-m-d') }} • {{ $order->status_text }}
                                                     </p>
                                                 </div>
                                                 <div class="flex-shrink-0 text-right">

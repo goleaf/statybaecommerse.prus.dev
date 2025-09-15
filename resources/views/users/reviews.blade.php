@@ -173,7 +173,7 @@ title(__('users.reviews'));
                             </div>
                             
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">{{ $review->created_at->format('M d, Y') }}</p>
+                                <p class="text-sm text-gray-500">{{ $review->created_at->format('Y-m-d') }}</p>
                                 @if($review->helpful_count > 0)
                                     <p class="text-sm text-gray-600 mt-1">
                                         {{ $review->helpful_count }} {{ __('users.people_found_helpful') }}

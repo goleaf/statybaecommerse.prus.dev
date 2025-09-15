@@ -29,6 +29,7 @@ final class ProductVariantSelector extends Component
         $this->loadVariants();
         $this->loadAttributes();
         $this->selectDefaultVariant();
+        $this->recordProductView();
     }
 
     public function loadVariants(): void
@@ -74,6 +75,7 @@ final class ProductVariantSelector extends Component
     {
         $this->selectedAttributes[$attributeSlug] = $value;
         $this->findMatchingVariant();
+        $this->recordVariantClick();
     }
 
     public function findMatchingVariant(): void
@@ -195,6 +197,9 @@ final class ProductVariantSelector extends Component
             return;
         }
 
+        // Record analytics
+        $this->recordAddToCart();
+
         // Dispatch event to add to cart
         $this->dispatch('add-to-cart', [
             'variant_id' => $this->selectedVariant->id,
@@ -206,7 +211,34 @@ final class ProductVariantSelector extends Component
 
     public function getVariantPrice(): float
     {
-        return $this->selectedVariant ? $this->selectedVariant->final_price : 0;
+        return $this->selectedVariant ? $this->selectedVariant->getCurrentPrice() : 0;
+    }
+
+    public function getVariantOriginalPrice(): float
+    {
+        return $this->selectedVariant ? $this->selectedVariant->price : 0;
+    }
+
+    public function getVariantPromotionalPrice(): ?float
+    {
+        return $this->selectedVariant && $this->selectedVariant->isCurrentlyOnSale() 
+            ? $this->selectedVariant->promotional_price 
+            : null;
+    }
+
+    public function isVariantOnSale(): bool
+    {
+        return $this->selectedVariant ? $this->selectedVariant->isCurrentlyOnSale() : false;
+    }
+
+    public function getVariantLocalizedName(?string $locale = null): string
+    {
+        return $this->selectedVariant ? $this->selectedVariant->getLocalizedName($locale) : '';
+    }
+
+    public function getVariantLocalizedDescription(?string $locale = null): ?string
+    {
+        return $this->selectedVariant ? $this->selectedVariant->getLocalizedDescription($locale) : null;
     }
 
     public function getVariantStockStatus(): string
@@ -235,6 +267,89 @@ final class ProductVariantSelector extends Component
         }
         
         return __('product_variants.messages.in_stock', ['quantity' => $available]);
+    }
+
+    /**
+     * Record product view for analytics.
+     */
+    public function recordProductView(): void
+    {
+        // Record view for the product
+        $this->product->increment('views_count');
+        
+        // Record view for the default variant if available
+        if ($this->selectedVariant) {
+            $this->selectedVariant->recordView();
+        }
+    }
+
+    /**
+     * Record variant click for analytics.
+     */
+    public function recordVariantClick(): void
+    {
+        if ($this->selectedVariant) {
+            $this->selectedVariant->recordClick();
+        }
+    }
+
+    /**
+     * Record add to cart action for analytics.
+     */
+    public function recordAddToCart(): void
+    {
+        if ($this->selectedVariant) {
+            $this->selectedVariant->recordDailyAnalytics('add_to_cart');
+        }
+    }
+
+    /**
+     * Get variant badges (new, featured, bestseller, on sale).
+     */
+    public function getVariantBadges(): array
+    {
+        if (!$this->selectedVariant) {
+            return [];
+        }
+
+        $badges = [];
+
+        if ($this->selectedVariant->is_new) {
+            $badges[] = ['type' => 'new', 'label' => __('product_variants.badges.new')];
+        }
+
+        if ($this->selectedVariant->is_featured) {
+            $badges[] = ['type' => 'featured', 'label' => __('product_variants.badges.featured')];
+        }
+
+        if ($this->selectedVariant->is_bestseller) {
+            $badges[] = ['type' => 'bestseller', 'label' => __('product_variants.badges.bestseller')];
+        }
+
+        if ($this->isVariantOnSale()) {
+            $badges[] = ['type' => 'sale', 'label' => __('product_variants.badges.sale')];
+        }
+
+        return $badges;
+    }
+
+    /**
+     * Get variant discount percentage.
+     */
+    public function getVariantDiscountPercentage(): ?float
+    {
+        if (!$this->selectedVariant || !$this->isVariantOnSale()) {
+            return null;
+        }
+
+        $originalPrice = $this->getVariantOriginalPrice();
+        $currentPrice = $this->getVariantPrice();
+
+        if ($originalPrice <= 0 || $currentPrice >= $originalPrice) {
+            return null;
+        }
+
+        return round((($originalPrice - $currentPrice) / $originalPrice) * 100, 0);
     }
 
     public function render()

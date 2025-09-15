@@ -186,7 +186,7 @@ title(__('users.wishlist'));
                             <!-- Added Date -->
                             <div class="mt-3 pt-3 border-t border-gray-200">
                                 <p class="text-xs text-gray-500">
-                                    {{ __('users.added_on') }} {{ $item->created_at->format('M d, Y') }}
+                                    {{ __('users.added_on') }} {{ $item->created_at->format('Y-m-d') }}
                                 </p>
                             </div>
                         </div>
