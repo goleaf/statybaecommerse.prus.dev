@@ -136,6 +136,139 @@ final class Product extends Model implements HasMedia
         }
         return 'in_stock';
     }
+
+    /**
+     * Handle getStockStatusAttribute functionality with proper error handling.
+     * @return string
+     */
+    public function getStockStatusAttribute(): string
+    {
+        return $this->getStockStatus();
+    }
+
+    /**
+     * Handle getIsInStockAttribute functionality with proper error handling.
+     * @return bool
+     */
+    public function getIsInStockAttribute(): bool
+    {
+        return $this->isInStock();
+    }
+
+    /**
+     * Handle getIsLowStockAttribute functionality with proper error handling.
+     * @return bool
+     */
+    public function getIsLowStockAttribute(): bool
+    {
+        return $this->isLowStock();
+    }
+
+    /**
+     * Handle getIsOutOfStockAttribute functionality with proper error handling.
+     * @return bool
+     */
+    public function getIsOutOfStockAttribute(): bool
+    {
+        return $this->isOutOfStock();
+    }
+
+    /**
+     * Handle getAvailableQuantityAttribute functionality with proper error handling.
+     * @return int
+     */
+    public function getAvailableQuantityAttribute(): int
+    {
+        return $this->availableQuantity();
+    }
+
+    /**
+     * Handle getDiscountPercentageAttribute functionality with proper error handling.
+     * @return float
+     */
+    public function getDiscountPercentageAttribute(): float
+    {
+        if (!$this->compare_price || $this->compare_price <= $this->price) {
+            return 0.0;
+        }
+        return round((($this->compare_price - $this->price) / $this->compare_price) * 100, 2);
+    }
+
+    /**
+     * Handle getProfitMarginAttribute functionality with proper error handling.
+     * @return float
+     */
+    public function getProfitMarginAttribute(): float
+    {
+        if (!$this->cost_price || $this->cost_price <= 0) {
+            return 0.0;
+        }
+        return round((($this->price - $this->cost_price) / $this->price) * 100, 2);
+    }
+
+    /**
+     * Handle getMarkupPercentageAttribute functionality with proper error handling.
+     * @return float
+     */
+    public function getMarkupPercentageAttribute(): float
+    {
+        if (!$this->cost_price || $this->cost_price <= 0) {
+            return 0.0;
+        }
+        return round((($this->price - $this->cost_price) / $this->cost_price) * 100, 2);
+    }
+
+    /**
+     * Handle getDimensionsAttribute functionality with proper error handling.
+     * @return array
+     */
+    public function getDimensionsAttribute(): array
+    {
+        return [
+            'length' => $this->length ?? 0,
+            'width' => $this->width ?? 0,
+            'height' => $this->height ?? 0,
+        ];
+    }
+
+    /**
+     * Handle getVolumeAttribute functionality with proper error handling.
+     * @return float
+     */
+    public function getVolumeAttribute(): float
+    {
+        $dimensions = $this->getDimensionsAttribute();
+        return $dimensions['length'] * $dimensions['width'] * $dimensions['height'];
+    }
+
+    /**
+     * Handle getCanonicalUrlAttribute functionality with proper error handling.
+     * @return string
+     */
+    public function getCanonicalUrlAttribute(): string
+    {
+        return route('products.show', $this->slug);
+    }
+
+    /**
+     * Handle getSalesCountAttribute functionality with proper error handling.
+     * @return int
+     */
+    public function getSalesCountAttribute(): int
+    {
+        // This would need to be implemented based on order items
+        return 0;
+    }
+
+    /**
+     * Handle getRevenueAttribute functionality with proper error handling.
+     * @return float
+     */
+    public function getRevenueAttribute(): float
+    {
+        // This would need to be implemented based on order items
+        return 0.0;
+    }
     /**
      * Handle decreaseStock functionality with proper error handling.
      * @param int $quantity
