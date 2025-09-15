@@ -246,4 +246,33 @@ return [
     'time_year' => 'год',
     'time_years' => 'лет',
     'time_ago' => 'назад',
+    
+    // Newsletter translations
+    'newsletter' => [
+        'email_address' => 'Адрес электронной почты',
+        'email_placeholder' => 'Введите адрес электронной почты',
+        'first_name' => 'Имя',
+        'first_name_placeholder' => 'Введите ваше имя',
+        'last_name' => 'Фамилия',
+        'last_name_placeholder' => 'Введите вашу фамилию',
+        'company' => 'Компания',
+        'company_placeholder' => 'Введите название компании',
+        'interests' => 'Области интересов',
+        'interests_products' => 'Продукты',
+        'interests_news' => 'Новости',
+        'interests_promotions' => 'Акции',
+        'interests_events' => 'События',
+        'interests_blog' => 'Блог',
+        'interests_technical' => 'Техническая информация',
+        'subscribe_button' => 'Подписаться',
+        'subscribing' => 'Подписка...',
+        'privacy_notice' => 'Подписываясь, вы соглашаетесь с нашей политикой конфиденциальности',
+    ],
+    
+    // Product image alt text
+    'product_image_alt' => 'Изображение продукта',
+    
+    // Additional search translations
+    'search_for' => 'по',
+    'search_result_count' => ':count результат найден|:count результата найдено|:count результатов найдено',
 ];

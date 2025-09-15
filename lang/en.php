@@ -1535,4 +1535,33 @@ return [
             'tags_help' => 'Tags are separated by commas, e.g.: tag1, tag2, tag3',
         ],
     ],
+    
+    // Newsletter translations
+    'newsletter' => [
+        'email_address' => 'Email Address',
+        'email_placeholder' => 'Enter your email address',
+        'first_name' => 'First Name',
+        'first_name_placeholder' => 'Enter your first name',
+        'last_name' => 'Last Name',
+        'last_name_placeholder' => 'Enter your last name',
+        'company' => 'Company',
+        'company_placeholder' => 'Enter company name',
+        'interests' => 'Areas of Interest',
+        'interests_products' => 'Products',
+        'interests_news' => 'News',
+        'interests_promotions' => 'Promotions',
+        'interests_events' => 'Events',
+        'interests_blog' => 'Blog',
+        'interests_technical' => 'Technical Information',
+        'subscribe_button' => 'Subscribe',
+        'subscribing' => 'Subscribing...',
+        'privacy_notice' => 'By subscribing you agree to our privacy policy',
+    ],
+    
+    // Product image alt text
+    'product_image_alt' => 'Product Image',
+    
+    // Additional search translations
+    'search_for' => 'for',
+    'search_result_count' => ':count result found|:count results found',
 ];

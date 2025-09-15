@@ -1535,4 +1535,33 @@ return [
             'tags_help' => 'Žymės atskiriamos kableliais, pvz.: tag1, tag2, tag3',
         ],
     ],
+    
+    // Newsletter translations
+    'newsletter' => [
+        'email_address' => 'El. pašto adresas',
+        'email_placeholder' => 'Įveskite el. pašto adresą',
+        'first_name' => 'Vardas',
+        'first_name_placeholder' => 'Įveskite vardą',
+        'last_name' => 'Pavardė',
+        'last_name_placeholder' => 'Įveskite pavardę',
+        'company' => 'Įmonė',
+        'company_placeholder' => 'Įveskite įmonės pavadinimą',
+        'interests' => 'Domėjimosi sritys',
+        'interests_products' => 'Produktai',
+        'interests_news' => 'Naujienos',
+        'interests_promotions' => 'Akcijos',
+        'interests_events' => 'Renginiai',
+        'interests_blog' => 'Tinklaraštis',
+        'interests_technical' => 'Techninė informacija',
+        'subscribe_button' => 'Prenumeruoti',
+        'subscribing' => 'Prenumeruojama...',
+        'privacy_notice' => 'Prenumeruodami sutinkate su mūsų privatumo politika',
+    ],
+    
+    // Product image alt text
+    'product_image_alt' => 'Produkto nuotrauka',
+    
+    // Additional search translations
+    'search_for' => 'pagal',
+    'search_result_count' => ':count rezultatas rastas|:count rezultatai rasti|:count rezultatų rasta',
 ];
