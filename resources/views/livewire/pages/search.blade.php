@@ -81,13 +81,14 @@
         $elements = [];
         $position = 1;
         foreach ($products as $p) {
+            $productSlug = $p->trans('slug') ?? $p->slug;
+            if (empty($productSlug)) {
+                continue; // Skip products without valid slug
+            }
             $elements[] = [
                 '@type' => 'ListItem',
                 'position' => $position++,
-                'url' => route('product.show', [
-                    'locale' => app()->getLocale(),
-                    'slug' => $p->trans('slug') ?? $p->slug,
-                ]),
+                'url' => route('product.show', $productSlug),
                 'name' => $p->trans('name') ?? $p->name,
             ];
         }

@@ -163,7 +163,7 @@
         </p>
         <div id="results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)
-                <a href="{{ route('product.show', ['locale' => app()->getLocale(), 'slug' => $product->trans('slug') ?? $product->slug]) }}"
+                <a href="{{ route('product.show', $product->trans('slug') ?? $product->slug) }}"
                    class="block border rounded-lg p-4 hover:shadow-sm">
                     <x-product.thumbnail :product="$product" containerClass="mb-3" />
                     <div class="text-base font-medium">{{ $product->trans('name') ?? $product->name }}</div>
@@ -192,10 +192,7 @@
             $elements[] = [
                 '@type' => 'ListItem',
                 'position' => $position++,
-                'url' => route('product.show', [
-                    'locale' => app()->getLocale(),
-                    'slug' => $p->trans('slug') ?? $p->slug,
-                ]),
+                'url' => route('product.show', $p->trans('slug') ?? $p->slug),
                 'name' => $p->trans('name') ?? $p->name,
             ];
         }

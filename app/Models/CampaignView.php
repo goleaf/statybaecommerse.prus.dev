@@ -52,3 +52,4 @@ final class CampaignView extends Model
         return $this->belongsTo(User::class, 'customer_id');
     }
 }
+

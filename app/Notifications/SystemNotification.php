@@ -51,3 +51,4 @@ final class SystemNotification extends Notification implements ShouldQueue
         return (new MailMessage())->subject($this->data['title'])->line($this->data['message'])->line('Šis pranešimas išsiųstas iš sistemos administracijos.');
     }
 }
+

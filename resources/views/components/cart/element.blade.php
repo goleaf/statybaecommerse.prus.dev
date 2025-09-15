@@ -13,10 +13,7 @@
     <x-product.thumbnail :product="$item->associatedModel" class="size-20 border aspect-none border-primary-700" />
     <div class="flex-auto">
         <h3 class="font-medium font-heading text-white">
-            <x-link :href="route('product.show', [
-                'locale' => app()->getLocale(),
-                'slug' => method_exists($model, 'trans') ? $model->trans('slug') ?? $model->slug : $model->slug,
-            ])">
+            <x-link :href="route('product.show', method_exists($model, 'trans') ? $model->trans('slug') ?? $model->slug : $model->slug)">
                 {{ $item->name }}
             </x-link>
         </h3>

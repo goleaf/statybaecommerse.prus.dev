@@ -52,7 +52,7 @@ final class ImageStatsService
         })->withCount(['media' => function ($q) {
             $q->where('collection_name', 'images');
         }])->orderBy('media_count', 'desc')->limit($limit)->get(['id', 'name', 'slug'])->map(function ($product) {
-            return ['id' => $product->id, 'name' => $product->name, 'slug' => $product->slug, 'image_count' => $product->media_count, 'url' => route('product.show', ['slug' => $product->slug])];
+            return ['id' => $product->id, 'name' => $product->name, 'slug' => $product->slug, 'image_count' => $product->media_count, 'url' => route('product.show', $product->slug)];
         })->toArray();
     }
     /**

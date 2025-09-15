@@ -163,10 +163,7 @@
 
 @push('scripts')
     @php
-        $productUrl = route('product.show', [
-            'locale' => app()->getLocale(),
-            'slug' => $product->trans('slug') ?? $product->slug,
-        ]);
+        $productUrl = route('product.show', $product->trans('slug') ?? $product->slug);
         $image =
             $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?:
             $product->getFirstMediaUrl(config('media.storage.collection_name'));
