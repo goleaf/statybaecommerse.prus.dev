@@ -644,7 +644,9 @@ Route::get('/products/{product}/gallery', function ($product) {
 })->name('products.gallery');
 // Alias for legacy route names - handled by route model binding
 Route::get('/product/{product}', function ($product) {
-    return redirect()->route('products.show', $product);
+    // Handle both slug string and product model
+    $productSlug = is_string($product) ? $product : $product->slug;
+    return redirect()->route('products.show', $productSlug);
 })->name('product.show');
 
 Route::get('/categories', function () {
