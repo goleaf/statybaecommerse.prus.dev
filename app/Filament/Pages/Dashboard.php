@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use Filament\Pages\Dashboard as BaseDashboard;
-use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\ChartWidget;
-use Filament\Widgets\TableWidget;
 use BackedEnum;
 use UnitEnum;
 
@@ -26,9 +23,10 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            StatsOverviewWidget::class,
-            ChartWidget::class,
-            TableWidget::class,
+            // Only include concrete widget implementations, not abstract base classes
+            // StatsOverviewWidget::class, // This is also abstract
+            // ChartWidget::class, // This is abstract - cannot be instantiated
+            // TableWidget::class, // This is also abstract
         ];
     }
 
