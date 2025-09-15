@@ -91,7 +91,7 @@ it('registers a new user successfully', function () {
     ]);
 
     $user = User::where('email', 'john@example.com')->first();
-    expect(Hash::check('password123', $user->password))->toBeTrue();
+    expect(Hash::check('password123', $user->getAttributes()['password']))->toBeTrue();
 
     assertAuthenticated();
     Event::assertDispatched(Registered::class);

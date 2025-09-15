@@ -274,7 +274,7 @@ final class CountryTest extends TestCase
         $country = Country::factory()->create();
 
         // Test that relations exist and are properly configured
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $country->regions());
+        // Note: regions() method was removed as regions functionality was removed from the system
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $country->cities());
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $country->addresses());
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $country->users());

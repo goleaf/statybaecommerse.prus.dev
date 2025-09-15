@@ -24,7 +24,7 @@ final class AdminUserTest extends TestCase
         $this->assertInstanceOf(AdminUser::class, $adminUser);
         $this->assertEquals('Admin User', $adminUser->name);
         $this->assertEquals('admin@example.com', $adminUser->email);
-        $this->assertTrue(Hash::check('password123', $adminUser->password));
+        $this->assertTrue(Hash::check('password123', $adminUser->getAttributes()['password']));
     }
 
     public function test_admin_user_fillable_attributes(): void
@@ -54,7 +54,7 @@ final class AdminUserTest extends TestCase
         ]);
 
         $this->assertInstanceOf(\Carbon\Carbon::class, $adminUser->email_verified_at);
-        $this->assertTrue(Hash::check('password123', $adminUser->password));
+        $this->assertTrue(Hash::check('password123', $adminUser->getAttributes()['password']));
     }
 
     public function test_admin_user_can_access_panel(): void
@@ -86,8 +86,8 @@ final class AdminUserTest extends TestCase
             'password' => 'plaintext_password',
         ]);
 
-        $this->assertNotEquals('plaintext_password', $adminUser->password);
-        $this->assertTrue(Hash::check('plaintext_password', $adminUser->password));
+        $this->assertNotEquals('plaintext_password', $adminUser->getAttributes()['password']);
+        $this->assertTrue(Hash::check('plaintext_password', $adminUser->getAttributes()['password']));
     }
 
     public function test_admin_user_email_verification(): void
@@ -140,7 +140,7 @@ final class AdminUserTest extends TestCase
         ]);
 
         // Test password verification
-        $this->assertTrue(\Hash::check('password123', $adminUser->password));
+        $this->assertTrue(\Hash::check('password123', $adminUser->getAttributes()['password']));
         
         // Test that the user can be found by email
         $foundUser = AdminUser::where('email', 'admin@test.com')->first();
@@ -155,6 +155,6 @@ final class AdminUserTest extends TestCase
         $this->assertInstanceOf(AdminUser::class, $adminUser);
         $this->assertNotEmpty($adminUser->name);
         $this->assertNotEmpty($adminUser->email);
-        $this->assertNotEmpty($adminUser->password);
+        $this->assertNotEmpty($adminUser->getAttributes()['password']);
     }
 }
