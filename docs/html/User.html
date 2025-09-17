@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>User - Class Documentation</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+<body>
+    <nav class='navbar'>
+        <div class='nav-container'>
+            <a href='index.html' class='nav-brand'>📚 API Docs</a>
+            <div class='nav-links'>
+                <a href='index.html'>Home</a>
+            </div>
+        </div>
+    </nav>
+    
+    <main>
+        
+        <div class='container'>
+            <h1>User</h1>
+            <p class='lead'>No description available</p>
+            
+            <div class='info'>
+                <p><strong>File:</strong> app/Models/User.php</p>
+                <p><strong>Namespace:</strong> </p>
+            </div>
+
+            <section>
+                <h2>Properties</h2>
+                <table>
+                    <thead>
+                        <tr><th>Name</th><th>Type</th><th>Description</th></tr>
+                    </thead>
+                    <tbody><tr><td>$translatable</td><td>array</td><td>Property description</td></tr><tr><td>$fillable</td><td>mixed</td><td>Property description</td></tr><tr><td>$hidden</td><td>mixed</td><td>Property description</td></tr><tr><td>$appends</td><td>mixed</td><td>Property description</td></tr></tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Methods</h2>
+                <table>
+                    <thead>
+                        <tr><th>Name</th><th>Return Type</th><th>Description</th></tr>
+                    </thead>
+                    <tbody><tr><td>booted()</td><td>void</td><td>Method description</td></tr><tr><td>casts()</td><td>array</td><td>Method description</td></tr><tr><td>preferredLocale()</td><td>string|null</td><td>Method description</td></tr><tr><td>sendPasswordResetNotification()</td><td>void</td><td>Method description</td></tr><tr><td>sendEmailVerificationNotification()</td><td>void</td><td>Method description</td></tr><tr><td>rolesLabel()</td><td>Attribute</td><td>Method description</td></tr><tr><td>getActivitylogOptions()</td><td>LogOptions</td><td>Method description</td></tr><tr><td>orders()</td><td>HasMany</td><td>Method description</td></tr><tr><td>latestOrder()</td><td>HasOne</td><td>Method description</td></tr><tr><td>oldestOrder()</td><td>HasOne</td><td>Method description</td></tr><tr><td>latestCompletedOrder()</td><td>HasOne</td><td>Method description</td></tr><tr><td>highestValueOrder()</td><td>HasOne</td><td>Method description</td></tr><tr><td>wishlist()</td><td>BelongsToMany</td><td>Method description</td></tr><tr><td>wishlists()</td><td>HasMany</td><td>Method description</td></tr><tr><td>addresses()</td><td>HasMany</td><td>Method description</td></tr><tr><td>cartItems()</td><td>HasMany</td><td>Method description</td></tr><tr><td>reviews()</td><td>HasMany</td><td>Method description</td></tr><tr><td>latestReview()</td><td>HasOne</td><td>Method description</td></tr><tr><td>oldestReview()</td><td>HasOne</td><td>Method description</td></tr><tr><td>highestRatedReview()</td><td>HasOne</td><td>Method description</td></tr><tr><td>lowestRatedReview()</td><td>HasOne</td><td>Method description</td></tr><tr><td>authoredReviews()</td><td>HasMany</td><td>Method description</td></tr><tr><td>customerGroups()</td><td>BelongsToMany</td><td>Method description</td></tr><tr><td>discountRedemptions()</td><td>HasMany</td><td>Method description</td></tr><tr><td>latestDiscountRedemption()</td><td>HasOne</td><td>Method description</td></tr><tr><td>highestValueDiscountRedemption()</td><td>HasOne</td><td>Method description</td></tr><tr><td>latestAddress()</td><td>HasOne</td><td>Method description</td></tr><tr><td>latestCartItem()</td><td>HasOne</td><td>Method description</td></tr><tr><td>latestNotification()</td><td>HasOne</td><td>Method description</td></tr><tr><td>latestReferral()</td><td>HasOne</td><td>Method description</td></tr><tr><td>documents()</td><td>MorphMany</td><td>Method description</td></tr><tr><td>latestDocument()</td><td>MorphOne</td><td>Method description</td></tr><tr><td>scopeWithPreferredLocale()</td><td>void</td><td>Method description</td></tr><tr><td>getDefaultAddressAttribute()</td><td>Address|null</td><td>Method description</td></tr><tr><td>getBillingAddressAttribute()</td><td>Address|null</td><td>Method description</td></tr><tr><td>getShippingAddressAttribute()</td><td>Address|null</td><td>Method description</td></tr><tr><td>partners()</td><td>BelongsToMany</td><td>Method description</td></tr><tr><td>getActivePartnerAttribute()</td><td>Partner|null</td><td>Method description</td></tr><tr><td>isPartner()</td><td>bool</td><td>Method description</td></tr><tr><td>getPartnerDiscountRateAttribute()</td><td>float</td><td>Method description</td></tr><tr><td>canAccessPanel()</td><td>bool</td><td>Method description</td></tr><tr><td>referrals()</td><td>HasMany</td><td>Method description</td></tr><tr><td>referredBy()</td><td>HasMany</td><td>Method description</td></tr><tr><td>referralCodes()</td><td>HasMany</td><td>Method description</td></tr><tr><td>latestReferralCode()</td><td>HasOne</td><td>Method description</td></tr><tr><td>referralRewards()</td><td>HasMany</td><td>Method description</td></tr><tr><td>latestReferralReward()</td><td>HasOne</td><td>Method description</td></tr><tr><td>referralStatistics()</td><td>HasMany</td><td>Method description</td></tr><tr><td>activeReferralCode()</td><td>ReferralCode|null</td><td>Method description</td></tr><tr><td>getReferralCodeAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getReferralUrlAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>hasActiveReferralCode()</td><td>bool</td><td>Method description</td></tr><tr><td>wasReferred()</td><td>bool</td><td>Method description</td></tr><tr><td>getReferralStatsAttribute()</td><td>array</td><td>Method description</td></tr><tr><td>notifications()</td><td>HasMany</td><td>Method description</td></tr><tr><td>loginLogs()</td><td>HasMany</td><td>Method description</td></tr><tr><td>sessions()</td><td>HasMany</td><td>Method description</td></tr><tr><td>activityLogs()</td><td>HasMany</td><td>Method description</td></tr><tr><td>subscriptions()</td><td>HasMany</td><td>Method description</td></tr><tr><td>payments()</td><td>HasMany</td><td>Method description</td></tr><tr><td>refunds()</td><td>HasMany</td><td>Method description</td></tr><tr><td>supportTickets()</td><td>HasMany</td><td>Method description</td></tr><tr><td>feedback()</td><td>HasMany</td><td>Method description</td></tr><tr><td>newsletters()</td><td>BelongsToMany</td><td>Method description</td></tr><tr><td>tags()</td><td>MorphMany</td><td>Method description</td></tr><tr><td>files()</td><td>MorphMany</td><td>Method description</td></tr><tr><td>scopeActive()</td><td>void</td><td>Method description</td></tr><tr><td>scopeInactive()</td><td>void</td><td>Method description</td></tr><tr><td>scopeAdmins()</td><td>void</td><td>Method description</td></tr><tr><td>scopeWithOrders()</td><td>void</td><td>Method description</td></tr><tr><td>scopeWithoutOrders()</td><td>void</td><td>Method description</td></tr><tr><td>scopeRecentlyActive()</td><td>void</td><td>Method description</td></tr><tr><td>scopeByRole()</td><td>void</td><td>Method description</td></tr><tr><td>scopeByGender()</td><td>void</td><td>Method description</td></tr><tr><td>scopeByLocale()</td><td>void</td><td>Method description</td></tr><tr><td>scopeSubscribed()</td><td>void</td><td>Method description</td></tr><tr><td>scopeOnTrial()</td><td>void</td><td>Method description</td></tr><tr><td>getFullNameAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getInitialsAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getTotalSpentAttribute()</td><td>float</td><td>Method description</td></tr><tr><td>getAverageOrderValueAttribute()</td><td>float</td><td>Method description</td></tr><tr><td>getLastOrderDateAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getOrdersCountAttribute()</td><td>int</td><td>Method description</td></tr><tr><td>getReviewsCountAttribute()</td><td>int</td><td>Method description</td></tr><tr><td>getAverageRatingAttribute()</td><td>float</td><td>Method description</td></tr><tr><td>isEmailVerified()</td><td>bool</td><td>Method description</td></tr><tr><td>isPhoneVerified()</td><td>bool</td><td>Method description</td></tr><tr><td>hasTwoFactor()</td><td>bool</td><td>Method description</td></tr><tr><td>isOnTrial()</td><td>bool</td><td>Method description</td></tr><tr><td>hasActiveSubscription()</td><td>bool</td><td>Method description</td></tr><tr><td>getSubscriptionStatusColorAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getStatusColorAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getStatusTextAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getAgeAttribute()</td><td>int|null</td><td>Method description</td></tr><tr><td>getGenderTextAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getLocaleTextAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getAvatarUrlAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>generateGravatarUrl()</td><td>string</td><td>Method description</td></tr><tr><td>getSocialLinksAttribute()</td><td>array</td><td>Method description</td></tr><tr><td>getNotificationPreferencesAttribute()</td><td>array</td><td>Method description</td></tr><tr><td>getPrivacySettingsAttribute()</td><td>array</td><td>Method description</td></tr><tr><td>getMarketingPreferencesAttribute()</td><td>array</td><td>Method description</td></tr></tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Generated by Laravel PHPDoc Generator</p>
+    </footer>
+    
+    <script src='script.js'></script>
+</body>
+</html>

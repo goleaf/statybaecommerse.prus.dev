@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Campaign - Class Documentation</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+<body>
+    <nav class='navbar'>
+        <div class='nav-container'>
+            <a href='index.html' class='nav-brand'>📚 API Docs</a>
+            <div class='nav-links'>
+                <a href='index.html'>Home</a>
+            </div>
+        </div>
+    </nav>
+    
+    <main>
+        
+        <div class='container'>
+            <h1>Campaign</h1>
+            <p class='lead'>No description available</p>
+            
+            <div class='info'>
+                <p><strong>File:</strong> app/Models/Campaign.php</p>
+                <p><strong>Namespace:</strong> </p>
+            </div>
+
+            <section>
+                <h2>Properties</h2>
+                <table>
+                    <thead>
+                        <tr><th>Name</th><th>Type</th><th>Description</th></tr>
+                    </thead>
+                    <tbody><tr><td>$table</td><td>mixed</td><td>Property description</td></tr><tr><td>$fillable</td><td>mixed</td><td>Property description</td></tr><tr><td>$translationModel</td><td>string</td><td>Property description</td></tr></tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Methods</h2>
+                <table>
+                    <thead>
+                        <tr><th>Name</th><th>Return Type</th><th>Description</th></tr>
+                    </thead>
+                    <tbody><tr><td>casts()</td><td>array</td><td>Method description</td></tr><tr><td>getRouteKeyName()</td><td>string</td><td>Method description</td></tr><tr><td>getTranslatedName()</td><td>string</td><td>Method description</td></tr><tr><td>discounts()</td><td>BelongsToMany</td><td>Method description</td></tr><tr><td>channel()</td><td>BelongsTo</td><td>Method description</td></tr><tr><td>zone()</td><td>BelongsTo</td><td>Method description</td></tr><tr><td>views()</td><td>HasMany</td><td>Method description</td></tr><tr><td>clicks()</td><td>HasMany</td><td>Method description</td></tr><tr><td>conversions()</td><td>HasMany</td><td>Method description</td></tr><tr><td>customerSegments()</td><td>HasMany</td><td>Method description</td></tr><tr><td>productTargets()</td><td>HasMany</td><td>Method description</td></tr><tr><td>schedules()</td><td>HasMany</td><td>Method description</td></tr><tr><td>latestView()</td><td>HasOne</td><td>Method description</td></tr><tr><td>latestClick()</td><td>HasOne</td><td>Method description</td></tr><tr><td>latestConversion()</td><td>HasOne</td><td>Method description</td></tr><tr><td>highestValueConversion()</td><td>HasOne</td><td>Method description</td></tr><tr><td>lowestValueConversion()</td><td>HasOne</td><td>Method description</td></tr><tr><td>latestSchedule()</td><td>HasOne</td><td>Method description</td></tr><tr><td>orders()</td><td>HasManyThrough</td><td>Method description</td></tr><tr><td>latestOrder()</td><td>HasOneThrough</td><td>Method description</td></tr><tr><td>targetCategories()</td><td>BelongsToMany</td><td>Method description</td></tr><tr><td>targetProducts()</td><td>BelongsToMany</td><td>Method description</td></tr><tr><td>targetCustomerGroups()</td><td>BelongsToMany</td><td>Method description</td></tr><tr><td>scopeActive()</td><td>Builder</td><td>Method description</td></tr><tr><td>scopeScheduled()</td><td>Builder</td><td>Method description</td></tr><tr><td>scopeExpired()</td><td>Builder</td><td>Method description</td></tr><tr><td>scopeFeatured()</td><td>Builder</td><td>Method description</td></tr><tr><td>scopeByPriority()</td><td>Builder</td><td>Method description</td></tr><tr><td>scopeForChannel()</td><td>Builder</td><td>Method description</td></tr><tr><td>scopeForZone()</td><td>Builder</td><td>Method description</td></tr><tr><td>scopeWithAnalytics()</td><td>Builder</td><td>Method description</td></tr><tr><td>scopeSocialMediaReady()</td><td>Builder</td><td>Method description</td></tr><tr><td>isActive()</td><td>bool</td><td>Method description</td></tr><tr><td>isExpired()</td><td>bool</td><td>Method description</td></tr><tr><td>isScheduled()</td><td>bool</td><td>Method description</td></tr><tr><td>isInactive()</td><td>bool</td><td>Method description</td></tr><tr><td>isUpcoming()</td><td>bool</td><td>Method description</td></tr><tr><td>isWithinBudget()</td><td>bool</td><td>Method description</td></tr><tr><td>getClickThroughRate()</td><td>float</td><td>Method description</td></tr><tr><td>getConversionRate()</td><td>float</td><td>Method description</td></tr><tr><td>getROI()</td><td>float</td><td>Method description</td></tr><tr><td>recordView()</td><td>void</td><td>Method description</td></tr><tr><td>recordClick()</td><td>void</td><td>Method description</td></tr><tr><td>recordConversion()</td><td>void</td><td>Method description</td></tr><tr><td>getBannerUrl()</td><td>string|null</td><td>Method description</td></tr><tr><td>getStatusBadgeColor()</td><td>string</td><td>Method description</td></tr><tr><td>getStatusLabel()</td><td>string</td><td>Method description</td></tr><tr><td>registerMediaCollections()</td><td>void</td><td>Method description</td></tr><tr><td>registerMediaConversions()</td><td>void</td><td>Method description</td></tr><tr><td>getImageUrl()</td><td>string|null</td><td>Method description</td></tr><tr><td>getDisplayNameAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getDescriptionAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getTypeAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getSubjectAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getContentAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getStartDateAttribute()</td><td>Carbon\Carbon|null</td><td>Method description</td></tr><tr><td>getEndDateAttribute()</td><td>Carbon\Carbon|null</td><td>Method description</td></tr><tr><td>getBudgetAttribute()</td><td>float|null</td><td>Method description</td></tr><tr><td>getTotalViewsAttribute()</td><td>int</td><td>Method description</td></tr><tr><td>getTotalClicksAttribute()</td><td>int</td><td>Method description</td></tr><tr><td>getTotalConversionsAttribute()</td><td>int</td><td>Method description</td></tr><tr><td>getTotalRevenueAttribute()</td><td>float</td><td>Method description</td></tr><tr><td>getConversionRateAttribute()</td><td>float</td><td>Method description</td></tr><tr><td>getTargetAudienceAttribute()</td><td>array|null</td><td>Method description</td></tr><tr><td>getTargetSegmentsAttribute()</td><td>array|null</td><td>Method description</td></tr><tr><td>getDisplayPriorityAttribute()</td><td>int</td><td>Method description</td></tr><tr><td>getBannerImageAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getBannerAltTextAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getCtaTextAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getCtaUrlAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getAutoStartAttribute()</td><td>bool</td><td>Method description</td></tr><tr><td>getAutoEndAttribute()</td><td>bool</td><td>Method description</td></tr><tr><td>getAutoPauseOnBudgetAttribute()</td><td>bool</td><td>Method description</td></tr><tr><td>getMetaTitleAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getMetaDescriptionAttribute()</td><td>string|null</td><td>Method description</td></tr><tr><td>getSocialMediaReadyAttribute()</td><td>bool</td><td>Method description</td></tr><tr><td>getFormattedDescriptionAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getTypeIconAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getTypeColorAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getTypeLabelAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getDurationAttribute()</td><td>int|null</td><td>Method description</td></tr><tr><td>getDaysRemainingAttribute()</td><td>int|null</td><td>Method description</td></tr><tr><td>getProgressPercentageAttribute()</td><td>float</td><td>Method description</td></tr><tr><td>getBudgetUtilizationAttribute()</td><td>float</td><td>Method description</td></tr><tr><td>getPerformanceScoreAttribute()</td><td>int</td><td>Method description</td></tr><tr><td>getPerformanceGradeAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getPerformanceColorAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getStatistics()</td><td>array</td><td>Method description</td></tr><tr><td>getFormattedBudgetAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getFormattedBudgetLimitAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getFormattedTotalRevenueAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getFormattedROIAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getFormattedConversionRateAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getFormattedClickThroughRateAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getFormattedBudgetUtilizationAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>getFormattedProgressPercentageAttribute()</td><td>string</td><td>Method description</td></tr><tr><td>isHighPerforming()</td><td>bool</td><td>Method description</td></tr><tr><td>isUnderperforming()</td><td>bool</td><td>Method description</td></tr><tr><td>needsAttention()</td><td>bool</td><td>Method description</td></tr><tr><td>canBeActivated()</td><td>bool</td><td>Method description</td></tr><tr><td>canBePaused()</td><td>bool</td><td>Method description</td></tr><tr><td>canBeResumed()</td><td>bool</td><td>Method description</td></tr><tr><td>canBeCompleted()</td><td>bool</td><td>Method description</td></tr><tr><td>getRecommendedActions()</td><td>array</td><td>Method description</td></tr><tr><td>duplicateForNewPeriod()</td><td>self</td><td>Method description</td></tr><tr><td>getTargetingSummary()</td><td>array</td><td>Method description</td></tr><tr><td>getContentSummary()</td><td>array</td><td>Method description</td></tr><tr><td>getAutomationSummary()</td><td>array</td><td>Method description</td></tr></tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Generated by Laravel PHPDoc Generator</p>
+    </footer>
+    
+    <script src='script.js'></script>
+</body>
+</html>
