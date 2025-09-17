@@ -41,3 +41,4 @@ final class ReportStatsWidget extends BaseWidget
         ];
     }
 }
+

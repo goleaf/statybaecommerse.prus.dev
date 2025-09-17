@@ -8,7 +8,7 @@
 <meta property="og:title" content="{{ $news->seo_title ?? $news->title }}">
 <meta property="og:description" content="{{ $news->seo_description ?? $news->summary }}">
 <meta property="og:type" content="article">
-<meta property="og:url" content="{{ route('news.show', $news->slug) }}">
+<meta property="og:url" content="{{ localized_route('news.show', $news->slug) }}">
 @if($news->images->where('is_featured', true)->first())
 <meta property="og:image" content="{{ $news->images->where('is_featured', true)->first()->url }}">
 @endif
@@ -23,7 +23,7 @@
     <!-- Breadcrumb -->
     <nav class="mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-500">
-            <li><a href="{{ route('news.index') }}" class="hover:text-blue-600">{{ __('news.title') }}</a></li>
+            <li><a href="{{ localized_route('news.index') }}" class="hover:text-blue-600">{{ __('news.title') }}</a></li>
             <li class="flex items-center">
                 <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
@@ -50,7 +50,7 @@
                     <!-- Categories and Tags -->
                     <div class="flex flex-wrap gap-2 mb-4">
                         @foreach($news->categories as $category)
-                        <a href="{{ route('news.category', $category->slug) }}" 
+                        <a href="{{ localized_route('news.category', $category->slug) }}" 
                            class="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full hover:bg-blue-200">
                             {{ $category->name }}
                         </a>
@@ -112,7 +112,7 @@
                         <h3 class="text-sm font-medium text-gray-900 mb-3">{{ __('news.tags') }}:</h3>
                         <div class="flex flex-wrap gap-2">
                             @foreach($news->tags as $tag)
-                            <a href="{{ route('news.tag', $tag->slug) }}" 
+                            <a href="{{ localized_route('news.tag', $tag->slug) }}" 
                                class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-gray-200">
                                 #{{ $tag->name }}
                             </a>
@@ -125,7 +125,7 @@
                     <div class="mt-8 pt-6 border-t border-gray-200">
                         <h3 class="text-sm font-medium text-gray-900 mb-3">{{ __('news.share_this_news') }}:</h3>
                         <div class="flex space-x-4">
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('news.show', $news->slug)) }}" 
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(localized_route('news.show', $news->slug)) }}" 
                                target="_blank" 
                                class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -133,7 +133,7 @@
                                 </svg>
                                 Facebook
                             </a>
-                            <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('news.show', $news->slug)) }}&text={{ urlencode($news->title) }}" 
+                            <a href="https://twitter.com/intent/tweet?url={{ urlencode(localized_route('news.show', $news->slug)) }}&text={{ urlencode($news->title) }}" 
                                target="_blank" 
                                class="flex items-center px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-500">
                                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -187,7 +187,7 @@
             <div class="mt-8 bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-xl font-semibold text-gray-900 mb-6">{{ __('news.add_comment') }}</h3>
                 
-                <form action="{{ route('news.comments.store', $news->slug) }}" method="POST" class="space-y-4">
+                <form action="{{ localized_route('news.comments.store', $news->slug) }}" method="POST" class="space-y-4">
                     @csrf
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -264,7 +264,7 @@
                         @endif
                         <div class="flex-1 min-w-0">
                             <h4 class="text-sm font-medium text-gray-900 line-clamp-2">
-                                <a href="{{ route('news.show', $related->slug) }}" class="hover:text-blue-600">
+                                <a href="{{ localized_route('news.show', $related->slug) }}" class="hover:text-blue-600">
                                     {{ $related->title }}
                                 </a>
                             </h4>
@@ -294,3 +294,4 @@
     </div>
 </div>
 @endsection
+

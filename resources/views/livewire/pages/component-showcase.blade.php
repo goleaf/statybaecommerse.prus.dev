@@ -12,7 +12,7 @@
         description="Demonstration of all shared components and their variants"
         icon="heroicon-o-squares-2x2"
         :breadcrumbs="[
-            ['title' => __('shared.home'), 'url' => route('home')],
+            ['title' => __('shared.home'), 'url' => localized_route('home')],
             ['title' => 'Component Showcase']
         ]"
     />
@@ -239,7 +239,7 @@
                 description="This is an example of an empty state component with action buttons"
                 icon="heroicon-o-cube"
                 action-text="Browse Products"
-                action-url="{{ route('products.index') }}"
+                action-url="{{ localized_route('products.index') }}"
             />
         </x-shared.section>
 

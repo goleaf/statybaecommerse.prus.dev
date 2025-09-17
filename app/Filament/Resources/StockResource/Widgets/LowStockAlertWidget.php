@@ -46,3 +46,4 @@ final class LowStockAlertWidget extends ChartWidget
         return 'doughnut';
     }
 }
+

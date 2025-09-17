@@ -406,3 +406,4 @@ final class VariantInventoryTest extends TestCase
         $this->assertFalse($variantItems->contains($anotherStockItem));
     }
 }
+

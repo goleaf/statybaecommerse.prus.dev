@@ -25,3 +25,4 @@ final class EditSeoData extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 }
+

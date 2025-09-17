@@ -47,7 +47,7 @@ final class SEOService
     {
         $title = $brand->meta_title ?? $brand->name . ' Products - ' . config('app.name');
         $description = $brand->meta_description ?? Str::limit(strip_tags($brand->description), 160);
-        return ['title' => $title, 'description' => $description, 'canonical' => route('brands.show', $brand->slug), 'og_title' => $title, 'og_description' => $description, 'og_image' => $brand->getFirstMediaUrl('logo', 'logo-md') ?: $brand->getFirstMediaUrl('logo'), 'og_type' => 'website'];
+        return ['title' => $title, 'description' => $description, 'canonical' => localized_route('brands.show', $brand->slug), 'og_title' => $title, 'og_description' => $description, 'og_image' => $brand->getFirstMediaUrl('logo', 'logo-md') ?: $brand->getFirstMediaUrl('logo'), 'og_type' => 'website'];
     }
     /**
      * Handle generateProductKeywords functionality with proper error handling.

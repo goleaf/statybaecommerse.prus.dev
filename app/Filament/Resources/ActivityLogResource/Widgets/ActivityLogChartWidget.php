@@ -62,3 +62,4 @@ final class ActivityLogChartWidget extends ChartWidget
         ];
     }
 }
+

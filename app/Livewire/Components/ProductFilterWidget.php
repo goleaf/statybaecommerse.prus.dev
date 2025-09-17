@@ -174,7 +174,7 @@ final class ProductFilterWidget extends Component
     #[Computed]
     public function availableBrands(): Collection
     {
-        return Brand::where('is_visible', true)->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])->orderBy('name')->get();
+        return Brand::with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])->orderBy('name')->get();
     }
     /**
      * Handle availableAttributes functionality with proper error handling.

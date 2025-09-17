@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
@@ -23,10 +21,26 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            // Only include concrete widget implementations, not abstract base classes
-            // StatsOverviewWidget::class, // This is also abstract
-            // ChartWidget::class, // This is abstract - cannot be instantiated
-            // TableWidget::class, // This is also abstract
+            // Dashboard Overview - Key Metrics
+            \App\Filament\Widgets\DashboardOverviewWidget::class,
+            // Advanced Analytics Charts
+            \App\Filament\Widgets\AdvancedAnalyticsWidget::class,
+            // Revenue Analytics
+            \App\Filament\Widgets\RevenueAnalyticsWidget::class,
+            // Product Performance
+            \App\Filament\Widgets\ProductPerformanceWidget::class,
+            // User Activity Analytics
+            \App\Filament\Widgets\UserActivityWidget::class,
+            // Campaign Performance
+            \App\Filament\Widgets\CampaignPerformanceWidget::class,
+            // Inventory Analytics
+            \App\Filament\Widgets\InventoryAnalyticsWidget::class,
+            // System Performance
+            \App\Filament\Widgets\SystemPerformanceWidget::class,
+            // Real-time Analytics
+            \App\Filament\Widgets\RealtimeAnalyticsWidget::class,
+            // Recent Activity Feed
+            \App\Filament\Widgets\RecentActivityWidget::class,
         ];
     }
 

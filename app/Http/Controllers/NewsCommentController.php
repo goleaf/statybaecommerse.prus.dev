@@ -36,6 +36,6 @@ final class NewsCommentController extends Controller
             // Comments need approval
             'is_visible' => true,
         ]);
-        return redirect()->route('news.show', $slug)->with('success', __('news.comment_success'));
+        return redirect(localized_route('news.show', $slug))->with('success', __('news.comment_success'));
     }
 }

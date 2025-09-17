@@ -67,11 +67,11 @@
                         </div>
                         
                         <div class="space-y-2">
-                            <a href="{{ route('cart.index') }}" 
+                            <a href="{{ localized_route('cart.index') }}" 
                                class="block w-full text-center px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors">
                                 {{ __('store.nav.cart') }}
                             </a>
-                            <a href="{{ route('checkout.index') }}" 
+                            <a href="{{ localized_route('checkout.index') }}" 
                                class="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                                 {{ __('store.checkout.proceed') }}
                             </a>

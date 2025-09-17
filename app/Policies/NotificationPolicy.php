@@ -6,6 +6,7 @@ namespace App\Policies;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 /**
  * NotificationPolicy
  * 
@@ -18,142 +19,156 @@ final class NotificationPolicy
     /**
      * Handle viewAny functionality with proper error handling.
      * @param User $user
-     * @return bool
+     * @return Response
      */
-    public function viewAny(User $user): bool
+    public function viewAny(User $user): Response
     {
-        return $user->hasPermissionTo('view notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('view notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.view_any_denied'));
     }
     /**
      * Handle view functionality with proper error handling.
      * @param User $user
      * @param Notification $notification
-     * @return bool
+     * @return Response
      */
-    public function view(User $user, Notification $notification): bool
+    public function view(User $user, Notification $notification): Response
     {
-        // Users can view their own notifications
         if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
-            return true;
+            return Response::allow();
         }
-        // Admins can view all notifications
-        return $user->hasPermissionTo('view notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('view notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.view_denied'));
     }
     /**
      * Show the form for creating a new resource.
      * @param User $user
-     * @return bool
+     * @return Response
      */
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
-        return $user->hasPermissionTo('create notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('create notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.create_denied'));
     }
     /**
      * Update the specified resource in storage with validation.
      * @param User $user
      * @param Notification $notification
-     * @return bool
+     * @return Response
      */
-    public function update(User $user, Notification $notification): bool
+    public function update(User $user, Notification $notification): Response
     {
-        // Users can update their own notifications (mark as read/unread)
         if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
-            return true;
+            return Response::allow();
         }
-        // Admins can update all notifications
-        return $user->hasPermissionTo('update notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('update notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.update_denied'));
     }
     /**
      * Handle delete functionality with proper error handling.
      * @param User $user
      * @param Notification $notification
-     * @return bool
+     * @return Response
      */
-    public function delete(User $user, Notification $notification): bool
+    public function delete(User $user, Notification $notification): Response
     {
-        // Users can delete their own notifications
         if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
-            return true;
+            return Response::allow();
         }
-        // Admins can delete all notifications
-        return $user->hasPermissionTo('delete notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('delete notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.delete_denied'));
     }
     /**
      * Handle restore functionality with proper error handling.
      * @param User $user
      * @param Notification $notification
-     * @return bool
+     * @return Response
      */
-    public function restore(User $user, Notification $notification): bool
+    public function restore(User $user, Notification $notification): Response
     {
-        return $user->hasPermissionTo('restore notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('restore notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.restore_denied'));
     }
     /**
      * Handle forceDelete functionality with proper error handling.
      * @param User $user
      * @param Notification $notification
-     * @return bool
+     * @return Response
      */
-    public function forceDelete(User $user, Notification $notification): bool
+    public function forceDelete(User $user, Notification $notification): Response
     {
-        return $user->hasPermissionTo('force delete notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('force delete notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.force_delete_denied'));
     }
     /**
      * Handle markAsRead functionality with proper error handling.
      * @param User $user
      * @param Notification $notification
-     * @return bool
+     * @return Response
      */
-    public function markAsRead(User $user, Notification $notification): bool
+    public function markAsRead(User $user, Notification $notification): Response
     {
-        // Users can mark their own notifications as read
         if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
-            return true;
+            return Response::allow();
         }
-        // Admins can mark any notification as read
-        return $user->hasPermissionTo('update notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('update notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.mark_as_read_denied'));
     }
     /**
      * Handle markAsUnread functionality with proper error handling.
      * @param User $user
      * @param Notification $notification
-     * @return bool
+     * @return Response
      */
-    public function markAsUnread(User $user, Notification $notification): bool
+    public function markAsUnread(User $user, Notification $notification): Response
     {
-        // Users can mark their own notifications as unread
         if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
-            return true;
+            return Response::allow();
         }
-        // Admins can mark any notification as unread
-        return $user->hasPermissionTo('update notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('update notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.mark_as_unread_denied'));
     }
     /**
      * Handle duplicate functionality with proper error handling.
      * @param User $user
      * @param Notification $notification
-     * @return bool
+     * @return Response
      */
-    public function duplicate(User $user, Notification $notification): bool
+    public function duplicate(User $user, Notification $notification): Response
     {
-        return $user->hasPermissionTo('create notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('create notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.duplicate_denied'));
     }
     /**
      * Handle bulkUpdate functionality with proper error handling.
      * @param User $user
-     * @return bool
+     * @return Response
      */
-    public function bulkUpdate(User $user): bool
+    public function bulkUpdate(User $user): Response
     {
-        return $user->hasPermissionTo('update notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('update notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.bulk_update_denied'));
     }
     /**
      * Handle bulkDelete functionality with proper error handling.
      * @param User $user
-     * @return bool
+     * @return Response
      */
-    public function bulkDelete(User $user): bool
+    public function bulkDelete(User $user): Response
     {
-        return $user->hasPermissionTo('delete notifications') || $user->is_admin;
+        return ($user->hasPermissionTo('delete notifications') || $user->is_admin)
+            ? Response::allow()
+            : Response::deny(__('policy.notification.bulk_delete_denied'));
     }
 }

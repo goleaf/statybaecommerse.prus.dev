@@ -103,7 +103,7 @@
                     <p class="text-sm text-gray-600">
                         {{ __('Already registered?') }}
                         <x-link 
-                            :href="route('login', ['locale' => app()->getLocale()])"
+                            :href="route('login', [])"
                             class="font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-200 ml-1">
                             {{ __('Sign in') }}
                         </x-link>

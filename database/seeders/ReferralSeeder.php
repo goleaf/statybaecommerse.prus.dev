@@ -88,3 +88,4 @@ final class ReferralSeeder extends Seeder
         $this->command->info('- '.ReferralReward::count().' referral rewards');
     }
 }
+

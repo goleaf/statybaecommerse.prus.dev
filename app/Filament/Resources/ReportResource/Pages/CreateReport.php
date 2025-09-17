@@ -25,3 +25,4 @@ final class CreateReport extends CreateRecord
         return $data;
     }
 }
+

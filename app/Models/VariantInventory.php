@@ -64,7 +64,10 @@ final class VariantInventory extends Model
             'available' => 'integer',
             'reorder_point' => 'integer',
             'reorder_quantity' => 'integer',
+            'cost_per_unit' => 'decimal:2',
             'last_restocked_at' => 'datetime',
+            'last_sold_at' => 'datetime',
+            'expiry_date' => 'date',
         ];
     }
 
@@ -83,6 +86,14 @@ final class VariantInventory extends Model
     public function variant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class, 'variant_id');
+    }
+
+    /**
+     * Supplier partner for this inventory record.
+     */
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Partner::class, 'supplier_id');
     }
 
     /**

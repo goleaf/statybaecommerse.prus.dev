@@ -70,11 +70,11 @@
                     </div>
 
                     <div class="flex gap-2">
-                        <a href="{{ route('cart.index', ['locale' => app()->getLocale()]) ?? '/cart' }}"
+                        <a href="{{ localized_route('cart.index') }}"
                            class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-center font-medium hover:bg-gray-200 transition-colors duration-200">
                             {{ __('View Cart') }}
                         </a>
-                        <a href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
+                        <a href="{{ localized_route('checkout.index') }}"
                            class="flex-1 btn-gradient px-4 py-2 rounded-lg text-center font-medium">
                             {{ __('Checkout') }}
                         </a>
@@ -91,7 +91,7 @@
                     </svg>
                     <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('Your cart is empty') }}</h4>
                     <p class="text-gray-600 mb-4">{{ __('Add some products to get started') }}</p>
-                    <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                    <a href="{{ localized_route('products.index') }}"
                        class="btn-gradient px-6 py-2 rounded-lg font-medium">
                         {{ __('Start Shopping') }}
                     </a>

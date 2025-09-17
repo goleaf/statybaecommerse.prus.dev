@@ -21,7 +21,7 @@
                         
                         <!-- Product Image -->
                         <div class="relative overflow-hidden rounded-t-lg">
-                            <a href="{{ route('products.show', $recommendedProduct->slug) }}" 
+                            <a href="{{ localized_route('products.show', $recommendedProduct->slug) }}" 
                                wire:click="trackClick({{ $recommendedProduct->id }})"
                                class="block">
                                 <img src="{{ $recommendedProduct->getMainImage() }}" 
@@ -46,7 +46,7 @@
                         <div class="p-4">
                             <!-- Product Name -->
                             <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2 line-clamp-2">
-                                <a href="{{ route('products.show', $recommendedProduct->slug) }}" 
+                                <a href="{{ localized_route('products.show', $recommendedProduct->slug) }}" 
                                    wire:click="trackClick({{ $recommendedProduct->id }})"
                                    class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                                     {{ $recommendedProduct->name }}

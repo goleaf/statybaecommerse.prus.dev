@@ -17,7 +17,7 @@
         <x-filament::dropdown.list>
             @foreach ($availableLocales as $locale => $name)
                 <x-filament::dropdown.list.item
-                                                :href="url()->current() . '?locale=' . $locale"
+                                                :href="switch_locale_url($locale, request()->getPathInfo(), request()->query(), false)"
                                                 :active="$currentLocale === $locale"
                                                 icon="heroicon-o-globe-alt">
                     {{ $name }}

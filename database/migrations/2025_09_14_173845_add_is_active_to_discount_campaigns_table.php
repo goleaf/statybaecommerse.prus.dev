@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('discount_campaigns', function (Blueprint $table) {
-            if (!Schema::hasColumn('discount_campaigns', 'is_active')) {
-                $table->boolean('is_active')->default(true)->after('status');
-            }
+            $table->boolean('is_active')->default(true)->after('status');
         });
     }
 
@@ -24,9 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('discount_campaigns', function (Blueprint $table) {
-            if (Schema::hasColumn('discount_campaigns', 'is_active')) {
-                $table->dropColumn('is_active');
-            }
+            $table->dropColumn('is_active');
         });
     }
 };

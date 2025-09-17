@@ -82,3 +82,4 @@ final class DiscountConditionTableWidget extends BaseWidget
             ->defaultSort('created_at', 'desc');
     }
 }
+

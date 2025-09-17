@@ -326,3 +326,4 @@ final class RegionTest extends TestCase
         $this->assertEquals('Lithuania > Vilnius County > Vilnius District', $districtRegion->breadcrumb_string);
     }
 }
+

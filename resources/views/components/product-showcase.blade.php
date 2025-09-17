@@ -245,7 +245,7 @@
                                         <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                                             <div class="flex-1">
                                                 <h3 class="text-xl font-semibold text-gray-900 mb-2">
-                                                    <a href="{{ route('product.show', $product->slug ?? $product) }}"
+                                                    <a href="{{ route('product.show', $product->slug) }}"
                                                        class="hover:text-blue-600 transition-colors duration-200">
                                                         {{ $product->name }}
                                                     </a>

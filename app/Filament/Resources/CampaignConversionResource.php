@@ -13,7 +13,7 @@ use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
@@ -43,7 +43,7 @@ final class CampaignConversionResource extends Resource
     protected static ?string $model = CampaignConversion::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+    protected static UnitEnum|string|null  = NavigationGroup::Marketing;
     
     protected static ?int $navigationSort = 9;
     protected static ?string $recordTitleAttribute = 'campaign_name';
@@ -86,12 +86,11 @@ final class CampaignConversionResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->schema([
+    public static function form(Form $form): Form{
+        return $form->schema([
             Section::make(__('campaign_conversions.basic_information'))
                 ->schema([
                     Grid::make(2)

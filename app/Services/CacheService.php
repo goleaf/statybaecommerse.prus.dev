@@ -43,7 +43,7 @@ final class CacheService
      */
     public static function getTopBrands(int $limit = 10): Collection
     {
-        return Cache::remember("top_brands_{$limit}", self::TTL, fn() => Brand::where('is_visible', true)->where('is_featured', true)->with(['media'])->withCount('products')->orderBy('products_count', 'desc')->limit($limit)->get());
+        return Cache::remember("top_brands_{$limit}", self::TTL, fn() => Brand::where('is_featured', true)->with(['media'])->withCount('products')->orderBy('products_count', 'desc')->limit($limit)->get());
     }
     /**
      * Handle getNavigationCategories functionality with proper error handling.

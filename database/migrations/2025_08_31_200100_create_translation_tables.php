@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -71,21 +72,17 @@ return new class extends Migration
 
     private function createTranslation(string $tableName, string $parentKey, callable $columns, bool $hasSlug = false): void
     {
-        if (Schema::hasTable($tableName)) {
-            return;
-        }
-
-        Schema::create($tableName, function (Blueprint $table) use ($parentKey, $columns, $hasSlug) {
+        Schema::create($tableName, function (Blueprint $table) use ($parentKey, $columns, $hasSlug, $tableName) {
             $table->id();
             $table->unsignedBigInteger($parentKey);
             $table->string('locale', 10);
             $columns($table);
             $table->timestamps();
 
-            $table->index('locale');
-            $table->unique([$parentKey, 'locale']);
+            $table->index('locale', $tableName . '_locale_idx');
+            $table->unique([$parentKey, 'locale'], $tableName . '_' . $parentKey . '_locale_unique');
             if ($hasSlug) {
-                $table->unique(['locale', 'slug']);
+                $table->unique(['locale', 'slug'], $tableName . '_locale_slug_unique');
             }
         });
     }

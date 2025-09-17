@@ -47,3 +47,4 @@ final class ReportTypesWidget extends ChartWidget
         return 'doughnut';
     }
 }
+

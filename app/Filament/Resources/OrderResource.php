@@ -1,50 +1,48 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
-use App\Models\User;
-use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\KeyValue;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Notifications\Notification;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
 /**
  * OrderResource
- * 
+ *
  * Filament v4 resource for Order management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
-    
-    /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
-    
+
     protected static ?int $navigationSort = 1;
+
     protected static ?string $recordTitleAttribute = 'number';
 
     /**
@@ -85,8 +83,6 @@ final class OrderResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
@@ -100,7 +96,6 @@ final class OrderResource extends Resource
                                 ->required()
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(255),
-                            
                             Select::make('user_id')
                                 ->label(__('orders.customer'))
                                 ->relationship('user', 'name')
@@ -108,7 +103,6 @@ final class OrderResource extends Resource
                                 ->preload()
                                 ->required(),
                         ]),
-                    
                     Grid::make(3)
                         ->schema([
                             Select::make('status')
@@ -123,7 +117,6 @@ final class OrderResource extends Resource
                                 ])
                                 ->required()
                                 ->default('pending'),
-                            
                             Select::make('payment_status')
                                 ->label(__('orders.payment_status'))
                                 ->options([
@@ -134,7 +127,6 @@ final class OrderResource extends Resource
                                 ])
                                 ->required()
                                 ->default('pending'),
-                            
                             Select::make('payment_method')
                                 ->label(__('orders.payment_method'))
                                 ->options([
@@ -145,7 +137,6 @@ final class OrderResource extends Resource
                                 ]),
                         ]),
                 ]),
-            
             Section::make(__('orders.pricing'))
                 ->schema([
                     Grid::make(4)
@@ -155,26 +146,22 @@ final class OrderResource extends Resource
                                 ->numeric()
                                 ->prefix('€')
                                 ->required(),
-                            
                             TextInput::make('tax_amount')
                                 ->label(__('orders.tax_amount'))
                                 ->numeric()
                                 ->prefix('€')
                                 ->default(0),
-                            
                             TextInput::make('shipping_amount')
                                 ->label(__('orders.shipping_amount'))
                                 ->numeric()
                                 ->prefix('€')
                                 ->default(0),
-                            
                             TextInput::make('discount_amount')
                                 ->label(__('orders.discount_amount'))
                                 ->numeric()
                                 ->prefix('€')
                                 ->default(0),
                         ]),
-                    
                     TextInput::make('total')
                         ->label(__('orders.total'))
                         ->numeric()
@@ -182,7 +169,6 @@ final class OrderResource extends Resource
                         ->required()
                         ->disabled(),
                 ]),
-            
             Section::make(__('orders.addresses'))
                 ->schema([
                     KeyValue::make('billing_address')
@@ -190,26 +176,22 @@ final class OrderResource extends Resource
                         ->keyLabel(__('orders.address_field'))
                         ->valueLabel(__('orders.address_value'))
                         ->addActionLabel(__('orders.add_address_field')),
-                    
                     KeyValue::make('shipping_address')
                         ->label(__('orders.shipping_address'))
                         ->keyLabel(__('orders.address_field'))
                         ->valueLabel(__('orders.address_value'))
                         ->addActionLabel(__('orders.add_address_field')),
                 ]),
-            
             Section::make(__('orders.additional_information'))
                 ->schema([
                     Textarea::make('notes')
                         ->label(__('orders.notes'))
                         ->rows(3)
                         ->columnSpanFull(),
-                    
                     Grid::make(2)
                         ->schema([
                             DateTimePicker::make('shipped_at')
                                 ->label(__('orders.shipped_at')),
-                            
                             DateTimePicker::make('delivered_at')
                                 ->label(__('orders.delivered_at')),
                         ]),
@@ -231,12 +213,10 @@ final class OrderResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->copyable(),
-                
                 TextColumn::make('user.name')
                     ->label(__('orders.customer'))
                     ->searchable()
                     ->sortable(),
-                
                 BadgeColumn::make('status')
                     ->label(__('orders.status'))
                     ->colors([
@@ -247,8 +227,7 @@ final class OrderResource extends Resource
                         'danger' => 'cancelled',
                         'secondary' => 'refunded',
                     ])
-                    ->formatStateUsing(fn (string $state): string => __("orders.statuses.{$state}")),
-                
+                    ->formatStateUsing(fn(string $state): string => __("orders.statuses.{$state}")),
                 BadgeColumn::make('payment_status')
                     ->label(__('orders.payment_status'))
                     ->colors([
@@ -257,24 +236,20 @@ final class OrderResource extends Resource
                         'danger' => 'failed',
                         'secondary' => 'refunded',
                     ])
-                    ->formatStateUsing(fn (string $state): string => __("orders.payment_statuses.{$state}")),
-                
+                    ->formatStateUsing(fn(string $state): string => __("orders.payment_statuses.{$state}")),
                 TextColumn::make('total')
                     ->label(__('orders.total'))
                     ->money('EUR')
                     ->sortable(),
-                
                 TextColumn::make('items_count')
                     ->label(__('orders.items_count'))
                     ->counts('items')
                     ->sortable(),
-                
                 TextColumn::make('created_at')
                     ->label(__('orders.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('updated_at')
                     ->label(__('orders.updated_at'))
                     ->dateTime()
@@ -292,7 +267,6 @@ final class OrderResource extends Resource
                         'cancelled' => __('orders.statuses.cancelled'),
                         'refunded' => __('orders.statuses.refunded'),
                     ]),
-                
                 SelectFilter::make('payment_status')
                     ->label(__('orders.payment_status'))
                     ->options([
@@ -301,7 +275,6 @@ final class OrderResource extends Resource
                         'failed' => __('orders.payment_statuses.failed'),
                         'refunded' => __('orders.payment_statuses.refunded'),
                     ]),
-                
                 Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
@@ -313,47 +286,45 @@ final class OrderResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                
                 TableAction::make('mark_shipped')
                     ->label(__('orders.mark_shipped'))
                     ->icon('heroicon-o-truck')
                     ->color('info')
-                    ->visible(fn (Order $record): bool => $record->status === 'processing')
+                    ->visible(fn(Order $record): bool => $record->status === 'processing')
                     ->action(function (Order $record): void {
                         $record->update([
                             'status' => 'shipped',
                             'shipped_at' => now(),
                         ]);
-                        
+
                         Notification::make()
                             ->title(__('orders.shipped_successfully'))
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation(),
-                
                 TableAction::make('mark_delivered')
                     ->label(__('orders.mark_delivered'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Order $record): bool => $record->status === 'shipped')
+                    ->visible(fn(Order $record): bool => $record->status === 'shipped')
                     ->action(function (Order $record): void {
                         $record->update([
                             'status' => 'delivered',
                             'delivered_at' => now(),
                         ]);
-                        
+
                         Notification::make()
                             ->title(__('orders.delivered_successfully'))
                             ->success()
@@ -364,14 +335,13 @@ final class OrderResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    
                     BulkAction::make('mark_processing')
                         ->label(__('orders.mark_processing'))
                         ->icon('heroicon-o-cog')
                         ->color('primary')
                         ->action(function (Collection $records): void {
                             $records->each->update(['status' => 'processing']);
-                            
+
                             Notification::make()
                                 ->title(__('orders.bulk_processing_success'))
                                 ->success()

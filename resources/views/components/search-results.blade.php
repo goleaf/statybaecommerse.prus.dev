@@ -241,7 +241,7 @@
                         <h4 class="font-semibold text-gray-900 mb-3">{{ __('Browse Categories') }}</h4>
                         <div class="space-y-2">
                             @foreach ($suggestions['Categories'] as $category)
-                                <a href="{{ route('categories.index', ['locale' => app()->getLocale()]) ?? '/categories' }}"
+                                <a href="{{ localized_route('categories.index') }}"
                                    class="block px-3 py-2 text-sm text-gray-600 hover:bg-white hover:text-blue-600 rounded-lg transition-colors duration-200">
                                     {{ $category }}
                                 </a>

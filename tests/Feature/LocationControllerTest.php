@@ -17,7 +17,7 @@ final class LocationControllerTest extends TestCase
     {
         Location::factory()->count(3)->create(['is_enabled' => true]);
 
-        $response = $this->get(route('locations.index'));
+        $response = $this->get(localized_route('locations.index'));
 
         $response->assertStatus(200);
         $response->assertViewIs('locations.index');
@@ -31,7 +31,7 @@ final class LocationControllerTest extends TestCase
         Location::factory()->create(['is_enabled' => true, 'name' => 'Enabled Location']);
         Location::factory()->create(['is_enabled' => false, 'name' => 'Disabled Location']);
 
-        $response = $this->get(route('locations.index'));
+        $response = $this->get(localized_route('locations.index'));
 
         $response->assertStatus(200);
         $response->assertSee('Enabled Location');
@@ -43,7 +43,7 @@ final class LocationControllerTest extends TestCase
         Location::factory()->create(['type' => 'warehouse', 'name' => 'Warehouse Location']);
         Location::factory()->create(['type' => 'store', 'name' => 'Store Location']);
 
-        $response = $this->get(route('locations.index', ['type' => 'warehouse']));
+        $response = $this->get(localized_route('locations.index', ['type' => 'warehouse']));
 
         $response->assertStatus(200);
         $response->assertSee('Warehouse Location');
@@ -55,7 +55,7 @@ final class LocationControllerTest extends TestCase
         Location::factory()->create(['city' => 'Vilnius', 'name' => 'Vilnius Location']);
         Location::factory()->create(['city' => 'Kaunas', 'name' => 'Kaunas Location']);
 
-        $response = $this->get(route('locations.index', ['city' => 'Vilnius']));
+        $response = $this->get(localized_route('locations.index', ['city' => 'Vilnius']));
 
         $response->assertStatus(200);
         $response->assertSee('Vilnius Location');
@@ -67,7 +67,7 @@ final class LocationControllerTest extends TestCase
         Location::factory()->create(['name' => 'Main Warehouse']);
         Location::factory()->create(['name' => 'Secondary Store']);
 
-        $response = $this->get(route('locations.index', ['search' => 'Main']));
+        $response = $this->get(localized_route('locations.index', ['search' => 'Main']));
 
         $response->assertStatus(200);
         $response->assertSee('Main Warehouse');
@@ -79,7 +79,7 @@ final class LocationControllerTest extends TestCase
         Location::factory()->create(['address_line_1' => '123 Main Street']);
         Location::factory()->create(['address_line_1' => '456 Oak Avenue']);
 
-        $response = $this->get(route('locations.index', ['search' => 'Main']));
+        $response = $this->get(localized_route('locations.index', ['search' => 'Main']));
 
         $response->assertStatus(200);
         $response->assertSee('123 Main Street');
@@ -90,7 +90,7 @@ final class LocationControllerTest extends TestCase
     {
         $location = Location::factory()->create(['is_enabled' => true]);
 
-        $response = $this->get(route('locations.show', $location));
+        $response = $this->get(localized_route('locations.show', $location));
 
         $response->assertStatus(200);
         $response->assertViewIs('locations.show');
@@ -102,7 +102,7 @@ final class LocationControllerTest extends TestCase
     {
         $location = Location::factory()->create(['is_enabled' => false]);
 
-        $response = $this->get(route('locations.show', $location));
+        $response = $this->get(localized_route('locations.show', $location));
 
         $response->assertStatus(404);
     }
@@ -120,7 +120,7 @@ final class LocationControllerTest extends TestCase
             'country_code' => 'LT',
         ]);
 
-        $response = $this->get(route('locations.show', $location));
+        $response = $this->get(localized_route('locations.show', $location));
 
         $response->assertStatus(200);
         $response->assertSee('Test Location');
@@ -156,7 +156,7 @@ final class LocationControllerTest extends TestCase
             'city' => 'Kaunas',
         ]);
 
-        $response = $this->get(route('locations.show', $mainLocation));
+        $response = $this->get(localized_route('locations.show', $mainLocation));
 
         $response->assertStatus(200);
         $response->assertSee($relatedLocation1->name);
@@ -168,7 +168,7 @@ final class LocationControllerTest extends TestCase
     {
         $location = Location::factory()->create(['is_enabled' => true]);
 
-        $response = $this->post(route('locations.contact', $location), [
+        $response = $this->post(localized_route('locations.contact', $location), [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'subject' => 'Test Subject',
@@ -183,7 +183,7 @@ final class LocationControllerTest extends TestCase
     {
         $location = Location::factory()->create(['is_enabled' => true]);
 
-        $response = $this->post(route('locations.contact', $location), [
+        $response = $this->post(localized_route('locations.contact', $location), [
             'name' => '',
             'email' => 'invalid-email',
             'subject' => '',
@@ -197,7 +197,7 @@ final class LocationControllerTest extends TestCase
     {
         $location = Location::factory()->create(['is_enabled' => true]);
 
-        $response = $this->post(route('locations.contact', $location), [
+        $response = $this->post(localized_route('locations.contact', $location), [
             'name' => 'John Doe',
             'email' => 'not-an-email',
             'subject' => 'Test Subject',
@@ -211,7 +211,7 @@ final class LocationControllerTest extends TestCase
     {
         $location = Location::factory()->create(['is_enabled' => true]);
 
-        $response = $this->post(route('locations.contact', $location), [
+        $response = $this->post(localized_route('locations.contact', $location), [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'subject' => 'Test Subject',
@@ -225,7 +225,7 @@ final class LocationControllerTest extends TestCase
     {
         Location::factory()->count(15)->create(['is_enabled' => true]);
 
-        $response = $this->get(route('locations.index'));
+        $response = $this->get(localized_route('locations.index'));
 
         $response->assertStatus(200);
         $response->assertViewHas('locations');
@@ -240,7 +240,7 @@ final class LocationControllerTest extends TestCase
         Location::factory()->create(['type' => 'warehouse', 'name' => 'Warehouse 2']);
         Location::factory()->create(['type' => 'store', 'name' => 'Store 1']);
 
-        $response = $this->get(route('locations.index', ['type' => 'warehouse', 'page' => 1]));
+        $response = $this->get(localized_route('locations.index', ['type' => 'warehouse', 'page' => 1]));
 
         $response->assertStatus(200);
         $response->assertSee('Warehouse 1');
@@ -258,7 +258,7 @@ final class LocationControllerTest extends TestCase
             ],
         ]);
 
-        $response = $this->get(route('locations.show', $location));
+        $response = $this->get(localized_route('locations.show', $location));
 
         $response->assertStatus(200);
         $response->assertSee(__('locations.working_hours'));
@@ -275,7 +275,7 @@ final class LocationControllerTest extends TestCase
             'longitude' => 25.2797,
         ]);
 
-        $response = $this->get(route('locations.show', $location));
+        $response = $this->get(localized_route('locations.show', $location));
 
         $response->assertStatus(200);
         $response->assertSee('https://www.google.com/maps?q=54.6872,25.2797');

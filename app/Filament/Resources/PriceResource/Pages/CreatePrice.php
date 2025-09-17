@@ -26,3 +26,4 @@ final class CreatePrice extends CreateRecord
         return $data;
     }
 }
+

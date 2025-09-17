@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -328,7 +326,7 @@ final class LithuanianCatalogSeeder extends Seeder
                 'category_id' => $category->id,
                 'locale' => $loc,
                 'name' => $name,
-                'slug' => Str::slug($data['slug'].'-'.$loc), // Ensure unique slugs per locale
+                'slug' => Str::slug($data['slug'] . '-' . $loc),  // Ensure unique slugs per locale
                 'description' => $this->translateLike((string) ($data['description'] ?? ''), $loc),
                 'seo_title' => $name,
                 'seo_description' => $this->translateLike('Statybinių prekių kategorija.', $loc),
@@ -342,8 +340,8 @@ final class LithuanianCatalogSeeder extends Seeder
             ['name', 'slug', 'description', 'seo_title', 'seo_description', 'updated_at']
         );
 
-        if ($category && ($category->wasRecentlyCreated || ! $category->hasMedia('images')) && isset($data['image_url'])) {
-            $this->attachGeneratedImage($category, 'images', $data['name'].' Image');
+        if ($category && ($category->wasRecentlyCreated || !$category->hasMedia('images')) && isset($data['image_url'])) {
+            $this->attachGeneratedImage($category, 'images', $data['name'] . ' Image');
         }
 
         if (isset($data['children']) && is_array($data['children'])) {
@@ -357,10 +355,10 @@ final class LithuanianCatalogSeeder extends Seeder
     {
         try {
             $imagePath = $this->imageGenerator->generateCategoryImage($category->name);
-            if (! file_exists($imagePath)) {
+            if (!file_exists($imagePath)) {
                 return;
             }
-            $filename = Str::slug($name).'.webp';
+            $filename = Str::slug($name) . '.webp';
             $category
                 ->addMedia($imagePath)
                 ->withCustomProperties(['source' => 'local_generated'])
@@ -376,7 +374,7 @@ final class LithuanianCatalogSeeder extends Seeder
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn ($v) => trim((string) $v))
+            ->map(fn($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -387,10 +385,409 @@ final class LithuanianCatalogSeeder extends Seeder
     {
         return match ($locale) {
             'lt' => $text,
-            'en' => $text.' (EN)',
-            'ru' => $text.' (RU)',
-            'de' => $text.' (DE)',
-            default => $text.' ('.strtoupper($locale).')',
+            'en' => $this->translateToEnglish($text),
+            'ru' => $this->translateToRussian($text),
+            'de' => $this->translateToGerman($text),
+            default => $text . ' (' . strtoupper($locale) . ')',
         };
+    }
+
+    private function translateToEnglish(string $text): string
+    {
+        $translations = [
+            // Main categories
+            'Sandarinimo plėvelės ir juostos' => 'Sealing films and tapes',
+            'Tvirtinimo elementai, varžtai, medvarsčiai' => 'Fastening elements, bolts, wood screws',
+            'Įsukami, įkalami poliai' => 'Screw-in, driven piles',
+            'Chemija statyboms' => 'Construction chemistry',
+            'Įrankiai ir jų priedai' => 'Tools and accessories',
+            'Stogų danga ir priedai' => 'Roofing and accessories',
+            'Fasadams' => 'For facades',
+            'Elektros prekės' => 'Electrical products',
+            'Darbo apranga, saugos priemonės' => 'Work clothing, safety equipment',
+            // Subcategories - Sealing
+            'Juostos' => 'Tapes',
+            'Plėvelės' => 'Films',
+            'Pamatų hidroizoliacija' => 'Foundation waterproofing',
+            'Vinių sandarinimo juostos' => 'Nail sealing tapes',
+            'Kitos sandarinimo medžiagos ir priedai' => 'Other sealing materials and accessories',
+            'Laukui' => 'For outdoor use',
+            'Vidui' => 'For indoor use',
+            'Horizontali' => 'Horizontal',
+            'Vertikali' => 'Vertical',
+            // Subcategories - Fastening
+            'Medvarsčiai' => 'Wood screws',
+            'Tvirtinimas į betoną, mūrą' => 'Fastening to concrete, masonry',
+            'Medžio konstrukcijų tvirtinimas' => 'Wood construction fastening',
+            'Sriegiai, varžtai, veržlės, poveržlės' => 'Threads, bolts, nuts, washers',
+            'Kniedės' => 'Rivets',
+            'Vinys, kabės' => 'Nails, hooks',
+            'Lengvas tvirtinimas' => 'Light fastening',
+            'Tvirtinimo juostos' => 'Fastening strips',
+            'Išlyginimo kaladėlė, kyliai ir kt.' => 'Leveling shims, wedges, etc.',
+            'Termoizoliaciniai kaiščiai' => 'Thermal insulation dowels',
+            // Wood screw types
+            'Įleidžiama galvute' => 'Countersunk head',
+            'Plokščia galvute' => 'Flat head',
+            'Pusapvale galvute' => 'Round head',
+            'Šešiakampe galvute' => 'Hex head',
+            'Konstrukciniai' => 'Structural',
+            'Terasiniai' => 'For terraces',
+            'Stoginiai' => 'For roofing',
+            'Savigręžiai' => 'Self-tapping',
+            'Reguliuojami' => 'Adjustable',
+            // Concrete/masonry fastening
+            'Su plastikiniu kaiščiu' => 'With plastic dowel',
+            'Su nailoniniu kaiščiu' => 'With nylon dowel',
+            'Inkariniai' => 'Anchor',
+            'Sraigtai į betoną' => 'Screws for concrete',
+            'Sraigtai į mūrą' => 'Screws for masonry',
+            'Įbetonuojami ankeriai, sriegiai, detalės' => 'Embedded anchors, threads, parts',
+            'Greitvinės' => 'Quick nails',
+            // Wood construction
+            'Plokštelės' => 'Plates',
+            'Kampai' => 'Angles',
+            'Sijų atrama' => 'Beam support',
+            'Gegnių sujungimai' => 'Rafter connections',
+            'Paslėptas tvirtinimas' => 'Hidden fastening',
+            'Kolonų atramos (reguliuojamos, įbetonuojamos)' => 'Column supports (adjustable, embedded)',
+            'Kita' => 'Other',
+            // Nails and hooks
+            'Palaidos' => 'Hidden',
+            'Pistoletinės' => 'Pistol',
+            // Light fastening
+            'Gipsui' => 'For gypsum',
+            'Į termoizoliaciją' => 'Into thermal insulation',
+            'Laikikliai ir kt.' => 'Holders and etc.',
+            // Piles
+            'HDG' => 'HDG',
+            'HEX HDG' => 'HEX HDG',
+            // Construction chemistry
+            'Klijuojančios putos' => 'Adhesive foams',
+            'Montavimo putos' => 'Installation foams',
+            'Purškiama termoizoliacija' => 'Spray thermal insulation',
+            'Klijai' => 'Adhesives',
+            'Hermetikai' => 'Sealants',
+            'Silikonai' => 'Silicones',
+            'Akrilai' => 'Acrylics',
+            'Sandarinimo mastikos' => 'Sealing mastics',
+            'Tepama hidroizoliacija' => 'Applied waterproofing',
+            'Putų ir kiti valikliai' => 'Foam and other cleaners',
+            'Dažai' => 'Paints',
+            // Tools
+            'Pieštukai' => 'Pencils',
+            'Matavimo' => 'Measuring',
+            'Armatūrai rišti' => 'For tying reinforcement',
+            'EPDM darbui skirti įrankiai' => 'Tools for EPDM work',
+            'Grąžtai metalui' => 'Drills for metal',
+            'Grąžtai medžiui' => 'Drills for wood',
+            'Plaktukai' => 'Hammers',
+            'Lankstytuvai, žirklės skardai' => 'Benders, tin snips',
+            'Kniedikliai' => 'Riveters',
+            'Atsuktuvai' => 'Screwdrivers',
+            'Replės' => 'Wrenches',
+            'Pjūklai' => 'Saws',
+            'Laužtuvai' => 'Demolition tools',
+            // Roofing
+            'EPDM medžiaga ir įrankiai montavimui' => 'EPDM material and installation tools',
+            'Stogų priedai' => 'Roofing accessories',
+            'Ventiliuojami profiliai' => 'Ventilated profiles',
+            'Paukščių užtvaros' => 'Bird barriers',
+            'Latakų apsauga' => 'Gutter protection',
+            'Kraigo tarpinės' => 'Ridge spacers',
+            'Vinių sandarinimo juostos' => 'Nail sealing tapes',
+            // Facades
+            'Ventiliuojami fasadai' => 'Ventilated facades',
+            'Akmenys, stount' => 'Stones, stount',
+            'Priedai fasadams' => 'Facade accessories',
+            'Kiti fasadai' => 'Other facades',
+            'Pelių barjerai' => 'Rodent barriers',
+            'Įvairūs tinkliukai' => 'Various meshes',
+            'Ventiliuojami profiliai' => 'Ventilated profiles',
+            'Fasadiniai varžtai' => 'Facade screws',
+            // Electrical
+            'Izoliacinės juostos' => 'Insulating tapes',
+            'Laidų sujungimas' => 'Wire connection',
+            'Laidų tvirtinimas' => 'Wire fastening',
+            // Work clothing
+            'Kelnės' => 'Trousers',
+            'Džemperiai' => 'Jumpers',
+            'Striukės' => 'Jackets',
+            'Kepurės' => 'Caps',
+            'Pirštinės' => 'Gloves',
+            'Kojinės' => 'Socks',
+            'Batai' => 'Shoes',
+            'Akiniai' => 'Glasses',
+            'Kelių apsauga' => 'Knee protection',
+            'Ausų apsauga' => 'Ear protection',
+        ];
+
+        return $translations[$text] ?? $text;
+    }
+
+    private function translateToRussian(string $text): string
+    {
+        $translations = [
+            // Main categories
+            'Sandarinimo plėvelės ir juostos' => 'Герметизирующие пленки и ленты',
+            'Tvirtinimo elementai, varžtai, medvarsčiai' => 'Крепежные элементы, болты, шурупы',
+            'Įsukami, įkalami poliai' => 'Винтовые, забивные сваи',
+            'Chemija statyboms' => 'Строительная химия',
+            'Įrankiai ir jų priedai' => 'Инструменты и аксессуары',
+            'Stogų danga ir priedai' => 'Кровельные материалы и аксессуары',
+            'Fasadams' => 'Для фасадов',
+            'Elektros prekės' => 'Электротовары',
+            'Darbo apranga, saugos priemonės' => 'Рабочая одежда, средства защиты',
+            // Subcategories - Sealing
+            'Juostos' => 'Ленты',
+            'Plėvelės' => 'Пленки',
+            'Pamatų hidroizoliacija' => 'Гидроизоляция фундамента',
+            'Vinių sandarinimo juostos' => 'Герметизирующие ленты для гвоздей',
+            'Kitos sandarinimo medžiagos ir priedai' => 'Другие герметизирующие материалы и аксессуары',
+            'Laukui' => 'Для наружного применения',
+            'Vidui' => 'Для внутреннего применения',
+            'Horizontali' => 'Горизонтальная',
+            'Vertikali' => 'Вертикальная',
+            // Subcategories - Fastening
+            'Medvarsčiai' => 'Шурупы по дереву',
+            'Tvirtinimas į betoną, mūrą' => 'Крепление к бетону, кладке',
+            'Medžio konstrukcijų tvirtinimas' => 'Крепление деревянных конструкций',
+            'Sriegiai, varžtai, veržlės, poveržlės' => 'Резьба, болты, гайки, шайбы',
+            'Kniedės' => 'Заклепки',
+            'Vinys, kabės' => 'Гвозди, крючки',
+            'Lengvas tvirtinimas' => 'Легкое крепление',
+            'Tvirtinimo juostos' => 'Крепежные ленты',
+            'Išlyginimo kaladėlė, kyliai ir kt.' => 'Выравнивающие прокладки, клинья и т.д.',
+            'Termoizoliaciniai kaiščiai' => 'Дюбели для теплоизоляции',
+            // Wood screw types
+            'Įleidžiama galvute' => 'С потайной головкой',
+            'Plokščia galvute' => 'С плоской головкой',
+            'Pusapvale galvute' => 'С полукруглой головкой',
+            'Šešiakampe galvute' => 'С шестигранной головкой',
+            'Konstrukciniai' => 'Конструкционные',
+            'Terasiniai' => 'Для террас',
+            'Stoginiai' => 'Для кровли',
+            'Savigręžiai' => 'Саморезы',
+            'Reguliuojami' => 'Регулируемые',
+            // Concrete/masonry fastening
+            'Su plastikiniu kaiščiu' => 'С пластиковым дюбелем',
+            'Su nailoniniu kaiščiu' => 'С нейлоновым дюбелем',
+            'Inkariniai' => 'Анкерные',
+            'Sraigtai į betoną' => 'Винты для бетона',
+            'Sraigtai į mūrą' => 'Винты для кладки',
+            'Įbetonuojami ankeriai, sriegiai, detalės' => 'Заливаемые анкеры, резьба, детали',
+            'Greitvinės' => 'Быстрые гвозди',
+            // Wood construction
+            'Plokštelės' => 'Пластины',
+            'Kampai' => 'Уголки',
+            'Sijų atrama' => 'Опоры балок',
+            'Gegnių sujungimai' => 'Соединения стропил',
+            'Paslėptas tvirtinimas' => 'Скрытое крепление',
+            'Kolonų atramos (reguliuojamos, įbetonuojamos)' => 'Опоры колонн (регулируемые, заливаемые)',
+            'Kita' => 'Другое',
+            // Nails and hooks
+            'Palaidos' => 'Скрытые',
+            'Pistoletinės' => 'Пистолетные',
+            // Light fastening
+            'Gipsui' => 'Для гипса',
+            'Į termoizoliaciją' => 'В теплоизоляцию',
+            'Laikikliai ir kt.' => 'Держатели и т.д.',
+            // Piles
+            'HDG' => 'HDG',
+            'HEX HDG' => 'HEX HDG',
+            // Construction chemistry
+            'Klijuojančios putos' => 'Клеящие пены',
+            'Montavimo putos' => 'Монтажные пены',
+            'Purškiama termoizoliacija' => 'Напыляемая теплоизоляция',
+            'Klijai' => 'Клеи',
+            'Hermetikai' => 'Герметики',
+            'Silikonai' => 'Силиконы',
+            'Akrilai' => 'Акрилы',
+            'Sandarinimo mastikos' => 'Герметизирующие мастики',
+            'Tepama hidroizoliacija' => 'Обмазочная гидроизоляция',
+            'Putų ir kiti valikliai' => 'Очистители пены и другие',
+            'Dažai' => 'Краски',
+            // Tools
+            'Pieštukai' => 'Карандаши',
+            'Matavimo' => 'Измерительные',
+            'Armatūrai rišti' => 'Для вязки арматуры',
+            'EPDM darbui skirti įrankiai' => 'Инструменты для работы с EPDM',
+            'Grąžtai metalui' => 'Сверла по металлу',
+            'Grąžtai medžiui' => 'Сверла по дереву',
+            'Plaktukai' => 'Молотки',
+            'Lankstytuvai, žirklės skardai' => 'Гибщики, ножницы по жести',
+            'Kniedikliai' => 'Заклепочники',
+            'Atsuktuvai' => 'Отвертки',
+            'Replės' => 'Ключи',
+            'Pjūklai' => 'Пилы',
+            'Laužtuvai' => 'Демонтажные инструменты',
+            // Roofing
+            'EPDM medžiaga ir įrankiai montavimui' => 'EPDM материал и инструменты для монтажа',
+            'Stogų priedai' => 'Кровельные аксессуары',
+            'Ventiliuojami profiliai' => 'Вентилируемые профили',
+            'Paukščių užtvaros' => 'Защита от птиц',
+            'Latakų apsauga' => 'Защита водостоков',
+            'Kraigo tarpinės' => 'Коньковые прокладки',
+            'Vinių sandarinimo juostos' => 'Герметизирующие ленты для гвоздей',
+            // Facades
+            'Ventiliuojami fasadai' => 'Вентилируемые фасады',
+            'Akmenys, stount' => 'Камни, stount',
+            'Priedai fasadams' => 'Фасадные аксессуары',
+            'Kiti fasadai' => 'Другие фасады',
+            'Pelių barjerai' => 'Защита от грызунов',
+            'Įvairūs tinkliukai' => 'Различные сетки',
+            'Ventiliuojami profiliai' => 'Вентилируемые профили',
+            'Fasadiniai varžtai' => 'Фасадные винты',
+            // Electrical
+            'Izoliacinės juostos' => 'Изоляционные ленты',
+            'Laidų sujungimas' => 'Соединение проводов',
+            'Laidų tvirtinimas' => 'Крепление проводов',
+            // Work clothing
+            'Kelnės' => 'Брюки',
+            'Džemperiai' => 'Джемперы',
+            'Striukės' => 'Куртки',
+            'Kepurės' => 'Кепки',
+            'Pirštinės' => 'Перчатки',
+            'Kojinės' => 'Носки',
+            'Batai' => 'Обувь',
+            'Akiniai' => 'Очки',
+            'Kelių apsauga' => 'Защита коленей',
+            'Ausų apsauga' => 'Защита слуха',
+        ];
+
+        return $translations[$text] ?? $text;
+    }
+
+    private function translateToGerman(string $text): string
+    {
+        $translations = [
+            // Main categories
+            'Sandarinimo plėvelės ir juostos' => 'Dichtungsfolien und -bänder',
+            'Tvirtinimo elementai, varžtai, medvarsčiai' => 'Befestigungselemente, Schrauben, Holzschrauben',
+            'Įsukami, įkalami poliai' => 'Einschraub-, Rammpfähle',
+            'Chemija statyboms' => 'Bauchemie',
+            'Įrankiai ir jų priedai' => 'Werkzeuge und Zubehör',
+            'Stogų danga ir priedai' => 'Dachmaterialien und Zubehör',
+            'Fasadams' => 'Für Fassaden',
+            'Elektros prekės' => 'Elektroartikel',
+            'Darbo apranga, saugos priemonės' => 'Arbeitskleidung, Sicherheitsausrüstung',
+            // Subcategories - Sealing
+            'Juostos' => 'Bänder',
+            'Plėvelės' => 'Folien',
+            'Pamatų hidroizoliacija' => 'Fundamentabdichtung',
+            'Vinių sandarinimo juostos' => 'Nageldichtungsbänder',
+            'Kitos sandarinimo medžiagos ir priedai' => 'Andere Dichtungsmaterialien und Zubehör',
+            'Laukui' => 'Für Außenbereich',
+            'Vidui' => 'Für Innenbereich',
+            'Horizontali' => 'Horizontal',
+            'Vertikali' => 'Vertikal',
+            // Subcategories - Fastening
+            'Medvarsčiai' => 'Holzschrauben',
+            'Tvirtinimas į betoną, mūrą' => 'Befestigung in Beton, Mauerwerk',
+            'Medžio konstrukcijų tvirtinimas' => 'Holzkonstruktionsbefestigung',
+            'Sriegiai, varžtai, veržlės, poveržlės' => 'Gewinde, Schrauben, Muttern, Unterlegscheiben',
+            'Kniedės' => 'Nieten',
+            'Vinys, kabės' => 'Nägel, Haken',
+            'Lengvas tvirtinimas' => 'Leichte Befestigung',
+            'Tvirtinimo juostos' => 'Befestigungsbänder',
+            'Išlyginimo kaladėlė, kyliai ir kt.' => 'Ausgleichsplättchen, Keile usw.',
+            'Termoizoliaciniai kaiščiai' => 'Dämmstoffdübel',
+            // Wood screw types
+            'Įleidžiama galvute' => 'Senkkopf',
+            'Plokščia galvute' => 'Flachkopf',
+            'Pusapvale galvute' => 'Halbrundkopf',
+            'Šešiakampe galvute' => 'Sechskantkopf',
+            'Konstrukciniai' => 'Konstruktionsschrauben',
+            'Terasiniai' => 'Für Terrassen',
+            'Stoginiai' => 'Für Dach',
+            'Savigręžiai' => 'Selbstschneidend',
+            'Reguliuojami' => 'Verstellbar',
+            // Concrete/masonry fastening
+            'Su plastikiniu kaiščiu' => 'Mit Kunststoffdübel',
+            'Su nailoniniu kaiščiu' => 'Mit Nylondübel',
+            'Inkariniai' => 'Anker',
+            'Sraigtai į betoną' => 'Schrauben für Beton',
+            'Sraigtai į mūrą' => 'Schrauben für Mauerwerk',
+            'Įbetonuojami ankeriai, sriegiai, detalės' => 'Einbetonierte Anker, Gewinde, Teile',
+            'Greitvinės' => 'Schnellnägel',
+            // Wood construction
+            'Plokštelės' => 'Platten',
+            'Kampai' => 'Winkel',
+            'Sijų atrama' => 'Balkenauflager',
+            'Gegnių sujungimai' => 'Sparrenverbindungen',
+            'Paslėptas tvirtinimas' => 'Versteckte Befestigung',
+            'Kolonų atramos (reguliuojamos, įbetonuojamos)' => 'Stützenauflager (verstellbar, einbetoniert)',
+            'Kita' => 'Andere',
+            // Nails and hooks
+            'Palaidos' => 'Versteckt',
+            'Pistoletinės' => 'Pistolen',
+            // Light fastening
+            'Gipsui' => 'Für Gips',
+            'Į termoizoliaciją' => 'In Dämmstoff',
+            'Laikikliai ir kt.' => 'Halterungen usw.',
+            // Piles
+            'HDG' => 'HDG',
+            'HEX HDG' => 'HEX HDG',
+            // Construction chemistry
+            'Klijuojančios putos' => 'Klebeschäume',
+            'Montavimo putos' => 'Montageschäume',
+            'Purškiama termoizoliacija' => 'Aufgesprühte Dämmung',
+            'Klijai' => 'Klebstoffe',
+            'Hermetikai' => 'Dichtstoffe',
+            'Silikonai' => 'Silikone',
+            'Akrilai' => 'Acrylate',
+            'Sandarinimo mastikos' => 'Dichtungsmassen',
+            'Tepama hidroizoliacija' => 'Aufgetragene Abdichtung',
+            'Putų ir kiti valikliai' => 'Schaum- und andere Reiniger',
+            'Dažai' => 'Farben',
+            // Tools
+            'Pieštukai' => 'Bleistifte',
+            'Matavimo' => 'Messwerkzeuge',
+            'Armatūrai rišti' => 'Für Bewehrungsbindung',
+            'EPDM darbui skirti įrankiai' => 'Werkzeuge für EPDM-Arbeiten',
+            'Grąžtai metalui' => 'Bohrer für Metall',
+            'Grąžtai medžiui' => 'Bohrer für Holz',
+            'Plaktukai' => 'Hämmer',
+            'Lankstytuvai, žirklės skardai' => 'Bieger, Blechscheren',
+            'Kniedikliai' => 'Nietzangen',
+            'Atsuktuvai' => 'Schraubendreher',
+            'Replės' => 'Schraubenschlüssel',
+            'Pjūklai' => 'Sägen',
+            'Laužtuvai' => 'Abbruchwerkzeuge',
+            // Roofing
+            'EPDM medžiaga ir įrankiai montavimui' => 'EPDM-Material und Montagewerkzeuge',
+            'Stogų priedai' => 'Dachzubehör',
+            'Ventiliuojami profiliai' => 'Belüftete Profile',
+            'Paukščių užtvaros' => 'Vogelschutz',
+            'Latakų apsauga' => 'Rinnen-Schutz',
+            'Kraigo tarpinės' => 'First-Abstandshalter',
+            'Vinių sandarinimo juostos' => 'Nageldichtungsbänder',
+            // Facades
+            'Ventiliuojami fasadai' => 'Belüftete Fassaden',
+            'Akmenys, stount' => 'Steine, stount',
+            'Priedai fasadams' => 'Fassadenzubehör',
+            'Kiti fasadai' => 'Andere Fassaden',
+            'Pelių barjerai' => 'Nagerschutz',
+            'Įvairūs tinkliukai' => 'Verschiedene Netze',
+            'Ventiliuojami profiliai' => 'Belüftete Profile',
+            'Fasadiniai varžtai' => 'Fassadenschrauben',
+            // Electrical
+            'Izoliacinės juostos' => 'Isolierbänder',
+            'Laidų sujungimas' => 'Kabelverbindung',
+            'Laidų tvirtinimas' => 'Kabelbefestigung',
+            // Work clothing
+            'Kelnės' => 'Hosen',
+            'Džemperiai' => 'Pullover',
+            'Striukės' => 'Jacken',
+            'Kepurės' => 'Mützen',
+            'Pirštinės' => 'Handschuhe',
+            'Kojinės' => 'Socken',
+            'Batai' => 'Schuhe',
+            'Akiniai' => 'Brillen',
+            'Kelių apsauga' => 'Knieschutz',
+            'Ausų apsauga' => 'Gehörschutz',
+        ];
+
+        return $translations[$text] ?? $text;
     }
 }

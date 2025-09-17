@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Currency;
 
 class PriceFactory extends Factory
 {
@@ -17,9 +18,9 @@ class PriceFactory extends Factory
         $cost = $this->faker->boolean(50) ? $amount * $this->faker->randomFloat(2, 0.5, 0.9) : null;
 
         return [
-            'priceable_type' => 'Product',
+            'priceable_type' => \App\Models\Product::class,
             'priceable_id' => fn () => \App\Models\Product::factory(),
-            'currency_id' => fn () => 1, // Default currency
+            'currency_id' => fn () => Currency::query()->where('code', 'EUR')->value('id') ?? Currency::factory()->eur()->default()->create()->id,
             'amount' => round($amount, 2),
             'compare_amount' => $compare ? round($compare, 2) : null,
             'cost_amount' => $cost ? round($cost, 2) : null,

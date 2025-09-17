@@ -18,6 +18,30 @@ final class SeoDataSeeder extends Seeder
 
         $locales = ['lt', 'en'];
 
+        $getLocalized = static function (mixed $value, string $locale, mixed $fallback = null) {
+            if (is_string($value)) {
+                return $value;
+            }
+            if (is_array($value)) {
+                return $value[$locale]
+                    ?? $value['lt']
+                    ?? $value['en']
+                    ?? (is_array($value) && count($value) ? reset($value) : $fallback);
+            }
+            return $fallback;
+        };
+
+        $getModelField = static function ($model, string $field, string $locale) use ($getLocalized): ?string {
+            if (method_exists($model, 'trans')) {
+                $val = $model->trans($field, $locale);
+                if (!empty($val)) {
+                    return is_array($val) ? $getLocalized($val, $locale) : (string) $val;
+                }
+            }
+            $raw = $model->{$field} ?? null;
+            return $getLocalized($raw, $locale, is_string($raw) ? $raw : null);
+        };
+
         $createFor = static function (string $type, int $id, array $attributes) use ($locales): void {
             foreach ($locales as $locale) {
                 SeoData::updateOrCreate(
@@ -40,23 +64,23 @@ final class SeoDataSeeder extends Seeder
             }
         };
 
-        Product::query()->limit(50)->get()->each(function (Product $product) use ($createFor): void {
+        Product::query()->limit(50)->get()->each(function (Product $product) use ($createFor, $getModelField): void {
             $createFor(Product::class, $product->id, [
                 'title' => [
-                    'lt' => mb_substr($product->name.' | '.config('app.name'), 0, 60),
-                    'en' => mb_substr($product->name.' | '.config('app.name'), 0, 60),
+                    'lt' => mb_substr((string) $getModelField($product, 'name', 'lt').' | '.config('app.name'), 0, 60),
+                    'en' => mb_substr((string) $getModelField($product, 'name', 'en').' | '.config('app.name'), 0, 60),
                 ],
                 'description' => [
-                    'lt' => mb_substr(strip_tags((string) $product->description), 0, 160),
-                    'en' => mb_substr(strip_tags((string) $product->description), 0, 160),
+                    'lt' => mb_substr(strip_tags((string) $getModelField($product, 'description', 'lt')), 0, 160),
+                    'en' => mb_substr(strip_tags((string) $getModelField($product, 'description', 'en')), 0, 160),
                 ],
                 'keywords' => [
-                    'lt' => implode(', ', array_filter([$product->name, $product->brand?->name])),
-                    'en' => implode(', ', array_filter([$product->name, $product->brand?->name])),
+                    'lt' => implode(', ', array_filter([(string) $getModelField($product, 'name', 'lt'), $product->brand?->name])),
+                    'en' => implode(', ', array_filter([(string) $getModelField($product, 'name', 'en'), $product->brand?->name])),
                 ],
                 'canonical_url' => [
-                    'lt' => url('/lt/products/'.$product->slug),
-                    'en' => url('/en/products/'.$product->slug),
+                    'lt' => url('/lt/products/'.($getModelField($product, 'slug', 'lt') ?? $product->id)),
+                    'en' => url('/en/products/'.($getModelField($product, 'slug', 'en') ?? $product->id)),
                 ],
                 'meta_tags' => [
                     'lt' => ['og:type' => 'product'],
@@ -66,73 +90,73 @@ final class SeoDataSeeder extends Seeder
                     'lt' => [
                         '@context' => 'https://schema.org',
                         '@type' => 'Product',
-                        'name' => $product->name,
+                        'name' => $getModelField($product, 'name', 'lt'),
                         'sku' => $product->sku,
                     ],
                     'en' => [
                         '@context' => 'https://schema.org',
                         '@type' => 'Product',
-                        'name' => $product->name,
+                        'name' => $getModelField($product, 'name', 'en'),
                         'sku' => $product->sku,
                     ],
                 ],
             ]);
         });
 
-        Category::query()->limit(30)->get()->each(function (Category $category) use ($createFor): void {
+        Category::query()->limit(30)->get()->each(function (Category $category) use ($createFor, $getModelField): void {
             $createFor(Category::class, $category->id, [
                 'title' => [
-                    'lt' => mb_substr($category->name.' | '.config('app.name'), 0, 60),
-                    'en' => mb_substr($category->name.' | '.config('app.name'), 0, 60),
+                    'lt' => mb_substr((string) $getModelField($category, 'name', 'lt').' | '.config('app.name'), 0, 60),
+                    'en' => mb_substr((string) $getModelField($category, 'name', 'en').' | '.config('app.name'), 0, 60),
                 ],
                 'description' => [
-                    'lt' => mb_substr(strip_tags((string) $category->description), 0, 160),
-                    'en' => mb_substr(strip_tags((string) $category->description), 0, 160),
+                    'lt' => mb_substr(strip_tags((string) $getModelField($category, 'description', 'lt')), 0, 160),
+                    'en' => mb_substr(strip_tags((string) $getModelField($category, 'description', 'en')), 0, 160),
                 ],
                 'keywords' => [
-                    'lt' => implode(', ', array_filter([$category->name])),
-                    'en' => implode(', ', array_filter([$category->name])),
+                    'lt' => implode(', ', array_filter([(string) $getModelField($category, 'name', 'lt')])),
+                    'en' => implode(', ', array_filter([(string) $getModelField($category, 'name', 'en')])),
                 ],
                 'canonical_url' => [
-                    'lt' => url('/lt/categories/'.$category->slug),
-                    'en' => url('/en/categories/'.$category->slug),
+                    'lt' => url('/lt/categories/'.($getModelField($category, 'slug', 'lt') ?? $category->id)),
+                    'en' => url('/en/categories/'.($getModelField($category, 'slug', 'en') ?? $category->id)),
                 ],
                 'meta_tags' => [
                     'lt' => ['og:type' => 'website'],
                     'en' => ['og:type' => 'website'],
                 ],
                 'structured_data' => [
-                    'lt' => ['@context' => 'https://schema.org', '@type' => 'CollectionPage', 'name' => $category->name],
-                    'en' => ['@context' => 'https://schema.org', '@type' => 'CollectionPage', 'name' => $category->name],
+                    'lt' => ['@context' => 'https://schema.org', '@type' => 'CollectionPage', 'name' => $getModelField($category, 'name', 'lt')],
+                    'en' => ['@context' => 'https://schema.org', '@type' => 'CollectionPage', 'name' => $getModelField($category, 'name', 'en')],
                 ],
             ]);
         });
 
-        Brand::query()->limit(30)->get()->each(function (Brand $brand) use ($createFor): void {
+        Brand::query()->limit(30)->get()->each(function (Brand $brand) use ($createFor, $getModelField): void {
             $createFor(Brand::class, $brand->id, [
                 'title' => [
-                    'lt' => mb_substr($brand->name.' | '.config('app.name'), 0, 60),
-                    'en' => mb_substr($brand->name.' | '.config('app.name'), 0, 60),
+                    'lt' => mb_substr((string) $getModelField($brand, 'name', 'lt').' | '.config('app.name'), 0, 60),
+                    'en' => mb_substr((string) $getModelField($brand, 'name', 'en').' | '.config('app.name'), 0, 60),
                 ],
                 'description' => [
-                    'lt' => mb_substr(strip_tags((string) $brand->description), 0, 160),
-                    'en' => mb_substr(strip_tags((string) $brand->description), 0, 160),
+                    'lt' => mb_substr(strip_tags((string) $getModelField($brand, 'description', 'lt')), 0, 160),
+                    'en' => mb_substr(strip_tags((string) $getModelField($brand, 'description', 'en')), 0, 160),
                 ],
                 'keywords' => [
-                    'lt' => implode(', ', array_filter([$brand->name])),
-                    'en' => implode(', ', array_filter([$brand->name])),
+                    'lt' => implode(', ', array_filter([(string) $getModelField($brand, 'name', 'lt')])),
+                    'en' => implode(', ', array_filter([(string) $getModelField($brand, 'name', 'en')])),
                 ],
                 'canonical_url' => [
-                    'lt' => url('/lt/brands/'.$brand->slug),
-                    'en' => url('/en/brands/'.$brand->slug),
+                    'lt' => url('/lt/brands/'.($getModelField($brand, 'slug', 'lt') ?? $brand->id)),
+                    'en' => url('/en/brands/'.($getModelField($brand, 'slug', 'en') ?? $brand->id)),
                 ],
                 'meta_tags' => [
                     'lt' => ['og:type' => 'website'],
                     'en' => ['og:type' => 'website'],
                 ],
                 'structured_data' => [
-                    'lt' => ['@context' => 'https://schema.org', '@type' => 'Brand', 'name' => $brand->name],
-                    'en' => ['@context' => 'https://schema.org', '@type' => 'Brand', 'name' => $brand->name],
+                    'lt' => ['@context' => 'https://schema.org', '@type' => 'Brand', 'name' => $getModelField($brand, 'name', 'lt')],
+                    'en' => ['@context' => 'https://schema.org', '@type' => 'Brand', 'name' => $getModelField($brand, 'name', 'en')],
                 ],
             ]);
         });

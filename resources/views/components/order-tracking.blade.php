@@ -169,7 +169,7 @@
                             {{-- Product Details --}}
                             <div class="flex-1 min-w-0">
                                 <h3 class="font-semibold text-gray-900 mb-1">
-                                    <a href="{{ route('product.show', $item->product->slug ?? $item->product) }}"
+                                    <a href="{{ route('product.show', $item->product->slug) }}"
                                        class="hover:text-blue-600 transition-colors duration-200">
                                         {{ $item->product->name }}
                                     </a>
@@ -305,7 +305,7 @@
                     </button>
 
                     {{-- Contact Support --}}
-                    <a href="{{ route('contact', ['locale' => app()->getLocale()]) ?? '/contact' }}"
+                    <a href="{{ route('contact', []) ?? '/contact' }}"
                        class="flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors duration-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -1,18 +1,15 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
-        // Create addresses table
-        if (! Schema::hasTable('sh_addresses')) {
-            Schema::create('sh_addresses', function (Blueprint $table) {
+        // Create addresses table (forward-only)
+        if (!Schema::hasTable('addresses')) {
+            Schema::create('addresses', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
                 $table->enum('type', ['billing', 'shipping', 'both'])->default('both');
@@ -30,196 +27,182 @@ return new class extends Migration
                 $table->timestamps();
                 $table->softDeletes();
 
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-                $table->foreign('country_code')->references('code')->on('sh_countries')->onDelete('restrict');
                 $table->index(['user_id', 'type']);
                 $table->index(['user_id', 'is_default']);
             });
         }
 
-        // Create collection rules table
-        if (! Schema::hasTable('sh_collection_rules')) {
-            Schema::create('sh_collection_rules', function (Blueprint $table) {
+        // Create collection rules table (forward-only)
+        if (!Schema::hasTable('collection_rules')) {
+            Schema::create('collection_rules', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('collection_id');
-                $table->string('field');  // 'brand_id', 'category_id', 'price', etc.
-                $table->string('operator');  // 'equals', 'not_equals', 'greater_than', 'less_than', 'contains'
+                $table->string('field');
+                $table->string('operator');
                 $table->string('value');
                 $table->integer('position')->default(0);
                 $table->timestamps();
 
-                $table->foreign('collection_id')->references('id')->on('collections')->onDelete('cascade');
+                $table->foreign('collection_id')->references('id')->on('collections')->cascadeOnUpdate()->cascadeOnDelete();
                 $table->index(['collection_id', 'position']);
             });
         }
 
-        // Add missing columns to existing tables
-        $this->addMissingColumns();
-
-        // Add foreign key constraints
-        $this->addForeignKeys();
+        // Canonical alters
+        $this->alterCoreTables();
+        $this->addVariantForeignKeys();
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('sh_collection_rules');
-        Schema::dropIfExists('sh_addresses');
+        Schema::dropIfExists('collection_rules');
+        Schema::dropIfExists('addresses');
     }
 
-    private function addMissingColumns(): void
+    private function alterCoreTables(): void
     {
-        // Add missing columns to zones table
-        if (Schema::hasTable('sh_zones')) {
-            Schema::table('sh_zones', function (Blueprint $table) {
-                if (! Schema::hasColumn('sh_zones', 'tax_rate')) {
+        if (Schema::hasTable('zones')) {
+            Schema::table('zones', function (Blueprint $table): void {
+                if (!Schema::hasColumn('zones', 'tax_rate')) {
                     $table->decimal('tax_rate', 5, 4)->default(0)->after('currency_id');
                 }
-                if (! Schema::hasColumn('sh_zones', 'shipping_rate')) {
+                if (!Schema::hasColumn('zones', 'shipping_rate')) {
                     $table->decimal('shipping_rate', 8, 2)->default(0)->after('tax_rate');
                 }
-                if (! Schema::hasColumn('sh_zones', 'is_default')) {
+                if (!Schema::hasColumn('zones', 'is_default')) {
                     $table->boolean('is_default')->default(false)->after('is_enabled');
                 }
             });
         }
 
-        // Add missing columns to currencies table
-        if (Schema::hasTable('sh_currencies')) {
-            Schema::table('sh_currencies', function (Blueprint $table) {
-                if (! Schema::hasColumn('sh_currencies', 'symbol')) {
+        if (Schema::hasTable('currencies')) {
+            Schema::table('currencies', function (Blueprint $table): void {
+                if (!Schema::hasColumn('currencies', 'symbol')) {
                     $table->string('symbol', 10)->nullable()->after('code');
                 }
-                if (! Schema::hasColumn('sh_currencies', 'exchange_rate')) {
+                if (!Schema::hasColumn('currencies', 'exchange_rate')) {
                     $table->decimal('exchange_rate', 10, 6)->default(1)->after('symbol');
                 }
-                if (! Schema::hasColumn('sh_currencies', 'is_default')) {
+                if (!Schema::hasColumn('currencies', 'is_default')) {
                     $table->boolean('is_default')->default(false)->after('exchange_rate');
                 }
-                if (! Schema::hasColumn('sh_currencies', 'is_enabled')) {
+                if (!Schema::hasColumn('currencies', 'is_enabled')) {
                     $table->boolean('is_enabled')->default(true)->after('is_default');
                 }
-                if (! Schema::hasColumn('sh_currencies', 'decimal_places')) {
+                if (!Schema::hasColumn('currencies', 'decimal_places')) {
                     $table->tinyInteger('decimal_places')->default(2)->after('is_enabled');
                 }
             });
         }
 
-        // Add missing columns to channels table
-        if (Schema::hasTable('sh_channels')) {
-            Schema::table('sh_channels', function (Blueprint $table) {
-                if (! Schema::hasColumn('sh_channels', 'name')) {
+        if (Schema::hasTable('channels')) {
+            Schema::table('channels', function (Blueprint $table): void {
+                if (!Schema::hasColumn('channels', 'name')) {
                     $table->string('name')->after('id');
                 }
-                if (! Schema::hasColumn('sh_channels', 'slug')) {
+                if (!Schema::hasColumn('channels', 'slug')) {
                     $table->string('slug')->nullable()->after('name');
                 }
-                if (! Schema::hasColumn('sh_channels', 'url')) {
+                if (!Schema::hasColumn('channels', 'url')) {
                     $table->string('url')->nullable()->after('slug');
                 }
-                if (! Schema::hasColumn('sh_channels', 'is_enabled')) {
+                if (!Schema::hasColumn('channels', 'is_enabled')) {
                     $table->boolean('is_enabled')->default(true)->after('url');
                 }
-                if (! Schema::hasColumn('sh_channels', 'is_default')) {
+                if (!Schema::hasColumn('channels', 'is_default')) {
                     $table->boolean('is_default')->default(false)->after('is_enabled');
                 }
-                if (! Schema::hasColumn('sh_channels', 'metadata')) {
+                if (!Schema::hasColumn('channels', 'metadata')) {
                     $table->json('metadata')->nullable()->after('is_default');
+                }
+                try {
+                    $table->index(['slug']);
+                } catch (\Throwable $e) {
+                }
+                try {
+                    $table->index(['is_enabled']);
+                } catch (\Throwable $e) {
                 }
             });
         }
 
-        // Add missing columns to collections table
         if (Schema::hasTable('collections')) {
-            Schema::table('collections', function (Blueprint $table) {
-                if (! Schema::hasColumn('collections', 'is_automatic')) {
+            Schema::table('collections', function (Blueprint $table): void {
+                if (!Schema::hasColumn('collections', 'is_automatic')) {
                     $table->boolean('is_automatic')->default(false)->after('is_visible');
                 }
-                if (! Schema::hasColumn('collections', 'rules')) {
+                if (!Schema::hasColumn('collections', 'rules')) {
                     $table->json('rules')->nullable()->after('is_automatic');
                 }
-                if (! Schema::hasColumn('collections', 'max_products')) {
+                if (!Schema::hasColumn('collections', 'max_products')) {
                     $table->integer('max_products')->nullable()->after('rules');
                 }
             });
         }
 
-        // Add missing columns to customer groups table
-        if (Schema::hasTable('sh_customer_groups')) {
-            Schema::table('sh_customer_groups', function (Blueprint $table) {
-                if (! Schema::hasColumn('sh_customer_groups', 'description')) {
+        if (Schema::hasTable('customer_groups')) {
+            Schema::table('customer_groups', function (Blueprint $table): void {
+                if (!Schema::hasColumn('customer_groups', 'description')) {
                     $table->text('description')->nullable()->after('code');
                 }
-                if (! Schema::hasColumn('sh_customer_groups', 'discount_rate')) {
+                if (!Schema::hasColumn('customer_groups', 'discount_rate')) {
                     $table->decimal('discount_rate', 5, 4)->default(0)->after('description');
                 }
-                if (! Schema::hasColumn('sh_customer_groups', 'is_enabled')) {
+                if (!Schema::hasColumn('customer_groups', 'is_enabled')) {
                     $table->boolean('is_enabled')->default(true)->after('discount_rate');
                 }
             });
         }
 
-        // Add soft deletes to tables that need it
-        $this->addSoftDeletes();
-    }
-
-    private function addSoftDeletes(): void
-    {
-        $tables = [
-            'sh_currencies' => 'currencies',
-            'sh_channels' => 'channels',
-            'sh_countries' => 'countries',
-        ];
-
-        foreach ($tables as $tableName => $displayName) {
-            if (Schema::hasTable($tableName) && ! Schema::hasColumn($tableName, 'deleted_at')) {
-                Schema::table($tableName, function (Blueprint $table) {
+        // Soft deletes coverage
+        foreach (['currencies', 'channels', 'countries'] as $tableName) {
+            if (Schema::hasTable($tableName) && !Schema::hasColumn($tableName, 'deleted_at')) {
+                Schema::table($tableName, function (Blueprint $table): void {
                     $table->softDeletes();
                 });
             }
         }
     }
 
-    private function addForeignKeys(): void
+    private function addVariantForeignKeys(): void
     {
-        // Add foreign keys that might be missing
+        // Orders foreign keys: only if referenced tables exist
         if (Schema::hasTable('orders')) {
-            Schema::table('orders', function (Blueprint $table) {
-                if (Schema::hasColumn('orders', 'channel_id') && Schema::hasTable('sh_channels')) {
-                    try {
-                        $table->foreign('channel_id')->references('id')->on('sh_channels')->onDelete('set null');
-                    } catch (\Exception $e) {
-                        // Foreign key might already exist
-                    }
+            if (Schema::hasTable('channels') && Schema::hasColumn('orders', 'channel_id')) {
+                try {
+                    Schema::table('orders', function (Blueprint $table): void {
+                        $table->foreign('channel_id')->references('id')->on('channels')->nullOnDelete()->cascadeOnUpdate();
+                    });
+                } catch (\Throwable $e) {
                 }
-                if (Schema::hasColumn('orders', 'zone_id') && Schema::hasTable('sh_zones')) {
-                    try {
-                        $table->foreign('zone_id')->references('id')->on('sh_zones')->onDelete('set null');
-                    } catch (\Exception $e) {
-                        // Foreign key might already exist
-                    }
+            }
+
+            if (Schema::hasTable('zones') && Schema::hasColumn('orders', 'zone_id')) {
+                try {
+                    Schema::table('orders', function (Blueprint $table): void {
+                        $table->foreign('zone_id')->references('id')->on('zones')->nullOnDelete()->cascadeOnUpdate();
+                    });
+                } catch (\Throwable $e) {
                 }
-            });
+            }
         }
 
-        // Add foreign keys to cart_items and order_items for variants
-        if (Schema::hasTable('cart_items') && Schema::hasColumn('cart_items', 'variant_id')) {
-            Schema::table('cart_items', function (Blueprint $table) {
-                try {
-                    $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('set null');
-                } catch (\Exception $e) {
-                    // Foreign key might already exist
-                }
-            });
+        if (Schema::hasTable('cart_items') && Schema::hasTable('product_variants') && Schema::hasColumn('cart_items', 'variant_id')) {
+            try {
+                Schema::table('cart_items', function (Blueprint $table): void {
+                    $table->foreign('variant_id')->references('id')->on('product_variants')->nullOnDelete()->cascadeOnUpdate();
+                });
+            } catch (\Throwable $e) {
+            }
         }
 
-        if (Schema::hasTable('order_items') && Schema::hasColumn('order_items', 'variant_id')) {
-            Schema::table('order_items', function (Blueprint $table) {
-                try {
-                    $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('set null');
-                } catch (\Exception $e) {
-                    // Foreign key might already exist
-                }
-            });
+        if (Schema::hasTable('order_items') && Schema::hasTable('product_variants') && Schema::hasColumn('order_items', 'variant_id')) {
+            try {
+                Schema::table('order_items', function (Blueprint $table): void {
+                    $table->foreign('variant_id')->references('id')->on('product_variants')->nullOnDelete()->cascadeOnUpdate();
+                });
+            } catch (\Throwable $e) {
+            }
         }
     }
 };

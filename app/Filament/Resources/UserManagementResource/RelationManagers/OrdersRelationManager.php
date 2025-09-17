@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
 use App\Models\Order;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -13,10 +13,10 @@ final class OrdersRelationManager extends RelationManager
 {
     protected static string $relationship = 'orders';
     protected static ?string $title = 'Orders';
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\TextInput::make('order_number')
                     ->required(),
                     ->maxLength(255),

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
 use App\Models\Document;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -20,7 +20,7 @@ final class DocumentsRelationManager extends RelationManager
     public function form(Schema $formSchema): Schema
     {
         return $formSchema
-            ->components([
+            ->schema([
                 Forms\Components\Select::make('document_template_id')
                     ->label(__('admin.documents.fields.template'))
                     ->relationship('documentTemplate', 'name')

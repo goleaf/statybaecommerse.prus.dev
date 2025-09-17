@@ -25,14 +25,13 @@
             <x-breadcrumbs :items="[
                 [
                     'label' => __('frontend.navigation.products'),
-                    'url' => route('products.index', ['locale' => app()->getLocale()]),
+                    'url' => localized_route('products.index'),
                 ],
                 [
                     'label' => $product->brand?->trans('name') ?? $product->brand?->name,
                     'url' =>
                         $product->brand && function_exists('route') && Route::has('brands.show')
-                            ? route('brands.show', [
-                                'locale' => app()->getLocale(),
+                            ? localized_route('brands.show', [
                                 'brand' => $product->brand->trans('slug') ?? $product->brand->slug,
                             ])
                             : null,
@@ -100,7 +99,6 @@
 
                                 <!-- View Full History Link -->
                                 <a href="{{ route('localized.products.history', [
-                                    'locale' => app()->getLocale(),
                                     'product' => $product->trans('slug') ?? $product->slug,
                                 ]) }}" 
                                    class="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-md hover:bg-indigo-100 hover:text-indigo-700 transition-colors">
@@ -198,7 +196,7 @@
 
     <!-- Back Button -->
     <div class="mt-8 text-center">
-        <a href="{{ route('products.index', ['locale' => app()->getLocale()]) }}" 
+        <a href="{{ localized_route('products.index') }}" 
            class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition duration-200">
             <x-heroicon-o-arrow-left class="w-4 h-4 mr-2" />
             {{ __('frontend.buttons.back_to_products') }}

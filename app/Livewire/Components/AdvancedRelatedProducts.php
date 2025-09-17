@@ -1,17 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+
 /**
  * AdvancedRelatedProducts
- * 
+ *
  * Livewire component for AdvancedRelatedProducts with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property Product $product
  * @property int $limit
  * @property string $type
@@ -28,6 +28,7 @@ final class AdvancedRelatedProducts extends Component
     public string $title = '';
     public bool $showTitle = true;
     public string $class = '';
+
     /**
      * Initialize the Livewire component with parameters.
      * @param Product $product
@@ -47,6 +48,7 @@ final class AdvancedRelatedProducts extends Component
         $this->showTitle = $showTitle;
         $this->class = $class;
     }
+
     /**
      * Handle relatedProducts functionality with proper error handling.
      * @return Collection
@@ -61,6 +63,7 @@ final class AdvancedRelatedProducts extends Component
             default => $this->product->getRelatedProducts($this->limit),
         };
     }
+
     /**
      * Handle sectionTitle functionality with proper error handling.
      * @return string
@@ -78,6 +81,16 @@ final class AdvancedRelatedProducts extends Component
             default => __('ecommerce.related_products'),
         };
     }
+
+    /**
+     * Get section title method for Blade view compatibility.
+     * @return string
+     */
+    public function getSectionTitle(): string
+    {
+        return $this->sectionTitle;
+    }
+
     /**
      * Render the Livewire component view with current state.
      */
@@ -86,3 +99,4 @@ final class AdvancedRelatedProducts extends Component
         return view('livewire.components.advanced-related-products');
     }
 }
+

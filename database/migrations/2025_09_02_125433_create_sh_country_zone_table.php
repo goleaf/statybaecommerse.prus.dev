@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('sh_country_zone', function (Blueprint $table) {
             // Pivot table: no id, no timestamps
-            $table->foreignId('zone_id')->constrained('sh_zones')->cascadeOnDelete();
-            $table->foreignId('country_id')->constrained('sh_countries')->cascadeOnDelete();
+            $table->unsignedBigInteger('zone_id');
+            $table->unsignedBigInteger('country_id');
 
             $table->unique(['zone_id', 'country_id'], 'country_zone_unique');
         });

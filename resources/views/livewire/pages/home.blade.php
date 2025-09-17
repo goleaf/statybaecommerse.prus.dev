@@ -32,7 +32,7 @@
                 </p>
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in-up"
                      style="animation-delay: 0.3s;">
-                    <a href="{{ route('products.index') }}"
+                    <a href="{{ localized_route('products.index') }}"
                        class="btn-gradient text-lg px-12 py-5 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group relative overflow-hidden">
                         <span class="relative z-10 flex items-center">
                             {{ __('translations.shop_now') }}
@@ -43,7 +43,7 @@
                             </svg>
                         </span>
                     </a>
-                    <a href="{{ route('categories.index') }}"
+                    <a href="{{ localized_route('categories.index') }}"
                        class="btn-glass text-lg px-12 py-5 rounded-2xl font-semibold hover:bg-white/20 hover:border-white/50 transition-all duration-300 backdrop-blur-xl group">
                         <span class="flex items-center">
                             {{ __('translations.browse_categories') }}
@@ -58,6 +58,10 @@
                 </div>
             </div>
         </div>
+
+
+        lalalalallaa
+
 
         <!-- Stats Bar -->
         <div class="relative bg-white/10 backdrop-blur-xl border-t border-white/20">
@@ -118,7 +122,7 @@
 
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                             @foreach ($featuredCategories as $index => $category)
-                                <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug ?? $category]) }}"
+                                <a href="{{ route('localized.categories.show', ['category' => $category->slug ?? $category]) }}"
                                    class="group animate-on-scroll" style="animation-delay: {{ $index * 0.1 }}s;">
                                     <div
                                          class="bg-gradient-to-br from-gray-50 to-white rounded-3xl p-6 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105 border border-gray-100 group-hover:border-blue-200">
@@ -205,7 +209,7 @@
                             <div class="p-6">
                                 <h3
                                     class="font-semibold text-gray-900 text-lg mb-3 line-clamp-2 group-hover:text-blue-700 transition-colors duration-300">
-                                    <a href="{{ route('product.show', $product->slug ?? $product) }}"
+                                    <a href="{{ route('product.show', $product->slug) }}"
                                        class="hover:text-blue-700">
                                         {{ $product->name }}
                                     </a>
@@ -269,7 +273,7 @@
 
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
                     @foreach ($featuredBrands as $index => $brand)
-                        <a href="{{ route('brands.show', $brand) }}" class="group animate-on-scroll"
+                        <a href="{{ localized_route('brands.show', $brand) }}" class="group animate-on-scroll"
                            style="animation-delay: {{ $index * 0.1 }}s;">
                             <div
                                  class="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105 border border-gray-200 group-hover:border-blue-300">
@@ -343,7 +347,7 @@
                                     </div>
                                 </div>
                                 @if ($review->product)
-                                    <a href="{{ route('product.show', $review->product->slug ?? $review->product) }}"
+                                    <a href="{{ route('product.show', $review->product->slug) }}"
                                        class="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200">
                                         {{ Str::limit($review->product->name, 30) }}
                                     </a>

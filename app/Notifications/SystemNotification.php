@@ -1,28 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+
 /**
  * SystemNotification
- * 
+ *
  * Notification class for SystemNotification user notifications with multi-channel delivery and customizable content.
- * 
  */
 final class SystemNotification extends Notification implements ShouldQueue
 {
     use Queueable;
+
     /**
      * Initialize the class instance with required dependencies.
      * @param array $data
      */
-    public function __construct(public array $data)
-    {
-    }
+    public function __construct(
+        public array $data
+    ) {}
+
     /**
      * Handle via functionality with proper error handling.
      * @param mixed $notifiable
@@ -32,6 +33,7 @@ final class SystemNotification extends Notification implements ShouldQueue
     {
         return ['database'];
     }
+
     /**
      * Handle toDatabase functionality with proper error handling.
      * @param mixed $notifiable
@@ -41,6 +43,7 @@ final class SystemNotification extends Notification implements ShouldQueue
     {
         return $this->data;
     }
+
     /**
      * Handle toMail functionality with proper error handling.
      * @param mixed $notifiable
@@ -48,7 +51,11 @@ final class SystemNotification extends Notification implements ShouldQueue
      */
     public function toMail($notifiable): MailMessage
     {
-        return (new MailMessage())->subject($this->data['title'])->line($this->data['message'])->line('Šis pranešimas išsiųstas iš sistemos administracijos.');
+        $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
+
+        return (new MailMessage())
+            ->subject($this->data['title'])
+            ->line($this->data['message'])
+            ->line(__('notifications.system.footer', [], $locale));
     }
 }
-

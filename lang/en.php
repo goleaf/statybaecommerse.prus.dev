@@ -1535,7 +1535,6 @@ return [
             'tags_help' => 'Tags are separated by commas, e.g.: tag1, tag2, tag3',
         ],
     ],
-    
     // Newsletter translations
     'newsletter' => [
         'email_address' => 'Email Address',
@@ -1557,11 +1556,66 @@ return [
         'subscribing' => 'Subscribing...',
         'privacy_notice' => 'By subscribing you agree to our privacy policy',
     ],
-    
     // Product image alt text
     'product_image_alt' => 'Product Image',
-    
     // Additional search translations
     'search_for' => 'for',
     'search_result_count' => ':count result found|:count results found',
+    'policy' => [
+        'address' => [
+            'view_denied' => 'You do not have permission to view this address.',
+            'update_denied' => 'You do not have permission to update this address.',
+            'delete_denied' => 'You do not have permission to delete this address.',
+            'restore_denied' => 'You do not have permission to restore this address.',
+            'force_delete_denied' => 'You do not have permission to permanently delete this address.',
+        ],
+        'referral' => [
+            'view_denied' => 'You do not have permission to view this referral.',
+            'update_denied' => 'You do not have permission to update this referral.',
+            'delete_denied' => 'You do not have permission to delete this referral.',
+            'restore_denied' => 'You do not have permission to restore this referral.',
+            'force_delete_denied' => 'You do not have permission to permanently delete this referral.',
+        ],
+        'referral_code' => [
+            'view_denied' => 'You do not have permission to view this referral code.',
+            'update_denied' => 'You do not have permission to update this referral code.',
+            'delete_denied' => 'You do not have permission to delete this referral code.',
+            'restore_denied' => 'You do not have permission to restore this referral code.',
+            'force_delete_denied' => 'You do not have permission to permanently delete this referral code.',
+        ],
+        'product_request' => [
+            'view_denied' => 'You do not have permission to view this product request.',
+            'create_denied' => 'You do not have permission to create a product request.',
+            'update_denied' => 'You do not have permission to update this product request.',
+            'delete_denied' => 'You do not have permission to delete this product request.',
+            'respond_denied' => 'You do not have permission to respond to this product request.',
+        ],
+        'role' => [
+            'view_any_denied' => 'You do not have permission to view roles.',
+            'view_denied' => 'You do not have permission to view this role.',
+            'create_denied' => 'You do not have permission to create roles.',
+            'update_denied' => 'You do not have permission to update this role.',
+            'delete_denied' => 'You do not have permission to delete this role.',
+            'restore_denied' => 'You do not have permission to restore this role.',
+            'force_delete_denied' => 'You do not have permission to permanently delete this role.',
+            'force_delete_any_denied' => 'You do not have permission to permanently delete selected roles.',
+            'restore_any_denied' => 'You do not have permission to restore selected roles.',
+            'replicate_denied' => 'You do not have permission to replicate this role.',
+            'reorder_denied' => 'You do not have permission to reorder roles.',
+        ],
+        'notification' => [
+            'view_any_denied' => 'You do not have permission to view notifications.',
+            'view_denied' => 'You do not have permission to view this notification.',
+            'create_denied' => 'You do not have permission to create notifications.',
+            'update_denied' => 'You do not have permission to update this notification.',
+            'delete_denied' => 'You do not have permission to delete this notification.',
+            'restore_denied' => 'You do not have permission to restore this notification.',
+            'force_delete_denied' => 'You do not have permission to permanently delete this notification.',
+            'mark_as_read_denied' => 'You do not have permission to mark this notification as read.',
+            'mark_as_unread_denied' => 'You do not have permission to mark this notification as unread.',
+            'duplicate_denied' => 'You do not have permission to duplicate this notification.',
+            'bulk_update_denied' => 'You do not have permission to update selected notifications.',
+            'bulk_delete_denied' => 'You do not have permission to delete selected notifications.',
+        ],
+    ],
 ];

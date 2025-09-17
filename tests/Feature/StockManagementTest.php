@@ -345,3 +345,4 @@ final class StockManagementTest extends TestCase
         $this->assertEquals('out_of_stock', $outOfStockItem->stock_status);
     }
 }
+

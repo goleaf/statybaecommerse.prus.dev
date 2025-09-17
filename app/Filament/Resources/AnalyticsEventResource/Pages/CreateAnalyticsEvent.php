@@ -28,3 +28,4 @@ final class CreateAnalyticsEvent extends CreateRecord
         return $data;
     }
 }
+

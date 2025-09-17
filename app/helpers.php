@@ -279,3 +279,66 @@ if (! function_exists('app_placeholder_url')) {
         return asset('images/placeholder.jpg');
     }
 }
+
+if (! function_exists('localized_route')) {
+    /**
+     * Generate a localized route URL, automatically injecting the locale parameter.
+     */
+    function localized_route(string $name, array $parameters = [], bool $absolute = true, ?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        $candidates = [];
+
+        if (str_starts_with($name, 'localized.')) {
+            $trimmed = $name;
+        } else {
+            $trimmed = 'localized.'.ltrim($name, '.');
+        }
+
+        $candidates[] = $trimmed;
+        $candidates[] = $trimmed.'.'.$locale;
+        $candidates[] = $name;
+
+        $routeParameters = array_merge(['locale' => $locale], $parameters);
+
+        foreach (array_unique($candidates) as $candidate) {
+            if (\Illuminate\Support\Facades\Route::has($candidate)) {
+                return route($candidate, str_starts_with($candidate, 'localized.') ? $routeParameters : $parameters, $absolute);
+            }
+        }
+
+        throw new \InvalidArgumentException('Route ['.$name.'] not defined. Checked variants: '.implode(', ', array_unique($candidates)));
+    }
+}
+
+if (! function_exists('switch_locale_url')) {
+    /**
+     * Build the current URL for a different locale using path-based localization.
+     */
+    function switch_locale_url(string $locale, ?string $path = null, ?array $query = null, bool $forcePrefix = true): string
+    {
+        $supported = config('app.supported_locales', []);
+        if (! is_array($supported)) {
+            $supported = array_filter(array_map('trim', explode(',', (string) $supported)));
+        }
+
+        $path = $path ?? request()->getPathInfo();
+        $segments = array_values(array_filter(explode('/', ltrim((string) $path, '/')), fn ($segment) => $segment !== ''));
+
+        $hasLocalePrefix = $segments !== [] && in_array($segments[0], $supported, true);
+
+        if ($hasLocalePrefix) {
+            $segments[0] = $locale;
+        } elseif ($forcePrefix || $segments === []) {
+            array_unshift($segments, $locale);
+        }
+
+        $normalizedPath = $segments === [] ? '/' : '/'.implode('/', $segments);
+
+        $query = $query ?? array_filter(request()->query(), fn ($value, $key) => $key !== 'locale', ARRAY_FILTER_USE_BOTH);
+        $queryString = $query !== [] ? '?'.http_build_query($query) : '';
+
+        return url($normalizedPath.$queryString);
+    }
+}

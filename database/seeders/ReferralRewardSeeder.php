@@ -130,3 +130,4 @@ final class ReferralRewardSeeder extends Seeder
         $this->command->info('ReferralRewardSeeder completed successfully!');
     }
 }
+

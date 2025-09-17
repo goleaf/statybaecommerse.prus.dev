@@ -277,3 +277,4 @@ it('can set featured image for news', function () {
     ]);
 });
 
+

@@ -35,9 +35,9 @@ class OrderItemFactory extends Factory
             'name' => $this->faker->words(3, true),
             'sku' => $this->faker->bothify('SKU-####-???'),
             'quantity' => $quantity,
-            'unit_price' => $unitPrice,
-            'price' => $unitPrice,
-            'total' => $total,
+            'unit_price' => round($unitPrice, 2),
+            'price' => round($unitPrice, 2),
+            'total' => round($total, 2),
         ];
     }
 
@@ -51,7 +51,7 @@ class OrderItemFactory extends Factory
 
             return [
                 'quantity' => $quantity,
-                'total' => $unitPrice * $quantity,
+                'total' => round($unitPrice * $quantity, 2),
             ];
         });
     }
@@ -65,9 +65,9 @@ class OrderItemFactory extends Factory
             $quantity = $attributes['quantity'] ?? $this->faker->numberBetween(1, 10);
 
             return [
-                'unit_price' => $unitPrice,
-                'price' => $unitPrice,
-                'total' => $unitPrice * $quantity,
+                'unit_price' => round($unitPrice, 2),
+                'price' => round($unitPrice, 2),
+                'total' => round($unitPrice * $quantity, 2),
             ];
         });
     }
@@ -82,9 +82,9 @@ class OrderItemFactory extends Factory
             $unitPrice = $this->faker->randomFloat(2, 100, 1000);
 
             return [
-                'unit_price' => $unitPrice,
-                'price' => $unitPrice,
-                'total' => $unitPrice * $quantity,
+                'unit_price' => round($unitPrice, 2),
+                'price' => round($unitPrice, 2),
+                'total' => round($unitPrice * $quantity, 2),
             ];
         });
     }
@@ -99,9 +99,9 @@ class OrderItemFactory extends Factory
             $unitPrice = $this->faker->randomFloat(2, 1, 20);
 
             return [
-                'unit_price' => $unitPrice,
-                'price' => $unitPrice,
-                'total' => $unitPrice * $quantity,
+                'unit_price' => round($unitPrice, 2),
+                'price' => round($unitPrice, 2),
+                'total' => round($unitPrice * $quantity, 2),
             ];
         });
     }
@@ -120,9 +120,9 @@ class OrderItemFactory extends Factory
                 'product_variant_id' => $variant->id,
                 'name' => $product->name,
                 'sku' => $variant->sku,
-                'unit_price' => $variant->price,
-                'price' => $variant->price,
-                'total' => $variant->price * ($attributes['quantity'] ?? 1),
+                'unit_price' => round((float) $variant->price, 2),
+                'price' => round((float) $variant->price, 2),
+                'total' => round(((float) $variant->price) * ($attributes['quantity'] ?? 1), 2),
             ];
         });
     }

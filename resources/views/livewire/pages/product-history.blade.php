@@ -12,12 +12,11 @@
             <x-breadcrumbs :items="[
                 [
                     'label' => __('frontend.navigation.products'),
-                    'url' => route('localized.products.index', ['locale' => app()->getLocale()]),
+                    'url' => route('localized.products.index', []),
                 ],
                 [
                     'label' => $product->trans('name') ?? $product->name,
                     'url' => route('localized.products.show', [
-                        'locale' => app()->getLocale(),
                         'product' => $product->trans('slug') ?? $product->slug,
                     ]),
                 ],
@@ -383,7 +382,6 @@
                         </p>
                         <div class="mt-6">
                             <a href="{{ route('localized.products.show', [
-                                'locale' => app()->getLocale(),
                                 'product' => $product->trans('slug') ?? $product->slug,
                             ]) }}" 
                                class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -399,7 +397,6 @@
             @if($history->count() > 0)
                 <div class="mt-8 flex justify-center">
                     <a href="{{ route('localized.products.show', [
-                        'locale' => app()->getLocale(),
                         'product' => $product->trans('slug') ?? $product->slug,
                     ]) }}" 
                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -411,4 +408,5 @@
         </x-container>
     </div>
 </div>
+
 

@@ -27,3 +27,4 @@ final class CreateActivityLog extends CreateRecord
         return $data;
     }
 }
+

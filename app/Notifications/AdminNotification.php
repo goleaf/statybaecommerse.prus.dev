@@ -41,7 +41,12 @@ final class AdminNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())->subject($this->title)->line($this->message)->line(__('admin.notifications.admin_message_footer'));
+        $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
+
+        return (new MailMessage())
+            ->subject($this->title)
+            ->line($this->message)
+            ->line(__('admin.notifications.admin_message_footer', [], $locale));
     }
     /**
      * Handle toDatabase functionality with proper error handling.

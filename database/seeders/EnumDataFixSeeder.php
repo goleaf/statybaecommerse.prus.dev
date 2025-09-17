@@ -89,7 +89,7 @@ class EnumDataFixSeeder extends Seeder
 
     protected function fixCollectionEnums(): void
     {
-        if (! DB::getSchemaBuilder()->hasTable('sh_collections')) {
+        if (! DB::getSchemaBuilder()->hasTable('collections')) {
             return;
         }
         $typeMap = [
@@ -97,19 +97,19 @@ class EnumDataFixSeeder extends Seeder
             'auto' => 'auto',
             'automatic' => 'auto',
         ];
-        $rows = DB::table('sh_collections')->select('id', 'type')->get();
+        $rows = DB::table('collections')->select('id', 'type')->get();
         foreach ($rows as $row) {
             $key = is_string($row->type) ? strtolower(trim($row->type)) : '';
             $mapped = $typeMap[$key] ?? 'manual';
             if ($mapped !== $row->type) {
-                DB::table('sh_collections')->where('id', $row->id)->update(['type' => $mapped]);
+                DB::table('collections')->where('id', $row->id)->update(['type' => $mapped]);
             }
         }
     }
 
     protected function fixProductEnums(): void
     {
-        if (! DB::getSchemaBuilder()->hasTable('sh_products')) {
+        if (! DB::getSchemaBuilder()->hasTable('products')) {
             return;
         }
         $typeMap = [
@@ -119,19 +119,19 @@ class EnumDataFixSeeder extends Seeder
             'virtual' => 'standard',
             'simple' => 'standard',
         ];
-        $rows = DB::table('sh_products')->select('id', 'type')->get();
+        $rows = DB::table('products')->select('id', 'type')->get();
         foreach ($rows as $row) {
             $key = is_string($row->type) ? strtolower(trim($row->type)) : '';
             $mapped = $typeMap[$key] ?? 'standard';
             if ($mapped !== $row->type) {
-                DB::table('sh_products')->where('id', $row->id)->update(['type' => $mapped]);
+                DB::table('products')->where('id', $row->id)->update(['type' => $mapped]);
             }
         }
     }
 
     protected function fixOrderEnums(): void
     {
-        if (! DB::getSchemaBuilder()->hasTable('sh_orders')) {
+        if (! DB::getSchemaBuilder()->hasTable('orders')) {
             return;
         }
         $statusMap = [
@@ -144,19 +144,19 @@ class EnumDataFixSeeder extends Seeder
             'completed' => 'completed',
             'cancelled' => 'cancelled',
         ];
-        $rows = DB::table('sh_orders')->select('id', 'status')->get();
+        $rows = DB::table('orders')->select('id', 'status')->get();
         foreach ($rows as $row) {
             $key = is_string($row->status) ? strtolower(trim($row->status)) : '';
             $mapped = $statusMap[$key] ?? 'pending';
             if ($mapped !== $row->status) {
-                DB::table('sh_orders')->where('id', $row->id)->update(['status' => $mapped]);
+                DB::table('orders')->where('id', $row->id)->update(['status' => $mapped]);
             }
         }
     }
 
     protected function fixOrderRefundEnums(): void
     {
-        if (! DB::getSchemaBuilder()->hasTable('sh_order_refunds')) {
+        if (! DB::getSchemaBuilder()->hasTable('order_refunds')) {
             return;
         }
         $statusMap = [
@@ -168,12 +168,12 @@ class EnumDataFixSeeder extends Seeder
             'rejected' => 'rejected',
             'cancelled' => 'cancelled',
         ];
-        $rows = DB::table('sh_order_refunds')->select('id', 'status')->get();
+        $rows = DB::table('order_refunds')->select('id', 'status')->get();
         foreach ($rows as $row) {
             $key = is_string($row->status) ? strtolower(trim($row->status)) : '';
             $mapped = $statusMap[$key] ?? 'pending';
             if ($mapped !== $row->status) {
-                DB::table('sh_order_refunds')->where('id', $row->id)->update(['status' => $mapped]);
+                DB::table('order_refunds')->where('id', $row->id)->update(['status' => $mapped]);
             }
         }
     }

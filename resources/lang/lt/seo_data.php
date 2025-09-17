@@ -56,3 +56,4 @@ return [
     'no_index' => 'No Index',
     'no_follow' => 'No Follow',
 ];
+

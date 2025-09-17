@@ -93,3 +93,4 @@ return [
         'footer' => 'Ataskaita: :name | Sugeneruota: :date',
     ],
 ];
+

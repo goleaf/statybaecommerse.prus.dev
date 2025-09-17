@@ -185,7 +185,7 @@
             <p class="text-gray-600 mb-6">
                 {{ __('Our customer support team is here to help you with any questions you may have.') }}</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('contact', ['locale' => app()->getLocale()]) ?? '/contact' }}"
+                <a href="{{ route('contact', []) ?? '/contact' }}"
                    class="btn-gradient px-6 py-3 rounded-xl font-semibold">
                     {{ __('Contact Support') }}
                 </a>

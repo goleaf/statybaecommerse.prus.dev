@@ -170,3 +170,4 @@ final class TranslationsRelationManager extends RelationManager
             ->defaultSort('locale');
     }
 }
+

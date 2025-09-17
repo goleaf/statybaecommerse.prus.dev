@@ -47,3 +47,4 @@ final class ReferralRewardTypeChartWidget extends ChartWidget
         return 'pie';
     }
 }
+

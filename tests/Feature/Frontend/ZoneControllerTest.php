@@ -152,3 +152,4 @@ final class ZoneControllerTest extends TestCase
         $this->assertCount(1, $zones->items());
     }
 }
+

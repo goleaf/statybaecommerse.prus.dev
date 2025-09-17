@@ -24,7 +24,7 @@
     <div
          class="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-2xl z-0 pointer-events-none">
     </div>
-    
+
     <!-- Glassmorphism effect -->
     <div
          class="absolute inset-0 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl z-0 pointer-events-none">
@@ -46,7 +46,8 @@
                  class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out">
             </div>
         @else
-            <div class="w-full h-64 bg-gradient-to-br from-gray-100 dark:from-gray-700 to-gray-200 dark:to-gray-600 flex items-center justify-center">
+            <div
+                 class="w-full h-64 bg-gradient-to-br from-gray-100 dark:from-gray-700 to-gray-200 dark:to-gray-600 flex items-center justify-center">
                 <svg class="w-16 h-16 text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors duration-300"
                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -63,7 +64,8 @@
                           class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm border border-white/20 animate-pulse">
                         <span class="flex items-center gap-1">
                             <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                <path
+                                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
                             {{ __('New') }}
                         </span>
@@ -74,7 +76,9 @@
                           class="bg-gradient-to-r from-red-500 to-pink-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm border border-white/20">
                         <span class="flex items-center gap-1">
                             <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.856.416L9.5 15.134 6.146 13.2a1 1 0 010-1.732L9.5 9.134l1.179-4.456A1 1 0 0112 2z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                      d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.856.416L9.5 15.134 6.146 13.2a1 1 0 010-1.732L9.5 9.134l1.179-4.456A1 1 0 0112 2z"
+                                      clip-rule="evenodd" />
                             </svg>
                             -{{ $discountPercentage }}%
                         </span>
@@ -136,7 +140,7 @@
         {{-- Product Name with enhanced styling --}}
         <h3
             class="font-bold text-gray-900 dark:text-white text-lg mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-            <a href="{{ route('product.show', $product->slug ?? $product) }}" class="hover:text-blue-600 dark:hover:text-blue-400">
+            <a href="{{ route('product.show', $product->slug) }}" class="hover:text-blue-600 dark:hover:text-blue-400">
                 {{ $product->name }}
             </a>
         </h3>
@@ -152,7 +156,8 @@
                                   d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                     @endfor
-                    <span class="ml-1 text-sm font-semibold text-yellow-600 dark:text-yellow-400">{{ number_format($product->avg_rating, 1) }}</span>
+                    <span
+                          class="ml-1 text-sm font-semibold text-yellow-600 dark:text-yellow-400">{{ number_format($product->avg_rating, 1) }}</span>
                 </div>
                 <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">({{ $product->reviews_count }})</span>
             </div>
@@ -175,7 +180,8 @@
 
                 @if ($showStock)
                     @if ($product->stock_quantity > 0)
-                        <span class="text-sm text-green-600 dark:text-green-400 font-semibold flex items-center gap-1 mt-1 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-lg w-fit">
+                        <span
+                              class="text-sm text-green-600 dark:text-green-400 font-semibold flex items-center gap-1 mt-1 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-lg w-fit">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M5 13l4 4L19 7"></path>
@@ -183,7 +189,8 @@
                             {{ __('In Stock') }}
                         </span>
                     @else
-                        <span class="text-sm text-red-600 dark:text-red-400 font-semibold flex items-center gap-1 mt-1 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded-lg w-fit">
+                        <span
+                              class="text-sm text-red-600 dark:text-red-400 font-semibold flex items-center gap-1 mt-1 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded-lg w-fit">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M6 18L18 6M6 6l12 12"></path>

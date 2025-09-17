@@ -36,3 +36,4 @@ return [
     'newsletter_success' => 'Successfully subscribed to newsletter',
     'newsletter_error' => 'Error subscribing to newsletter',
 ];
+

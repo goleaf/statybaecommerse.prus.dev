@@ -137,7 +137,7 @@ abstract class BasePageComponent extends Component
      */
     protected function getMetaData(): array
     {
-        return ['title' => $this->getPageTitle(), 'description' => $this->getPageDescription(), 'keywords' => $this->getPageKeywords(), 'canonical' => url()->current(), 'locale' => app()->getLocale()];
+        return ['title' => $this->getPageTitle(), 'description' => $this->getPageDescription(), 'keywords' => $this->getPageKeywords(), 'canonical' => url()->current()];
     }
     /**
      * Render the Livewire component view with current state.

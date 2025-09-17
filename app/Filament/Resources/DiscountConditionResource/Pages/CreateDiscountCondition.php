@@ -25,3 +25,4 @@ final class CreateDiscountCondition extends CreateRecord
         return $data;
     }
 }
+

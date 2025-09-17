@@ -158,3 +158,4 @@ final class ReportTest extends TestCase
         $this->assertEquals(1, $report->download_count);
     }
 }
+

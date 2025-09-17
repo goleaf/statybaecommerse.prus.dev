@@ -23,3 +23,4 @@ final class NewsTagFactory extends Factory
         ];
     }
 }
+

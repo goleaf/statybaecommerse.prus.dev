@@ -171,3 +171,4 @@ final class SystemSettingFactory extends Factory
         ]);
     }
 }
+

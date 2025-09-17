@@ -36,7 +36,7 @@ final class PriceListItem extends Model
      */
     protected function casts(): array
     {
-        return ['net_amount' => 'decimal:4', 'compare_amount' => 'decimal:4', 'is_active' => 'boolean', 'priority' => 'integer', 'min_quantity' => 'integer', 'max_quantity' => 'integer', 'valid_from' => 'datetime', 'valid_until' => 'datetime'];
+        return ['net_amount' => 'decimal:2', 'compare_amount' => 'decimal:2', 'is_active' => 'boolean', 'priority' => 'integer', 'min_quantity' => 'integer', 'max_quantity' => 'integer', 'valid_from' => 'datetime', 'valid_until' => 'datetime'];
     }
     /**
      * Handle priceList functionality with proper error handling.

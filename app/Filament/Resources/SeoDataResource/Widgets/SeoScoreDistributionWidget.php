@@ -79,3 +79,4 @@ final class SeoScoreDistributionWidget extends ChartWidget
         return 'doughnut';
     }
 }
+

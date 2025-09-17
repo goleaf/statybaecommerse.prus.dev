@@ -5,7 +5,7 @@ namespace App\Filament\Resources\AttributeResource\RelationManagers;
 use App\Models\AttributeValue;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,7 +20,7 @@ final class ValuesRelationManager extends RelationManager
     public function form(Schema $formSchema): Schema
     {
         return $formSchema
-            ->components([
+            ->schema([
                 Forms\Components\TextInput::make('value')
                     ->label(__('translations.value'))
                     ->required(),

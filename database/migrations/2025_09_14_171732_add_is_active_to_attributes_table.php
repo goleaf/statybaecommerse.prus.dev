@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('attributes', function (Blueprint $table) {
-            if (!Schema::hasColumn('attributes', 'is_active')) {
-                $table->boolean('is_active')->default(true)->after('is_enabled');
-            }
+            $table->boolean('is_active')->default(true)->after('is_enabled');
         });
     }
 
@@ -24,9 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('attributes', function (Blueprint $table) {
-            if (Schema::hasColumn('attributes', 'is_active')) {
-                $table->dropColumn('is_active');
-            }
+            $table->dropColumn('is_active');
         });
     }
 };

@@ -93,3 +93,4 @@ return [
         'footer' => 'Report: :name | Generated: :date',
     ],
 ];
+

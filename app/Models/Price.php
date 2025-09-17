@@ -29,6 +29,12 @@ final class Price extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'prices';
+    /**
+     * Eager-load defaults for admin tables/infolists to avoid N+1.
+     *
+     * @var array<int, string>
+     */
+    protected $with = ['currency'];
     protected $fillable = ['priceable_id', 'priceable_type', 'currency_id', 'amount', 'compare_amount', 'cost_amount', 'type', 'starts_at', 'ends_at', 'is_enabled', 'metadata'];
     /**
      * Handle casts functionality with proper error handling.
@@ -36,7 +42,7 @@ final class Price extends Model
      */
     protected function casts(): array
     {
-        return ['amount' => 'decimal:4', 'compare_amount' => 'decimal:4', 'cost_amount' => 'decimal:4', 'starts_at' => 'datetime', 'ends_at' => 'datetime', 'is_enabled' => 'boolean', 'metadata' => 'array'];
+        return ['amount' => 'decimal:2', 'compare_amount' => 'decimal:2', 'cost_amount' => 'decimal:2', 'starts_at' => 'datetime', 'ends_at' => 'datetime', 'is_enabled' => 'boolean', 'metadata' => 'array'];
     }
     /**
      * Handle priceable functionality with proper error handling.

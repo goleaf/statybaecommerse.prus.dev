@@ -1,40 +1,38 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
 use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Tabs;
+use App\Filament\Resources\ProductResource\Pages;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Notifications\Notification;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
@@ -42,16 +40,15 @@ use UnitEnum;
 
 /**
  * ProductResource
- * 
+ *
  * Filament v4 resource for Product management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
-    
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
-    
+
     protected static ?int $navigationSort = 1;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -92,8 +89,6 @@ final class ProductResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
@@ -105,34 +100,53 @@ final class ProductResource extends Resource
                         ->schema([
                             Section::make(__('products.sections.basic_information'))
                                 ->schema([
-                                    Grid::make(2)
-                                        ->schema([
-                                            TextInput::make('name')
-                                                ->label(__('products.fields.name'))
-                                                ->required()
-                                                ->maxLength(255)
-                                                ->columnSpan(1),
-
-                                            TextInput::make('slug')
-                                                ->label(__('products.fields.slug'))
-                                                ->maxLength(255)
-                                                ->unique(ignoreRecord: true)
-                                                ->columnSpan(1),
-                                        ]),
-
-                                    RichEditor::make('description')
-                                        ->label(__('products.fields.description'))
-                                        ->columnSpanFull(),
-
-                                    Textarea::make('short_description')
-                                        ->label(__('products.fields.short_description'))
-                                        ->maxLength(500)
-                                        ->rows(3)
-                                        ->columnSpanFull(),
+                                    Tabs::make(__('products.tabs.localization'))
+                                        ->tabs([
+                                            Tab::make('LT')
+                                                ->schema([
+                                                    Grid::make(2)
+                                                        ->schema([
+                                                            TextInput::make('name.lt')
+                                                                ->label(__('products.fields.name') . ' (LT)')
+                                                                ->required()
+                                                                ->maxLength(255),
+                                                            TextInput::make('slug.lt')
+                                                                ->label(__('products.fields.slug') . ' (LT)')
+                                                                ->maxLength(255),
+                                                        ]),
+                                                    RichEditor::make('description.lt')
+                                                        ->label(__('products.fields.description') . ' (LT)')
+                                                        ->columnSpanFull(),
+                                                    Textarea::make('short_description.lt')
+                                                        ->label(__('products.fields.short_description') . ' (LT)')
+                                                        ->maxLength(500)
+                                                        ->rows(3)
+                                                        ->columnSpanFull(),
+                                                ]),
+                                            Tab::make('EN')
+                                                ->schema([
+                                                    Grid::make(2)
+                                                        ->schema([
+                                                            TextInput::make('name.en')
+                                                                ->label(__('products.fields.name') . ' (EN)')
+                                                                ->maxLength(255),
+                                                            TextInput::make('slug.en')
+                                                                ->label(__('products.fields.slug') . ' (EN)')
+                                                                ->maxLength(255),
+                                                        ]),
+                                                    RichEditor::make('description.en')
+                                                        ->label(__('products.fields.description') . ' (EN)')
+                                                        ->columnSpanFull(),
+                                                    Textarea::make('short_description.en')
+                                                        ->label(__('products.fields.short_description') . ' (EN)')
+                                                        ->maxLength(500)
+                                                        ->rows(3)
+                                                        ->columnSpanFull(),
+                                                ]),
+                                        ])
                                 ])
                                 ->columns(1),
                         ]),
-
                     Tab::make(__('products.tabs.pricing'))
                         ->icon('heroicon-o-currency-euro')
                         ->schema([
@@ -147,14 +161,12 @@ final class ProductResource extends Resource
                                                 ->step(0.01)
                                                 ->prefix('€')
                                                 ->columnSpan(1),
-
                                             TextInput::make('compare_price')
                                                 ->label(__('products.fields.compare_price'))
                                                 ->numeric()
                                                 ->step(0.01)
                                                 ->prefix('€')
                                                 ->columnSpan(1),
-
                                             TextInput::make('cost_price')
                                                 ->label(__('products.fields.cost_price'))
                                                 ->numeric()
@@ -165,7 +177,6 @@ final class ProductResource extends Resource
                                 ])
                                 ->columns(1),
                         ]),
-
                     Tab::make(__('products.tabs.inventory'))
                         ->icon('heroicon-o-archive-box')
                         ->schema([
@@ -179,39 +190,33 @@ final class ProductResource extends Resource
                                                 ->unique(ignoreRecord: true)
                                                 ->maxLength(255)
                                                 ->columnSpan(1),
-
                                             TextInput::make('barcode')
                                                 ->label(__('products.fields.barcode'))
                                                 ->maxLength(255)
                                                 ->columnSpan(1),
                                         ]),
-
                                     Grid::make(3)
                                         ->schema([
                                             Toggle::make('manage_stock')
                                                 ->label(__('products.fields.manage_stock'))
                                                 ->default(true)
                                                 ->columnSpan(1),
-
                                             TextInput::make('stock_quantity')
                                                 ->label(__('products.fields.stock_quantity'))
                                                 ->numeric()
                                                 ->default(0)
                                                 ->columnSpan(1),
-
                                             TextInput::make('low_stock_threshold')
                                                 ->label(__('products.fields.low_stock_threshold'))
                                                 ->numeric()
                                                 ->default(5)
                                                 ->columnSpan(1),
                                         ]),
-
                                     Grid::make(2)
                                         ->schema([
                                             Toggle::make('allow_backorder')
                                                 ->label(__('products.fields.allow_backorder'))
                                                 ->columnSpan(1),
-
                                             Toggle::make('track_stock')
                                                 ->label(__('products.fields.track_stock'))
                                                 ->default(true)
@@ -220,7 +225,6 @@ final class ProductResource extends Resource
                                 ])
                                 ->columns(1),
                         ]),
-
                     Tab::make(__('products.tabs.organization'))
                         ->icon('heroicon-o-tag')
                         ->schema([
@@ -231,13 +235,14 @@ final class ProductResource extends Resource
                                             Select::make('category_id')
                                                 ->label(__('products.fields.category'))
                                                 ->relationship('categories', 'name')
+                                                ->getOptionLabelFromRecordUsing(fn($record) => is_array($record->name) ? ($record->name[app()->getLocale()] ?? ($record->name['lt'] ?? $record->name['en'] ?? reset($record->name))) : $record->name)
                                                 ->searchable()
                                                 ->preload()
                                                 ->columnSpan(1),
-
                                             Select::make('brand_id')
                                                 ->label(__('products.fields.brand'))
                                                 ->relationship('brand', 'name')
+                                                ->getOptionLabelFromRecordUsing(fn($record) => is_array($record->name) ? ($record->name[app()->getLocale()] ?? ($record->name['lt'] ?? $record->name['en'] ?? reset($record->name))) : $record->name)
                                                 ->searchable()
                                                 ->preload()
                                                 ->columnSpan(1),
@@ -245,7 +250,6 @@ final class ProductResource extends Resource
                                 ])
                                 ->columns(1),
                         ]),
-
                     Tab::make(__('products.tabs.visibility'))
                         ->icon('heroicon-o-eye')
                         ->schema([
@@ -257,12 +261,10 @@ final class ProductResource extends Resource
                                                 ->label(__('products.fields.is_visible'))
                                                 ->default(true)
                                                 ->columnSpan(1),
-
                                             Toggle::make('is_featured')
                                                 ->label(__('products.fields.is_featured'))
                                                 ->columnSpan(1),
                                         ]),
-
                                     DateTimePicker::make('published_at')
                                         ->label(__('products.fields.published_at'))
                                         ->default(now()),
@@ -287,27 +289,23 @@ final class ProductResource extends Resource
                     ->label(__('products.fields.image'))
                     ->circular()
                     ->size(50),
-
                 TextColumn::make('name')
                     ->label(__('products.fields.name'))
+                    ->getStateUsing(fn(Product $record) => is_array($record->name) ? ($record->name[app()->getLocale()] ?? ($record->name['lt'] ?? $record->name['en'] ?? reset($record->name))) : $record->name)
                     ->searchable()
                     ->sortable(),
-
                 TextColumn::make('sku')
                     ->label(__('products.fields.sku'))
                     ->searchable()
                     ->sortable(),
-
                 TextColumn::make('price')
                     ->label(__('products.fields.price'))
                     ->money('EUR')
                     ->sortable(),
-
                 TextColumn::make('stock_quantity')
                     ->label(__('products.fields.stock'))
                     ->numeric()
                     ->sortable(),
-
                 BadgeColumn::make('stock_status')
                     ->label(__('products.fields.stock_status'))
                     ->colors([
@@ -315,21 +313,18 @@ final class ProductResource extends Resource
                         'warning' => 'low_stock',
                         'danger' => 'out_of_stock',
                     ])
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'in_stock' => __('products.stock_status.in_stock'),
                         'low_stock' => __('products.stock_status.low_stock'),
                         'out_of_stock' => __('products.stock_status.out_of_stock'),
                         default => $state,
                     }),
-
                 IconColumn::make('is_visible')
                     ->label(__('products.fields.is_visible'))
                     ->boolean(),
-
                 IconColumn::make('is_featured')
                     ->label(__('products.fields.is_featured'))
                     ->boolean(),
-
                 TextColumn::make('created_at')
                     ->label(__('products.fields.created_at'))
                     ->dateTime()
@@ -342,16 +337,13 @@ final class ProductResource extends Resource
                     ->relationship('brand', 'name')
                     ->searchable()
                     ->preload(),
-
                 SelectFilter::make('category_id')
                     ->label(__('products.fields.category'))
                     ->relationship('categories', 'name')
                     ->searchable()
                     ->preload(),
-
                 TernaryFilter::make('is_visible')
                     ->label(__('products.fields.is_visible')),
-
                 TernaryFilter::make('is_featured')
                     ->label(__('products.fields.is_featured')),
             ])
@@ -371,7 +363,6 @@ final class ProductResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-
                     BulkAction::make('unpublish')
                         ->label(__('products.actions.unpublish'))
                         ->icon('heroicon-o-eye-slash')
@@ -382,7 +373,6 @@ final class ProductResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])

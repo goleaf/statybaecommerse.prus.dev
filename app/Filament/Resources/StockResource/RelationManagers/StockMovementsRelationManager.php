@@ -7,7 +7,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -45,9 +45,9 @@ class StockMovementsRelationManager extends RelationManager
         return __('inventory.stock_movements');
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 TextInput::make('quantity')
                     ->label(__('inventory.quantity'))
@@ -281,3 +281,4 @@ class StockMovementsRelationManager extends RelationManager
             ->striped();
     }
 }
+

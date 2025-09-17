@@ -1,6 +1,49 @@
 <?php
 
 return [
+    // Notifications (general)
+    'notifications' => [
+        'greeting' => 'Sveiki, :name',
+        'shop_now' => 'Apsipirkti dabar',
+        'read_more' => 'Skaityti daugiau',
+        'claim_discount' => 'Gauti nuolaidą',
+        'promotional_footer' => 'Jūs gavote šį reklaminį laišką, nes užsiprenumeravote mūsų naujienlaiškį.',
+        'newsletter_footer' => 'Ačiū, kad esate su mumis! Sekite naujienas.',
+        'discount_footer' => 'Pasiūlymas galioja ribotą laiką. Pasinaudokite dabar.',
+        'marketing_unsubscribe' => 'Jei nebenorite gauti tokių laiškų, galite atsisakyti prenumeratos paskyros nustatymuose.',
+        'system' => [
+            'footer' => 'Šis pranešimas išsiųstas iš sistemos administracijos.',
+        ],
+        'order' => [
+            'order_number' => 'Užsakymo numeris: :number',
+        ],
+        'product' => [
+            'name_line' => 'Produktas: :name',
+        ],
+        'stock' => [
+            'low_stock_subject' => 'Mažas likutis: :product',
+            'low_stock_line' => 'Produktas :name netrukus baigsis sandėlyje.',
+            'current_stock' => 'Dabartinis likutis: :stock vnt.',
+            'threshold' => 'Slenkstis: :threshold vnt.',
+            'manage_product' => 'Valdyti produktą',
+            'please_restock' => 'Papildykite šio produkto likutį, kad išvengtumėte trūkumo.',
+            'low_stock_short' => 'Mažo likučio įspėjimas: :product',
+            'low_stock_title' => 'Mažas likutis',
+            'low_stock_body' => 'Produktas :name netrukus baigsis (liko :stock vnt.)',
+            'view_product' => 'Peržiūrėti produktą',
+        ],
+        'live' => [
+            'order_title' => 'Užsakymas #:id',
+            'stock_title' => 'Mažas likutis',
+            'stock_message' => 'Prekė ":name" turi mažiau nei :threshold vnt. Dabartinis kiekis: :stock',
+            'payment_title' => 'Mokėjimo atnaujinimas',
+            'payment_message' => 'Užsakymo #:id mokėjimo būsena: :status',
+            'customer_title' => 'Naujas klientas',
+            'customer_message' => 'Užsiregistravo naujas klientas: :email',
+            'review_title' => 'Naujas atsiliepimas',
+            'review_message' => 'Prekė ":name" gavo naują atsiliepimą: :rating/5 žvaigždučių',
+        ],
+    ],
     // Navigation
     'nav_home' => 'Pradžia',
     'nav_categories' => 'Kategorijos',

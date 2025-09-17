@@ -1,28 +1,31 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
+
 /**
  * UserNotification
- * 
+ *
  * Notification class for UserNotification user notifications with multi-channel delivery and customizable content.
- * 
  */
 final class UserNotification extends Notification
 {
     use Queueable;
+
     /**
      * Initialize the class instance with required dependencies.
      * @param string $action
      * @param array $userData
      * @param string|null $message
      */
-    public function __construct(public readonly string $action, public readonly array $userData, public readonly ?string $message = null)
-    {
-    }
+    public function __construct(
+        public readonly string $action,
+        public readonly array $userData,
+        public readonly ?string $message = null
+    ) {}
+
     /**
      * Handle via functionality with proper error handling.
      * @param object $notifiable
@@ -32,6 +35,7 @@ final class UserNotification extends Notification
     {
         return ['database'];
     }
+
     /**
      * Handle toDatabase functionality with proper error handling.
      * @param object $notifiable
@@ -41,6 +45,7 @@ final class UserNotification extends Notification
     {
         return ['type' => 'user', 'action' => $this->action, 'user_id' => $this->userData['id'] ?? null, 'user_name' => $this->userData['name'] ?? null, 'user_email' => $this->userData['email'] ?? null, 'title' => $this->getTitle(), 'message' => $this->message ?? $this->getMessage(), 'data' => $this->userData, 'sent_at' => now()->toISOString()];
     }
+
     /**
      * Handle getTitle functionality with proper error handling.
      * @return string
@@ -59,6 +64,7 @@ final class UserNotification extends Notification
             default => __('notifications.user.profile_updated'),
         };
     }
+
     /**
      * Handle getMessage functionality with proper error handling.
      * @return string

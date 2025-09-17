@@ -9,7 +9,7 @@
     <nav class="mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
             <li>
-                <a href="{{ route('locations.index') }}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                <a href="{{ localized_route('locations.index') }}" class="hover:text-blue-600 dark:hover:text-blue-400">
                     {{ __('locations.title') }}
                 </a>
             </li>
@@ -307,7 +307,7 @@
                 </h3>
                 
                 <div class="space-y-3">
-                    <a href="{{ route('locations.index') }}" 
+                    <a href="{{ localized_route('locations.index') }}" 
                        class="w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-md text-sm font-medium transition duration-200 block">
                         {{ __('locations.actions.back_to_list') }}
                     </a>
@@ -342,7 +342,7 @@
                                 <span class="text-sm text-gray-700 dark:text-gray-300">
                                     {{ $relatedLocation->translated_name }}
                                 </span>
-                                <a href="{{ route('locations.show', $relatedLocation) }}" 
+                                <a href="{{ localized_route('locations.show', $relatedLocation) }}" 
                                    class="text-blue-600 dark:text-blue-400 hover:underline text-xs">
                                     {{ __('locations.actions.view') }}
                                 </a>

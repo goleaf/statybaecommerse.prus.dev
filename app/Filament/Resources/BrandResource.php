@@ -1,48 +1,44 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
-use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Notifications\Notification;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
 /**
  * BrandResource
- * 
+ *
  * Filament v4 resource for Brand management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class BrandResource extends Resource
 {
     protected static ?string $model = Brand::class;
-    
-    /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
-    
+
     protected static ?int $navigationSort = 2;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -83,39 +79,49 @@ final class BrandResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('brands.basic_information'))
                 ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('brands.name'))
-                                ->required()
-                                ->maxLength(255)
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
-                                    $operation === 'create' ? $set('slug', \Str::slug($state)) : null
-                                ),
-                            
-                            TextInput::make('slug')
-                                ->label(__('brands.slug'))
-                                ->required()
-                                ->maxLength(255)
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
+                    Forms\Components\Tabs::make('i18n')
+                        ->tabs([
+                            Forms\Components\Tabs\Tab::make('LT')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextInput::make('name.lt')
+                                                ->label(__('brands.name') . ' (LT)')
+                                                ->required()
+                                                ->maxLength(255),
+                                            TextInput::make('slug.lt')
+                                                ->label(__('brands.slug') . ' (LT)')
+                                                ->maxLength(255),
+                                        ]),
+                                    Textarea::make('description.lt')
+                                        ->label(__('brands.description') . ' (LT)')
+                                        ->rows(3)
+                                        ->columnSpanFull(),
+                                ]),
+                            Forms\Components\Tabs\Tab::make('EN')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextInput::make('name.en')
+                                                ->label(__('brands.name') . ' (EN)')
+                                                ->maxLength(255),
+                                            TextInput::make('slug.en')
+                                                ->label(__('brands.slug') . ' (EN)')
+                                                ->maxLength(255),
+                                        ]),
+                                    Textarea::make('description.en')
+                                        ->label(__('brands.description') . ' (EN)')
+                                        ->rows(3)
+                                        ->columnSpanFull(),
+                                ]),
                         ]),
-                    
-                    Textarea::make('description')
-                        ->label(__('brands.description'))
-                        ->rows(3)
-                        ->columnSpanFull(),
                 ]),
-            
             Section::make(__('brands.media'))
                 ->schema([
                     FileUpload::make('logo')
@@ -130,46 +136,15 @@ final class BrandResource extends Resource
                         ->directory('brands/logos')
                         ->visibility('public')
                         ->columnSpanFull(),
-                    
-                    FileUpload::make('banner')
-                        ->label(__('brands.banner'))
-                        ->image()
-                        ->imageEditor()
-                        ->imageEditorAspectRatios([
-                            '16:9',
-                            '21:9',
-                            '4:3',
-                        ])
-                        ->directory('brands/banners')
-                        ->visibility('public')
-                        ->columnSpanFull(),
                 ]),
-            
-            Section::make(__('brands.seo'))
+            Section::make(__('brands.visibility'))
                 ->schema([
-                    TextInput::make('seo_title')
-                        ->label(__('brands.seo_title'))
-                        ->maxLength(255)
-                        ->columnSpanFull(),
-                    
-                    Textarea::make('seo_description')
-                        ->label(__('brands.seo_description'))
-                        ->rows(2)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                ]),
-            
-            Section::make(__('brands.settings'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            Toggle::make('is_active')
-                                ->label(__('brands.is_active'))
-                                ->default(true),
-                            
-                            Toggle::make('is_featured')
-                                ->label(__('brands.is_featured')),
-                        ]),
+                    Toggle::make('is_featured')
+                        ->label(__('brands.is_featured'))
+                        ->default(false),
+                    Toggle::make('is_active')
+                        ->label(__('brands.is_active'))
+                        ->default(true),
                 ]),
         ]);
     }
@@ -187,41 +162,35 @@ final class BrandResource extends Resource
                     ->label(__('brands.logo'))
                     ->circular()
                     ->size(40),
-                
                 TextColumn::make('name')
                     ->label(__('brands.name'))
+                    ->getStateUsing(fn(Brand $record) => is_array($record->name) ? ($record->name[app()->getLocale()] ?? ($record->name['lt'] ?? $record->name['en'] ?? reset($record->name))) : $record->name)
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
-                
                 TextColumn::make('slug')
                     ->label(__('brands.slug'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('products_count')
                     ->label(__('brands.products_count'))
                     ->counts('products')
                     ->sortable(),
-                
                 IconColumn::make('is_active')
                     ->label(__('brands.is_active'))
                     ->boolean()
                     ->sortable(),
-                
                 IconColumn::make('is_featured')
                     ->label(__('brands.is_featured'))
                     ->boolean()
                     ->sortable(),
-                
                 TextColumn::make('created_at')
                     ->label(__('brands.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('updated_at')
                     ->label(__('brands.updated_at'))
                     ->dateTime()
@@ -235,7 +204,6 @@ final class BrandResource extends Resource
                     ->trueLabel(__('brands.active_only'))
                     ->falseLabel(__('brands.inactive_only'))
                     ->native(false),
-                
                 TernaryFilter::make('is_featured')
                     ->label(__('brands.is_featured'))
                     ->boolean()
@@ -246,14 +214,13 @@ final class BrandResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                
                 TableAction::make('toggle_active')
-                    ->label(fn (Brand $record): string => $record->is_active ? __('brands.deactivate') : __('brands.activate'))
-                    ->icon(fn (Brand $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (Brand $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn(Brand $record): string => $record->is_active ? __('brands.deactivate') : __('brands.activate'))
+                    ->icon(fn(Brand $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(Brand $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Brand $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-                        
+
                         Notification::make()
                             ->title($record->is_active ? __('brands.activated_successfully') : __('brands.deactivated_successfully'))
                             ->success()
@@ -264,28 +231,26 @@ final class BrandResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    
                     BulkAction::make('activate')
                         ->label(__('brands.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-                            
+
                             Notification::make()
                                 ->title(__('brands.bulk_activated_success'))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    
                     BulkAction::make('deactivate')
                         ->label(__('brands.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-                            
+
                             Notification::make()
                                 ->title(__('brands.bulk_deactivated_success'))
                                 ->success()

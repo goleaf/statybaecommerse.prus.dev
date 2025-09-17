@@ -70,7 +70,7 @@ final class SitemapController extends Controller
             return empty($brand->name) || !$brand->is_active || empty($brand->slug);
         });
         LazyCollection::make($brands)->takeUntilTimeout($timeout)->each(function ($brand) use (&$sitemap) {
-            $sitemap .= $this->generateUrl(route('brands.show', $brand->slug), $brand->updated_at->toISOString(), 'monthly', 0.6);
+            $sitemap .= $this->generateUrl(localized_route('brands.show', $brand->slug), $brand->updated_at->toISOString(), 'monthly', 0.6);
         });
         // Static pages
         $staticPages = ['about' => 'monthly', 'contact' => 'monthly', 'privacy' => 'yearly', 'terms' => 'yearly', 'shipping' => 'monthly', 'returns' => 'monthly'];

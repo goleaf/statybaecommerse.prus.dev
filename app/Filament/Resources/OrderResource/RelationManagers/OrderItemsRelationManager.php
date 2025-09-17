@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\OrderItem;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -13,10 +13,10 @@ final class OrderItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'items';
     protected static ?string $title = 'Order Items';
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\Select::make('product_id')
                     ->label(__('admin.order_items.fields.product'))
                     ->relationship('product', 'name')

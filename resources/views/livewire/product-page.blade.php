@@ -2,14 +2,14 @@
     <!-- Breadcrumb -->
     <nav class="breadcrumb mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-500">
-            <li><a href="{{ route('home') }}" class="hover:text-gray-700">{{ __('common.home') }}</a></li>
+            <li><a href="{{ localized_route('home') }}" class="hover:text-gray-700">{{ __('common.home') }}</a></li>
             <li class="flex items-center">
                 <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                 </svg>
             </li>
             @foreach($this->getProductCategories() as $category)
-                <li><a href="{{ route('categories.show', $category) }}" class="hover:text-gray-700">{{ $category->name }}</a></li>
+                <li><a href="{{ localized_route('categories.show', $category) }}" class="hover:text-gray-700">{{ $category->name }}</a></li>
                 <li class="flex items-center">
                     <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
@@ -241,7 +241,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($relatedProducts as $relatedProduct)
                     <div class="product-card bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                        <a href="{{ route('products.show', $relatedProduct) }}" class="block">
+                        <a href="{{ localized_route('products.show', $relatedProduct) }}" class="block">
                             <div class="aspect-square bg-gray-100">
                                 @if($relatedProduct->hasMedia('images'))
                                     <img src="{{ $relatedProduct->getFirstMediaUrl('images', 'thumb') }}" 
@@ -273,7 +273,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($recentlyViewed as $recentProduct)
                     <div class="product-card bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                        <a href="{{ route('products.show', $recentProduct) }}" class="block">
+                        <a href="{{ localized_route('products.show', $recentProduct) }}" class="block">
                             <div class="aspect-square bg-gray-100">
                                 @if($recentProduct->hasMedia('images'))
                                     <img src="{{ $recentProduct->getFirstMediaUrl('images', 'thumb') }}" 

@@ -49,7 +49,7 @@
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
                             </svg>
-                            <a href="{{ route('products.show', $review->product) }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                            <a href="{{ localized_route('products.show', $review->product) }}" class="text-blue-600 hover:text-blue-800 font-medium">
                                 {{ $review->product->name }}
                             </a>
                         </div>
@@ -105,4 +105,5 @@
     </div>
 </div>
 @endsection
+
 

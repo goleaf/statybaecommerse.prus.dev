@@ -72,8 +72,9 @@ return new class extends Migration
             $table->text('help_text')->nullable();
             $table->timestamps();
 
-            $table->unique(['system_setting_id', 'locale']);
-            $table->foreign('system_setting_id')->references('id')->on('system_settings')->onDelete('cascade');
+            $table->unique(['system_setting_id', 'locale'], 'sys_setting_trans_setting_locale_unique');
+            $table->foreign('system_setting_id', 'sys_setting_trans_setting_fk')
+                ->references('id')->on('system_settings')->onDelete('cascade');
         });
 
         // System Setting Category Translations Table
@@ -85,8 +86,9 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->timestamps();
 
-            $table->unique(['system_setting_category_id', 'locale']);
-            $table->foreign('system_setting_category_id')->references('id')->on('system_setting_categories')->onDelete('cascade');
+            $table->unique(['system_setting_category_id', 'locale'], 'sys_set_cat_trans_cat_locale_unique');
+            $table->foreign('system_setting_category_id', 'sys_set_cat_trans_cat_fk')
+                ->references('id')->on('system_setting_categories')->onDelete('cascade');
         });
 
         // System Setting History Table (for audit trail)

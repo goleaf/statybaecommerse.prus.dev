@@ -585,5 +585,12 @@
     "newsletter.privacy_notice": "Prenumeruodami sutinkate su mūsų privatumo politika",
     "translations.product_image_alt": "Produkto nuotrauka",
     "search_for": "pagal",
-    "search_result_count": "— search_for"
+    "search_result_count": "— search_for",
+    "Page Not Found": "Puslapis nerastas",
+    "The page you are looking for could not be found. It might have been moved, deleted, or you entered the wrong URL.": "Ieškomas puslapis nerastas. Jis galėjo būti perkeltas, ištrintas arba įvedėte neteisingą adresą.",
+    "Go Home": "Į pradžią",
+    "Go Back": "Grįžti atgal",
+    "Search for what you need": "Ieškokite to, ko reikia",
+    "Popular Pages": "Populiarūs puslapiai",
+    "Laravel": "Laravel"
 }

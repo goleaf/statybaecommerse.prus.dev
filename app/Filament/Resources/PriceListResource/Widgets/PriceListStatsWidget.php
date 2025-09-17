@@ -41,3 +41,4 @@ final class PriceListStatsWidget extends BaseWidget
         ];
     }
 }
+

@@ -63,7 +63,7 @@ $comparisonAttributes = [
 
                                             {{-- Product Name --}}
                                             <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">
-                                                <a href="{{ route('product.show', $product->slug ?? $product) }}"
+                                                <a href="{{ route('product.show', $product->slug) }}"
                                                    class="hover:text-blue-600 transition-colors duration-200">
                                                     {{ $product->name }}
                                                 </a>
@@ -221,7 +221,7 @@ $comparisonAttributes = [
                                                 </button>
                                             @endif
 
-                                            <a href="{{ route('product.show', $product->slug ?? $product) }}"
+                                            <a href="{{ route('product.show', $product->slug) }}"
                                                class="w-full text-blue-600 hover:text-blue-700 text-sm font-medium">
                                                 {{ __('View Details') }}
                                             </a>
@@ -326,7 +326,7 @@ $comparisonAttributes = [
                 <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('No products to compare') }}</h3>
                 <p class="text-gray-600 mb-8">{{ __('Add products to compare their features and specifications') }}
                 </p>
-                <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                <a href="{{ localized_route('products.index') }}"
                    class="btn-gradient px-8 py-3 rounded-xl font-semibold">
                     {{ __('Browse Products') }}
                 </a>

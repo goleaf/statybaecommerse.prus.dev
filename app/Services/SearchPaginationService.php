@@ -359,7 +359,6 @@ final class SearchPaginationService
             'page_size' => $pageSize,
             'filters' => $filters,
             'types' => $types,
-            'locale' => app()->getLocale(),
         ];
         
         return self::CACHE_PREFIX . md5(serialize($keyData));

@@ -170,7 +170,7 @@
                     </h3>
                     
                     <div class="space-y-3">
-                        <a href="{{ route('products.show', $productRequest->product) }}" 
+                        <a href="{{ localized_route('products.show', $productRequest->product) }}" 
                            class="w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                             {{ __('translations.view_product') }}
                         </a>

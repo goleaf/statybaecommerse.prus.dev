@@ -121,7 +121,7 @@ final class NavigationCreator
                             'id' => $category->id,
                             'name' => $category->getTranslatedName(),
                             'slug' => $category->slug,
-                            'url' => route('categories.show', $category->slug),
+                            'url' => localized_route('categories.show', $category->slug),
                             'icon' => $category->icon,
                             'children' => $category->children()
                                 ->where('is_visible', true)
@@ -134,7 +134,7 @@ final class NavigationCreator
                                     'id' => $child->id,
                                     'name' => $child->getTranslatedName(),
                                     'slug' => $child->slug,
-                                    'url' => route('categories.show', $child->slug),
+                                    'url' => localized_route('categories.show', $child->slug),
                                 ]),
                         ];
                     }),
@@ -143,7 +143,7 @@ final class NavigationCreator
                             'id' => $brand->id,
                             'name' => $brand->getTranslatedName(),
                             'slug' => $brand->slug,
-                            'url' => route('brands.show', $brand->slug),
+                            'url' => localized_route('brands.show', $brand->slug),
                             'logo' => $brand->logo_url,
                         ];
                     }),

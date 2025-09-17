@@ -163,7 +163,8 @@
 
 @push('scripts')
     @php
-        $productUrl = route('product.show', $product->trans('slug') ?? $product->slug);
+        $productSlug = $product->trans('slug') ?? $product->slug;
+        $productUrl = !empty($productSlug) ? route('product.show', $productSlug) : '#';
         $image =
             $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?:
             $product->getFirstMediaUrl(config('media.storage.collection_name'));
@@ -200,7 +201,6 @@
                     'position' => $position++,
                     'name' => $cat->trans('name') ?? $cat->name,
                     'item' => route('localized.categories.show', [
-                        'locale' => app()->getLocale(),
                         'category' => $cat->trans('slug') ?? $cat->slug,
                     ]),
                 ];

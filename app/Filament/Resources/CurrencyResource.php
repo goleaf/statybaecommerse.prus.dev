@@ -11,7 +11,7 @@ use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
@@ -39,7 +39,7 @@ final class CurrencyResource extends Resource
     protected static ?string $model = Currency::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+    protected static UnitEnum|string|null  = NavigationGroup::System;
     
     protected static ?int $navigationSort = 7;
     protected static ?string $recordTitleAttribute = 'name';
@@ -82,12 +82,11 @@ final class CurrencyResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->schema([
+    public static function form(Form $form): Form{
+        return $form->schema([
             Section::make(__('currencies.basic_information'))
                 ->schema([
                     Grid::make(2)

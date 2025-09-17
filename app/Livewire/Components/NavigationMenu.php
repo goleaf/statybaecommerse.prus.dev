@@ -105,7 +105,7 @@ final class NavigationMenu extends Component
         if (empty($this->searchQuery)) {
             return;
         }
-        $this->redirect(route('search', ['q' => $this->searchQuery, 'locale' => app()->getLocale()]));
+        $this->redirect(localized_route('search', ['q' => $this->searchQuery]));
     }
     /**
      * Render the Livewire component view with current state.

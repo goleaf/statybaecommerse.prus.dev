@@ -55,8 +55,7 @@ final class UserDataCreator
     private function getUserPreferences(?User $user): array
     {
         if (!$user) {
-            return [
-                'locale' => app()->getLocale(),
+            return [,
                 'currency' => current_currency(),
                 'theme' => 'light',
                 'notifications' => [

@@ -28,3 +28,4 @@ final class CreateSeoData extends CreateRecord
         return $data;
     }
 }
+

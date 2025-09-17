@@ -32,7 +32,7 @@ final class OrderItem extends Model
      */
     protected function casts(): array
     {
-        return ['quantity' => 'integer', 'unit_price' => 'float', 'price' => 'float', 'total' => 'float'];
+        return ['quantity' => 'integer', 'unit_price' => 'decimal:2', 'price' => 'decimal:2', 'total' => 'decimal:2'];
     }
     /**
      * Handle order functionality with proper error handling.

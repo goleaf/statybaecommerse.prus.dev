@@ -33,14 +33,13 @@
 
     {{-- Enhanced Search with Autocomplete --}}
     <div class="mb-6">
-        <livewire:components.live-search 
-            :max-results="20"
-            :search-types="['products', 'categories', 'brands', 'collections']"
-            :enable-suggestions="true"
-            :enable-recent-searches="true"
-            :enable-popular-searches="true"
-            placeholder="{{ __('search_products') }}"
-        />
+        <livewire:components.live-search
+                                         :max-results="20"
+                                         :search-types="['products', 'categories', 'brands', 'collections']"
+                                         :enable-suggestions="true"
+                                         :enable-recent-searches="true"
+                                         :enable-popular-searches="true"
+                                         placeholder="{{ __('search_products') }}" />
     </div>
 
     <div wire:loading class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6" role="status"
@@ -68,7 +67,7 @@
 
     <!-- Back Button -->
     <div class="mt-8 text-center">
-        <a href="{{ route('home', ['locale' => app()->getLocale()]) }}" 
+        <a href="{{ localized_route('home') }}"
            class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition duration-200">
             <x-heroicon-o-arrow-left class="w-4 h-4 mr-2" />
             {{ __('frontend.buttons.back_to_home') }}
@@ -92,7 +91,7 @@
                 'name' => $p->trans('name') ?? $p->name,
             ];
         }
-        $searchUrl = route('search', ['locale' => app()->getLocale()]);
+        $searchUrl = localized_route('search');
         $websiteSchema = [
             '@context' => 'https://schema.org',
             '@type' => 'WebSite',

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,10 +15,10 @@ final class WishlistRelationManager extends RelationManager
     protected static string $relationship = 'wishlist';
     protected static ?string $title = 'admin.sections.wishlist';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\Select::make('product_id')
                     ->relationship('product', 'name')
                     ->required(),
@@ -75,3 +75,4 @@ final class WishlistRelationManager extends RelationManager
             ]);
     }
 }
+

@@ -62,3 +62,4 @@ final class StockMovementsWidget extends ChartWidget
         ];
     }
 }
+

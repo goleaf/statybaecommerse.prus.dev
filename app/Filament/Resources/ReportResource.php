@@ -13,7 +13,7 @@ use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
@@ -46,7 +46,8 @@ final class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;
     
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::System;
+    /** @var UnitEnum|string|null */
+    protected static UnitEnum|string|null  = NavigationGroup::System;
     
     protected static ?int $navigationSort = 17;
     protected static ?string $recordTitleAttribute = 'name';
@@ -89,12 +90,9 @@ final class ReportResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->schema([
+    public static function form(Form $form): Form{
+        return $form->schema([
             Section::make(__('reports.basic_information'))
                 ->schema([
                     Grid::make(2)

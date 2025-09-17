@@ -93,3 +93,4 @@ final class ReferralCodeStatisticsFactory extends Factory
         ]);
     }
 }
+

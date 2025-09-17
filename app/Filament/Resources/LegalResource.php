@@ -1,51 +1,47 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\LegalResource\Pages;
 use App\Models\Legal;
-use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Notifications\Notification;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
 /**
  * LegalResource
- * 
+ *
  * Filament v4 resource for Legal document management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class LegalResource extends Resource
 {
     protected static ?string $model = Legal::class;
-    
-    /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
-    
+
     protected static ?int $navigationSort = 3;
+
     protected static ?string $recordTitleAttribute = 'title';
 
     /**
@@ -86,12 +82,12 @@ final class LegalResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('legal.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -101,10 +97,8 @@ final class LegalResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
-                                    $operation === 'create' ? $set('slug', \Str::slug($state)) : null
-                                ),
-                            
+                                ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) =>
+                                    $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
                             TextInput::make('slug')
                                 ->label(__('legal.slug'))
                                 ->required()
@@ -112,7 +106,6 @@ final class LegalResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
                         ]),
-                    
                     Select::make('type')
                         ->label(__('legal.type'))
                         ->options([
@@ -129,14 +122,12 @@ final class LegalResource extends Resource
                         ])
                         ->required()
                         ->default('privacy_policy'),
-                    
                     Textarea::make('description')
                         ->label(__('legal.description'))
                         ->rows(3)
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            
             Section::make(__('legal.content'))
                 ->schema([
                     RichEditor::make('content')
@@ -158,7 +149,6 @@ final class LegalResource extends Resource
                             'codeBlock',
                         ]),
                 ]),
-            
             Section::make(__('legal.publishing'))
                 ->schema([
                     Grid::make(2)
@@ -166,26 +156,22 @@ final class LegalResource extends Resource
                             Toggle::make('is_published')
                                 ->label(__('legal.is_published'))
                                 ->default(false),
-                            
                             Toggle::make('is_required')
                                 ->label(__('legal.is_required'))
                                 ->default(false),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             DateTimePicker::make('published_at')
                                 ->label(__('legal.published_at'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            
                             DateTimePicker::make('effective_date')
                                 ->label(__('legal.effective_date'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y'),
                         ]),
                 ]),
-            
             Section::make(__('legal.versioning'))
                 ->schema([
                     Grid::make(2)
@@ -195,21 +181,18 @@ final class LegalResource extends Resource
                                 ->required()
                                 ->maxLength(20)
                                 ->default('1.0'),
-                            
                             TextInput::make('previous_version_id')
                                 ->label(__('legal.previous_version'))
                                 ->numeric()
                                 ->helperText(__('legal.previous_version_help')),
                         ]),
                 ]),
-            
             Section::make(__('legal.seo'))
                 ->schema([
                     TextInput::make('seo_title')
                         ->label(__('legal.seo_title'))
                         ->maxLength(255)
                         ->columnSpanFull(),
-                    
                     Textarea::make('seo_description')
                         ->label(__('legal.seo_description'))
                         ->rows(2)
@@ -234,12 +217,11 @@ final class LegalResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->limit(50),
-                
                 TextColumn::make('type')
                     ->label(__('legal.type'))
-                    ->formatStateUsing(fn (string $state): string => __("legal.types.{$state}"))
+                    ->formatStateUsing(fn(string $state): string => __("legal.types.{$state}"))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'privacy_policy' => 'blue',
                         'terms_of_service' => 'green',
                         'cookie_policy' => 'yellow',
@@ -252,48 +234,40 @@ final class LegalResource extends Resource
                         'other' => 'slate',
                         default => 'gray',
                     }),
-                
                 TextColumn::make('version')
                     ->label(__('legal.version'))
                     ->badge()
                     ->color('gray'),
-                
                 TextColumn::make('description')
                     ->label(__('legal.description'))
                     ->limit(100)
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 BadgeColumn::make('is_published')
                     ->label(__('legal.status'))
-                    ->formatStateUsing(fn (bool $state): string => $state ? __('legal.published') : __('legal.draft'))
+                    ->formatStateUsing(fn(bool $state): string => $state ? __('legal.published') : __('legal.draft'))
                     ->colors([
                         'success' => true,
                         'warning' => false,
                     ]),
-                
                 IconColumn::make('is_required')
                     ->label(__('legal.is_required'))
                     ->boolean()
                     ->sortable(),
-                
                 TextColumn::make('effective_date')
                     ->label(__('legal.effective_date'))
                     ->date()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('published_at')
                     ->label(__('legal.published_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('created_at')
                     ->label(__('legal.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('updated_at')
                     ->label(__('legal.updated_at'))
                     ->dateTime()
@@ -315,14 +289,12 @@ final class LegalResource extends Resource
                         'imprint' => __('legal.types.imprint'),
                         'other' => __('legal.types.other'),
                     ]),
-                
                 TernaryFilter::make('is_published')
                     ->label(__('legal.is_published'))
                     ->boolean()
                     ->trueLabel(__('legal.published_only'))
                     ->falseLabel(__('legal.draft_only'))
                     ->native(false),
-                
                 TernaryFilter::make('is_required')
                     ->label(__('legal.is_required'))
                     ->boolean()
@@ -333,40 +305,37 @@ final class LegalResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                
                 TableAction::make('publish')
                     ->label(__('legal.publish'))
                     ->icon('heroicon-o-eye')
                     ->color('success')
-                    ->visible(fn (Legal $record): bool => !$record->is_published)
+                    ->visible(fn(Legal $record): bool => !$record->is_published)
                     ->action(function (Legal $record): void {
                         $record->update([
                             'is_published' => true,
                             'published_at' => now(),
                         ]);
-                        
+
                         Notification::make()
                             ->title(__('legal.published_successfully'))
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation(),
-                
                 TableAction::make('unpublish')
                     ->label(__('legal.unpublish'))
                     ->icon('heroicon-o-eye-slash')
                     ->color('warning')
-                    ->visible(fn (Legal $record): bool => $record->is_published)
+                    ->visible(fn(Legal $record): bool => $record->is_published)
                     ->action(function (Legal $record): void {
                         $record->update(['is_published' => false]);
-                        
+
                         Notification::make()
                             ->title(__('legal.unpublished_successfully'))
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation(),
-                
                 TableAction::make('create_new_version')
                     ->label(__('legal.create_new_version'))
                     ->icon('heroicon-o-document-duplicate')
@@ -383,7 +352,6 @@ final class LegalResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    
                     BulkAction::make('publish')
                         ->label(__('legal.publish_selected'))
                         ->icon('heroicon-o-eye')
@@ -393,21 +361,20 @@ final class LegalResource extends Resource
                                 'is_published' => true,
                                 'published_at' => now(),
                             ]);
-                            
+
                             Notification::make()
                                 ->title(__('legal.bulk_published_success'))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    
                     BulkAction::make('unpublish')
                         ->label(__('legal.unpublish_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_published' => false]);
-                            
+
                             Notification::make()
                                 ->title(__('legal.bulk_unpublished_success'))
                                 ->success()

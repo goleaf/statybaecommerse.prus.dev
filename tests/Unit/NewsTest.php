@@ -208,3 +208,4 @@ it('can get translated attributes', function () {
 it('uses slug as route key', function () {
     expect($this->news->getRouteKeyName())->toBe('slug');
 });
+

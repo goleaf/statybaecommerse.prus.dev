@@ -265,7 +265,7 @@ final class SearchWidget extends Component
     #[Computed]
     public function brands(): Collection
     {
-        return Brand::where('is_visible', true)->whereHas('products')->withCount('products')->orderBy('name')->get();
+        return Brand::whereHas('products')->withCount('products')->orderBy('name')->get();
     }
     /**
      * Handle attributes functionality with proper error handling.

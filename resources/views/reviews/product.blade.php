@@ -7,7 +7,7 @@
     <div class="max-w-6xl mx-auto">
         <div class="mb-8">
             <div class="flex items-center space-x-2 text-sm text-gray-500 mb-4">
-                <a href="{{ route('products.show', $product) }}" class="hover:text-gray-700">{{ $product->name }}</a>
+                <a href="{{ localized_route('products.show', $product) }}" class="hover:text-gray-700">{{ $product->name }}</a>
                 <span>›</span>
                 <span>{{ __('reviews_reviews') }}</span>
             </div>
@@ -143,4 +143,5 @@
     </div>
 </div>
 @endsection
+
 

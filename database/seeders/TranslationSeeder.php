@@ -97,21 +97,24 @@ class TranslationSeeder extends Seeder
             foreach ($locales as $loc) {
                 $exists = DB::table('product_translations')->where('product_id', $p->id)->where('locale', $loc)->exists();
                 if (! $exists) {
+                    $name = is_array($p->name) ? ($p->name[$loc] ?? ($p->name['lt'] ?? $p->name['en'] ?? null)) : $p->name;
+                    $slug = is_array($p->slug) ? ($p->slug[$loc] ?? ($p->slug['lt'] ?? $p->slug['en'] ?? null)) : $p->slug;
+                    $summary = is_array($p->short_description) ? ($p->short_description[$loc] ?? null) : $p->short_description;
                     DB::table('product_translations')->insert([
                         'product_id' => $p->id,
                         'locale' => $loc,
-                        'name' => $suffix($p->name, $loc),
-                        'slug' => $suffix($p->slug, $loc),
-                        'summary' => $p->short_description ? $suffix($p->short_description, $loc) : ($loc === 'lt' ? 'Trumpas produkto aprašymas lietuvių kalba.' : 'Short product description in English.'),
+                        'name' => $suffix($name ?? 'Produktas', $loc),
+                        'slug' => $suffix($slug ?? 'produktas', $loc),
+                        'summary' => $summary ? $suffix($summary, $loc) : ($loc === 'lt' ? 'Trumpas produkto aprašymas lietuvių kalba.' : 'Short product description in English.'),
                         'description' => $loc === 'lt'
-                            ? '<p>Detalus produkto <strong>'.$p->name.'</strong> aprašymas lietuvių kalba.</p><p>Šis produktas pasižymi aukšta kokybe ir patikimumu. Idealiai tinka profesionaliam ir buitiniam naudojimui.</p><ul><li>Aukšta kokybė</li><li>Patikimumas</li><li>Lengvas naudojimas</li><li>Ilgas tarnavimo laikas</li></ul>'
-                            : '<p>Detailed product <strong>'.$p->name.'</strong> description in English.</p><p>This product is characterized by high quality and reliability. Ideally suited for professional and domestic use.</p><ul><li>High quality</li><li>Reliability</li><li>Easy to use</li><li>Long service life</li></ul>',
+                            ? '<p>Detalus produkto <strong>'.e($name ?? '').'</strong> aprašymas lietuvių kalba.</p><p>Šis produktas pasižymi aukšta kokybe ir patikimumu. Idealiai tinka profesionaliam ir buitiniam naudojimui.</p><ul><li>Aukšta kokybė</li><li>Patikimumas</li><li>Lengvas naudojimas</li><li>Ilgas tarnavimo laikas</li></ul>'
+                            : '<p>Detailed product <strong>'.e($name ?? '').'</strong> description in English.</p><p>This product is characterized by high quality and reliability. Ideally suited for professional and domestic use.</p><ul><li>High quality</li><li>Reliability</li><li>Easy to use</li><li>Long service life</li></ul>',
                         'seo_title' => $loc === 'lt'
-                            ? $p->name.' - Aukštos kokybės statybos įrankis'
-                            : $p->name.' - High Quality Construction Tool',
+                            ? ($name ? $name.' - Aukštos kokybės statybos įrankis' : 'Aukštos kokybės statybos įrankis')
+                            : ($name ? $name.' - High Quality Construction Tool' : 'High Quality Construction Tool'),
                         'seo_description' => $loc === 'lt'
-                            ? 'Pirkite '.$p->name.' mūsų internetinėje parduotuvėje. Greitas pristatymas, geriausia kaina.'
-                            : 'Buy '.$p->name.' in our online store. Fast delivery, best price.',
+                            ? 'Pirkite '.($name ?? 'produktą').' mūsų internetinėje parduotuvėje. Greitas pristatymas, geriausia kaina.'
+                            : 'Buy '.($name ?? 'the product').' in our online store. Fast delivery, best price.',
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);

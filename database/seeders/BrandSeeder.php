@@ -238,7 +238,7 @@ class BrandSeeder extends Seeder
 
     private function supportedLocales(): array
     {
-        return collect(explode(',', (string) config('app.supported_locales', 'lt')))
+        return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
             ->map(fn ($v) => trim((string) $v))
             ->filter()->unique()->values()->all();
     }

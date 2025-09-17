@@ -169,3 +169,4 @@ final class CustomerGroupsRelationManager extends RelationManager
             ->defaultSort('priority', 'desc');
     }
 }
+

@@ -273,3 +273,4 @@ final class SystemSettingsWidgetsTest extends TestCase
         $this->assertEquals(1, $encryptedStat['value']);
     }
 }
+

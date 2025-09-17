@@ -36,3 +36,4 @@ return [
     'newsletter_success' => 'Sėkmingai prenumeruota naujienlaiškiui',
     'newsletter_error' => 'Įvyko klaida prenumeruojant naujienlaiškiui',
 ];
+

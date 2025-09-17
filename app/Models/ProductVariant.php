@@ -38,6 +38,12 @@ final class ProductVariant extends Model implements HasMedia
 {
     use HasFactory, HasProductPricing, InteractsWithMedia, SoftDeletes;
     protected $table = 'product_variants';
+    /**
+     * Eager-load defaults for admin tables/infolists to avoid N+1.
+     *
+     * @var array<int, string>
+     */
+    protected $with = ['product', 'images', 'prices.currency'];
     protected $fillable = [
         'product_id', 'sku', 'name', 'variant_name_lt', 'variant_name_en',
         'description_lt', 'description_en', 'price', 'compare_price', 'cost_price',
@@ -55,12 +61,12 @@ final class ProductVariant extends Model implements HasMedia
     protected function casts(): array
     {
         return [
-            'price' => 'decimal:4', 
-            'compare_price' => 'decimal:4', 
-            'cost_price' => 'decimal:4',
-            'wholesale_price' => 'decimal:4',
-            'member_price' => 'decimal:4',
-            'promotional_price' => 'decimal:4',
+            'price' => 'decimal:2', 
+            'compare_price' => 'decimal:2', 
+            'cost_price' => 'decimal:2',
+            'wholesale_price' => 'decimal:2',
+            'member_price' => 'decimal:2',
+            'promotional_price' => 'decimal:2',
             'weight' => 'decimal:2', 
             'stock_quantity' => 'integer',
             'reserved_quantity' => 'integer',
@@ -224,7 +230,7 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function scopeInStock($query)
     {
-        return $query->where('quantity', '>', 0);
+        return $query->where('available_quantity', '>', 0);
     }
     /**
      * Handle scopeByStatus functionality with proper error handling.
@@ -438,7 +444,7 @@ final class ProductVariant extends Model implements HasMedia
     public function scopeLowStock($query)
     {
         return $query->where('track_inventory', true)
-            ->whereRaw('quantity <= low_stock_threshold');
+            ->whereRaw('available_quantity <= low_stock_threshold');
     }
 
     /**
@@ -448,7 +454,7 @@ final class ProductVariant extends Model implements HasMedia
     public function scopeOutOfStock($query)
     {
         return $query->where('track_inventory', true)
-            ->where('quantity', '<=', 0);
+            ->where('available_quantity', '<=', 0);
     }
 
     /**

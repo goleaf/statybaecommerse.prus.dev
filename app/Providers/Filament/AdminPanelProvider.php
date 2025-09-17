@@ -35,6 +35,7 @@ final class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->profile(\App\Filament\Pages\Auth\EditProfile::class, isSimple: false)
             ->brandName(__('admin.brand_name'))
             ->brandLogo(asset('images/logo-admin.svg'))
             ->brandLogoHeight('2rem')
@@ -109,11 +110,13 @@ final class AdminPanelProvider extends PanelProvider
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))
-                    ->url(fn (): string => '#')
+                    ->url(fn (): string => \App\Filament\Pages\Auth\EditProfile::getUrl())
                     ->icon('heroicon-o-user-circle'),
                 'language' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.language'))
-                    ->url(fn (): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
+                    ->url(fn (): string => route('language.switch', [
+                        'locale' => app()->getLocale() === 'lt' ? 'en' : 'lt',
+                    ]))
                     ->icon('heroicon-o-language'),
                 // 'settings' => \Filament\Navigation\MenuItem::make()
                 //     ->label(__('admin.navigation.settings'))

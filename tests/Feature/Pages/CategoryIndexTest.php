@@ -37,7 +37,7 @@ beforeEach(function () {
 });
 
 it('renders the categories page', function () {
-    get(route('categories.index'))
+    get(localized_route('categories.index'))
         ->assertOk()
         ->assertSeeLivewire(Index::class);
 });
@@ -138,13 +138,13 @@ it('shows empty state when no categories found', function () {
 });
 
 it('shows proper breadcrumb navigation', function () {
-    get(route('categories.index'))
+    get(localized_route('categories.index'))
         ->assertSee(__('Home'))
         ->assertSee(__('Categories'));
 });
 
 it('displays meta information correctly', function () {
-    get(route('categories.index'))
+    get(localized_route('categories.index'))
         ->assertSee(__('Categories'))
         ->assertSee(__('Explore our comprehensive range of categories'));
 });

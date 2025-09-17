@@ -153,3 +153,4 @@ final class CommentsRelationManager extends RelationManager
             ->defaultSort('sort_order');
     }
 }
+

@@ -200,7 +200,7 @@
             {{-- View All Results Link --}}
             <div class="border-t border-gray-200 dark:border-gray-700">
                 <a 
-                    href="{{ route('localized.search', ['locale' => app()->getLocale(), 'q' => $query]) }}"
+                    href="{{ route('localized.search', ['q' => $query]) }}"
                     class="block w-full px-4 py-3 text-center text-sm font-medium text-blue-600 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none dark:text-blue-400 dark:hover:bg-blue-900 dark:focus:bg-blue-900"
                 >
                     {{ __('frontend.search.view_all_results') }}

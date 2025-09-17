@@ -308,3 +308,4 @@ final class ReferralCodeResourceTest extends TestCase
             ->assertSuccessful();
     }
 }
+

@@ -58,7 +58,7 @@
             <x-buttons.primary class="w-full px-4" :href="route('account.orders.detail', ['number' => $order->number])">
                 {{ __('View details') }}
             </x-buttons.primary>
-            <x-buttons.default class="w-full px-4" :href="route('account.orders.invoice', ['locale' => app()->getLocale(), 'number' => $order->number])">
+            <x-buttons.default class="w-full px-4" :href="route('account.orders.invoice', ['number' => $order->number])">
                 {{ __('Invoice') }}
             </x-buttons.default>
         </div>

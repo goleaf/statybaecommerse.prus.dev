@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 return [
     // Category page sidebar & controls
@@ -26,7 +24,6 @@ return [
     'address_type_home_description' => 'Home address',
     'address_type_work_description' => 'Work address',
     'address_type_other_description' => 'Other address',
-
     // Payment Types
     'payment_type_stripe' => 'Stripe',
     'payment_type_notch_pay' => 'NotchPay',
@@ -36,7 +33,6 @@ return [
     'payment_type_cash_description' => 'Cash payment',
     'payment_processing_instant' => 'Instant',
     'payment_processing_immediate' => 'Immediate',
-
     // Order Status
     'order_status_pending' => 'Pending',
     'order_status_confirmed' => 'Confirmed',
@@ -48,7 +44,6 @@ return [
     'order_status_partially_refunded' => 'Partially Refunded',
     'order_status_failed' => 'Failed',
     'order_status_on_hold' => 'On Hold',
-
     // Confirmation Messages
     'confirm_remove_cart_item' => 'Are you sure you want to remove this item from your cart?',
     'confirm_clear_cart' => 'Are you sure you want to clear your entire cart?',
@@ -116,7 +111,6 @@ return [
     'order_status_partially_refunded_description' => 'Order has been partially refunded',
     'order_status_failed_description' => 'Order has failed',
     'order_status_on_hold_description' => 'Order is on hold',
-
     // Product Status
     'product_status_draft' => 'Draft',
     'product_status_active' => 'Active',
@@ -134,7 +128,6 @@ return [
     'product_status_archived_description' => 'Product is archived',
     'product_status_pending_review_description' => 'Product is pending review',
     'product_status_rejected_description' => 'Product has been rejected',
-
     // User Roles
     'user_role_super_admin' => 'Super Administrator',
     'user_role_admin' => 'Administrator',
@@ -148,7 +141,6 @@ return [
     'user_role_editor_description' => 'Content editing privileges',
     'user_role_customer_description' => 'Customer privileges',
     'user_role_guest_description' => 'Guest privileges',
-
     // Navigation Groups
     'nav_group_referral' => 'Referral System',
     'nav_group_products' => 'Products',
@@ -338,7 +330,6 @@ return [
     'campaign_description' => 'Campaign Description',
     'campaign_content' => 'Campaign Content',
     'campaign_settings' => 'Campaign Settings',
-
     // Campaign translations
     'campaigns' => [
         'navigation' => [
@@ -477,11 +468,11 @@ return [
             ],
             'campaign_ending_soon' => [
                 'title' => 'Campaign Ending Soon',
-                'description' => 'Your campaign is ending in less than a week. Consider extending it if it\'s performing well.',
+                'description' => "Your campaign is ending in less than a week. Consider extending it if it's performing well.",
             ],
             'missing_cta' => [
                 'title' => 'Missing Call-to-Action',
-                'description' => 'Your campaign doesn\'t have a clear call-to-action. Add one to improve conversions.',
+                'description' => "Your campaign doesn't have a clear call-to-action. Add one to improve conversions.",
             ],
             'short_content' => [
                 'title' => 'Short Content',
@@ -841,10 +832,8 @@ return [
     'this_month' => 'This Month',
     // Brands
     'brands' => 'Brands',
-
     // Additional translations for attributes
     'updated_at' => 'Updated At',
-    
     // Attribute specific translations
     'attributes' => 'Attributes',
     'attribute' => 'Attribute',
@@ -936,7 +925,6 @@ return [
     'searchable_only' => 'Searchable Only',
     'enabled_only' => 'Enabled Only',
     'with_values_only' => 'With Values Only',
-    
     // Address specific translations
     'add_new_address' => 'Add New Address',
     'address_type' => 'Address Type',
@@ -952,7 +940,7 @@ return [
     'use_for_shipping' => 'Use for shipping',
     'save_address' => 'Save Address',
     'no_addresses' => 'No addresses',
-    'no_addresses_description' => 'You don\'t have any saved addresses yet. Add your first address.',
+    'no_addresses_description' => "You don't have any saved addresses yet. Add your first address.",
     'address_created_successfully' => 'Address created successfully',
     'address_updated_successfully' => 'Address updated successfully',
     'address_deleted_successfully' => 'Address deleted successfully',
@@ -1060,7 +1048,6 @@ return [
     'add_metadata' => 'Add Metadata',
     'active_only' => 'Active Only',
     'inactive_only' => 'Inactive Only',
-    
     // Navigation and UI translations
     'logo' => 'Logo',
     'global_search' => 'Global Search',
@@ -1071,7 +1058,6 @@ return [
     'recommendation_system' => 'Recommendation System',
     'recommendation_system_management' => 'Recommendation System Management',
     'content_management' => 'Content Management',
-    
     // System management translations
     'clear_cache' => 'Clear Cache',
     'optimize_system' => 'Optimize System',
@@ -1090,7 +1076,6 @@ return [
     'total_requests' => 'Total Requests',
     'avg_ctr' => 'Avg CTR',
     'avg_conversion' => 'Avg Conversion',
-    
     // Recommendation block names
     'related_products' => 'Related Products',
     'you_might_also_like' => 'You Might Also Like',
@@ -1100,14 +1085,12 @@ return [
     'customers_also_bought' => 'Customers Also Bought',
     'complete_your_purchase' => 'Complete Your Purchase',
     'upgrade_your_choice' => 'Upgrade Your Choice',
-    
     // Quick actions
     'quick_actions' => 'Quick Actions',
     'clear_recommendation_cache' => 'Clear Recommendation Cache',
     'optimize_recommendation_system' => 'Optimize Recommendation System',
     'manage_configurations' => 'Manage Configurations',
     'system_information' => 'System Information',
-    
     // Available algorithms
     'available_algorithms' => 'Available Algorithms',
     'content_based_filtering' => 'Content-Based Filtering',
@@ -1117,7 +1100,6 @@ return [
     'trending_products' => 'Trending Products',
     'cross_sell' => 'Cross-Sell',
     'up_sell' => 'Up-Sell',
-    
     // Features
     'features' => 'Features',
     'realtime_caching' => 'Real-time caching',
@@ -1126,17 +1108,94 @@ return [
     'ab_testing_support' => 'A/B testing support',
     'dynamic_algorithm_weights' => 'Dynamic algorithm weights',
     'multilanguage_support' => 'Multi-language support',
-    
     // System information
     'php_version' => 'PHP Version',
     'response_time' => 'Response Time',
     'memory_usage' => 'Memory Usage',
     'request_method' => 'Request Method',
-    
     // Cache and optimization messages
     'cache_cleared_successfully' => 'Cache cleared successfully',
     'cache_clear_failed' => 'Cache clear failed',
     'system_optimized_successfully' => 'System optimized successfully',
     'system_optimization_failed' => 'System optimization failed',
     'no_data_available' => 'No data available',
+    // Dashboard Analytics Translations
+    'active_settings' => 'Active Settings',
+    'analytics_events' => 'Analytics Events',
+    'events_last_week' => 'Events Last Week',
+    'analytics_activity' => 'Analytics Activity',
+    'behaviors_last_week' => 'Behaviors Last Week',
+    'recent_activity' => 'Recent Activity',
+    'avg_recommendation_score' => 'Avg Recommendation Score',
+    'quality_score' => 'Quality Score',
+    'recommendation_clicks' => 'Recommendation Clicks',
+    'database_entities' => 'Database Entities',
+    'total_records' => 'Total Records',
+    'products_in_db' => 'Products in DB',
+    'product_records' => 'Product Records',
+    'orders_in_db' => 'Orders in DB',
+    'order_records' => 'Order Records',
+    'users_in_db' => 'Users in DB',
+    'user_records' => 'User Records',
+    'cache_hit_rate' => 'Cache Hit Rate',
+    'performance_metric' => 'Performance Metric',
+    'avg_response_time' => 'Avg Response Time',
+    'error_rate' => 'Error Rate',
+    'system_health' => 'System Health',
+    'overall_status' => 'Overall Status',
+    'last_24h' => 'Last 24h',
+    'last_7_days' => 'Last 7 Days',
+    'per_order' => 'Per Order',
+    'products_need_restocking' => 'Products Need Restocking',
+    'products_unavailable' => 'Products Unavailable',
+    'visible_categories' => 'Visible Categories',
+    'total_brands' => 'Total Brands',
+    'approved_reviews' => 'Approved Reviews',
+    'customer_satisfaction' => 'Customer Satisfaction',
+    'running_campaigns' => 'Running Campaigns',
+    'total_impressions' => 'Total Impressions',
+    'total_clicks' => 'Total Clicks',
+    'total_conversions' => 'Total Conversions',
+    'running_discounts' => 'Running Discounts',
+    'available_coupons' => 'Available Coupons',
+    'total_savings' => 'Total Savings',
+    'total_stock_value' => 'Total Stock Value',
+    'total_movements' => 'Total Movements',
+    'total_views' => 'Total Views',
+    'total_searches' => 'Total Searches',
+    'add_to_cart_events' => 'Add to Cart Events',
+    'supported_countries' => 'Supported Countries',
+    'shipping_zones' => 'Shipping Zones',
+    'warehouse_locations' => 'Warehouse Locations',
+    'customer_addresses' => 'Customer Addresses',
+    'total_articles' => 'Total Articles',
+    'legal_documents' => 'Legal Documents',
+    'configuration_items' => 'Configuration Items',
+    'total_recommendations' => 'Total Recommendations',
+    'tracked_behaviors' => 'Tracked Behaviors',
+    'variant_insights' => 'Variant Insights',
+    'type' => 'Type',
+    'description' => 'Description',
+    'amount' => 'Amount',
+    'status' => 'Status',
+    'created_at' => 'Created At',
+    'order' => 'Order',
+    'user' => 'User',
+    'review' => 'Review',
+    'campaign' => 'Campaign',
+    // Real-time Analytics Translations
+    'orders_last_hour' => 'Orders Last Hour',
+    'orders_last_15min' => 'Orders Last 15min',
+    'users_last_hour' => 'Users Last Hour',
+    'users_last_15min' => 'Users Last 15min',
+    'page_views_last_hour' => 'Page Views Last Hour',
+    'page_views_last_15min' => 'Page Views Last 15min',
+    'cart_adds_last_hour' => 'Cart Adds Last Hour',
+    'cart_adds_last_15min' => 'Cart Adds Last 15min',
+    'wishlist_adds_last_hour' => 'Wishlist Adds Last Hour',
+    'wishlist_adds_last_15min' => 'Wishlist Adds Last 15min',
+    'searches_last_hour' => 'Searches Last Hour',
+    'searches_last_15min' => 'Searches Last 15min',
+    'last_30min' => 'Last 30min',
+    'last_5min' => 'Last 5min',
 ];

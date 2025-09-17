@@ -33,8 +33,8 @@ final class VariantPriceHistory extends Model
     protected function casts(): array
     {
         return [
-            'old_price' => 'decimal:4',
-            'new_price' => 'decimal:4',
+            'old_price' => 'decimal:2',
+            'new_price' => 'decimal:2',
             'effective_from' => 'datetime',
             'effective_until' => 'datetime',
         ];

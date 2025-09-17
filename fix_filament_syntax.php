@@ -72,3 +72,4 @@ foreach ($files as $file) {
 
 echo "Done fixing Filament syntax errors.\n";
 
+

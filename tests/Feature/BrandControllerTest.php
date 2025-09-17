@@ -18,7 +18,7 @@ beforeEach(function () {
 });
 
 it('displays brands index page', function () {
-    $response = $this->get(route('brands.index'));
+    $response = $this->get(localized_route('brands.index'));
 
     $response->assertOk();
     $response->assertViewIs('brands.index');
@@ -26,7 +26,7 @@ it('displays brands index page', function () {
 });
 
 it('displays individual brand page', function () {
-    $response = $this->get(route('brands.show', $this->brand));
+    $response = $this->get(localized_route('brands.show', $this->brand));
 
     $response->assertOk();
     $response->assertViewIs('brands.show');
@@ -52,13 +52,13 @@ it('displays localized brand page', function () {
 });
 
 it('redirects to localized route when accessing non-localized brand route', function () {
-    $response = $this->get(route('brands.show', $this->brand));
+    $response = $this->get(localized_route('brands.show', $this->brand));
 
     $response->assertRedirect();
 });
 
 it('handles brand not found gracefully', function () {
-    $response = $this->get(route('brands.show', 'non-existent-brand'));
+    $response = $this->get(localized_route('brands.show', 'non-existent-brand'));
 
     $response->assertNotFound();
 });
@@ -66,7 +66,7 @@ it('handles brand not found gracefully', function () {
 it('displays only enabled brands on index', function () {
     Brand::factory()->create(['is_enabled' => false, 'name' => 'Disabled Brand']);
 
-    $response = $this->get(route('brands.index'));
+    $response = $this->get(localized_route('brands.index'));
 
     $response->assertOk();
     $response->assertSee('Test Brand');
@@ -76,7 +76,7 @@ it('displays only enabled brands on index', function () {
 it('can search brands by name', function () {
     Brand::factory()->create(['name' => 'Another Brand']);
 
-    $response = $this->get(route('brands.index', ['search' => 'Test']));
+    $response = $this->get(localized_route('brands.index', ['search' => 'Test']));
 
     $response->assertOk();
     $response->assertSee('Test Brand');
@@ -84,14 +84,14 @@ it('can search brands by name', function () {
 });
 
 it('displays brand with products count', function () {
-    $response = $this->get(route('brands.show', $this->brand));
+    $response = $this->get(localized_route('brands.show', $this->brand));
 
     $response->assertOk();
     // The view should display products count if there are any
 });
 
 it('handles brand with website link', function () {
-    $response = $this->get(route('brands.show', $this->brand));
+    $response = $this->get(localized_route('brands.show', $this->brand));
 
     $response->assertOk();
     $response->assertSee('https://testbrand.com');
@@ -103,7 +103,7 @@ it('displays brand SEO information', function () {
         'seo_description' => 'SEO Description',
     ]);
 
-    $response = $this->get(route('brands.show', $brand));
+    $response = $this->get(localized_route('brands.show', $brand));
 
     $response->assertOk();
     $response->assertSee('SEO Title');
@@ -113,7 +113,7 @@ it('displays brand SEO information', function () {
 it('handles brand without description', function () {
     $brand = Brand::factory()->create(['description' => null]);
 
-    $response = $this->get(route('brands.show', $brand));
+    $response = $this->get(localized_route('brands.show', $brand));
 
     $response->assertOk();
     // Should not throw error when description is null
@@ -122,7 +122,7 @@ it('handles brand without description', function () {
 it('handles brand without website', function () {
     $brand = Brand::factory()->create(['website' => null]);
 
-    $response = $this->get(route('brands.show', $brand));
+    $response = $this->get(localized_route('brands.show', $brand));
 
     $response->assertOk();
     // Should not display website link when website is null

@@ -212,27 +212,42 @@
             </div>
         </div>
 
-        <!-- Sort Options -->
+        <!-- Enhanced Sort Options -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {{ __('translations.sort_by') }}
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
+                </svg>
+                {{ __('translations.sort_by') ?? 'Sort By' }}
             </label>
-            <div class="grid grid-cols-2 gap-2">
-                <select
-                        wire:model.live="sortBy"
-                        class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
-                    <option value="created_at">{{ __('translations.newest') }}</option>
-                    <option value="name">{{ __('translations.name') }}</option>
-                    <option value="price">{{ __('translations.price') }}</option>
-                    <option value="stock_quantity">{{ __('translations.stock') }}</option>
-                    <option value="updated_at">{{ __('translations.recently_updated') }}</option>
-                </select>
-                <select
-                        wire:model.live="sortDirection"
-                        class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
-                    <option value="asc">{{ __('translations.ascending') }}</option>
-                    <option value="desc">{{ __('translations.descending') }}</option>
-                </select>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label
+                               class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">{{ __('translations.sort_field') ?? 'Field' }}</label>
+                        <select
+                                wire:model.live="sortBy"
+                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-sm transition-all duration-200">
+                            <option value="created_at">{{ __('translations.newest') ?? 'Newest' }}</option>
+                            <option value="name">{{ __('translations.name') ?? 'Name' }}</option>
+                            <option value="price">{{ __('translations.price') ?? 'Price' }}</option>
+                            <option value="stock_quantity">{{ __('translations.stock') ?? 'Stock' }}</option>
+                            <option value="updated_at">{{ __('translations.recently_updated') ?? 'Recently Updated' }}
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                               class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">{{ __('translations.order') ?? 'Order' }}</label>
+                        <select
+                                wire:model.live="sortDirection"
+                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-sm transition-all duration-200">
+                            <option value="asc">{{ __('translations.ascending') ?? 'Ascending' }}</option>
+                            <option value="desc">{{ __('translations.descending') ?? 'Descending' }}</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

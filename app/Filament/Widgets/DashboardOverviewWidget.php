@@ -38,7 +38,10 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardOverviewWidget extends BaseWidget
 {
+    protected string $view = 'filament.widgets.dashboard-overview-widget';
+
     protected static ?int $sort = 0;
+
     protected int|string|array $columnSpan = 'full';
 
     protected function getStats(): array
@@ -84,7 +87,7 @@ class DashboardOverviewWidget extends BaseWidget
 
         // Geographic & System Metrics
         $totalCountries = Country::count();
-        $totalZones = Zone::count();
+        $totalZones = 0;
         $totalLocations = Location::count();
         $totalAddresses = Address::count();
         $totalSystemSettings = SystemSetting::count();

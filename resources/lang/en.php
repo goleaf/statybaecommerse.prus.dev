@@ -1,6 +1,49 @@
 <?php
 
 return [
+    // Notifications (general)
+    'notifications' => [
+        'greeting' => 'Hello, :name',
+        'shop_now' => 'Shop now',
+        'read_more' => 'Read more',
+        'claim_discount' => 'Claim discount',
+        'promotional_footer' => 'You received this promotional email because you subscribed to our newsletter.',
+        'newsletter_footer' => 'Thank you for being with us! Stay tuned for updates.',
+        'discount_footer' => 'This offer is valid for a limited time. Use it now.',
+        'marketing_unsubscribe' => 'If you no longer wish to receive such emails, you can unsubscribe in your account settings.',
+        'system' => [
+            'footer' => 'This message was sent from the system administration.',
+        ],
+        'order' => [
+            'order_number' => 'Order number: :number',
+        ],
+        'product' => [
+            'name_line' => 'Product: :name',
+        ],
+        'stock' => [
+            'low_stock_subject' => 'Low Stock: :product',
+            'low_stock_line' => 'Product :name is running low on stock.',
+            'current_stock' => 'Current stock: :stock units',
+            'threshold' => 'Threshold: :threshold units',
+            'manage_product' => 'Manage Product',
+            'please_restock' => 'Please restock this product to avoid stockouts.',
+            'low_stock_short' => 'Low stock alert: :product',
+            'low_stock_title' => 'Low Stock',
+            'low_stock_body' => 'Product :name is running low (only :stock units left)',
+            'view_product' => 'View Product',
+        ],
+        'live' => [
+            'order_title' => 'Order #:id',
+            'stock_title' => 'Low stock',
+            'stock_message' => 'Item ":name" has less than :threshold units. Current stock: :stock',
+            'payment_title' => 'Payment update',
+            'payment_message' => 'Order #:id payment status: :status',
+            'customer_title' => 'New customer',
+            'customer_message' => 'A new customer registered: :email',
+            'review_title' => 'New review',
+            'review_message' => 'Product ":name" received a new review: :rating/5 stars',
+        ],
+    ],
     // Navigation
     'nav_home' => 'Home',
     'nav_categories' => 'Categories',

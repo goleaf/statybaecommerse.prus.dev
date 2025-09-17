@@ -45,12 +45,12 @@ class ImportInventoryChunk implements ShouldQueue
             if ($sku === '' || $stock === null) {
                 return;
             }
-            $variantId = DB::table('sh_product_variants')->where('sku', $sku)->value('id');
+            $variantId = DB::table('product_variants')->where('sku', $sku)->value('id');
             if (!$variantId) {
-                $variantId = DB::table('sh_products')->where('sku', $sku)->value('id');
+                $variantId = DB::table('products')->where('sku', $sku)->value('id');
                 if ($variantId) {
                     // Interpret as product-level inventory if variant not found
-                    $existing = DB::table('sh_variant_inventories')->where('variant_id', $variantId)->first();
+                    $existing = DB::table('variant_inventories')->where('variant_id', $variantId)->first();
                     if ($existing) {
                         return;
                     }
@@ -58,16 +58,16 @@ class ImportInventoryChunk implements ShouldQueue
                     return;
                 }
             }
-            $inventoryId = DB::table('sh_inventories')->where('code', $locationCode)->value('id') ?? DB::table('sh_inventories')->insertGetId(['code' => $locationCode, 'name' => $locationCode, 'created_at' => now(), 'updated_at' => now()]);
+            $inventoryId = DB::table('inventories')->where('code', $locationCode)->value('id') ?? DB::table('inventories')->insertGetId(['code' => $locationCode, 'name' => $locationCode, 'created_at' => now(), 'updated_at' => now()]);
             try {
-                DB::table('sh_variant_inventories')->upsert([['variant_id' => (int) $variantId, 'inventory_id' => (int) $inventoryId, 'stock' => (int) $stock, 'reserved' => 0, 'updated_at' => now(), 'created_at' => now()]], ['variant_id', 'inventory_id'], ['stock', 'reserved', 'updated_at']);
+                DB::table('variant_inventories')->upsert([['variant_id' => (int) $variantId, 'inventory_id' => (int) $inventoryId, 'stock' => (int) $stock, 'reserved' => 0, 'updated_at' => now(), 'created_at' => now()]], ['variant_id', 'inventory_id'], ['stock', 'reserved', 'updated_at']);
                 // Denormalize warehouse_quantity on product
-                $productId = DB::table('sh_product_variants')->where('id', $variantId)->value('product_id') ?? $variantId;
-                $sum = (int) DB::table('sh_product_variants as v')->join('sh_variant_inventories as vi', 'vi.variant_id', '=', 'v.id')->where('v.product_id', $productId)->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END'));
+                $productId = DB::table('product_variants')->where('id', $variantId)->value('product_id') ?? $variantId;
+                $sum = (int) DB::table('product_variants as v')->join('variant_inventories as vi', 'vi.variant_id', '=', 'v.id')->where('v.product_id', $productId)->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END'));
                 if ($sum === 0) {
-                    $sum = (int) DB::table('sh_variant_inventories as vi')->where('vi.variant_id', $productId)->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END'));
+                    $sum = (int) DB::table('variant_inventories as vi')->where('vi.variant_id', $productId)->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END'));
                 }
-                DB::table('sh_products')->where('id', $productId)->update(['warehouse_quantity' => $sum]);
+                DB::table('products')->where('id', $productId)->update(['warehouse_quantity' => $sum]);
             } catch (\Throwable $e) {
                 // continue
             }

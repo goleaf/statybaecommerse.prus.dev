@@ -11,7 +11,7 @@ use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
@@ -42,7 +42,7 @@ final class CollectionResource extends Resource
     protected static ?string $model = Collection::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+    protected static UnitEnum|string|null  = NavigationGroup::Products;
     
     protected static ?int $navigationSort = 5;
     protected static ?string $recordTitleAttribute = 'name';
@@ -85,37 +85,51 @@ final class CollectionResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->schema([
+    /**
+     * @param Form $form
+     * @return Form
+     */
+    public static function form(Form $form): Form{
+        return $form->schema([
             Section::make(__('collections.basic_information'))
                 ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('collections.name'))
-                                ->required()
-                                ->maxLength(255)
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
-                                    $operation === 'create' ? $set('slug', \Str::slug($state)) : null
-                                ),
-                            
-                            TextInput::make('slug')
-                                ->label(__('collections.slug'))
-                                ->required()
-                                ->maxLength(255)
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
+                    Forms\Components\Tabs::make('i18n')
+                        ->tabs([
+                            Forms\Components\Tabs\Tab::make('LT')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextInput::make('name.lt')
+                                                ->label(__('collections.name').' (LT)')
+                                                ->required()
+                                                ->maxLength(255),
+                                            TextInput::make('slug.lt')
+                                                ->label(__('collections.slug').' (LT)')
+                                                ->maxLength(255),
+                                        ]),
+                                    Textarea::make('description.lt')
+                                        ->label(__('collections.description').' (LT)')
+                                        ->rows(3)
+                                        ->columnSpanFull(),
+                                ]),
+                            Forms\Components\Tabs\Tab::make('EN')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextInput::make('name.en')
+                                                ->label(__('collections.name').' (EN)')
+                                                ->maxLength(255),
+                                            TextInput::make('slug.en')
+                                                ->label(__('collections.slug').' (EN)')
+                                                ->maxLength(255),
+                                        ]),
+                                    Textarea::make('description.en')
+                                        ->label(__('collections.description').' (EN)')
+                                        ->rows(3)
+                                        ->columnSpanFull(),
+                                ]),
                         ]),
-                    
-                    Textarea::make('description')
-                        ->label(__('collections.description'))
-                        ->rows(3)
-                        ->columnSpanFull(),
                 ]),
             
             Section::make(__('collections.media'))
@@ -152,6 +166,7 @@ final class CollectionResource extends Resource
                     Select::make('products')
                         ->label(__('collections.products'))
                         ->relationship('products', 'name')
+                        ->getOptionLabelFromRecordUsing(fn($record) => is_array($record->name) ? ($record->name[app()->getLocale()] ?? ($record->name['lt'] ?? $record->name['en'] ?? reset($record->name))) : $record->name)
                         ->multiple()
                         ->searchable()
                         ->preload()
@@ -191,13 +206,22 @@ final class CollectionResource extends Resource
             
             Section::make(__('collections.seo'))
                 ->schema([
-                    TextInput::make('seo_title')
+                    TextInput::make('seo_title.lt')
                         ->label(__('collections.seo_title'))
                         ->maxLength(255)
                         ->columnSpanFull(),
+                    TextInput::make('seo_title.en')
+                        ->label(__('collections.seo_title').' (EN)')
+                        ->maxLength(255)
+                        ->columnSpanFull(),
                     
-                    Textarea::make('seo_description')
+                    Textarea::make('seo_description.lt')
                         ->label(__('collections.seo_description'))
+                        ->rows(2)
+                        ->maxLength(500)
+                        ->columnSpanFull(),
+                    Textarea::make('seo_description.en')
+                        ->label(__('collections.seo_description').' (EN)')
                         ->rows(2)
                         ->maxLength(500)
                         ->columnSpanFull(),

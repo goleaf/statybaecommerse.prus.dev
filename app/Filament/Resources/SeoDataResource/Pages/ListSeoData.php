@@ -7,7 +7,7 @@ namespace App\Filament\Resources\SeoDataResource\Pages;
 use App\Filament\Resources\SeoDataResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Forms\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListSeoData extends ListRecords
@@ -60,3 +60,4 @@ final class ListSeoData extends ListRecords
         ];
     }
 }
+

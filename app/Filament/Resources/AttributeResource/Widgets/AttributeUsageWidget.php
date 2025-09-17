@@ -47,3 +47,4 @@ final class AttributeUsageWidget extends ChartWidget
         return 'bar';
     }
 }
+

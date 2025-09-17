@@ -36,7 +36,7 @@ beforeEach(function () {
 });
 
 it('renders the brands page', function () {
-    get(route('brands.index'))
+    get(localized_route('brands.index'))
         ->assertOk()
         ->assertSeeLivewire(Index::class);
 });
@@ -146,13 +146,13 @@ it('can clear search filters', function () {
 });
 
 it('displays proper page header', function () {
-    get(route('brands.index'))
+    get(localized_route('brands.index'))
         ->assertSee(__('shared.brands'))
         ->assertSee(__('Browse all our trusted brand partners and discover quality products'));
 });
 
 it('displays meta information correctly', function () {
-    get(route('brands.index'))
+    get(localized_route('brands.index'))
         ->assertSee(__('translations.brands'))
         ->assertSee(__('Browse all our trusted brand partners and discover quality products'));
 });
@@ -166,19 +166,19 @@ it('has proper form field attributes', function () {
 it('shows pagination when there are many brands', function () {
     Brand::factory()->count(15)->create(['is_enabled' => true]);
     
-    get(route('brands.index'))
+    get(localized_route('brands.index'))
         ->assertSee('Next'); // Pagination link
 });
 
 it('includes brand links to individual brand pages', function () {
-    get(route('brands.index'))
-        ->assertSee(route('brands.show', $this->brandWithProducts));
+    get(localized_route('brands.index'))
+        ->assertSee(localized_route('brands.show', $this->brandWithProducts));
 });
 
 it('displays brand logos when available', function () {
     // This would require setting up media for the brand
     // For now, just check that the placeholder is shown
-    get(route('brands.index'))
+    get(localized_route('brands.index'))
         ->assertSee('svg'); // Placeholder SVG
 });
 

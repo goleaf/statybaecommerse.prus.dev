@@ -265,7 +265,7 @@ final class ShoppingCartWidget extends Component
             $this->dispatch('notify', ['type' => 'error', 'message' => __('translations.cart_is_empty')]);
             return;
         }
-        $this->redirect(route('checkout.index', app()->getLocale()));
+        $this->redirect(localized_route('checkout.index'));
     }
     /**
      * Render the Livewire component view with current state.

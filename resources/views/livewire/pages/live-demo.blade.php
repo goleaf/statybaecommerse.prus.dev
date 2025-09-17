@@ -244,11 +244,11 @@
                 {{ __('translations.ready_to_experience_description') }}
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('home') }}" 
+                <a href="{{ localized_route('home') }}" 
                    class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200">
                     {{ __('translations.explore_homepage') }}
                 </a>
-                <a href="{{ route('products.index') }}" 
+                <a href="{{ localized_route('products.index') }}" 
                    class="bg-white/10 backdrop-blur-sm text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/20 transition-colors duration-200">
                     {{ __('translations.browse_products') }}
                 </a>

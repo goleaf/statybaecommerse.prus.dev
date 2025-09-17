@@ -66,3 +66,4 @@ final class ReferralCodeUsageLogFactory extends Factory
         ]);
     }
 }
+

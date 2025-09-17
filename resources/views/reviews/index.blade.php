@@ -45,7 +45,7 @@
                                 <span class="font-medium">{{ $review->reviewer_name }}</span>
                                 @if($review->product)
                                     <span class="mx-1">•</span>
-                                    <a href="{{ route('products.show', $review->product) }}" class="text-blue-600 hover:text-blue-800">
+                                    <a href="{{ localized_route('products.show', $review->product) }}" class="text-blue-600 hover:text-blue-800">
                                         {{ $review->product->name }}
                                     </a>
                                 @endif
@@ -79,4 +79,5 @@
     </div>
 </div>
 @endsection
+
 

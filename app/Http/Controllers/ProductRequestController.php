@@ -43,7 +43,7 @@ final class ProductRequestController extends Controller
         $productRequest = ProductRequest::create(['product_id' => $product->id, 'user_id' => auth()->id(), 'name' => $data->name, 'email' => $data->email, 'phone' => $data->phone, 'message' => $data->message, 'requested_quantity' => $data->requested_quantity, 'status' => 'pending']);
         // Increment the requests count on the product
         $product->incrementRequestsCount();
-        return redirect()->route('products.show', $product)->with('success', __('translations.product_request_submitted_successfully'));
+        return redirect(localized_route('products.show', $product))->with('success', __('translations.product_request_submitted_successfully'));
     }
     /**
      * Display the specified resource with related data.

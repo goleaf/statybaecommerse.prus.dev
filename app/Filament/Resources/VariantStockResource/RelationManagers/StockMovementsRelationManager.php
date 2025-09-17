@@ -162,3 +162,4 @@ class StockMovementsRelationManager extends RelationManager
 }
     }
 }
+

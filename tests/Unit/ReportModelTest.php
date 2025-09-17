@@ -223,3 +223,4 @@ final class ReportModelTest extends TestCase
         $this->assertArrayHasKey('monthly', $frequencies);
     }
 }
+

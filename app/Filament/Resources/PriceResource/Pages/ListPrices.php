@@ -7,7 +7,7 @@ namespace App\Filament\Resources\PriceResource\Pages;
 use App\Filament\Resources\PriceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Forms\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListPrices extends ListRecords
@@ -60,3 +60,4 @@ final class ListPrices extends ListRecords
         ];
     }
 }
+

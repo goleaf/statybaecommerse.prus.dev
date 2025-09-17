@@ -114,7 +114,7 @@
             <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('Quick Actions') }}</h2>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <a href="{{ route('orders.index', ['locale' => app()->getLocale()]) ?? '/orders' }}"
+                <a href="{{ route('orders.index', []) ?? '/orders' }}"
                    class="flex flex-col items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200">
                     <svg class="w-8 h-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -124,7 +124,7 @@
                     <span class="text-sm font-medium text-gray-900">{{ __('View Orders') }}</span>
                 </a>
 
-                <a href="{{ route('wishlist.index', ['locale' => app()->getLocale()]) ?? '/wishlist' }}"
+                <a href="{{ route('wishlist.index', []) ?? '/wishlist' }}"
                    class="flex flex-col items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200">
                     <svg class="w-8 h-8 text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -134,7 +134,7 @@
                     <span class="text-sm font-medium text-gray-900">{{ __('Wishlist') }}</span>
                 </a>
 
-                <a href="{{ route('addresses.index', ['locale' => app()->getLocale()]) ?? '/addresses' }}"
+                <a href="{{ route('addresses.index', []) ?? '/addresses' }}"
                    class="flex flex-col items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200">
                     <svg class="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -144,7 +144,7 @@
                     <span class="text-sm font-medium text-gray-900">{{ __('Addresses') }}</span>
                 </a>
 
-                <a href="{{ route('profile.edit', ['locale' => app()->getLocale()]) ?? '/profile/edit' }}"
+                <a href="{{ route('profile.edit', []) ?? '/profile/edit' }}"
                    class="flex flex-col items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200">
                     <svg class="w-8 h-8 text-purple-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -161,7 +161,7 @@
                 <div class="bg-white border border-gray-200 rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-xl font-semibold text-gray-900">{{ __('Recent Orders') }}</h2>
-                        <a href="{{ route('orders.index', ['locale' => app()->getLocale()]) ?? '/orders' }}"
+                        <a href="{{ route('orders.index', []) ?? '/orders' }}"
                            class="text-blue-600 hover:text-blue-700 font-medium text-sm">
                             {{ __('View All') }}
                         </a>
@@ -216,7 +216,7 @@
                             </svg>
                             <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('No orders yet') }}</h3>
                             <p class="text-gray-600 mb-4">{{ __('Start shopping to see your orders here') }}</p>
-                            <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                            <a href="{{ localized_route('products.index') }}"
                                class="btn-gradient px-6 py-2 rounded-xl font-medium text-sm">
                                 {{ __('Start Shopping') }}
                             </a>
@@ -266,7 +266,7 @@
                         </div>
 
                         <div class="pt-4">
-                            <a href="{{ route('profile.edit', ['locale' => app()->getLocale()]) ?? '/profile/edit' }}"
+                            <a href="{{ route('profile.edit', []) ?? '/profile/edit' }}"
                                class="w-full btn-gradient py-2 rounded-xl font-medium text-center block">
                                 {{ __('Edit Profile') }}
                             </a>
@@ -283,7 +283,7 @@
                 <div class="bg-white border border-gray-200 rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-xl font-semibold text-gray-900">{{ __('Wishlist') }}</h2>
-                        <a href="{{ route('wishlist.index', ['locale' => app()->getLocale()]) ?? '/wishlist' }}"
+                        <a href="{{ route('wishlist.index', []) ?? '/wishlist' }}"
                            class="text-blue-600 hover:text-blue-700 font-medium text-sm">
                             {{ __('View All') }}
                         </a>
@@ -312,7 +312,7 @@
                 <div class="bg-white border border-gray-200 rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-xl font-semibold text-gray-900">{{ __('Addresses') }}</h2>
-                        <a href="{{ route('addresses.index', ['locale' => app()->getLocale()]) ?? '/addresses' }}"
+                        <a href="{{ route('addresses.index', []) ?? '/addresses' }}"
                            class="text-blue-600 hover:text-blue-700 font-medium text-sm">
                             {{ __('Manage') }}
                         </a>
@@ -351,7 +351,7 @@
                             </svg>
                             <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('No addresses yet') }}</h3>
                             <p class="text-gray-600 mb-4">{{ __('Add an address for faster checkout') }}</p>
-                            <a href="{{ route('addresses.create', ['locale' => app()->getLocale()]) ?? '/addresses/create' }}"
+                            <a href="{{ route('addresses.create', []) ?? '/addresses/create' }}"
                                class="btn-gradient px-6 py-2 rounded-xl font-medium text-sm">
                                 {{ __('Add Address') }}
                             </a>

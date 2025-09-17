@@ -1,28 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+
 /**
  * OrderNotification
- * 
+ *
  * Notification class for OrderNotification user notifications with multi-channel delivery and customizable content.
- * 
  */
 final class OrderNotification extends Notification implements ShouldQueue
 {
     use Queueable;
+
     /**
      * Initialize the class instance with required dependencies.
      * @param array $data
      */
-    public function __construct(public array $data)
-    {
-    }
+    public function __construct(
+        public array $data
+    ) {}
+
     /**
      * Handle via functionality with proper error handling.
      * @param mixed $notifiable
@@ -32,6 +33,7 @@ final class OrderNotification extends Notification implements ShouldQueue
     {
         return ['database'];
     }
+
     /**
      * Handle toDatabase functionality with proper error handling.
      * @param mixed $notifiable
@@ -41,6 +43,7 @@ final class OrderNotification extends Notification implements ShouldQueue
     {
         return $this->data;
     }
+
     /**
      * Handle toMail functionality with proper error handling.
      * @param mixed $notifiable
@@ -48,8 +51,13 @@ final class OrderNotification extends Notification implements ShouldQueue
      */
     public function toMail($notifiable): MailMessage
     {
-        return (new MailMessage())->subject($this->data['title'])->line($this->data['message'])->when(isset($this->data['order_number']), function ($mail) {
-            return $mail->line('Užsakymo numeris: ' . $this->data['order_number']);
-        });
+        $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
+
+        return (new MailMessage())
+            ->subject($this->data['title'])
+            ->line($this->data['message'])
+            ->when(isset($this->data['order_number']), function ($mail) use ($locale) {
+                return $mail->line(__('notifications.order.order_number', ['number' => $this->data['order_number']], $locale));
+            });
     }
 }

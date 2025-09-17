@@ -104,3 +104,4 @@ return [
     'locale_de' => 'German',
     'locale_ru' => 'Russian',
 ];
+

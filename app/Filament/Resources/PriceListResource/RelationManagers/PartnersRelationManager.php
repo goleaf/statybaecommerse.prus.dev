@@ -192,3 +192,4 @@ final class PartnersRelationManager extends RelationManager
             ->defaultSort('priority', 'desc');
     }
 }
+

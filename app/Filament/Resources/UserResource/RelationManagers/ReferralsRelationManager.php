@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,10 +15,10 @@ final class ReferralsRelationManager extends RelationManager
     protected static string $relationship = 'referrals';
     protected static ?string $title = 'admin.sections.referrals';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\Select::make('referred_id')
                     ->relationship('referred', 'name')
                     ->required(),
@@ -92,3 +92,4 @@ final class ReferralsRelationManager extends RelationManager
             ]);
     }
 }
+

@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\ProductVariant;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -15,10 +15,10 @@ final class VariantsRelationManager extends RelationManager
     protected static string $relationship = 'variants';
     protected static ?string $title = 'Product Variants';
     
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\TextInput::make('name')
                     ->label(__('admin.products.fields.variant_name'))
                     ->required()

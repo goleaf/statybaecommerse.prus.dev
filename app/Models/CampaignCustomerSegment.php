@@ -50,3 +50,6 @@ final class CampaignCustomerSegment extends Model
     }
 }
 
+
+
+

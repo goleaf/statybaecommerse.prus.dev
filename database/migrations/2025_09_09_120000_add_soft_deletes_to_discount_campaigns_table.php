@@ -8,19 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('discount_campaigns') && ! Schema::hasColumn('discount_campaigns', 'deleted_at')) {
-            Schema::table('discount_campaigns', function (Blueprint $table) {
-                $table->softDeletes();
-            });
-        }
+        Schema::table('discount_campaigns', function (Blueprint $table) {
+            $table->softDeletes();
+        });
     }
 
     public function down(): void
     {
-        if (Schema::hasTable('discount_campaigns') && Schema::hasColumn('discount_campaigns', 'deleted_at')) {
-            Schema::table('discount_campaigns', function (Blueprint $table) {
-                $table->dropSoftDeletes();
-            });
-        }
+        Schema::table('discount_campaigns', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

@@ -16,9 +16,8 @@ class DatabaseSeeder extends Seeder
             CurrencySeeder::class,
             RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
-            // Countries and zones for shipping/tax logic
+            // Countries for shipping/tax logic
             CountrySeeder::class,
-            ZoneSeeder::class,
             // RegionSeeder::class, // Regions table is dropped in migration 2025_09_14_204041
             // Comprehensive cities seeding with multilingual support
             AllCountriesComprehensiveCitiesSeeder::class,
@@ -65,8 +64,12 @@ class DatabaseSeeder extends Seeder
             NewsSeeder::class,
             // Legal pages
             LegalSeeder::class,
+            // Ensure essential translations exist for brands, categories, collections, products, legal
+            TranslationSeeder::class,
             // Build header menu from categories
             MenuSeeder::class,
+            // Ensure every product has at least one variant
+            EnsureProductVariantsSeeder::class,
         ]);
     }
 }

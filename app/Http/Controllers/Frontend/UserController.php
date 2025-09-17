@@ -221,7 +221,7 @@ final class UserController extends Controller
         }
         $user->update(['is_active' => false, 'deactivated_at' => now()]);
         Auth::logout();
-        return redirect()->route('home')->with('success', __('users.account_deactivated_successfully'));
+        return redirect(localized_route('home'))->with('success', __('users.account_deactivated_successfully'));
     }
     /**
      * Handle deleteAccount functionality with proper error handling.
@@ -237,6 +237,6 @@ final class UserController extends Controller
         // Soft delete the user
         $user->delete();
         Auth::logout();
-        return redirect()->route('home')->with('success', __('users.account_deleted_successfully'));
+        return redirect(localized_route('home'))->with('success', __('users.account_deleted_successfully'));
     }
 }

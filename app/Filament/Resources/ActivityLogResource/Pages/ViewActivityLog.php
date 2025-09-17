@@ -19,3 +19,4 @@ final class ViewActivityLog extends ViewRecord
         ];
     }
 }
+

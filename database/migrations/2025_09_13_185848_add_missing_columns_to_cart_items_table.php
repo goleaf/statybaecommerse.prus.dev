@@ -1,45 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
-        Schema::table('cart_items', function (Blueprint $table) {
-            if (!Schema::hasColumn('cart_items', 'price')) {
-                $table->decimal('price', 10, 2)->nullable()->after('total_price');
-            }
-            if (!Schema::hasColumn('cart_items', 'product_variant_id')) {
-                $table->foreignId('product_variant_id')->nullable()->constrained('product_variants')->nullOnDelete()->after('product_id');
-            }
-            if (!Schema::hasColumn('cart_items', 'notes')) {
-                $table->text('notes')->nullable()->after('product_snapshot');
-            }
-            if (!Schema::hasColumn('cart_items', 'attributes')) {
-                $table->json('attributes')->nullable()->after('notes');
-            }
-        });
+        // No-op: cart_items schema finalized in earlier migrations
     }
 
     public function down(): void
     {
-        Schema::table('cart_items', function (Blueprint $table) {
-            if (Schema::hasColumn('cart_items', 'price')) {
-                $table->dropColumn('price');
-            }
-            if (Schema::hasColumn('cart_items', 'product_variant_id')) {
-                $table->dropForeign(['product_variant_id']);
-                $table->dropColumn('product_variant_id');
-            }
-            if (Schema::hasColumn('cart_items', 'notes')) {
-                $table->dropColumn('notes');
-            }
-            if (Schema::hasColumn('cart_items', 'attributes')) {
-                $table->dropColumn('attributes');
-            }
-        });
+        // No-op
     }
 };

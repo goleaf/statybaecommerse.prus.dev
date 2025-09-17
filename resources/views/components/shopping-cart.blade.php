@@ -185,12 +185,12 @@
 
             {{-- Action Buttons --}}
             <div class="mt-6 space-y-3">
-                <a href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
+                <a href="{{ localized_route('checkout.index') }}"
                    class="w-full btn-gradient py-3 rounded-xl font-semibold text-center block">
                     {{ __('Proceed to Checkout') }}
                 </a>
 
-                <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                <a href="{{ localized_route('products.index') }}"
                    class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-xl font-semibold text-center block hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
                     {{ __('Continue Shopping') }}
                 </a>
@@ -211,12 +211,12 @@
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                <a href="{{ localized_route('products.index') }}"
                    class="btn-gradient px-8 py-3 rounded-xl font-semibold">
                     {{ __('Start Shopping') }}
                 </a>
 
-                <a href="{{ route('categories.index', ['locale' => app()->getLocale()]) ?? '/categories' }}"
+                <a href="{{ localized_route('categories.index') }}"
                    class="border-2 border-gray-300 text-gray-700 px-8 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
                     {{ __('Browse Categories') }}
                 </a>

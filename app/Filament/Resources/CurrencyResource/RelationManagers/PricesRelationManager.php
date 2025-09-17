@@ -4,7 +4,7 @@ namespace App\Filament\Resources\CurrencyResource\RelationManagers;
 
 use App\Models\Price;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
@@ -21,10 +21,10 @@ final class PricesRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Prices';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\Select::make('priceable_type')
                     ->options([
                         'App\Models\Product' => 'Product',

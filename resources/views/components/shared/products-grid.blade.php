@@ -50,6 +50,6 @@
         :description="$emptyStateDescription ?? __('Try adjusting your search or browse our categories')"
         icon="heroicon-o-cube"
         :actionText="$emptyStateAction ?? __('shared.browse_products')"
-        :actionUrl="$emptyStateActionUrl ?? route('categories.index')"
+        :actionUrl="$emptyStateActionUrl ?? localized_route('categories.index')"
     />
 @endif

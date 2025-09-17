@@ -1,64 +1,90 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         if (Schema::hasTable('sh_price_lists')) {
-            $this->createIndex('sh_price_lists', 'sh_price_lists_currency_zone_priority', ['currency_id', 'zone_id', 'priority']);
-            $this->createIndex('sh_price_lists', 'sh_price_lists_is_enabled', ['is_enabled']);
+            Schema::table('sh_price_lists', function (Blueprint $table) {
+                try {
+                    $table->index(['currency_id', 'zone_id', 'priority'], 'sh_price_lists_currency_zone_priority');
+                } catch (\Throwable $e) {
+                }
+                try {
+                    $table->index(['is_enabled'], 'sh_price_lists_is_enabled');
+                } catch (\Throwable $e) {
+                }
+            });
         }
 
         if (Schema::hasTable('sh_group_price_list')) {
-            $this->createIndex('sh_group_price_list', 'idx_gpl_group_price', ['group_id', 'price_list_id']);
+            Schema::table('sh_group_price_list', function (Blueprint $table) {
+                try {
+                    $table->index(['group_id', 'price_list_id'], 'idx_gpl_group_price');
+                } catch (\Throwable $e) {
+                }
+            });
         }
+
         if (Schema::hasTable('sh_partner_price_list')) {
-            $this->createIndex('sh_partner_price_list', 'idx_ppl_partner_price', ['partner_id', 'price_list_id']);
+            Schema::table('sh_partner_price_list', function (Blueprint $table) {
+                try {
+                    $table->index(['partner_id', 'price_list_id'], 'idx_ppl_partner_price');
+                } catch (\Throwable $e) {
+                }
+            });
         }
 
         if (Schema::hasTable('sh_customer_group_user')) {
-            $this->createIndex('sh_customer_group_user', 'idx_cgu_group_user', ['group_id', 'user_id']);
-            $this->createIndex('sh_customer_group_user', 'idx_cgu_user', ['user_id']);
+            Schema::table('sh_customer_group_user', function (Blueprint $table) {
+                try {
+                    $table->index(['group_id', 'user_id'], 'idx_cgu_group_user');
+                } catch (\Throwable $e) {
+                }
+                try {
+                    $table->index(['user_id'], 'idx_cgu_user');
+                } catch (\Throwable $e) {
+                }
+            });
         }
+
         if (Schema::hasTable('sh_partner_users')) {
-            $this->createIndex('sh_partner_users', 'idx_pu_partner_user', ['partner_id', 'user_id']);
-            $this->createIndex('sh_partner_users', 'idx_pu_user', ['user_id']);
+            Schema::table('sh_partner_users', function (Blueprint $table) {
+                try {
+                    $table->index(['partner_id', 'user_id'], 'idx_pu_partner_user');
+                } catch (\Throwable $e) {
+                }
+                try {
+                    $table->index(['user_id'], 'idx_pu_user');
+                } catch (\Throwable $e) {
+                }
+            });
         }
 
         if (Schema::hasTable('sh_price_list_items')) {
-            $this->createIndex('sh_price_list_items', 'idx_pli_price_product', ['price_list_id', 'product_id']);
+            Schema::table('sh_price_list_items', function (Blueprint $table) {
+                try {
+                    $table->index(['price_list_id', 'product_id'], 'idx_pli_price_product');
+                } catch (\Throwable $e) {
+                }
+            });
         }
 
         if (Schema::hasTable('sh_currencies')) {
-            $this->createIndex('sh_currencies', 'idx_currencies_code', ['code']);
+            Schema::table('sh_currencies', function (Blueprint $table) {
+                try {
+                    $table->index(['code'], 'idx_currencies_code');
+                } catch (\Throwable $e) {
+                }
+            });
         }
     }
 
-    public function down(): void {}
-
-    private function createIndex(string $table, string $indexName, array $columns): void
+    public function down(): void
     {
-        $driver = DB::getDriverName();
-        try {
-            if ($driver === 'mysql') {
-                $cols = '`'.implode('`,`', $columns).'`';
-                DB::statement("CREATE INDEX IF NOT EXISTS `{$indexName}` ON `{$table}` ({$cols})");
-            } elseif ($driver === 'sqlite') {
-                DB::statement("CREATE INDEX IF NOT EXISTS {$indexName} ON {$table} (".implode(',', $columns).')');
-            } else {
-                Schema::table($table, function (Blueprint $t) use ($columns, $indexName) {
-                    try {
-                        $t->index($columns, $indexName);
-                    } catch (Throwable $e) {
-                    }
-                });
-            }
-        } catch (Throwable $e) {
-        }
+        // Non-destructive
     }
 };

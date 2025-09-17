@@ -140,3 +140,4 @@ final class ProductsRelationManager extends RelationManager
             ->defaultSort('sort_order');
     }
 }
+

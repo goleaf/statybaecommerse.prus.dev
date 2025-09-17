@@ -40,7 +40,7 @@
                     <p class="text-gray-500 mb-6">{{ __('Browse our product catalog to find your perfect match.') }}</p>
                     
                     <a 
-                        href="{{ route('products.index') }}"
+                        href="{{ localized_route('products.index') }}"
                         class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,7 +72,7 @@
             </div>
         </div>
         <a 
-            href="{{ route('checkout.index', ['locale' => app()->getLocale()]) }}"
+            href="{{ localized_route('checkout.index') }}"
             class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-4 text-lg font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             wire:loading.attr="disabled"
         >

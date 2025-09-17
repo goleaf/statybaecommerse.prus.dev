@@ -12,7 +12,8 @@ return new class extends Migration
     {
         Schema::create('order_translations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+            // Defer FK to orders; ensure creation order stability on MySQL
+            $table->unsignedBigInteger('order_id');
             $table->string('locale', 8);
             $table->text('notes')->nullable();
             $table->json('billing_address')->nullable();

@@ -1,7 +1,11 @@
 @props(['item'])
 
 @php
-    $price = \Illuminate\Support\Number::currency($item->price * $item->quantity, current_currency(), app()->getLocale());
+    $price = \Illuminate\Support\Number::currency(
+        $item->price * $item->quantity,
+        current_currency(),
+        app()->getLocale(),
+    );
 
     $model =
         $item->associatedModel instanceof \App\Models\ProductVariant
@@ -15,7 +19,10 @@
         <div class="flex justify-between text-base">
             <div>
                 <h3 class="font-medium font-heading text-primary-700">
-                    <x-link :href="route('product.show', method_exists($model, 'trans') ? $model->trans('slug') ?? $model->slug : $model->slug)">
+                    <x-link :href="route(
+                        'product.show',
+                        method_exists($model, 'trans') ? $model->trans('slug') ?? $model->slug : $model->slug,
+                    )">
                         {{ $item->name }}
                     </x-link>
                 </h3>

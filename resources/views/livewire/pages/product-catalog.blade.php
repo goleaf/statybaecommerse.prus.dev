@@ -32,7 +32,7 @@
             emptyStateTitle="{{ __('No products found') }}"
             emptyStateDescription="{{ __('Try adjusting your search or filter criteria') }}"
             emptyStateAction="{{ __('browse_categories') }}"
-            emptyStateActionUrl="{{ route('categories.index') }}"
+            emptyStateActionUrl="{{ localized_route('categories.index') }}"
         />
     </x-container>
 </div>

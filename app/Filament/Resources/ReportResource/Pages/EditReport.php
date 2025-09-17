@@ -25,3 +25,4 @@ final class EditReport extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 }
+

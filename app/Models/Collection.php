@@ -46,7 +46,7 @@ final class Collection extends Model implements HasMedia
      */
     protected function casts(): array
     {
-        return ['is_visible' => 'boolean', 'sort_order' => 'integer', 'is_automatic' => 'boolean', 'rules' => 'array', 'is_active' => 'boolean', 'products_per_page' => 'integer', 'show_filters' => 'boolean', 'meta_keywords' => 'array'];
+        return ['name' => 'array', 'slug' => 'array', 'description' => 'array', 'seo_title' => 'array', 'seo_description' => 'array', 'is_visible' => 'boolean', 'sort_order' => 'integer', 'is_automatic' => 'boolean', 'rules' => 'array', 'is_active' => 'boolean', 'products_per_page' => 'integer', 'show_filters' => 'boolean', 'meta_keywords' => 'array'];
     }
     /**
      * The accessors to append to the model's array form.

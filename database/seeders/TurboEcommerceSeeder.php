@@ -438,7 +438,7 @@ final class TurboEcommerceSeeder extends Seeder
 
     private function supportedLocales(): array
     {
-        $raw = (string) config('app.supported_locales', 'lt');
+        $raw = (string) config('app.supported_locales', 'lt,en');
 
         return collect(explode(',', $raw))
             ->map(fn ($v) => trim((string) $v))

@@ -81,3 +81,4 @@ final class ReferralCampaignFactory extends Factory
         ]);
     }
 }
+

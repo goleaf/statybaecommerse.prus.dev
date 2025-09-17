@@ -36,7 +36,7 @@ final class VariantAnalytics extends Model
             'clicks' => 'integer',
             'add_to_cart' => 'integer',
             'purchases' => 'integer',
-            'revenue' => 'decimal:4',
+            'revenue' => 'decimal:2',
             'conversion_rate' => 'decimal:4',
         ];
     }

@@ -19,10 +19,11 @@ return new class extends Migration
             $table->boolean('is_enabled')->default(true);
             $table->boolean('is_default')->default(false);
             $table->boolean('is_capital')->default(false);
-            $table->foreignId('country_id')->nullable()->constrained('countries')->onDelete('set null');
-            $table->foreignId('zone_id')->nullable()->constrained('zones')->onDelete('set null');
-            $table->foreignId('region_id')->nullable()->constrained('regions')->onDelete('set null');
-            $table->foreignId('parent_id')->nullable()->constrained('cities')->onDelete('cascade');
+            // Defer FKs to avoid creation order issues; add later if needed
+            $table->unsignedBigInteger('country_id')->nullable();
+            $table->unsignedBigInteger('zone_id')->nullable();
+            $table->unsignedBigInteger('region_id')->nullable();
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->integer('level')->default(0)->comment('Hierarchy level: 0=city, 1=district, 2=neighborhood, etc.');
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();

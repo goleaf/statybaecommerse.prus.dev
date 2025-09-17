@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,22 +12,22 @@ return new class extends Migration
         $tablesToRename = [
             'sh_attribute_product' => 'attribute_product',
             'sh_attribute_value_product_variant' => 'attribute_value_product_variant',
-            'sh_brands' => 'brands_legacy',  // Will be handled separately
+            'sh_brands' => 'brands_legacy',
             'sh_carrier_options' => 'carrier_options',
             'sh_carriers' => 'carriers',
-            'sh_categories' => 'categories_legacy',  // Will be handled separately
-            'sh_collections' => 'collections_legacy',  // Will be handled separately
+            'sh_categories' => 'categories_legacy',
+            'sh_collections' => 'collections_legacy',
             'sh_discountables' => 'discountables',
             'sh_inventory_histories' => 'inventory_histories',
             'sh_order_addresses' => 'order_addresses',
-            'sh_order_items' => 'order_items_legacy',  // Will be handled separately
+            'sh_order_items' => 'order_items_legacy',
             'sh_order_refunds' => 'order_refunds',
-            'sh_order_shipping' => 'order_shipping_legacy',  // Will be handled separately
-            'sh_orders' => 'orders_legacy',  // Will be handled separately
+            'sh_order_shipping' => 'order_shipping_legacy',
+            'sh_orders' => 'orders_legacy',
             'sh_payment_methods' => 'payment_methods',
             'sh_product_has_relations' => 'product_has_relations',
-            'sh_products' => 'products_legacy',  // Will be handled separately
-            'sh_reviews' => 'reviews_legacy',  // Will be handled separately
+            'sh_products' => 'products_legacy',
+            'sh_reviews' => 'reviews_legacy',
             'sh_settings' => 'settings',
             'sh_user_addresses' => 'user_addresses',
             'sh_users_geolocation_history' => 'users_geolocation_history',
@@ -36,9 +35,11 @@ return new class extends Migration
         ];
 
         foreach ($tablesToRename as $oldName => $newName) {
-            if (Schema::hasTable($oldName) && ! Schema::hasTable($newName)) {
-                Schema::rename($oldName, $newName);
-                // Renamed table: {$oldName} -> {$newName}
+            if (Schema::hasTable($oldName) && !Schema::hasTable($newName)) {
+                try {
+                    Schema::rename($oldName, $newName);
+                } catch (\Throwable $e) {
+                }
             }
         }
     }
@@ -74,8 +75,11 @@ return new class extends Migration
         ];
 
         foreach ($tablesToRevert as $newName => $oldName) {
-            if (Schema::hasTable($newName) && ! Schema::hasTable($oldName)) {
-                Schema::rename($newName, $oldName);
+            if (Schema::hasTable($newName) && !Schema::hasTable($oldName)) {
+                try {
+                    Schema::rename($newName, $oldName);
+                } catch (\Throwable $e) {
+                }
             }
         }
     }

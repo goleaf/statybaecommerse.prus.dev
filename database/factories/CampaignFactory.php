@@ -37,7 +37,7 @@ final class CampaignFactory extends Factory
             'send_notifications' => $this->faker->boolean(80),
             'track_conversions' => $this->faker->boolean(90),
             'max_uses' => $this->faker->numberBetween(100, 10000),
-            'budget_limit' => $this->faker->randomFloat(2, 500, 50000),
+            'budget_limit' => round($this->faker->randomFloat(2, 500, 50000), 2),
         ];
     }
 
@@ -127,8 +127,8 @@ final class CampaignFactory extends Factory
                 'total_views' => $this->faker->numberBetween(50000, 200000),
                 'total_clicks' => $this->faker->numberBetween(5000, 20000),
                 'total_conversions' => $this->faker->numberBetween(500, 2000),
-                'total_revenue' => $this->faker->randomFloat(2, 10000, 100000),
-                'conversion_rate' => $this->faker->randomFloat(2, 5, 25),
+                'total_revenue' => round($this->faker->randomFloat(2, 10000, 100000), 2),
+                'conversion_rate' => round($this->faker->randomFloat(4, 0.05, 0.25), 4),
             ]),
         ]);
     }
@@ -140,8 +140,8 @@ final class CampaignFactory extends Factory
                 'total_views' => $this->faker->numberBetween(0, 1000),
                 'total_clicks' => $this->faker->numberBetween(0, 50),
                 'total_conversions' => $this->faker->numberBetween(0, 5),
-                'total_revenue' => $this->faker->randomFloat(2, 0, 100),
-                'conversion_rate' => $this->faker->randomFloat(2, 0, 2),
+                'total_revenue' => round($this->faker->randomFloat(2, 0, 100), 2),
+                'conversion_rate' => round($this->faker->randomFloat(4, 0.0, 0.02), 4),
             ]),
         ]);
     }

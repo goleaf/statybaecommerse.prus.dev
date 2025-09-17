@@ -40,3 +40,4 @@ return [
     'no_settings_found' => 'Nustatymų nerasta',
     'no_settings_description' => 'Pagal jūsų paieškos kriterijus nustatymų nerasta.',
 ];
+

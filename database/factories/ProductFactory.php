@@ -68,19 +68,33 @@ class ProductFactory extends Factory
             'Apsauginė kaukė',
         ];
 
-        $name = $this->faker->randomElement($lithuanianProducts);
+        $nameLt = $this->faker->randomElement($lithuanianProducts);
+        $nameEn = Str::title($this->faker->words(3, true));
+        $suffix = (string) $this->faker->unique()->randomNumber();
         $basePrice = $this->faker->randomFloat(2, 5, 2000);
-        $salePrice = $this->faker->boolean(25) ? $basePrice * 0.8 : null;
+        $salePrice = $this->faker->boolean(25) ? round($basePrice * 0.8, 2) : null;
 
         return [
             'type' => 'simple',
-            'name' => $name,
-            'slug' => Str::slug($name.'-'.$this->faker->unique()->randomNumber()),
+            'name' => [
+                'lt' => $nameLt,
+                'en' => $nameEn,
+            ],
+            'slug' => [
+                'lt' => Str::slug($nameLt.'-'.$suffix),
+                'en' => Str::slug($nameEn.'-'.$suffix),
+            ],
             'sku' => 'LT-'.strtoupper(Str::random(8)),
-            'description' => $this->generateLithuanianDescription($name),
-            'short_description' => $this->generateShortDescription($name),
-            'price' => $basePrice,
-            'sale_price' => $salePrice,
+            'description' => [
+                'lt' => $this->generateLithuanianDescription($nameLt),
+                'en' => $this->faker->paragraphs(3, true),
+            ],
+            'short_description' => [
+                'lt' => $this->generateShortDescription($nameLt),
+                'en' => $this->faker->sentence(6),
+            ],
+            'price' => round($basePrice, 2),
+            'sale_price' => $salePrice !== null ? round($salePrice, 2) : null,
             'brand_id' => Brand::factory(),
             'stock_quantity' => $this->faker->numberBetween(0, 200),
             'low_stock_threshold' => $this->faker->numberBetween(5, 20),
@@ -92,8 +106,14 @@ class ProductFactory extends Factory
             'is_featured' => $this->faker->boolean(15),
             'manage_stock' => $this->faker->boolean(85),
             'status' => 'published',
-            'seo_title' => $name.' - Profesionalūs statybos įrankiai',
-            'seo_description' => 'Pirkite '.strtolower($name).' geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje.',
+            'seo_title' => [
+                'lt' => $nameLt.' - Profesionalūs statybos įrankiai',
+                'en' => $nameEn.' - Professional construction tools',
+            ],
+            'seo_description' => [
+                'lt' => 'Pirkite '.strtolower($nameLt).' geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje.',
+                'en' => 'Buy '.strtolower($nameEn).' at the best price in Lithuania. Fast nationwide delivery.',
+            ],
             'published_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
         ];
     }

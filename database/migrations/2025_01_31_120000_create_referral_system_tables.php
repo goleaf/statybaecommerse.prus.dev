@@ -46,7 +46,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('referral_id')->constrained('referrals')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('order_id')->nullable()->constrained('orders');
+            // Defer FK to orders to avoid creation order issues
+            $table->unsignedBigInteger('order_id')->nullable();
             $table->string('type'); // referrer_bonus, referred_discount
             $table->decimal('amount', 12, 2);
             $table->string('currency_code', 3)->default('EUR');
@@ -77,7 +78,7 @@ return new class extends Migration
             $table->decimal('reward_amount', 12, 2)->nullable();
             $table->string('reward_type')->nullable();
             $table->json('conditions')->nullable();
-            $table->foreignId('campaign_id')->nullable()->constrained('referral_campaigns');
+            $table->unsignedBigInteger('campaign_id')->nullable();
             $table->string('source')->nullable();
             $table->json('tags')->nullable();
             $table->timestamps();
@@ -120,7 +121,7 @@ return new class extends Migration
         Schema::create('referral_code_usage_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('referral_code_id')->constrained('referral_codes')->cascadeOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained('users');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('ip_address');
             $table->text('user_agent')->nullable();
             $table->string('referrer')->nullable();

@@ -72,7 +72,7 @@
 
             {{-- Main Navigation --}}
             <nav class="space-y-2">
-                <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) ?? url('/') }}"
+                <a href="{{ localized_route('home') }}"
                    class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -82,7 +82,7 @@
                     {{ __('Home') }}
                 </a>
 
-                <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                <a href="{{ localized_route('products.index') }}"
                    class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -91,7 +91,7 @@
                     {{ __('Products') }}
                 </a>
 
-                <a href="{{ route('categories.index', ['locale' => app()->getLocale()]) ?? '/categories' }}"
+                <a href="{{ localized_route('categories.index') }}"
                    class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -101,7 +101,7 @@
                     {{ __('Categories') }}
                 </a>
 
-                <a href="{{ route('brands.index', ['locale' => app()->getLocale()]) ?? '/brands' }}"
+                <a href="{{ localized_route('brands.index') }}"
                    class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -142,7 +142,7 @@
                                      class="ml-4 space-y-1"
                                      style="display: none;">
                                     @foreach ($category->children as $subcategory)
-                                        <a href="{{ route('categories.show', ['locale' => app()->getLocale(), 'category' => $subcategory->slug]) ?? '/categories/' . $subcategory->slug }}"
+                                        <a href="{{ localized_route('categories.show', ['category' => $subcategory->slug]) }}"
                                            class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                                             {{ $subcategory->name }}
                                         </a>
@@ -159,7 +159,7 @@
                 <h3 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Popular Brands') }}</h3>
                 <div class="grid grid-cols-2 gap-2">
                     @foreach ($brands as $brand)
-                        <a href="{{ route('brands.show', $brand->slug) }}"
+                        <a href="{{ localized_route('brands.show', $brand->slug) }}"
                            class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                             @if ($brand->getFirstMediaUrl('logo'))
                                 <img src="{{ $brand->getFirstMediaUrl('logo', 'thumb') }}"
@@ -175,7 +175,7 @@
             {{-- User Account Section --}}
             <div class="border-t border-gray-200 pt-4">
                 @auth
-                    <a href="{{ route('account.index', ['locale' => app()->getLocale()]) ?? '/account' }}"
+                    <a href="{{ route('account.index') }}"
                        class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -184,7 +184,7 @@
                         {{ __('My Account') }}
                     </a>
 
-                    <form method="POST" action="{{ route('logout', ['locale' => app()->getLocale()]) ?? '/logout' }}"
+                    <form method="POST" action="{{ route('logout') }}"
                           class="mt-2">
                         @csrf
                         <button type="submit"
@@ -198,7 +198,7 @@
                         </button>
                     </form>
                 @else
-                    <a href="{{ route('login', ['locale' => app()->getLocale()]) ?? '/login' }}"
+                    <a href="{{ route('login') }}"
                        class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -208,7 +208,7 @@
                         {{ __('Login') }}
                     </a>
 
-                    <a href="{{ route('register', ['locale' => app()->getLocale()]) ?? '/register' }}"
+                    <a href="{{ route('register') }}"
                        class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -227,4 +227,3 @@
         </div>
     </div>
 </div>
-

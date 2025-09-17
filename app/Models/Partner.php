@@ -40,7 +40,7 @@ final class Partner extends Model implements HasMedia
      */
     protected function casts(): array
     {
-        return ['is_enabled' => 'boolean', 'discount_rate' => 'decimal:4', 'commission_rate' => 'decimal:4', 'metadata' => 'array'];
+        return ['is_enabled' => 'boolean', 'discount_rate' => 'decimal:2', 'commission_rate' => 'decimal:2', 'metadata' => 'array'];
     }
     /**
      * Handle tier functionality with proper error handling.

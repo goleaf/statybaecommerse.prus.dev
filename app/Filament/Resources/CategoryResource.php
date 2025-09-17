@@ -1,52 +1,48 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
-use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\ColorPicker;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ColorColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ColorColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
 /**
  * CategoryResource
- * 
+ *
  * Filament v4 resource for Category management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
-    
-    /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
-    
+
     protected static ?int $navigationSort = 3;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -87,124 +83,76 @@ final class CategoryResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('categories.basic_information'))
                 ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('categories.name'))
-                                ->required()
-                                ->maxLength(255)
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
-                                    $operation === 'create' ? $set('slug', \Str::slug($state)) : null
-                                ),
-                            
-                            TextInput::make('slug')
-                                ->label(__('categories.slug'))
-                                ->required()
-                                ->maxLength(255)
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
+                    Forms\Components\Tabs::make('i18n')
+                        ->tabs([
+                            Forms\Components\Tabs\Tab::make('LT')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextInput::make('name.lt')
+                                                ->label(__('categories.name') . ' (LT)')
+                                                ->required()
+                                                ->maxLength(255),
+                                            TextInput::make('slug.lt')
+                                                ->label(__('categories.slug') . ' (LT)')
+                                                ->maxLength(255),
+                                        ]),
+                                    Textarea::make('description.lt')
+                                        ->label(__('categories.description') . ' (LT)')
+                                        ->rows(3)
+                                        ->columnSpanFull(),
+                                ]),
+                            Forms\Components\Tabs\Tab::make('EN')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextInput::make('name.en')
+                                                ->label(__('categories.name') . ' (EN)')
+                                                ->maxLength(255),
+                                            TextInput::make('slug.en')
+                                                ->label(__('categories.slug') . ' (EN)')
+                                                ->maxLength(255),
+                                        ]),
+                                    Textarea::make('description.en')
+                                        ->label(__('categories.description') . ' (EN)')
+                                        ->rows(3)
+                                        ->columnSpanFull(),
+                                ]),
                         ]),
-                    
                     Select::make('parent_id')
                         ->label(__('categories.parent_category'))
                         ->relationship('parent', 'name')
+                        ->getOptionLabelFromRecordUsing(fn($record) => is_array($record->name) ? ($record->name[app()->getLocale()] ?? ($record->name['lt'] ?? $record->name['en'] ?? reset($record->name))) : $record->name)
                         ->searchable()
                         ->preload()
-                        ->createOptionForm([
-                            TextInput::make('name')
-                                ->required()
-                                ->maxLength(255),
-                            TextInput::make('slug')
-                                ->required()
-                                ->maxLength(255)
-                                ->rules(['alpha_dash']),
-                        ]),
-                    
-                    Textarea::make('description')
-                        ->label(__('categories.description'))
-                        ->rows(3)
                         ->columnSpanFull(),
                 ]),
-            
             Section::make(__('categories.media'))
                 ->schema([
                     FileUpload::make('image')
                         ->label(__('categories.image'))
                         ->image()
-                        ->imageEditor()
-                        ->imageEditorAspectRatios([
-                            '1:1',
-                            '16:9',
-                            '4:3',
-                        ])
                         ->directory('categories/images')
                         ->visibility('public')
                         ->columnSpanFull(),
-                    
-                    FileUpload::make('banner')
-                        ->label(__('categories.banner'))
-                        ->image()
-                        ->imageEditor()
-                        ->imageEditorAspectRatios([
-                            '16:9',
-                            '21:9',
-                            '4:3',
-                        ])
-                        ->directory('categories/banners')
-                        ->visibility('public')
-                        ->columnSpanFull(),
                 ]),
-            
             Section::make(__('categories.appearance'))
                 ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            ColorPicker::make('color')
-                                ->label(__('categories.color'))
-                                ->hex(),
-                            
-                            TextInput::make('sort_order')
-                                ->label(__('categories.sort_order'))
-                                ->numeric()
-                                ->default(0)
-                                ->minValue(0),
-                        ]),
-                ]),
-            
-            Section::make(__('categories.seo'))
-                ->schema([
-                    TextInput::make('seo_title')
-                        ->label(__('categories.seo_title'))
-                        ->maxLength(255)
-                        ->columnSpanFull(),
-                    
-                    Textarea::make('seo_description')
-                        ->label(__('categories.seo_description'))
-                        ->rows(2)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                ]),
-            
-            Section::make(__('categories.settings'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            Toggle::make('is_active')
-                                ->label(__('categories.is_active'))
-                                ->default(true),
-                            
-                            Toggle::make('is_featured')
-                                ->label(__('categories.is_featured')),
-                        ]),
+                    ColorPicker::make('color')
+                        ->label(__('categories.color'))
+                        ->nullable(),
+                    Toggle::make('is_featured')
+                        ->label(__('categories.is_featured'))
+                        ->default(false),
+                    Toggle::make('is_active')
+                        ->label(__('categories.is_active'))
+                        ->default(true),
                 ]),
         ]);
     }
@@ -222,65 +170,56 @@ final class CategoryResource extends Resource
                     ->label(__('categories.image'))
                     ->circular()
                     ->size(40),
-                
                 TextColumn::make('name')
                     ->label(__('categories.name'))
+                    ->getStateUsing(fn(Category $record) => is_array($record->name) ? ($record->name[app()->getLocale()] ?? ($record->name['lt'] ?? $record->name['en'] ?? reset($record->name))) : $record->name)
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
                     ->formatStateUsing(function (TextColumn $column): ?string {
                         $state = $column->getState();
                         $record = $column->getRecord();
-                        
+
                         if ($record->parent) {
                             return "{$record->parent->name} → {$state}";
                         }
-                        
+
                         return $state;
                     }),
-                
                 TextColumn::make('slug')
                     ->label(__('categories.slug'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 ColorColumn::make('color')
                     ->label(__('categories.color'))
                     ->toggleable(),
-                
                 TextColumn::make('products_count')
                     ->label(__('categories.products_count'))
                     ->counts('products')
                     ->sortable(),
-                
                 TextColumn::make('children_count')
                     ->label(__('categories.subcategories_count'))
                     ->counts('children')
                     ->sortable(),
-                
                 IconColumn::make('is_active')
                     ->label(__('categories.is_active'))
                     ->boolean()
                     ->sortable(),
-                
                 IconColumn::make('is_featured')
                     ->label(__('categories.is_featured'))
                     ->boolean()
                     ->sortable(),
-                
                 TextColumn::make('sort_order')
                     ->label(__('categories.sort_order'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('created_at')
                     ->label(__('categories.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('updated_at')
                     ->label(__('categories.updated_at'))
                     ->dateTime()
@@ -293,14 +232,12 @@ final class CategoryResource extends Resource
                     ->relationship('parent', 'name')
                     ->searchable()
                     ->preload(),
-                
                 TernaryFilter::make('is_active')
                     ->label(__('categories.is_active'))
                     ->boolean()
                     ->trueLabel(__('categories.active_only'))
                     ->falseLabel(__('categories.inactive_only'))
                     ->native(false),
-                
                 TernaryFilter::make('is_featured')
                     ->label(__('categories.is_featured'))
                     ->boolean()
@@ -311,14 +248,13 @@ final class CategoryResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                
                 TableAction::make('toggle_active')
-                    ->label(fn (Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
-                    ->icon(fn (Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (Category $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn(Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
+                    ->icon(fn(Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(Category $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Category $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-                        
+
                         Notification::make()
                             ->title($record->is_active ? __('categories.activated_successfully') : __('categories.deactivated_successfully'))
                             ->success()
@@ -329,28 +265,26 @@ final class CategoryResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    
                     BulkAction::make('activate')
                         ->label(__('categories.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-                            
+
                             Notification::make()
                                 ->title(__('categories.bulk_activated_success'))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    
                     BulkAction::make('deactivate')
                         ->label(__('categories.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-                            
+
                             Notification::make()
                                 ->title(__('categories.bulk_deactivated_success'))
                                 ->success()

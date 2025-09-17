@@ -97,3 +97,4 @@ final class RedemptionsRelationManager extends RelationManager
 }
     }
 }
+

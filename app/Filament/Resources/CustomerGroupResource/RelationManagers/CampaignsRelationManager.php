@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,10 +15,10 @@ final class CampaignsRelationManager extends RelationManager
     protected static string $relationship = 'targetCustomerGroups';
     protected static ?string $title = 'customer_groups.relation_campaigns';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required(),
                     ->maxLength(255),
@@ -87,5 +87,8 @@ final class CampaignsRelationManager extends RelationManager
             ]);
     }
 }
+
+
+
 
 

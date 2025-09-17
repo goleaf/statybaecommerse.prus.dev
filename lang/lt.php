@@ -1036,7 +1036,7 @@ return [
     'search_no_results_found' => 'Rezultatų nerasta.',
     'search_for' => 'pagal',
     'search_pagination' => 'Puslapių numeracija',
-    'search_result_count' => ':count rezultatas rastas|:count rezultatai rasti',
+    'search_result_count' => ':count rezultatas rastas|:count rezultatai rasti|:count rezultatų rasta',
     // Common
     'skip_to_results' => 'Pereiti prie rezultatų',
     'sort' => 'Rūšiuoti',
@@ -1535,7 +1535,6 @@ return [
             'tags_help' => 'Žymės atskiriamos kableliais, pvz.: tag1, tag2, tag3',
         ],
     ],
-    
     // Newsletter translations
     'newsletter' => [
         'email_address' => 'El. pašto adresas',
@@ -1557,11 +1556,66 @@ return [
         'subscribing' => 'Prenumeruojama...',
         'privacy_notice' => 'Prenumeruodami sutinkate su mūsų privatumo politika',
     ],
-    
     // Product image alt text
     'product_image_alt' => 'Produkto nuotrauka',
-    
     // Additional search translations
     'search_for' => 'pagal',
     'search_result_count' => ':count rezultatas rastas|:count rezultatai rasti|:count rezultatų rasta',
+    'policy' => [
+        'address' => [
+            'view_denied' => 'Neturite teisių peržiūrėti šio adreso.',
+            'update_denied' => 'Neturite teisių atnaujinti šio adreso.',
+            'delete_denied' => 'Neturite teisių ištrinti šio adreso.',
+            'restore_denied' => 'Neturite teisių atkurti šio adreso.',
+            'force_delete_denied' => 'Neturite teisių negrįžtamai ištrinti šio adreso.',
+        ],
+        'referral' => [
+            'view_denied' => 'Neturite teisių peržiūrėti šios rekomendacijos.',
+            'update_denied' => 'Neturite teisių atnaujinti šios rekomendacijos.',
+            'delete_denied' => 'Neturite teisių ištrinti šios rekomendacijos.',
+            'restore_denied' => 'Neturite teisių atkurti šios rekomendacijos.',
+            'force_delete_denied' => 'Neturite teisių negrįžtamai ištrinti šios rekomendacijos.',
+        ],
+        'referral_code' => [
+            'view_denied' => 'Neturite teisių peržiūrėti šio rekomendacijos kodo.',
+            'update_denied' => 'Neturite teisių atnaujinti šio rekomendacijos kodo.',
+            'delete_denied' => 'Neturite teisių ištrinti šio rekomendacijos kodo.',
+            'restore_denied' => 'Neturite teisių atkurti šio rekomendacijos kodo.',
+            'force_delete_denied' => 'Neturite teisių negrįžtamai ištrinti šio rekomendacijos kodo.',
+        ],
+        'product_request' => [
+            'view_denied' => 'Neturite teisių peržiūrėti šios prekės užklausos.',
+            'create_denied' => 'Neturite teisių sukurti prekės užklausą.',
+            'update_denied' => 'Neturite teisių atnaujinti šios prekės užklausos.',
+            'delete_denied' => 'Neturite teisių ištrinti šios prekės užklausos.',
+            'respond_denied' => 'Neturite teisių atsakyti į šią prekės užklausą.',
+        ],
+        'role' => [
+            'view_any_denied' => 'Neturite teisių peržiūrėti rolių.',
+            'view_denied' => 'Neturite teisių peržiūrėti šios rolės.',
+            'create_denied' => 'Neturite teisių kurti rolių.',
+            'update_denied' => 'Neturite teisių atnaujinti šios rolės.',
+            'delete_denied' => 'Neturite teisių ištrinti šios rolės.',
+            'restore_denied' => 'Neturite teisių atkurti šios rolės.',
+            'force_delete_denied' => 'Neturite teisių negrįžtamai ištrinti šios rolės.',
+            'force_delete_any_denied' => 'Neturite teisių negrįžtamai ištrinti pasirinktų rolių.',
+            'restore_any_denied' => 'Neturite teisių atkurti pasirinktų rolių.',
+            'replicate_denied' => 'Neturite teisių dubliuoti šios rolės.',
+            'reorder_denied' => 'Neturite teisių keisti rolių eiliškumą.',
+        ],
+        'notification' => [
+            'view_any_denied' => 'Neturite teisių peržiūrėti pranešimų.',
+            'view_denied' => 'Neturite teisių peržiūrėti šio pranešimo.',
+            'create_denied' => 'Neturite teisių kurti pranešimų.',
+            'update_denied' => 'Neturite teisių atnaujinti šio pranešimo.',
+            'delete_denied' => 'Neturite teisių ištrinti šio pranešimo.',
+            'restore_denied' => 'Neturite teisių atkurti šio pranešimo.',
+            'force_delete_denied' => 'Neturite teisių negrįžtamai ištrinti šio pranešimo.',
+            'mark_as_read_denied' => 'Neturite teisių pažymėti šį pranešimą kaip skaitytą.',
+            'mark_as_unread_denied' => 'Neturite teisių pažymėti šį pranešimą kaip neskaitytą.',
+            'duplicate_denied' => 'Neturite teisių dubliuoti šio pranešimo.',
+            'bulk_update_denied' => 'Neturite teisių atnaujinti pasirinktų pranešimų.',
+            'bulk_delete_denied' => 'Neturite teisių ištrinti pasirinktų pranešimų.',
+        ],
+    ],
 ];

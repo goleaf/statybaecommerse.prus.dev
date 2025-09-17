@@ -11,7 +11,7 @@ use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
@@ -40,7 +40,7 @@ final class CustomerGroupResource extends Resource
     protected static ?string $model = CustomerGroup::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+    protected static UnitEnum|string|null  = NavigationGroup::Users;
     
     protected static ?int $navigationSort = 2;
     protected static ?string $recordTitleAttribute = 'name';
@@ -60,7 +60,7 @@ final class CustomerGroupResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Customers->label();
+        return NavigationGroup::Users->label();
     }
 
     /**
@@ -83,12 +83,13 @@ final class CustomerGroupResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->schema([
+    /**
+     * @param Form $form
+     * @return Form
+     */
+    public static function form(Form $form): Form{
+        return $form->schema([
             Section::make(__('customer_groups.basic_information'))
                 ->schema([
                     Grid::make(2)

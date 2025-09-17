@@ -609,7 +609,19 @@ Route::get('/lang/{locale}', function (string $locale) {
         }
     }
 
-    return redirect()->back();
+    $previousUrl = url()->previous();
+    if (empty($previousUrl) || $previousUrl === url()->current()) {
+        return redirect('/' . $locale);
+    }
+
+    $parsed = parse_url($previousUrl);
+    $path = $parsed['path'] ?? '/';
+    $queryParams = [];
+    if (isset($parsed['query'])) {
+        parse_str($parsed['query'], $queryParams);
+    }
+
+    return redirect()->to(switch_locale_url($locale, $path, $queryParams));
 })->name('language.switch');
 
 // Root -> redirect to first supported locale home
@@ -623,7 +635,7 @@ Route::get('/', function () {
     return redirect('/' . $locale);
 })->name('home');
 // Backward-compatible redirect
-Route::get('/home', fn() => redirect()->route('home'));
+Route::get('/home', fn() => redirect(localized_route('home')));
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
 Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.show');
 Route::get('/products/{product}/history', Pages\ProductHistoryPage::class)->name('products.history');
@@ -638,27 +650,27 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
 Route::get('/products/{product}/gallery', function ($product) {
-    return redirect('/' . app()->getLocale() . '/products/' . $product . '/gallery');
+    return redirect(switch_locale_url(app()->getLocale(), '/products/' . $product . '/gallery'));
 })->name('products.gallery');
 // Alias for legacy route names - handled by route model binding
 Route::get('/product/{product}', function ($product) {
     // Handle both slug string and product model
     $productSlug = is_string($product) ? $product : $product->slug;
-    return redirect()->route('products.show', $productSlug);
+    return redirect(localized_route('products.show', $productSlug));
 })->name('product.show');
 
 Route::get('/categories', function () {
-    return redirect('/' . app()->getLocale() . '/categories');
+    return redirect(localized_route('categories.index'));
 })->name('categories.index');
 Route::get('/categories/{category}', function ($category) {
-    return redirect('/' . app()->getLocale() . '/categories/' . $category);
+    return redirect(localized_route('categories.show', ['category' => $category]));
 })->name('categories.show');
 // Brands
 Route::get('/brands', function () {
-    return redirect('/' . app()->getLocale() . '/brands');
+    return redirect(localized_route('brands.index'));
 })->name('brands.index');
 Route::get('/brands/{brand}', function ($brand) {
-    return redirect('/' . app()->getLocale() . '/brands/' . $brand);
+    return redirect(localized_route('brands.show', ['slug' => $brand]));
 })->name('brands.show');
 // Collection routes
 Route::prefix('collections')->name('collections.')->group(function () {
@@ -669,7 +681,7 @@ Route::prefix('collections')->name('collections.')->group(function () {
 });
 Route::get('/cart', Pages\Cart::class)->name('cart.index');
 Route::get('/search', function () {
-    return redirect('/' . app()->getLocale() . '/search');
+    return redirect(localized_route('search'));
 })->name('search');
 // Legal pages
 Route::prefix('legal')->name('legal.')->group(function () {
@@ -684,7 +696,7 @@ Route::prefix('legal')->name('legal.')->group(function () {
 
 // Legacy legal route
 Route::get('/legal/{slug}', function ($slug) {
-    return redirect('/' . app()->getLocale() . '/legal/' . $slug);
+    return redirect(switch_locale_url(app()->getLocale(), '/legal/' . $slug));
 })->name('legal.show.legacy');
 
 // Cpanel routes
@@ -702,7 +714,7 @@ require __DIR__ . '/auth.php';
 Route::middleware('auth')->group(function (): void {
     Route::get('/checkout', Pages\Checkout::class)->name('checkout.index');
     Route::get('/checkout/confirmation/{number}', function (string $number) {
-        return redirect()->route('localized.order.confirmed', ['locale' => app()->getLocale(), 'number' => $number]);
+        return redirect(localized_route('order.confirmed', ['number' => $number]));
     })->name('checkout.confirmation');
     Route::get('/orders', Pages\Account\Orders::class)->name('orders.index');
     Route::get('/account', function () {
@@ -798,9 +810,7 @@ Route::middleware('auth')->group(function (): void {
             'description',
         ])->toArray();
 
-        Zone::create($payload);
-
-        return redirect('/admin/zones');
+        // Zones removed
     });
 
     // Update Zone (PUT to Filament edit URL)
@@ -867,7 +877,7 @@ Route::middleware('auth')->group(function (): void {
 
 // Locations pages
 Route::get('/locations', function () {
-    return redirect('/' . app()->getLocale() . '/locations');
+    return redirect(localized_route('locations.index'));
 })->name('locations.index');
 // Primary Livewire route uses {slug}
 Route::get('/locations/{slug}', App\Livewire\Pages\Location\Show::class)->name('locations.view');
@@ -876,7 +886,7 @@ Route::get('/locations/{id}', function ($id) {
     $loc = \App\Models\Location::query()->findOrFail($id);
     $slug = $loc->code ?: $loc->name;
 
-    return redirect()->route('locations.view', ['slug' => $slug]);
+    return redirect(localized_route('locations.show', ['slug' => $slug]));
 })->whereNumber('id')->name('locations.show.legacy');
 
 // --- Locale-prefixed public routes used in tests ---

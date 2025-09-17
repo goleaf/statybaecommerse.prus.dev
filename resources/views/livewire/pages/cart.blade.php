@@ -9,7 +9,7 @@
                         <div class="text-gray-600">
                             <p class="text-gray-500">{{ __('Your cart is empty.') }}</p>
                             <div class="mt-4">
-                                <x-link :href="route('home', ['locale' => app()->getLocale()])" class="text-primary-600">
+                                <x-link :href="localized_route('products.index')" class="text-primary-600">
                                     {{ __('Continue shopping') }}
                                 </x-link>
                             </div>
@@ -63,7 +63,7 @@
                     </div>
 
                     <div>
-                        <a href="{{ route('checkout.index', ['locale' => app()->getLocale()]) }}"
+                        <a href="{{ localized_route('checkout.index') }}"
                            class="inline-flex items-center justify-center rounded-md bg-primary-600 px-4 py-3 text-white w-full disabled:opacity-50 {{ $items->isEmpty() ? 'pointer-events-none opacity-50' : '' }}"
                            @if($items->isEmpty()) aria-disabled="true" @endif>
                             {{ __('Proceed to checkout') }}

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
 use App\Models\Product;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -17,10 +17,10 @@ final class ProductsRelationManager extends RelationManager
 
     protected static ?string $title = 'Collection Products';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\Select::make('product_id')
                     ->label(__('admin.collections.fields.product'))
                     ->relationship('product', 'name')

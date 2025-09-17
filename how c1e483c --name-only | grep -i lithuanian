@@ -1,0 +1,44 @@
+[33mc97bfa1[m Add missing translations for search page and newsletter
+[33m9bce0fb[m feat: Fix major test issues and improve system stability
+[33mdc59af5[m feat: Create comprehensive Filament v4 CRUD resources and fix test issues
+[33m9068511[m Fix migration index conflict and verify Filament v4 compatibility
+[33me41ec98[m feat: Add final batch of city seeders for global coverage
+[33m0d05d7d[m feat: Add comprehensive city seeders for 25+ countries
+[33m8b7a012[m feat: Add comprehensive Filament CRUD resources and fix database issues
+[33m035b0bf[m feat: add comprehensive MCP email marketing integration with Mailchimp
+[33mc36b333[m feat: complete email subscription system with seeds, tests, and company integration
+[33m7887393[m feat: implement comprehensive email subscription system with full CRUD
+[33mb6144f6[m Fix translation methods in Attribute and Collection models
+[33mb80a39e[m feat: Implement comprehensive smart product recommendation system
+[33m3dbc50d[m Create comprehensive tests for format_price() function and fix Filament v4 compatibility bugs
+[33m96ccd26[m feat: Add essential UI translations for filters, navigation and products
+[33mde93f85[m feat: Add comprehensive translations for all missing UI elements
+[33m16fe7d8[m feat: Enhance Brand module with comprehensive helper methods and widgets
+[33m5405c8c[m feat: Enhance Post module with comprehensive translation methods and widgets
+[33m3a824fb[m feat: Enhance Review module with comprehensive translation methods and widgets
+[33mebe70a3[m feat: Enhance Attribute module with comprehensive multi-translation, widgets, and frontend
+[33mb3078c1[m feat: Enhance Collection module with comprehensive multi-translation, widgets, and frontend
+[33mf04ac59[m feat: Enhance Location module with comprehensive multi-translation, widgets, and frontend
+[33m2e1bc39[m feat(country): Implement comprehensive Country module with multi-translation, widgets, frontend, and tests
+[33m3aefeae[m feat(city): Implement comprehensive City module with multi-translation, Filament 4 admin, frontend, and tests
+[33m5f657db[m feat: Comprehensive Collection module implementation with multi-translation support
+[33m92ad8df[m feat: Enhance Attribute module with comprehensive functionality
+[33m84f264f[m feat: Comprehensive Product module enhancement with multi-translation support
+[33mc1e483c[m feat: Complete Order system with translations, Filament resources, frontend, and comprehensive tests
+[33m5e23a8f[m feat: Implement comprehensive Campaign module with multi-translations and Filament v4 support
+[33m12ae230[m feat: Complete notification system implementation with comprehensive testing
+[33m458ea8e[m Fix WidgetsTest and ActivityLogResourceTest issues
+[33me5a16e0[m Fix WidgetsTest.php - Resolve all Filament widget test issues
+[33m38e57a0[m Fix SimpleDashboardTest translation issues
+[33m1230e46[m refactor: Improve category routing and enhance Livewire components for better performance
+[33m475eef3[m feat: Complete comprehensive Filament v4 system with maximum usability and control
+[33md5ab1cc[m fix: Complete Filament v4 compatibility and system optimization
+[33m854dc36[m feat: Comprehensive Filament upgrade with enhanced features
+[33m6af5fcf[m Fix RouteNotFoundException for locations.index - Add missing Location frontend pages
+[33mb468d47[m 🚀 Complete Laravel E-commerce System Upgrade to Filament v4
+[33m97b4904[m ✅ COMPREHENSIVE: Added extensive test suite and final system optimizations
+[33m8b5a855[m feat: Complete comprehensive multilanguage tabs implementation across ALL admin modules
+[33mf80e9a0[m fix: Resolve Filament v4 compatibility issues and finalize document system
+[33m0ff23c6[m feat: Implement comprehensive multilanguage tabs across all admin modules
+[33m63dce67[m feat: Implement comprehensive document generation system for Filament v4
+[33ma2a417f[m feat: Enhance translation and localization features across the application

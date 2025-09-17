@@ -63,19 +63,19 @@
                             @if ((bool) ($features['category'] ?? false))
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('categories.index', ['locale' => app()->getLocale()]) }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_categories') }}</x-footer-link>
+                                                   href="{{ localized_route('categories.index') }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_categories') }}</x-footer-link>
                                 </li>
                             @endif
                             @if ((bool) ($features['collection'] ?? false) && \Illuminate\Support\Facades\Route::has('collections.index'))
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('collections.index', ['locale' => app()->getLocale()]) }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_collections') }}</x-footer-link>
+                                                   href="{{ route('collections.index', []) }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_collections') }}</x-footer-link>
                                 </li>
                             @endif
                             @if ((bool) ($features['brand'] ?? false))
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('brands.index', ['locale' => app()->getLocale()]) }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_brands') }}</x-footer-link>
+                                                   href="{{ localized_route('brands.index') }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_brands') }}</x-footer-link>
                                 </li>
                             @endif
                             <li>
@@ -185,25 +185,25 @@
                     @php($refund = $legalModel->newQuery()->where('slug', 'refund')->where('is_enabled', true)->first())
                     @php($shipping = $legalModel->newQuery()->where('slug', 'shipping')->where('is_enabled', true)->first())
                     @if ($privacy)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $privacy->trans('slug') ?? 'privacy']) }}"
+                        <x-link href="{{ route('legal.show', ['slug' => $privacy->trans('slug') ?? 'privacy']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
                             {{ __('legal_privacy') }}
                         </x-link>
                     @endif
                     @if ($terms)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $terms->trans('slug') ?? 'terms']) }}"
+                        <x-link href="{{ route('legal.show', ['slug' => $terms->trans('slug') ?? 'terms']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
                             {{ __('legal_terms') }}
                         </x-link>
                     @endif
                     @if ($refund)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $refund->trans('slug') ?? 'refund']) }}"
+                        <x-link href="{{ route('legal.show', ['slug' => $refund->trans('slug') ?? 'refund']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
                             {{ __('legal_refund') }}
                         </x-link>
                     @endif
                     @if ($shipping)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $shipping->trans('slug') ?? 'shipping']) }}"
+                        <x-link href="{{ route('legal.show', ['slug' => $shipping->trans('slug') ?? 'shipping']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
                             {{ __('legal_shipping') }}
                         </x-link>

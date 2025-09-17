@@ -62,3 +62,4 @@ final class RecentReportsWidget extends ChartWidget
         ];
     }
 }
+

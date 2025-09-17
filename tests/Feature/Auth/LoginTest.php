@@ -100,7 +100,7 @@ it('redirects to intended url after login', function () {
         'password' => Hash::make('password123'),
     ]);
 
-    session(['url.intended' => route('cart.index')]);
+    session(['url.intended' => localized_route('cart.index')]);
 
     livewire(Login::class)
         ->fillForm([
@@ -108,7 +108,7 @@ it('redirects to intended url after login', function () {
             'password' => 'password123',
         ])
         ->call('login')
-        ->assertRedirect(route('cart.index'));
+        ->assertRedirect(localized_route('cart.index'));
 });
 
 it('rate limits login attempts', function () {

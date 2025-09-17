@@ -25,6 +25,6 @@ class Logout
         Session::forget(['impersonate', 'original_user']);
         Session::invalidate();
         Session::regenerateToken();
-        return redirect()->route('home');
+        return redirect(localized_route('home'));
     }
 }

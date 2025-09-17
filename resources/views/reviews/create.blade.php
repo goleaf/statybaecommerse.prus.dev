@@ -124,7 +124,7 @@
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <a href="{{ $product ? route('products.show', $product) : route('reviews.index') }}" 
+                    <a href="{{ $product ? localized_route('products.show', $product) : route('reviews.index') }}" 
                        class="text-gray-600 hover:text-gray-800 font-medium">
                         {{ __('reviews_cancel') }}
                     </a>
@@ -178,4 +178,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
+
 

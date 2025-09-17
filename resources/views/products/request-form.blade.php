@@ -120,7 +120,7 @@
                 </div>
 
                 <div class="flex items-center justify-between pt-6 border-t">
-                    <a href="{{ route('products.show', $product) }}" 
+                    <a href="{{ localized_route('products.show', $product) }}" 
                        class="text-gray-600 hover:text-gray-800 transition-colors">
                         {{ __('translations.back_to_product') }}
                     </a>

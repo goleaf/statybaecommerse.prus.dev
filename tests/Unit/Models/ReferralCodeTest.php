@@ -430,3 +430,4 @@ final class ReferralCodeTest extends TestCase
         $this->assertEquals(21.00, $stats['total_reward_amount']);
     }
 }
+

@@ -142,7 +142,7 @@
                                         @foreach ($variant->options as $option)
                                             <button @click="selectOption('{{ $variant->name }}', '{{ $option->value }}')"
                                                     :class="selectedOptions[
-                                                        '{{ $variant->name }}'] === '{{ $option->value }}' ?
+                                                            '{{ $variant->name }}'] === '{{ $option->value }}' ?
                                                         'bg-blue-600 text-white' :
                                                         'bg-gray-100 text-gray-700 hover:bg-gray-200'"
                                                     class="px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
@@ -219,7 +219,7 @@
                             </button>
                         </div>
 
-                        <a href="{{ route('product.show', $product->slug ?? $product) }}"
+                        <a href="{{ route('product.show', $product->slug) }}"
                            class="w-full text-center py-3 text-blue-600 hover:text-blue-700 font-medium">
                             {{ __('View Full Details') }}
                         </a>

@@ -80,7 +80,7 @@
     description="Page description"
     icon="heroicon-o-icon-name"
     :breadcrumbs="[
-        ['title' => 'Home', 'url' => route('home')],
+        ['title' => 'Home', 'url' => localized_route('home')],
         ['title' => 'Current Page']
     ]"
 >
@@ -197,7 +197,7 @@
 {{--
 <x-shared.breadcrumbs 
     :items="[
-        ['title' => 'Category', 'url' => route('categories.index')],
+        ['title' => 'Category', 'url' => localized_route('categories.index')],
         ['title' => 'Current Category']
     ]"
     separator="chevron|slash|dot"

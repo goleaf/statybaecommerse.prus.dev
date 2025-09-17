@@ -19,3 +19,4 @@ final class ViewStock extends ViewRecord
         ];
     }
 }
+

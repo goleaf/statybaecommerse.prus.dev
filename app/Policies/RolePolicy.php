@@ -6,6 +6,7 @@ namespace App\Policies;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Spatie\Permission\Models\Role;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 /**
  * RolePolicy
  * 
@@ -18,106 +19,128 @@ class RolePolicy
     /**
      * Handle viewAny functionality with proper error handling.
      * @param AuthUser $authUser
-     * @return bool
+     * @return Response
      */
-    public function viewAny(AuthUser $authUser): bool
+    public function viewAny(AuthUser $authUser): Response
     {
-        return $authUser->can('ViewAny:Role');
+        return $authUser->can('ViewAny:Role')
+            ? Response::allow()
+            : Response::deny(__('policy.role.view_any_denied'));
     }
     /**
      * Handle view functionality with proper error handling.
      * @param AuthUser $authUser
      * @param Role $role
-     * @return bool
+     * @return Response
      */
-    public function view(AuthUser $authUser, Role $role): bool
+    public function view(AuthUser $authUser, Role $role): Response
     {
-        return $authUser->can('View:Role');
+        return $authUser->can('View:Role')
+            ? Response::allow()
+            : Response::deny(__('policy.role.view_denied'));
     }
     /**
      * Show the form for creating a new resource.
      * @param AuthUser $authUser
-     * @return bool
+     * @return Response
      */
-    public function create(AuthUser $authUser): bool
+    public function create(AuthUser $authUser): Response
     {
-        return $authUser->can('Create:Role');
+        return $authUser->can('Create:Role')
+            ? Response::allow()
+            : Response::deny(__('policy.role.create_denied'));
     }
     /**
      * Update the specified resource in storage with validation.
      * @param AuthUser $authUser
      * @param Role $role
-     * @return bool
+     * @return Response
      */
-    public function update(AuthUser $authUser, Role $role): bool
+    public function update(AuthUser $authUser, Role $role): Response
     {
-        return $authUser->can('Update:Role');
+        return $authUser->can('Update:Role')
+            ? Response::allow()
+            : Response::deny(__('policy.role.update_denied'));
     }
     /**
      * Handle delete functionality with proper error handling.
      * @param AuthUser $authUser
      * @param Role $role
-     * @return bool
+     * @return Response
      */
-    public function delete(AuthUser $authUser, Role $role): bool
+    public function delete(AuthUser $authUser, Role $role): Response
     {
-        return $authUser->can('Delete:Role');
+        return $authUser->can('Delete:Role')
+            ? Response::allow()
+            : Response::deny(__('policy.role.delete_denied'));
     }
     /**
      * Handle restore functionality with proper error handling.
      * @param AuthUser $authUser
      * @param Role $role
-     * @return bool
+     * @return Response
      */
-    public function restore(AuthUser $authUser, Role $role): bool
+    public function restore(AuthUser $authUser, Role $role): Response
     {
-        return $authUser->can('Restore:Role');
+        return $authUser->can('Restore:Role')
+            ? Response::allow()
+            : Response::deny(__('policy.role.restore_denied'));
     }
     /**
      * Handle forceDelete functionality with proper error handling.
      * @param AuthUser $authUser
      * @param Role $role
-     * @return bool
+     * @return Response
      */
-    public function forceDelete(AuthUser $authUser, Role $role): bool
+    public function forceDelete(AuthUser $authUser, Role $role): Response
     {
-        return $authUser->can('ForceDelete:Role');
+        return $authUser->can('ForceDelete:Role')
+            ? Response::allow()
+            : Response::deny(__('policy.role.force_delete_denied'));
     }
     /**
      * Handle forceDeleteAny functionality with proper error handling.
      * @param AuthUser $authUser
-     * @return bool
+     * @return Response
      */
-    public function forceDeleteAny(AuthUser $authUser): bool
+    public function forceDeleteAny(AuthUser $authUser): Response
     {
-        return $authUser->can('ForceDeleteAny:Role');
+        return $authUser->can('ForceDeleteAny:Role')
+            ? Response::allow()
+            : Response::deny(__('policy.role.force_delete_any_denied'));
     }
     /**
      * Handle restoreAny functionality with proper error handling.
      * @param AuthUser $authUser
-     * @return bool
+     * @return Response
      */
-    public function restoreAny(AuthUser $authUser): bool
+    public function restoreAny(AuthUser $authUser): Response
     {
-        return $authUser->can('RestoreAny:Role');
+        return $authUser->can('RestoreAny:Role')
+            ? Response::allow()
+            : Response::deny(__('policy.role.restore_any_denied'));
     }
     /**
      * Handle replicate functionality with proper error handling.
      * @param AuthUser $authUser
      * @param Role $role
-     * @return bool
+     * @return Response
      */
-    public function replicate(AuthUser $authUser, Role $role): bool
+    public function replicate(AuthUser $authUser, Role $role): Response
     {
-        return $authUser->can('Replicate:Role');
+        return $authUser->can('Replicate:Role')
+            ? Response::allow()
+            : Response::deny(__('policy.role.replicate_denied'));
     }
     /**
      * Handle reorder functionality with proper error handling.
      * @param AuthUser $authUser
-     * @return bool
+     * @return Response
      */
-    public function reorder(AuthUser $authUser): bool
+    public function reorder(AuthUser $authUser): Response
     {
-        return $authUser->can('Reorder:Role');
+        return $authUser->can('Reorder:Role')
+            ? Response::allow()
+            : Response::deny(__('policy.role.reorder_denied'));
     }
 }

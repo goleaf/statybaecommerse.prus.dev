@@ -352,7 +352,7 @@
             <!-- Enhanced View All Results Link -->
             <div class="border-t border-gray-200 bg-gray-50">
                 <a 
-                    href="{{ route('localized.search', ['locale' => app()->getLocale(), 'q' => $query]) }}"
+                    href="{{ route('localized.search', ['q' => $query]) }}"
                     class="block w-full px-4 py-3 text-center text-sm font-medium text-blue-600 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none transition-colors duration-200"
                 >
                     <div class="flex items-center justify-center gap-2">

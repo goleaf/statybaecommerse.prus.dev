@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Category;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -13,19 +13,19 @@ final class CategoriesRelationManager extends RelationManager
 {
     protected static string $relationship = 'categories';
     protected static ?string $title = 'Categories';
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\Select::make('category_id')
                     ->label(__('admin.products.fields.categories'))
                     ->relationship('category', 'name')
-                    ->searchable(),
-                    ->preload(),
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Forms\Components\TextInput::make('sort_order')
                     ->label(__('admin.products.fields.sort_order'))
-                    ->numeric(),
+                    ->numeric()
                     ->default(0),
                 Forms\Components\Toggle::make('is_primary')
                     ->label(__('admin.products.fields.is_primary'))
@@ -43,7 +43,7 @@ final class CategoriesRelationManager extends RelationManager
                     ->sortable(),
                 Tables\Columns\TextColumn::make('category.description')
                     ->label(__('admin.products.fields.description'))
-                    ->limit(50),
+                    ->limit(50)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
                         $state = $column->getState();
                         if (strlen($state) <= 50) {
@@ -52,6 +52,8 @@ final class CategoriesRelationManager extends RelationManager
                         return $state;
                     }),
                 Tables\Columns\TextColumn::make('sort_order')
+                    ->label(__('admin.products.fields.sort_order'))
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_primary')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')

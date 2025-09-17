@@ -36,7 +36,6 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
 
         DB::transaction(function () {
             $this->seedCountriesWithTranslations();
-            $this->seedZonesWithTranslations();
             $this->seedCurrenciesWithTranslations();
             $this->seedLocationsWithTranslations();
             $this->seedCategoriesWithTranslations();
@@ -153,67 +152,6 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
         }
 
         $this->command->info('   ✅ Created '.count($countries).' countries with translations');
-    }
-
-    private function seedZonesWithTranslations(): void
-    {
-        $this->command->info('🌍 Seeding zones with translations...');
-
-        $zones = [
-            [
-                'name' => 'Europe',
-                'slug' => 'europe',
-                'code' => 'EU',
-                'is_enabled' => true,
-                'translations' => [
-                    'lt' => ['name' => 'Europa', 'description' => 'Europos regionas'],
-                    'en' => ['name' => 'Europe', 'description' => 'European region'],
-                ],
-            ],
-            [
-                'name' => 'North America',
-                'slug' => 'north-america',
-                'code' => 'NA',
-                'is_enabled' => true,
-                'translations' => [
-                    'lt' => ['name' => 'Šiaurės Amerika', 'description' => 'Šiaurės Amerikos regionas'],
-                    'en' => ['name' => 'North America', 'description' => 'North American region'],
-                ],
-            ],
-            [
-                'name' => 'Baltic States',
-                'slug' => 'baltic-states',
-                'code' => 'BALTIC',
-                'is_enabled' => true,
-                'translations' => [
-                    'lt' => ['name' => 'Baltijos šalys', 'description' => 'Lietuvos, Latvijos ir Estijos regionas'],
-                    'en' => ['name' => 'Baltic States', 'description' => 'Lithuania, Latvia and Estonia region'],
-                ],
-            ],
-        ];
-
-        foreach ($zones as $zoneData) {
-            $zone = Zone::updateOrCreate(
-                ['code' => $zoneData['code']],
-                [
-                    'name' => $zoneData['name'],
-                    'slug' => Str::slug($zoneData['name']),
-                    'is_enabled' => $zoneData['is_enabled'],
-                ]
-            );
-
-            foreach ($zoneData['translations'] as $locale => $translation) {
-                DB::table('zone_translations')->updateOrInsert(
-                    ['zone_id' => $zone->id, 'locale' => $locale],
-                    array_merge($translation, [
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ])
-                );
-            }
-        }
-
-        $this->command->info('   ✅ Created '.count($zones).' zones with translations');
     }
 
     private function seedCurrenciesWithTranslations(): void

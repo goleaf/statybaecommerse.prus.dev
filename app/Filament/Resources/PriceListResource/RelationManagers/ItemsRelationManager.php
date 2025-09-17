@@ -197,3 +197,4 @@ final class ItemsRelationManager extends RelationManager
             ->defaultSort('sort_order');
     }
 }
+

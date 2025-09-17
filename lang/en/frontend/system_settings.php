@@ -40,3 +40,4 @@ return [
     'no_settings_found' => 'No settings found',
     'no_settings_description' => 'No settings found matching your search criteria.',
 ];
+

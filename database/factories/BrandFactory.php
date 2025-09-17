@@ -13,68 +13,85 @@ use Illuminate\Support\Str;
  */
 class BrandFactory extends Factory
 {
-    protected $model = Brand::class;
+	protected $model = Brand::class;
 
-    public function definition(): array
-    {
-        $lithuanianBrands = [
-            'Makita Tools LT',
-            'Bosch Lietuva',
-            'DeWalt Baltics',
-            'Hilti Lithuania',
-            'Festool Baltic',
-            'Milwaukee Tools LT',
-            'Metabo Lithuania',
-            'Ryobi Baltics',
-            'Black & Decker LT',
-            'Stanley Tools Lithuania',
-            'Kärcher Lietuva',
-            'Husqvarna Lithuania',
-            'STIHL Baltic',
-            'Würth Lietuva',
-            'Fischer Baltic',
-            'Knauf Lithuania',
-            'Rockwool Baltics',
-            'URSA Insulation LT',
-            'Isover Lithuania',
-            'Weber Lietuva',
-            'Mapei Baltic',
-            'Ceresit Lithuania',
-            'Henkel Baltics',
-            'Sika Lietuva',
-            'Tremco Baltic',
-        ];
+	public function definition(): array
+	{
+		$lithuanianBrands = [
+			'Makita Tools LT',
+			'Bosch Lietuva',
+			'DeWalt Baltics',
+			'Hilti Lithuania',
+			'Festool Baltic',
+			'Milwaukee Tools LT',
+			'Metabo Lithuania',
+			'Ryobi Baltics',
+			'Black & Decker LT',
+			'Stanley Tools Lithuania',
+			'Kärcher Lietuva',
+			'Husqvarna Lithuania',
+			'STIHL Baltic',
+			'Würth Lietuva',
+			'Fischer Baltic',
+			'Knauf Lithuania',
+			'Rockwool Baltics',
+			'URSA Insulation LT',
+			'Isover Lithuania',
+			'Weber Lietuva',
+			'Mapei Baltic',
+			'Ceresit Lithuania',
+			'Henkel Baltics',
+			'Sika Lietuva',
+			'Tremco Baltic',
+		];
 
-        $name = $this->faker->randomElement($lithuanianBrands);
+		$nameLt = $this->faker->randomElement($lithuanianBrands);
+		$nameEn = Str::title($this->faker->company());
+		$suffix = (string) $this->faker->unique()->randomNumber();
 
-        return [
-            'name' => $name,
-            'slug' => Str::slug($name).'-'.$this->faker->unique()->randomNumber(),
-            'website' => $this->faker->boolean(70) ? 'https://'.Str::slug($name).'.lt' : null,
-            'description' => $this->faker->boolean(80) ? $this->generateLithuanianDescription($name) : null,
-            'is_enabled' => true,
-            'seo_title' => $name.' - Profesionalūs įrankiai statybininkams',
-            'seo_description' => 'Aukštos kokybės '.strtolower($name).' įrankiai ir įranga statybos darbams Lietuvoje.',
-        ];
-    }
+		return [
+			'name' => [
+				'lt' => $nameLt,
+				'en' => $nameEn,
+			],
+			'slug' => [
+				'lt' => Str::slug($nameLt.'-'.$suffix),
+				'en' => Str::slug($nameEn.'-'.$suffix),
+			],
+			'website' => $this->faker->boolean(70) ? 'https://'.Str::slug($nameLt).'.lt' : null,
+			'description' => [
+				'lt' => $this->faker->boolean(80) ? $this->generateLithuanianDescription($nameLt) : null,
+				'en' => $this->faker->boolean(80) ? $this->faker->paragraph() : null,
+			],
+			'is_enabled' => true,
+			'seo_title' => [
+				'lt' => $nameLt.' - Profesionalūs įrankiai statybininkams',
+				'en' => $nameEn.' - Professional tools for builders',
+			],
+			'seo_description' => [
+				'lt' => 'Aukštos kokybės '.strtolower($nameLt).' įrankiai ir įranga statybos darbams Lietuvoje.',
+				'en' => 'High-quality '.strtolower($nameEn).' tools and equipment for construction work in Lithuania.',
+			],
+		];
+	}
 
-    private function generateLithuanianDescription(string $brandName): string
-    {
-        $descriptions = [
-            "Profesionalūs statybos įrankiai ir įranga nuo {$brandName}. Patikimi sprendimai statybininkams.",
-            "Aukštos kokybės {$brandName} gaminiai statybos ir remonto darbams. Garantuota kokybė.",
-            "Patikimi {$brandName} įrankiai profesionaliems statybininkams Lietuvoje.",
-            "Inovatyvūs {$brandName} sprendimai statybos pramonei. Efektyvumas ir patikimumas.",
-            "Pilna {$brandName} įrankių ir įrangos gama namų statybai ir remontui.",
-        ];
+	private function generateLithuanianDescription(string $brandName): string
+	{
+		$descriptions = [
+			"Profesionalūs statybos įrankiai ir įranga nuo {$brandName}. Patikimi sprendimai statybininkams.",
+			"Aukštos kokybės {$brandName} gaminiai statybos ir remonto darbams. Garantuota kokybė.",
+			"Patikimi {$brandName} įrankiai profesionaliems statybininkams Lietuvoje.",
+			"Inovatyvūs {$brandName} sprendimai statybos pramonei. Efektyvumas ir patikimumas.",
+			"Pilna {$brandName} įrankių ir įrangos gama namų statybai ir remontui.",
+		];
 
-        return $this->faker->randomElement($descriptions);
-    }
+		return $this->faker->randomElement($descriptions);
+	}
 
-    public function configure(): static
-    {
-        return $this->afterCreating(function (Brand $brand): void {
-            // Skip media for now - will be added manually or via admin
-        });
-    }
+	public function configure(): static
+	{
+		return $this->afterCreating(function (Brand $brand): void {
+			// Skip media for now - will be added manually or via admin
+		});
+	}
 }

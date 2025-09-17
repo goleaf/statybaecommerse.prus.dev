@@ -14,7 +14,7 @@ use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
@@ -42,7 +42,7 @@ final class OrderItemResource extends Resource
     protected static ?string $model = OrderItem::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+    protected static UnitEnum|string|null  = NavigationGroup::Orders;
     
     protected static ?int $navigationSort = 2;
     protected static ?string $recordTitleAttribute = 'product_name';
@@ -85,12 +85,11 @@ final class OrderItemResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->schema([
+    public static function form(Form $form): Form{
+        return $form->schema([
             Section::make(__('order_items.basic_information'))
                 ->schema([
                     Grid::make(2)

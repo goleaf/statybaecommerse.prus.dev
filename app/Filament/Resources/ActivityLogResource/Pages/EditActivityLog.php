@@ -25,3 +25,4 @@ final class EditActivityLog extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 }
+

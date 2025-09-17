@@ -7,7 +7,7 @@
     <!-- Breadcrumb -->
     <nav class="mb-8">
         <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-            <li><a href="{{ route('home') }}" class="hover:text-blue-600">{{ __('nav_home') }}</a></li>
+            <li><a href="{{ localized_route('home') }}" class="hover:text-blue-600">{{ __('nav_home') }}</a></li>
             <li><span class="mx-2">/</span></li>
             <li><a href="{{ route('cities.index') }}" class="hover:text-blue-600">{{ __('cities.plural_model_label') }}</a></li>
             <li><span class="mx-2">/</span></li>

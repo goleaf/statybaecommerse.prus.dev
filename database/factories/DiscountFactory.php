@@ -19,14 +19,14 @@ final class DiscountFactory extends Factory
             'slug' => $this->faker->slug(),
             'description' => $this->faker->sentence(),
             'type' => $this->faker->randomElement(['percentage', 'fixed']),
-            'value' => $this->faker->randomFloat(2, 5, 50),
+            'value' => round($this->faker->randomFloat(2, 5, 50), 2),
             'is_active' => true,
             'is_enabled' => true,
             'starts_at' => now()->subDays(1),
             'ends_at' => now()->addDays(30),
             'usage_limit' => $this->faker->numberBetween(10, 100),
             'usage_count' => 0,
-            'minimum_amount' => $this->faker->randomFloat(2, 0, 100),
+            'minimum_amount' => round($this->faker->randomFloat(2, 0, 100), 2),
             'zone_id' => Zone::factory(),
         ];
     }
@@ -35,7 +35,7 @@ final class DiscountFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'type' => 'percentage',
-            'value' => $this->faker->randomFloat(2, 5, 30),
+            'value' => round($this->faker->randomFloat(2, 5, 30), 2),
         ]);
     }
 
@@ -43,7 +43,7 @@ final class DiscountFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'type' => 'fixed',
-            'value' => $this->faker->randomFloat(2, 5, 100),
+            'value' => round($this->faker->randomFloat(2, 5, 100), 2),
         ]);
     }
 

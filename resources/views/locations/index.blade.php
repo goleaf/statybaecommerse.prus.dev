@@ -17,7 +17,7 @@
 
     <!-- Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-        <form method="GET" action="{{ route('locations.index') }}" class="space-y-4">
+        <form method="GET" action="{{ localized_route('locations.index') }}" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- Search -->
                 <div>
@@ -91,7 +91,7 @@
                     {{ __('locations.filters.apply_filters') }}
                 </button>
                 
-                <a href="{{ route('locations.index') }}" 
+                <a href="{{ localized_route('locations.index') }}" 
                    class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
                     {{ __('locations.filters.clear_filters') }}
                 </a>
@@ -164,7 +164,7 @@
 
                         <!-- Actions -->
                         <div class="mt-4 flex space-x-2">
-                            <a href="{{ route('locations.show', $location) }}" 
+                            <a href="{{ localized_route('locations.show', $location) }}" 
                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-3 rounded-md text-sm font-medium transition duration-200">
                                 {{ __('locations.actions.view_details') }}
                             </a>

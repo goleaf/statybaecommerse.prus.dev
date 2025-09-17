@@ -64,7 +64,7 @@ final class SearchService
             // Skip products that are not properly configured for search results
             return empty($product->name) || !$product->is_visible || $product->price <= 0 || empty($product->slug);
         })->take($limit)->map(function (Product $product) use ($query) {
-            return ['id' => $product->id, 'type' => 'product', 'title' => $product->name, 'subtitle' => $product->brand?->name, 'description' => $product->short_description ?: $product->description, 'price' => $product->price, 'formatted_price' => number_format((float) $product->price, 2) . ' €', 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'url' => route('products.show', $product->slug), 'relevance_score' => $this->calculateProductRelevance($product, $query)];
+            return ['id' => $product->id, 'type' => 'product', 'title' => $product->name, 'subtitle' => $product->brand?->name, 'description' => $product->short_description ?: $product->description, 'price' => $product->price, 'formatted_price' => number_format((float) $product->price, 2) . ' €', 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'url' => localized_route('products.show', $product->slug), 'relevance_score' => $this->calculateProductRelevance($product, $query)];
         })->sortByDesc('relevance_score')->values()->toArray();
     }
     /**
@@ -87,7 +87,7 @@ final class SearchService
             // Skip categories that are not properly configured for search results
             return empty($category->name) || !$category->is_visible || empty($category->slug) || $category->products_count <= 0;
         })->map(function (Category $category) use ($query) {
-            return ['id' => $category->id, 'type' => 'category', 'title' => $category->name, 'subtitle' => __('frontend.search.category_with_products', ['count' => $category->products_count]), 'description' => $category->description, 'image' => $category->getFirstMediaUrl('images', 'thumb'), 'url' => route('categories.show', $category->slug), 'relevance_score' => $this->calculateCategoryRelevance($category, $query)];
+            return ['id' => $category->id, 'type' => 'category', 'title' => $category->name, 'subtitle' => __('frontend.search.category_with_products', ['count' => $category->products_count]), 'description' => $category->description, 'image' => $category->getFirstMediaUrl('images', 'thumb'), 'url' => localized_route('categories.show', $category->slug), 'relevance_score' => $this->calculateCategoryRelevance($category, $query)];
         })->sortByDesc('relevance_score')->values()->toArray();
     }
     /**
@@ -110,7 +110,7 @@ final class SearchService
             // Skip brands that are not properly configured for search results
             return empty($brand->name) || !$brand->is_enabled || empty($brand->slug) || $brand->products_count <= 0;
         })->map(function (Brand $brand) use ($query) {
-            return ['id' => $brand->id, 'type' => 'brand', 'title' => $brand->name, 'subtitle' => __('frontend.search.brand_with_products', ['count' => $brand->products_count]), 'description' => $brand->description, 'image' => $brand->getFirstMediaUrl('logo', 'thumb'), 'url' => route('brands.show', $brand->slug), 'relevance_score' => $this->calculateBrandRelevance($brand, $query)];
+            return ['id' => $brand->id, 'type' => 'brand', 'title' => $brand->name, 'subtitle' => __('frontend.search.brand_with_products', ['count' => $brand->products_count]), 'description' => $brand->description, 'image' => $brand->getFirstMediaUrl('logo', 'thumb'), 'url' => localized_route('brands.show', $brand->slug), 'relevance_score' => $this->calculateBrandRelevance($brand, $query)];
         })->sortByDesc('relevance_score')->values()->toArray();
     }
     /**

@@ -28,3 +28,4 @@ final class CreateStock extends CreateRecord
         return $data;
     }
 }
+

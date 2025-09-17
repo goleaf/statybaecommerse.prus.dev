@@ -3,7 +3,7 @@
 use function Pest\Laravel\get;
 
 it('redirects categories index to localized version', function () {
-    $response = get(route('categories.index'));
+    $response = get(localized_route('categories.index'));
     $response->assertRedirect('/' . app()->getLocale() . '/categories');
 });
 

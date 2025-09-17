@@ -7,7 +7,7 @@ namespace App\Filament\Resources\ActivityLogResource\Pages;
 use App\Filament\Resources\ActivityLogResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Forms\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListActivityLogs extends ListRecords
@@ -56,3 +56,4 @@ final class ListActivityLogs extends ListRecords
         ];
     }
 }
+

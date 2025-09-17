@@ -44,7 +44,7 @@
         @else
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach ($brands as $brand)
-                    <a href="{{ route('brands.show', ['locale' => app()->getLocale(), 'brand' => $brand->trans('slug') ?? $brand->slug]) }}"
+                    <a href="{{ localized_route('brands.show', ['brand' => $brand->trans('slug') ?? $brand->slug]) }}"
                        class="block border rounded-lg p-4 hover:shadow-sm">
                         <div class="aspect-square bg-gray-50 flex items-center justify-center mb-3">
                             @if ($brand->getLogoUrl('md'))

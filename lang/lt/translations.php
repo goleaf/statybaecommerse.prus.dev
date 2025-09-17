@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 return [
     // Category page sidebar & controls
@@ -27,7 +25,6 @@ return [
     'address_type_home_description' => 'Namų adresas',
     'address_type_work_description' => 'Darbo adresas',
     'address_type_other_description' => 'Kitas adresas',
-
     // Payment Types
     'payment_type_stripe' => 'Stripe',
     'payment_type_notch_pay' => 'NotchPay',
@@ -37,7 +34,6 @@ return [
     'payment_type_cash_description' => 'Mokėjimas grynaisiais',
     'payment_processing_instant' => 'Momentinis',
     'payment_processing_immediate' => 'Nedelsiant',
-
     // Order Status
     'order_status_pending' => 'Laukiantis',
     'order_status_confirmed' => 'Patvirtintas',
@@ -48,7 +44,6 @@ return [
     'order_status_refunded' => 'Grąžintas',
     'order_status_partially_refunded' => 'Dalinai grąžintas',
     'order_status_failed' => 'Nepavyko',
-
     // Confirmation Messages
     'confirm_remove_cart_item' => 'Ar tikrai norite pašalinti šį elementą iš krepšelio?',
     'confirm_clear_cart' => 'Ar tikrai norite išvalyti visą krepšelį?',
@@ -117,7 +112,6 @@ return [
     'order_status_partially_refunded_description' => 'Užsakymas dalinai grąžintas',
     'order_status_failed_description' => 'Užsakymas nepavyko',
     'order_status_on_hold_description' => 'Užsakymas sulaikytas',
-
     // Product Status
     'product_status_draft' => 'Juodraštis',
     'product_status_active' => 'Aktyvus',
@@ -135,7 +129,6 @@ return [
     'product_status_archived_description' => 'Produktas archyvuotas',
     'product_status_pending_review_description' => 'Produktas laukia peržiūros',
     'product_status_rejected_description' => 'Produktas atmestas',
-
     // User Roles
     'user_role_super_admin' => 'Super administratorius',
     'user_role_admin' => 'Administratorius',
@@ -149,7 +142,6 @@ return [
     'user_role_editor_description' => 'Turinio redagavimo teisės',
     'user_role_customer_description' => 'Kliento teisės',
     'user_role_guest_description' => 'Svečio teisės',
-
     // Navigation Groups
     'nav_group_referral' => 'Referral sistema',
     'nav_group_products' => 'Produktai',
@@ -339,7 +331,6 @@ return [
     'campaign_description' => 'Kampanijos aprašymas',
     'campaign_content' => 'Kampanijos turinys',
     'campaign_settings' => 'Kampanijos nustatymai',
-
     // Campaign translations
     'campaigns' => [
         'navigation' => [
@@ -859,10 +850,8 @@ return [
     'this_month' => 'Šį mėnesį',
     // Brands
     'brands' => 'Prekės ženklai',
-
     // Additional translations for attributes
     'updated_at' => 'Atnaujinta',
-    
     // Attribute specific translations
     'attributes' => 'Atributai',
     'attribute' => 'Atributas',
@@ -954,7 +943,6 @@ return [
     'searchable_only' => 'Tik ieškomi',
     'enabled_only' => 'Tik įjungti',
     'with_values_only' => 'Tik su reikšmėmis',
-    
     // Address specific translations
     'add_new_address' => 'Pridėti naują adresą',
     'address_type' => 'Adreso tipas',
@@ -1078,7 +1066,6 @@ return [
     'add_metadata' => 'Pridėti metaduomenis',
     'active_only' => 'Tik aktyvūs',
     'inactive_only' => 'Tik neaktyvūs',
-    
     // Navigation and UI translations
     'logo' => 'Logotipas',
     'global_search' => 'Globali paieška',
@@ -1089,7 +1076,6 @@ return [
     'recommendation_system' => 'Rekomendacijų sistema',
     'recommendation_system_management' => 'Rekomendacijų sistemos valdymas',
     'content_management' => 'Turinio valdymas',
-    
     // System management translations
     'clear_cache' => 'Išvalyti kešą',
     'optimize_system' => 'Optimizuoti sistemą',
@@ -1108,7 +1094,6 @@ return [
     'total_requests' => 'Iš viso užklausų',
     'avg_ctr' => 'Vid. CTR',
     'avg_conversion' => 'Vid. konversija',
-    
     // Recommendation block names
     'related_products' => 'Susiję produktai',
     'you_might_also_like' => 'Jums gali patikti',
@@ -1118,14 +1103,12 @@ return [
     'customers_also_bought' => 'Klientai taip pat pirko',
     'complete_your_purchase' => 'Užbaikite pirkimą',
     'upgrade_your_choice' => 'Pagerinkite savo pasirinkimą',
-    
     // Quick actions
     'quick_actions' => 'Greiti veiksmai',
     'clear_recommendation_cache' => 'Išvalyti rekomendacijų kešą',
     'optimize_recommendation_system' => 'Optimizuoti rekomendacijų sistemą',
     'manage_configurations' => 'Valdyti konfigūracijas',
     'system_information' => 'Sistemos informacija',
-    
     // Available algorithms
     'available_algorithms' => 'Galimi algoritmai',
     'content_based_filtering' => 'Turinio pagrindu filtravimas',
@@ -1135,7 +1118,6 @@ return [
     'trending_products' => 'Populiarėjantys produktai',
     'cross_sell' => 'Kryžminis pardavimas',
     'up_sell' => 'Papildomas pardavimas',
-    
     // Features
     'features' => 'Funkcijos',
     'realtime_caching' => 'Realiuoju laiku kešavimas',
@@ -1144,17 +1126,94 @@ return [
     'ab_testing_support' => 'A/B testavimo palaikymas',
     'dynamic_algorithm_weights' => 'Dinaminiai algoritmo svoriai',
     'multilanguage_support' => 'Daugiakalbis palaikymas',
-    
     // System information
     'php_version' => 'PHP versija',
     'response_time' => 'Atsako laikas',
     'memory_usage' => 'Atminties naudojimas',
     'request_method' => 'Užklausos metodas',
-    
     // Cache and optimization messages
     'cache_cleared_successfully' => 'Kešas sėkmingai išvalytas',
     'cache_clear_failed' => 'Kešo išvalymas nepavyko',
     'system_optimized_successfully' => 'Sistema sėkmingai optimizuota',
     'system_optimization_failed' => 'Sistemos optimizavimas nepavyko',
     'no_data_available' => 'Duomenų nėra',
+    // Dashboard Analytics Translations
+    'active_settings' => 'Aktyvūs nustatymai',
+    'analytics_events' => 'Analitikos įvykiai',
+    'events_last_week' => 'Įvykiai per savaitę',
+    'analytics_activity' => 'Analitikos veikla',
+    'behaviors_last_week' => 'Elgsenos per savaitę',
+    'recent_activity' => 'Neseniai veikla',
+    'avg_recommendation_score' => 'Vid. rekomendacijos balas',
+    'quality_score' => 'Kokybės balas',
+    'recommendation_clicks' => 'Rekomendacijų paspaudimai',
+    'database_entities' => 'Duomenų bazės objektai',
+    'total_records' => 'Iš viso įrašų',
+    'products_in_db' => 'Produktai DB',
+    'product_records' => 'Produktų įrašai',
+    'orders_in_db' => 'Užsakymai DB',
+    'order_records' => 'Užsakymų įrašai',
+    'users_in_db' => 'Vartotojai DB',
+    'user_records' => 'Vartotojų įrašai',
+    'cache_hit_rate' => 'Kešo pataikymo dažnis',
+    'performance_metric' => 'Veiklos rodiklis',
+    'avg_response_time' => 'Vid. atsako laikas',
+    'error_rate' => 'Klaidų dažnis',
+    'system_health' => 'Sistemos sveikata',
+    'overall_status' => 'Bendras statusas',
+    'last_24h' => 'Per 24 val.',
+    'last_7_days' => 'Per 7 dienas',
+    'per_order' => 'Už užsakymą',
+    'products_need_restocking' => 'Produktai reikalauja papildymo',
+    'products_unavailable' => 'Produktai nepasiekiami',
+    'visible_categories' => 'Matomos kategorijos',
+    'total_brands' => 'Iš viso prekės ženklų',
+    'approved_reviews' => 'Patvirtinti atsiliepimai',
+    'customer_satisfaction' => 'Klientų pasitenkinimas',
+    'running_campaigns' => 'Vykdomos kampanijos',
+    'total_impressions' => 'Iš viso peržiūrų',
+    'total_clicks' => 'Iš viso paspaudimų',
+    'total_conversions' => 'Iš viso konversijų',
+    'running_discounts' => 'Vykdomos nuolaidos',
+    'available_coupons' => 'Galimi kuponai',
+    'total_savings' => 'Iš viso sutaupyta',
+    'total_stock_value' => 'Bendras atsargų vertė',
+    'total_movements' => 'Iš viso judėjimų',
+    'total_views' => 'Iš viso peržiūrų',
+    'total_searches' => 'Iš viso paieškų',
+    'add_to_cart_events' => 'Į krepšelį pridėjimo įvykiai',
+    'supported_countries' => 'Palaikomos šalys',
+    'shipping_zones' => 'Pristatymo zonos',
+    'warehouse_locations' => 'Sandėlių vietos',
+    'customer_addresses' => 'Klientų adresai',
+    'total_articles' => 'Iš viso straipsnių',
+    'legal_documents' => 'Teisiniai dokumentai',
+    'configuration_items' => 'Konfigūracijos elementai',
+    'total_recommendations' => 'Iš viso rekomendacijų',
+    'tracked_behaviors' => 'Sekamos elgsenos',
+    'variant_insights' => 'Variantų įžvalgos',
+    'type' => 'Tipas',
+    'description' => 'Aprašymas',
+    'amount' => 'Suma',
+    'status' => 'Būsena',
+    'created_at' => 'Sukurta',
+    'order' => 'Užsakymas',
+    'user' => 'Vartotojas',
+    'review' => 'Atsiliepimas',
+    'campaign' => 'Kampanija',
+    // Real-time Analytics Translations
+    'orders_last_hour' => 'Užsakymai per valandą',
+    'orders_last_15min' => 'Užsakymai per 15 min',
+    'users_last_hour' => 'Vartotojai per valandą',
+    'users_last_15min' => 'Vartotojai per 15 min',
+    'page_views_last_hour' => 'Peržiūros per valandą',
+    'page_views_last_15min' => 'Peržiūros per 15 min',
+    'cart_adds_last_hour' => 'Pridėjimai į krepšelį per valandą',
+    'cart_adds_last_15min' => 'Pridėjimai į krepšelį per 15 min',
+    'wishlist_adds_last_hour' => 'Pridėjimai į norų sąrašą per valandą',
+    'wishlist_adds_last_15min' => 'Pridėjimai į norų sąrašą per 15 min',
+    'searches_last_hour' => 'Paieškos per valandą',
+    'searches_last_15min' => 'Paieškos per 15 min',
+    'last_30min' => 'Per 30 min',
+    'last_5min' => 'Per 5 min',
 ];

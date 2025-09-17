@@ -24,7 +24,7 @@
     @if (config('app.supported_locales'))
         @foreach (config('app.supported_locales') as $locale)
             <link rel="alternate" hreflang="{{ $locale }}"
-                  href="{{ url()->current() }}?locale={{ $locale }}">
+                  href="{{ switch_locale_url($locale) }}">
         @endforeach
     @endif
 

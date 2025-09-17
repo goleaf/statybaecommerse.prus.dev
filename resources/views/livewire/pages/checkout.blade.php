@@ -6,11 +6,11 @@
     <header class="relative border-b border-gray-200 bg-white text-sm font-medium text-gray-700">
         <x-container class="py-4">
             <div class="relative flex items-center gap-10">
-                <x-link :href="route('home', ['locale' => app()->getLocale()])">
+                <x-link :href="localized_route('home')">
                     <span class="sr-only">{{ app_setting('legal_name') }}</span>
                     <x-brand class="h-10 w-auto" aria-hidden="true" />
                 </x-link>
-                <x-link :href="route('home', ['locale' => app()->getLocale()])"
+                <x-link :href="localized_route('home')"
                         class="inline-flex items-center font-medium text-gray-600 hover:text-gray-900">
                     {{ __('checkout_back_to_store') }}
                 </x-link>

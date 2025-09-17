@@ -248,59 +248,86 @@ final class ProductVariantSeeder extends Seeder
         ];
 
         foreach ($products as $productData) {
-            $product = Product::create([
-                'name' => $productData['name'],
-                'slug' => Str::slug($productData['name']),
-                'description' => $productData['description'],
-                'short_description' => substr($productData['description'], 0, 100),
-                'sku' => 'PROD-' . strtoupper(Str::random(8)),
-                'price' => $productData['base_price'],
-                'compare_price' => $productData['base_price'] * 1.2,
-                'cost_price' => $productData['base_price'] * 0.6,
-                'manage_stock' => true,
-                'stock_quantity' => 0,
-                'weight' => 0.5,
-                'is_visible' => true,
-                'is_featured' => true,
-                'published_at' => now(),
-                'brand_id' => $brand->id,
-                'status' => 'published',
-                'type' => 'variable',
-            ]);
+            $nameEn = $productData['name'];
+            $nameLt = match ($nameEn) {
+                'Premium T-Shirt' => 'Premium marškinėliai',
+                'Designer Jeans' => 'Dizainerio džinsai',
+                'Luxury Jacket' => 'Prabangi striukė',
+                'Sports Shoes' => 'Sportiniai batai',
+                'Elegant Dress' => 'Elegantiška suknelė',
+                default => $nameEn,
+            };
+            $slugEn = Str::slug($nameEn);
+            $slugLt = Str::slug($nameLt);
+            $sku = 'PROD-' . strtoupper(Str::slug($nameEn));
+
+            $product = Product::updateOrCreate(
+                ['sku' => $sku],
+                [
+                    'name' => ['lt' => $nameLt, 'en' => $nameEn],
+                    'slug' => ['lt' => $slugLt, 'en' => $slugEn],
+                    'description' => [
+                        'lt' => 'Aukštos kokybės produktas: ' . $nameLt,
+                        'en' => $productData['description'],
+                    ],
+                    'short_description' => [
+                        'lt' => 'Trumpas aprašymas: ' . $nameLt,
+                        'en' => substr($productData['description'], 0, 100),
+                    ],
+                    'price' => round($productData['base_price'], 2),
+                    'compare_price' => round($productData['base_price'] * 1.2, 2),
+                    'cost_price' => round($productData['base_price'] * 0.6, 2),
+                    'manage_stock' => true,
+                    'stock_quantity' => 0,
+                    'weight' => 0.5,
+                    'is_visible' => true,
+                    'is_featured' => true,
+                    'published_at' => now(),
+                    'brand_id' => $brand->id,
+                    'status' => 'published',
+                    'type' => 'variable',
+                ]
+            );
 
             // Attach category
             $product->categories()->attach($category->id);
 
             // Create variants
             foreach ($productData['variants'] as $index => $variantData) {
-                $variant = ProductVariant::create([
-                    'product_id' => $product->id,
-                    'name' => $productData['name'] . ' - ' . $variantData['size'],
-                    'sku' => $product->sku . '-' . $variantData['size'],
-                    'price' => $productData['base_price'] + $variantData['price_modifier'],
-                    'compare_price' => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
-                    'cost_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
-                    'stock_quantity' => $variantData['stock'],
-                    'weight' => 0.5,
-                    'track_inventory' => true,
-                    'is_default' => $index === 0,
-                    'is_enabled' => true,
-                    'attributes' => json_encode(['size' => $variantData['size']]),
-                ]);
+                $variant = ProductVariant::updateOrCreate(
+                    ['sku' => $product->sku . '-' . $variantData['size']],
+                    [
+                        'product_id' => $product->id,
+                        'name' => $productData['name'] . ' - ' . $variantData['size'],
+                        'sku' => $product->sku . '-' . $variantData['size'],
+                        'price' => round($productData['base_price'] + $variantData['price_modifier'], 2),
+                        'compare_price' => round(($productData['base_price'] + $variantData['price_modifier']) * 1.2, 2),
+                        'cost_price' => round(($productData['base_price'] + $variantData['price_modifier']) * 0.6, 2),
+                        'stock_quantity' => $variantData['stock'],
+                        'weight' => 0.5,
+                        'track_inventory' => true,
+                        'is_default' => $index === 0,
+                        'is_enabled' => true,
+                        'attributes' => ['size' => $variantData['size']],
+                    ]
+                );
 
                 // Note: Attributes are stored in JSON format in the attributes column
                 // The relationship will be handled by the frontend components
 
                 // Create variant inventory
-                VariantInventory::create([
-                    'variant_id' => $variant->id,
-                    'warehouse_code' => 'main',
-                    'stock' => $variantData['stock'],
-                    'reserved' => 0,
-                    'available' => $variantData['stock'],
-                    'reorder_point' => 10,
-                    'reorder_quantity' => 50,
-                ]);
+                VariantInventory::updateOrCreate(
+                    ['variant_id' => $variant->id, 'warehouse_code' => 'main'],
+                    [
+                        'variant_id' => $variant->id,
+                        'warehouse_code' => 'main',
+                        'stock' => $variantData['stock'],
+                        'reserved' => 0,
+                        'available' => $variantData['stock'],
+                        'reorder_point' => 10,
+                        'reorder_quantity' => 50,
+                    ]
+                );
             }
         }
     }

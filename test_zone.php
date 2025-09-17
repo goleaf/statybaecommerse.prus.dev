@@ -53,3 +53,4 @@ try {
     echo "Error: " . $e->getMessage() . "\n";
     echo "Stack trace: " . $e->getTraceAsString() . "\n";
 }
+

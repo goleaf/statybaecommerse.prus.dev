@@ -18,7 +18,7 @@
         :description="$brand->getTranslatedDescription()"
         icon="heroicon-o-tag"
         :breadcrumbs="[
-            ['title' => __('shared.home'), 'url' => route('home')],
+            ['title' => __('shared.home'), 'url' => localized_route('home')],
             ['title' => __('shared.brands'), 'url' => route('localized.brands.index')],
             ['title' => $brand->getTranslatedName()]
         ]"
@@ -156,7 +156,9 @@
                             </div>
                             
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 p-4">
-                                <a href="{{ route('localized.brands.show', $relatedBrand->getTranslatedSlug()) }}" class="stretched-link">
+                                <a href="{{ route('localized.brands.show', [
+                                    'slug' => $relatedBrand->getTranslatedSlug(),
+                                ]) }}" class="stretched-link">
                                     {{ $relatedBrand->getTranslatedName() }}
                                 </a>
                             </h3>

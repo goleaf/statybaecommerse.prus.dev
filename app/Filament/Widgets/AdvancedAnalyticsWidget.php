@@ -18,9 +18,14 @@ use Illuminate\Support\Facades\DB;
 
 class AdvancedAnalyticsWidget extends ChartWidget
 {
+    protected string $view = 'filament.widgets.advanced-analytics-widget';
+
     protected ?string $heading = 'Advanced Analytics Dashboard';
+
     protected static ?int $sort = 2;
+
     protected int|string|array $columnSpan = 'full';
+
     protected ?string $maxHeight = '400px';
 
     protected function getData(): array

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
 use App\Models\Product;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -17,31 +17,31 @@ final class ProductsRelationManager extends RelationManager
 
     protected static ?string $title = 'Brand Products';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\TextInput::make('name')
                     ->label(__('admin.products.fields.name'))
-                    ->required(),
+                    ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('sku')
                     ->label(__('admin.products.fields.sku'))
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(255)
                     ->unique(Product::class, 'sku', ignoreRecord: true),
                 Forms\Components\Textarea::make('description')
                     ->label(__('admin.products.fields.description'))
-                    ->rows(3),
+                    ->rows(3)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('price')
                     ->label(__('admin.products.fields.price'))
-                    ->numeric(),
-                    ->prefix('€'),
+                    ->numeric()
+                    ->prefix('€')
                     ->required(),
                 Forms\Components\TextInput::make('stock_quantity')
                     ->label(__('admin.products.fields.stock_quantity'))
-                    ->numeric(),
+                    ->numeric()
                     ->default(0),
                 Forms\Components\Toggle::make('is_published')
                     ->label(__('admin.products.fields.is_published'))

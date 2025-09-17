@@ -24,10 +24,8 @@ return new class extends Migration
             $table->timestamp('valid_from')->nullable()->after('max_quantity');
             $table->timestamp('valid_until')->nullable()->after('valid_from');
 
-            // Add compare_amount if it doesn't exist
-            if (! Schema::hasColumn('price_list_items', 'compare_amount')) {
-                $table->decimal('compare_amount', 12, 4)->nullable()->after('net_amount');
-            }
+            // Add compare_amount
+            $table->decimal('compare_amount', 15, 2)->nullable()->after('net_amount');
 
             // Add indexes for performance
             $table->index(['is_active', 'priority']);
@@ -53,6 +51,7 @@ return new class extends Migration
                 'max_quantity',
                 'valid_from',
                 'valid_until',
+                'compare_amount',
             ]);
         });
     }

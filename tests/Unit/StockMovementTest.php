@@ -353,3 +353,4 @@ final class StockMovementTest extends TestCase
         $this->assertEquals('stock_movements', $this->stockMovement->getTable());
     }
 }
+

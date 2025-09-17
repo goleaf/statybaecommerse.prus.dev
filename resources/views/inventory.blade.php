@@ -101,7 +101,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('products.show', $product) }}" 
+                                    <a href="{{ localized_route('products.show', $product) }}" 
                                        class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                         {{ __('View') }}
                                     </a>

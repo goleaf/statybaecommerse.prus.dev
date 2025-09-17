@@ -14,7 +14,7 @@ use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
@@ -42,7 +42,8 @@ final class RecommendationConfigResourceSimple extends Resource
 {
     protected static ?string $model = RecommendationConfigSimple::class;
     
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
+    /** @var UnitEnum|string|null */
+    protected static UnitEnum|string|null  = NavigationGroup::Products;
     
     protected static ?int $navigationSort = 14;
     protected static ?string $recordTitleAttribute = 'name';
@@ -85,12 +86,9 @@ final class RecommendationConfigResourceSimple extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->schema([
+    public static function form(Form $form): Form{
+        return $form->schema([
             Section::make(__('recommendation_configs_simple.basic_information'))
                 ->schema([
                     Grid::make(2)

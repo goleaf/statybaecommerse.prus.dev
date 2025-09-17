@@ -10,23 +10,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('cart_items')) {
-            Schema::table('cart_items', function (Blueprint $table) {
-                if (! Schema::hasColumn('cart_items', 'deleted_at')) {
-                    $table->softDeletes();
-                }
-            });
-        }
+        Schema::table('cart_items', function (Blueprint $table) {
+            $table->softDeletes();
+        });
     }
 
     public function down(): void
     {
-        if (Schema::hasTable('cart_items')) {
-            Schema::table('cart_items', function (Blueprint $table) {
-                if (Schema::hasColumn('cart_items', 'deleted_at')) {
-                    $table->dropSoftDeletes();
-                }
-            });
-        }
+        Schema::table('cart_items', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

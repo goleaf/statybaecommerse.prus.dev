@@ -63,9 +63,9 @@ final class ProductCatalog extends Component
     #[Computed]
     public function brands(): Collection
     {
-        return Brand::where('is_visible', true)->orderBy('name')->get()->skipWhile(function ($brand) {
+        return Brand::orderBy('name')->get()->skipWhile(function ($brand) {
             // Skip brands that are not properly configured for display
-            return empty($brand->name) || !$brand->is_visible || empty($brand->slug);
+            return empty($brand->name) || !$brand->is_enabled || empty($brand->slug);
         });
     }
     /**

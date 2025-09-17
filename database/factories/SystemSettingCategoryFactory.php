@@ -122,3 +122,4 @@ final class SystemSettingCategoryFactory extends Factory
         ]);
     }
 }
+

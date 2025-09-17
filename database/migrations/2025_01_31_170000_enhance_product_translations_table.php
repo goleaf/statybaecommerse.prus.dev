@@ -1,68 +1,65 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         if (Schema::hasTable('product_translations')) {
             Schema::table('product_translations', function (Blueprint $table) {
-                // Add missing translation fields if they don't exist
-                if (! Schema::hasColumn('product_translations', 'short_description')) {
+                if (!Schema::hasColumn('product_translations', 'short_description')) {
                     $table->text('short_description')->nullable()->after('summary');
                 }
-
-                if (! Schema::hasColumn('product_translations', 'meta_keywords')) {
+                if (!Schema::hasColumn('product_translations', 'meta_keywords')) {
                     $table->json('meta_keywords')->nullable()->after('seo_description');
                 }
-
-                if (! Schema::hasColumn('product_translations', 'alt_text')) {
+                if (!Schema::hasColumn('product_translations', 'alt_text')) {
                     $table->string('alt_text')->nullable()->after('meta_keywords');
                 }
             });
         }
 
-        // Ensure the products table has all necessary fields
         if (Schema::hasTable('products')) {
             Schema::table('products', function (Blueprint $table) {
-                // Add missing fields if they don't exist
-                $fields = [
-                    'barcode' => 'string',
-                    'compare_price' => 'decimal:2',
-                    'cost_price' => 'decimal:2',
-                    'track_stock' => 'boolean',
-                    'allow_backorder' => 'boolean',
-                    'video_url' => 'string',
-                    'metadata' => 'json',
-                    'sort_order' => 'integer',
-                    'tax_class' => 'string',
-                    'shipping_class' => 'string',
-                    'download_limit' => 'integer',
-                    'download_expiry' => 'integer',
-                    'external_url' => 'string',
-                    'button_text' => 'string',
-                    'is_requestable' => 'boolean',
-                    'requests_count' => 'integer',
-                    'minimum_quantity' => 'integer',
-                    'hide_add_to_cart' => 'boolean',
-                    'request_message' => 'text',
-                ];
+                $stringColumns = ['barcode', 'video_url', 'tax_class', 'shipping_class', 'external_url', 'button_text'];
+                foreach ($stringColumns as $col) {
+                    if (!Schema::hasColumn('products', $col)) {
+                        $table->string($col)->nullable();
+                    }
+                }
 
-                foreach ($fields as $field => $type) {
-                    if (! Schema::hasColumn('products', $field)) {
-                        match ($type) {
-                            'string' => $table->string($field)->nullable(),
-                            'text' => $table->text($field)->nullable(),
-                            'boolean' => $table->boolean($field)->default(false),
-                            'integer' => $table->integer($field)->default(0),
-                            'decimal:2' => $table->decimal($field, 10, 2)->nullable(),
-                            'json' => $table->json($field)->nullable(),
-                        };
+                $decimalColumns = ['compare_price', 'cost_price'];
+                foreach ($decimalColumns as $col) {
+                    if (!Schema::hasColumn('products', $col)) {
+                        $table->decimal($col, 15, 2)->nullable();
+                    }
+                }
+
+                $boolColumns = ['track_stock', 'allow_backorder', 'is_requestable', 'hide_add_to_cart'];
+                foreach ($boolColumns as $col) {
+                    if (!Schema::hasColumn('products', $col)) {
+                        $table->boolean($col)->default(in_array($col, ['track_stock'], true));
+                    }
+                }
+
+                $intColumns = ['sort_order', 'download_limit', 'download_expiry', 'requests_count', 'minimum_quantity'];
+                foreach ($intColumns as $col) {
+                    if (!Schema::hasColumn('products', $col)) {
+                        $table->integer($col)->default(match ($col) {
+                            'sort_order' => 0,
+                            'requests_count' => 0,
+                            'minimum_quantity' => 1,
+                            default => 0,
+                        });
+                    }
+                }
+
+                $jsonColumns = ['metadata', 'request_message'];
+                foreach ($jsonColumns as $col) {
+                    if (!Schema::hasColumn('products', $col)) {
+                        $table->json($col)->nullable();
                     }
                 }
             });
@@ -73,13 +70,17 @@ return new class extends Migration
     {
         if (Schema::hasTable('product_translations')) {
             Schema::table('product_translations', function (Blueprint $table) {
-                $table->dropColumn(['short_description', 'meta_keywords', 'alt_text']);
+                foreach (['short_description', 'meta_keywords', 'alt_text'] as $column) {
+                    if (Schema::hasColumn('product_translations', $column)) {
+                        $table->dropColumn($column);
+                    }
+                }
             });
         }
 
         if (Schema::hasTable('products')) {
             Schema::table('products', function (Blueprint $table) {
-                $table->dropColumn([
+                $columns = [
                     'barcode',
                     'compare_price',
                     'cost_price',
@@ -99,7 +100,12 @@ return new class extends Migration
                     'minimum_quantity',
                     'hide_add_to_cart',
                     'request_message',
-                ]);
+                ];
+                foreach ($columns as $column) {
+                    if (Schema::hasColumn('products', $column)) {
+                        $table->dropColumn($column);
+                    }
+                }
             });
         }
     }

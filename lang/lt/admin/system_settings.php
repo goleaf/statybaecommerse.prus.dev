@@ -153,3 +153,4 @@ return [
     'is_false' => 'Netiesa',
     'unknown_setting' => 'Nežinomas nustatymas',
 ];
+

@@ -1,36 +1,17 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up(): void
     {
-        Schema::table('collection_translations', function (Blueprint $table) {
-            $table->string('meta_title')->nullable()->after('seo_description');
-            $table->text('meta_description')->nullable()->after('meta_title');
-            $table->json('meta_keywords')->nullable()->after('meta_description');
-        });
+        // No-op: collection_translations meta fields handled in earlier schema
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('collection_translations', function (Blueprint $table) {
-            $table->dropColumn([
-                'meta_title',
-                'meta_description',
-                'meta_keywords',
-            ]);
-        });
+        // No-op
     }
 };

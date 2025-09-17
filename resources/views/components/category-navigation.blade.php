@@ -20,7 +20,7 @@
             @foreach ($categories as $category)
                 <div class="relative group flex-shrink-0" x-data="{ open: false }">
                     {{-- Main Category Link --}}
-                    <a href="{{ route('categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug]) ?? '/categories/' . $category->slug }}"
+                    <a href="{{ localized_route('categories.show', ['category' => $category->slug]) }}"
                        class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors duration-200"
                        @mouseenter="open = true"
                        @mouseleave="open = false">
@@ -72,7 +72,7 @@
 
                             <div class="py-2">
                                 @foreach ($category->children as $subcategory)
-                                    <a href="{{ route('categories.show', ['locale' => app()->getLocale(), 'category' => $subcategory->slug]) ?? '/categories/' . $subcategory->slug }}"
+                                    <a href="{{ localized_route('categories.show', ['category' => $subcategory->slug]) }}"
                                        class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors duration-200">
 
                                         @if ($showImages && $subcategory->getFirstMediaUrl('images'))
@@ -98,7 +98,7 @@
 
                                 @if ($category->children->count() > 5)
                                     <div class="border-t border-gray-100 mt-2 pt-2">
-                                        <a href="{{ route('categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug]) ?? '/categories/' . $category->slug }}"
+                                        <a href="{{ localized_route('categories.show', ['category' => $category->slug]) }}"
                                            class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors duration-200">
                                             <span>{{ __('View All') }} {{ $category->name }}</span>
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -117,7 +117,7 @@
 
             {{-- View All Categories Link --}}
             <div class="flex-shrink-0">
-                <a href="{{ route('categories.index', ['locale' => app()->getLocale()]) ?? '/categories' }}"
+                <a href="{{ localized_route('categories.index') }}"
                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -129,4 +129,3 @@
         </nav>
     </div>
 </div>
-

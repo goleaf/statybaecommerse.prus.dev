@@ -1,49 +1,45 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
-use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Repeater;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Notifications\Notification;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
 /**
  * AttributeResource
- * 
+ *
  * Filament v4 resource for Attribute management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class AttributeResource extends Resource
 {
     protected static ?string $model = Attribute::class;
-    
-    /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
-    
+
     protected static ?int $navigationSort = 8;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -84,8 +80,6 @@ final class AttributeResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
@@ -98,7 +92,6 @@ final class AttributeResource extends Resource
                                 ->label(__('attributes.name'))
                                 ->required()
                                 ->maxLength(255),
-                            
                             TextInput::make('slug')
                                 ->label(__('attributes.slug'))
                                 ->required()
@@ -106,14 +99,12 @@ final class AttributeResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
                         ]),
-                    
                     Textarea::make('description')
                         ->label(__('attributes.description'))
                         ->rows(3)
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            
             Section::make(__('attributes.type_settings'))
                 ->schema([
                     Grid::make(2)
@@ -135,7 +126,6 @@ final class AttributeResource extends Resource
                                 ->required()
                                 ->default('text')
                                 ->live(),
-                            
                             Select::make('input_type')
                                 ->label(__('attributes.input_type'))
                                 ->options([
@@ -150,19 +140,16 @@ final class AttributeResource extends Resource
                                 ])
                                 ->default('text'),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             Toggle::make('is_required')
                                 ->label(__('attributes.is_required'))
                                 ->default(false),
-                            
                             Toggle::make('is_filterable')
                                 ->label(__('attributes.is_filterable'))
                                 ->default(true),
                         ]),
                 ]),
-            
             Section::make(__('attributes.validation'))
                 ->schema([
                     Grid::make(2)
@@ -171,31 +158,26 @@ final class AttributeResource extends Resource
                                 ->label(__('attributes.min_length'))
                                 ->numeric()
                                 ->minValue(0),
-                            
                             TextInput::make('max_length')
                                 ->label(__('attributes.max_length'))
                                 ->numeric()
                                 ->minValue(0),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             TextInput::make('min_value')
                                 ->label(__('attributes.min_value'))
                                 ->numeric(),
-                            
                             TextInput::make('max_value')
                                 ->label(__('attributes.max_value'))
                                 ->numeric(),
                         ]),
-                    
                     TextInput::make('validation_rules')
                         ->label(__('attributes.validation_rules'))
                         ->maxLength(500)
                         ->helperText(__('attributes.validation_rules_help'))
                         ->columnSpanFull(),
                 ]),
-            
             Section::make(__('attributes.options'))
                 ->schema([
                     Repeater::make('options')
@@ -205,18 +187,15 @@ final class AttributeResource extends Resource
                                 ->label(__('attributes.option_value'))
                                 ->required()
                                 ->maxLength(255),
-                            
                             TextInput::make('label')
                                 ->label(__('attributes.option_label'))
                                 ->required()
                                 ->maxLength(255),
-                            
                             TextInput::make('sort_order')
                                 ->label(__('attributes.option_sort_order'))
                                 ->numeric()
                                 ->default(0)
                                 ->minValue(0),
-                            
                             Toggle::make('is_active')
                                 ->label(__('attributes.option_is_active'))
                                 ->default(true),
@@ -225,7 +204,6 @@ final class AttributeResource extends Resource
                         ->addActionLabel(__('attributes.add_option'))
                         ->columnSpanFull(),
                 ]),
-            
             Section::make(__('attributes.settings'))
                 ->schema([
                     Grid::make(2)
@@ -233,12 +211,10 @@ final class AttributeResource extends Resource
                             Toggle::make('is_active')
                                 ->label(__('attributes.is_active'))
                                 ->default(true),
-                            
                             Toggle::make('is_searchable')
                                 ->label(__('attributes.is_searchable'))
                                 ->default(false),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             TextInput::make('sort_order')
@@ -246,7 +222,6 @@ final class AttributeResource extends Resource
                                 ->numeric()
                                 ->default(0)
                                 ->minValue(0),
-                            
                             Select::make('group')
                                 ->label(__('attributes.group'))
                                 ->options([
@@ -278,7 +253,6 @@ final class AttributeResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
-                
                 TextColumn::make('slug')
                     ->label(__('attributes.slug'))
                     ->searchable()
@@ -286,12 +260,11 @@ final class AttributeResource extends Resource
                     ->copyable()
                     ->badge()
                     ->color('gray'),
-                
                 TextColumn::make('type')
                     ->label(__('attributes.type'))
-                    ->formatStateUsing(fn (string $state): string => __("attributes.types.{$state}"))
+                    ->formatStateUsing(fn(string $state): string => __("attributes.types.{$state}"))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'text' => 'blue',
                         'number' => 'green',
                         'select' => 'purple',
@@ -304,54 +277,45 @@ final class AttributeResource extends Resource
                         'url' => 'teal',
                         default => 'gray',
                     }),
-                
                 TextColumn::make('group')
                     ->label(__('attributes.group'))
-                    ->formatStateUsing(fn (string $state): string => __("attributes.groups.{$state}"))
+                    ->formatStateUsing(fn(string $state): string => __("attributes.groups.{$state}"))
                     ->badge()
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('options_count')
                     ->label(__('attributes.options_count'))
                     ->counts('options')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('is_required')
                     ->label(__('attributes.is_required'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('is_filterable')
                     ->label(__('attributes.is_filterable'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('is_searchable')
                     ->label(__('attributes.is_searchable'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('is_active')
                     ->label(__('attributes.is_active'))
                     ->boolean()
                     ->sortable(),
-                
                 TextColumn::make('sort_order')
                     ->label(__('attributes.sort_order'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('created_at')
                     ->label(__('attributes.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('updated_at')
                     ->label(__('attributes.updated_at'))
                     ->dateTime()
@@ -373,7 +337,6 @@ final class AttributeResource extends Resource
                         'file' => __('attributes.types.file'),
                         'url' => __('attributes.types.url'),
                     ]),
-                
                 SelectFilter::make('group')
                     ->label(__('attributes.group'))
                     ->options([
@@ -385,28 +348,24 @@ final class AttributeResource extends Resource
                         'seo' => __('attributes.groups.seo'),
                         'other' => __('attributes.groups.other'),
                     ]),
-                
                 TernaryFilter::make('is_required')
                     ->label(__('attributes.is_required'))
                     ->boolean()
                     ->trueLabel(__('attributes.required_only'))
                     ->falseLabel(__('attributes.optional_only'))
                     ->native(false),
-                
                 TernaryFilter::make('is_filterable')
                     ->label(__('attributes.is_filterable'))
                     ->boolean()
                     ->trueLabel(__('attributes.filterable_only'))
                     ->falseLabel(__('attributes.not_filterable'))
                     ->native(false),
-                
                 TernaryFilter::make('is_searchable')
                     ->label(__('attributes.is_searchable'))
                     ->boolean()
                     ->trueLabel(__('attributes.searchable_only'))
                     ->falseLabel(__('attributes.not_searchable'))
                     ->native(false),
-                
                 TernaryFilter::make('is_active')
                     ->label(__('attributes.is_active'))
                     ->boolean()
@@ -417,14 +376,13 @@ final class AttributeResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                
                 TableAction::make('toggle_active')
-                    ->label(fn (Attribute $record): string => $record->is_active ? __('attributes.deactivate') : __('attributes.activate'))
-                    ->icon(fn (Attribute $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (Attribute $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn(Attribute $record): string => $record->is_active ? __('attributes.deactivate') : __('attributes.activate'))
+                    ->icon(fn(Attribute $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(Attribute $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Attribute $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-                        
+
                         Notification::make()
                             ->title($record->is_active ? __('attributes.activated_successfully') : __('attributes.deactivated_successfully'))
                             ->success()
@@ -435,28 +393,26 @@ final class AttributeResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    
                     BulkAction::make('activate')
                         ->label(__('attributes.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-                            
+
                             Notification::make()
                                 ->title(__('attributes.bulk_activated_success'))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    
                     BulkAction::make('deactivate')
                         ->label(__('attributes.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-                            
+
                             Notification::make()
                                 ->title(__('attributes.bulk_deactivated_success'))
                                 ->success()

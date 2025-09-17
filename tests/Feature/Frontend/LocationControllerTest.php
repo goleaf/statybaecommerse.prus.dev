@@ -26,7 +26,7 @@ final class LocationControllerTest extends TestCase
         $country = $this->createTestCountry();
         Location::factory()->count(5)->create(['country_code' => 'LT']);
         
-        $response = $this->get(route('locations.index'));
+        $response = $this->get(localized_route('locations.index'));
         
         $response->assertOk()
             ->assertViewIs('locations.index')
@@ -38,7 +38,7 @@ final class LocationControllerTest extends TestCase
         $country = $this->createTestCountry();
         $location = Location::factory()->create(['country_code' => 'LT']);
         
-        $response = $this->get(route('locations.show', $location));
+        $response = $this->get(localized_route('locations.show', $location));
         
         $response->assertOk()
             ->assertViewIs('locations.show')
@@ -51,7 +51,7 @@ final class LocationControllerTest extends TestCase
         Location::factory()->create(['type' => 'warehouse', 'is_enabled' => true, 'country_code' => 'LT']);
         Location::factory()->create(['type' => 'store', 'is_enabled' => true, 'country_code' => 'LT']);
         
-        $response = $this->get(route('locations.index', [
+        $response = $this->get(localized_route('locations.index', [
             'type' => 'warehouse',
         ]));
         
@@ -67,7 +67,7 @@ final class LocationControllerTest extends TestCase
             'country_code' => 'LT',
         ]);
         
-        $response = $this->getJson(route('locations.api.search', ['q' => 'Test']));
+        $response = $this->getJson(localized_route('locations.api.search', ['q' => 'Test']));
         
         $response->assertOk()
             ->assertJsonStructure(['data']);
@@ -79,7 +79,7 @@ final class LocationControllerTest extends TestCase
         Location::factory()->create(['type' => 'warehouse', 'country_code' => 'LT']);
         Location::factory()->create(['type' => 'store', 'country_code' => 'LT']);
         
-        $response = $this->getJson(route('locations.api.by-type', 'warehouse'));
+        $response = $this->getJson(localized_route('locations.api.by-type', 'warehouse'));
         
         $response->assertOk()
             ->assertJsonStructure(['data']);
@@ -90,7 +90,7 @@ final class LocationControllerTest extends TestCase
         $country = $this->createTestCountry();
         Location::factory()->create(['country_code' => 'LT']);
         
-        $response = $this->getJson(route('locations.api.by-country', $country));
+        $response = $this->getJson(localized_route('locations.api.by-country', $country));
         
         $response->assertOk()
             ->assertJsonStructure(['data']);
@@ -101,7 +101,7 @@ final class LocationControllerTest extends TestCase
         $country = $this->createTestCountry();
         Location::factory()->create(['city' => 'Vilnius', 'country_code' => 'LT']);
         
-        $response = $this->getJson(route('locations.api.by-city', 'Vilnius'));
+        $response = $this->getJson(localized_route('locations.api.by-city', 'Vilnius'));
         
         $response->assertOk()
             ->assertJsonStructure(['data']);
@@ -116,7 +116,7 @@ final class LocationControllerTest extends TestCase
             'country_code' => 'LT',
         ]);
         
-        $response = $this->getJson(route('locations.api.nearby', [
+        $response = $this->getJson(localized_route('locations.api.nearby', [
             'lat' => 54.6872,
             'lng' => 25.2797,
             'radius' => 10,
@@ -128,7 +128,7 @@ final class LocationControllerTest extends TestCase
 
     public function test_location_nearby_api_without_coordinates(): void
     {
-        $response = $this->getJson(route('locations.api.nearby'));
+        $response = $this->getJson(localized_route('locations.api.nearby'));
         
         $response->assertStatus(400)
             ->assertJson(['error' => 'Latitude and longitude are required']);
@@ -140,7 +140,7 @@ final class LocationControllerTest extends TestCase
         Location::factory()->count(3)->create(['type' => 'warehouse', 'country_code' => 'LT']);
         Location::factory()->count(2)->create(['type' => 'store', 'country_code' => 'LT']);
         
-        $response = $this->getJson(route('locations.api.statistics'));
+        $response = $this->getJson(localized_route('locations.api.statistics'));
         
         $response->assertOk()
             ->assertJsonStructure([
@@ -159,7 +159,7 @@ final class LocationControllerTest extends TestCase
             'country_code' => 'LT',
         ]);
         
-        $response = $this->get(route('locations.show', $location));
+        $response = $this->get(localized_route('locations.show', $location));
         
         $response->assertOk()
             ->assertSee('Test Location')
@@ -171,7 +171,7 @@ final class LocationControllerTest extends TestCase
         $country = $this->createTestCountry();
         Location::factory()->count(15)->create(['country_code' => 'LT']);
         
-        $response = $this->get(route('locations.index'));
+        $response = $this->get(localized_route('locations.index'));
         
         $response->assertOk();
         $this->assertTrue(true); // Page loads successfully with many locations

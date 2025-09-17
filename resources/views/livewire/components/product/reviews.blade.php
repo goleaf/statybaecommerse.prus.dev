@@ -1,11 +1,11 @@
 <div class="mt-8">
     <h2 class="text-lg font-semibold">{{ __('frontend.products.customer_reviews') }}</h2>
 
-    @if ($reviews->isEmpty())
+    @if ($this->reviews->isEmpty())
         <p class="text-sm text-gray-500 mt-2">{{ __('frontend.products.no_reviews_yet') }}</p>
     @else
         <ul class="mt-4 space-y-4">
-            @foreach ($reviews as $r)
+            @foreach ($this->reviews as $r)
                 <li class="border rounded-md p-3">
                     <div class="flex items-center justify-between">
                         <strong>{{ $r->title }}</strong>
@@ -18,9 +18,9 @@
             @endforeach
         </ul>
 
-        @if ($reviews->hasPages())
+        @if ($this->reviews->hasPages())
             <div class="mt-6">
-                {{ $reviews->links('components.pagination') }}
+                {{ $this->reviews->links('components.pagination') }}
             </div>
         @endif
     @endif

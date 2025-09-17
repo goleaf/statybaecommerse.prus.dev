@@ -25,3 +25,4 @@ final class EditDiscountCondition extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 }
+

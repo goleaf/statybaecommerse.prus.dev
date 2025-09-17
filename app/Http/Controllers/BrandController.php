@@ -39,7 +39,7 @@ final class BrandController extends Controller
         $canonicalSlug = $this->getCanonicalSlug($brand);
         // If the current slug is not the canonical slug, redirect
         if ($canonicalSlug !== $slug) {
-            return redirect()->route('localized.brands.show', ['locale' => $locale, 'slug' => $canonicalSlug], 301);
+            return redirect(localized_route('brands.show', ['slug' => $canonicalSlug], true, $locale), 301);
         }
         // Load products for this brand
         $products = $brand->products()->with(['media', 'translations'])->where('is_visible', true)->whereNotNull('published_at')->latest()->limit(12)->get()->skipWhile(function ($product) {

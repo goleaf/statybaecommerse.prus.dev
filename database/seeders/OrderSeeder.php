@@ -18,8 +18,7 @@ class OrderSeeder extends Seeder
             $currency = \App\Models\Currency::query()->where('code', 'EUR')->first()
                 ?: \App\Models\Currency::query()->where('is_default', true)->first();
 
-            $zone = \App\Models\Zone::query()->where('currency_id', $currency->id)->first()
-                ?: \App\Models\Zone::query()->first();
+            $zone = null;
             $channelId = \App\Models\Channel::query()->value('id');
 
             if (! $currency || ! $zone || ! $channelId) {
@@ -54,7 +53,7 @@ class OrderSeeder extends Seeder
                         'number' => 'WEB-'.Str::upper(Str::random(8)),
                         'currency' => $currency->code,
                         'channel_id' => $channelId,
-                        'zone_id' => $zone->id,
+                        'zone_id' => null,
                         'user_id' => $user->id,
                         'payment_method' => 'card',
                         'payment_status' => 'paid',
@@ -67,13 +66,16 @@ class OrderSeeder extends Seeder
                     $items = $visibleProducts->random(min(random_int(1, 4), $visibleProducts->count()));
                     $subtotal = 0.0;
                     foreach ($items as $p) {
+                        $resolvedName = is_array($p->name)
+                            ? ($p->name['lt'] ?? ($p->name['en'] ?? reset($p->name)))
+                            : $p->name;
                         $unit = (float) (optional($p->prices()->whereHas('currency', fn ($q) => $q->where('code', $currency->code))->first())->amount ?? (random_int(1000, 5000) / 100));
                         $qty = random_int(1, 3);
                         $lineTotal = $unit * $qty;
                         $subtotal += $lineTotal;
                         $order->items()->create([
                             'product_id' => $p->id,
-                            'name' => $p->name,
+                            'name' => $resolvedName,
                             'sku' => $p->sku ?? 'SKU-'.Str::upper(Str::random(6)),
                             'unit_price' => $unit,
                             'quantity' => $qty,

@@ -51,7 +51,7 @@
         </x-alert>
     @endif
     <x-breadcrumbs :items="[
-        ['label' => __('Collections'), 'url' => route('collection.index', ['locale' => app()->getLocale()])],
+        ['label' => __('Collections'), 'url' => route('collection.index', [])],
         ['label' => $collection->trans('name') ?? $collection->name],
     ]" />
     <div class="flex items-center justify-between mb-6">
@@ -89,7 +89,7 @@
                 @endif
             @endforeach
             @if (collect($brandIds)->filter()->isNotEmpty())
-                <button type="button" wire:click="clearBrandFilters" 
+                <button type="button" wire:click="clearBrandFilters"
                         wire:confirm="{{ __('translations.confirm_clear_brand_filters') }}"
                         class="text-xs underline">
                     {{ __('Clear all') }}
@@ -122,7 +122,7 @@
                     @endif
                 @endforeach
                 @if (collect($selectedValues)->filter()->isNotEmpty())
-                    <button type="button" wire:click="clearAttributeFilters" 
+                    <button type="button" wire:click="clearAttributeFilters"
                             wire:confirm="{{ __('translations.confirm_clear_attribute_filters') }}"
                             class="text-xs underline">
                         {{ __('Clear all') }}
@@ -176,7 +176,7 @@
 
     <!-- Back Button -->
     <div class="mt-8 text-center">
-        <a href="{{ route('collections.index', ['locale' => app()->getLocale()]) }}" 
+        <a href="{{ route('collections.index', []) }}"
            class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition duration-200">
             <x-heroicon-o-arrow-left class="w-4 h-4 mr-2" />
             {{ __('frontend.buttons.back_to_collections') }}
@@ -189,10 +189,14 @@
         $elements = [];
         $position = 1;
         foreach ($products as $p) {
+            $productSlug = $p->trans('slug') ?? $p->slug;
+            if (empty($productSlug)) {
+                continue; // Skip products without valid slug
+            }
             $elements[] = [
                 '@type' => 'ListItem',
                 'position' => $position++,
-                'url' => route('product.show', $p->trans('slug') ?? $p->slug),
+                'url' => route('product.show', $productSlug),
                 'name' => $p->trans('name') ?? $p->name,
             ];
         }

@@ -15,7 +15,7 @@
             @if ($product->brand_id)
                 <p class="mt-1 text-sm text-gray-500">
                     @if ($product->brand)
-                        <x-link :href="route('brands.show', $product->brand)">
+                        <x-link :href="localized_route('brands.show', $product->brand)">
                             {{ $product->brand?->trans('name') ?? $product->brand?->name }}
                         </x-link>
                     @else

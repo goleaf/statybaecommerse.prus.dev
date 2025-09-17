@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\URL;
 
 final class SetLocale
 {
@@ -40,6 +41,7 @@ final class SetLocale
 
         // Set application locale
         App::setLocale($locale);
+        URL::defaults(['locale' => $locale]);
 
         // Store in session and cookie for persistence
         Session::put('locale', $locale);

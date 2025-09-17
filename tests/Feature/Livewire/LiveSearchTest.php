@@ -246,7 +246,7 @@ final class LiveSearchTest extends TestCase
 
         $component->call('selectResult', $productResult);
 
-        $component->assertRedirect(route('products.show', 'test-product'));
+        $component->assertRedirect(localized_route('products.show', 'test-product'));
     }
 
     public function test_live_search_clears_results_when_select_result(): void

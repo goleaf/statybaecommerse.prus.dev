@@ -136,7 +136,7 @@ final class ProductComparison extends Component
      */
     public function navigateToComparison(): void
     {
-        $this->redirect(route('products.compare', ['locale' => app()->getLocale(), 'products' => implode(',', $this->compareProducts)]));
+        $this->redirect(localized_route('products.compare', ['products' => implode(',', $this->compareProducts)]));
     }
     /**
      * Render the Livewire component view with current state.

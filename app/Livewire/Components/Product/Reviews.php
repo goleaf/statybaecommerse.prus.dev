@@ -1,6 +1,5 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Livewire\Components\Product;
 
 use App\Models\Product;
@@ -10,18 +9,21 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
+
 /**
  * Reviews
- * 
+ *
  * Livewire component for Reviews with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property int $productId
  * @property mixed $listeners
  */
 class Reviews extends Component
 {
     use WithPagination;
+
     public int $productId;
+
     /**
      * Initialize the Livewire component with parameters.
      * @param int $productId
@@ -31,7 +33,9 @@ class Reviews extends Component
     {
         $this->productId = $productId;
     }
+
     protected $listeners = ['review-submitted' => '$refresh'];
+
     /**
      * Handle reviews functionality with proper error handling.
      * @return LengthAwarePaginator
@@ -39,8 +43,13 @@ class Reviews extends Component
     #[Computed]
     public function reviews(): LengthAwarePaginator
     {
-        return Review::query()->where('reviewrateable_type', app(Product::class)->getMorphClass())->where('reviewrateable_id', $this->productId)->where('approved', true)->latest('id')->paginate(10);
+        return Review::query()
+            ->where('product_id', $this->productId)
+            ->where('is_approved', true)
+            ->latest('id')
+            ->paginate(10);
     }
+
     /**
      * Render the Livewire component view with current state.
      * @return View

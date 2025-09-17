@@ -46,3 +46,4 @@ final class NewsCommentFactory extends Factory
         ]);
     }
 }
+

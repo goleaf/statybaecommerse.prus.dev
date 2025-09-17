@@ -7,7 +7,7 @@ namespace App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Filament\Resources\AnalyticsEventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Forms\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListAnalyticsEvents extends ListRecords
@@ -56,3 +56,4 @@ final class ListAnalyticsEvents extends ListRecords
         ];
     }
 }
+

@@ -9,7 +9,7 @@
     <x-container class="py-6 md:py-10">
         <nav class="text-sm text-muted-700 mb-3 md:mb-6" aria-label="Breadcrumb">
             <ol class="list-reset flex items-center gap-2">
-                <li><a href="{{ route('home') }}" class="hover:text-gray-900">{{ __('Home') }}</a></li>
+                <li><a href="{{ localized_route('home') }}" class="hover:text-gray-900">{{ __('Home') }}</a></li>
                 <li class="text-gray-400" aria-hidden="true">/</li>
                 <li aria-current="page" class="text-gray-700 font-medium">{{ __('Categories') }}</li>
             </ol>
@@ -72,7 +72,7 @@
                         <div class="bg-white rounded-xl border p-4 shadow-sm">
                             <div class="flex items-center justify-between mb-3">
                                 <h3 class="text-sm font-semibold">{{ __('Filters') }}</h3>
-                                <a href="{{ route('categories.index') }}"
+                                <a href="{{ localized_route('categories.index') }}"
                                    class="text-sm text-gray-600 hover:underline">{{ __('Clear all') }}</a>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
@@ -177,7 +177,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <a href="{{ route('categories.index') }}"
+                        <a href="{{ localized_route('categories.index') }}"
                            class="text-sm text-gray-600 hover:underline">{{ __('Clear all') }}</a>
 
                         <div class="mt-4 space-y-4">
@@ -293,7 +293,7 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                             @foreach ($this->categories as $category)
-                                <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug ?? $category]) }}"
+                                <a href="{{ route('localized.categories.show', ['category' => $category->slug ?? $category]) }}"
                                    class="group relative overflow-hidden rounded-xl border bg-white shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     <div class="aspect-square bg-gray-100 relative overflow-hidden">
                                         @php

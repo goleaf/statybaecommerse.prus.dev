@@ -1,29 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
+use App\Enums\AddressType;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
+use App\Models\City;
 use App\Models\Country;
 use App\Models\Zone;
-use App\Models\City;
-use App\Enums\AddressType;
-use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\View\View;
+
 /**
  * AddressController
- * 
+ *
  * HTTP controller handling AddressController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class AddressController extends Controller
 {
     use AuthorizesRequests;
+
     /**
      * Display a listing of the resource with pagination and filtering.
      * @return View
@@ -34,6 +34,7 @@ final class AddressController extends Controller
         $addresses = Address::where('user_id', $user->id)->where('is_active', true)->orderBy('is_default', 'desc')->orderBy('created_at', 'desc')->get();
         return view('addresses.index', compact('addresses'));
     }
+
     /**
      * Show the form for creating a new resource.
      * @return View
@@ -44,6 +45,7 @@ final class AddressController extends Controller
         $addressTypes = AddressType::options();
         return view('addresses.create', compact('countries', 'addressTypes'));
     }
+
     /**
      * Store a newly created resource in storage with validation.
      * @param Request $request
@@ -51,7 +53,7 @@ final class AddressController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $validator = Validator::make($request->all(), ['type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'zone_id' => 'nullable|exists:zones,id',  'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255']);
+        $validator = Validator::make($request->all(), ['type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255']);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -65,6 +67,7 @@ final class AddressController extends Controller
         $address = Address::create($data);
         return redirect()->route('frontend.addresses.index')->with('success', __('translations.address_created_successfully'));
     }
+
     /**
      * Display the specified resource with related data.
      * @param Address $address
@@ -75,6 +78,7 @@ final class AddressController extends Controller
         $this->authorize('view', $address);
         return view('addresses.show', compact('address'));
     }
+
     /**
      * Show the form for editing the specified resource.
      * @param Address $address
@@ -87,6 +91,7 @@ final class AddressController extends Controller
         $addressTypes = AddressType::options();
         return view('addresses.edit', compact('address', 'countries', 'addressTypes'));
     }
+
     /**
      * Update the specified resource in storage with validation.
      * @param Request $request
@@ -96,7 +101,7 @@ final class AddressController extends Controller
     public function update(Request $request, Address $address): RedirectResponse
     {
         $this->authorize('update', $address);
-        $validator = Validator::make($request->all(), ['type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'zone_id' => 'nullable|exists:zones,id',  'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255']);
+        $validator = Validator::make($request->all(), ['type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255']);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -108,6 +113,7 @@ final class AddressController extends Controller
         $address->update($data);
         return redirect()->route('frontend.addresses.index')->with('success', __('translations.address_updated_successfully'));
     }
+
     /**
      * Remove the specified resource from storage.
      * @param Address $address
@@ -119,6 +125,7 @@ final class AddressController extends Controller
         $address->delete();
         return redirect()->route('frontend.addresses.index')->with('success', __('translations.address_deleted_successfully'));
     }
+
     /**
      * Handle setDefault functionality with proper error handling.
      * @param Address $address
@@ -130,6 +137,7 @@ final class AddressController extends Controller
         $address->setAsDefault();
         return redirect()->route('frontend.addresses.index')->with('success', __('translations.address_set_as_default'));
     }
+
     /**
      * Handle duplicate functionality with proper error handling.
      * @param Address $address
@@ -141,6 +149,7 @@ final class AddressController extends Controller
         $newAddress = $address->duplicateForUser(Auth::id());
         return redirect()->route('frontend.addresses.edit', $newAddress)->with('success', __('translations.address_duplicated'));
     }
+
     /**
      * Handle getCountries functionality with proper error handling.
      * @return Illuminate\Http\JsonResponse
@@ -150,6 +159,7 @@ final class AddressController extends Controller
         $countries = Country::orderBy('name')->get(['id', 'name', 'cca2']);
         return response()->json($countries);
     }
+
     /**
      * Handle getZones functionality with proper error handling.
      * @param Request $request
@@ -160,6 +170,7 @@ final class AddressController extends Controller
         $zones = Zone::where('country_id', $request->country_id)->orderBy('name')->get(['id', 'name']);
         return response()->json($zones);
     }
+
     /**
      * Handle getCities functionality with proper error handling.
      * @param Request $request

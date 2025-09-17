@@ -38,14 +38,14 @@
                                      class="absolute top-full left-0 mt-1 w-64 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                                     <div class="py-2">
                                         <a
-                                           href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category['slug']]) }}"
+                                           href="{{ route('localized.categories.show', ['category' => $category['slug']]) }}"
                                            class="block px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 border-b border-gray-100">
                                             {{ __('translations.view_all') }} {{ $category['name'] }}
                                         </a>
 
                                         @foreach ($category['children'] as $child)
                                             <a
-                                               href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $child['slug']]) }}"
+                                               href="{{ route('localized.categories.show', ['category' => $child['slug']]) }}"
                                                class="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
                                                 <span>{{ $child['name'] }}</span>
                                                 @if ($child['products_count'] > 0)
@@ -71,7 +71,7 @@
 
             <div class="flex items-center space-x-4">
                 <a
-                   href="{{ route('categories.index') }}"
+                   href="{{ localized_route('categories.index') }}"
                    class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                     {{ __('translations.view_all_categories') }}
                 </a>

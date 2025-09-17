@@ -223,7 +223,7 @@ final class ProductPage extends Component
     {
         // Implement sharing functionality
         $this->dispatch('share-product', [
-            'url' => route('products.show', $this->product),
+            'url' => localized_route('products.show', $this->product),
             'title' => $this->product->name,
             'description' => $this->product->short_description,
         ]);

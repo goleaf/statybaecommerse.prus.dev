@@ -1,32 +1,34 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
-        if (Schema::hasTable('countries')) {
-            Schema::table('countries', function (Blueprint $table) {
-                if (! Schema::hasColumn('countries', 'created_at')) {
-                    $table->timestamps();
-                }
-            });
+        if (!Schema::hasTable('countries')) {
+            return;
         }
+
+        Schema::table('countries', function (Blueprint $table) {
+            if (!Schema::hasColumn('countries', 'created_at') && !Schema::hasColumn('countries', 'updated_at')) {
+                $table->timestamps();
+            }
+        });
     }
 
     public function down(): void
     {
-        if (Schema::hasTable('countries')) {
-            Schema::table('countries', function (Blueprint $table) {
-                if (Schema::hasColumn('countries', 'created_at')) {
-                    $table->dropTimestamps();
-                }
-            });
+        if (!Schema::hasTable('countries')) {
+            return;
         }
+
+        Schema::table('countries', function (Blueprint $table) {
+            try {
+                $table->dropTimestamps();
+            } catch (\Throwable $e) {
+            }
+        });
     }
 };

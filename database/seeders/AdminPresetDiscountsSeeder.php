@@ -12,7 +12,7 @@ class AdminPresetDiscountsSeeder extends Seeder
     {
         DB::transaction(function () {
             // 1) VIP 12% sitewide (stacking off -> single_best), priority 20, customer_group condition
-            $vipGroupId = DB::table('sh_customer_groups')->where('code', 'vip')->value('id');
+            $vipGroupId = DB::table('customer_groups')->where('code', 'vip')->value('id');
             if ($vipGroupId) {
                 $vipId = $this->upsertDiscount([
                     'name' => 'VIP 12% Off',
@@ -48,10 +48,10 @@ class AdminPresetDiscountsSeeder extends Seeder
             $this->ensureCondition($silverId, 'partner_tier', ['silver']);
 
             // 3) Category weekend sale: Shoes 15% off, Sat–Sun (6,7), EU zone only, stacking single_best
-            $shoesCategoryId = DB::table('sh_categories')->whereRaw('LOWER(slug) = ?', ['shoes'])->value('id')
-                ?? DB::table('sh_categories')->whereRaw('LOWER(name) = ?', ['shoes'])->value('id');
-            $euZoneId = DB::table('sh_zones')->whereRaw('LOWER(code) = ?', ['lt'])->value('id')
-                ?? DB::table('sh_zones')->whereRaw('LOWER(name) LIKE ?', ['%lithuania%'])->value('id');
+            $shoesCategoryId = DB::table('categories')->whereRaw('LOWER(slug) = ?', ['shoes'])->value('id')
+                ?? DB::table('categories')->whereRaw('LOWER(name) = ?', ['shoes'])->value('id');
+            $euZoneId = DB::table('zones')->whereRaw('LOWER(code) = ?', ['lt'])->value('id')
+                ?? DB::table('zones')->whereRaw('LOWER(name) LIKE ?', ['%lithuania%'])->value('id');
             if ($shoesCategoryId && $euZoneId) {
                 $shoesId = $this->upsertDiscount([
                     'name' => 'Weekend Shoes 15%',
@@ -67,8 +67,8 @@ class AdminPresetDiscountsSeeder extends Seeder
             }
 
             // 4) BOGO T-Shirts collection: B2G1 cheapest free
-            $teesCollectionId = DB::table('sh_collections')->whereRaw('LOWER(slug) = ?', ['t-shirts'])->value('id')
-                ?? DB::table('sh_collections')->whereRaw('LOWER(name) = ?', ['t-shirts'])->value('id');
+            $teesCollectionId = DB::table('collections')->whereRaw('LOWER(slug) = ?', ['t-shirts'])->value('id')
+                ?? DB::table('collections')->whereRaw('LOWER(name) = ?', ['t-shirts'])->value('id');
             if ($teesCollectionId) {
                 $bogoId = $this->upsertDiscount([
                     'name' => 'BOGO T-Shirts B2G1',
@@ -95,7 +95,7 @@ class AdminPresetDiscountsSeeder extends Seeder
             $this->ensureCondition($freeShipId, 'cart_total', 99.0, 'greater_than');
 
             // 6) Student group code STUDENT15, per_customer_limit=3, weekday Mon–Fri after 18:00
-            $studentGroupId = DB::table('sh_customer_groups')->where('code', 'student')->value('id');
+            $studentGroupId = DB::table('customer_groups')->where('code', 'student')->value('id');
             $studentId = $this->upsertDiscount([
                 'name' => 'Student 15% (Evenings)',
                 'type' => 'percentage',
@@ -186,13 +186,13 @@ class AdminPresetDiscountsSeeder extends Seeder
     private function ensureCondition(int $discountId, string $type, $value, string $operator = 'greater_than'): void
     {
         $encoded = is_array($value) ? json_encode($value) : (is_numeric($value) ? json_encode($value) : (string) $value);
-        $exists = DB::table('sh_discount_conditions')
+        $exists = DB::table('discount_conditions')
             ->where('discount_id', $discountId)
             ->where('type', $type)
             ->where('value', $encoded)
             ->exists();
         if (! $exists) {
-            DB::table('sh_discount_conditions')->insert([
+            DB::table('discount_conditions')->insert([
                 'discount_id' => $discountId,
                 'type' => $type,
                 'operator' => in_array($type, ['cart_total', 'item_qty']) ? $operator : 'equals_to',
@@ -217,11 +217,11 @@ class AdminPresetDiscountsSeeder extends Seeder
     {
         for ($i = 0; $i < $quantity; $i++) {
             $code = strtoupper($prefix).'-'.Str::upper(Str::random(8));
-            $exists = DB::table('sh_discount_codes')->where('code', $code)->exists();
+            $exists = DB::table('discount_codes')->where('code', $code)->exists();
             if ($exists) {
                 continue;
             }
-            DB::table('sh_discount_codes')->insert([
+            DB::table('discount_codes')->insert([
                 'discount_id' => $discountId,
                 'code' => $code,
                 'expires_at' => now()->addYear(),
@@ -236,9 +236,9 @@ class AdminPresetDiscountsSeeder extends Seeder
 
     private function ensureCode(int $discountId, string $code): void
     {
-        $exists = DB::table('sh_discount_codes')->where('code', $code)->exists();
+        $exists = DB::table('discount_codes')->where('code', $code)->exists();
         if (! $exists) {
-            DB::table('sh_discount_codes')->insert([
+            DB::table('discount_codes')->insert([
                 'discount_id' => $discountId,
                 'code' => $code,
                 'expires_at' => now()->addYear(),

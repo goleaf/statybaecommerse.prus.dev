@@ -230,3 +230,4 @@ final class ReferralTest extends TestCase
         $this->assertNotNull($reward->fresh()->applied_at);
     }
 }
+

@@ -84,8 +84,8 @@ final class DataFilteringService
     public function filterActiveBrands(Collection $brands): Collection
     {
         return $brands->skipWhile(function ($brand) {
-            // Skip brands that have no products or are not visible
-            return !$brand->is_visible || empty($brand->name) || empty($brand->slug) || $brand->products_count <= 0;
+            // Skip brands that have no products or are disabled
+            return !$brand->is_enabled || empty($brand->name) || empty($brand->slug) || $brand->products_count <= 0;
         });
     }
     /**

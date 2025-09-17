@@ -1,18 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Services;
 
 use App\Models\User;
 use App\Notifications\TestNotification;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+
 /**
  * LiveNotificationService
- * 
+ *
  * Service class containing LiveNotificationService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class LiveNotificationService
 {
@@ -34,6 +33,7 @@ final class LiveNotificationService
             $this->sendToUser($user, $title, $message, $type);
         });
     }
+
     /**
      * Handle sendToUser functionality with proper error handling.
      * @param User $user
@@ -48,6 +48,7 @@ final class LiveNotificationService
         // Dispatch event for real-time updates
         Event::dispatch('notification.sent', ['user_id' => $user->id, 'title' => $title, 'message' => $message, 'type' => $type, 'timestamp' => now()->toISOString()]);
     }
+
     /**
      * Handle sendToUsers functionality with proper error handling.
      * @param Collection $users
@@ -65,6 +66,7 @@ final class LiveNotificationService
             $this->sendToUser($user, $title, $message, $type);
         });
     }
+
     /**
      * Handle sendSystemNotification functionality with proper error handling.
      * @param string $title
@@ -76,6 +78,7 @@ final class LiveNotificationService
     {
         $this->sendToAdmins($title, $message, $type);
     }
+
     /**
      * Handle sendOrderNotification functionality with proper error handling.
      * @param int $orderId
@@ -85,9 +88,10 @@ final class LiveNotificationService
      */
     public function sendOrderNotification(int $orderId, string $message, string $type = 'info'): void
     {
-        $title = "Užsakymas #{$orderId}";
+        $title = __('notifications.live.order_title', ['id' => $orderId]);
         $this->sendToAdmins($title, $message, $type);
     }
+
     /**
      * Handle sendStockAlert functionality with proper error handling.
      * @param string $productName
@@ -97,10 +101,11 @@ final class LiveNotificationService
      */
     public function sendStockAlert(string $productName, int $currentStock, int $threshold): void
     {
-        $title = 'Mažos atsargos';
-        $message = "Prekė \"{$productName}\" turi mažiau nei {$threshold} vienetų atsargų. Dabartinis kiekis: {$currentStock}";
+        $title = __('notifications.live.stock_title');
+        $message = __('notifications.live.stock_message', ['name' => $productName, 'threshold' => $threshold, 'stock' => $currentStock]);
         $this->sendToAdmins($title, $message, 'warning');
     }
+
     /**
      * Handle sendPaymentNotification functionality with proper error handling.
      * @param int $orderId
@@ -109,8 +114,8 @@ final class LiveNotificationService
      */
     public function sendPaymentNotification(int $orderId, string $status): void
     {
-        $title = 'Mokėjimo atnaujinimas';
-        $message = "Užsakymo #{$orderId} mokėjimas: {$status}";
+        $title = __('notifications.live.payment_title');
+        $message = __('notifications.live.payment_message', ['id' => $orderId, 'status' => $status]);
         $type = match ($status) {
             'Sėkmingas' => 'success',
             'Nepavyko' => 'error',
@@ -119,6 +124,7 @@ final class LiveNotificationService
         };
         $this->sendToAdmins($title, $message, $type);
     }
+
     /**
      * Handle sendCustomerRegistrationNotification functionality with proper error handling.
      * @param string $customerEmail
@@ -126,10 +132,11 @@ final class LiveNotificationService
      */
     public function sendCustomerRegistrationNotification(string $customerEmail): void
     {
-        $title = 'Naujas klientas';
-        $message = "Registruotas naujas klientas: {$customerEmail}";
+        $title = __('notifications.live.customer_title');
+        $message = __('notifications.live.customer_message', ['email' => $customerEmail]);
         $this->sendToAdmins($title, $message, 'success');
     }
+
     /**
      * Handle sendReviewNotification functionality with proper error handling.
      * @param string $productName
@@ -138,8 +145,8 @@ final class LiveNotificationService
      */
     public function sendReviewNotification(string $productName, int $rating): void
     {
-        $title = 'Naujas atsiliepimas';
-        $message = "Prekė \"{$productName}\" gavo naują atsiliepimą: {$rating}/5 žvaigždučių";
+        $title = __('notifications.live.review_title');
+        $message = __('notifications.live.review_message', ['name' => $productName, 'rating' => $rating]);
         $this->sendToAdmins($title, $message, 'info');
     }
 }

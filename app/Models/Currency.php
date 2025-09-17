@@ -38,7 +38,7 @@ final class Currency extends Model
      */
     protected function casts(): array
     {
-        return ['exchange_rate' => 'float', 'is_default' => 'boolean', 'is_enabled' => 'boolean', 'decimal_places' => 'integer'];
+        return ['exchange_rate' => 'decimal:6', 'is_default' => 'boolean', 'is_enabled' => 'boolean', 'decimal_places' => 'integer'];
     }
     // Relationships
     /**

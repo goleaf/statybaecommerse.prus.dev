@@ -41,3 +41,4 @@ final class BrandOverviewWidget extends BaseWidget
         ];
     }
 }
+

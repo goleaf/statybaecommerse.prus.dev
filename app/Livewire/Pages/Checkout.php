@@ -30,7 +30,7 @@ class Checkout extends Component
             if (session()->exists('checkout')) {
                 session()->forget('checkout');
             }
-            $this->redirect(route('home'), true);
+            $this->redirect(localized_route('home'), true);
         }
     }
     /**

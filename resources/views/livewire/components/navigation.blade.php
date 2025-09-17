@@ -16,9 +16,9 @@
 
                 @php
                     $homeUrl = Route::has('localized.home')
-                        ? route('localized.home', ['locale' => app()->getLocale()])
+                        ? route('localized.home', [])
                         : (Route::has('home')
-                            ? route('home')
+                            ? localized_route('home')
                             : url('/'));
                 @endphp
                 <a href="{{ $homeUrl }}" class="flex items-center gap-3 group" aria-label="{{ __('nav_home') }}">
@@ -104,7 +104,6 @@
                                 : $category->name;
                         @endphp
                         <x-nav.item :href="route('localized.categories.show', [
-                            'locale' => app()->getLocale(),
                             'category' => $slug,
                         ])">{{ $name }}</x-nav.item>
                     @endforeach
@@ -124,19 +123,19 @@
                 </div>
                 <nav class="grid gap-2">
                     @if (Route::has('brands.index'))
-                        <x-link :href="route('brands.index', ['locale' => app()->getLocale()])"
+                        <x-link :href="localized_route('brands.index')"
                                 class="text-sm font-medium text-gray-700">{{ __('nav_brands') }}</x-link>
                     @endif
                     @if (Route::has('locations.index'))
-                        <x-link :href="route('locations.index', ['locale' => app()->getLocale()])"
+                        <x-link :href="localized_route('locations.index')"
                                 class="text-sm font-medium text-gray-700">{{ __('nav_locations') }}</x-link>
                     @endif
                     @if (Route::has('search'))
-                        <x-link :href="route('search', ['locale' => app()->getLocale()])"
+                        <x-link :href="localized_route('search')"
                                 class="text-sm font-medium text-gray-700">{{ __('nav_search') }}</x-link>
                     @endif
                     @if (Route::has('cart.index'))
-                        <x-link :href="route('cart.index', ['locale' => app()->getLocale()])"
+                        <x-link :href="localized_route('cart.index')"
                                 class="text-sm font-medium text-gray-700">{{ __('nav_cart') }}</x-link>
                     @endif
                 </nav>

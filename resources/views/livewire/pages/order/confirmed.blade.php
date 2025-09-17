@@ -112,7 +112,6 @@ mount(function (string $number): void {
                 </dl>
                 <div class="mt-6 space-y-4 sm:flex sm:space-x-4 sm:space-y-0 md:mt-0">
                     <x-buttons.default :href="route('account.orders.detail', [
-                        'locale' => app()->getLocale(),
                         'number' => $order->number,
                     ])" class="flex w-full px-4 py-2 text-sm md:w-auto">
                         {{ __('Detail') }}
@@ -149,7 +148,7 @@ mount(function (string $number): void {
                         </div>
                     </div>
                     <p class="mt-3 text-sm pl-8">
-                        <x-link :href="route('account.orders', ['locale' => app()->getLocale()])"
+                        <x-link :href="route('account.orders', [])"
                                 class="whitespace-nowrap font-medium text-gray-700 hover:text-gray-600">
                             {{ __('My orders') }}
                             <span aria-hidden="true"> &rarr;</span>

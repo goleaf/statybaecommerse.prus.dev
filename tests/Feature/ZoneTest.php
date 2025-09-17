@@ -169,3 +169,4 @@ final class ZoneTest extends TestCase
         $this->assertEquals('€100.00', $zone->formatted_free_shipping_threshold);
     }
 }
+

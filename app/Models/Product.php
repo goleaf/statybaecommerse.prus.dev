@@ -1,6 +1,5 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
@@ -12,24 +11,26 @@ use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 /**
  * Product
- * 
+ *
  * Eloquent model representing the Product entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property mixed $fillable
  * @property mixed $casts
  * @property mixed $appends
@@ -50,18 +51,29 @@ final class Product extends Model implements HasMedia
     use HasTranslations;
     use InteractsWithMedia;
     use LogsActivity;
-    protected $fillable = ['name', 'slug', 'description', 'short_description', 'sku', 'barcode', 'price', 'compare_price', 'cost_price', 'sale_price', 'manage_stock', 'track_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_visible', 'is_featured', 'is_requestable', 'requests_count', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url', 'metadata', 'sort_order', 'tax_class', 'shipping_class', 'download_limit', 'download_expiry', 'external_url', 'button_text'];
-    protected $casts = ['price' => 'decimal:2', 'compare_price' => 'decimal:2', 'cost_price' => 'decimal:2', 'sale_price' => 'decimal:2', 'weight' => 'decimal:2', 'length' => 'decimal:2', 'width' => 'decimal:2', 'height' => 'decimal:2', 'is_visible' => 'boolean', 'is_featured' => 'boolean', 'is_requestable' => 'boolean', 'hide_add_to_cart' => 'boolean', 'manage_stock' => 'boolean', 'track_stock' => 'boolean', 'allow_backorder' => 'boolean', 'published_at' => 'datetime', 'stock_quantity' => 'integer', 'low_stock_threshold' => 'integer', 'requests_count' => 'integer', 'minimum_quantity' => 'integer', 'sort_order' => 'integer', 'download_limit' => 'integer', 'download_expiry' => 'integer', 'metadata' => 'array'];
+
+    /**
+     * Eager-load defaults for admin tables/infolists to avoid N+1.
+     *
+     * @var array<int, string>
+     */
+    protected $with = ['brand', 'images', 'prices.currency'];
+
+    protected $fillable = ['name', 'slug', 'description', 'short_description', 'sku', 'barcode', 'price', 'compare_price', 'cost_price', 'sale_price', 'manage_stock', 'track_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_visible', 'is_featured', 'is_requestable', 'requests_count', 'views_count', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url', 'metadata', 'sort_order', 'tax_class', 'shipping_class', 'download_limit', 'download_expiry', 'external_url', 'button_text'];
+    protected $casts = ['name' => 'array', 'slug' => 'array', 'description' => 'array', 'short_description' => 'array', 'seo_title' => 'array', 'seo_description' => 'array', 'price' => 'decimal:2', 'compare_price' => 'decimal:2', 'cost_price' => 'decimal:2', 'sale_price' => 'decimal:2', 'weight' => 'decimal:2', 'length' => 'decimal:2', 'width' => 'decimal:2', 'height' => 'decimal:2', 'is_visible' => 'boolean', 'is_featured' => 'boolean', 'is_requestable' => 'boolean', 'hide_add_to_cart' => 'boolean', 'manage_stock' => 'boolean', 'track_stock' => 'boolean', 'allow_backorder' => 'boolean', 'published_at' => 'datetime', 'stock_quantity' => 'integer', 'low_stock_threshold' => 'integer', 'requests_count' => 'integer', 'views_count' => 'integer', 'minimum_quantity' => 'integer', 'sort_order' => 'integer', 'download_limit' => 'integer', 'download_expiry' => 'integer', 'metadata' => 'array'];
+
     /**
      * The accessors to append to the model's array form.
      *
      * @var array<int, string>
      */
     protected $appends = ['average_rating', 'reviews_count', 'main_image', 'thumbnail', 'stock_status', 'is_in_stock', 'is_low_stock', 'is_out_of_stock', 'available_quantity', 'discount_percentage', 'profit_margin', 'markup_percentage', 'dimensions', 'volume', 'canonical_url', 'sales_count', 'revenue', 'formatted_price', 'formatted_compare_price'];
+
     protected $table = 'products';
     protected string $translationModel = \App\Models\Translations\ProductTranslation::class;
     // Translation fields that should be handled by the translation system
     protected array $translatable = ['name', 'slug', 'description', 'short_description', 'seo_title', 'seo_description'];
+
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
      * @return LogOptions
@@ -70,6 +82,7 @@ final class Product extends Model implements HasMedia
     {
         return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'sku', 'price', 'sale_price', 'stock_quantity', 'is_visible'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "Product {$eventName}")->useLogName('product');
     }
+
     /**
      * Handle getRouteKeyName functionality with proper error handling.
      * @return string
@@ -78,6 +91,7 @@ final class Product extends Model implements HasMedia
     {
         return 'slug';
     }
+
     /**
      * Handle isPublished functionality with proper error handling.
      * @return bool
@@ -86,6 +100,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->is_visible && $this->published_at && $this->published_at <= now();
     }
+
     /**
      * Handle reservedQuantity functionality with proper error handling.
      * @return int
@@ -95,6 +110,7 @@ final class Product extends Model implements HasMedia
         // For simple products, no reservations for now
         return 0;
     }
+
     /**
      * Handle isInStock functionality with proper error handling.
      * @return bool
@@ -107,6 +123,7 @@ final class Product extends Model implements HasMedia
         }
         return $this->availableQuantity() > 0;
     }
+
     /**
      * Handle isLowStock functionality with proper error handling.
      * @return bool
@@ -119,6 +136,7 @@ final class Product extends Model implements HasMedia
         }
         return $this->stock_quantity <= $this->low_stock_threshold;
     }
+
     /**
      * Handle getStockStatus functionality with proper error handling.
      * @return string
@@ -247,7 +265,7 @@ final class Product extends Model implements HasMedia
      */
     public function getCanonicalUrlAttribute(): string
     {
-        return route('products.show', $this->slug);
+        return localized_route('products.show', $this->slug);
     }
 
     /**
@@ -269,6 +287,7 @@ final class Product extends Model implements HasMedia
         // This would need to be implemented based on order items
         return 0.0;
     }
+
     /**
      * Handle decreaseStock functionality with proper error handling.
      * @param int $quantity
@@ -287,6 +306,7 @@ final class Product extends Model implements HasMedia
         $this->decrement('stock_quantity', $quantity);
         return true;
     }
+
     /**
      * Handle increaseStock functionality with proper error handling.
      * @param int $quantity
@@ -298,6 +318,7 @@ final class Product extends Model implements HasMedia
             $this->increment('stock_quantity', $quantity);
         }
     }
+
     /**
      * Handle availableQuantity functionality with proper error handling.
      * @return int
@@ -310,6 +331,7 @@ final class Product extends Model implements HasMedia
         }
         return max($this->stock_quantity - $this->reservedQuantity(), 0);
     }
+
     /**
      * Handle isOutOfStock functionality with proper error handling.
      * @return bool
@@ -318,6 +340,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->availableQuantity() < 1;
     }
+
     /**
      * Handle isVariant functionality with proper error handling.
      * @return bool
@@ -326,6 +349,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->type === 'variable' || $this->variants()->exists();
     }
+
     /**
      * Handle getStockAttribute functionality with proper error handling.
      * @return int
@@ -334,6 +358,7 @@ final class Product extends Model implements HasMedia
     {
         return (int) ($this->stock_quantity ?? 0);
     }
+
     /**
      * Handle variants functionality with proper error handling.
      * @return HasMany
@@ -342,6 +367,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(ProductVariant::class, 'product_id');
     }
+
     /**
      * Handle latestVariant functionality with proper error handling.
      * @return HasOne
@@ -350,6 +376,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->variants()->one()->latestOfMany();
     }
+
     /**
      * Handle brand functionality with proper error handling.
      * @return BelongsTo
@@ -358,6 +385,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->belongsTo(Brand::class, 'brand_id');
     }
+
     /**
      * Handle prices functionality with proper error handling.
      * @return MorphMany
@@ -366,6 +394,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->morphMany(Price::class, 'priceable');
     }
+
     /**
      * Handle latestPrice functionality with proper error handling.
      * @return MorphOne
@@ -374,6 +403,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->morphOne(Price::class, 'priceable')->latestOfMany();
     }
+
     /**
      * Handle categories functionality with proper error handling.
      * @return BelongsToMany
@@ -382,6 +412,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->belongsToMany(Category::class, 'product_categories');
     }
+
     /**
      * Handle collections functionality with proper error handling.
      * @return BelongsToMany
@@ -390,6 +421,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->belongsToMany(Collection::class, 'product_collections');
     }
+
     /**
      * Handle reviews functionality with proper error handling.
      * @return HasMany
@@ -398,6 +430,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(Review::class);
     }
+
     /**
      * Handle latestReview functionality with proper error handling.
      * @return HasOne
@@ -406,6 +439,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->reviews()->one()->latestOfMany();
     }
+
     /**
      * Handle oldestReview functionality with proper error handling.
      * @return HasOne
@@ -414,6 +448,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->reviews()->one()->oldestOfMany();
     }
+
     /**
      * Handle highestRatedReview functionality with proper error handling.
      * @return HasOne
@@ -422,6 +457,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->reviews()->one()->ofMany('rating', 'max');
     }
+
     /**
      * Handle lowestRatedReview functionality with proper error handling.
      * @return HasOne
@@ -430,6 +466,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->reviews()->one()->ofMany('rating', 'min');
     }
+
     /**
      * Handle latestApprovedReview functionality with proper error handling.
      * @return HasOne
@@ -440,6 +477,7 @@ final class Product extends Model implements HasMedia
             $query->where('is_approved', true);
         });
     }
+
     /**
      * Handle images functionality with proper error handling.
      * @return HasMany
@@ -448,6 +486,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
+
     /**
      * Handle latestImage functionality with proper error handling.
      * @return HasOne
@@ -456,6 +495,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->images()->one()->latestOfMany();
     }
+
     /**
      * Handle oldestImage functionality with proper error handling.
      * @return HasOne
@@ -464,6 +504,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->images()->one()->oldestOfMany();
     }
+
     /**
      * Handle primaryImage functionality with proper error handling.
      * @return HasOne
@@ -472,6 +513,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->images()->one()->ofMany('sort_order', 'min');
     }
+
     /**
      * Handle orderItems functionality with proper error handling.
      * @return HasMany
@@ -480,6 +522,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(OrderItem::class);
     }
+
     /**
      * Handle cartItems functionality with proper error handling.
      * @return HasMany
@@ -488,6 +531,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(CartItem::class);
     }
+
     /**
      * Handle inventories functionality with proper error handling.
      * @return HasMany
@@ -496,6 +540,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(Inventory::class);
     }
+
     /**
      * Handle latestInventory functionality with proper error handling.
      * @return HasOne
@@ -504,6 +549,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->inventories()->one()->latestOfMany();
     }
+
     /**
      * Handle documents functionality with proper error handling.
      * @return MorphMany
@@ -512,6 +558,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->morphMany(Document::class, 'documentable');
     }
+
     /**
      * Handle latestDocument functionality with proper error handling.
      * @return MorphOne
@@ -520,6 +567,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->morphOne(Document::class, 'documentable')->latestOfMany();
     }
+
     /**
      * Handle requests functionality with proper error handling.
      * @return HasMany
@@ -528,6 +576,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(ProductRequest::class);
     }
+
     /**
      * Handle latestRequest functionality with proper error handling.
      * @return HasOne
@@ -536,6 +585,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->requests()->one()->latestOfMany();
     }
+
     /**
      * Handle attributes functionality with proper error handling.
      * @return BelongsToMany
@@ -544,6 +594,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->belongsToMany(Attribute::class, 'product_attributes', 'product_id', 'attribute_id')->withTimestamps();
     }
+
     /**
      * Handle histories functionality with proper error handling.
      * @return HasMany
@@ -552,6 +603,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(ProductHistory::class);
     }
+
     /**
      * Handle latestHistory functionality with proper error handling.
      * @return HasOne
@@ -560,6 +612,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->histories()->one()->latestOfMany();
     }
+
     /**
      * Handle latestPriceChange functionality with proper error handling.
      * @return HasOne
@@ -570,6 +623,7 @@ final class Product extends Model implements HasMedia
             $query->where('field_name', 'price');
         });
     }
+
     /**
      * Handle latestStockUpdate functionality with proper error handling.
      * @return HasOne
@@ -580,6 +634,7 @@ final class Product extends Model implements HasMedia
             $query->where('field_name', 'stock_quantity');
         });
     }
+
     /**
      * Handle currentPrice functionality with proper error handling.
      * @return HasOne
@@ -590,6 +645,7 @@ final class Product extends Model implements HasMedia
             $query->where('field_name', 'price')->where('created_at', '<=', now());
         });
     }
+
     /**
      * Handle recentHistories functionality with proper error handling.
      * @return HasMany
@@ -598,6 +654,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(ProductHistory::class)->recent(30);
     }
+
     /**
      * Handle priceHistories functionality with proper error handling.
      * @return HasMany
@@ -606,6 +663,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(ProductHistory::class)->byAction('price_changed');
     }
+
     /**
      * Handle stockHistories functionality with proper error handling.
      * @return HasMany
@@ -614,6 +672,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(ProductHistory::class)->byAction('stock_updated');
     }
+
     /**
      * Handle statusHistories functionality with proper error handling.
      * @return HasMany
@@ -622,6 +681,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(ProductHistory::class)->byAction('status_changed');
     }
+
     /**
      * Handle significantHistories functionality with proper error handling.
      * @return HasMany
@@ -630,6 +690,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hasMany(ProductHistory::class)->whereIn('field_name', ['price', 'sale_price', 'stock_quantity', 'status', 'is_visible']);
     }
+
     /**
      * Handle getLastPriceChange functionality with proper error handling.
      * @return ProductHistory|null
@@ -638,6 +699,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->latestPriceChange;
     }
+
     /**
      * Handle getLastStockUpdate functionality with proper error handling.
      * @return ProductHistory|null
@@ -646,6 +708,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->latestStockUpdate;
     }
+
     /**
      * Handle getLastStatusChange functionality with proper error handling.
      * @return ProductHistory|null
@@ -654,6 +717,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->statusHistories()->latest()->first();
     }
+
     /**
      * Handle getChangeCount functionality with proper error handling.
      * @param int $days
@@ -663,6 +727,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->histories()->recent($days)->count();
     }
+
     /**
      * Handle getPriceChangeCount functionality with proper error handling.
      * @param int $days
@@ -672,6 +737,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->priceHistories()->recent($days)->count();
     }
+
     /**
      * Handle getStockChangeCount functionality with proper error handling.
      * @param int $days
@@ -681,6 +747,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->stockHistories()->recent($days)->count();
     }
+
     /**
      * Handle hasRecentChanges functionality with proper error handling.
      * @param int $days
@@ -690,6 +757,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->histories()->recent($days)->exists();
     }
+
     /**
      * Handle getChangeFrequency functionality with proper error handling.
      * @param int $days
@@ -700,6 +768,7 @@ final class Product extends Model implements HasMedia
         $changeCount = $this->getChangeCount($days);
         return $changeCount > 0 ? round($changeCount / $days, 2) : 0;
     }
+
     /**
      * Handle scopePublished functionality with proper error handling.
      * @param mixed $query
@@ -708,6 +777,7 @@ final class Product extends Model implements HasMedia
     {
         return $query->where('is_visible', true)->where('status', 'published')->whereNotNull('published_at')->where('published_at', '<=', now());
     }
+
     /**
      * Handle scopeFeatured functionality with proper error handling.
      * @param mixed $query
@@ -716,6 +786,7 @@ final class Product extends Model implements HasMedia
     {
         return $query->where('is_featured', true);
     }
+
     /**
      * Handle scopeVisible functionality with proper error handling.
      * @param mixed $query
@@ -724,6 +795,7 @@ final class Product extends Model implements HasMedia
     {
         return $query->where('is_visible', true);
     }
+
     /**
      * Handle scopeByBrand functionality with proper error handling.
      * @param mixed $query
@@ -733,6 +805,7 @@ final class Product extends Model implements HasMedia
     {
         return $query->where('brand_id', $brandId);
     }
+
     /**
      * Handle scopeByCategory functionality with proper error handling.
      * @param mixed $query
@@ -744,6 +817,7 @@ final class Product extends Model implements HasMedia
             $q->where('category_id', $categoryId);
         });
     }
+
     /**
      * Handle scopeByCollection functionality with proper error handling.
      * @param mixed $query
@@ -755,6 +829,7 @@ final class Product extends Model implements HasMedia
             $q->where('collection_id', $collectionId);
         });
     }
+
     /**
      * Handle scopeInStock functionality with proper error handling.
      * @param mixed $query
@@ -763,6 +838,7 @@ final class Product extends Model implements HasMedia
     {
         return $query->where('stock_quantity', '>', 0);
     }
+
     /**
      * Handle scopeLowStock functionality with proper error handling.
      * @param mixed $query
@@ -771,6 +847,7 @@ final class Product extends Model implements HasMedia
     {
         return $query->whereRaw('stock_quantity <= low_stock_threshold');
     }
+
     /**
      * Handle scopeRequestable functionality with proper error handling.
      * @param mixed $query
@@ -779,6 +856,7 @@ final class Product extends Model implements HasMedia
     {
         return $query->where('is_requestable', true);
     }
+
     /**
      * Handle scopeNeedsRestocking functionality with proper error handling.
      * @param mixed $query
@@ -787,6 +865,7 @@ final class Product extends Model implements HasMedia
     {
         return $query->where('manage_stock', true)->whereRaw('stock_quantity < minimum_quantity');
     }
+
     /**
      * Handle scopeWithRequests functionality with proper error handling.
      * @param mixed $query
@@ -795,6 +874,7 @@ final class Product extends Model implements HasMedia
     {
         return $query->where('requests_count', '>', 0);
     }
+
     /**
      * Handle getAverageRatingAttribute functionality with proper error handling.
      * @return float
@@ -803,6 +883,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->reviews()->approved()->avg('rating') ?: 0;
     }
+
     /**
      * Handle getReviewsCountAttribute functionality with proper error handling.
      * @return int
@@ -811,6 +892,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->reviews()->approved()->count();
     }
+
     /**
      * Handle hasVariants functionality with proper error handling.
      * @return bool
@@ -819,6 +901,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->type === 'variable' && $this->variants()->exists();
     }
+
     /**
      * Handle isRequestable functionality with proper error handling.
      * @return bool
@@ -827,6 +910,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->is_requestable;
     }
+
     /**
      * Handle shouldHideAddToCart functionality with proper error handling.
      * @return bool
@@ -835,6 +919,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->hide_add_to_cart || $this->is_requestable;
     }
+
     /**
      * Handle getRequestsCount functionality with proper error handling.
      * @return int
@@ -843,6 +928,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->requests_count;
     }
+
     /**
      * Handle incrementRequestsCount functionality with proper error handling.
      * @return void
@@ -851,6 +937,7 @@ final class Product extends Model implements HasMedia
     {
         $this->increment('requests_count');
     }
+
     /**
      * Handle decrementRequestsCount functionality with proper error handling.
      * @return void
@@ -859,6 +946,7 @@ final class Product extends Model implements HasMedia
     {
         $this->decrement('requests_count');
     }
+
     /**
      * Handle getMinimumQuantity functionality with proper error handling.
      * @return int
@@ -867,6 +955,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->minimum_quantity;
     }
+
     /**
      * Handle isBelowMinimumQuantity functionality with proper error handling.
      * @return bool
@@ -878,6 +967,7 @@ final class Product extends Model implements HasMedia
         }
         return $this->stock_quantity < $this->minimum_quantity;
     }
+
     /**
      * Handle needsRestocking functionality with proper error handling.
      * @return bool
@@ -886,6 +976,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->isBelowMinimumQuantity();
     }
+
     /**
      * Handle getMainImageAttribute functionality with proper error handling.
      * @return string|null
@@ -895,6 +986,7 @@ final class Product extends Model implements HasMedia
         $img = $this->images()->orderBy('sort_order')->first();
         return $img ? $this->resolvePublicUrl($img->path) : null;
     }
+
     /**
      * Handle getThumbnailAttribute functionality with proper error handling.
      * @return string|null
@@ -904,6 +996,7 @@ final class Product extends Model implements HasMedia
         $img = $this->images()->orderBy('sort_order')->first();
         return $img ? $this->resolvePublicUrl($img->path) : null;
     }
+
     /**
      * Handle getImageUrl functionality with proper error handling.
      * @param string|null $size
@@ -914,6 +1007,7 @@ final class Product extends Model implements HasMedia
         $img = $this->images()->orderBy('sort_order')->first();
         return $img ? $this->resolvePublicUrl($img->path) : null;
     }
+
     /**
      * Handle getGalleryImages functionality with proper error handling.
      * @return array
@@ -925,6 +1019,7 @@ final class Product extends Model implements HasMedia
             return ['original' => $url, 'xl' => $url, 'lg' => $url, 'md' => $url, 'sm' => $url, 'xs' => $url, 'alt' => $img->alt_text ?: $this->name, 'title' => $this->name, 'generated' => true];
         })->toArray();
     }
+
     /**
      * Handle getMainImage functionality with proper error handling.
      * @param string|null $conversion
@@ -934,6 +1029,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->getFirstMediaUrl('images', $conversion) ?: null;
     }
+
     /**
      * Handle getAllImageSizes functionality with proper error handling.
      * @return array
@@ -947,6 +1043,7 @@ final class Product extends Model implements HasMedia
         $url = $this->resolvePublicUrl($img->path);
         return ['original' => $url, 'xl' => $url, 'lg' => $url, 'md' => $url, 'sm' => $url, 'xs' => $url];
     }
+
     /**
      * Handle getResponsiveImageAttributes functionality with proper error handling.
      * @param string|null $defaultSize
@@ -961,6 +1058,7 @@ final class Product extends Model implements HasMedia
         $srcset = [$images['xs'] ?? null ? $images['xs'] . ' 150w' : null, $images['sm'] ?? null ? $images['sm'] . ' 300w' : null, $images['md'] ?? null ? $images['md'] . ' 500w' : null, $images['lg'] ?? null ? $images['lg'] . ' 800w' : null, $images['xl'] ?? null ? $images['xl'] . ' 1200w' : null];
         return ['src' => $images[$defaultSize] ?? $images['md'], 'srcset' => implode(', ', array_filter($srcset)), 'sizes' => '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px', 'alt' => __('translations.product_image_alt', ['name' => $this->name, 'number' => 1])];
     }
+
     /**
      * Handle hasImages functionality with proper error handling.
      * @return bool
@@ -969,6 +1067,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->images()->exists();
     }
+
     /**
      * Handle getImagesCount functionality with proper error handling.
      * @return int
@@ -977,8 +1076,10 @@ final class Product extends Model implements HasMedia
     {
         return (int) $this->images()->count();
     }
+
     // Media library removed for product images in favor of product_images table
     // Media conversions removed
+
     /**
      * Handle resolvePublicUrl functionality with proper error handling.
      * @param string $path
@@ -995,7 +1096,9 @@ final class Product extends Model implements HasMedia
         }
         return asset(trim($path, '/'));
     }
+
     // Translation methods
+
     /**
      * Handle getTranslatedName functionality with proper error handling.
      * @param string|null $locale
@@ -1005,6 +1108,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->trans('name', $locale) ?: $this->name;
     }
+
     /**
      * Handle getTranslatedDescription functionality with proper error handling.
      * @param string|null $locale
@@ -1014,6 +1118,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->trans('description', $locale) ?: $this->description;
     }
+
     /**
      * Handle getTranslatedShortDescription functionality with proper error handling.
      * @param string|null $locale
@@ -1023,6 +1128,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->trans('summary', $locale) ?: $this->short_description;
     }
+
     /**
      * Handle getTranslatedSeoTitle functionality with proper error handling.
      * @param string|null $locale
@@ -1032,6 +1138,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->trans('seo_title', $locale) ?: $this->seo_title;
     }
+
     /**
      * Handle getTranslatedSeoDescription functionality with proper error handling.
      * @param string|null $locale
@@ -1041,6 +1148,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->trans('seo_description', $locale) ?: $this->seo_description;
     }
+
     /**
      * Handle getTranslatedSlug functionality with proper error handling.
      * @param string|null $locale
@@ -1050,7 +1158,9 @@ final class Product extends Model implements HasMedia
     {
         return $this->trans('slug', $locale) ?: $this->slug;
     }
+
     // Scope for translated products
+
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      * @param mixed $query
@@ -1063,7 +1173,9 @@ final class Product extends Model implements HasMedia
             $q->where('locale', $locale);
         }]);
     }
+
     // Get all available locales for this product
+
     /**
      * Handle getAvailableLocales functionality with proper error handling.
      * @return array
@@ -1072,7 +1184,9 @@ final class Product extends Model implements HasMedia
     {
         return $this->translations()->pluck('locale')->toArray();
     }
+
     // Check if product has translation for specific locale
+
     /**
      * Handle hasTranslationFor functionality with proper error handling.
      * @param string $locale
@@ -1082,7 +1196,9 @@ final class Product extends Model implements HasMedia
     {
         return $this->translations()->where('locale', $locale)->exists();
     }
+
     // Get or create translation for locale
+
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
      * @param string $locale
@@ -1092,7 +1208,9 @@ final class Product extends Model implements HasMedia
     {
         return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'summary' => $this->short_description, 'seo_title' => $this->seo_title, 'seo_description' => $this->seo_description]);
     }
+
     // Update translation for specific locale
+
     /**
      * Handle updateTranslation functionality with proper error handling.
      * @param string $locale
@@ -1104,7 +1222,9 @@ final class Product extends Model implements HasMedia
         $translation = $this->getOrCreateTranslation($locale);
         return $translation->update($data);
     }
+
     // Delete translation for specific locale
+
     /**
      * Handle deleteTranslation functionality with proper error handling.
      * @param string $locale
@@ -1114,7 +1234,9 @@ final class Product extends Model implements HasMedia
     {
         return $this->translations()->where('locale', $locale)->delete() > 0;
     }
+
     // Related products methods
+
     /**
      * Handle getRelatedProducts functionality with proper error handling.
      * @param int $limit
@@ -1153,6 +1275,7 @@ final class Product extends Model implements HasMedia
         }
         return $relatedProducts->take($limit);
     }
+
     /**
      * Handle getRelatedProductsByCategory functionality with proper error handling.
      * @param int $limit
@@ -1168,6 +1291,7 @@ final class Product extends Model implements HasMedia
             $query->whereIn('category_id', $categoryIds);
         })->where('id', '!=', $this->id)->with(['media', 'brand', 'categories', 'translations'])->limit($limit)->get();
     }
+
     /**
      * Handle getRelatedProductsByBrand functionality with proper error handling.
      * @param int $limit
@@ -1180,6 +1304,7 @@ final class Product extends Model implements HasMedia
         }
         return Product::published()->where('brand_id', $this->brand_id)->where('id', '!=', $this->id)->with(['media', 'brand', 'categories', 'translations'])->limit($limit)->get();
     }
+
     /**
      * Handle getRelatedProductsByPriceRange functionality with proper error handling.
      * @param float $priceRange
@@ -1198,7 +1323,9 @@ final class Product extends Model implements HasMedia
             $query->whereBetween('price', [$minPrice, $maxPrice])->orWhereBetween('sale_price', [$minPrice, $maxPrice]);
         })->with(['media', 'brand', 'categories', 'translations'])->limit($limit)->get();
     }
+
     // Advanced Helper Methods
+
     /**
      * Handle getProductInfo functionality with proper error handling.
      * @return array
@@ -1207,6 +1334,7 @@ final class Product extends Model implements HasMedia
     {
         return ['id' => $this->id, 'name' => $this->name, 'slug' => $this->slug, 'sku' => $this->sku, 'description' => $this->description, 'short_description' => $this->short_description, 'price' => $this->price, 'sale_price' => $this->sale_price, 'compare_price' => $this->compare_price, 'cost_price' => $this->cost_price, 'status' => $this->status, 'type' => $this->type, 'is_visible' => $this->is_visible, 'is_featured' => $this->is_featured, 'published_at' => $this->published_at?->toISOString()];
     }
+
     /**
      * Handle getInventoryInfo functionality with proper error handling.
      * @return array
@@ -1215,6 +1343,7 @@ final class Product extends Model implements HasMedia
     {
         return ['stock_quantity' => $this->stock_quantity, 'manage_stock' => $this->manage_stock, 'track_stock' => $this->track_stock, 'allow_backorder' => $this->allow_backorder, 'low_stock_threshold' => $this->low_stock_threshold, 'minimum_quantity' => $this->minimum_quantity, 'stock_status' => $this->getStockStatus(), 'is_in_stock' => $this->isInStock(), 'is_low_stock' => $this->isLowStock(), 'is_out_of_stock' => $this->isOutOfStock(), 'available_quantity' => $this->availableQuantity(), 'reserved_quantity' => $this->reservedQuantity()];
     }
+
     /**
      * Handle getPricingInfo functionality with proper error handling.
      * @return array
@@ -1223,6 +1352,7 @@ final class Product extends Model implements HasMedia
     {
         return ['price' => $this->price, 'sale_price' => $this->sale_price, 'compare_price' => $this->compare_price, 'cost_price' => $this->cost_price, 'current_price' => $this->sale_price ?: $this->price, 'discount_percentage' => $this->getDiscountPercentage(), 'profit_margin' => $this->getProfitMargin(), 'markup_percentage' => $this->getMarkupPercentage()];
     }
+
     /**
      * Handle getPhysicalInfo functionality with proper error handling.
      * @return array
@@ -1231,6 +1361,7 @@ final class Product extends Model implements HasMedia
     {
         return ['weight' => $this->weight, 'length' => $this->length, 'width' => $this->width, 'height' => $this->height, 'dimensions' => $this->getDimensions(), 'volume' => $this->getVolume()];
     }
+
     /**
      * Handle getSeoInfo functionality with proper error handling.
      * @return array
@@ -1239,6 +1370,7 @@ final class Product extends Model implements HasMedia
     {
         return ['seo_title' => $this->seo_title, 'seo_description' => $this->seo_description, 'meta_keywords' => $this->meta_keywords ?? [], 'canonical_url' => $this->getCanonicalUrl()];
     }
+
     /**
      * Handle getBusinessInfo functionality with proper error handling.
      * @return array
@@ -1247,6 +1379,7 @@ final class Product extends Model implements HasMedia
     {
         return ['is_featured' => $this->is_featured, 'is_requestable' => $this->is_requestable, 'requests_count' => $this->requests_count, 'average_rating' => $this->average_rating, 'reviews_count' => $this->reviews_count, 'views_count' => $this->views_count ?? 0, 'sales_count' => $this->getSalesCount(), 'revenue' => $this->getRevenue()];
     }
+
     /**
      * Handle getCompleteInfo functionality with proper error handling.
      * @param string|null $locale
@@ -1256,7 +1389,9 @@ final class Product extends Model implements HasMedia
     {
         return array_merge($this->getProductInfo(), $this->getInventoryInfo(), $this->getPricingInfo(), $this->getPhysicalInfo(), $this->getSeoInfo(), $this->getBusinessInfo(), ['translations' => $this->getAvailableLocales(), 'has_translations' => count($this->getAvailableLocales()) > 0, 'brand' => $this->brand?->name, 'categories' => $this->categories->pluck('name')->toArray(), 'collections' => $this->collections->pluck('name')->toArray(), 'images_count' => $this->getImagesCount(), 'variants_count' => $this->variants()->count(), 'attributes_count' => $this->attributes()->count(), 'created_at' => $this->created_at?->toISOString(), 'updated_at' => $this->updated_at?->toISOString()]);
     }
+
     // Additional helper methods
+
     /**
      * Handle getDiscountPercentage functionality with proper error handling.
      * @return float|null
@@ -1268,6 +1403,7 @@ final class Product extends Model implements HasMedia
         }
         return round(($this->price - $this->sale_price) / $this->price * 100, 2);
     }
+
     /**
      * Handle getProfitMargin functionality with proper error handling.
      * @return float|null
@@ -1279,6 +1415,7 @@ final class Product extends Model implements HasMedia
         }
         return round(($this->price - $this->cost_price) / $this->price * 100, 2);
     }
+
     /**
      * Handle getMarkupPercentage functionality with proper error handling.
      * @return float|null
@@ -1290,6 +1427,7 @@ final class Product extends Model implements HasMedia
         }
         return round(($this->price - $this->cost_price) / $this->cost_price * 100, 2);
     }
+
     /**
      * Handle getDimensions functionality with proper error handling.
      * @return string|null
@@ -1301,6 +1439,7 @@ final class Product extends Model implements HasMedia
         }
         return "{$this->length} × {$this->width} × {$this->height} cm";
     }
+
     /**
      * Handle getVolume functionality with proper error handling.
      * @return float|null
@@ -1313,14 +1452,16 @@ final class Product extends Model implements HasMedia
         return round($this->length * $this->width * $this->height / 1000000, 2);
         // Convert to cubic meters
     }
+
     /**
      * Handle getCanonicalUrl functionality with proper error handling.
      * @return string
      */
     public function getCanonicalUrl(): string
     {
-        return route('products.show', $this);
+        return localized_route('products.show', $this);
     }
+
     /**
      * Handle getSalesCount functionality with proper error handling.
      * @return int
@@ -1329,6 +1470,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->orderItems()->sum('quantity');
     }
+
     /**
      * Handle getRevenue functionality with proper error handling.
      * @return float
@@ -1337,6 +1479,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->orderItems()->sum(DB::raw('quantity * price'));
     }
+
     /**
      * Handle getFullDisplayName functionality with proper error handling.
      * @param string|null $locale
@@ -1348,6 +1491,7 @@ final class Product extends Model implements HasMedia
         $sku = $this->sku ? " ({$this->sku})" : '';
         return $name . $sku;
     }
+
     /**
      * Handle getFormattedPrice functionality with proper error handling.
      * @return string
@@ -1360,6 +1504,7 @@ final class Product extends Model implements HasMedia
         }
         return app_money_format($price->value->amount);
     }
+
     /**
      * Handle getFormattedComparePrice functionality with proper error handling.
      * @return string
@@ -1372,6 +1517,7 @@ final class Product extends Model implements HasMedia
         }
         return app_money_format($price->compare);
     }
+
     /**
      * Handle getFormattedPriceAttribute functionality with proper error handling.
      * @return string
@@ -1380,6 +1526,7 @@ final class Product extends Model implements HasMedia
     {
         return $this->getFormattedPrice();
     }
+
     /**
      * Handle getFormattedComparePriceAttribute functionality with proper error handling.
      * @return string

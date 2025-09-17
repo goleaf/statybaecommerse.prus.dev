@@ -94,3 +94,4 @@ final class SystemSettingHistoryFactory extends Factory
         ]);
     }
 }
+

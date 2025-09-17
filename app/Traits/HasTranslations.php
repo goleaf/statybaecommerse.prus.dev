@@ -27,19 +27,38 @@ trait HasTranslations
         if ($translation && isset($translation->{$field}) && !empty($translation->{$field})) {
             $value = $translation->{$field};
             if (is_array($value)) {
-                return $value[$locale] ?? reset($value) ?? $this->{$field} ?? null;
+                return $value[$locale]
+                    ?? reset($value)
+                    ?? ($this->{$field} ?? null);
             }
             return $value;
         }
-        // Fallback to default locale if current locale not found
+
         $defaultLocale = config('app.locale', 'en');
+
+        // Fallback to default locale if current locale not found
         if ($locale !== $defaultLocale) {
             $defaultTranslation = $this->translations->firstWhere('locale', $defaultLocale);
             if ($defaultTranslation && isset($defaultTranslation->{$field}) && !empty($defaultTranslation->{$field})) {
-                return $defaultTranslation->{$field};
+                $value = $defaultTranslation->{$field};
+                if (is_array($value)) {
+                    return $value[$defaultLocale]
+                        ?? ($value[$locale] ?? null)
+                        ?? reset($value);
+                }
+                return $value;
             }
         }
-        return $this->{$field} ?? null;
+
+        $value = $this->{$field} ?? null;
+
+        if (is_array($value)) {
+            return $value[$locale]
+                ?? ($value[$defaultLocale] ?? null)
+                ?? reset($value);
+        }
+
+        return $value;
     }
     protected function translationModelClass(): string
     {

@@ -27,3 +27,4 @@ Route::prefix('reports')->name('reports.')->group(function () {
         Route::post('/{report:slug}/generate', [ReportController::class, 'generate'])->name('generate');
     });
 });
+

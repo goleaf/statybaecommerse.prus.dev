@@ -40,7 +40,7 @@ beforeEach(function () {
 });
 
 it('can display news index page', function () {
-    $response = $this->get(route('news.index'));
+    $response = $this->get(localized_route('news.index'));
     
     $response->assertStatus(200);
     $response->assertViewIs('news.index');
@@ -49,7 +49,7 @@ it('can display news index page', function () {
 });
 
 it('can display individual news article', function () {
-    $response = $this->get(route('news.show', $this->news->slug));
+    $response = $this->get(localized_route('news.show', $this->news->slug));
     
     $response->assertStatus(200);
     $response->assertViewIs('news.show');
@@ -61,7 +61,7 @@ it('can display individual news article', function () {
 it('increments view count when viewing news', function () {
     expect($this->news->view_count)->toBe(0);
     
-    $this->get(route('news.show', $this->news->slug));
+    $this->get(localized_route('news.show', $this->news->slug));
     
     expect($this->news->fresh()->view_count)->toBe(1);
 });
@@ -69,7 +69,7 @@ it('increments view count when viewing news', function () {
 it('can filter news by category', function () {
     $this->news->categories()->attach($this->category->id);
     
-    $response = $this->get(route('news.index', ['category' => $this->category->id]));
+    $response = $this->get(localized_route('news.index', ['category' => $this->category->id]));
     
     $response->assertStatus(200);
     $response->assertSee('Test News Title');
@@ -78,14 +78,14 @@ it('can filter news by category', function () {
 it('can filter news by tag', function () {
     $this->news->tags()->attach($this->tag->id);
     
-    $response = $this->get(route('news.index', ['tag' => $this->tag->id]));
+    $response = $this->get(localized_route('news.index', ['tag' => $this->tag->id]));
     
     $response->assertStatus(200);
     $response->assertSee('Test News Title');
 });
 
 it('can search news', function () {
-    $response = $this->get(route('news.index', ['search' => 'Test']));
+    $response = $this->get(localized_route('news.index', ['search' => 'Test']));
     
     $response->assertStatus(200);
     $response->assertSee('Test News Title');
@@ -106,7 +106,7 @@ it('can filter featured news', function () {
         'content' => 'Featured news content',
     ]);
     
-    $response = $this->get(route('news.index', ['featured' => '1']));
+    $response = $this->get(localized_route('news.index', ['featured' => '1']));
     
     $response->assertStatus(200);
     $response->assertSee('Featured News');
@@ -115,7 +115,7 @@ it('can filter featured news', function () {
 it('can display news by category', function () {
     $this->news->categories()->attach($this->category->id);
     
-    $response = $this->get(route('news.category', $this->category->slug));
+    $response = $this->get(localized_route('news.category', $this->category->slug));
     
     $response->assertStatus(200);
     $response->assertViewIs('news.category');
@@ -126,7 +126,7 @@ it('can display news by category', function () {
 it('can display news by tag', function () {
     $this->news->tags()->attach($this->tag->id);
     
-    $response = $this->get(route('news.tag', $this->tag->slug));
+    $response = $this->get(localized_route('news.tag', $this->tag->slug));
     
     $response->assertStatus(200);
     $response->assertViewIs('news.tag');
@@ -151,7 +151,7 @@ it('shows related news on news detail page', function () {
     $this->news->categories()->attach($this->category->id);
     $relatedNews->categories()->attach($this->category->id);
     
-    $response = $this->get(route('news.show', $this->news->slug));
+    $response = $this->get(localized_route('news.show', $this->news->slug));
     
     $response->assertStatus(200);
     $response->assertSee('Related News');
@@ -166,7 +166,7 @@ it('displays comments on news detail page', function () {
         'is_visible' => true,
     ]);
     
-    $response = $this->get(route('news.show', $this->news->slug));
+    $response = $this->get(localized_route('news.show', $this->news->slug));
     
     $response->assertStatus(200);
     $response->assertSee('Comment Author');
@@ -174,7 +174,7 @@ it('displays comments on news detail page', function () {
 });
 
 it('displays comment form on news detail page', function () {
-    $response = $this->get(route('news.show', $this->news->slug));
+    $response = $this->get(localized_route('news.show', $this->news->slug));
     
     $response->assertStatus(200);
     $response->assertSee('comment_name');
@@ -189,9 +189,9 @@ it('can store a new comment', function () {
         'content' => 'New comment content',
     ];
     
-    $response = $this->post(route('news.comments.store', $this->news->slug), $commentData);
+    $response = $this->post(localized_route('news.comments.store', $this->news->slug), $commentData);
     
-    $response->assertRedirect(route('news.show', $this->news->slug));
+    $response->assertRedirect(localized_route('news.show', $this->news->slug));
     $response->assertSessionHas('success');
     
     $this->assertDatabaseHas('news_comments', [
@@ -205,7 +205,7 @@ it('can store a new comment', function () {
 });
 
 it('validates comment data', function () {
-    $response = $this->post(route('news.comments.store', $this->news->slug), []);
+    $response = $this->post(localized_route('news.comments.store', $this->news->slug), []);
     
     $response->assertSessionHasErrors(['author_name', 'author_email', 'content']);
 });
@@ -224,9 +224,9 @@ it('can store a reply to a comment', function () {
         'content' => 'Reply content',
     ];
     
-    $response = $this->post(route('news.comments.store', $this->news->slug), $replyData);
+    $response = $this->post(localized_route('news.comments.store', $this->news->slug), $replyData);
     
-    $response->assertRedirect(route('news.show', $this->news->slug));
+    $response->assertRedirect(localized_route('news.show', $this->news->slug));
     
     $this->assertDatabaseHas('news_comments', [
         'news_id' => $this->news->id,
@@ -250,7 +250,7 @@ it('does not show unpublished news', function () {
         'content' => 'Unpublished content',
     ]);
     
-    $response = $this->get(route('news.index'));
+    $response = $this->get(localized_route('news.index'));
     
     $response->assertStatus(200);
     $response->assertDontSee('Unpublished News');
@@ -270,26 +270,27 @@ it('does not show future published news', function () {
         'content' => 'Future content',
     ]);
     
-    $response = $this->get(route('news.index'));
+    $response = $this->get(localized_route('news.index'));
     
     $response->assertStatus(200);
     $response->assertDontSee('Future News');
 });
 
 it('returns 404 for non-existent news', function () {
-    $response = $this->get(route('news.show', 'non-existent-slug'));
+    $response = $this->get(localized_route('news.show', 'non-existent-slug'));
     
     $response->assertStatus(404);
 });
 
 it('returns 404 for non-existent category', function () {
-    $response = $this->get(route('news.category', 'non-existent-category'));
+    $response = $this->get(localized_route('news.category', 'non-existent-category'));
     
     $response->assertStatus(404);
 });
 
 it('returns 404 for non-existent tag', function () {
-    $response = $this->get(route('news.tag', 'non-existent-tag'));
+    $response = $this->get(localized_route('news.tag', 'non-existent-tag'));
     
     $response->assertStatus(404);
 });
+

@@ -26,7 +26,7 @@
         <nav class="mb-8">
             <ol class="flex items-center space-x-2 text-sm text-gray-500">
                 <li>
-                    <a href="{{ route('home') }}" class="hover:text-gray-700">
+                    <a href="{{ localized_route('home') }}" class="hover:text-gray-700">
                         {{ __('frontend.legal.home') }}
                     </a>
                 </li>

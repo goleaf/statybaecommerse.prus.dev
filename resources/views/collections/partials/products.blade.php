@@ -20,7 +20,7 @@
                 <!-- Product Content -->
                 <div class="p-4">
                     <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                        <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
+                        <a href="{{ localized_route('products.show', $product) }}" class="hover:text-blue-600">
                             {{ $product->name }}
                         </a>
                     </h3>
@@ -79,7 +79,7 @@
 
                     <!-- Actions -->
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('products.show', $product) }}" 
+                        <a href="{{ localized_route('products.show', $product) }}" 
                            class="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                             {{ __('products.view_details') }}
                         </a>

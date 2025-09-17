@@ -47,3 +47,4 @@ final class AttributeTypesWidget extends ChartWidget
         return 'pie';
     }
 }
+

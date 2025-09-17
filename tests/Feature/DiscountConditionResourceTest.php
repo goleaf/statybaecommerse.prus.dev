@@ -380,3 +380,4 @@ final class DiscountConditionResourceTest extends TestCase
             ->assertSessionHasErrors(['value']);
     }
 }
+

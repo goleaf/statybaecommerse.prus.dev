@@ -106,3 +106,4 @@ final class LowStockCartItemsWidget extends BaseWidget
             ->paginated([10, 25, 50]);
     }
 }
+

@@ -47,3 +47,4 @@ final class DiscountConditionChartWidget extends ChartWidget
         return 'pie';
     }
 }
+

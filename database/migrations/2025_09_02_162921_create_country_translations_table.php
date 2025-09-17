@@ -13,14 +13,15 @@ return new class extends Migration
     {
         Schema::create('country_translations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('country_id')->constrained('countries')->cascadeOnDelete();
+            // Defer FK to avoid ordering issues
+            $table->unsignedBigInteger('country_id');
             $table->string('locale', 5);
             $table->string('name');
             $table->string('name_official')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
 
-            $table->unique(['country_id', 'locale']);
+            $table->unique(['country_id', 'locale'], 'ct_country_locale_unique');
             $table->index(['locale']);
         });
     }

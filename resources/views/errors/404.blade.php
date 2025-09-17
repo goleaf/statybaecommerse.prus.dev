@@ -31,7 +31,7 @@
 
                 {{-- Action Buttons --}}
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) ?? url('/') }}"
+                    <a href="{{ route('localized.home', []) ?? url('/') }}"
                        class="btn-gradient px-8 py-3 rounded-xl font-semibold text-center">
                         {{ __('Go Home') }}
                     </a>
@@ -44,7 +44,7 @@
                 {{-- Search Box --}}
                 <div class="mt-12 max-w-md mx-auto">
                     <h3 class="text-lg font-semibold text-gray-700 mb-4">{{ __('Search for what you need') }}</h3>
-                    <form action="{{ route('search', ['locale' => app()->getLocale()]) ?? '/search' }}" method="GET"
+                    <form action="{{ localized_route('search') }}" method="GET"
                           class="flex gap-2">
                         <input type="search"
                                name="q"
@@ -64,7 +64,7 @@
                 <div class="mt-12">
                     <h3 class="text-lg font-semibold text-gray-700 mb-6">{{ __('Popular Pages') }}</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <a href="{{ route('categories.index', ['locale' => app()->getLocale()]) ?? '/categories' }}"
+                        <a href="{{ localized_route('categories.index') }}"
                            class="text-center p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-soft transition-all duration-200">
                             <svg class="w-8 h-8 text-blue-600 mx-auto mb-2" fill="none" stroke="currentColor"
                                  viewBox="0 0 24 24">
@@ -75,7 +75,7 @@
                             <span class="text-sm font-medium text-gray-700">{{ __('Categories') }}</span>
                         </a>
 
-                        <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                        <a href="{{ localized_route('products.index') }}"
                            class="text-center p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-soft transition-all duration-200">
                             <svg class="w-8 h-8 text-blue-600 mx-auto mb-2" fill="none" stroke="currentColor"
                                  viewBox="0 0 24 24">
@@ -85,7 +85,7 @@
                             <span class="text-sm font-medium text-gray-700">{{ __('Products') }}</span>
                         </a>
 
-                        <a href="{{ route('brands.index', ['locale' => app()->getLocale()]) ?? '/brands' }}"
+                        <a href="{{ localized_route('brands.index') }}"
                            class="text-center p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-soft transition-all duration-200">
                             <svg class="w-8 h-8 text-blue-600 mx-auto mb-2" fill="none" stroke="currentColor"
                                  viewBox="0 0 24 24">
@@ -96,7 +96,7 @@
                             <span class="text-sm font-medium text-gray-700">{{ __('Brands') }}</span>
                         </a>
 
-                        <a href="{{ route('cart.index', ['locale' => app()->getLocale()]) ?? '/cart' }}"
+                        <a href="{{ localized_route('cart.index') }}"
                            class="text-center p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-soft transition-all duration-200">
                             <svg class="w-8 h-8 text-blue-600 mx-auto mb-2" fill="none" stroke="currentColor"
                                  viewBox="0 0 24 24">

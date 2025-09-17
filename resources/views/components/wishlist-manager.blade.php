@@ -94,7 +94,7 @@
                         <div class="p-6">
                             {{-- Product Name --}}
                             <h3 class="font-semibold text-gray-900 text-lg mb-2 line-clamp-2">
-                                <a href="{{ route('product.show', $item->slug ?? $item) }}"
+                                <a href="{{ route('product.show', $item->slug) }}"
                                    class="hover:text-blue-600 transition-colors duration-200">
                                     {{ $item->name }}
                                 </a>
@@ -151,7 +151,7 @@
                                     </button>
                                 @endif
 
-                                <a href="{{ route('product.show', $item->slug ?? $item) }}"
+                                <a href="{{ route('product.show', $item->slug) }}"
                                    class="w-full border border-gray-300 text-gray-700 text-sm px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200 text-center block">
                                     {{ __('View Details') }}
                                 </a>
@@ -215,11 +215,11 @@
                     {{ __('Start adding products to your wishlist by clicking the heart icon on any product page.') }}
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                    <a href="{{ localized_route('products.index') }}"
                        class="btn-gradient px-8 py-3 rounded-xl font-semibold">
                         {{ __('Browse Products') }}
                     </a>
-                    <a href="{{ route('categories.index', ['locale' => app()->getLocale()]) ?? '/categories' }}"
+                    <a href="{{ localized_route('categories.index') }}"
                        class="border-2 border-gray-300 text-gray-700 px-8 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
                         {{ __('View Categories') }}
                     </a>
@@ -327,4 +327,3 @@
         }
     }
 </script>
-

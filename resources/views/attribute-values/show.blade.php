@@ -162,7 +162,7 @@
                         </div>
                         @if ($attributeValue->products()->count() > 6)
                             <div class="mt-4 text-center">
-                                <a href="{{ route('products.index', ['attribute_value_id' => $attributeValue->id]) }}"
+                                <a href="{{ localized_route('products.index', ['attribute_value_id' => $attributeValue->id]) }}"
                                    class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">
                                     {{ __('attributes.view_all_products') }}
                                 </a>

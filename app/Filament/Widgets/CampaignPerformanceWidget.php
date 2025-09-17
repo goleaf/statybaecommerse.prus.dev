@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 
 class CampaignPerformanceWidget extends ChartWidget
 {
+    protected string $view = 'filament.widgets.campaign-performance-widget';
+    
     protected ?string $heading = 'Campaign Performance Analytics';
     protected static ?int $sort = 6;
     protected int|string|array $columnSpan = 2;

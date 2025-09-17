@@ -45,7 +45,7 @@ return new class extends Migration {
                 $table->timestamps();
                 $table->softDeletes();
 
-                $table->foreign('parent_id')->references('id')->on('categories')->onDelete('set null');
+                $table->foreign('parent_id')->references('id')->on('categories')->nullOnDelete()->cascadeOnUpdate();
                 $table->index(['is_visible', 'sort_order']);
                 $table->index(['parent_id', 'sort_order']);
             });
@@ -61,10 +61,10 @@ return new class extends Migration {
                 $table->text('short_description')->nullable();
                 $table->string('sku')->unique();
                 $table->text('summary')->nullable();
-                $table->decimal('price', 10, 2)->nullable();
-                $table->decimal('sale_price', 10, 2)->nullable();
-                $table->decimal('compare_price', 10, 2)->nullable();
-                $table->decimal('cost_price', 10, 2)->nullable();
+                $table->decimal('price', 15, 2)->nullable();
+                $table->decimal('sale_price', 15, 2)->nullable();
+                $table->decimal('compare_price', 15, 2)->nullable();
+                $table->decimal('cost_price', 15, 2)->nullable();
                 $table->boolean('manage_stock')->default(false);
                 $table->integer('stock_quantity')->default(0);
                 $table->integer('low_stock_threshold')->default(0);
@@ -84,7 +84,7 @@ return new class extends Migration {
                 $table->timestamps();
                 $table->softDeletes();
 
-                $table->foreign('brand_id')->references('id')->on('brands')->onDelete('set null');
+                $table->foreign('brand_id')->references('id')->on('brands')->nullOnDelete()->cascadeOnUpdate();
                 $table->index(['is_visible', 'published_at']);
                 $table->index(['status', 'is_visible']);
                 $table->index(['brand_id', 'is_visible']);
@@ -100,8 +100,8 @@ return new class extends Migration {
                 $table->unsignedBigInteger('category_id');
                 $table->timestamps();
 
-                $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-                $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+                $table->foreign('product_id')->references('id')->on('products')->cascadeOnUpdate()->cascadeOnDelete();
+                $table->foreign('category_id')->references('id')->on('categories')->cascadeOnUpdate()->cascadeOnDelete();
                 $table->unique(['product_id', 'category_id']);
             });
         }
@@ -134,8 +134,8 @@ return new class extends Migration {
                 $table->unsignedBigInteger('collection_id');
                 $table->timestamps();
 
-                $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-                $table->foreign('collection_id')->references('id')->on('collections')->onDelete('cascade');
+                $table->foreign('product_id')->references('id')->on('products')->cascadeOnUpdate()->cascadeOnDelete();
+                $table->foreign('collection_id')->references('id')->on('collections')->cascadeOnUpdate()->cascadeOnDelete();
                 $table->unique(['product_id', 'collection_id']);
             });
         }
@@ -147,11 +147,11 @@ return new class extends Migration {
                 $table->string('number')->unique();
                 $table->unsignedBigInteger('user_id')->nullable();
                 $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled'])->default('pending');
-                $table->decimal('subtotal', 10, 2)->default(0);
-                $table->decimal('tax_amount', 10, 2)->default(0);
-                $table->decimal('shipping_amount', 10, 2)->default(0);
-                $table->decimal('discount_amount', 10, 2)->default(0);
-                $table->decimal('total', 10, 2)->default(0);
+                $table->decimal('subtotal', 15, 2)->default(0);
+                $table->decimal('tax_amount', 15, 2)->default(0);
+                $table->decimal('shipping_amount', 15, 2)->default(0);
+                $table->decimal('discount_amount', 15, 2)->default(0);
+                $table->decimal('total', 15, 2)->default(0);
                 $table->string('currency', 3)->default('EUR');
                 $table->json('billing_address')->nullable();
                 $table->json('shipping_address')->nullable();
@@ -161,7 +161,7 @@ return new class extends Migration {
                 $table->timestamps();
                 $table->softDeletes();
 
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+                $table->foreign('user_id')->references('id')->on('users')->nullOnDelete()->cascadeOnUpdate();
                 $table->index(['status', 'created_at']);
                 $table->index(['user_id', 'created_at']);
             });
@@ -176,12 +176,12 @@ return new class extends Migration {
                 $table->string('product_name');
                 $table->string('product_sku');
                 $table->integer('quantity');
-                $table->decimal('price', 10, 2);
-                $table->decimal('total', 10, 2);
+                $table->decimal('price', 15, 2);
+                $table->decimal('total', 15, 2);
                 $table->timestamps();
 
-                $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
-                $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+                $table->foreign('order_id')->references('id')->on('orders')->cascadeOnUpdate()->cascadeOnDelete();
+                $table->foreign('product_id')->references('id')->on('products')->cascadeOnUpdate()->cascadeOnDelete();
             });
         }
 
@@ -203,8 +203,8 @@ return new class extends Migration {
                 $table->timestamps();
                 $table->softDeletes();
 
-                $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+                $table->foreign('product_id')->references('id')->on('products')->cascadeOnUpdate()->cascadeOnDelete();
+                $table->foreign('user_id')->references('id')->on('users')->nullOnDelete()->cascadeOnUpdate();
                 $table->index(['product_id', 'is_approved']);
                 $table->index(['is_approved', 'created_at']);
                 $table->index(['locale']);
@@ -219,8 +219,8 @@ return new class extends Migration {
                 $table->string('name');
                 $table->text('description')->nullable();
                 $table->enum('type', ['percentage', 'fixed']);
-                $table->decimal('value', 10, 2);
-                $table->decimal('minimum_amount', 10, 2)->nullable();
+                $table->decimal('value', 15, 2);
+                $table->decimal('minimum_amount', 15, 2)->nullable();
                 $table->integer('usage_limit')->nullable();
                 $table->integer('used_count')->default(0);
                 $table->boolean('is_active')->default(true);
@@ -241,12 +241,16 @@ return new class extends Migration {
                 $table->string('session_id');
                 $table->unsignedBigInteger('user_id')->nullable();
                 $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('variant_id')->nullable();
                 $table->integer('quantity');
-                $table->decimal('price', 10, 2);
+                $table->decimal('unit_price', 15, 2);
+                $table->decimal('total_price', 15, 2);
+                $table->json('product_snapshot')->nullable();
                 $table->timestamps();
 
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-                $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+                $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->cascadeOnDelete();
+                $table->foreign('product_id')->references('id')->on('products')->cascadeOnUpdate()->cascadeOnDelete();
+                $table->foreign('variant_id')->references('id')->on('product_variants')->nullOnDelete()->cascadeOnUpdate();
                 $table->index(['session_id']);
                 $table->index(['user_id']);
             });

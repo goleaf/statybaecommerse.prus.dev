@@ -41,3 +41,4 @@ final class ActivityLogStatsWidget extends BaseWidget
         ];
     }
 }
+

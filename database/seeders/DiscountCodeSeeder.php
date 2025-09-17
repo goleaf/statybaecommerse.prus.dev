@@ -25,11 +25,11 @@ class DiscountCodeSeeder extends Seeder
                 $base = is_string($discount->name ?? null) ? $discount->name : 'DISCOUNT';
                 $prefix = Str::upper(Str::slug($base));
                 $code = $prefix.'-'.Str::upper(Str::random(6));
-                $exists = DB::table('sh_discount_codes')->where('code', $code)->exists();
+                $exists = DB::table('discount_codes')->where('code', $code)->exists();
                 if ($exists) {
                     continue;
                 }
-                DB::table('sh_discount_codes')->insert([
+                DB::table('discount_codes')->insert([
                     'discount_id' => $discount->id,
                     'code' => $code,
                     'expires_at' => now()->addMonths(6),

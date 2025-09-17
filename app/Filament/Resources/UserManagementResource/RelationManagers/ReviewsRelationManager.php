@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
 use App\Models\Review;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -13,10 +13,10 @@ final class ReviewsRelationManager extends RelationManager
 {
     protected static string $relationship = 'reviews';
     protected static ?string $title = 'Reviews';
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\Select::make('product_id')
                     ->relationship('product', 'name')
                     ->required(),

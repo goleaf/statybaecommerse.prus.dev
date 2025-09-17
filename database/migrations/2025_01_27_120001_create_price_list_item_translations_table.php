@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            $table->foreign('price_list_item_id')->references('id')->on('price_list_items')->onDelete('cascade');
+            $table->index(['price_list_item_id']);
             $table->unique(['price_list_item_id', 'locale'], 'price_list_item_translations_unique');
             $table->index(['locale']);
         });
@@ -30,3 +30,4 @@ return new class extends Migration
         Schema::dropIfExists('price_list_item_translations');
     }
 };
+

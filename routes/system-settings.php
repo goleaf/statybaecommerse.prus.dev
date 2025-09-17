@@ -34,7 +34,7 @@ Route::prefix('admin/system-settings')->middleware(['web'])->group(function () {
                 ]);
         }
 
-        return redirect()->back()->with('success', 'Settings updated successfully!');
+        return redirect()->back()->with('success', __('admin.settings.updated_successfully'));
     })->name('admin.system-settings.update');
 
     Route::get('/export', function () {
@@ -103,7 +103,7 @@ Route::get('/api/settings/{key}', function ($key) {
         ->where('is_active', true)
         ->first();
 
-    if (! $setting) {
+    if (!$setting) {
         return response()->json(['error' => 'Setting not found'], 404);
     }
 

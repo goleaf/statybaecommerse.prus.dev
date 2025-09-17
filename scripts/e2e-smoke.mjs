@@ -5,7 +5,7 @@ const baseUrl = process.env.TARGET_URL || process.env.APP_URL || 'http://localho
 const targets = [
   '/',
   '/register',
-  '/login?locale=lt',
+  '/lt/login',
   '/categories',
 ];
 
@@ -39,8 +39,8 @@ const full = (path) => baseUrl.replace(/\/$/, '') + path;
       const linkCount = await page.evaluate(() => document.querySelectorAll('link[rel="stylesheet"]').length);
       const bgColor = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 
-      // Locale-specific quick check on /login?locale=lt
-      if (path.startsWith('/login?locale=lt')) {
+      // Locale-specific quick check on /lt/login
+      if (path.startsWith('/lt/login')) {
         const hasLtLogin = await page.evaluate(() => document.body.innerText.toLowerCase().includes('prisijungti'));
         if (!hasLtLogin) errors.push('[assertion] Expected LT localized login text');
       }
@@ -68,4 +68,3 @@ const full = (path) => baseUrl.replace(/\/$/, '') + path;
   console.log(`\n[e2e:smoke] total=${targets.length} failed=${failures}`);
   if (failures > 0) process.exitCode = 1;
 })();
-

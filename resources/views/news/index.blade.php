@@ -33,7 +33,7 @@
                         @endforeach
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
-                        <a href="{{ route('news.show', $featured->slug) }}" class="hover:text-blue-600">
+                        <a href="{{ localized_route('news.show', $featured->slug) }}" class="hover:text-blue-600">
                             {{ $featured->title }}
                         </a>
                     </h3>
@@ -51,7 +51,7 @@
 
     <!-- Filters Section -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <form method="GET" action="{{ route('news.index') }}" class="space-y-4">
+        <form method="GET" action="{{ localized_route('news.index') }}" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <!-- Search -->
                 <div>
@@ -148,7 +148,7 @@
                     @endif
                 </div>
                 <h3 class="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
-                    <a href="{{ route('news.show', $article->slug) }}" class="hover:text-blue-600">
+                    <a href="{{ localized_route('news.show', $article->slug) }}" class="hover:text-blue-600">
                         {{ $article->title }}
                     </a>
                 </h3>
@@ -180,3 +180,4 @@
     @endif
 </div>
 @endsection
+

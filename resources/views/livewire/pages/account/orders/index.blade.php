@@ -1,6 +1,6 @@
 <div class="space-y-10">
     <x-breadcrumbs :items="[
-        ['label' => __('My account'), 'url' => route('account.index', ['locale' => app()->getLocale()])],
+        ['label' => __('My account'), 'url' => route('account.index', [])],
         ['label' => __('My orders')],
     ]" />
     <x-page-heading
@@ -15,7 +15,7 @@
             <p class="max-w-3xl mx-auto text-sm text-gray-500">
                 {{ __("You haven't ordered anything from us yet. Is this the day to change that?") }}
             </p>
-            <x-buttons.primary :href="route('home', ['locale' => app()->getLocale()])" class="px-4 text-sm">
+            <x-buttons.primary :href="localized_route('products.index')" class="px-4 text-sm">
                 {{ __('Continue shopping') }}
             </x-buttons.primary>
         </div>

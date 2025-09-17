@@ -10,15 +10,18 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (!Schema::hasTable('countries')) {
+            return;
+        }
+
         Schema::table('countries', function (Blueprint $table) {
-            // Add missing fields for the Country model
+            // Country fields (forward-only canonical)
             if (!Schema::hasColumn('countries', 'code')) {
                 $table->string('code', 3)->unique()->nullable()->after('id');
             }
             if (!Schema::hasColumn('countries', 'iso_code')) {
                 $table->string('iso_code', 3)->unique()->nullable()->after('code');
             }
-            // phone_code and currency_code already exist in the original table
             if (!Schema::hasColumn('countries', 'currency_symbol')) {
                 $table->string('currency_symbol', 5)->nullable()->after('currency_code');
             }
@@ -51,8 +54,12 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        if (!Schema::hasTable('countries')) {
+            return;
+        }
+
         Schema::table('countries', function (Blueprint $table) {
-            $table->dropColumn([
+            foreach ([
                 'code',
                 'iso_code',
                 'currency_symbol',
@@ -63,7 +70,11 @@ return new class extends Migration {
                 'timezone',
                 'metadata',
                 'sort_order',
-            ]);
+            ] as $col) {
+                if (Schema::hasColumn('countries', $col)) {
+                    $table->dropColumn($col);
+                }
+            }
         });
     }
 };
