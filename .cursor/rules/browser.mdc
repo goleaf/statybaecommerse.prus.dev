@@ -1,0 +1,6 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+after changing code create test for model, for 
