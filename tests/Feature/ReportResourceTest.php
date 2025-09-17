@@ -1,0 +1,158 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\Report;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+final class ReportResourceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->actingAs(User::factory()->create());
+    }
+
+    public function test_can_list_reports(): void
+    {
+        Report::factory()->count(3)->create();
+
+        Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
+            ->assertCanSeeTableRecords(Report::all());
+    }
+
+    public function test_can_create_report(): void
+    {
+        $reportData = [
+            'name' => 'Test Report',
+            'slug' => 'test-report',
+            'description' => 'Test report description',
+            'type' => 'sales',
+            'category' => 'analytics',
+            'is_active' => true,
+        ];
+
+        Livewire::test(\App\Filament\Resources\ReportResource\Pages\CreateReport::class)
+            ->fillForm($reportData)
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('reports', [
+            'name' => 'Test Report',
+            'slug' => 'test-report',
+            'type' => 'sales',
+        ]);
+    }
+
+    public function test_can_edit_report(): void
+    {
+        $report = Report::factory()->create();
+
+        Livewire::test(\App\Filament\Resources\ReportResource\Pages\EditReport::class, [
+            'record' => $report->getRouteKey(),
+        ])
+            ->fillForm([
+                'name' => 'Updated Report Name',
+                'description' => 'Updated description',
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('reports', [
+            'id' => $report->id,
+            'name' => 'Updated Report Name',
+            'description' => 'Updated description',
+        ]);
+    }
+
+    public function test_can_view_report(): void
+    {
+        $report = Report::factory()->create();
+
+        Livewire::test(\App\Filament\Resources\ReportResource\Pages\ViewReport::class, [
+            'record' => $report->getRouteKey(),
+        ])
+            ->assertCanSeeRecord($report);
+    }
+
+    public function test_can_delete_report(): void
+    {
+        $report = Report::factory()->create();
+
+        Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
+            ->callTableAction('delete', $report)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseMissing('reports', [
+            'id' => $report->id,
+        ]);
+    }
+
+    public function test_can_filter_reports_by_type(): void
+    {
+        Report::factory()->create(['type' => 'sales']);
+        Report::factory()->create(['type' => 'inventory']);
+
+        Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
+            ->filterTable('type', 'sales')
+            ->assertCanSeeTableRecords(Report::where('type', 'sales')->get())
+            ->assertCanNotSeeTableRecords(Report::where('type', 'inventory')->get());
+    }
+
+    public function test_can_filter_reports_by_status(): void
+    {
+        Report::factory()->create(['is_active' => true]);
+        Report::factory()->create(['is_active' => false]);
+
+        Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
+            ->filterTable('is_active', 'true')
+            ->assertCanSeeTableRecords(Report::where('is_active', true)->get())
+            ->assertCanNotSeeTableRecords(Report::where('is_active', false)->get());
+    }
+
+    public function test_can_bulk_delete_reports(): void
+    {
+        $reports = Report::factory()->count(3)->create();
+
+        Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
+            ->callTableBulkAction('delete', $reports)
+            ->assertHasNoTableBulkActionErrors();
+
+        foreach ($reports as $report) {
+            $this->assertDatabaseMissing('reports', [
+                'id' => $report->id,
+            ]);
+        }
+    }
+
+    public function test_can_toggle_report_status(): void
+    {
+        $report = Report::factory()->create(['is_active' => true]);
+
+        Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
+            ->callTableAction('toggle_active', $report)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseHas('reports', [
+            'id' => $report->id,
+            'is_active' => false,
+        ]);
+    }
+
+    public function test_can_generate_report(): void
+    {
+        $report = Report::factory()->create();
+
+        Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
+            ->callTableAction('generate', $report)
+            ->assertHasNoTableActionErrors();
+    }
+}

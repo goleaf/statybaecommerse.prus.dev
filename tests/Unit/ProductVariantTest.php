@@ -1,0 +1,242 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit;
+
+use App\Models\ProductVariant;
+use App\Models\Product;
+use App\Models\Attribute;
+use App\Models\AttributeValue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class ProductVariantTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_product_variant_can_be_created(): void
+    {
+        $product = Product::factory()->create();
+        
+        $variant = ProductVariant::factory()->create([
+            'product_id' => $product->id,
+            'sku' => 'VARIANT-123',
+            'price' => 99.99,
+            'stock_quantity' => 50,
+        ]);
+
+        $this->assertDatabaseHas('product_variants', [
+            'product_id' => $product->id,
+            'sku' => 'VARIANT-123',
+            'price' => 99.99,
+            'stock_quantity' => 50,
+        ]);
+    }
+
+    public function test_product_variant_belongs_to_product(): void
+    {
+        $product = Product::factory()->create();
+        $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
+
+        $this->assertInstanceOf(Product::class, $variant->product);
+        $this->assertEquals($product->id, $variant->product->id);
+    }
+
+    public function test_product_variant_can_have_many_attribute_values(): void
+    {
+        $variant = ProductVariant::factory()->create();
+        $attribute = Attribute::factory()->create();
+        $attributeValues = AttributeValue::factory()->count(3)->create(['attribute_id' => $attribute->id]);
+
+        $variant->attributeValues()->attach($attributeValues->pluck('id'));
+
+        $this->assertCount(3, $variant->attributeValues);
+        $this->assertInstanceOf(AttributeValue::class, $variant->attributeValues->first());
+    }
+
+    public function test_product_variant_casts_work_correctly(): void
+    {
+        $variant = ProductVariant::factory()->create([
+            'price' => 99.99,
+            'sale_price' => 79.99,
+            'stock_quantity' => 100,
+            'weight' => 1.5,
+            'is_active' => true,
+            'is_default' => false,
+            'created_at' => now(),
+        ]);
+
+        $this->assertIsNumeric($variant->price);
+        $this->assertIsNumeric($variant->sale_price);
+        $this->assertIsInt($variant->stock_quantity);
+        $this->assertIsNumeric($variant->weight);
+        $this->assertIsBool($variant->is_active);
+        $this->assertIsBool($variant->is_default);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $variant->created_at);
+    }
+
+    public function test_product_variant_fillable_attributes(): void
+    {
+        $variant = new ProductVariant();
+        $fillable = $variant->getFillable();
+
+        $this->assertContains('product_id', $fillable);
+        $this->assertContains('sku', $fillable);
+        $this->assertContains('price', $fillable);
+        $this->assertContains('sale_price', $fillable);
+        $this->assertContains('stock_quantity', $fillable);
+        $this->assertContains('is_active', $fillable);
+    }
+
+    public function test_product_variant_scope_active(): void
+    {
+        $activeVariant = ProductVariant::factory()->create(['is_active' => true]);
+        $inactiveVariant = ProductVariant::factory()->create(['is_active' => false]);
+
+        $activeVariants = ProductVariant::active()->get();
+
+        $this->assertTrue($activeVariants->contains($activeVariant));
+        $this->assertFalse($activeVariants->contains($inactiveVariant));
+    }
+
+    public function test_product_variant_scope_default(): void
+    {
+        $defaultVariant = ProductVariant::factory()->create(['is_default' => true]);
+        $nonDefaultVariant = ProductVariant::factory()->create(['is_default' => false]);
+
+        $defaultVariants = ProductVariant::default()->get();
+
+        $this->assertTrue($defaultVariants->contains($defaultVariant));
+        $this->assertFalse($defaultVariants->contains($nonDefaultVariant));
+    }
+
+    public function test_product_variant_scope_in_stock(): void
+    {
+        $inStockVariant = ProductVariant::factory()->create(['stock_quantity' => 10]);
+        $outOfStockVariant = ProductVariant::factory()->create(['stock_quantity' => 0]);
+
+        $inStockVariants = ProductVariant::inStock()->get();
+
+        $this->assertTrue($inStockVariants->contains($inStockVariant));
+        $this->assertFalse($inStockVariants->contains($outOfStockVariant));
+    }
+
+    public function test_product_variant_scope_for_product(): void
+    {
+        $product1 = Product::factory()->create();
+        $product2 = Product::factory()->create();
+        
+        $variant1 = ProductVariant::factory()->create(['product_id' => $product1->id]);
+        $variant2 = ProductVariant::factory()->create(['product_id' => $product2->id]);
+
+        $product1Variants = ProductVariant::forProduct($product1->id)->get();
+
+        $this->assertTrue($product1Variants->contains($variant1));
+        $this->assertFalse($product1Variants->contains($variant2));
+    }
+
+    public function test_product_variant_can_calculate_discount_percentage(): void
+    {
+        $variant = ProductVariant::factory()->create([
+            'price' => 100.00,
+            'sale_price' => 80.00,
+        ]);
+
+        $discountPercentage = $variant->getDiscountPercentage();
+        
+        $this->assertEquals(20, $discountPercentage);
+    }
+
+    public function test_product_variant_can_get_effective_price(): void
+    {
+        $variantWithSale = ProductVariant::factory()->create([
+            'price' => 100.00,
+            'sale_price' => 80.00,
+        ]);
+
+        $variantWithoutSale = ProductVariant::factory()->create([
+            'price' => 100.00,
+            'sale_price' => null,
+        ]);
+
+        $this->assertEquals(80.00, $variantWithSale->getEffectivePrice());
+        $this->assertEquals(100.00, $variantWithoutSale->getEffectivePrice());
+    }
+
+    public function test_product_variant_can_check_availability(): void
+    {
+        $availableVariant = ProductVariant::factory()->create(['stock_quantity' => 10]);
+        $unavailableVariant = ProductVariant::factory()->create(['stock_quantity' => 0]);
+
+        $this->assertTrue($availableVariant->isAvailable());
+        $this->assertFalse($unavailableVariant->isAvailable());
+    }
+
+    public function test_product_variant_can_check_low_stock(): void
+    {
+        $lowStockVariant = ProductVariant::factory()->create(['stock_quantity' => 5]);
+        $normalStockVariant = ProductVariant::factory()->create(['stock_quantity' => 50]);
+
+        $this->assertTrue($lowStockVariant->isLowStock());
+        $this->assertFalse($normalStockVariant->isLowStock());
+    }
+
+    public function test_product_variant_can_have_dimensions(): void
+    {
+        $variant = ProductVariant::factory()->create([
+            'length' => 10.5,
+            'width' => 8.0,
+            'height' => 2.5,
+        ]);
+
+        $this->assertEquals(10.5, $variant->length);
+        $this->assertEquals(8.0, $variant->width);
+        $this->assertEquals(2.5, $variant->height);
+    }
+
+    public function test_product_variant_can_have_barcode(): void
+    {
+        $variant = ProductVariant::factory()->create([
+            'barcode' => '1234567890123',
+        ]);
+
+        $this->assertEquals('1234567890123', $variant->barcode);
+    }
+
+    public function test_product_variant_can_have_images(): void
+    {
+        $variant = ProductVariant::factory()->create();
+
+        // Test that variant implements HasMedia
+        $this->assertInstanceOf(\Spatie\MediaLibrary\HasMedia::class, $variant);
+        
+        // Test that variant can handle media
+        $this->assertTrue(method_exists($variant, 'registerMediaCollections'));
+        $this->assertTrue(method_exists($variant, 'registerMediaConversions'));
+        $this->assertTrue(method_exists($variant, 'media'));
+    }
+
+    public function test_product_variant_can_have_custom_attributes(): void
+    {
+        $variant = ProductVariant::factory()->create([
+            'custom_attributes' => [
+                'color' => 'red',
+                'size' => 'large',
+                'material' => 'cotton',
+            ],
+        ]);
+
+        $this->assertIsArray($variant->custom_attributes);
+        $this->assertEquals('red', $variant->custom_attributes['color']);
+        $this->assertEquals('large', $variant->custom_attributes['size']);
+        $this->assertEquals('cotton', $variant->custom_attributes['material']);
+    }
+
+    public function test_product_variant_can_have_sort_order(): void
+    {
+        $variant = ProductVariant::factory()->create([
+            'sort_order' => 5,
+        ]);
+
+        $this->assertEquals(5, $variant->sort_order);
+    }
+}

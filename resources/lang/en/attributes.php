@@ -1,0 +1,185 @@
+<?php
+
+return [
+    // Basic fields
+    'name' => 'Name',
+    'slug' => 'Slug',
+    'type' => 'Type',
+    'description' => 'Description',
+    'validation_rules' => 'Validation Rules',
+    'default_value' => 'Default Value',
+    'is_required' => 'Required',
+    'is_filterable' => 'Filterable',
+    'is_searchable' => 'Searchable',
+    'is_visible' => 'Visible',
+    'is_editable' => 'Editable',
+    'is_sortable' => 'Sortable',
+    'sort_order' => 'Sort Order',
+    'is_enabled' => 'Enabled',
+    'category_id' => 'Category',
+    'group_name' => 'Group Name',
+    'icon' => 'Icon',
+    'color' => 'Color',
+    'min_value' => 'Min Value',
+    'max_value' => 'Max Value',
+    'step_value' => 'Step Value',
+    'placeholder' => 'Placeholder',
+    'help_text' => 'Help Text',
+    'meta_data' => 'Meta Data',
+
+    // Helpers
+    'full_display_name' => 'Full Display Name',
+    'attribute_info' => 'Attribute Information',
+    'technical_info' => 'Technical Information',
+    'business_info' => 'Business Information',
+    'complete_info' => 'Complete Information',
+    'values_count' => 'Values Count',
+    'usage_count' => 'Usage Count',
+    'popularity_score' => 'Popularity Score',
+
+    // Types
+    'text' => 'Text',
+    'number' => 'Number',
+    'boolean' => 'Boolean',
+    'select' => 'Select',
+    'multiselect' => 'Multi Select',
+    'color' => 'Color',
+    'date' => 'Date',
+    'textarea' => 'Textarea',
+    'file' => 'File',
+    'image' => 'Image',
+
+    // Status
+    'disabled' => 'Disabled',
+    'required' => 'Required',
+    'filterable' => 'Filterable',
+    'standard' => 'Standard',
+    'unknown' => 'Unknown',
+
+    // Filters
+    'filters' => [
+        'type' => 'Type',
+        'group_name' => 'Group Name',
+        'required_only' => 'Required Only',
+        'filterable_only' => 'Filterable Only',
+        'searchable_only' => 'Searchable Only',
+        'enabled_only' => 'Enabled Only',
+        'with_values_only' => 'With Values Only',
+    ],
+
+    // Actions
+    'actions' => [
+        'view' => 'View',
+        'edit' => 'Edit',
+        'delete' => 'Delete',
+        'restore' => 'Restore',
+        'force_delete' => 'Force Delete',
+        'duplicate' => 'Duplicate',
+        'merge' => 'Merge',
+    ],
+
+    // Empty states
+    'empty_states' => [
+        'no_attributes' => 'No attributes found',
+        'no_values' => 'No values for this attribute',
+        'no_translations' => 'No translations available',
+    ],
+
+    // Messages
+    'messages' => [
+        'created' => 'Attribute created successfully',
+        'updated' => 'Attribute updated successfully',
+        'deleted' => 'Attribute deleted successfully',
+        'restored' => 'Attribute restored successfully',
+        'duplicated' => 'Attribute duplicated successfully',
+        'merged' => 'Attributes merged successfully',
+    ],
+
+    // Validation
+    'validation' => [
+        'name_required' => 'Name is required',
+        'slug_required' => 'Slug is required',
+        'type_required' => 'Type is required',
+        'slug_unique' => 'Slug must be unique',
+        'description_max' => 'Description cannot exceed 1000 characters',
+        'sort_order_numeric' => 'Sort order must be a number',
+    ],
+
+    // Statistics
+    'stats' => [
+        'total_attributes' => 'Total Attributes',
+        'enabled_attributes' => 'Enabled Attributes',
+        'required_attributes' => 'Required Attributes',
+        'filterable_attributes' => 'Filterable Attributes',
+        'searchable_attributes' => 'Searchable Attributes',
+        'attributes_with_values' => 'Attributes with Values',
+        'avg_values_per_attribute' => 'Average Values per Attribute',
+        'most_popular_type' => 'Most Popular Type',
+        'all_attributes' => 'All attributes in the system',
+        'enabled_for_use' => 'Enabled for use',
+        'required_for_products' => 'Required for products',
+        'can_be_filtered' => 'Can be filtered',
+        'can_be_searched' => 'Can be searched',
+        'have_values' => 'Attributes that have values',
+        'average_values' => 'Average number of values',
+    ],
+
+    // Widgets
+    'widgets' => [
+        'stats_heading' => 'Attribute Statistics',
+        'types_heading' => 'Attribute Types',
+        'usage_heading' => 'Attribute Usage',
+        'analytics_heading' => 'Attribute Analytics',
+        'performance_heading' => 'Attribute Performance',
+        'charts' => [
+            'types_distribution' => 'Types Distribution',
+            'usage_overview' => 'Usage Overview',
+            'popularity_trends' => 'Popularity Trends',
+        ],
+    ],
+
+    // Form labels
+    'attribute_name' => 'Attribute Name',
+    'attribute_description' => 'Attribute Description',
+    'attribute_settings' => 'Attribute Settings',
+    'attribute_settings_description' => 'Configure the basic settings for this attribute',
+    'attribute_properties' => 'Attribute Properties',
+    'attribute_properties_description' => 'Define the behavior and visibility of this attribute',
+    'numeric_settings' => 'Numeric Settings',
+    'numeric_settings_description' => 'Configure numeric constraints for this attribute',
+
+    // Help text
+    'help' => [
+        'type' => 'The type of input field for this attribute',
+        'sort_order' => 'Order in which attributes are displayed',
+        'group_name' => 'Group to organize related attributes',
+        'icon' => 'Icon to display for this attribute',
+        'color' => 'Color theme for this attribute',
+        'required' => 'Whether this attribute is required',
+        'filterable' => 'Whether this attribute can be used for filtering',
+        'searchable' => 'Whether this attribute can be searched',
+        'visible' => 'Whether this attribute is visible to users',
+        'editable' => 'Whether this attribute can be edited',
+        'sortable' => 'Whether this attribute can be sorted',
+        'enabled' => 'Whether this attribute is enabled',
+        'min_value' => 'Minimum value for numeric attributes',
+        'max_value' => 'Maximum value for numeric attributes',
+        'step_value' => 'Step value for numeric attributes',
+        'default_value' => 'Default value for this attribute',
+        'placeholder' => 'Placeholder text for input fields',
+        'help_text' => 'Help text to guide users',
+        'slug_auto_generated' => 'Slug will be auto-generated from name',
+    ],
+
+    // Placeholders
+    'placeholders' => [
+        'name' => 'Enter attribute name',
+        'slug' => 'Enter attribute slug',
+        'description' => 'Enter attribute description',
+        'group_name' => 'Enter group name',
+        'icon' => 'Enter icon name',
+        'placeholder' => 'Enter placeholder text',
+        'help_text' => 'Enter help text',
+        'default_value' => 'Enter default value',
+    ],
+];

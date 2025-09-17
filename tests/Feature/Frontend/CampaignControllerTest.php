@@ -1,0 +1,481 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Feature\Frontend;
+
+use App\Models\Campaign;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class CampaignControllerTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_can_view_campaigns_index(): void
+    {
+        $campaigns = Campaign::factory()->count(3)->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.index'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('campaigns.index');
+        $response->assertViewHas('campaigns');
+        $response->assertSee($campaigns->first()->trans('name'));
+    }
+
+    public function test_can_filter_campaigns_by_type(): void
+    {
+        $emailCampaign = Campaign::factory()->create([
+            'type' => 'email',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $smsCampaign = Campaign::factory()->create([
+            'type' => 'sms',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.index', ['type' => 'email']));
+
+        $response->assertStatus(200);
+        $response->assertSee($emailCampaign->trans('name'));
+        $response->assertDontSee($smsCampaign->trans('name'));
+    }
+
+    public function test_can_search_campaigns(): void
+    {
+        $searchableCampaign = Campaign::factory()->create([
+            'name' => 'Searchable Campaign',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $otherCampaign = Campaign::factory()->create([
+            'name' => 'Other Campaign',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.index', ['search' => 'Searchable']));
+
+        $response->assertStatus(200);
+        $response->assertSee($searchableCampaign->trans('name'));
+        $response->assertDontSee($otherCampaign->trans('name'));
+    }
+
+    public function test_can_view_single_campaign(): void
+    {
+        $category = Category::factory()->create();
+        $product = Product::factory()->create();
+
+        $campaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $campaign->targetCategories()->attach($category->id);
+        $campaign->targetProducts()->attach($product->id);
+
+        $response = $this->get(route('frontend.campaigns.show', $campaign));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('campaigns.show');
+        $response->assertViewHas('campaign');
+        $response->assertViewHas('relatedCampaigns');
+        $response->assertSee($campaign->trans('name'));
+        $response->assertSee($category->trans('name'));
+        $response->assertSee($product->trans('name'));
+    }
+
+    public function test_campaign_view_records_analytics(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+            'total_views' => 0,
+        ]);
+
+        $this->get(route('frontend.campaigns.show', $campaign));
+
+        $this->assertDatabaseHas('campaign_views', [
+            'campaign_id' => $campaign->id,
+            'ip_address' => '127.0.0.1',
+        ]);
+
+        $this->assertEquals(1, $campaign->fresh()->total_views);
+    }
+
+    public function test_campaign_view_records_analytics_for_authenticated_user(): void
+    {
+        $user = User::factory()->create();
+        $campaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+            'total_views' => 0,
+        ]);
+
+        $this
+            ->actingAs($user)
+            ->get(route('frontend.campaigns.show', $campaign));
+
+        $this->assertDatabaseHas('campaign_views', [
+            'campaign_id' => $campaign->id,
+            'customer_id' => $user->id,
+            'ip_address' => '127.0.0.1',
+        ]);
+    }
+
+    public function test_can_record_campaign_click(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+            'total_clicks' => 0,
+        ]);
+
+        $response = $this->postJson(route('frontend.campaigns.click', $campaign), [
+            'type' => 'cta',
+            'url' => 'https://example.com',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'message' => __('campaigns.messages.click_recorded'),
+        ]);
+
+        $this->assertDatabaseHas('campaign_clicks', [
+            'campaign_id' => $campaign->id,
+            'click_type' => 'cta',
+            'clicked_url' => 'https://example.com',
+            'ip_address' => '127.0.0.1',
+        ]);
+
+        $this->assertEquals(1, $campaign->fresh()->total_clicks);
+    }
+
+    public function test_can_record_campaign_click_for_authenticated_user(): void
+    {
+        $user = User::factory()->create();
+        $campaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+            'total_clicks' => 0,
+        ]);
+
+        $this
+            ->actingAs($user)
+            ->postJson(route('frontend.campaigns.click', $campaign), [
+                'type' => 'banner',
+                'url' => 'https://example.com',
+            ]);
+
+        $this->assertDatabaseHas('campaign_clicks', [
+            'campaign_id' => $campaign->id,
+            'click_type' => 'banner',
+            'clicked_url' => 'https://example.com',
+            'customer_id' => $user->id,
+        ]);
+    }
+
+    public function test_can_record_campaign_conversion(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+            'total_conversions' => 0,
+            'total_revenue' => 0,
+        ]);
+
+        $response = $this->postJson(route('frontend.campaigns.conversion', $campaign), [
+            'type' => 'purchase',
+            'value' => 100.5,
+            'order_id' => 1,
+            'data' => ['order_total' => 100.5],
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'message' => __('campaigns.messages.conversion_recorded'),
+        ]);
+
+        $this->assertDatabaseHas('campaign_conversions', [
+            'campaign_id' => $campaign->id,
+            'conversion_type' => 'purchase',
+            'conversion_value' => 100.5,
+            'order_id' => 1,
+            'conversion_data' => json_encode(['order_total' => 100.5]),
+        ]);
+
+        $freshCampaign = $campaign->fresh();
+        $this->assertEquals(1, $freshCampaign->total_conversions);
+        $this->assertEquals(100.5, $freshCampaign->total_revenue);
+    }
+
+    public function test_can_record_campaign_conversion_for_authenticated_user(): void
+    {
+        $user = User::factory()->create();
+        $campaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+            'total_conversions' => 0,
+            'total_revenue' => 0,
+        ]);
+
+        $this
+            ->actingAs($user)
+            ->postJson(route('frontend.campaigns.conversion', $campaign), [
+                'type' => 'signup',
+                'value' => 0,
+            ]);
+
+        $this->assertDatabaseHas('campaign_conversions', [
+            'campaign_id' => $campaign->id,
+            'conversion_type' => 'signup',
+            'conversion_value' => 0,
+            'customer_id' => $user->id,
+        ]);
+    }
+
+    public function test_can_view_featured_campaigns(): void
+    {
+        $featuredCampaigns = Campaign::factory()->count(3)->create([
+            'is_featured' => true,
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $regularCampaign = Campaign::factory()->create([
+            'is_featured' => false,
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.featured'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('campaigns.featured');
+        $response->assertViewHas('campaigns');
+
+        foreach ($featuredCampaigns as $campaign) {
+            $response->assertSee($campaign->trans('name'));
+        }
+        $response->assertDontSee($regularCampaign->trans('name'));
+    }
+
+    public function test_can_view_campaigns_by_type(): void
+    {
+        $emailCampaigns = Campaign::factory()->count(3)->create([
+            'type' => 'email',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $smsCampaign = Campaign::factory()->create([
+            'type' => 'sms',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.by-type', 'email'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('campaigns.by-type');
+        $response->assertViewHas('campaigns');
+        $response->assertViewHas('type', 'email');
+
+        foreach ($emailCampaigns as $campaign) {
+            $response->assertSee($campaign->trans('name'));
+        }
+        $response->assertDontSee($smsCampaign->trans('name'));
+    }
+
+    public function test_only_active_campaigns_are_shown(): void
+    {
+        $activeCampaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $draftCampaign = Campaign::factory()->create(['status' => 'draft']);
+        $expiredCampaign = Campaign::factory()->create([
+            'status' => 'active',
+            'ends_at' => now()->subDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.index'));
+
+        $response->assertSee($activeCampaign->trans('name'));
+        $response->assertDontSee($draftCampaign->trans('name'));
+        $response->assertDontSee($expiredCampaign->trans('name'));
+    }
+
+    public function test_campaigns_are_sorted_by_priority(): void
+    {
+        $lowPriorityCampaign = Campaign::factory()->create([
+            'display_priority' => 1,
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $highPriorityCampaign = Campaign::factory()->create([
+            'display_priority' => 10,
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.index'));
+
+        $response->assertStatus(200);
+
+        // Check that high priority campaign appears first
+        $content = $response->getContent();
+        $highPriorityPosition = strpos($content, $highPriorityCampaign->trans('name'));
+        $lowPriorityPosition = strpos($content, $lowPriorityCampaign->trans('name'));
+
+        $this->assertTrue($highPriorityPosition < $lowPriorityPosition);
+    }
+
+    public function test_returns_404_for_inactive_campaign(): void
+    {
+        $inactiveCampaign = Campaign::factory()->create(['status' => 'draft']);
+
+        $response = $this->get(route('frontend.campaigns.show', $inactiveCampaign));
+
+        $response->assertStatus(404);
+    }
+
+    public function test_returns_404_for_expired_campaign(): void
+    {
+        $expiredCampaign = Campaign::factory()->create([
+            'status' => 'active',
+            'ends_at' => now()->subDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.show', $expiredCampaign));
+
+        $response->assertStatus(404);
+    }
+
+    public function test_returns_404_for_future_campaign(): void
+    {
+        $futureCampaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->addDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.show', $futureCampaign));
+
+        $response->assertStatus(404);
+    }
+
+    public function test_campaign_show_page_includes_related_campaigns(): void
+    {
+        $category = Category::factory()->create();
+
+        $mainCampaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+        $mainCampaign->targetCategories()->attach($category->id);
+
+        $relatedCampaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+        $relatedCampaign->targetCategories()->attach($category->id);
+
+        $unrelatedCampaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.show', $mainCampaign));
+
+        $response->assertStatus(200);
+        $response->assertSee($relatedCampaign->trans('name'));
+        $response->assertDontSee($unrelatedCampaign->trans('name'));
+    }
+
+    public function test_campaign_click_requires_valid_campaign(): void
+    {
+        $response = $this->postJson(route('frontend.campaigns.click', 'invalid-slug'), [
+            'type' => 'cta',
+            'url' => 'https://example.com',
+        ]);
+
+        $response->assertStatus(404);
+    }
+
+    public function test_campaign_conversion_requires_valid_campaign(): void
+    {
+        $response = $this->postJson(route('frontend.campaigns.conversion', 'invalid-slug'), [
+            'type' => 'purchase',
+            'value' => 100.5,
+        ]);
+
+        $response->assertStatus(404);
+    }
+
+    public function test_campaign_click_requires_csrf_token(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->post(route('frontend.campaigns.click', $campaign), [
+            'type' => 'cta',
+            'url' => 'https://example.com',
+        ]);
+
+        $response->assertStatus(419);  // CSRF token mismatch
+    }
+
+    public function test_campaign_conversion_requires_csrf_token(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->post(route('frontend.campaigns.conversion', $campaign), [
+            'type' => 'purchase',
+            'value' => 100.5,
+        ]);
+
+        $response->assertStatus(419);  // CSRF token mismatch
+    }
+}

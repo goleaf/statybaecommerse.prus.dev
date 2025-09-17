@@ -1,0 +1,505 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit;
+
+use App\Models\AttributeValue;
+use App\Models\Attribute;
+use App\Models\Product;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
+
+class AttributeValueTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private function createActiveAttribute(): Attribute
+    {
+        return Attribute::factory()->create([
+            'is_enabled' => true,
+            'is_visible' => true,
+            'is_active' => true
+        ]);
+    }
+
+    private function createActiveAttributeValue(array $attributes = []): AttributeValue
+    {
+        return AttributeValue::factory()->create(array_merge([
+            'is_active' => true,
+            'is_enabled' => true
+        ], $attributes));
+    }
+
+    public function test_attribute_value_can_be_created(): void
+    {
+        $attribute = $this->createActiveAttribute();
+        $attributeValue = AttributeValue::factory()->create([
+            'attribute_id' => $attribute->id,
+            'value' => 'Red',
+            'slug' => 'red',
+            'sort_order' => 1,
+            'is_enabled' => true,
+        ]);
+
+        $this->assertDatabaseHas('attribute_values', [
+            'attribute_id' => $attribute->id,
+            'value' => 'Red',
+            'slug' => 'red',
+            'sort_order' => 1,
+            'is_enabled' => true,
+        ]);
+    }
+
+    public function test_attribute_value_belongs_to_attribute(): void
+    {
+        $attribute = Attribute::factory()->create([
+            'is_active' => true,
+            'is_enabled' => true,
+            'is_visible' => true
+        ]);
+        $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
+
+        $this->assertInstanceOf(Attribute::class, $attributeValue->attribute);
+        $this->assertEquals($attribute->id, $attributeValue->attribute->id);
+    }
+
+    // Note: AttributeValue doesn't have a direct products() relationship
+    // Products are connected through variants via product_variant_attributes table
+
+    public function test_attribute_value_casts_work_correctly(): void
+    {
+        $attributeValue = AttributeValue::factory()->create([
+            'is_enabled' => true,
+            'sort_order' => 5,
+            'created_at' => now(),
+        ]);
+
+        $this->assertIsBool($attributeValue->is_enabled);
+        $this->assertIsInt($attributeValue->sort_order);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $attributeValue->created_at);
+    }
+
+    public function test_attribute_value_fillable_attributes(): void
+    {
+        $attributeValue = new AttributeValue();
+        $fillable = $attributeValue->getFillable();
+
+        $this->assertContains('attribute_id', $fillable);
+        $this->assertContains('value', $fillable);
+        $this->assertContains('slug', $fillable);
+        $this->assertContains('color_code', $fillable);
+        $this->assertContains('sort_order', $fillable);
+        $this->assertContains('is_enabled', $fillable);
+    }
+
+    public function test_attribute_value_scope_enabled(): void
+    {
+        $enabledValue = AttributeValue::factory()->create(['is_enabled' => true]);
+        $disabledValue = AttributeValue::factory()->create(['is_enabled' => false]);
+
+        $enabledValues = AttributeValue::enabled()->get();
+
+        $this->assertTrue($enabledValues->contains($enabledValue));
+        $this->assertFalse($enabledValues->contains($disabledValue));
+    }
+
+    public function test_attribute_value_scope_ordered(): void
+    {
+        $value1 = AttributeValue::factory()->create(['sort_order' => 2, 'is_active' => true, 'is_enabled' => true]);
+        $value2 = AttributeValue::factory()->create(['sort_order' => 1, 'is_active' => true, 'is_enabled' => true]);
+        $value3 = AttributeValue::factory()->create(['sort_order' => 3, 'is_active' => true, 'is_enabled' => true]);
+
+        $orderedValues = AttributeValue::ordered()->get();
+
+        $this->assertEquals($value2->id, $orderedValues->first()->id);
+        $this->assertEquals($value3->id, $orderedValues->last()->id);
+    }
+
+    public function test_attribute_value_can_have_description(): void
+    {
+        $attributeValue = AttributeValue::factory()->create([
+            'description' => 'Red color option',
+        ]);
+
+        $this->assertEquals('Red color option', $attributeValue->description);
+    }
+
+    public function test_attribute_value_can_have_hex_color(): void
+    {
+        $attributeValue = AttributeValue::factory()->create([
+            'hex_color' => '#FF0000',
+        ]);
+
+        $this->assertEquals('#FF0000', $attributeValue->hex_color);
+    }
+
+    public function test_attribute_value_can_have_image(): void
+    {
+        $attributeValue = AttributeValue::factory()->create([
+            'image' => 'red-color.jpg',
+        ]);
+
+        $this->assertEquals('red-color.jpg', $attributeValue->image);
+    }
+
+    public function test_attribute_value_can_have_metadata(): void
+    {
+        $attributeValue = AttributeValue::factory()->create([
+            'metadata' => [
+                'created_by' => 'admin',
+                'version' => '1.0',
+                'tags' => ['red', 'color', 'option'],
+            ],
+        ]);
+
+        $this->assertIsArray($attributeValue->metadata);
+        $this->assertEquals('admin', $attributeValue->metadata['created_by']);
+        $this->assertEquals('1.0', $attributeValue->metadata['version']);
+        $this->assertIsArray($attributeValue->metadata['tags']);
+    }
+
+    public function test_attribute_value_can_have_scope_by_attribute(): void
+    {
+        $attribute1 = $this->createActiveAttribute();
+        $attribute2 = $this->createActiveAttribute();
+        
+        $value1 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id]);
+        $value2 = AttributeValue::factory()->create(['attribute_id' => $attribute2->id]);
+
+        $attribute1Values = AttributeValue::byAttribute($attribute1->id)->get();
+
+        $this->assertTrue($attribute1Values->contains($value1));
+        $this->assertFalse($attribute1Values->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_value(): void
+    {
+        $value1 = AttributeValue::factory()->create(['value' => 'Red']);
+        $value2 = AttributeValue::factory()->create(['value' => 'Blue']);
+
+        $redValues = AttributeValue::byValue('Red')->get();
+
+        $this->assertTrue($redValues->contains($value1));
+        $this->assertFalse($redValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_display_value(): void
+    {
+        $value1 = AttributeValue::factory()->create(['display_value' => 'Red Color', 'is_active' => true, 'is_enabled' => true]);
+        $value2 = AttributeValue::factory()->create(['display_value' => 'Blue Color', 'is_active' => true, 'is_enabled' => true]);
+
+        $redDisplayValues = AttributeValue::byDisplayValue('Red Color')->get();
+
+        $this->assertTrue($redDisplayValues->contains($value1));
+        $this->assertFalse($redDisplayValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_hex_color(): void
+    {
+        $value1 = AttributeValue::factory()->create(['hex_color' => '#FF0000', 'is_active' => true]);
+        $value2 = AttributeValue::factory()->create(['hex_color' => '#0000FF', 'is_active' => true]);
+
+        $redHexValues = AttributeValue::byHexColor('#FF0000')->get();
+
+        $this->assertTrue($redHexValues->contains($value1));
+        $this->assertFalse($redHexValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_image(): void
+    {
+        $value1 = AttributeValue::factory()->create(['image' => 'red-color.jpg', 'is_active' => true]);
+        $value2 = AttributeValue::factory()->create(['image' => 'blue-color.jpg', 'is_active' => true]);
+
+        $redImageValues = AttributeValue::byImage('red-color.jpg')->get();
+
+        $this->assertTrue($redImageValues->contains($value1));
+        $this->assertFalse($redImageValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_attribute_and_value(): void
+    {
+        $attribute1 = $this->createActiveAttribute();
+        $attribute2 = $this->createActiveAttribute();
+        
+        $value1 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id, 'value' => 'Red']);
+        $value2 = AttributeValue::factory()->create(['attribute_id' => $attribute2->id, 'value' => 'Red']);
+
+        $attribute1RedValues = AttributeValue::byAttribute($attribute1->id)->byValue('Red')->get();
+
+        $this->assertTrue($attribute1RedValues->contains($value1));
+        $this->assertFalse($attribute1RedValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_attribute_and_display_value(): void
+    {
+        $attribute1 = $this->createActiveAttribute();
+        $attribute2 = $this->createActiveAttribute();
+        
+        $value1 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id, 'display_value' => 'Red Color', 'is_active' => true, 'is_enabled' => true]);
+        $value2 = AttributeValue::factory()->create(['attribute_id' => $attribute2->id, 'display_value' => 'Red Color', 'is_active' => true, 'is_enabled' => true]);
+
+        $attribute1RedDisplayValues = AttributeValue::byAttribute($attribute1->id)->byDisplayValue('Red Color')->get();
+
+        $this->assertTrue($attribute1RedDisplayValues->contains($value1));
+        $this->assertFalse($attribute1RedDisplayValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_attribute_and_hex_color(): void
+    {
+        $attribute1 = $this->createActiveAttribute();
+        $attribute2 = $this->createActiveAttribute();
+        
+        $value1 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id, 'hex_color' => '#FF0000']);
+        $value2 = AttributeValue::factory()->create(['attribute_id' => $attribute2->id, 'hex_color' => '#FF0000']);
+
+        $attribute1RedHexValues = AttributeValue::byAttribute($attribute1->id)->byHexColor('#FF0000')->get();
+
+        $this->assertTrue($attribute1RedHexValues->contains($value1));
+        $this->assertFalse($attribute1RedHexValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_attribute_and_image(): void
+    {
+        $attribute1 = $this->createActiveAttribute();
+        $attribute2 = $this->createActiveAttribute();
+        
+        $value1 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id, 'image' => 'red-color.jpg', 'is_active' => true, 'is_enabled' => true]);
+        $value2 = AttributeValue::factory()->create(['attribute_id' => $attribute2->id, 'image' => 'red-color.jpg', 'is_active' => true, 'is_enabled' => true]);
+
+        $attribute1RedImageValues = AttributeValue::byAttribute($attribute1->id)->byImage('red-color.jpg')->get();
+
+        $this->assertTrue($attribute1RedImageValues->contains($value1));
+        $this->assertFalse($attribute1RedImageValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_value_and_display_value(): void
+    {
+        $value1 = AttributeValue::factory()->create(['value' => 'Red', 'display_value' => 'Red Color', 'is_active' => true]);
+        $value2 = AttributeValue::factory()->create(['value' => 'Blue', 'display_value' => 'Red Color', 'is_active' => true]);
+
+        $redValueRedDisplayValues = AttributeValue::byValue('Red')->byDisplayValue('Red Color')->get();
+
+        $this->assertTrue($redValueRedDisplayValues->contains($value1));
+        $this->assertFalse($redValueRedDisplayValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_value_and_hex_color(): void
+    {
+        $value1 = AttributeValue::factory()->create(['value' => 'Red', 'hex_color' => '#FF0000']);
+        $value2 = AttributeValue::factory()->create(['value' => 'Blue', 'hex_color' => '#FF0000']);
+
+        $redValueRedHexValues = AttributeValue::byValue('Red')->byHexColor('#FF0000')->get();
+
+        $this->assertTrue($redValueRedHexValues->contains($value1));
+        $this->assertFalse($redValueRedHexValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_value_and_image(): void
+    {
+        $value1 = AttributeValue::factory()->create(['value' => 'Red', 'image' => 'red-color.jpg', 'is_active' => true, 'is_enabled' => true]);
+        $value2 = AttributeValue::factory()->create(['value' => 'Blue', 'image' => 'red-color.jpg', 'is_active' => true, 'is_enabled' => true]);
+
+        $redValueRedImageValues = AttributeValue::byValue('Red')->byImage('red-color.jpg')->get();
+
+        $this->assertTrue($redValueRedImageValues->contains($value1));
+        $this->assertFalse($redValueRedImageValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_display_value_and_hex_color(): void
+    {
+        $value1 = AttributeValue::factory()->create(['display_value' => 'Red Color', 'hex_color' => '#FF0000', 'is_active' => true, 'is_enabled' => true]);
+        $value2 = AttributeValue::factory()->create(['display_value' => 'Blue Color', 'hex_color' => '#FF0000', 'is_active' => true, 'is_enabled' => true]);
+
+        $redDisplayRedHexValues = AttributeValue::byDisplayValue('Red Color')->byHexColor('#FF0000')->get();
+
+        $this->assertTrue($redDisplayRedHexValues->contains($value1));
+        $this->assertFalse($redDisplayRedHexValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_display_value_and_image(): void
+    {
+        $value1 = AttributeValue::factory()->create(['display_value' => 'Red Color', 'image' => 'red-color.jpg', 'is_active' => true]);
+        $value2 = AttributeValue::factory()->create(['display_value' => 'Blue Color', 'image' => 'red-color.jpg', 'is_active' => true]);
+
+        $redDisplayRedImageValues = AttributeValue::byDisplayValue('Red Color')->byImage('red-color.jpg')->get();
+
+        $this->assertTrue($redDisplayRedImageValues->contains($value1));
+        $this->assertFalse($redDisplayRedImageValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_hex_color_and_image(): void
+    {
+        $value1 = AttributeValue::factory()->create(['hex_color' => '#FF0000', 'image' => 'red-color.jpg']);
+        $value2 = AttributeValue::factory()->create(['hex_color' => '#0000FF', 'image' => 'red-color.jpg']);
+
+        $redHexRedImageValues = AttributeValue::byHexColor('#FF0000')->byImage('red-color.jpg')->get();
+
+        $this->assertTrue($redHexRedImageValues->contains($value1));
+        $this->assertFalse($redHexRedImageValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_all_attributes(): void
+    {
+        $attribute1 = $this->createActiveAttribute();
+        $attribute2 = $this->createActiveAttribute();
+        
+        $value1 = AttributeValue::factory()->create([
+            'attribute_id' => $attribute1->id,
+            'value' => 'Red',
+            'display_value' => 'Red Color',
+            'hex_color' => '#FF0000',
+            'image' => 'red-color.jpg',
+            'is_active' => true
+        ]);
+        $value2 = AttributeValue::factory()->create([
+            'attribute_id' => $attribute2->id,
+            'value' => 'Red',
+            'display_value' => 'Red Color',
+            'hex_color' => '#FF0000',
+            'image' => 'red-color.jpg',
+            'is_active' => true
+        ]);
+
+        $attribute1AllRedValues = AttributeValue::byAttribute($attribute1->id)
+            ->byValue('Red')
+            ->byDisplayValue('Red Color')
+            ->byHexColor('#FF0000')
+            ->byImage('red-color.jpg')
+            ->get();
+
+        $this->assertTrue($attribute1AllRedValues->contains($value1));
+        $this->assertFalse($attribute1AllRedValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_active_and_ordered(): void
+    {
+        $value1 = AttributeValue::factory()->create(['is_active' => true, 'sort_order' => 1]);
+        $value2 = AttributeValue::factory()->create(['is_active' => true, 'sort_order' => 2]);
+
+        // Global ActiveScope already filters for active records, so we don't need ->active()
+        $activeOrderedValues = AttributeValue::ordered()->get();
+
+        $this->assertEquals($value1->id, $activeOrderedValues->first()->id);
+        $this->assertEquals($value2->id, $activeOrderedValues->last()->id);
+    }
+
+    public function test_attribute_value_can_have_scope_by_attribute_and_active(): void
+    {
+        $attribute1 = $this->createActiveAttribute();
+        $attribute2 = $this->createActiveAttribute();
+        
+        $value1 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id, 'is_active' => true, 'is_enabled' => true]);
+        $value2 = AttributeValue::factory()->create(['attribute_id' => $attribute2->id, 'is_active' => true, 'is_enabled' => true]);
+
+        // Global ActiveScope already filters for active records, so we don't need ->active()
+        $attribute1ActiveValues = AttributeValue::byAttribute($attribute1->id)->get();
+
+        $this->assertTrue($attribute1ActiveValues->contains($value1));
+        $this->assertFalse($attribute1ActiveValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_attribute_and_ordered(): void
+    {
+        $attribute1 = $this->createActiveAttribute();
+        
+        $value1 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id, 'sort_order' => 1]);
+        $value2 = AttributeValue::factory()->create(['attribute_id' => $attribute1->id, 'sort_order' => 2]);
+
+        $attribute1OrderedValues = AttributeValue::byAttribute($attribute1->id)->ordered()->get();
+
+        $this->assertEquals($value1->id, $attribute1OrderedValues->first()->id);
+        $this->assertEquals($value2->id, $attribute1OrderedValues->last()->id);
+    }
+
+    public function test_attribute_value_can_have_scope_by_value_and_active(): void
+    {
+        $value1 = AttributeValue::factory()->create(['value' => 'Red', 'is_active' => true]);
+        $value2 = AttributeValue::factory()->create(['value' => 'Blue', 'is_active' => true]);
+
+        // Global ActiveScope already filters for active records, so we don't need ->active()
+        $redActiveValues = AttributeValue::byValue('Red')->get();
+
+        $this->assertTrue($redActiveValues->contains($value1));
+        $this->assertFalse($redActiveValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_value_and_ordered(): void
+    {
+        $value1 = AttributeValue::factory()->create(['value' => 'Red', 'sort_order' => 1, 'is_active' => true, 'is_enabled' => true]);
+        $value2 = AttributeValue::factory()->create(['value' => 'Red', 'sort_order' => 2, 'is_active' => true, 'is_enabled' => true]);
+
+        $redOrderedValues = AttributeValue::byValue('Red')->ordered()->get();
+
+        $this->assertEquals($value1->id, $redOrderedValues->first()->id);
+        $this->assertEquals($value2->id, $redOrderedValues->last()->id);
+    }
+
+    public function test_attribute_value_can_have_scope_by_display_value_and_active(): void
+    {
+        $value1 = AttributeValue::factory()->create(['display_value' => 'Red Color', 'is_active' => true]);
+        $value2 = AttributeValue::factory()->create(['display_value' => 'Blue Color', 'is_active' => true]);
+
+        // Global ActiveScope already filters for active records, so we don't need ->active()
+        $redDisplayActiveValues = AttributeValue::byDisplayValue('Red Color')->get();
+
+        $this->assertTrue($redDisplayActiveValues->contains($value1));
+        $this->assertFalse($redDisplayActiveValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_display_value_and_ordered(): void
+    {
+        $value1 = AttributeValue::factory()->create(['display_value' => 'Red Color', 'sort_order' => 1, 'is_active' => true]);
+        $value2 = AttributeValue::factory()->create(['display_value' => 'Red Color', 'sort_order' => 2, 'is_active' => true]);
+
+        $redDisplayOrderedValues = AttributeValue::byDisplayValue('Red Color')->ordered()->get();
+
+        $this->assertEquals($value1->id, $redDisplayOrderedValues->first()->id);
+        $this->assertEquals($value2->id, $redDisplayOrderedValues->last()->id);
+    }
+
+    public function test_attribute_value_can_have_scope_by_hex_color_and_active(): void
+    {
+        $value1 = AttributeValue::factory()->create(['hex_color' => '#FF0000', 'is_active' => true, 'is_enabled' => true]);
+        $value2 = AttributeValue::factory()->create(['hex_color' => '#0000FF', 'is_active' => true, 'is_enabled' => true]);
+
+        // Global ActiveScope already filters for active records, so we don't need ->active()
+        $redHexActiveValues = AttributeValue::byHexColor('#FF0000')->get();
+
+        $this->assertTrue($redHexActiveValues->contains($value1));
+        $this->assertFalse($redHexActiveValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_hex_color_and_ordered(): void
+    {
+        $value1 = AttributeValue::factory()->create(['hex_color' => '#FF0000', 'sort_order' => 1, 'is_active' => true]);
+        $value2 = AttributeValue::factory()->create(['hex_color' => '#FF0000', 'sort_order' => 2, 'is_active' => true]);
+
+        $redHexOrderedValues = AttributeValue::byHexColor('#FF0000')->ordered()->get();
+
+        $this->assertEquals($value1->id, $redHexOrderedValues->first()->id);
+        $this->assertEquals($value2->id, $redHexOrderedValues->last()->id);
+    }
+
+    public function test_attribute_value_can_have_scope_by_image_and_active(): void
+    {
+        $value1 = AttributeValue::factory()->create(['image' => 'red-color.jpg', 'is_active' => true]);
+        $value2 = AttributeValue::factory()->create(['image' => 'blue-color.jpg', 'is_active' => true]);
+
+        // Global ActiveScope already filters for active records, so we don't need ->active()
+        $redImageActiveValues = AttributeValue::byImage('red-color.jpg')->get();
+
+        $this->assertTrue($redImageActiveValues->contains($value1));
+        $this->assertFalse($redImageActiveValues->contains($value2));
+    }
+
+    public function test_attribute_value_can_have_scope_by_image_and_ordered(): void
+    {
+        $value1 = AttributeValue::factory()->create(['image' => 'red-color.jpg', 'sort_order' => 1, 'is_active' => true]);
+        $value2 = AttributeValue::factory()->create(['image' => 'red-color.jpg', 'sort_order' => 2, 'is_active' => true]);
+
+        $redImageOrderedValues = AttributeValue::byImage('red-color.jpg')->ordered()->get();
+
+        $this->assertEquals($value1->id, $redImageOrderedValues->first()->id);
+        $this->assertEquals($value2->id, $redImageOrderedValues->last()->id);
+    }
+}

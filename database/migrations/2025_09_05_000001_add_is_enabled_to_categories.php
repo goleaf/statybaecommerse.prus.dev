@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (Schema::hasTable('categories') && ! Schema::hasColumn('categories', 'is_enabled')) {
+            Schema::table('categories', function (Blueprint $table): void {
+                $table->boolean('is_enabled')->default(true)->after('sort_order');
+                $table->index(['is_enabled']);
+            });
+        }
+    }
+
+    public function down(): void
+    {
+        if (Schema::hasTable('categories') && Schema::hasColumn('categories', 'is_enabled')) {
+            Schema::table('categories', function (Blueprint $table): void {
+                $table->dropIndex(['is_enabled']);
+                $table->dropColumn('is_enabled');
+            });
+        }
+    }
+};

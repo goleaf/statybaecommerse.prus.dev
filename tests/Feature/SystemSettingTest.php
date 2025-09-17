@@ -1,0 +1,355 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\SystemSetting;
+use App\Models\SystemSettingCategory;
+use App\Models\SystemSettingHistory;
+use App\Models\SystemSettingDependency;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class SystemSettingTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_can_create_system_setting(): void
+    {
+        $category = SystemSettingCategory::factory()->create();
+        $user = User::factory()->create();
+
+        $settingData = [
+            'category_id' => $category->id,
+            'key' => 'app.name',
+            'name' => 'Application Name',
+            'value' => 'My Application',
+            'type' => 'string',
+            'group' => 'general',
+            'description' => 'The name of the application',
+            'is_public' => true,
+            'is_required' => true,
+            'is_active' => true,
+            'updated_by' => $user->id,
+        ];
+
+        $setting = SystemSetting::create($settingData);
+
+        $this->assertDatabaseHas('system_settings', [
+            'key' => 'app.name',
+            'name' => 'Application Name',
+            'value' => 'My Application',
+        ]);
+
+        $this->assertEquals('app.name', $setting->key);
+        $this->assertEquals('My Application', $setting->value);
+        $this->assertTrue($setting->is_public);
+        $this->assertTrue($setting->is_required);
+    }
+
+    public function test_can_get_setting_value_by_key(): void
+    {
+        SystemSetting::factory()->create([
+            'key' => 'app.name',
+            'value' => 'My Application',
+            'is_active' => true,
+        ]);
+
+        $value = SystemSetting::getValue('app.name');
+        $this->assertEquals('My Application', $value);
+
+        $defaultValue = SystemSetting::getValue('non.existent', 'Default');
+        $this->assertEquals('Default', $defaultValue);
+    }
+
+    public function test_can_set_setting_value(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        SystemSetting::setValue('app.name', 'New Application Name', [
+            'type' => 'string',
+            'group' => 'general',
+            'is_public' => true,
+        ]);
+
+        $this->assertDatabaseHas('system_settings', [
+            'key' => 'app.name',
+            'value' => 'New Application Name',
+            'updated_by' => $user->id,
+        ]);
+    }
+
+    public function test_can_get_public_setting(): void
+    {
+        SystemSetting::factory()->create([
+            'key' => 'app.name',
+            'value' => 'Public App',
+            'is_public' => true,
+            'is_active' => true,
+        ]);
+
+        SystemSetting::factory()->create([
+            'key' => 'app.secret',
+            'value' => 'Secret Value',
+            'is_public' => false,
+            'is_active' => true,
+        ]);
+
+        $publicValue = SystemSetting::getPublic('app.name');
+        $this->assertEquals('Public App', $publicValue);
+
+        $privateValue = SystemSetting::getPublic('app.secret');
+        $this->assertNull($privateValue);
+    }
+
+    public function test_encrypted_value_handling(): void
+    {
+        $setting = SystemSetting::factory()->create([
+            'type' => 'string',
+            'is_encrypted' => true,
+            'value' => 'Secret Value',
+        ]);
+
+        $this->assertNotEquals('Secret Value', $setting->getRawOriginal('value'));
+        $this->assertEquals('Secret Value', $setting->value);
+    }
+
+    public function test_boolean_value_casting(): void
+    {
+        $setting = SystemSetting::factory()->create([
+            'type' => 'boolean',
+            'value' => true,
+        ]);
+
+        $this->assertTrue($setting->value);
+        $this->assertIsBool($setting->value);
+    }
+
+    public function test_array_value_casting(): void
+    {
+        $arrayValue = ['key1' => 'value1', 'key2' => 'value2'];
+        
+        $setting = SystemSetting::factory()->create([
+            'type' => 'array',
+            'value' => $arrayValue,
+        ]);
+
+        $this->assertEquals($arrayValue, $setting->value);
+        $this->assertIsArray($setting->value);
+    }
+
+    public function test_json_value_casting(): void
+    {
+        $jsonValue = ['nested' => ['key' => 'value']];
+        
+        $setting = SystemSetting::factory()->create([
+            'type' => 'json',
+            'value' => $jsonValue,
+        ]);
+
+        $this->assertEquals($jsonValue, $setting->value);
+        $this->assertIsArray($setting->value);
+    }
+
+    public function test_scopes_work_correctly(): void
+    {
+        SystemSetting::factory()->create(['group' => 'general', 'is_active' => true]);
+        SystemSetting::factory()->create(['group' => 'email', 'is_active' => true]);
+        SystemSetting::factory()->create(['group' => 'general', 'is_active' => false]);
+
+        $generalSettings = SystemSetting::byGroup('general')->get();
+        $this->assertCount(1, $generalSettings);
+
+        $activeSettings = SystemSetting::active()->get();
+        $this->assertCount(2, $activeSettings);
+
+        $publicSettings = SystemSetting::public()->get();
+        $this->assertCount(0, $publicSettings); // No public settings created
+    }
+
+    public function test_searchable_scope(): void
+    {
+        SystemSetting::factory()->create([
+            'key' => 'app.name',
+            'name' => 'Application Name',
+            'description' => 'The main application name',
+        ]);
+
+        SystemSetting::factory()->create([
+            'key' => 'app.version',
+            'name' => 'Application Version',
+            'description' => 'Current version number',
+        ]);
+
+        $results = SystemSetting::searchable('application')->get();
+        $this->assertCount(2, $results);
+
+        $results = SystemSetting::searchable('version')->get();
+        $this->assertCount(1, $results);
+    }
+
+    public function test_can_get_formatted_value(): void
+    {
+        $booleanSetting = SystemSetting::factory()->create([
+            'type' => 'boolean',
+            'value' => true,
+        ]);
+
+        $this->assertStringContainsString('Taip', $booleanSetting->getFormattedValue());
+
+        $arraySetting = SystemSetting::factory()->create([
+            'type' => 'array',
+            'value' => ['key' => 'value'],
+        ]);
+
+        $formatted = $arraySetting->getFormattedValue();
+        $this->assertStringContainsString('key', $formatted);
+        $this->assertStringContainsString('value', $formatted);
+    }
+
+    public function test_can_get_validation_rules(): void
+    {
+        $setting = SystemSetting::factory()->create([
+            'is_required' => true,
+            'validation_rules' => ['min' => 1, 'max' => 100],
+        ]);
+
+        $rules = $setting->getValidationRulesForForm();
+        $this->assertContains('required', $rules);
+        $this->assertContains('min:1', $rules);
+        $this->assertContains('max:100', $rules);
+    }
+
+    public function test_can_get_form_field_config(): void
+    {
+        $setting = SystemSetting::factory()->create([
+            'type' => 'string',
+            'is_required' => true,
+            'is_readonly' => false,
+        ]);
+
+        $config = $setting->getFormFieldConfig();
+        
+        $this->assertEquals('string', $config['type']);
+        $this->assertTrue($config['required']);
+        $this->assertFalse($config['readonly']);
+    }
+
+    public function test_can_check_if_modifiable(): void
+    {
+        $readonlySetting = SystemSetting::factory()->create(['is_readonly' => true]);
+        $editableSetting = SystemSetting::factory()->create(['is_readonly' => false]);
+
+        $this->assertFalse($readonlySetting->canBeModified());
+        $this->assertTrue($editableSetting->canBeModified());
+    }
+
+    public function test_can_add_to_history(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $setting = SystemSetting::factory()->create();
+        $setting->addToHistory('old value', 'new value', 'Test change');
+
+        $this->assertDatabaseHas('system_setting_history', [
+            'system_setting_id' => $setting->id,
+            'old_value' => 'old value',
+            'new_value' => 'new value',
+            'change_reason' => 'Test change',
+            'changed_by' => $user->id,
+        ]);
+    }
+
+    public function test_can_get_recent_history(): void
+    {
+        $user = User::factory()->create();
+        $setting = SystemSetting::factory()->create();
+
+        $setting->addToHistory('old1', 'new1', 'Change 1');
+        $setting->addToHistory('old2', 'new2', 'Change 2');
+        $setting->addToHistory('old3', 'new3', 'Change 3');
+
+        $history = $setting->getRecentHistory(2);
+        $this->assertCount(2, $history);
+        $this->assertEquals('Change 3', $history->first()->change_reason);
+    }
+
+    public function test_dependency_relationships(): void
+    {
+        $setting1 = SystemSetting::factory()->create();
+        $setting2 = SystemSetting::factory()->create();
+
+        $dependency = SystemSettingDependency::create([
+            'setting_id' => $setting1->id,
+            'depends_on_setting_id' => $setting2->id,
+            'condition' => 'equals',
+            'condition_value' => 'test',
+            'is_active' => true,
+        ]);
+
+        $this->assertTrue($setting1->hasDependencies());
+        $this->assertTrue($setting2->hasDependents());
+        $this->assertCount(1, $setting1->getActiveDependencies());
+        $this->assertCount(1, $setting2->getActiveDependents());
+    }
+
+    public function test_dependency_condition_checking(): void
+    {
+        $setting1 = SystemSetting::factory()->create(['value' => 'test']);
+        $setting2 = SystemSetting::factory()->create();
+
+        $dependency = SystemSettingDependency::create([
+            'setting_id' => $setting2->id,
+            'depends_on_setting_id' => $setting1->id,
+            'condition' => 'equals',
+            'condition_value' => 'test',
+            'is_active' => true,
+        ]);
+
+        $this->assertTrue($dependency->isConditionMet());
+
+        $setting1->update(['value' => 'different']);
+        $this->assertFalse($dependency->isConditionMet());
+    }
+
+    public function test_can_check_if_enableable(): void
+    {
+        $setting1 = SystemSetting::factory()->create(['value' => 'enabled']);
+        $setting2 = SystemSetting::factory()->create();
+
+        SystemSettingDependency::create([
+            'setting_id' => $setting2->id,
+            'depends_on_setting_id' => $setting1->id,
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
+            'is_active' => true,
+        ]);
+
+        $this->assertTrue($setting2->canBeEnabled());
+
+        $setting1->update(['value' => 'disabled']);
+        $this->assertFalse($setting2->canBeEnabled());
+    }
+
+    public function test_can_get_dependency_status(): void
+    {
+        $setting1 = SystemSetting::factory()->create(['value' => 'enabled']);
+        $setting2 = SystemSetting::factory()->create();
+
+        SystemSettingDependency::create([
+            'setting_id' => $setting2->id,
+            'depends_on_setting_id' => $setting1->id,
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
+            'is_active' => true,
+        ]);
+
+        $status = $setting2->getDependencyStatus();
+        $this->assertTrue($status['can_enable']);
+        $this->assertCount(1, $status['met_dependencies']);
+        $this->assertCount(0, $status['blocking_dependencies']);
+    }
+}
+

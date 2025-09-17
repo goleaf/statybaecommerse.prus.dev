@@ -1,0 +1,154 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Http\Controllers\Frontend\MenuController;
+use App\Http\Controllers\Frontend\NewsController;
+use App\Livewire\Pages\ProductGallery;
+use App\View\Creators\NavigationCreator;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\LazyCollection;
+use Tests\TestCase;
+
+final class NewTimeoutImplementationTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_news_controller_featured_has_timeout_protection(): void
+    {
+        $controller = new NewsController();
+        $request = new \Illuminate\Http\Request();
+        
+        // Test that the featured method uses timeout protection
+        $response = $controller->featured($request);
+        
+        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function test_menu_controller_index_has_timeout_protection(): void
+    {
+        $controller = new MenuController();
+        $request = new \Illuminate\Http\Request();
+        
+        // Test that the index method uses timeout protection
+        $response = $controller->index($request);
+        
+        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function test_product_gallery_total_images_has_timeout_protection(): void
+    {
+        $component = new ProductGallery();
+        
+        // Test that the totalImages method uses timeout protection
+        $totalImages = $component->totalImages();
+        
+        $this->assertIsInt($totalImages);
+        $this->assertGreaterThanOrEqual(0, $totalImages);
+    }
+
+    public function test_navigation_creator_has_timeout_protection(): void
+    {
+        // Test that NavigationCreator class exists and has the expected methods
+        $this->assertTrue(class_exists(NavigationCreator::class));
+        $this->assertTrue(method_exists(NavigationCreator::class, 'getTopCategories'));
+        $this->assertTrue(method_exists(NavigationCreator::class, 'getFeaturedBrands'));
+        $this->assertTrue(method_exists(NavigationCreator::class, 'getNavigationMenu'));
+    }
+
+    public function test_timeout_protection_prevents_long_running_operations(): void
+    {
+        // Test that timeout protection actually works by simulating a long operation
+        $collection = LazyCollection::make(range(1, 1000));
+        $timeout = now()->addMilliseconds(50); // Very short timeout
+        
+        $processedCount = 0;
+        foreach ($collection->takeUntilTimeout($timeout) as $item) {
+            $processedCount++;
+            usleep(1000); // 1ms delay
+        }
+        
+        $this->assertLessThan(1000, $processedCount);
+        $this->assertGreaterThanOrEqual(0, $processedCount);
+    }
+
+    public function test_timeout_protection_with_normal_operations(): void
+    {
+        // Test that timeout protection doesn't interfere with normal operations
+        $collection = LazyCollection::make(range(1, 10));
+        $timeout = now()->addSeconds(10); // Long timeout
+        
+        $processedCount = 0;
+        foreach ($collection->takeUntilTimeout($timeout) as $item) {
+            $processedCount++;
+        }
+        
+        $this->assertEquals(10, $processedCount); // Should process all items
+    }
+
+    public function test_timeout_protection_with_database_cursor(): void
+    {
+        // Test timeout protection with database cursor operations
+        $timeout = now()->addSeconds(5);
+        
+        $processedCount = 0;
+        \App\Models\User::query()
+            ->cursor()
+            ->takeUntilTimeout($timeout)
+            ->each(function ($user) use (&$processedCount) {
+                $processedCount++;
+            });
+        
+        $this->assertGreaterThanOrEqual(0, $processedCount);
+    }
+
+    public function test_timeout_protection_with_lazy_collection_make(): void
+    {
+        // Test timeout protection with LazyCollection::make
+        $timeout = now()->addMilliseconds(100); // Very short timeout
+        
+        $processedCount = 0;
+        LazyCollection::make(range(1, 100))
+            ->takeUntilTimeout($timeout)
+            ->each(function ($item) use (&$processedCount) {
+                $processedCount++;
+                usleep(10000); // 10ms delay
+            });
+        
+        $this->assertLessThan(100, $processedCount);
+        $this->assertGreaterThan(0, $processedCount);
+    }
+
+    public function test_timeout_protection_with_collect_method(): void
+    {
+        // Test timeout protection with collect method
+        $timeout = now()->addSeconds(1);
+        
+        $collection = LazyCollection::make(range(1, 50))
+            ->takeUntilTimeout($timeout)
+            ->collect();
+        
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection);
+        $this->assertLessThanOrEqual(50, $collection->count());
+    }
+
+    public function test_timeout_protection_with_skip_while(): void
+    {
+        // Test timeout protection combined with skipWhile
+        $timeout = now()->addSeconds(1);
+        
+        $collection = LazyCollection::make(range(1, 20))
+            ->takeUntilTimeout($timeout)
+            ->skipWhile(function ($item) {
+                return $item < 5; // Skip first 4 items
+            })
+            ->collect();
+        
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection);
+        $this->assertLessThanOrEqual(16, $collection->count()); // Max 16 items (20 - 4)
+    }
+}

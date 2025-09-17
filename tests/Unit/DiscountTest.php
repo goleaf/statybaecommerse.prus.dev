@@ -1,0 +1,210 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit;
+
+use App\Models\Discount;
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class DiscountTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_discount_can_be_created(): void
+    {
+        $discount = Discount::factory()->create([
+            'name' => 'Test Discount',
+            'type' => 'percentage',
+            'value' => 10.00,
+            'is_active' => true,
+        ]);
+
+        $this->assertDatabaseHas('discounts', [
+            'name' => 'Test Discount',
+            'type' => 'percentage',
+            'value' => 10.00,
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_discount_casts_work_correctly(): void
+    {
+        $discount = Discount::factory()->create([
+            'value' => 15.50,
+            'is_active' => true,
+            'starts_at' => now(),
+            'ends_at' => now()->addDays(30),
+        ]);
+
+        $this->assertIsNumeric($discount->value);
+        $this->assertIsBool($discount->is_active);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $discount->starts_at);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $discount->ends_at);
+    }
+
+    public function test_discount_fillable_attributes(): void
+    {
+        $discount = new Discount();
+        $fillable = $discount->getFillable();
+
+        $this->assertContains('name', $fillable);
+        $this->assertContains('type', $fillable);
+        $this->assertContains('value', $fillable);
+        $this->assertContains('is_active', $fillable);
+    }
+
+    public function test_discount_type_enum(): void
+    {
+        $percentageDiscount = Discount::factory()->create(['type' => 'percentage']);
+        $fixedDiscount = Discount::factory()->create(['type' => 'fixed']);
+
+        $this->assertEquals('percentage', $percentageDiscount->type);
+        $this->assertEquals('fixed', $fixedDiscount->type);
+    }
+
+    public function test_discount_is_active_scope(): void
+    {
+        $activeDiscount = Discount::factory()->create(['is_active' => true, 'status' => 'active']);
+        $inactiveDiscount = Discount::factory()->create(['is_active' => false, 'status' => 'inactive']);
+
+        $activeDiscounts = Discount::active()->get();
+
+        $this->assertTrue($activeDiscounts->contains($activeDiscount));
+        $this->assertFalse($activeDiscounts->contains($inactiveDiscount));
+    }
+
+    public function test_discount_is_valid_scope(): void
+    {
+        $validDiscount = Discount::factory()->create([
+            'is_active' => true,
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $expiredDiscount = Discount::factory()->create([
+            'is_active' => true,
+            'status' => 'active',
+            'starts_at' => now()->subDays(2),
+            'ends_at' => now()->subDay(),
+        ]);
+
+        $futureDiscount = Discount::factory()->create([
+            'is_active' => true,
+            'status' => 'active',
+            'starts_at' => now()->addDay(),
+            'ends_at' => now()->addDays(2),
+        ]);
+
+        $this->assertTrue($validDiscount->isValid());
+        $this->assertFalse($expiredDiscount->isValid());
+        $this->assertFalse($futureDiscount->isValid());
+    }
+
+    public function test_discount_can_have_products(): void
+    {
+        $discount = Discount::factory()->create();
+        $products = Product::factory()->count(3)->create();
+
+        // Create the pivot table if it doesn't exist
+        if (!\Illuminate\Support\Facades\Schema::hasTable('discount_products')) {
+            \Illuminate\Support\Facades\Schema::create('discount_products', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('discount_id');
+                $table->unsignedBigInteger('product_id');
+                $table->timestamps();
+            });
+        }
+
+        $discount->products()->attach($products->pluck('id'));
+
+        $this->assertCount(3, $discount->products);
+        $this->assertInstanceOf(Product::class, $discount->products->first());
+    }
+
+    public function test_discount_can_have_users(): void
+    {
+        $discount = Discount::factory()->create();
+        $users = User::factory()->count(2)->create();
+
+        // Create the pivot table if it doesn't exist
+        if (!\Illuminate\Support\Facades\Schema::hasTable('discount_customers')) {
+            \Illuminate\Support\Facades\Schema::create('discount_customers', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('discount_id');
+                $table->unsignedBigInteger('user_id');
+                $table->timestamps();
+            });
+        }
+
+        $discount->customers()->attach($users->pluck('id'));
+
+        $this->assertCount(2, $discount->customers);
+        $this->assertInstanceOf(User::class, $discount->customers->first());
+    }
+
+    public function test_discount_calculate_amount(): void
+    {
+        $percentageDiscount = Discount::factory()->create([
+            'type' => 'percentage',
+            'value' => 20.00,
+        ]);
+
+        $fixedDiscount = Discount::factory()->create([
+            'type' => 'fixed',
+            'value' => 15.00,
+        ]);
+
+        $this->assertEquals(20.00, $percentageDiscount->calculateDiscountAmount(100.00));
+        $this->assertEquals(15.00, $fixedDiscount->calculateDiscountAmount(100.00));
+    }
+
+    public function test_discount_has_usage_limit(): void
+    {
+        $discount = Discount::factory()->create([
+            'usage_limit' => 100,
+            'usage_count' => 50,
+        ]);
+
+        $this->assertEquals(100, $discount->usage_limit);
+        $this->assertEquals(50, $discount->usage_count);
+        $this->assertTrue($discount->isUsageLimitReached() === false); // 50 < 100, so limit not reached
+        $this->assertTrue($discount->hasReachedLimit() === false); // 50 < 100, so limit not reached
+    }
+
+    public function test_discount_is_expired(): void
+    {
+        $expiredDiscount = Discount::factory()->create([
+            'status' => 'active',
+            'ends_at' => now()->subDay(),
+        ]);
+
+        $activeDiscount = Discount::factory()->create([
+            'status' => 'active',
+            'ends_at' => now()->addDay(),
+        ]);
+
+        // Test using the isValid() method which checks expiration
+        $this->assertFalse($expiredDiscount->isValid()); // Expired discount is not valid
+        $this->assertTrue($activeDiscount->isValid()); // Active discount is valid
+    }
+
+    public function test_discount_is_not_started(): void
+    {
+        $futureDiscount = Discount::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->addDay(),
+        ]);
+
+        $activeDiscount = Discount::factory()->create([
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+        ]);
+
+        // Test using the isValid() method which checks if discount has started
+        $this->assertFalse($futureDiscount->isValid()); // Future discount is not valid yet
+        $this->assertTrue($activeDiscount->isValid()); // Started discount is valid
+    }
+}

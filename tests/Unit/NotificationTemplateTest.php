@@ -1,0 +1,336 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit;
+
+use App\Models\NotificationTemplate;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class NotificationTemplateTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_notification_template_can_be_created(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'name' => 'Order Confirmation',
+            'type' => 'email',
+            'subject' => 'Your order has been confirmed',
+            'body' => 'Thank you for your order. Order number: {{order_number}}',
+            'is_active' => true,
+        ]);
+
+        $this->assertDatabaseHas('notification_templates', [
+            'name' => 'Order Confirmation',
+            'type' => 'email',
+            'subject' => 'Your order has been confirmed',
+            'body' => 'Thank you for your order. Order number: {{order_number}}',
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_notification_template_casts_work_correctly(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'is_active' => true,
+            'is_default' => false,
+            'variables' => ['order_number', 'customer_name'],
+            'created_at' => now(),
+        ]);
+
+        $this->assertIsBool($template->is_active);
+        $this->assertIsBool($template->is_default);
+        $this->assertIsArray($template->variables);
+        $this->assertContains('order_number', $template->variables);
+        $this->assertContains('customer_name', $template->variables);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $template->created_at);
+    }
+
+    public function test_notification_template_fillable_attributes(): void
+    {
+        $template = new NotificationTemplate();
+        $fillable = $template->getFillable();
+
+        $this->assertContains('name', $fillable);
+        $this->assertContains('type', $fillable);
+        $this->assertContains('subject', $fillable);
+        $this->assertContains('body', $fillable);
+        $this->assertContains('is_active', $fillable);
+    }
+
+    public function test_notification_template_scope_active(): void
+    {
+        $activeTemplate = NotificationTemplate::factory()->create(['is_active' => true]);
+        $inactiveTemplate = NotificationTemplate::factory()->create(['is_active' => false]);
+
+        $activeTemplates = NotificationTemplate::active()->get();
+
+        $this->assertTrue($activeTemplates->contains($activeTemplate));
+        $this->assertFalse($activeTemplates->contains($inactiveTemplate));
+    }
+
+    public function test_notification_template_scope_default(): void
+    {
+        $defaultTemplate = NotificationTemplate::factory()->create(['is_default' => true]);
+        $nonDefaultTemplate = NotificationTemplate::factory()->create(['is_default' => false]);
+
+        $defaultTemplates = NotificationTemplate::default()->get();
+
+        $this->assertTrue($defaultTemplates->contains($defaultTemplate));
+        $this->assertFalse($defaultTemplates->contains($nonDefaultTemplate));
+    }
+
+    public function test_notification_template_scope_by_type(): void
+    {
+        $emailTemplate = NotificationTemplate::factory()->create(['type' => 'email']);
+        $smsTemplate = NotificationTemplate::factory()->create(['type' => 'sms']);
+
+        $emailTemplates = NotificationTemplate::byType('email')->get();
+
+        $this->assertTrue($emailTemplates->contains($emailTemplate));
+        $this->assertFalse($emailTemplates->contains($smsTemplate));
+    }
+
+    public function test_notification_template_scope_by_name(): void
+    {
+        $template1 = NotificationTemplate::factory()->create(['name' => 'Order Confirmation']);
+        $template2 = NotificationTemplate::factory()->create(['name' => 'Order Shipped']);
+
+        $orderConfirmationTemplates = NotificationTemplate::byName('Order Confirmation')->get();
+
+        $this->assertTrue($orderConfirmationTemplates->contains($template1));
+        $this->assertFalse($orderConfirmationTemplates->contains($template2));
+    }
+
+    public function test_notification_template_can_have_description(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'description' => 'Email template sent when an order is confirmed',
+        ]);
+
+        $this->assertEquals('Email template sent when an order is confirmed', $template->description);
+    }
+
+    public function test_notification_template_can_have_category(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'category' => 'order',
+        ]);
+
+        $this->assertEquals('order', $template->category);
+    }
+
+    public function test_notification_template_can_have_priority(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'priority' => 'high',
+        ]);
+
+        $this->assertEquals('high', $template->priority);
+    }
+
+    public function test_notification_template_can_have_trigger_event(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'trigger_event' => 'order.created',
+        ]);
+
+        $this->assertEquals('order.created', $template->trigger_event);
+    }
+
+    public function test_notification_template_can_have_conditions(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'conditions' => [
+                'order_value' => '> 100',
+                'customer_type' => 'premium',
+                'payment_method' => 'credit_card',
+            ],
+        ]);
+
+        $this->assertIsArray($template->conditions);
+        $this->assertEquals('> 100', $template->conditions['order_value']);
+        $this->assertEquals('premium', $template->conditions['customer_type']);
+        $this->assertEquals('credit_card', $template->conditions['payment_method']);
+    }
+
+    public function test_notification_template_can_have_metadata(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'metadata' => [
+                'created_by' => 'admin',
+                'version' => '1.0',
+                'tags' => ['order', 'confirmation', 'email'],
+            ],
+        ]);
+
+        $this->assertIsArray($template->metadata);
+        $this->assertEquals('admin', $template->metadata['created_by']);
+        $this->assertEquals('1.0', $template->metadata['version']);
+        $this->assertIsArray($template->metadata['tags']);
+    }
+
+    public function test_notification_template_can_have_attachments(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'attachments' => [
+                'invoice.pdf',
+                'receipt.pdf',
+            ],
+        ]);
+
+        $this->assertIsArray($template->attachments);
+        $this->assertContains('invoice.pdf', $template->attachments);
+        $this->assertContains('receipt.pdf', $template->attachments);
+    }
+
+    public function test_notification_template_can_have_cc_recipients(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'cc_recipients' => [
+                'manager@example.com',
+                'support@example.com',
+            ],
+        ]);
+
+        $this->assertIsArray($template->cc_recipients);
+        $this->assertContains('manager@example.com', $template->cc_recipients);
+        $this->assertContains('support@example.com', $template->cc_recipients);
+    }
+
+    public function test_notification_template_can_have_bcc_recipients(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'bcc_recipients' => [
+                'archive@example.com',
+            ],
+        ]);
+
+        $this->assertIsArray($template->bcc_recipients);
+        $this->assertContains('archive@example.com', $template->bcc_recipients);
+    }
+
+    public function test_notification_template_can_have_sender(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'sender_name' => 'Store Support',
+            'sender_email' => 'support@store.com',
+        ]);
+
+        $this->assertEquals('Store Support', $template->sender_name);
+        $this->assertEquals('support@store.com', $template->sender_email);
+    }
+
+    public function test_notification_template_can_have_reply_to(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'reply_to' => 'noreply@store.com',
+        ]);
+
+        $this->assertEquals('noreply@store.com', $template->reply_to);
+    }
+
+    public function test_notification_template_can_have_headers(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'headers' => [
+                'X-Priority' => '1',
+                'X-MSMail-Priority' => 'High',
+            ],
+        ]);
+
+        $this->assertIsArray($template->headers);
+        $this->assertEquals('1', $template->headers['X-Priority']);
+        $this->assertEquals('High', $template->headers['X-MSMail-Priority']);
+    }
+
+    public function test_notification_template_can_have_footer(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'footer' => 'This is an automated message. Please do not reply.',
+        ]);
+
+        $this->assertEquals('This is an automated message. Please do not reply.', $template->footer);
+    }
+
+    public function test_notification_template_can_have_style(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'style' => 'modern',
+        ]);
+
+        $this->assertEquals('modern', $template->style);
+    }
+
+    public function test_notification_template_can_have_layout(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'layout' => 'default',
+        ]);
+
+        $this->assertEquals('default', $template->layout);
+    }
+
+    public function test_notification_template_can_have_language(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'language' => 'lt',
+        ]);
+
+        $this->assertEquals('lt', $template->language);
+    }
+
+    public function test_notification_template_can_have_encoding(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'encoding' => 'utf-8',
+        ]);
+
+        $this->assertEquals('utf-8', $template->encoding);
+    }
+
+    public function test_notification_template_can_have_charset(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'charset' => 'utf-8',
+        ]);
+
+        $this->assertEquals('utf-8', $template->charset);
+    }
+
+    public function test_notification_template_can_have_mime_type(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'mime_type' => 'text/html',
+        ]);
+
+        $this->assertEquals('text/html', $template->mime_type);
+    }
+
+    public function test_notification_template_can_have_retry_count(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'retry_count' => 3,
+        ]);
+
+        $this->assertEquals(3, $template->retry_count);
+    }
+
+    public function test_notification_template_can_have_retry_delay(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'retry_delay' => 300,
+        ]);
+
+        $this->assertEquals(300, $template->retry_delay);
+    }
+
+    public function test_notification_template_can_have_expiry_time(): void
+    {
+        $template = NotificationTemplate::factory()->create([
+            'expiry_time' => 3600,
+        ]);
+
+        $this->assertEquals(3600, $template->expiry_time);
+    }
+}

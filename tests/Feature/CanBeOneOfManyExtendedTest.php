@@ -1,0 +1,323 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\Address;
+use App\Models\Campaign;
+use App\Models\CampaignClick;
+use App\Models\CampaignConversion;
+use App\Models\CampaignSchedule;
+use App\Models\CampaignView;
+use App\Models\CartItem;
+use App\Models\Notification;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\Referral;
+use App\Models\ReferralReward;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class CanBeOneOfManyExtendedTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_address_latest_order_relationship(): void
+    {
+        $user = User::factory()->create();
+        $address = Address::factory()->create(['user_id' => $user->id]);
+        
+        // Create multiple orders
+        $oldOrder = Order::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(5),
+        ]);
+        
+        $latestOrder = Order::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the address to clear any cached relationships
+        $address->refresh();
+
+        // Test the latestOrder relationship
+        $this->assertInstanceOf(Order::class, $address->latestOrder);
+        $this->assertEquals($latestOrder->id, $address->latestOrder->id);
+        $this->assertNotEquals($oldOrder->id, $address->latestOrder->id);
+    }
+
+    public function test_address_latest_shipping_order_relationship(): void
+    {
+        $user = User::factory()->create();
+        $address = Address::factory()->create(['user_id' => $user->id]);
+        
+        // Create multiple shipping orders
+        $oldOrder = Order::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(5),
+        ]);
+        
+        $latestOrder = Order::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the address to clear any cached relationships
+        $address->refresh();
+
+        // Test the latestShippingOrder relationship
+        $this->assertInstanceOf(Order::class, $address->latestShippingOrder);
+        $this->assertEquals($latestOrder->id, $address->latestShippingOrder->id);
+        $this->assertNotEquals($oldOrder->id, $address->latestShippingOrder->id);
+    }
+
+    public function test_campaign_latest_view_relationship(): void
+    {
+        $campaign = Campaign::factory()->create();
+        
+        // Create multiple views
+        $oldView = CampaignView::factory()->create([
+            'campaign_id' => $campaign->id,
+            'viewed_at' => now()->subDays(5),
+        ]);
+        
+        $latestView = CampaignView::factory()->create([
+            'campaign_id' => $campaign->id,
+            'viewed_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the campaign to clear any cached relationships
+        $campaign->refresh();
+
+        // Test the latestView relationship
+        $this->assertInstanceOf(CampaignView::class, $campaign->latestView);
+        $this->assertEquals($latestView->id, $campaign->latestView->id);
+        $this->assertNotEquals($oldView->id, $campaign->latestView->id);
+    }
+
+    public function test_campaign_latest_click_relationship(): void
+    {
+        $campaign = Campaign::factory()->create();
+        
+        // Create multiple clicks
+        $oldClick = CampaignClick::factory()->create([
+            'campaign_id' => $campaign->id,
+            'clicked_at' => now()->subDays(5),
+        ]);
+        
+        $latestClick = CampaignClick::factory()->create([
+            'campaign_id' => $campaign->id,
+            'clicked_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the campaign to clear any cached relationships
+        $campaign->refresh();
+
+        // Test the latestClick relationship
+        $this->assertInstanceOf(CampaignClick::class, $campaign->latestClick);
+        $this->assertEquals($latestClick->id, $campaign->latestClick->id);
+        $this->assertNotEquals($oldClick->id, $campaign->latestClick->id);
+    }
+
+    public function test_campaign_latest_conversion_relationship(): void
+    {
+        $campaign = Campaign::factory()->create();
+        $user = User::factory()->create();
+        
+        // Create multiple conversions
+        $oldConversion = CampaignConversion::factory()->create([
+            'campaign_id' => $campaign->id,
+            'customer_id' => $user->id,
+            'converted_at' => now()->subDays(5),
+        ]);
+        
+        $latestConversion = CampaignConversion::factory()->create([
+            'campaign_id' => $campaign->id,
+            'customer_id' => $user->id,
+            'converted_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the campaign to clear any cached relationships
+        $campaign->refresh();
+
+        // Test the latestConversion relationship
+        $this->assertInstanceOf(CampaignConversion::class, $campaign->latestConversion);
+        $this->assertEquals($latestConversion->id, $campaign->latestConversion->id);
+        $this->assertNotEquals($oldConversion->id, $campaign->latestConversion->id);
+    }
+
+    public function test_campaign_latest_schedule_relationship(): void
+    {
+        $campaign = Campaign::factory()->create();
+        
+        // Create multiple schedules
+        $oldSchedule = CampaignSchedule::factory()->create([
+            'campaign_id' => $campaign->id,
+            'created_at' => now()->subDays(5),
+        ]);
+        
+        $latestSchedule = CampaignSchedule::factory()->create([
+            'campaign_id' => $campaign->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the campaign to clear any cached relationships
+        $campaign->refresh();
+
+        // Test the latestSchedule relationship
+        $this->assertInstanceOf(CampaignSchedule::class, $campaign->latestSchedule);
+        $this->assertEquals($latestSchedule->id, $campaign->latestSchedule->id);
+        $this->assertNotEquals($oldSchedule->id, $campaign->latestSchedule->id);
+    }
+
+    public function test_referral_latest_reward_relationship(): void
+    {
+        $referral = Referral::factory()->create();
+        
+        // Create multiple rewards
+        $oldReward = ReferralReward::factory()->create([
+            'referral_id' => $referral->id,
+            'created_at' => now()->subDays(5),
+        ]);
+        
+        $latestReward = ReferralReward::factory()->create([
+            'referral_id' => $referral->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the referral to clear any cached relationships
+        $referral->refresh();
+
+        // Test the latestReward relationship
+        $this->assertInstanceOf(ReferralReward::class, $referral->latestReward);
+        $this->assertEquals($latestReward->id, $referral->latestReward->id);
+        $this->assertNotEquals($oldReward->id, $referral->latestReward->id);
+    }
+
+    public function test_referral_latest_referred_order_relationship(): void
+    {
+        $user = User::factory()->create();
+        $referral = Referral::factory()->create(['referred_id' => $user->id]);
+        
+        // Create multiple referred orders
+        $oldOrder = Order::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(5),
+        ]);
+        
+        $latestOrder = Order::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the referral to clear any cached relationships
+        $referral->refresh();
+
+        // Test the latestReferredOrder relationship
+        $this->assertInstanceOf(Order::class, $referral->latestReferredOrder);
+        $this->assertEquals($latestOrder->id, $referral->latestReferredOrder->id);
+        $this->assertNotEquals($oldOrder->id, $referral->latestReferredOrder->id);
+    }
+
+    public function test_user_latest_address_relationship(): void
+    {
+        $user = User::factory()->create();
+        
+        // Create multiple addresses
+        $oldAddress = Address::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(5),
+        ]);
+        
+        $latestAddress = Address::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
+        // Test the latestAddress relationship
+        $this->assertInstanceOf(Address::class, $user->latestAddress);
+        $this->assertEquals($latestAddress->id, $user->latestAddress->id);
+        $this->assertNotEquals($oldAddress->id, $user->latestAddress->id);
+    }
+
+    public function test_user_latest_cart_item_relationship(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+        
+        // Create multiple cart items
+        $oldCartItem = CartItem::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'created_at' => now()->subDays(5),
+        ]);
+        
+        $latestCartItem = CartItem::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
+        // Test the latestCartItem relationship
+        $this->assertInstanceOf(CartItem::class, $user->latestCartItem);
+        $this->assertEquals($latestCartItem->id, $user->latestCartItem->id);
+        $this->assertNotEquals($oldCartItem->id, $user->latestCartItem->id);
+    }
+
+    public function test_user_latest_notification_relationship(): void
+    {
+        $user = User::factory()->create();
+        
+        // Create multiple notifications
+        $oldNotification = Notification::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(5),
+        ]);
+        
+        $latestNotification = Notification::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
+        // Test the latestNotification relationship
+        $this->assertInstanceOf(Notification::class, $user->latestNotification);
+        $this->assertEquals($latestNotification->id, $user->latestNotification->id);
+        $this->assertNotEquals($oldNotification->id, $user->latestNotification->id);
+    }
+
+    public function test_user_latest_referral_relationship(): void
+    {
+        $user = User::factory()->create();
+        
+        // Create multiple referrals
+        $oldReferral = Referral::factory()->create([
+            'referrer_id' => $user->id,
+            'created_at' => now()->subDays(5),
+        ]);
+        
+        $latestReferral = Referral::factory()->create([
+            'referrer_id' => $user->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Refresh the user to clear any cached relationships
+        $user->refresh();
+
+        // Test the latestReferral relationship
+        $this->assertInstanceOf(Referral::class, $user->latestReferral);
+        $this->assertEquals($latestReferral->id, $user->latestReferral->id);
+        $this->assertNotEquals($oldReferral->id, $user->latestReferral->id);
+    }
+}

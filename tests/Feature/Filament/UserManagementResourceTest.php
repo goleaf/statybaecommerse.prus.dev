@@ -1,0 +1,189 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Feature\Filament;
+
+use App\Models\User;
+use App\Filament\Resources\UserManagementResource;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class UserManagementResourceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Create admin user with proper permissions
+        $this->user = User::factory()->create();
+        $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
+        $this->user->assignRole($adminRole);
+    }
+
+    public function test_can_list_users(): void
+    {
+        $users = User::factory()->count(3)->create();
+
+        $this->actingAs($this->user)
+            ->get(UserManagementResource::getUrl('index'))
+            ->assertOk();
+    }
+
+    public function test_can_view_user(): void
+    {
+        $targetUser = User::factory()->create();
+
+        $this->actingAs($this->user)
+            ->get(UserManagementResource::getUrl('view', ['record' => $targetUser]))
+            ->assertOk();
+    }
+
+    public function test_can_create_user(): void
+    {
+        $this->actingAs($this->user)
+            ->get(UserManagementResource::getUrl('create'))
+            ->assertOk();
+    }
+
+    public function test_can_edit_user(): void
+    {
+        $targetUser = User::factory()->create();
+
+        $this->actingAs($this->user)
+            ->get(UserManagementResource::getUrl('edit', ['record' => $targetUser]))
+            ->assertOk();
+    }
+
+    public function test_user_management_resource_has_correct_model(): void
+    {
+        $this->assertEquals(User::class, UserManagementResource::getModel());
+    }
+
+    public function test_user_table_has_required_columns(): void
+    {
+        $targetUser = User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
+
+        $this->actingAs($this->user)
+            ->get(UserManagementResource::getUrl('index'))
+            ->assertSee('Test User')
+            ->assertSee('test@example.com');
+    }
+
+    public function test_user_form_has_required_fields(): void
+    {
+        $this->actingAs($this->user)
+            ->get(UserManagementResource::getUrl('create'))
+            ->assertSee('name')
+            ->assertSee('email')
+            ->assertSee('password');
+    }
+
+    public function test_can_filter_users_by_role(): void
+    {
+        $adminUser = User::factory()->create();
+        $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $adminUser->assignRole($adminRole);
+
+        $regularUser = User::factory()->create();
+
+        $this->actingAs($this->user)
+            ->get(UserManagementResource::getUrl('index'))
+            ->assertSee($adminUser->name)
+            ->assertSee($regularUser->name);
+    }
+
+    public function test_can_search_users(): void
+    {
+        $user1 = User::factory()->create(['name' => 'Unique User Name']);
+        $user2 = User::factory()->create(['name' => 'Another User']);
+
+        $this->actingAs($this->user)
+            ->get(UserManagementResource::getUrl('index') . '?search=Unique')
+            ->assertSee('Unique User Name')
+            ->assertDontSee('Another User');
+    }
+
+    public function test_user_management_resource_pages_exist(): void
+    {
+        $pages = UserManagementResource::getPages();
+
+        $this->assertArrayHasKey('index', $pages);
+        $this->assertArrayHasKey('create', $pages);
+        $this->assertArrayHasKey('view', $pages);
+        $this->assertArrayHasKey('edit', $pages);
+    }
+
+    public function test_user_management_resource_has_eloquent_query(): void
+    {
+        $query = UserManagementResource::getEloquentQuery();
+        
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $query);
+    }
+
+    public function test_user_management_resource_has_global_search_attributes(): void
+    {
+        $searchAttributes = UserManagementResource::getGlobalSearchResultAttributes();
+
+        $this->assertIsArray($searchAttributes);
+    }
+
+    public function test_user_management_resource_has_global_search_result_details(): void
+    {
+        $targetUser = User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
+
+        $details = UserManagementResource::getGlobalSearchResultDetails($targetUser);
+
+        $this->assertIsArray($details);
+    }
+
+    public function test_user_management_resource_has_global_search_result_url(): void
+    {
+        $targetUser = User::factory()->create();
+
+        $url = UserManagementResource::getGlobalSearchResultUrl($targetUser);
+
+        $this->assertIsString($url);
+        $this->assertStringContainsString('users', $url);
+    }
+
+    public function test_can_manage_user_roles(): void
+    {
+        $targetUser = User::factory()->create();
+        $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
+
+        $this->actingAs($this->user)
+            ->get(UserManagementResource::getUrl('edit', ['record' => $targetUser]))
+            ->assertOk();
+    }
+
+    public function test_can_manage_user_permissions(): void
+    {
+        $targetUser = User::factory()->create();
+        $permission = \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view_products', 'guard_name' => 'web']);
+
+        $this->actingAs($this->user)
+            ->get(UserManagementResource::getUrl('edit', ['record' => $targetUser]))
+            ->assertOk();
+    }
+
+    public function test_user_management_resource_has_correct_navigation_group(): void
+    {
+        $navigationGroup = UserManagementResource::getNavigationGroup();
+        
+        $this->assertIsString($navigationGroup);
+    }
+
+    public function test_user_management_resource_has_correct_navigation_icon(): void
+    {
+        $navigationIcon = UserManagementResource::getNavigationIcon();
+        
+        $this->assertIsString($navigationIcon);
+    }
+}

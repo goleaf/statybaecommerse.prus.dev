@@ -1,0 +1,229 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\ProductComparison;
+use App\Models\ProductFeature;
+use App\Models\ProductHistory;
+use App\Models\ProductImage;
+use App\Models\ProductRequest;
+use App\Models\ProductSimilarity;
+use App\Models\User;
+use App\Models\VariantInventory;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\StatusScope;
+use App\Models\Scopes\UserOwnedScope;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+final class AdditionalGlobalScopesTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_variant_inventory_model_has_multiple_scopes(): void
+    {
+        // Create test variant inventories
+        $activeInventory = VariantInventory::factory()->create([
+            'is_tracked' => true,
+            'status' => 'active',
+        ]);
+
+        $inactiveInventory = VariantInventory::factory()->create([
+            'is_tracked' => false,
+            'status' => 'active',
+        ]);
+
+        $inactiveStatusInventory = VariantInventory::factory()->create([
+            'is_tracked' => true,
+            'status' => 'inactive',
+        ]);
+
+        // Test that only active inventories with active status are returned
+        $inventories = VariantInventory::all();
+        
+        $this->assertCount(1, $inventories);
+        $this->assertEquals($activeInventory->id, $inventories->first()->id);
+
+        // Test bypassing scopes
+        $allInventories = VariantInventory::withoutGlobalScopes()->get();
+        $this->assertCount(3, $allInventories);
+    }
+
+    public function test_product_image_model_has_active_scope(): void
+    {
+        // Create test product images
+        $activeImage = ProductImage::factory()->create(['is_active' => true]);
+        $inactiveImage = ProductImage::factory()->create(['is_active' => false]);
+
+        // Test that only active images are returned
+        $images = ProductImage::all();
+        
+        $this->assertCount(1, $images);
+        $this->assertEquals($activeImage->id, $images->first()->id);
+
+        // Test bypassing scopes
+        $allImages = ProductImage::withoutGlobalScopes()->get();
+        $this->assertCount(2, $allImages);
+    }
+
+    public function test_product_feature_model_has_active_scope(): void
+    {
+        // Create test product features
+        $activeFeature = ProductFeature::factory()->create(['is_active' => true]);
+        $inactiveFeature = ProductFeature::factory()->create(['is_active' => false]);
+
+        // Test that only active features are returned
+        $features = ProductFeature::all();
+        
+        $this->assertCount(1, $features);
+        $this->assertEquals($activeFeature->id, $features->first()->id);
+
+        // Test bypassing scopes
+        $allFeatures = ProductFeature::withoutGlobalScopes()->get();
+        $this->assertCount(2, $allFeatures);
+    }
+
+    public function test_product_history_model_has_user_owned_scope(): void
+    {
+        // Create test users
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+
+        // Create test product histories
+        $user1History = ProductHistory::factory()->create(['user_id' => $user1->id]);
+        $user2History = ProductHistory::factory()->create(['user_id' => $user2->id]);
+
+        // Test that only current user's histories are returned
+        $this->actingAs($user1);
+        $histories = ProductHistory::all();
+        
+        $this->assertCount(1, $histories);
+        $this->assertEquals($user1History->id, $histories->first()->id);
+
+        // Test bypassing scopes
+        $allHistories = ProductHistory::withoutGlobalScopes()->get();
+        $this->assertCount(2, $allHistories);
+    }
+
+    public function test_product_comparison_model_has_user_owned_scope(): void
+    {
+        // Create test users
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+
+        // Create test product comparisons
+        $user1Comparison = ProductComparison::factory()->create(['user_id' => $user1->id]);
+        $user2Comparison = ProductComparison::factory()->create(['user_id' => $user2->id]);
+
+        // Test that only current user's comparisons are returned
+        $this->actingAs($user1);
+        $comparisons = ProductComparison::all();
+        
+        $this->assertCount(1, $comparisons);
+        $this->assertEquals($user1Comparison->id, $comparisons->first()->id);
+
+        // Test bypassing scopes
+        $allComparisons = ProductComparison::withoutGlobalScopes()->get();
+        $this->assertCount(2, $allComparisons);
+    }
+
+    public function test_product_similarity_model_has_active_scope(): void
+    {
+        // Create test product similarities
+        $activeSimilarity = ProductSimilarity::factory()->create(['is_active' => true]);
+        $inactiveSimilarity = ProductSimilarity::factory()->create(['is_active' => false]);
+
+        // Test that only active similarities are returned
+        $similarities = ProductSimilarity::all();
+        
+        $this->assertCount(1, $similarities);
+        $this->assertEquals($activeSimilarity->id, $similarities->first()->id);
+
+        // Test bypassing scopes
+        $allSimilarities = ProductSimilarity::withoutGlobalScopes()->get();
+        $this->assertCount(2, $allSimilarities);
+    }
+
+    public function test_product_request_model_has_multiple_scopes(): void
+    {
+        // Create test users
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+
+        // Create test product requests
+        $user1Request = ProductRequest::factory()->create([
+            'user_id' => $user1->id,
+            'status' => 'pending',
+        ]);
+
+        $user2Request = ProductRequest::factory()->create([
+            'user_id' => $user2->id,
+            'status' => 'pending',
+        ]);
+
+        $cancelledRequest = ProductRequest::factory()->create([
+            'user_id' => $user1->id,
+            'status' => 'cancelled',
+        ]);
+
+        // Test that only current user's requests with allowed status are returned
+        $this->actingAs($user1);
+        $requests = ProductRequest::all();
+        
+        $this->assertCount(1, $requests);
+        $this->assertEquals($user1Request->id, $requests->first()->id);
+
+        // Test bypassing scopes
+        $allRequests = ProductRequest::withoutGlobalScopes()->get();
+        $this->assertCount(3, $allRequests);
+    }
+
+    public function test_global_scopes_can_be_combined_with_local_scopes(): void
+    {
+        // Create test data
+        $user = User::factory()->create();
+        $history = ProductHistory::factory()->create(['user_id' => $user->id]);
+
+        // Test that global scopes work with local scopes
+        $this->actingAs($user);
+        $histories = ProductHistory::where('action', 'like', '%test%')->get();
+        $this->assertCount(0, $histories); // No histories with 'test' in action
+
+        // Test bypassing global scopes with local scopes
+        $allHistories = ProductHistory::withoutGlobalScopes()->where('user_id', $user->id)->get();
+        $this->assertCount(1, $allHistories);
+        $this->assertEquals($history->id, $allHistories->first()->id);
+    }
+
+    public function test_global_scopes_are_applied_to_relationships(): void
+    {
+        // Create test data with relationships
+        $user = User::factory()->create();
+        $history = ProductHistory::factory()->create(['user_id' => $user->id]);
+
+        // Test that relationships also apply global scopes
+        $this->actingAs($user);
+        $userHistories = $user->productHistories;
+        $this->assertCount(1, $userHistories);
+        $this->assertEquals($history->id, $userHistories->first()->id);
+    }
+
+    public function test_user_owned_scope_works_without_authentication(): void
+    {
+        // Create test data
+        $user = User::factory()->create();
+        $history = ProductHistory::factory()->create(['user_id' => $user->id]);
+
+        // Test without authentication
+        $histories = ProductHistory::all();
+        $this->assertCount(0, $histories); // No histories returned without auth
+
+        // Test with authentication
+        $this->actingAs($user);
+        $histories = ProductHistory::all();
+        $this->assertCount(1, $histories);
+        $this->assertEquals($history->id, $histories->first()->id);
+    }
+}

@@ -1,0 +1,315 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\City;
+use App\Models\Country;
+use App\Models\Currency;
+use App\Models\CustomerGroup;
+use App\Models\PartnerTier;
+use App\Models\Region;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+final class LocationGlobalScopesTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_city_model_has_multiple_scopes(): void
+    {
+        // Create test cities
+        $activeEnabledCity = City::factory()->create([
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+
+        $inactiveCity = City::factory()->create([
+            'is_active' => false,
+            'is_enabled' => true,
+        ]);
+
+        $disabledCity = City::factory()->create([
+            'is_active' => true,
+            'is_enabled' => false,
+        ]);
+
+        // Test that only active and enabled cities are returned
+        $cities = City::all();
+        
+        $this->assertCount(1, $cities);
+        $this->assertEquals($activeEnabledCity->id, $cities->first()->id);
+
+        // Test bypassing scopes
+        $allCities = City::withoutGlobalScopes()->get();
+        $this->assertCount(3, $allCities);
+    }
+
+    public function test_country_model_has_active_scope(): void
+    {
+        // Create test countries
+        $activeCountry = Country::factory()->create(['is_active' => true]);
+        $inactiveCountry = Country::factory()->create(['is_active' => false]);
+
+        // Test that only active countries are returned
+        $countries = Country::all();
+        
+        $this->assertCount(1, $countries);
+        $this->assertEquals($activeCountry->id, $countries->first()->id);
+
+        // Test bypassing scopes
+        $allCountries = Country::withoutGlobalScopes()->get();
+        $this->assertCount(2, $allCountries);
+    }
+
+    public function test_region_model_has_multiple_scopes(): void
+    {
+        // Create test regions
+        $activeEnabledRegion = Region::factory()->create([
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+
+        $inactiveRegion = Region::factory()->create([
+            'is_active' => false,
+            'is_enabled' => true,
+        ]);
+
+        $disabledRegion = Region::factory()->create([
+            'is_active' => true,
+            'is_enabled' => false,
+        ]);
+
+        // Test that only active and enabled regions are returned
+        $regions = Region::all();
+        
+        $this->assertCount(1, $regions);
+        $this->assertEquals($activeEnabledRegion->id, $regions->first()->id);
+
+        // Test bypassing scopes
+        $allRegions = Region::withoutGlobalScopes()->get();
+        $this->assertCount(3, $allRegions);
+    }
+
+    public function test_currency_model_has_multiple_scopes(): void
+    {
+        // Create test currencies
+        $activeEnabledCurrency = Currency::factory()->create([
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+
+        $inactiveCurrency = Currency::factory()->create([
+            'is_active' => false,
+            'is_enabled' => true,
+        ]);
+
+        $disabledCurrency = Currency::factory()->create([
+            'is_active' => true,
+            'is_enabled' => false,
+        ]);
+
+        // Test that only active and enabled currencies are returned
+        $currencies = Currency::all();
+        
+        $this->assertCount(1, $currencies);
+        $this->assertEquals($activeEnabledCurrency->id, $currencies->first()->id);
+
+        // Test bypassing scopes
+        $allCurrencies = Currency::withoutGlobalScopes()->get();
+        $this->assertCount(3, $allCurrencies);
+    }
+
+    public function test_customer_group_model_has_multiple_scopes(): void
+    {
+        // Create test customer groups
+        $activeEnabledGroup = CustomerGroup::factory()->create([
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+
+        $inactiveGroup = CustomerGroup::factory()->create([
+            'is_active' => false,
+            'is_enabled' => true,
+        ]);
+
+        $disabledGroup = CustomerGroup::factory()->create([
+            'is_active' => true,
+            'is_enabled' => false,
+        ]);
+
+        // Test that only active and enabled customer groups are returned
+        $groups = CustomerGroup::all();
+        
+        $this->assertCount(1, $groups);
+        $this->assertEquals($activeEnabledGroup->id, $groups->first()->id);
+
+        // Test bypassing scopes
+        $allGroups = CustomerGroup::withoutGlobalScopes()->get();
+        $this->assertCount(3, $allGroups);
+    }
+
+    public function test_partner_tier_model_has_multiple_scopes(): void
+    {
+        // Create test partner tiers
+        $activeEnabledTier = PartnerTier::factory()->create([
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+
+        $inactiveTier = PartnerTier::factory()->create([
+            'is_active' => false,
+            'is_enabled' => true,
+        ]);
+
+        $disabledTier = PartnerTier::factory()->create([
+            'is_active' => true,
+            'is_enabled' => false,
+        ]);
+
+        // Test that only active and enabled partner tiers are returned
+        $tiers = PartnerTier::all();
+        
+        $this->assertCount(1, $tiers);
+        $this->assertEquals($activeEnabledTier->id, $tiers->first()->id);
+
+        // Test bypassing scopes
+        $allTiers = PartnerTier::withoutGlobalScopes()->get();
+        $this->assertCount(3, $allTiers);
+    }
+
+    public function test_global_scopes_can_be_combined_with_local_scopes(): void
+    {
+        // Create test data
+        $activeCountry = Country::factory()->create(['is_active' => true]);
+        $inactiveCountry = Country::factory()->create(['is_active' => false]);
+
+        // Test that global scopes work with local scopes
+        $countries = Country::where('name', 'like', '%test%')->get();
+        $this->assertCount(0, $countries); // No countries with 'test' in name
+
+        // Test bypassing global scopes with local scopes
+        $allCountries = Country::withoutGlobalScopes()->where('is_active', true)->get();
+        $this->assertCount(1, $allCountries);
+        $this->assertEquals($activeCountry->id, $allCountries->first()->id);
+    }
+
+    public function test_global_scopes_are_applied_to_relationships(): void
+    {
+        // Create test data with relationships
+        $activeCountry = Country::factory()->create(['is_active' => true]);
+        $inactiveCountry = Country::factory()->create(['is_active' => false]);
+
+        // Test that relationships also apply global scopes
+        $countries = Country::all();
+        $this->assertCount(1, $countries);
+        $this->assertEquals($activeCountry->id, $countries->first()->id);
+    }
+
+    public function test_location_scope_combinations(): void
+    {
+        // Test different combinations of location scopes
+        $city1 = City::factory()->create([
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+
+        $city2 = City::factory()->create([
+            'is_active' => false,
+            'is_enabled' => true,
+        ]);
+
+        $city3 = City::factory()->create([
+            'is_active' => true,
+            'is_enabled' => false,
+        ]);
+
+        // Test bypassing specific scopes
+        $activeCities = City::withoutGlobalScope(EnabledScope::class)->get();
+        $this->assertCount(2, $activeCities); // Only active cities
+
+        $enabledCities = City::withoutGlobalScope(ActiveScope::class)->get();
+        $this->assertCount(2, $enabledCities); // Only enabled cities
+    }
+
+    public function test_currency_scope_combinations(): void
+    {
+        // Test different combinations of currency scopes
+        $currency1 = Currency::factory()->create([
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+
+        $currency2 = Currency::factory()->create([
+            'is_active' => false,
+            'is_enabled' => true,
+        ]);
+
+        $currency3 = Currency::factory()->create([
+            'is_active' => true,
+            'is_enabled' => false,
+        ]);
+
+        // Test bypassing specific scopes
+        $activeCurrencies = Currency::withoutGlobalScope(EnabledScope::class)->get();
+        $this->assertCount(2, $activeCurrencies); // Only active currencies
+
+        $enabledCurrencies = Currency::withoutGlobalScope(ActiveScope::class)->get();
+        $this->assertCount(2, $enabledCurrencies); // Only enabled currencies
+    }
+
+    public function test_customer_group_scope_combinations(): void
+    {
+        // Test different combinations of customer group scopes
+        $group1 = CustomerGroup::factory()->create([
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+
+        $group2 = CustomerGroup::factory()->create([
+            'is_active' => false,
+            'is_enabled' => true,
+        ]);
+
+        $group3 = CustomerGroup::factory()->create([
+            'is_active' => true,
+            'is_enabled' => false,
+        ]);
+
+        // Test bypassing specific scopes
+        $activeGroups = CustomerGroup::withoutGlobalScope(EnabledScope::class)->get();
+        $this->assertCount(2, $activeGroups); // Only active groups
+
+        $enabledGroups = CustomerGroup::withoutGlobalScope(ActiveScope::class)->get();
+        $this->assertCount(2, $enabledGroups); // Only enabled groups
+    }
+
+    public function test_partner_tier_scope_combinations(): void
+    {
+        // Test different combinations of partner tier scopes
+        $tier1 = PartnerTier::factory()->create([
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+
+        $tier2 = PartnerTier::factory()->create([
+            'is_active' => false,
+            'is_enabled' => true,
+        ]);
+
+        $tier3 = PartnerTier::factory()->create([
+            'is_active' => true,
+            'is_enabled' => false,
+        ]);
+
+        // Test bypassing specific scopes
+        $activeTiers = PartnerTier::withoutGlobalScope(EnabledScope::class)->get();
+        $this->assertCount(2, $activeTiers); // Only active tiers
+
+        $enabledTiers = PartnerTier::withoutGlobalScope(ActiveScope::class)->get();
+        $this->assertCount(2, $enabledTiers); // Only enabled tiers
+    }
+}

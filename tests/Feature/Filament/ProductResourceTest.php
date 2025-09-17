@@ -1,0 +1,187 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature\Filament;
+
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class ProductResourceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->actingAs(User::factory()->admin()->create());
+    }
+
+    public function test_product_resource_list_page_renders(): void
+    {
+        Product::factory()->count(3)->create();
+
+        $response = $this->get(route('filament.admin.resources.products.index'));
+
+        $response->assertOk();
+    }
+
+    public function test_product_resource_create_page_renders(): void
+    {
+        $response = $this->get(route('filament.admin.resources.products.create'));
+
+        $response->assertOk();
+    }
+
+    public function test_product_resource_can_create_product(): void
+    {
+        $productData = [
+            'name' => 'Test Product',
+            'slug' => 'test-product',
+            'sku' => 'TEST001',
+            'description' => 'Test description',
+            'price' => 99.99,
+            'status' => 'draft',
+            'is_visible' => true,
+            'is_featured' => false,
+        ];
+
+        $response = $this->post(route('filament.admin.resources.products.store'), $productData);
+
+        $response->assertRedirect();
+        
+        $this->assertDatabaseHas('products', [
+            'name' => 'Test Product',
+            'slug' => 'test-product',
+            'sku' => 'TEST001',
+            'description' => 'Test description',
+            'price' => 99.99,
+            'status' => 'draft',
+            'is_visible' => true,
+            'is_featured' => false,
+        ]);
+    }
+
+    public function test_product_resource_can_edit_product(): void
+    {
+        $product = Product::factory()->create([
+            'name' => 'Original Name',
+            'description' => 'Original Description',
+        ]);
+
+        $updateData = [
+            'name' => 'Updated Name',
+            'description' => 'Updated Description',
+        ];
+
+        $response = $this->put(route('filament.admin.resources.products.update', $product), $updateData);
+
+        $response->assertRedirect();
+        
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'name' => 'Updated Name',
+            'description' => 'Updated Description',
+        ]);
+    }
+
+    public function test_product_resource_can_delete_product(): void
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->delete(route('filament.admin.resources.products.destroy', $product));
+
+        $response->assertRedirect();
+        
+        $this->assertSoftDeleted('products', [
+            'id' => $product->id,
+        ]);
+    }
+
+    public function test_product_resource_widgets_are_included(): void
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->get(route('filament.admin.resources.products.index'));
+
+        $response->assertOk();
+        // Widgets should be rendered on the index page
+        $response->assertSee('Product Statistics');
+    }
+
+    public function test_product_resource_bulk_actions(): void
+    {
+        $products = Product::factory()->count(3)->create([
+            'status' => 'draft',
+            'is_visible' => false,
+        ]);
+
+        // Test bulk publish action
+        $response = $this->post(route('filament.admin.resources.products.bulk-action'), [
+            'action' => 'publish',
+            'records' => $products->pluck('id')->toArray(),
+        ]);
+
+        $response->assertRedirect();
+
+        foreach ($products as $product) {
+            $product->refresh();
+            $this->assertEquals('published', $product->status);
+            $this->assertTrue($product->is_visible);
+        }
+
+        // Test bulk feature action
+        $response = $this->post(route('filament.admin.resources.products.bulk-action'), [
+            'action' => 'feature',
+            'records' => $products->pluck('id')->toArray(),
+        ]);
+
+        $response->assertRedirect();
+
+        foreach ($products as $product) {
+            $product->refresh();
+            $this->assertTrue($product->is_featured);
+        }
+    }
+
+    public function test_product_resource_filters(): void
+    {
+        Product::factory()->create(['status' => 'published']);
+        Product::factory()->create(['status' => 'draft']);
+        Product::factory()->create(['is_featured' => true]);
+
+        // Test status filter
+        $response = $this->get(route('filament.admin.resources.products.index', ['tableFilters[status][value]' => 'published']));
+        $response->assertOk();
+
+        // Test featured filter
+        $response = $this->get(route('filament.admin.resources.products.index', ['tableFilters[is_featured][value]' => '1']));
+        $response->assertOk();
+    }
+
+    public function test_product_resource_duplicate_action(): void
+    {
+        $product = Product::factory()->create([
+            'name' => 'Original Product',
+            'sku' => 'ORIG001',
+            'slug' => 'original-product',
+        ]);
+
+        $response = $this->post(route('filament.admin.resources.products.bulk-action'), [
+            'action' => 'duplicate',
+            'records' => [$product->id],
+        ]);
+
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('products', [
+            'name' => 'Original Product (Copy)',
+            'sku' => 'ORIG001-copy',
+            'slug' => 'original-product-copy',
+            'status' => 'draft',
+        ]);
+    }
+}

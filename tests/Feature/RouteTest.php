@@ -1,0 +1,1206 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\Address;
+use App\Models\Campaign;
+use App\Models\CampaignConversion;
+use App\Models\CampaignClick;
+use App\Models\Category;
+use App\Models\City;
+use App\Models\Collection;
+use App\Models\Country;
+use App\Models\CustomerGroup;
+use App\Models\Discount;
+use App\Models\DiscountCode;
+use App\Models\DiscountCondition;
+use App\Models\DiscountRedemption;
+use App\Models\Legal;
+use App\Models\Location;
+use App\Models\News;
+use App\Models\Order;
+use App\Models\Post;
+use App\Models\Product;
+use App\Models\Referral;
+use App\Models\ReferralCode;
+use App\Models\ReferralReward;
+use App\Models\Region;
+use App\Models\Review;
+use App\Models\SeoData;
+use App\Models\Stock;
+use App\Models\SystemSetting;
+use App\Models\User;
+use App\Models\VariantStock;
+use App\Models\Zone;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+
+/**
+ * Comprehensive Route Tests
+ * 
+ * This test class dynamically tests all routes in the application
+ * to ensure they are properly configured and accessible.
+ */
+class RouteTest extends TestCase
+{
+    use RefreshDatabase, WithFaker;
+
+    protected User $user;
+    protected User $admin;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Create test users
+        $this->user = User::factory()->create();
+        $this->admin = User::factory()->create(['is_admin' => true]);
+        
+        // Seed essential data
+        $this->seedEssentialData();
+    }
+
+    /**
+     * Seed essential data for testing
+     */
+    private function seedEssentialData(): void
+    {
+        // Create countries with unique codes
+        Country::factory()->create(['cca2' => 'LT', 'cca3' => 'LTU']);
+        Country::factory()->create(['cca2' => 'US', 'cca3' => 'USA']);
+        
+        // Create zones with unique codes
+        Zone::factory()->create(['code' => 'LT', 'is_default' => true]);
+        Zone::factory()->create(['code' => 'US']);
+        
+        // Create regions
+        Region::factory()->create(['country_id' => 1]);
+        Region::factory()->create(['country_id' => 2]);
+        
+        // Create cities
+        City::factory()->create(['region_id' => 1]);
+        City::factory()->create(['region_id' => 2]);
+        
+        // Create categories
+        Category::factory()->create();
+        Category::factory()->create();
+        
+        // Create products
+        Product::factory()->create();
+        Product::factory()->create();
+        
+        // Create brands
+        \App\Models\Brand::factory()->create();
+        \App\Models\Brand::factory()->create();
+        
+        // Create collections
+        Collection::factory()->create();
+        Collection::factory()->create();
+        
+        // Create campaigns
+        Campaign::factory()->create();
+        Campaign::factory()->create();
+        
+        // Create orders
+        Order::factory()->create(['user_id' => $this->user->id]);
+        Order::factory()->create(['user_id' => $this->admin->id]);
+        
+        // Create addresses
+        Address::factory()->create(['user_id' => $this->user->id]);
+        Address::factory()->create(['user_id' => $this->admin->id]);
+        
+        // Create customer groups
+        CustomerGroup::factory()->create();
+        CustomerGroup::factory()->create();
+        
+        // Create discounts
+        Discount::factory()->create();
+        Discount::factory()->create();
+        
+        // Create discount codes
+        DiscountCode::factory()->create();
+        DiscountCode::factory()->create();
+        
+        // Create discount conditions
+        DiscountCondition::factory()->create();
+        DiscountCondition::factory()->create();
+        
+        // Create discount redemptions
+        DiscountRedemption::factory()->create(['user_id' => $this->user->id]);
+        DiscountRedemption::factory()->create(['user_id' => $this->admin->id]);
+        
+        // Create reviews
+        Review::factory()->create(['user_id' => $this->user->id]);
+        Review::factory()->create(['user_id' => $this->admin->id]);
+        
+        // Create referrals
+        Referral::factory()->create(['user_id' => $this->user->id]);
+        Referral::factory()->create(['user_id' => $this->admin->id]);
+        
+        // Create referral codes
+        ReferralCode::factory()->create(['user_id' => $this->user->id]);
+        ReferralCode::factory()->create(['user_id' => $this->admin->id]);
+        
+        // Create referral rewards
+        ReferralReward::factory()->create(['user_id' => $this->user->id]);
+        ReferralReward::factory()->create(['user_id' => $this->admin->id]);
+        
+        // Create campaign conversions
+        CampaignConversion::factory()->create();
+        CampaignConversion::factory()->create();
+        
+        // Create campaign clicks
+        CampaignClick::factory()->create();
+        CampaignClick::factory()->create();
+        
+        // Create stock
+        Stock::factory()->create();
+        Stock::factory()->create();
+        
+        // Create variant stock
+        VariantStock::factory()->create();
+        VariantStock::factory()->create();
+        
+        // Create locations
+        Location::factory()->create();
+        Location::factory()->create();
+        
+        // Create news
+        News::factory()->create();
+        News::factory()->create();
+        
+        // Create posts
+        Post::factory()->create();
+        Post::factory()->create();
+        
+        // Create legal documents
+        Legal::factory()->create();
+        Legal::factory()->create();
+        
+        // Create SEO data
+        SeoData::factory()->create();
+        SeoData::factory()->create();
+        
+        // Create system settings
+        SystemSetting::factory()->create();
+        SystemSetting::factory()->create();
+    }
+
+    /**
+     * Test health check route
+     */
+    public function test_health_route_returns_ok(): void
+    {
+        $response = $this->get('/health');
+        $response->assertStatus(200);
+        $response->assertJson(['ok' => true]);
+    }
+
+    /**
+     * Test language switching route
+     */
+    public function test_language_switch_route(): void
+    {
+        $response = $this->get('/lang/lt');
+        $response->assertRedirect();
+        
+        $response = $this->get('/lang/en');
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test root route redirects to localized home
+     */
+    public function test_root_route_redirects_to_localized_home(): void
+    {
+        $response = $this->get('/');
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test home route redirects to root
+     */
+    public function test_home_route_redirects_to_root(): void
+    {
+        $response = $this->get('/home');
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test product routes
+     */
+    public function test_product_routes(): void
+    {
+        $product = Product::first();
+        
+        // Test product catalog
+        $response = $this->get('/products');
+        $response->assertStatus(200);
+        
+        // Test single product
+        $response = $this->get("/products/{$product->id}");
+        $response->assertStatus(200);
+        
+        // Test product history
+        $response = $this->get("/products/{$product->id}/history");
+        $response->assertStatus(200);
+        
+        // Test product gallery redirect
+        $response = $this->get("/products/{$product->id}/gallery");
+        $response->assertRedirect();
+        
+        // Test legacy product route
+        $response = $this->get("/product/{$product->id}");
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test authenticated product request routes
+     */
+    public function test_authenticated_product_request_routes(): void
+    {
+        $product = Product::first();
+        
+        $this->actingAs($this->user);
+        
+        // Test create product request
+        $response = $this->get("/products/{$product->id}/request");
+        $response->assertStatus(200);
+        
+        // Test store product request
+        $response = $this->post('/product-requests', [
+            'product_id' => $product->id,
+            'message' => 'Test request message',
+        ]);
+        $response->assertRedirect();
+        
+        // Test product requests index
+        $response = $this->get('/product-requests');
+        $response->assertStatus(200);
+        
+        // Test product request show
+        $productRequest = \App\Models\ProductRequest::factory()->create(['user_id' => $this->user->id]);
+        $response = $this->get("/product-requests/{$productRequest->id}");
+        $response->assertStatus(200);
+        
+        // Test cancel product request
+        $response = $this->patch("/product-requests/{$productRequest->id}/cancel");
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test inventory route
+     */
+    public function test_inventory_route(): void
+    {
+        $response = $this->get('/inventory');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test category routes
+     */
+    public function test_category_routes(): void
+    {
+        $category = Category::first();
+        
+        // Test category index redirect
+        $response = $this->get('/categories');
+        $response->assertRedirect();
+        
+        // Test category show redirect
+        $response = $this->get("/categories/{$category->id}");
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test brand routes
+     */
+    public function test_brand_routes(): void
+    {
+        $brand = \App\Models\Brand::first();
+        
+        // Test brand index redirect
+        $response = $this->get('/brands');
+        $response->assertRedirect();
+        
+        // Test brand show redirect
+        $response = $this->get("/brands/{$brand->id}");
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test collection routes
+     */
+    public function test_collection_routes(): void
+    {
+        $collection = Collection::first();
+        
+        // Test collection index
+        $response = $this->get('/collections');
+        $response->assertStatus(200);
+        
+        // Test collection show
+        $response = $this->get("/collections/{$collection->id}");
+        $response->assertStatus(200);
+        
+        // Test collection products
+        $response = $this->get("/collections/{$collection->id}/products");
+        $response->assertStatus(200);
+        
+        // Test collection search
+        $response = $this->get('/collections/api/search');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test cart route
+     */
+    public function test_cart_route(): void
+    {
+        $response = $this->get('/cart');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test search route
+     */
+    public function test_search_route(): void
+    {
+        $response = $this->get('/search');
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test legal routes
+     */
+    public function test_legal_routes(): void
+    {
+        $legal = Legal::first();
+        
+        // Test legal index
+        $response = $this->get('/legal');
+        $response->assertStatus(200);
+        
+        // Test legal search
+        $response = $this->get('/legal/search');
+        $response->assertStatus(200);
+        
+        // Test legal by type
+        $response = $this->get('/legal/type/terms');
+        $response->assertStatus(200);
+        
+        // Test legal show
+        $response = $this->get("/legal/{$legal->key}");
+        $response->assertStatus(200);
+        
+        // Test legal download
+        $response = $this->get("/legal/{$legal->key}/download");
+        $response->assertStatus(200);
+        
+        // Test legal sitemap
+        $response = $this->get('/legal/sitemap.xml');
+        $response->assertStatus(200);
+        
+        // Test legal RSS
+        $response = $this->get('/legal/rss.xml');
+        $response->assertStatus(200);
+        
+        // Test legacy legal route
+        $response = $this->get("/legal/{$legal->key}");
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test cpanel routes
+     */
+    public function test_cpanel_routes(): void
+    {
+        // Test cpanel login
+        $response = $this->get('/cpanel/login');
+        $response->assertStatus(200);
+        
+        // Test cpanel any path
+        $response = $this->get('/cpanel/test');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test authenticated routes
+     */
+    public function test_authenticated_routes(): void
+    {
+        $this->actingAs($this->user);
+        
+        // Test checkout
+        $response = $this->get('/checkout');
+        $response->assertStatus(200);
+        
+        // Test checkout confirmation
+        $response = $this->get('/checkout/confirmation/TEST123');
+        $response->assertRedirect();
+        
+        // Test orders index
+        $response = $this->get('/orders');
+        $response->assertStatus(200);
+        
+        // Test account index
+        $response = $this->get('/account');
+        $response->assertRedirect();
+        
+        // Test account orders
+        $response = $this->get('/account/orders');
+        $response->assertStatus(200);
+        
+        // Test account addresses
+        $response = $this->get('/account/addresses');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test admin language switching
+     */
+    public function test_admin_language_switch(): void
+    {
+        $this->actingAs($this->admin);
+        
+        $response = $this->post('/admin/language/switch', ['locale' => 'lt']);
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test admin impersonation routes
+     */
+    public function test_admin_impersonation_routes(): void
+    {
+        $this->actingAs($this->admin);
+        
+        // Test impersonate user
+        $response = $this->post("/admin/impersonate/{$this->user->id}");
+        $response->assertStatus(200);
+        
+        // Test stop impersonating
+        $response = $this->post('/admin/stop-impersonating');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test advanced reports route
+     */
+    public function test_advanced_reports_route(): void
+    {
+        $this->actingAs($this->admin);
+        
+        $response = $this->get('/admin/advanced-reports');
+        $response->assertStatus(200);
+        $response->assertSee('Advanced Reports');
+    }
+
+    /**
+     * Test admin utility pages
+     */
+    public function test_admin_utility_pages(): void
+    {
+        $this->actingAs($this->admin);
+        
+        // Test data import/export
+        $response = $this->get('/admin/data-import-export');
+        $response->assertStatus(200);
+        $response->assertSee('Data Import/Export');
+        
+        // Test customer segmentation
+        $response = $this->get('/admin/customer-segmentation');
+        $response->assertStatus(200);
+        $response->assertSee('Customer Segmentation');
+        
+        // Test SEO analytics
+        $response = $this->get('/admin/seo-analytics');
+        $response->assertStatus(200);
+        $response->assertSee('SEO Analytics');
+        
+        // Test security audit
+        $response = $this->get('/admin/security-audit');
+        $response->assertStatus(200);
+        $response->assertSee('Security Audit');
+        
+        // Test system monitoring
+        $response = $this->get('/admin/system-monitoring');
+        $response->assertStatus(200);
+        $response->assertSee('System Monitoring');
+    }
+
+    /**
+     * Test discount presets routes
+     */
+    public function test_discount_presets_routes(): void
+    {
+        $this->actingAs($this->admin);
+        
+        // Test discount presets index
+        $response = $this->get('/admin/discounts/presets');
+        $response->assertStatus(200);
+        $response->assertSee('Discount Presets');
+        
+        // Test discount presets store
+        $response = $this->post('/admin/discounts/presets', []);
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test zone routes
+     */
+    public function test_zone_routes(): void
+    {
+        $this->actingAs($this->admin);
+        
+        $zone = Zone::first();
+        
+        // Test zone create
+        $response = $this->post('/admin/zones/create', [
+            'name' => 'Test Zone',
+            'code' => 'TZ',
+            'is_enabled' => true,
+        ]);
+        $response->assertRedirect();
+        
+        // Test zone update
+        $response = $this->put("/admin/zones/{$zone->id}/edit", [
+            'name' => 'Updated Zone',
+            'code' => 'UZ',
+            'is_enabled' => true,
+        ]);
+        $response->assertRedirect();
+        
+        // Test zone delete
+        $response = $this->delete("/admin/zones/{$zone->id}/edit");
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test API routes
+     */
+    public function test_api_routes(): void
+    {
+        // Test products search
+        $response = $this->get('/api/products/search');
+        $response->assertStatus(200);
+        
+        // Test categories tree
+        $response = $this->get('/api/categories/tree');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test robots.txt route
+     */
+    public function test_robots_txt_route(): void
+    {
+        $response = $this->get('/robots.txt');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test sitemap routes
+     */
+    public function test_sitemap_routes(): void
+    {
+        // Test main sitemap
+        $response = $this->get('/sitemap.xml');
+        $response->assertStatus(200);
+        
+        // Test localized sitemap
+        $response = $this->get('/lt/sitemap.xml');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test exports routes
+     */
+    public function test_exports_routes(): void
+    {
+        $this->actingAs($this->admin);
+        
+        // Test exports index
+        $response = $this->get('/exports');
+        $response->assertStatus(200);
+        
+        // Test exports file
+        $response = $this->get('/exports/test-file.csv');
+        $response->assertStatus(200);
+        
+        // Test exports download
+        $response = $this->get('/exports/download/test-file.csv');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test locations routes
+     */
+    public function test_locations_routes(): void
+    {
+        $location = Location::first();
+        
+        // Test locations index redirect
+        $response = $this->get('/locations');
+        $response->assertRedirect();
+        
+        // Test location show by slug
+        $response = $this->get("/locations/{$location->code}");
+        $response->assertStatus(200);
+        
+        // Test legacy location show by ID
+        $response = $this->get("/locations/{$location->id}");
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test region routes
+     */
+    public function test_region_routes(): void
+    {
+        $region = Region::first();
+        
+        // Test region index
+        $response = $this->get('/regions');
+        $response->assertStatus(200);
+        
+        // Test region show
+        $response = $this->get("/regions/{$region->id}");
+        $response->assertStatus(200);
+        
+        // Test region API routes
+        $response = $this->get('/regions/api/search');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/regions/api/by-country/1');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/regions/api/by-zone/1');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/regions/api/by-level/1');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/regions/api/children/1');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/regions/api/statistics');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/regions/api/data');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test localized routes
+     */
+    public function test_localized_routes(): void
+    {
+        // Test localized home
+        $response = $this->get('/lt');
+        $response->assertStatus(200);
+        
+        // Test localized categories
+        $response = $this->get('/lt/categories');
+        $response->assertStatus(200);
+        
+        $category = Category::first();
+        $response = $this->get("/lt/categories/{$category->id}");
+        $response->assertStatus(200);
+        
+        // Test localized products
+        $response = $this->get('/lt/products');
+        $response->assertStatus(200);
+        
+        $product = Product::first();
+        $response = $this->get("/lt/products/{$product->id}");
+        $response->assertStatus(200);
+        
+        $response = $this->get("/lt/products/{$product->id}/history");
+        $response->assertStatus(200);
+        
+        // Test localized inventory
+        $response = $this->get('/lt/inventory');
+        $response->assertStatus(200);
+        
+        // Test localized cart
+        $response = $this->get('/lt/cart');
+        $response->assertStatus(200);
+        
+        // Test localized search
+        $response = $this->get('/lt/search');
+        $response->assertStatus(200);
+        
+        // Test localized brands
+        $response = $this->get('/lt/brands');
+        $response->assertStatus(200);
+        
+        $brand = \App\Models\Brand::first();
+        $response = $this->get("/lt/brands/{$brand->slug}");
+        $response->assertStatus(200);
+        
+        // Test localized news
+        $response = $this->get('/lt/news');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/lt/naujienos');
+        $response->assertStatus(200);
+        
+        $news = News::first();
+        $response = $this->get("/lt/news/{$news->slug}");
+        $response->assertStatus(200);
+        
+        $response = $this->get("/lt/naujienos/{$news->slug}");
+        $response->assertStatus(200);
+        
+        // Test localized locations
+        $response = $this->get('/lt/locations');
+        $response->assertStatus(200);
+        
+        $location = Location::first();
+        $response = $this->get("/lt/locations/{$location->code}");
+        $response->assertStatus(200);
+        
+        // Test localized cpanel
+        $response = $this->get('/lt/cpanel');
+        $response->assertRedirect();
+        
+        $response = $this->get('/lt/cpanel/test');
+        $response->assertRedirect();
+        
+        // Test localized order confirmation
+        $this->actingAs($this->user);
+        $response = $this->get('/lt/order/confirmed/TEST123');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test admin news routes
+     */
+    public function test_admin_news_routes(): void
+    {
+        $this->actingAs($this->admin);
+        
+        // Test news index
+        $response = $this->get('/admin/news');
+        $response->assertStatus(200);
+        
+        // Test news store
+        $response = $this->post('/admin/news', [
+            'is_visible' => true,
+            'published_at' => now(),
+            'author_name' => 'Test Author',
+            'translations' => [
+                [
+                    'locale' => 'lt',
+                    'title' => 'Test Title',
+                    'slug' => 'test-title',
+                    'summary' => 'Test Summary',
+                    'content' => 'Test Content',
+                ],
+            ],
+        ]);
+        $response->assertRedirect();
+        
+        // Test news update
+        $news = News::first();
+        $response = $this->put("/admin/news/{$news->id}", [
+            'is_visible' => true,
+            'published_at' => now(),
+            'author_name' => 'Updated Author',
+            'translations' => [
+                [
+                    'locale' => 'lt',
+                    'title' => 'Updated Title',
+                    'slug' => 'updated-title',
+                    'summary' => 'Updated Summary',
+                    'content' => 'Updated Content',
+                ],
+            ],
+        ]);
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test admin translation save routes
+     */
+    public function test_admin_translation_save_routes(): void
+    {
+        $this->actingAs($this->admin);
+        
+        // Test legal translations save
+        $response = $this->put('/admin/lt/legal/1/translations/lt');
+        $response->assertRedirect();
+        
+        // Test brands translations save
+        $response = $this->put('/admin/lt/brands/1/translations/lt');
+        $response->assertRedirect();
+        
+        // Test categories translations save
+        $response = $this->put('/admin/lt/categories/1/translations/lt');
+        $response->assertRedirect();
+        
+        // Test collections translations save
+        $response = $this->put('/admin/lt/collections/1/translations/lt');
+        $response->assertRedirect();
+        
+        // Test products translations save
+        $response = $this->put('/admin/lt/products/1/translations/lt');
+        $response->assertRedirect();
+        
+        // Test attributes translations save
+        $response = $this->put('/admin/lt/attributes/1/translations/lt');
+        $response->assertRedirect();
+        
+        // Test attribute values translations save
+        $response = $this->put('/admin/lt/attribute-values/1/translations/lt');
+        $response->assertRedirect();
+    }
+
+    /**
+     * Test notification routes
+     */
+    public function test_notification_routes(): void
+    {
+        $this->actingAs($this->user);
+        
+        // Test notifications index
+        $response = $this->get('/notifications');
+        $response->assertStatus(200);
+        
+        // Test mark notification as read
+        $response = $this->post('/notifications/1/read');
+        $response->assertStatus(200);
+        
+        // Test mark notification as unread
+        $response = $this->post('/notifications/1/unread');
+        $response->assertStatus(200);
+        
+        // Test mark all notifications as read
+        $response = $this->post('/notifications/read-all');
+        $response->assertStatus(200);
+        
+        // Test delete notification
+        $response = $this->delete('/notifications/1');
+        $response->assertStatus(200);
+        
+        // Test clear all notifications
+        $response = $this->delete('/notifications');
+        $response->assertStatus(200);
+        
+        // Test get unread count
+        $response = $this->get('/notifications/unread-count');
+        $response->assertStatus(200);
+        
+        // Test get recent notifications
+        $response = $this->get('/notifications/recent');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test localized notification routes
+     */
+    public function test_localized_notification_routes(): void
+    {
+        $this->actingAs($this->user);
+        
+        $response = $this->get('/lt/notifications');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test SEO data routes
+     */
+    public function test_seo_data_routes(): void
+    {
+        $seoData = SeoData::first();
+        
+        // Test SEO data index
+        $response = $this->get('/seo-data');
+        $response->assertStatus(200);
+        
+        // Test SEO data analytics
+        $response = $this->get('/seo-data/analytics');
+        $response->assertStatus(200);
+        
+        // Test SEO data by type
+        $response = $this->get('/seo-data/type/product');
+        $response->assertStatus(200);
+        
+        // Test SEO data show
+        $response = $this->get("/seo-data/{$seoData->id}");
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test attribute routes
+     */
+    public function test_attribute_routes(): void
+    {
+        $attribute = \App\Models\Attribute::factory()->create();
+        
+        // Test frontend attribute routes
+        $response = $this->get('/attributes');
+        $response->assertStatus(200);
+        
+        $response = $this->get("/attributes/{$attribute->id}");
+        $response->assertStatus(200);
+        
+        $response = $this->get('/attributes/filter/products');
+        $response->assertStatus(200);
+        
+        // Test attribute API routes
+        $response = $this->get('/attributes/api/values');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/attributes/api/statistics');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/attributes/api/groups');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/attributes/api/types');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/attributes/api/search');
+        $response->assertStatus(200);
+        
+        $response = $this->get('/attributes/api/compare');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test attribute value routes
+     */
+    public function test_attribute_value_routes(): void
+    {
+        $attributeValue = \App\Models\AttributeValue::factory()->create();
+        $attribute = \App\Models\Attribute::factory()->create();
+        
+        // Test attribute value index
+        $response = $this->get('/attribute-values');
+        $response->assertStatus(200);
+        
+        // Test attribute value show
+        $response = $this->get("/attribute-values/{$attributeValue->id}");
+        $response->assertStatus(200);
+        
+        // Test attribute value by attribute
+        $response = $this->get("/attribute-values/attribute/{$attribute->id}");
+        $response->assertStatus(200);
+        
+        // Test attribute value search
+        $response = $this->get('/attribute-values/api/search');
+        $response->assertStatus(200);
+        
+        // Test attribute value API
+        $response = $this->get('/attribute-values/api/data');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test post routes
+     */
+    public function test_post_routes(): void
+    {
+        $post = Post::first();
+        
+        // Test post index
+        $response = $this->get('/posts');
+        $response->assertStatus(200);
+        
+        // Test post featured
+        $response = $this->get('/posts/featured');
+        $response->assertStatus(200);
+        
+        // Test post search
+        $response = $this->get('/posts/search');
+        $response->assertStatus(200);
+        
+        // Test post by author
+        $response = $this->get('/posts/author/1');
+        $response->assertStatus(200);
+        
+        // Test post show
+        $response = $this->get("/posts/{$post->id}");
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test city routes
+     */
+    public function test_city_routes(): void
+    {
+        $city = City::first();
+        $country = Country::first();
+        $region = Region::first();
+        
+        // Test city index
+        $response = $this->get('/cities');
+        $response->assertStatus(200);
+        
+        // Test city search
+        $response = $this->get('/cities/search');
+        $response->assertStatus(200);
+        
+        // Test city by country
+        $response = $this->get("/cities/country/{$country->id}");
+        $response->assertStatus(200);
+        
+        // Test city by region
+        $response = $this->get("/cities/region/{$region->id}");
+        $response->assertStatus(200);
+        
+        // Test city show
+        $response = $this->get("/cities/{$city->id}");
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test location routes
+     */
+    public function test_location_routes(): void
+    {
+        $location = Location::first();
+        
+        // Test location index
+        $response = $this->get('/locations');
+        $response->assertStatus(200);
+        
+        // Test location show
+        $response = $this->get("/locations/{$location->id}");
+        $response->assertStatus(200);
+        
+        // Test location contact
+        $response = $this->post("/locations/{$location->id}/contact", [
+            'name' => 'Test Name',
+            'email' => 'test@example.com',
+            'message' => 'Test message',
+        ]);
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test country routes
+     */
+    public function test_country_routes(): void
+    {
+        $country = Country::first();
+        $region = Region::first();
+        
+        // Test country index
+        $response = $this->get('/countries');
+        $response->assertStatus(200);
+        
+        // Test country show
+        $response = $this->get("/countries/{$country->id}");
+        $response->assertStatus(200);
+        
+        // Test country API search
+        $response = $this->get('/countries/api/search');
+        $response->assertStatus(200);
+        
+        // Test country API by region
+        $response = $this->get("/countries/api/by-region/{$region->id}");
+        $response->assertStatus(200);
+        
+        // Test country API EU members
+        $response = $this->get('/countries/api/eu-members');
+        $response->assertStatus(200);
+        
+        // Test country API with VAT
+        $response = $this->get('/countries/api/with-vat');
+        $response->assertStatus(200);
+        
+        // Test country API statistics
+        $response = $this->get('/countries/api/statistics');
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test collection routes (duplicate)
+     */
+    public function test_collection_routes_duplicate(): void
+    {
+        $collection = Collection::first();
+        
+        // Test collection index
+        $response = $this->get('/collections');
+        $response->assertStatus(200);
+        
+        // Test collection show
+        $response = $this->get("/collections/{$collection->id}");
+        $response->assertStatus(200);
+        
+        // Test collection API search
+        $response = $this->get('/collections/api/search');
+        $response->assertStatus(200);
+        
+        // Test collection API by type
+        $response = $this->get('/collections/api/by-type/featured');
+        $response->assertStatus(200);
+        
+        // Test collection API with products
+        $response = $this->get('/collections/api/with-products');
+        $response->assertStatus(200);
+        
+        // Test collection API popular
+        $response = $this->get('/collections/api/popular');
+        $response->assertStatus(200);
+        
+        // Test collection API statistics
+        $response = $this->get('/collections/api/statistics');
+        $response->assertStatus(200);
+        
+        // Test collection products
+        $response = $this->get("/collections/{$collection->id}/products");
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test attribute routes (duplicate)
+     */
+    public function test_attribute_routes_duplicate(): void
+    {
+        $attribute = \App\Models\Attribute::factory()->create();
+        
+        // Test attribute index
+        $response = $this->get('/attributes');
+        $response->assertStatus(200);
+        
+        // Test attribute show
+        $response = $this->get("/attributes/{$attribute->id}");
+        $response->assertStatus(200);
+        
+        // Test attribute API search
+        $response = $this->get('/attributes/api/search');
+        $response->assertStatus(200);
+        
+        // Test attribute API by type
+        $response = $this->get('/attributes/api/by-type/text');
+        $response->assertStatus(200);
+        
+        // Test attribute API by group
+        $response = $this->get('/attributes/api/by-group/general');
+        $response->assertStatus(200);
+        
+        // Test attribute API filterable
+        $response = $this->get('/attributes/api/filterable');
+        $response->assertStatus(200);
+        
+        // Test attribute API required
+        $response = $this->get('/attributes/api/required');
+        $response->assertStatus(200);
+        
+        // Test attribute API statistics
+        $response = $this->get('/attributes/api/statistics');
+        $response->assertStatus(200);
+        
+        // Test attribute values
+        $response = $this->get("/attributes/{$attribute->id}/values");
+        $response->assertStatus(200);
+    }
+}

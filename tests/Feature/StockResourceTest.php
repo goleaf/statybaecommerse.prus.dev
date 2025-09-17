@@ -1,0 +1,139 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\Stock;
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class StockResourceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->actingAs(User::factory()->create());
+    }
+
+    public function test_can_create_stock(): void
+    {
+        $product = Product::factory()->create();
+        
+        $stockData = [
+            'product_id' => $product->id,
+            'quantity' => 100,
+            'reserved_quantity' => 10,
+            'min_quantity' => 5,
+            'max_quantity' => 1000,
+            'is_active' => true,
+        ];
+
+        $stock = Stock::create($stockData);
+
+        $this->assertDatabaseHas('stocks', [
+            'product_id' => $product->id,
+            'quantity' => 100,
+            'reserved_quantity' => 10,
+            'min_quantity' => 5,
+            'max_quantity' => 1000,
+        ]);
+
+        $this->assertEquals(100, $stock->quantity);
+        $this->assertEquals(10, $stock->reserved_quantity);
+        $this->assertEquals(5, $stock->min_quantity);
+        $this->assertEquals(1000, $stock->max_quantity);
+    }
+
+    public function test_can_update_stock(): void
+    {
+        $product = Product::factory()->create();
+        $stock = Stock::factory()->create(['product_id' => $product->id]);
+
+        $stock->update([
+            'quantity' => 200,
+            'reserved_quantity' => 20,
+        ]);
+
+        $this->assertEquals(200, $stock->quantity);
+        $this->assertEquals(20, $stock->reserved_quantity);
+    }
+
+    public function test_can_filter_stock_by_quantity(): void
+    {
+        $product = Product::factory()->create();
+        
+        Stock::factory()->create([
+            'product_id' => $product->id,
+            'quantity' => 100,
+        ]);
+        
+        Stock::factory()->create([
+            'product_id' => $product->id,
+            'quantity' => 5,
+        ]);
+
+        $inStock = Stock::where('quantity', '>', 10)->get();
+        $lowStock = Stock::where('quantity', '<=', 10)->get();
+
+        $this->assertCount(1, $inStock);
+        $this->assertCount(1, $lowStock);
+        $this->assertEquals(100, $inStock->first()->quantity);
+        $this->assertEquals(5, $lowStock->first()->quantity);
+    }
+
+    public function test_can_filter_stock_by_status(): void
+    {
+        $product = Product::factory()->create();
+        
+        Stock::factory()->create([
+            'product_id' => $product->id,
+            'quantity' => 0,
+        ]);
+        
+        Stock::factory()->create([
+            'product_id' => $product->id,
+            'quantity' => 50,
+        ]);
+
+        $outOfStock = Stock::where('quantity', '=', 0)->get();
+        $inStock = Stock::where('quantity', '>', 0)->get();
+
+        $this->assertCount(1, $outOfStock);
+        $this->assertCount(1, $inStock);
+        $this->assertEquals(0, $outOfStock->first()->quantity);
+        $this->assertEquals(50, $inStock->first()->quantity);
+    }
+
+    public function test_can_calculate_available_quantity(): void
+    {
+        $product = Product::factory()->create();
+        
+        $stock = Stock::factory()->create([
+            'product_id' => $product->id,
+            'quantity' => 100,
+            'reserved_quantity' => 20,
+        ]);
+
+        $availableQuantity = $stock->quantity - $stock->reserved_quantity;
+        
+        $this->assertEquals(80, $availableQuantity);
+    }
+
+    public function test_can_get_stock_with_product_relationship(): void
+    {
+        $product = Product::factory()->create();
+        
+        $stock = Stock::factory()->create([
+            'product_id' => $product->id,
+        ]);
+
+        $this->assertInstanceOf(Product::class, $stock->product);
+        $this->assertEquals($product->id, $stock->product->id);
+    }
+}

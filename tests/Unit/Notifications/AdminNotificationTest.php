@@ -1,0 +1,106 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit\Notifications;
+
+use App\Notifications\AdminNotification;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Notifications\DatabaseNotification;
+use Tests\TestCase;
+
+final class AdminNotificationTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_notification_can_be_created(): void
+    {
+        $notification = new AdminNotification(
+            title: 'Admin Title',
+            message: 'Admin Message',
+            type: 'warning'
+        );
+
+        $this->assertEquals('Admin Title', $notification->title);
+        $this->assertEquals('Admin Message', $notification->message);
+        $this->assertEquals('warning', $notification->type);
+    }
+
+    public function test_notification_uses_database_and_mail_channels(): void
+    {
+        $user = User::factory()->create();
+        $notification = new AdminNotification('Admin Title', 'Admin Message', 'error');
+
+        $channels = $notification->via($user);
+
+        $this->assertEquals(['database', 'mail'], $channels);
+    }
+
+    public function test_notification_database_data_structure(): void
+    {
+        $user = User::factory()->create();
+        $notification = new AdminNotification('Admin Title', 'Admin Message', 'info');
+
+        $data = $notification->toDatabase($user);
+
+        $this->assertArrayHasKey('title', $data);
+        $this->assertArrayHasKey('message', $data);
+        $this->assertArrayHasKey('type', $data);
+        $this->assertArrayHasKey('sent_at', $data);
+        
+        $this->assertEquals('Admin Title', $data['title']);
+        $this->assertEquals('Admin Message', $data['message']);
+        $this->assertEquals('info', $data['type']);
+        $this->assertIsString($data['sent_at']);
+    }
+
+    public function test_notification_array_data_structure(): void
+    {
+        $user = User::factory()->create();
+        $notification = new AdminNotification('Admin Title', 'Admin Message', 'success');
+
+        $data = $notification->toArray($user);
+
+        $this->assertArrayHasKey('title', $data);
+        $this->assertArrayHasKey('message', $data);
+        $this->assertArrayHasKey('type', $data);
+        $this->assertArrayHasKey('sent_at', $data);
+        
+        $this->assertEquals('Admin Title', $data['title']);
+        $this->assertEquals('Admin Message', $data['message']);
+        $this->assertEquals('success', $data['type']);
+        $this->assertIsString($data['sent_at']);
+    }
+
+    public function test_notification_can_be_sent_to_user(): void
+    {
+        $user = User::factory()->create();
+        $notification = new AdminNotification('Admin Title', 'Admin Message', 'error');
+
+        $user->notify($notification);
+
+        $this->assertDatabaseHas('notifications', [
+            'notifiable_type' => User::class,
+            'notifiable_id' => $user->id,
+            'type' => AdminNotification::class,
+        ]);
+
+        $dbNotification = DatabaseNotification::where('notifiable_id', $user->id)->first();
+        $this->assertEquals('Admin Title', $dbNotification->data['title']);
+        $this->assertEquals('Admin Message', $dbNotification->data['message']);
+        $this->assertEquals('error', $dbNotification->data['type']);
+    }
+
+    public function test_notification_defaults_to_info_type(): void
+    {
+        $notification = new AdminNotification('Admin Title', 'Admin Message');
+
+        $this->assertEquals('info', $notification->type);
+    }
+
+    public function test_notification_implements_should_queue(): void
+    {
+        $notification = new AdminNotification('Admin Title', 'Admin Message');
+
+        $this->assertInstanceOf(\Illuminate\Contracts\Queue\ShouldQueue::class, $notification);
+    }
+}

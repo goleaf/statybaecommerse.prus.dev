@@ -1,0 +1,178 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\SystemSetting;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+final class SystemSettingResourceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->actingAs(User::factory()->create());
+    }
+
+    public function test_can_list_system_settings(): void
+    {
+        SystemSetting::factory()->count(3)->create();
+
+        Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings::class)
+            ->assertCanSeeTableRecords(SystemSetting::all());
+    }
+
+    public function test_can_create_system_setting(): void
+    {
+        $settingData = [
+            'key' => 'test_setting',
+            'type' => 'string',
+            'value' => 'test value',
+            'description' => 'Test setting description',
+            'category' => 'general',
+            'is_active' => true,
+        ];
+
+        Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\CreateSystemSetting::class)
+            ->fillForm($settingData)
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('system_settings', [
+            'key' => 'test_setting',
+            'type' => 'string',
+            'value' => 'test value',
+            'category' => 'general',
+        ]);
+    }
+
+    public function test_can_edit_system_setting(): void
+    {
+        $setting = SystemSetting::factory()->create();
+
+        Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\EditSystemSetting::class, [
+            'record' => $setting->getRouteKey(),
+        ])
+            ->fillForm([
+                'value' => 'updated value',
+                'description' => 'Updated description',
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('system_settings', [
+            'id' => $setting->id,
+            'value' => 'updated value',
+            'description' => 'Updated description',
+        ]);
+    }
+
+    public function test_can_view_system_setting(): void
+    {
+        $setting = SystemSetting::factory()->create();
+
+        Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\ViewSystemSetting::class, [
+            'record' => $setting->getRouteKey(),
+        ])
+            ->assertCanSeeRecord($setting);
+    }
+
+    public function test_can_delete_system_setting(): void
+    {
+        $setting = SystemSetting::factory()->create();
+
+        Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings::class)
+            ->callTableAction('delete', $setting)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseMissing('system_settings', [
+            'id' => $setting->id,
+        ]);
+    }
+
+    public function test_can_filter_settings_by_category(): void
+    {
+        SystemSetting::factory()->create(['category' => 'general']);
+        SystemSetting::factory()->create(['category' => 'email']);
+
+        Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings::class)
+            ->filterTable('category', 'general')
+            ->assertCanSeeTableRecords(SystemSetting::where('category', 'general')->get())
+            ->assertCanNotSeeTableRecords(SystemSetting::where('category', 'email')->get());
+    }
+
+    public function test_can_filter_settings_by_type(): void
+    {
+        SystemSetting::factory()->create(['type' => 'string']);
+        SystemSetting::factory()->create(['type' => 'boolean']);
+
+        Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings::class)
+            ->filterTable('type', 'string')
+            ->assertCanSeeTableRecords(SystemSetting::where('type', 'string')->get())
+            ->assertCanNotSeeTableRecords(SystemSetting::where('type', 'boolean')->get());
+    }
+
+    public function test_can_filter_settings_by_status(): void
+    {
+        SystemSetting::factory()->create(['is_active' => true]);
+        SystemSetting::factory()->create(['is_active' => false]);
+
+        Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings::class)
+            ->filterTable('is_active', 'true')
+            ->assertCanSeeTableRecords(SystemSetting::where('is_active', true)->get())
+            ->assertCanNotSeeTableRecords(SystemSetting::where('is_active', false)->get());
+    }
+
+    public function test_can_bulk_delete_settings(): void
+    {
+        $settings = SystemSetting::factory()->count(3)->create();
+
+        Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings::class)
+            ->callTableBulkAction('delete', $settings)
+            ->assertHasNoTableBulkActionErrors();
+
+        foreach ($settings as $setting) {
+            $this->assertDatabaseMissing('system_settings', [
+                'id' => $setting->id,
+            ]);
+        }
+    }
+
+    public function test_can_toggle_setting_status(): void
+    {
+        $setting = SystemSetting::factory()->create(['is_active' => true]);
+
+        Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings::class)
+            ->callTableAction('toggle_active', $setting)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseHas('system_settings', [
+            'id' => $setting->id,
+            'is_active' => false,
+        ]);
+    }
+
+    public function test_can_reset_setting_to_default(): void
+    {
+        $setting = SystemSetting::factory()->create([
+            'value' => 'custom value',
+            'default_value' => 'default value',
+        ]);
+
+        Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings::class)
+            ->callTableAction('reset_to_default', $setting)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseHas('system_settings', [
+            'id' => $setting->id,
+            'value' => 'default value',
+        ]);
+    }
+}

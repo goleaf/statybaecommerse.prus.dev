@@ -1,0 +1,41 @@
+{
+    "$schema": "https://json.schemastore.org/package.json",
+    "name": "laravel-app",
+    "private": true,
+    "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "mcp:filament": "node mcp/filament-docs-server.js",
+    "test": "php artisan test",
+    "e2e:smoke": "node scripts/e2e-smoke.mjs",
+    "e2e:routes": "node scripts/check-routes.mjs",
+    "e2e:console": "node scripts/check-console.mjs"
+  },
+    "devDependencies": {
+        "@modelcontextprotocol/sdk": "^1.0.0",
+        "@tailwindcss/aspect-ratio": "^0.4.2",
+        "@tailwindcss/forms": "^0.5.10",
+        "@tailwindcss/postcss": "^4.1.12",
+        "@tailwindcss/typography": "^0.5.16",
+        "@tailwindcss/vite": "^4.1.12",
+        "autoprefixer": "^10.4.21",
+        "axios": "^1.11.0",
+        "cheerio": "^1.0.0",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^2.0.0",
+        "node-fetch": "^3.3.2",
+        "playwright": "^1.47.2",
+        "tailwindcss": "^4.1.12",
+        "vite": "^7.1.3"
+    },
+    "dependencies": {
+        "@fontsource/figtree": "^5.2.8",
+        "@fontsource/instrument-sans": "^5.2.6",
+        "@fontsource/inter": "^5.2.6",
+        "@fontsource/space-grotesk": "^5.2.8",
+        "shiki": "^3.12.0",
+        "sortablejs": "^1.15.6",
+        "treeselectjs": "^0.13.1"
+    }
+}
