@@ -194,31 +194,31 @@ $socialInstagram = $hasSettings ? app_setting('social_instagram') ?? '#' : '#';
                 @if ($hasLegals)
                     @php
                     $legalModel = app(\App\Models\Legal::class);
-                    $privacy = $legalModel->newQuery()->where('slug', 'privacy')->where('is_enabled', true)->first();
-                    $terms = $legalModel->newQuery()->where('slug', 'terms')->where('is_enabled', true)->first();
-                    $refund = $legalModel->newQuery()->where('slug', 'refund')->where('is_enabled', true)->first();
-                    $shipping = $legalModel->newQuery()->where('slug', 'shipping')->where('is_enabled', true)->first();
+                    $privacy = $legalModel->newQuery()->where('key', 'privacy')->where('is_enabled', true)->first();
+                    $terms = $legalModel->newQuery()->where('key', 'terms')->where('is_enabled', true)->first();
+                    $refund = $legalModel->newQuery()->where('key', 'refund')->where('is_enabled', true)->first();
+                    $shipping = $legalModel->newQuery()->where('key', 'shipping')->where('is_enabled', true)->first();
                     @endphp
                     @if ($privacy)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $privacy->trans('slug') ?? 'privacy']) }}"
+                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $privacy->key ?? 'privacy']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
                             {{ __('legal_privacy') }}
                         </x-link>
                     @endif
                     @if ($terms)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $terms->trans('slug') ?? 'terms']) }}"
+                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $terms->key ?? 'terms']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
                             {{ __('legal_terms') }}
                         </x-link>
                     @endif
                     @if ($refund)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $refund->trans('slug') ?? 'refund']) }}"
+                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $refund->key ?? 'refund']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
                             {{ __('legal_refund') }}
                         </x-link>
                     @endif
                     @if ($shipping)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $shipping->trans('slug') ?? 'shipping']) }}"
+                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $shipping->key ?? 'shipping']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
                             {{ __('legal_shipping') }}
                         </x-link>
