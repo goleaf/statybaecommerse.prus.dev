@@ -85,8 +85,8 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->timestamps();
 
-            $table->unique(['system_setting_category_id', 'locale']);
-            $table->foreign('system_setting_category_id')->references('id')->on('system_setting_categories')->onDelete('cascade');
+            $table->unique(['system_setting_category_id', 'locale'], 'system_setting_cat_locale_unique');
+            $table->foreign('system_setting_category_id', 'system_setting_category_fk')->references('id')->on('system_setting_categories')->onDelete('cascade');
         });
 
         // System Setting History Table (for audit trail)

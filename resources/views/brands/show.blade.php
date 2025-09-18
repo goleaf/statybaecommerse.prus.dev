@@ -91,7 +91,7 @@
                     {{ __('Products by :brand', ['brand' => $brand->getTranslatedName()]) }}
                 </h2>
                 
-                @if($brand->products()->where('is_visible', true)->whereNotNull('published_at')->count() > 12)
+                @if($products->count() > 12)
                     <a href="{{ route('localized.products.index', ['locale' => app()->getLocale(), 'brand' => $brand->getTranslatedSlug()]) }}" 
                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         {{ __('View All Products') }}
@@ -105,15 +105,63 @@
             @if($products->count() > 0)
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     @foreach($products as $product)
-                        <x-shared.product-card :product="$product" />
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow duration-200">
+                            <div class="aspect-w-16 aspect-h-9 bg-gray-100 dark:bg-gray-700">
+                                @if($product->getFirstMediaUrl('images'))
+                                    <img src="{{ $product->getFirstMediaUrl('images') }}" 
+                                         alt="{{ $product->getTranslatedName() ?? $product->name }}"
+                                         class="w-full h-48 object-cover object-center">
+                                @else
+                                    <div class="flex items-center justify-center h-48 bg-gray-100 dark:bg-gray-700">
+                                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            <div class="p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                    <a href="{{ route('product.show', $product->getTranslatedSlug() ?? $product->slug) }}" 
+                                       class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
+                                        {{ $product->getTranslatedName() ?? $product->name }}
+                                    </a>
+                                </h3>
+                                
+                                @if($product->getTranslatedSummary() ?? $product->summary)
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
+                                        {{ $product->getTranslatedSummary() ?? $product->summary }}
+                                    </p>
+                                @endif
+                                
+                                <div class="flex items-center justify-between">
+                                    <div class="text-lg font-bold text-gray-900 dark:text-white">
+                                        €{{ number_format($product->price, 2) }}
+                                    </div>
+                                    
+                                    <a href="{{ route('product.show', $product->getTranslatedSlug() ?? $product->slug) }}" 
+                                       class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                                        {{ __('View Details') }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     @endforeach
                 </div>
             @else
-                <x-shared.empty-state
-                    title="{{ __('No products found') }}"
-                    description="{{ __('No products are available for this brand yet.') }}"
-                    icon="heroicon-o-cube"
-                />
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('No products found') }}</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('No products are available for this brand yet.') }}</p>
+                    <div class="mt-6">
+                        <a href="{{ route('localized.brands.index', ['locale' => app()->getLocale()]) }}" 
+                           class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            {{ __('Browse Other Brands') }}
+                        </a>
+                    </div>
+                </div>
             @endif
         </div>
 

@@ -41,15 +41,38 @@ final class BrandController extends Controller
         if ($canonicalSlug !== $slug) {
             return redirect()->route('localized.brands.show', ['locale' => $locale, 'slug' => $canonicalSlug], 301);
         }
-        // Load products for this brand
-        $products = $brand->products()->with(['media', 'translations'])->where('is_visible', true)->whereNotNull('published_at')->latest()->limit(12)->get()->skipWhile(function ($product) {
-            // Skip products that are not properly configured for display
-            return empty($product->name) || !$product->is_visible || $product->price <= 0 || empty($product->slug) || !$product->getFirstMediaUrl('images');
-        });
+        // Load products for this brand with proper relationships
+        try {
+            $products = $brand->products()
+                ->with(['media', 'translations', 'brand:id,name,slug'])
+                ->where('is_visible', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now())
+                ->orderByDesc('published_at')
+                ->limit(12)
+                ->get()
+                ->filter(function ($product) {
+                    // Filter out products that are not properly configured for display
+                    return !empty($product->name) && 
+                           $product->is_visible && 
+                           $product->price > 0 && 
+                           !empty($product->slug);
+                });
+        } catch (\Exception $e) {
+            // If there's an error loading products, return empty collection
+            $products = collect();
+        }
+        
         // Get SEO data
         $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName() . ' - ' . config('app.name');
         $seoDescription = $brand->getTranslatedSeoDescription() ?: $brand->getTranslatedDescription();
-        return view('brands.show', ['brand' => $brand, 'products' => $products, 'seoTitle' => $seoTitle, 'seoDescription' => $seoDescription]);
+        
+        return view('brands.show', [
+            'brand' => $brand, 
+            'products' => $products, 
+            'seoTitle' => $seoTitle, 
+            'seoDescription' => $seoDescription
+        ]);
     }
     /**
      * Handle getCanonicalSlug functionality with proper error handling.

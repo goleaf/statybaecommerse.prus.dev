@@ -64,7 +64,7 @@ return new class extends Migration
     public function up(): void
     {
         // Disable foreign key checks
-        DB::statement('PRAGMA foreign_keys=OFF');
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
         try {
             // Rename all tables
@@ -76,14 +76,14 @@ return new class extends Migration
             }
         } finally {
             // Re-enable foreign key checks
-            DB::statement('PRAGMA foreign_keys=ON');
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
     }
 
     public function down(): void
     {
         // Disable foreign key checks
-        DB::statement('PRAGMA foreign_keys=OFF');
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
         try {
             // Rename tables back
@@ -95,7 +95,7 @@ return new class extends Migration
             }
         } finally {
             // Re-enable foreign key checks
-            DB::statement('PRAGMA foreign_keys=ON');
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
     }
 };

@@ -175,7 +175,7 @@ return new class extends Migration
         }
 
         // Product variant attributes pivot
-        if (! Schema::hasTable('sh_product_variant_attributes')) {
+        if (Schema::hasTable('product_variants') && Schema::hasTable('sh_attribute_values') && ! Schema::hasTable('sh_product_variant_attributes')) {
             Schema::create('sh_product_variant_attributes', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
@@ -186,7 +186,7 @@ return new class extends Migration
                 $table->foreign('attribute_value_id')->references('id')->on('sh_attribute_values')->onDelete('cascade');
                 $table->unique(['variant_id', 'attribute_value_id'], 'variant_attribute_value_unique');
             });
-        } else {
+        } elseif (Schema::hasTable('sh_product_variant_attributes') && Schema::hasTable('product_variants') && Schema::hasTable('sh_attribute_values')) {
             // Table exists, check if index exists and add if not
             if (!Schema::hasIndex('sh_product_variant_attributes', 'variant_attribute_value_unique')) {
                 Schema::table('sh_product_variant_attributes', function (Blueprint $table) {

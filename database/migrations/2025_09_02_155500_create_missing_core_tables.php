@@ -10,6 +10,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('sh_countries')) {
+            // Legacy tables are not present, skip the legacy scaffolding.
+            return;
+        }
+
         // Create addresses table
         if (! Schema::hasTable('sh_addresses')) {
             Schema::create('sh_addresses', function (Blueprint $table) {

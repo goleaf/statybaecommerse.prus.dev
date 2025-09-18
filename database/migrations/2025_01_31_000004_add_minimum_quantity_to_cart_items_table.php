@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cart_items', function (Blueprint $table) {
-            $table->integer('minimum_quantity')->default(1)->after('quantity');
-        });
+        if (Schema::hasTable('cart_items') && ! Schema::hasColumn('cart_items', 'minimum_quantity')) {
+            Schema::table('cart_items', function (Blueprint $table) {
+                $table->integer('minimum_quantity')->default(1)->after('quantity');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cart_items', function (Blueprint $table) {
-            $table->dropColumn('minimum_quantity');
-        });
+        if (Schema::hasTable('cart_items') && Schema::hasColumn('cart_items', 'minimum_quantity')) {
+            Schema::table('cart_items', function (Blueprint $table) {
+                $table->dropColumn('minimum_quantity');
+            });
+        }
     }
 };

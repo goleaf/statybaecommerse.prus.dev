@@ -160,13 +160,11 @@ return new class extends Migration
                 $table->string('secret')->nullable();
                 $table->json('permissions')->nullable(); // scoped permissions
                 $table->json('rate_limits')->nullable(); // custom rate limits
-                $table->string('user_id')->nullable();
+                $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
                 $table->timestamp('last_used_at')->nullable();
                 $table->timestamp('expires_at')->nullable();
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();
-
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             });
         }
 

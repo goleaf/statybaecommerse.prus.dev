@@ -53,7 +53,7 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('sh_discount_conditions')) {
+        if (Schema::hasTable('sh_discounts') && ! Schema::hasTable('sh_discount_conditions')) {
             Schema::create('sh_discount_conditions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('discount_id')->constrained('sh_discounts')->cascadeOnDelete();
@@ -67,7 +67,7 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('sh_discount_codes')) {
+        if (Schema::hasTable('sh_discounts') && ! Schema::hasTable('sh_discount_codes')) {
             Schema::create('sh_discount_codes', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('discount_id')->constrained('sh_discounts')->cascadeOnDelete();
@@ -82,7 +82,7 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('sh_discount_redemptions')) {
+        if (Schema::hasTable('sh_discounts') && ! Schema::hasTable('sh_discount_redemptions')) {
             Schema::create('sh_discount_redemptions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('discount_id')->constrained('sh_discounts');
@@ -101,7 +101,7 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('sh_discount_campaigns')) {
+        if (Schema::hasTable('sh_discounts') && ! Schema::hasTable('sh_discount_campaigns')) {
             Schema::create('sh_discount_campaigns', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -116,7 +116,7 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('sh_campaign_discount')) {
+        if (Schema::hasTable('sh_discounts') && ! Schema::hasTable('sh_campaign_discount')) {
             Schema::create('sh_campaign_discount', function (Blueprint $table) {
                 $table->unsignedBigInteger('campaign_id');
                 $table->unsignedBigInteger('discount_id');
