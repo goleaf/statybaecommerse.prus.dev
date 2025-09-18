@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -101,12 +102,29 @@ return new class extends Migration
     private function createMissingTables(): void
     {
         // Create locations table
+        if (Schema::hasTable('locations')) {
+            try {
+                DB::statement('ALTER TABLE `locations` MODIFY `name` VARCHAR(255) NULL');
+            } catch (\Throwable $e) {
+            }
+
+            try {
+                DB::statement('ALTER TABLE `locations` MODIFY `slug` VARCHAR(255) NULL');
+            } catch (\Throwable $e) {
+            }
+
+            try {
+                DB::statement('ALTER TABLE `locations` MODIFY `description` TEXT NULL');
+            } catch (\Throwable $e) {
+            }
+        }
+
         if (! Schema::hasTable('locations')) {
             Schema::create('locations', function (Blueprint $table) {
                 $table->id();
-                $table->json('name')->nullable(); // Translatable field
-                $table->json('slug')->nullable(); // Translatable field
-                $table->json('description')->nullable(); // Translatable field
+                $table->string('name')->nullable();
+                $table->string('slug')->nullable();
+                $table->text('description')->nullable();
                 $table->string('code')->nullable()->unique();
                 $table->string('address_line_1')->nullable();
                 $table->string('address_line_2')->nullable();

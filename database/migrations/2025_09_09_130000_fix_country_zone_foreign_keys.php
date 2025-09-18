@@ -11,28 +11,38 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('country_zone')) {
-            // Recreate table to fix foreign keys after renames from sh_* tables
-            DB::statement('PRAGMA foreign_keys=OFF');
-            try {
-                Schema::dropIfExists('tmp_country_zone');
+        if (! Schema::hasTable('country_zone')) {
+            return;
+        }
 
-                Schema::create('tmp_country_zone', function (Blueprint $table) {
-                    $table->foreignId('zone_id')->constrained('zones')->cascadeOnDelete();
-                    $table->foreignId('country_id')->constrained('countries')->cascadeOnDelete();
-                    $table->unique(['zone_id', 'country_id'], 'tmp_country_zone_unique');
-                });
+        $driver = DB::getDriverName();
+        $disableFk = $driver === 'sqlite' ? 'PRAGMA foreign_keys=OFF' : 'SET FOREIGN_KEY_CHECKS=0';
+        $enableFk = $driver === 'sqlite' ? 'PRAGMA foreign_keys=ON' : 'SET FOREIGN_KEY_CHECKS=1';
 
-                // If old table existed, migrate data (best-effort)
-                if (Schema::hasTable('country_zone')) {
-                    DB::insert('insert into tmp_country_zone (zone_id, country_id) select zone_id, country_id from country_zone');
+        DB::statement($disableFk);
+
+        try {
+            Schema::dropIfExists('tmp_country_zone');
+
+            Schema::create('tmp_country_zone', function (Blueprint $table) {
+                $table->foreignId('zone_id')->constrained('zones')->cascadeOnDelete();
+                $table->foreignId('country_id')->constrained('countries')->cascadeOnDelete();
+                $table->unique(['zone_id', 'country_id'], 'tmp_country_zone_unique');
+            });
+
+            DB::table('country_zone')->orderBy('zone_id')->orderBy('country_id')->chunk(500, function ($rows) {
+                foreach ($rows as $row) {
+                    DB::table('tmp_country_zone')->insert([
+                        'zone_id' => $row->zone_id,
+                        'country_id' => $row->country_id,
+                    ]);
                 }
+            });
 
-                Schema::dropIfExists('country_zone');
-                Schema::rename('tmp_country_zone', 'country_zone');
-            } finally {
-                DB::statement('PRAGMA foreign_keys=ON');
-            }
+            Schema::dropIfExists('country_zone');
+            Schema::rename('tmp_country_zone', 'country_zone');
+        } finally {
+            DB::statement($enableFk);
         }
     }
 

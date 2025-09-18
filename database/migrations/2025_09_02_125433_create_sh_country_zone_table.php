@@ -20,8 +20,8 @@ return new class extends Migration
 
         if (! Schema::hasTable('country_zone')) {
             Schema::create('country_zone', function (Blueprint $table) {
-                $table->foreignId('zone_id')->constrained('zones')->cascadeOnDelete();
-                $table->foreignId('country_id')->constrained('countries')->cascadeOnDelete();
+                $table->unsignedBigInteger('zone_id');
+                $table->unsignedBigInteger('country_id');
 
                 $table->unique(['zone_id', 'country_id'], 'country_zone_unique');
             });
