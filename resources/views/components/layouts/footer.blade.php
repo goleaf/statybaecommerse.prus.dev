@@ -1,10 +1,14 @@
-@php($hasSettings = \Illuminate\Support\Facades\Schema::hasTable('settings'))
-@php($companyName = $hasSettings ? app_setting('company_name') ?? config('app.name') : config('app.name'))
-@php($companyEmail = $hasSettings ? app_setting('email') ?? null : null)
-@php($companyPhone = $hasSettings ? app_setting('phone_number') ?? null : null)
-@php($companyAddress = $hasSettings ? app_setting('company_address') ?? null : null)
-@php($socialFacebook = $hasSettings ? app_setting('social_facebook') ?? '#' : '#')
-@php($socialInstagram = $hasSettings ? app_setting('social_instagram') ?? '#' : '#')
+@php
+$hasSettings = \Illuminate\Support\Facades\Schema::hasTable('settings');
+$companyName = $hasSettings ? app_setting('company_name') ?? config('app.name') : config('app.name');
+$companyEmail = $hasSettings ? app_setting('email') ?? null : null;
+$companyPhone = $hasSettings ? app_setting('phone_number') ?? null : null;
+$companyAddress = $hasSettings ? app_setting('company_address') ?? null : null;
+@endphp
+@php
+$socialFacebook = $hasSettings ? app_setting('social_facebook') ?? '#' : '#';
+$socialInstagram = $hasSettings ? app_setting('social_instagram') ?? '#' : '#';
+@endphp
 
 <footer aria-labelledby="footer-heading" class="bg-gradient-to-br from-slate-50 via-white to-blue-50/30 border-t border-slate-200/60 relative overflow-hidden shadow-lg shadow-slate-100/50">
     <!-- Background decorative elements -->
@@ -59,7 +63,9 @@
                             {{ __('footer_shop') }}
                         </h3>
                         <ul role="list" class="space-y-4">
-                            @php($features = config('app-features.features'))
+                            @php
+                            $features = config('app-features.features');
+                            @endphp
                             @if ((bool) ($features['category'] ?? false))
                                 <li>
                                     <x-footer-link
@@ -182,13 +188,17 @@
                         {{ __('Exports') }}
                     </x-link>
                 @endif
-                @php($hasLegals = \Illuminate\Support\Facades\Schema::hasTable('legals'))
+                @php
+                $hasLegals = \Illuminate\Support\Facades\Schema::hasTable('legals');
+                @endphp
                 @if ($hasLegals)
-                    @php($legalModel = app(\App\Models\Legal::class))
-                    @php($privacy = $legalModel->newQuery()->where('slug', 'privacy')->where('is_enabled', true)->first())
-                    @php($terms = $legalModel->newQuery()->where('slug', 'terms')->where('is_enabled', true)->first())
-                    @php($refund = $legalModel->newQuery()->where('slug', 'refund')->where('is_enabled', true)->first())
-                    @php($shipping = $legalModel->newQuery()->where('slug', 'shipping')->where('is_enabled', true)->first())
+                    @php
+                    $legalModel = app(\App\Models\Legal::class);
+                    $privacy = $legalModel->newQuery()->where('slug', 'privacy')->where('is_enabled', true)->first();
+                    $terms = $legalModel->newQuery()->where('slug', 'terms')->where('is_enabled', true)->first();
+                    $refund = $legalModel->newQuery()->where('slug', 'refund')->where('is_enabled', true)->first();
+                    $shipping = $legalModel->newQuery()->where('slug', 'shipping')->where('is_enabled', true)->first();
+                    @endphp
                     @if ($privacy)
                         <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $privacy->trans('slug') ?? 'privacy']) }}"
                                 class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
