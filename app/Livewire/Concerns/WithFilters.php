@@ -29,6 +29,12 @@ trait WithFilters
     #[Url]
     public int $priceMax = 10000;
     #[Url]
+    public int $minPrice = 0;
+    #[Url]
+    public int $maxPrice = 1000;
+    #[Url]
+    public int $priceRange = 1000;
+    #[Url]
     public string $availability = 'all';
     #[Url]
     public int $perPage = 12;
@@ -61,6 +67,19 @@ trait WithFilters
     {
         $this->resetPage();
     }
+    public function updatedMinPrice(): void
+    {
+        $this->resetPage();
+    }
+    public function updatedMaxPrice(): void
+    {
+        $this->resetPage();
+    }
+    public function updatedPriceRange(): void
+    {
+        $this->maxPrice = $this->priceRange;
+        $this->resetPage();
+    }
     public function updatedAvailability(): void
     {
         $this->resetPage();
@@ -71,7 +90,7 @@ trait WithFilters
     }
     public function clearFilters(): void
     {
-        $this->reset(['search', 'selectedCategories', 'selectedBrands', 'priceMin', 'priceMax', 'availability']);
+        $this->reset(['search', 'selectedCategories', 'selectedBrands', 'priceMin', 'priceMax', 'minPrice', 'maxPrice', 'priceRange', 'availability']);
         $this->resetPage();
     }
     public function toggleFilters(): void
@@ -96,6 +115,10 @@ trait WithFilters
             $q->where('price', '>=', $this->priceMin);
         })->when($this->priceMax < 10000, function (Builder $q) {
             $q->where('price', '<=', $this->priceMax);
+        })->when($this->minPrice > 0, function (Builder $q) {
+            $q->where('price', '>=', $this->minPrice);
+        })->when($this->maxPrice < 1000, function (Builder $q) {
+            $q->where('price', '<=', $this->maxPrice);
         })->when($this->availability === 'in_stock', function (Builder $q) {
             $q->where('stock_quantity', '>', 0);
         })->when($this->availability === 'out_of_stock', function (Builder $q) {
