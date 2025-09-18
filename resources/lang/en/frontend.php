@@ -467,7 +467,6 @@ return [
     'searching' => 'Searching',
     'view_details' => 'View Details',
     'locations' => 'Locations',
-    'countries' => 'Countries',
     'cities' => 'Cities',
     'orders' => 'Orders',
     'customers' => 'Customers',

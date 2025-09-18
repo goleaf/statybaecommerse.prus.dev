@@ -88,9 +88,9 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('cities.country') }}</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                                <a href="{{ route('countries.show', $city->country) }}" class="text-blue-600 hover:text-blue-800">
+                                <span class="text-gray-900 dark:text-white">
                                     {{ $city->country->translated_name }}
-                                </a>
+                                </span>
                             </dd>
                         </div>
                     @endif

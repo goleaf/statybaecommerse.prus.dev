@@ -467,7 +467,6 @@ return [
     'searching' => 'Ieškoma',
     'view_details' => 'Peržiūrėti detales',
     'locations' => 'Vietos',
-    'countries' => 'Šalys',
     'cities' => 'Miestai',
     'orders' => 'Užsakymai',
     'customers' => 'Klientai',

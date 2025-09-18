@@ -21,10 +21,21 @@ final class CountryController extends Controller
      */
     public function index(Request $request): View
     {
-        $countries = Country::query()->active()->enabled()->with(['cities'])->when($request->has('region'), fn($query) => $query->where('region', $request->get('region')))->when($request->has('currency'), fn($query) => $query->where('currency_code', $request->get('currency')))->when($request->has('is_eu_member'), fn($query) => $query->where('is_eu_member', $request->boolean('is_eu_member')))->when($request->has('requires_vat'), fn($query) => $query->where('requires_vat', $request->boolean('requires_vat')))->when($request->has('search'), fn($query) => $query->where('name', 'like', '%' . $request->get('search') . '%'))->orderBy('sort_order')->orderBy('name')->get()->skipWhile(function ($country) {
-            // Skip countries that are not properly configured for display
-            return empty($country->name) || !$country->is_active || !$country->is_enabled || empty($country->cca2) || empty($country->cca3);
-        })->paginate(24);
+        $countries = Country::query()
+            ->active()
+            ->enabled()
+            ->with(['cities'])
+            ->when($request->has('region'), fn($query) => $query->where('region', $request->get('region')))
+            ->when($request->has('currency'), fn($query) => $query->where('currency_code', $request->get('currency')))
+            ->when($request->has('is_eu_member'), fn($query) => $query->where('is_eu_member', $request->boolean('is_eu_member')))
+            ->when($request->has('requires_vat'), fn($query) => $query->where('requires_vat', $request->boolean('requires_vat')))
+            ->when($request->has('search'), fn($query) => $query->where('name', 'like', '%' . $request->get('search') . '%'))
+            ->whereNotNull('name')
+            ->whereNotNull('cca2')
+            ->whereNotNull('cca3')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->paginate(24);
         $regions = Country::distinct()->pluck('region')->filter()->sort()->values();
         $currencies = Country::distinct()->pluck('currency_code')->filter()->sort()->values();
         return view('countries.index', compact('countries', 'regions', 'currencies'));

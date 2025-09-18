@@ -48,20 +48,6 @@ Route::middleware(['web'])->group(function () {
         Route::get('/{reward}', [App\Http\Controllers\Frontend\ReferralRewardController::class, 'show'])->name('show');
     });
 
-    // Country Frontend Routes
-    Route::prefix('countries')->name('frontend.countries.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\CountryController::class, 'index'])->name('index');
-        Route::get('/{country}', [App\Http\Controllers\Frontend\CountryController::class, 'show'])->name('show');
-        Route::get('/api/search', [App\Http\Controllers\Frontend\CountryController::class, 'getCountriesJson'])->name('api.search');
-    });
-
-    // Country Routes for Testing
-    Route::prefix('countries')->name('countries.')->group(function () {
-        Route::get('/', [App\Http\Controllers\CountryController::class, 'index'])->name('index');
-        Route::get('/{country}', [App\Http\Controllers\CountryController::class, 'show'])->name('show');
-        Route::get('/api/search', [App\Http\Controllers\CountryController::class, 'api'])->name('api.search');
-        Route::get('/api/statistics', [App\Http\Controllers\CountryController::class, 'statistics'])->name('api.statistics');
-    });
 
     // Address Frontend Routes
     Route::middleware(['auth'])->prefix('addresses')->name('frontend.addresses.')->group(function () {
