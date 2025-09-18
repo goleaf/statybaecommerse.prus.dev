@@ -542,7 +542,9 @@ final class Product extends Model implements HasMedia
      */
     public function attributes(): BelongsToMany
     {
-        return $this->belongsToMany(Attribute::class, 'product_attributes', 'product_id', 'attribute_id')->withTimestamps();
+        return $this->belongsToMany(Attribute::class, 'product_attributes', 'product_id', 'attribute_id')
+            ->withPivot('attribute_value_id')
+            ->withTimestamps();
     }
     /**
      * Handle histories functionality with proper error handling.

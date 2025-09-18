@@ -5,6 +5,7 @@ namespace App\Livewire\Pages;
 
 use App\Livewire\Concerns\WithCart;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -33,9 +34,19 @@ final class SingleProduct extends Component
             abort(404);
         }
         // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
-        if (!$product->relationLoaded('brand') || !$product->relationLoaded('categories') || !$product->relationLoaded('media') || !$product->relationLoaded('variants') || !$product->relationLoaded('reviews') || !$product->relationLoaded('translations') || !$product->relationLoaded('histories')) {
-            $product->load(['brand', 'categories', 'media', 'variants', 'reviews', 'translations', 'histories']);
-        }
+        $product->loadMissing([
+            'brand.translations',
+            'categories.translations',
+            'media',
+            'variants.media',
+            'variants.values.attribute',
+            'variants.prices.currency',
+            'reviews',
+            'translations',
+            'histories',
+            'documents',
+            'attributes.values',
+        ]);
         $this->product = $product;
         // Track product view for recommendations
         $this->trackProductView();
@@ -143,11 +154,127 @@ final class SingleProduct extends Component
     {
         return $this->product->getRelatedProducts(4);
     }
+
+    #[Computed]
+    public function attributeFeatures(): \Illuminate\Support\Collection
+    {
+        if (!$this->product->relationLoaded('attributes')) {
+            $this->product->loadMissing(['attributes.values']);
+        }
+
+        return $this->product->attributes
+            ->map(function ($attribute): array {
+                $valueId = $attribute->pivot->attribute_value_id ?? null;
+                $value = null;
+
+                if ($valueId) {
+                    $valueModel = $attribute->values->firstWhere('id', $valueId);
+                    $value = $valueModel ? ($valueModel->trans('value') ?? $valueModel->value) : null;
+                }
+
+                return [
+                    'id' => $attribute->id,
+                    'label' => $attribute->trans('name') ?? $attribute->name,
+                    'value' => $value,
+                    'icon' => $attribute->icon,
+                ];
+            })
+            ->filter(fn(array $feature) => filled($feature['value']))
+            ->values();
+    }
+
+    #[Computed]
+    public function variantMatrix(): \Illuminate\Support\Collection
+    {
+        if (!$this->product->relationLoaded('variants')) {
+            $this->product->loadMissing(['variants.media', 'variants.values.attribute', 'variants.prices.currency']);
+        }
+
+        return $this->product->variants
+            ->map(function (ProductVariant $variant): array {
+                $price = $variant->getPrice();
+                $currentCurrency = function_exists('current_currency') ? current_currency() : null;
+                $priceValue = $price?->value?->amount ?? $variant->price;
+                $priceFormatted = $priceValue !== null ? app_money_format((float) $priceValue, $currentCurrency) : null;
+                $compareFormatted = null;
+
+                if ($price && $price->compare) {
+                    $compareFormatted = app_money_format((float) $price->compare, $currentCurrency);
+                } elseif ($variant->compare_price) {
+                    $compareFormatted = app_money_format((float) $variant->compare_price, $currentCurrency);
+                }
+
+                $thumbnail = $variant->getFirstMediaUrl(config('media.storage.thumbnail_collection'))
+                    ?: ($variant->getFirstMediaUrl(config('media.storage.collection_name'), 'small')
+                        ?: $variant->getFirstMediaUrl(config('media.storage.collection_name')));
+
+                $attributes = $variant->values
+                    ->map(function ($value): array {
+                        return [
+                            'attribute' => $value->attribute->trans('name') ?? $value->attribute->name,
+                            'value' => $value->trans('value') ?? $value->value,
+                        ];
+                    })
+                    ->values();
+
+                return [
+                    'id' => $variant->id,
+                    'name' => $variant->name,
+                    'sku' => $variant->sku,
+                    'price' => $priceFormatted,
+                    'compare_price' => $compareFormatted,
+                    'is_out_of_stock' => $variant->isOutOfStock(),
+                    'available_quantity' => $variant->availableQuantity(),
+                    'thumbnail' => $thumbnail,
+                    'attributes' => $attributes,
+                ];
+            })
+            ->values();
+    }
+
+    #[Computed]
+    public function productQuickFacts(): array
+    {
+        $brandName = $this->product->brand?->trans('name') ?? $this->product->brand?->name;
+        $categoryNames = $this->product->categories
+            ->map(fn($category) => $category->trans('name') ?? $category->name)
+            ->filter()
+            ->implode(', ');
+
+        $facts = [
+            ['label' => __('translations.brand'), 'value' => $brandName],
+            ['label' => __('translations.category'), 'value' => $categoryNames],
+            ['label' => __('translations.sku'), 'value' => $this->product->sku],
+            ['label' => __('frontend.availability'), 'value' => $this->product->isInStock() ? __('translations.in_stock') : __('translations.out_of_stock')],
+            ['label' => __('translations.weight'), 'value' => $this->formatMeasurement($this->product->weight, $this->product->weight_unit?->value ?? null)],
+            ['label' => __('Dimensions'), 'value' => $this->product->getDimensions()],
+            ['label' => __('translations.last_updated'), 'value' => $this->product->updated_at?->diffForHumans()],
+        ];
+
+        return array_values(array_filter($facts, fn(array $fact) => filled($fact['value'])));
+    }
     /**
      * Render the Livewire component view with current state.
      */
     public function render()
     {
         return view('livewire.pages.single-product', ['relatedProducts' => $this->relatedProducts])->layout('components.layouts.templates.app', ['title' => $this->product->name]);
+    }
+
+    private function formatMeasurement(null|int|float|string $value, ?string $unit): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $numeric = (float) $value;
+
+        if ($numeric <= 0) {
+            return null;
+        }
+
+        $formatted = rtrim(rtrim(number_format($numeric, 2, '.', ''), '0'), '.');
+
+        return trim($formatted . ' ' . ($unit ?? '')) ?: null;
     }
 }
