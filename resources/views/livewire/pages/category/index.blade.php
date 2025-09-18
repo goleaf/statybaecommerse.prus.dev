@@ -224,7 +224,7 @@
                                             </p>
                                         @endif
 
-                                        <div class="flex items-center justify-between">
+                                        <div class="flex items-center justify-center">
                                             <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
                                                class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-100">
                                                 {{ __('View category') }}
@@ -232,14 +232,6 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                                 </svg>
                                             </a>
-
-                                            <button type="button"
-                                                    class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:border-blue-300 hover:text-blue-600">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0l3-3m-3 3l-3-3m9 6H6" />
-                                                </svg>
-                                                {{ __('Quick preview') }}
-                                            </button>
                                         </div>
                                     </div>
                                 </article>

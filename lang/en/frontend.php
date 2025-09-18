@@ -294,7 +294,6 @@ return [
         'grid' => 'Grid',
         'list' => 'List',
         'view_category' => 'View category',
-        'quick_preview' => 'Quick preview',
         'products' => 'products',
         'showing_results' => 'Showing :from–:to of :total results',
         'showing_to' => 'Showing :from to :to of :total results',
