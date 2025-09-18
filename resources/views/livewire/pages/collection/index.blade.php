@@ -94,7 +94,7 @@
                     @endif
 
                     <div class="flex justify-end">
-                        <a href="{{ route('collections.show', ['locale' => app()->getLocale(), 'slug' => $collection->getTranslatedSlug() ?? $collection->slug]) }}"
+                        <a href="{{ route('collections.show', ['locale' => app()->getLocale(), 'collection' => $collection->getTranslatedSlug() ?? $collection->slug]) }}"
                            class="inline-flex items-center gap-2 rounded-full bg-indigo-500 px-5 py-3 text-xs font-semibold text-white shadow-lg transition hover:bg-indigo-600">
                             {{ __('frontend/collections.buttons.view_collection') }}
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
