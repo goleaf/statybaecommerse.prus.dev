@@ -43,6 +43,7 @@ final class CartItemSeeder extends Seeder
                     'quantity' => $quantity,
                     'unit_price' => $unitPrice,
                     'total_price' => $totalPrice,
+                    'price' => $unitPrice,
                     'product_snapshot' => [
                         'name' => $product->name,
                         'price' => $unitPrice,
