@@ -10,6 +10,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('locations')) {
+            return;
+        }
+
         if (! Schema::hasTable('location_translations')) {
             Schema::create('location_translations', function (Blueprint $table) {
                 $table->id();

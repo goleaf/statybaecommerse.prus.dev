@@ -223,7 +223,7 @@ return new class extends Migration
                 $table->foreign('recommended_variant_id')->references('id')->on('product_variants')->onDelete('cascade');
                 
                 $table->unique(['variant_id', 'recommended_variant_id']);
-                $table->index(['recommendation_type', 'confidence_score']);
+                $table->index(['recommendation_type', 'confidence_score'], 'variant_recommend_type_idx');
                 $table->index(['is_active', 'sort_order']);
             });
         }

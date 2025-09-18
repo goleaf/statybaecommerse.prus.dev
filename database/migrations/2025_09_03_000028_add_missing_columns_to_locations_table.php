@@ -10,6 +10,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('locations')) {
+            return;
+        }
+
         Schema::table('locations', function (Blueprint $table) {
             // Add missing columns if they don't exist
             if (!Schema::hasColumn('locations', 'latitude')) {
@@ -32,8 +36,22 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('locations')) {
+            return;
+        }
+
         Schema::table('locations', function (Blueprint $table) {
-            $table->dropColumn(['latitude', 'longitude', 'opening_hours', 'contact_info', 'sort_order']);
+            $columns = array_filter([
+                Schema::hasColumn('locations', 'latitude') ? 'latitude' : null,
+                Schema::hasColumn('locations', 'longitude') ? 'longitude' : null,
+                Schema::hasColumn('locations', 'opening_hours') ? 'opening_hours' : null,
+                Schema::hasColumn('locations', 'contact_info') ? 'contact_info' : null,
+                Schema::hasColumn('locations', 'sort_order') ? 'sort_order' : null,
+            ]);
+
+            if ($columns !== []) {
+                $table->dropColumn($columns);
+            }
         });
     }
 };

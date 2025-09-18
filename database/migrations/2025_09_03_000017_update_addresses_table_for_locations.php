@@ -10,6 +10,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('countries') || ! Schema::hasTable('addresses')) {
+            return;
+        }
+
         Schema::table('addresses', function (Blueprint $table) {
             $table->foreignId('country_id')->nullable()->after('country_code')->constrained('countries')->onDelete('set null');
             $table->foreignId('zone_id')->nullable()->after('country_id')->constrained('zones')->onDelete('set null');

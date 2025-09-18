@@ -11,18 +11,96 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('zones', function (Blueprint $table) {
-            $table->string('type')->default('shipping')->after('code');
-            $table->integer('priority')->default(0)->after('sort_order');
-            $table->decimal('min_order_amount', 10, 2)->nullable()->after('shipping_rate');
-            $table->decimal('max_order_amount', 10, 2)->nullable()->after('min_order_amount');
-            $table->decimal('free_shipping_threshold', 10, 2)->nullable()->after('max_order_amount');
-            $table->boolean('is_active')->default(true)->after('is_default');
+        $hasCodeColumn = Schema::hasColumn('zones', 'code');
+        $hasMetadataColumn = Schema::hasColumn('zones', 'metadata');
+        $hasIsDefaultColumn = Schema::hasColumn('zones', 'is_default');
+        $hasSortOrderColumn = Schema::hasColumn('zones', 'sort_order');
+        $hasTypeIsActiveIndex = Schema::hasIndex('zones', 'zones_type_is_active_index');
+        $hasCurrencyIsActiveIndex = Schema::hasIndex('zones', 'zones_currency_is_active_index');
+        $hasPrioritySortOrderIndex = Schema::hasIndex('zones', 'zones_priority_sort_order_index');
 
-            // Add indexes for better performance
-            $table->index(['type', 'is_active']);
-            $table->index(['currency_id', 'is_active']);
-            $table->index(['priority', 'sort_order']);
+        Schema::table('zones', function (Blueprint $table) use (
+            $hasCodeColumn,
+            $hasMetadataColumn,
+            $hasIsDefaultColumn,
+            $hasSortOrderColumn,
+            $hasTypeIsActiveIndex,
+            $hasCurrencyIsActiveIndex,
+            $hasPrioritySortOrderIndex
+        ) {
+            if (! Schema::hasColumn('zones', 'type')) {
+                $column = $table->string('type')->default('shipping');
+
+                if ($hasCodeColumn) {
+                    $column->after('code');
+                }
+            }
+
+            if (! $hasSortOrderColumn && ! Schema::hasColumn('zones', 'sort_order')) {
+                $column = $table->integer('sort_order')->default(0);
+
+                if ($hasMetadataColumn) {
+                    $column->after('metadata');
+                } elseif ($hasCodeColumn) {
+                    $column->after('code');
+                }
+            }
+
+            if (! Schema::hasColumn('zones', 'priority')) {
+                $column = $table->integer('priority')->default(0);
+
+                if ($hasSortOrderColumn || Schema::hasColumn('zones', 'sort_order')) {
+                    $column->after('sort_order');
+                } elseif ($hasIsDefaultColumn) {
+                    $column->after('is_default');
+                } elseif ($hasCodeColumn) {
+                    $column->after('code');
+                }
+            }
+
+            if (! Schema::hasColumn('zones', 'min_order_amount')) {
+                $column = $table->decimal('min_order_amount', 10, 2)->nullable();
+
+                if (Schema::hasColumn('zones', 'shipping_rate')) {
+                    $column->after('shipping_rate');
+                }
+            }
+
+            if (! Schema::hasColumn('zones', 'max_order_amount')) {
+                $column = $table->decimal('max_order_amount', 10, 2)->nullable();
+
+                if (Schema::hasColumn('zones', 'min_order_amount')) {
+                    $column->after('min_order_amount');
+                }
+            }
+
+            if (! Schema::hasColumn('zones', 'free_shipping_threshold')) {
+                $column = $table->decimal('free_shipping_threshold', 10, 2)->nullable();
+
+                if (Schema::hasColumn('zones', 'max_order_amount')) {
+                    $column->after('max_order_amount');
+                }
+            }
+
+            if (! Schema::hasColumn('zones', 'is_active')) {
+                $column = $table->boolean('is_active')->default(true);
+
+                if ($hasIsDefaultColumn) {
+                    $column->after('is_default');
+                }
+            }
+
+            if (! $hasTypeIsActiveIndex) {
+                $table->index(['type', 'is_active'], 'zones_type_is_active_index');
+            }
+
+            if (! $hasCurrencyIsActiveIndex) {
+                $table->index(['currency_id', 'is_active'], 'zones_currency_is_active_index');
+            }
+
+            if (! $hasPrioritySortOrderIndex) {
+                $table->index(['priority', 'sort_order'], 'zones_priority_sort_order_index');
+            }
         });
     }
 
@@ -32,18 +110,36 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('zones', function (Blueprint $table) {
-            $table->dropIndex(['type', 'is_active']);
-            $table->dropIndex(['currency_id', 'is_active']);
-            $table->dropIndex(['priority', 'sort_order']);
+            if (Schema::hasIndex('zones', 'zones_type_is_active_index')) {
+                $table->dropIndex('zones_type_is_active_index');
+            }
 
-            $table->dropColumn([
+            if (Schema::hasIndex('zones', 'zones_currency_is_active_index')) {
+                $table->dropIndex('zones_currency_is_active_index');
+            }
+
+            if (Schema::hasIndex('zones', 'zones_priority_sort_order_index')) {
+                $table->dropIndex('zones_priority_sort_order_index');
+            }
+
+            $columnsToDrop = [];
+
+            foreach ([
                 'type',
                 'priority',
                 'min_order_amount',
                 'max_order_amount',
                 'free_shipping_threshold',
                 'is_active',
-            ]);
+            ] as $column) {
+                if (Schema::hasColumn('zones', $column)) {
+                    $columnsToDrop[] = $column;
+                }
+            }
+
+            if ($columnsToDrop !== []) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 };

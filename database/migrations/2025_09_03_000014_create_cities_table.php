@@ -10,6 +10,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('countries') || Schema::hasTable('cities')) {
+            return;
+        }
+
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
             $table->string('name');

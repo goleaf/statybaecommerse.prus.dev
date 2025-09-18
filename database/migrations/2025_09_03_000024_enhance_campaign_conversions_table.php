@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('campaign_conversions')) {
+            return;
+        }
+
         Schema::table('campaign_conversions', function (Blueprint $table) {
             // Add new fields for enhanced tracking
             $table->string('status')->default('completed')->after('conversion_data');
@@ -104,6 +108,11 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('campaign_conversions')) {
+            Schema::dropIfExists('campaign_conversion_translations');
+            return;
+        }
+
         Schema::dropIfExists('campaign_conversion_translations');
 
         Schema::table('campaign_conversions', function (Blueprint $table) {

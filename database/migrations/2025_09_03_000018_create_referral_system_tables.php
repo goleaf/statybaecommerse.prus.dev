@@ -8,6 +8,61 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('users')) {
+            return;
+        }
+
+        // Create referral_campaigns table first (used by other tables)
+        if (! Schema::hasTable('referral_campaigns')) {
+            Schema::create('referral_campaigns', function (Blueprint $table) {
+                $table->id();
+                $table->json('name');
+                $table->json('description')->nullable();
+                $table->boolean('is_active')->default(true);
+                $table->timestamp('start_date')->nullable();
+                $table->timestamp('end_date')->nullable();
+                $table->decimal('reward_amount', 12, 2)->nullable();
+                $table->string('reward_type')->nullable();
+                $table->integer('max_referrals_per_user')->nullable();
+                $table->integer('max_total_referrals')->nullable();
+                $table->json('conditions')->nullable();
+                $table->json('metadata')->nullable();
+                $table->timestamps();
+
+                $table->index(['is_active', 'start_date', 'end_date']);
+            });
+        }
+
+        // Create referral_codes table for tracking generated codes
+        if (! Schema::hasTable('referral_codes')) {
+            Schema::create('referral_codes', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+                $table->string('code', 20)->unique();
+                $table->boolean('is_active')->default(true);
+                $table->timestamp('expires_at')->nullable();
+                $table->json('metadata')->nullable();
+                $table->json('title')->nullable();
+                $table->json('description')->nullable();
+                $table->integer('usage_limit')->nullable();
+                $table->integer('usage_count')->default(0);
+                $table->decimal('reward_amount', 12, 2)->nullable();
+                $table->string('reward_type')->nullable();
+                $table->json('conditions')->nullable();
+                $table->foreignId('campaign_id')->nullable()->constrained('referral_campaigns');
+                $table->string('source')->nullable();
+                $table->json('tags')->nullable();
+                $table->timestamps();
+
+                $table->index(['user_id', 'is_active']);
+                $table->index(['code']);
+                $table->index(['campaign_id']);
+                $table->index(['source']);
+                $table->index(['reward_type']);
+                $table->index(['is_active', 'expires_at']);
+            });
+        }
+
         // Create referrals table
         Schema::create('referrals', function (Blueprint $table) {
             $table->id();
@@ -62,58 +117,11 @@ return new class extends Migration
             $table->index(['type', 'status']);
         });
 
-        // Create referral_codes table for tracking generated codes
-        Schema::create('referral_codes', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('code', 20)->unique();
-            $table->boolean('is_active')->default(true);
-            $table->timestamp('expires_at')->nullable();
-            $table->json('metadata')->nullable();
-            $table->json('title')->nullable();
-            $table->json('description')->nullable();
-            $table->integer('usage_limit')->nullable();
-            $table->integer('usage_count')->default(0);
-            $table->decimal('reward_amount', 12, 2)->nullable();
-            $table->string('reward_type')->nullable();
-            $table->json('conditions')->nullable();
-            $table->foreignId('campaign_id')->nullable()->constrained('referral_campaigns');
-            $table->string('source')->nullable();
-            $table->json('tags')->nullable();
-            $table->timestamps();
-
-            $table->index(['user_id', 'is_active']);
-            $table->index(['code']);
-            $table->index(['campaign_id']);
-            $table->index(['source']);
-            $table->index(['reward_type']);
-            $table->index(['is_active', 'expires_at']);
-        });
-
         // Add referral fields to users table
         Schema::table('users', function (Blueprint $table) {
             $table->string('referral_code', 20)->unique()->nullable()->after('is_admin');
             $table->timestamp('referral_code_generated_at')->nullable()->after('referral_code');
             $table->json('referral_settings')->nullable()->after('referral_code_generated_at');
-        });
-
-        // Create referral_campaigns table
-        Schema::create('referral_campaigns', function (Blueprint $table) {
-            $table->id();
-            $table->json('name');
-            $table->json('description')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->timestamp('start_date')->nullable();
-            $table->timestamp('end_date')->nullable();
-            $table->decimal('reward_amount', 12, 2)->nullable();
-            $table->string('reward_type')->nullable();
-            $table->integer('max_referrals_per_user')->nullable();
-            $table->integer('max_total_referrals')->nullable();
-            $table->json('conditions')->nullable();
-            $table->json('metadata')->nullable();
-            $table->timestamps();
-
-            $table->index(['is_active', 'start_date', 'end_date']);
         });
 
         // Create referral_code_usage_logs table
