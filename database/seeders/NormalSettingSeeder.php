@@ -74,9 +74,12 @@ final class NormalSettingSeeder extends Seeder
 
         foreach ($settings as $data) {
             /** @var array{group:string,key:string} $data */
+            $payload = $data;
+            $payload['value'] = json_encode($data['value']);
+
             $setting = NormalSetting::query()->updateOrCreate(
                 ['group' => $data['group'], 'key' => $data['key']],
-                $data,
+                $payload,
             );
 
             // Create translations for each locale

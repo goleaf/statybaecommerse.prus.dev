@@ -220,6 +220,18 @@ return new class extends Migration
             });
         }
 
+        if (Schema::hasTable('collections')) {
+            Schema::table('collections', function (Blueprint $table) {
+                if (! Schema::hasColumn('collections', 'is_automatic')) {
+                    $table->boolean('is_automatic')->default(false)->after('is_enabled');
+                }
+
+                if (! Schema::hasColumn('collections', 'display_type')) {
+                    $table->string('display_type')->default('grid')->after('is_automatic');
+                }
+            });
+        }
+
         // Create or normalize customer_group_user pivot table
         if (Schema::hasTable('customer_group_user')) {
             if (! Schema::hasColumn('customer_group_user', 'customer_group_id')) {
