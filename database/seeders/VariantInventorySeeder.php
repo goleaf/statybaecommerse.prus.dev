@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Models\Partner;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Seeder;
 
 class VariantInventorySeeder extends Seeder
@@ -17,7 +18,9 @@ class VariantInventorySeeder extends Seeder
         // Get existing variants and locations
         $variants = ProductVariant::with('product')->get();
         $locations = Location::enabled()->get();
-        $suppliers = Partner::where('type', 'supplier')->get();
+        $suppliers = Schema::hasTable('partners') && Schema::hasColumn('partners', 'type')
+            ? Partner::where('type', 'supplier')->get()
+            : collect();
 
         if ($variants->isEmpty() || $locations->isEmpty()) {
             $this->command->warn('No variants or locations found. Skipping VariantInventory seeding.');

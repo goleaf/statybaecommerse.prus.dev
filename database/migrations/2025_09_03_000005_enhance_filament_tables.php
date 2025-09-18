@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -173,24 +174,82 @@ return new class extends Migration
             });
         }
 
-        // Create customer_groups table for customer segmentation
-        if (! Schema::hasTable('customer_groups')) {
-            Schema::create('customer_groups', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->text('description')->nullable();
-            $table->decimal('discount_percentage', 5, 2)->default(0);
-            $table->boolean('is_enabled')->default(true);
-            $table->json('conditions')->nullable(); // Conditions for automatic assignment
-            $table->timestamps();
+        // Create or enhance customer_groups table for customer segmentation
+        if (Schema::hasTable('customer_groups')) {
+            Schema::table('customer_groups', function (Blueprint $table) {
+                if (! Schema::hasColumn('customer_groups', 'slug')) {
+                    $table->string('slug')->nullable()->unique()->after('name');
+                }
 
-            $table->index(['is_enabled']);
+                if (! Schema::hasColumn('customer_groups', 'code')) {
+                    $table->string('code')->nullable()->unique()->after('slug');
+                }
+
+                if (! Schema::hasColumn('customer_groups', 'description')) {
+                    $table->text('description')->nullable()->after('code');
+                }
+
+                if (! Schema::hasColumn('customer_groups', 'discount_percentage')) {
+                    $table->decimal('discount_percentage', 5, 2)->default(0)->after('description');
+                }
+
+                if (! Schema::hasColumn('customer_groups', 'is_enabled')) {
+                    $table->boolean('is_enabled')->default(true)->after('discount_percentage');
+                }
+
+                if (! Schema::hasColumn('customer_groups', 'conditions')) {
+                    $table->json('conditions')->nullable()->after('is_enabled');
+                }
+
+                if (! Schema::hasColumn('customer_groups', 'created_at')) {
+                    $table->timestamps();
+                }
+            });
+        } else {
+            Schema::create('customer_groups', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('slug')->unique();
+                $table->text('description')->nullable();
+                $table->decimal('discount_percentage', 5, 2)->default(0);
+                $table->boolean('is_enabled')->default(true);
+                $table->json('conditions')->nullable(); // Conditions for automatic assignment
+                $table->timestamps();
+
+                $table->index(['is_enabled']);
             });
         }
 
-        // Create customer_group_user pivot table
-        if (! Schema::hasTable('customer_group_user')) {
+        // Create or normalize customer_group_user pivot table
+        if (Schema::hasTable('customer_group_user')) {
+            if (! Schema::hasColumn('customer_group_user', 'customer_group_id')) {
+                $columns = Schema::getColumnListing('customer_group_user');
+                $groupColumn = in_array('group_id', $columns, true) ? 'group_id' : 'customer_group_id';
+                $assignedColumn = in_array('assigned_at', $columns, true) ? 'assigned_at' : 'CURRENT_TIMESTAMP';
+                $createdColumn = in_array('created_at', $columns, true) ? 'created_at' : 'CURRENT_TIMESTAMP';
+                $updatedColumn = in_array('updated_at', $columns, true) ? 'updated_at' : 'CURRENT_TIMESTAMP';
+
+                DB::statement('CREATE TABLE tmp_customer_group_user (
+                    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    customer_group_id BIGINT UNSIGNED NOT NULL,
+                    user_id BIGINT UNSIGNED NOT NULL,
+                    assigned_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE KEY customer_group_user_unique (customer_group_id, user_id),
+                    KEY customer_group_user_user_id_index (user_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci');
+
+                DB::statement("INSERT INTO tmp_customer_group_user (customer_group_id, user_id, assigned_at, created_at, updated_at)
+                        SELECT {$groupColumn}, user_id, {$assignedColumn}, {$createdColumn}, {$updatedColumn} FROM customer_group_user");
+
+                DB::statement('DROP TABLE customer_group_user');
+                DB::statement('ALTER TABLE tmp_customer_group_user RENAME TO customer_group_user');
+
+                DB::statement('ALTER TABLE customer_group_user ADD CONSTRAINT customer_group_user_customer_group_id_foreign FOREIGN KEY (customer_group_id) REFERENCES customer_groups(id) ON DELETE CASCADE');
+                DB::statement('ALTER TABLE customer_group_user ADD CONSTRAINT customer_group_user_user_id_foreign FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE');
+            }
+        } elseif (! Schema::hasTable('customer_group_user')) {
             Schema::create('customer_group_user', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('customer_group_id');

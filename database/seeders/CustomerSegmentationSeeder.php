@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Models\CustomerGroup;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 final class CustomerSegmentationSeeder extends Seeder
 {
@@ -89,9 +90,12 @@ final class CustomerSegmentationSeeder extends Seeder
         ];
 
         foreach ($customerGroups as $groupData) {
+            $payload = $groupData;
+            $payload['code'] = $groupData['code'] ?? Str::upper(Str::of($groupData['slug'])->replace('-', '_'));
+
             CustomerGroup::updateOrCreate(
                 ['slug' => $groupData['slug']],
-                $groupData
+                $payload
             );
         }
 

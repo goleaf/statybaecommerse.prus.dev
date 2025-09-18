@@ -7,12 +7,19 @@ namespace Database\Seeders;
 use App\Models\Inventory;
 use App\Models\Location;
 use App\Models\Product;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Seeder;
 
 final class InventorySeeder extends Seeder
 {
     public function run(): void
     {
+        if (! Schema::hasTable('inventories')) {
+            $this->command?->warn('InventorySeeder: inventories table missing, skipping.');
+
+            return;
+        }
+
         $locationIds = Location::query()->pluck('id');
         if ($locationIds->isEmpty()) {
             $this->command?->warn('InventorySeeder: no locations found, skipping.');
