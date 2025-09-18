@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('discount_conditions')) {
+            return;
+        }
+
         Schema::table('discount_conditions', function (Blueprint $table) {
             // Add missing fields if they don't exist
             if (! Schema::hasColumn('discount_conditions', 'is_active')) {
@@ -39,6 +43,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('discount_conditions')) {
+            return;
+        }
+
         Schema::table('discount_conditions', function (Blueprint $table) {
             // Drop indexes
             $table->dropIndex('discount_conditions_is_active_index');

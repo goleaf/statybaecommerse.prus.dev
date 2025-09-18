@@ -95,7 +95,8 @@ return new class extends Migration
         }
 
         // Create product_variants table for enhanced product management
-        Schema::create('product_variants', function (Blueprint $table) {
+        if (! Schema::hasTable('product_variants')) {
+            Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
             $table->string('name');
@@ -115,10 +116,12 @@ return new class extends Migration
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->index(['product_id', 'is_enabled']);
             $table->index(['sku']);
-        });
+            });
+        }
 
         // Create attributes table for product attributes
-        Schema::create('attributes', function (Blueprint $table) {
+        if (! Schema::hasTable('attributes')) {
+            Schema::create('attributes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
@@ -132,10 +135,12 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['is_enabled', 'sort_order']);
-        });
+            });
+        }
 
         // Create attribute_values table
-        Schema::create('attribute_values', function (Blueprint $table) {
+        if (! Schema::hasTable('attribute_values')) {
+            Schema::create('attribute_values', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('attribute_id');
             $table->string('value');
@@ -149,10 +154,12 @@ return new class extends Migration
             $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
             $table->unique(['attribute_id', 'slug']);
             $table->index(['attribute_id', 'is_enabled']);
-        });
+            });
+        }
 
         // Create product_attributes pivot table
-        Schema::create('product_attributes', function (Blueprint $table) {
+        if (! Schema::hasTable('product_attributes')) {
+            Schema::create('product_attributes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('attribute_id');
@@ -163,10 +170,12 @@ return new class extends Migration
             $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
             $table->foreign('attribute_value_id')->references('id')->on('attribute_values')->onDelete('cascade');
             $table->unique(['product_id', 'attribute_id'], 'product_attribute_unique');
-        });
+            });
+        }
 
         // Create customer_groups table for customer segmentation
-        Schema::create('customer_groups', function (Blueprint $table) {
+        if (! Schema::hasTable('customer_groups')) {
+            Schema::create('customer_groups', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
@@ -177,10 +186,12 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['is_enabled']);
-        });
+            });
+        }
 
         // Create customer_group_user pivot table
-        Schema::create('customer_group_user', function (Blueprint $table) {
+        if (! Schema::hasTable('customer_group_user')) {
+            Schema::create('customer_group_user', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('customer_group_id');
             $table->unsignedBigInteger('user_id');
@@ -190,10 +201,12 @@ return new class extends Migration
             $table->foreign('customer_group_id')->references('id')->on('customer_groups')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unique(['customer_group_id', 'user_id']);
-        });
+            });
+        }
 
         // Create addresses table for user addresses
-        Schema::create('addresses', function (Blueprint $table) {
+        if (! Schema::hasTable('addresses')) {
+            Schema::create('addresses', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('type')->default('shipping'); // shipping, billing
@@ -212,7 +225,8 @@ return new class extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->index(['user_id', 'type']);
-        });
+            });
+        }
 
         // Create wishlists table
         Schema::create('wishlists', function (Blueprint $table) {

@@ -40,7 +40,7 @@ return new class extends Migration
         }
 
         // Create pivot tables for many-to-many relationships
-        if (! Schema::hasTable('campaign_categories')) {
+        if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_categories')) {
             Schema::create('campaign_categories', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -53,7 +53,7 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('campaign_products')) {
+        if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_products')) {
             Schema::create('campaign_products', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -66,7 +66,7 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('campaign_customer_groups')) {
+        if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_customer_groups')) {
             Schema::create('campaign_customer_groups', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -79,7 +79,7 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('campaign_discount')) {
+        if (Schema::hasTable('discount_campaigns') && Schema::hasTable('discounts') && ! Schema::hasTable('campaign_discount')) {
             Schema::create('campaign_discount', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();

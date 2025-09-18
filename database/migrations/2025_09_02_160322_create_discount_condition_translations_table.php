@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('discount_conditions')) {
+            return;
+        }
+
         Schema::create('discount_condition_translations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('discount_condition_id')->constrained()->onDelete('cascade');

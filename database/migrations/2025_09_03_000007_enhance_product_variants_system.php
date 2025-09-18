@@ -56,7 +56,11 @@ return new class extends Migration
                 
                 // Add variant metadata
                 if (!Schema::hasColumn('product_variants', 'variant_metadata')) {
-                    $table->json('variant_metadata')->nullable()->after('status');
+                    $afterColumn = Schema::hasColumn('product_variants', 'status')
+                        ? 'status'
+                        : (Schema::hasColumn('product_variants', 'attributes') ? 'attributes' : 'is_enabled');
+
+                    $table->json('variant_metadata')->nullable()->after($afterColumn);
                 }
                 
                 // Add indexes

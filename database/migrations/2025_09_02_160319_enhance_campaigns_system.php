@@ -89,7 +89,7 @@ return new class extends Migration
         }
 
         // Create campaign views tracking table
-        if (! Schema::hasTable('campaign_views')) {
+        if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_views')) {
             Schema::create('campaign_views', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -107,7 +107,7 @@ return new class extends Migration
         }
 
         // Create campaign clicks tracking table
-        if (! Schema::hasTable('campaign_clicks')) {
+        if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_clicks')) {
             Schema::create('campaign_clicks', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -127,7 +127,7 @@ return new class extends Migration
         }
 
         // Create campaign conversions tracking table
-        if (! Schema::hasTable('campaign_conversions')) {
+        if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_conversions')) {
             Schema::create('campaign_conversions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -149,7 +149,7 @@ return new class extends Migration
         }
 
         // Create campaign customer segments table
-        if (! Schema::hasTable('campaign_customer_segments')) {
+        if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_customer_segments')) {
             Schema::create('campaign_customer_segments', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -164,7 +164,7 @@ return new class extends Migration
         }
 
         // Create campaign product targets table
-        if (! Schema::hasTable('campaign_product_targets')) {
+        if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_product_targets')) {
             Schema::create('campaign_product_targets', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
@@ -180,7 +180,7 @@ return new class extends Migration
         }
 
         // Create campaign schedule table for recurring campaigns
-        if (! Schema::hasTable('campaign_schedules')) {
+        if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_schedules')) {
             Schema::create('campaign_schedules', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();

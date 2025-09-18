@@ -10,6 +10,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('attribute_values') || Schema::hasTable('attribute_value_translations')) {
+            return;
+        }
+
         Schema::create('attribute_value_translations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('attribute_value_id')->constrained('attribute_values')->onDelete('cascade');

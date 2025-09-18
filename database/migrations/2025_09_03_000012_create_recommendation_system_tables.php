@@ -46,9 +46,9 @@ return new class extends Migration
             $table->timestamp('calculated_at');
             $table->timestamps();
             
-            $table->unique(['product_id', 'similar_product_id', 'algorithm_type']);
-            $table->index(['product_id', 'algorithm_type', 'similarity_score']);
-            $table->index(['similar_product_id', 'algorithm_type']);
+            $table->unique(['product_id', 'similar_product_id', 'algorithm_type'], 'product_similarity_unique');
+            $table->index(['product_id', 'algorithm_type', 'similarity_score'], 'product_similarity_score_idx');
+            $table->index(['similar_product_id', 'algorithm_type'], 'product_similarity_type_idx');
         });
         }
 
@@ -70,7 +70,8 @@ return new class extends Migration
         }
 
         // Recommendation configurations
-        Schema::create('recommendation_configs', function (Blueprint $table) {
+        if (! Schema::hasTable('recommendation_configs')) {
+            Schema::create('recommendation_configs', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->string('type'); // algorithm type
@@ -84,10 +85,12 @@ return new class extends Migration
             $table->timestamps();
             
             $table->index(['type', 'is_active', 'priority']);
-        });
+            });
+        }
 
         // Recommendation blocks (related_products, you_might_also_like, etc.)
-        Schema::create('recommendation_blocks', function (Blueprint $table) {
+        if (! Schema::hasTable('recommendation_blocks')) {
+            Schema::create('recommendation_blocks', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique(); // related_products, you_might_also_like, similar_products
             $table->string('title');
@@ -100,10 +103,12 @@ return new class extends Migration
             $table->timestamps();
             
             $table->index(['is_active', 'name']);
-        });
+            });
+        }
 
         // Cached recommendations
-        Schema::create('recommendation_cache', function (Blueprint $table) {
+        if (! Schema::hasTable('recommendation_cache')) {
+            Schema::create('recommendation_cache', function (Blueprint $table) {
             $table->id();
             $table->string('cache_key')->unique();
             $table->foreignId('block_id')->nullable()->constrained('recommendation_blocks')->onDelete('cascade');
@@ -119,10 +124,12 @@ return new class extends Migration
             $table->index(['block_id', 'user_id', 'product_id']);
             $table->index(['expires_at']);
             $table->index(['hit_count']);
-        });
+            });
+        }
 
         // Recommendation performance analytics
-        Schema::create('recommendation_analytics', function (Blueprint $table) {
+        if (! Schema::hasTable('recommendation_analytics')) {
+            Schema::create('recommendation_analytics', function (Blueprint $table) {
             $table->id();
             $table->foreignId('block_id')->nullable()->constrained('recommendation_blocks')->onDelete('cascade');
             $table->foreignId('config_id')->nullable()->constrained('recommendation_configs')->onDelete('cascade');
@@ -138,10 +145,12 @@ return new class extends Migration
             $table->index(['block_id', 'date']);
             $table->index(['config_id', 'date']);
             $table->index(['action', 'date']);
-        });
+            });
+        }
 
         // Product feature vectors for content-based recommendations
-        Schema::create('product_features', function (Blueprint $table) {
+        if (! Schema::hasTable('product_features')) {
+            Schema::create('product_features', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->string('feature_type'); // category, brand, price_range, attributes, etc.
@@ -152,10 +161,12 @@ return new class extends Migration
             
             $table->unique(['product_id', 'feature_type', 'feature_key']);
             $table->index(['feature_type', 'feature_key', 'feature_value']);
-        });
+            });
+        }
 
         // User-item interaction matrix for collaborative filtering
-        Schema::create('user_product_interactions', function (Blueprint $table) {
+        if (! Schema::hasTable('user_product_interactions')) {
+            Schema::create('user_product_interactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
@@ -166,10 +177,12 @@ return new class extends Migration
             $table->timestamp('last_interaction');
             $table->timestamps();
             
-            $table->unique(['user_id', 'product_id', 'interaction_type']);
-            $table->index(['user_id', 'interaction_type', 'last_interaction']);
-            $table->index(['product_id', 'interaction_type', 'count']);
-        });
+            $table->unique(['user_id', 'product_id', 'interaction_type'], 'user_product_interaction_unique');
+            $table->index(['user_id', 'interaction_type', 'last_interaction'], 'user_interactions_last_idx');
+            $table->index(['product_id', 'interaction_type', 'count'], 'user_interactions_product_idx');
+            });
+        }
+
     }
 
     /**

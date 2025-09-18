@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('campaign_clicks')) {
+            return;
+        }
+
         Schema::table('campaign_clicks', function (Blueprint $table) {
             // Add new tracking fields
             if (! Schema::hasColumn('campaign_clicks', 'referer')) {
@@ -67,7 +71,7 @@ return new class extends Migration
         });
 
         // Create campaign click translations table
-        if (! Schema::hasTable('campaign_click_translations')) {
+        if (Schema::hasTable('campaign_clicks') && ! Schema::hasTable('campaign_click_translations')) {
             Schema::create('campaign_click_translations', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_click_id')->constrained('campaign_clicks')->cascadeOnDelete();
@@ -85,7 +89,7 @@ return new class extends Migration
         }
 
         // Create campaign conversion translations table
-        if (! Schema::hasTable('campaign_conversion_translations')) {
+        if (Schema::hasTable('campaign_conversions') && ! Schema::hasTable('campaign_conversion_translations')) {
             Schema::create('campaign_conversion_translations', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_conversion_id')->constrained('campaign_conversions')->cascadeOnDelete();
@@ -105,6 +109,10 @@ return new class extends Migration
     {
         Schema::dropIfExists('campaign_conversion_translations');
         Schema::dropIfExists('campaign_click_translations');
+
+        if (! Schema::hasTable('campaign_clicks')) {
+            return;
+        }
 
         Schema::table('campaign_clicks', function (Blueprint $table) {
             $columns = [

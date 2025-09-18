@@ -8,9 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('price_lists')) {
+            return;
+        }
+
         // Update price_lists table to add new fields
         Schema::table('price_lists', function (Blueprint $table) {
-            $table->text('description')->nullable()->after('code');
+            $afterColumn = Schema::hasColumn('price_lists', 'code')
+                ? 'code'
+                : (Schema::hasColumn('price_lists', 'name') ? 'name' : 'id');
+
+            $table->text('description')->nullable()->after($afterColumn);
             $table->json('metadata')->nullable()->after('description');
             $table->boolean('is_default')->default(false)->after('is_enabled');
             $table->boolean('auto_apply')->default(false)->after('is_default');
@@ -19,25 +27,31 @@ return new class extends Migration
         });
 
         // Create price_list_translations table
-        Schema::create('price_list_translations', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('price_list_id');
-            $table->string('locale', 5);
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->string('meta_title')->nullable();
-            $table->text('meta_description')->nullable();
-            $table->json('meta_keywords')->nullable();
-            $table->timestamps();
+        if (! Schema::hasTable('price_list_translations')) {
+            Schema::create('price_list_translations', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('price_list_id');
+                $table->string('locale', 5);
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->string('meta_title')->nullable();
+                $table->text('meta_description')->nullable();
+                $table->json('meta_keywords')->nullable();
+                $table->timestamps();
 
-            $table->unique(['price_list_id', 'locale']);
-            $table->foreign('price_list_id')->references('id')->on('price_lists')->onDelete('cascade');
-            $table->index(['locale']);
-        });
+                $table->unique(['price_list_id', 'locale']);
+                $table->foreign('price_list_id')->references('id')->on('price_lists')->onDelete('cascade');
+                $table->index(['locale']);
+            });
+        }
     }
 
     public function down(): void
     {
+        if (! Schema::hasTable('price_lists')) {
+            return;
+        }
+
         Schema::dropIfExists('price_list_translations');
 
         Schema::table('price_lists', function (Blueprint $table) {

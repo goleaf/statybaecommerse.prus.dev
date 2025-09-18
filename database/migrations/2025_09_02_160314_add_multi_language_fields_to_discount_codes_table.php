@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('discount_codes')) {
+            return;
+        }
+
         Schema::table('discount_codes', function (Blueprint $table) {
             // Add multi-language description fields
             if (! Schema::hasColumn('discount_codes', 'description_lt')) {
@@ -68,6 +72,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('discount_codes')) {
+            return;
+        }
+
         Schema::table('discount_codes', function (Blueprint $table) {
             $table->dropForeign(['created_by']);
             $table->dropForeign(['updated_by']);
