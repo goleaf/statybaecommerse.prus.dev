@@ -1024,6 +1024,15 @@ final class Product extends Model implements HasMedia
         return $this->trans('summary', $locale) ?: $this->short_description;
     }
     /**
+     * Handle getTranslatedSummary functionality with proper error handling.
+     * @param string|null $locale
+     * @return string|null
+     */
+    public function getTranslatedSummary(?string $locale = null): ?string
+    {
+        return $this->trans('summary', $locale) ?: ($this->summary ?? $this->short_description);
+    }
+    /**
      * Handle getTranslatedSeoTitle functionality with proper error handling.
      * @param string|null $locale
      * @return string|null
@@ -1245,7 +1254,7 @@ final class Product extends Model implements HasMedia
      */
     public function getBusinessInfo(): array
     {
-        return ['is_featured' => $this->is_featured, 'is_requestable' => $this->is_requestable, 'requests_count' => $this->requests_count, 'average_rating' => $this->average_rating, 'reviews_count' => $this->reviews_count, 'views_count' => $this->views_count ?? 0, 'sales_count' => $this->getSalesCount(), 'revenue' => $this->getRevenue()];
+        return ['is_featured' => $this->is_featured, 'is_requestable' => $this->is_requestable, 'requests_count' => $this->requests_count, 'average_rating' => $this->average_rating, 'reviews_count' => $this->reviews_count, 'sales_count' => $this->getSalesCount(), 'revenue' => $this->getRevenue()];
     }
     /**
      * Handle getCompleteInfo functionality with proper error handling.

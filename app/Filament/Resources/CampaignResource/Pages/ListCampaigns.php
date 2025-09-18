@@ -24,39 +24,38 @@ final class ListCampaigns extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('campaigns.tabs.all')),
-            
-            'active' => Tab::make(__('campaigns.tabs.active'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
-            
-            'scheduled' => Tab::make(__('campaigns.tabs.scheduled'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_scheduled', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_scheduled', true)->count()),
-            
-            'running' => Tab::make(__('campaigns.tabs.running'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'running'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('status', 'running')->count()),
-            
-            'paused' => Tab::make(__('campaigns.tabs.paused'))
+            'all' => Tab::make($this->label('campaigns.tabs.all', 'All')),
+
+            'active' => Tab::make($this->label('campaigns.tabs.active', 'Active'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'active'))
+                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('status', 'active')->count()),
+
+            'scheduled' => Tab::make($this->label('campaigns.tabs.scheduled', 'Scheduled'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'scheduled'))
+                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('status', 'scheduled')->count()),
+
+            'draft' => Tab::make($this->label('campaigns.tabs.draft', 'Draft'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'draft'))
+                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('status', 'draft')->count()),
+
+            'paused' => Tab::make($this->label('campaigns.tabs.paused', 'Paused'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'paused'))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->where('status', 'paused')->count()),
-            
-            'completed' => Tab::make(__('campaigns.tabs.completed'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'completed'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('status', 'completed')->count()),
-            
-            'email' => Tab::make(__('campaigns.tabs.email'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'email'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'email')->count()),
-            
-            'sms' => Tab::make(__('campaigns.tabs.sms'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'sms'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'sms')->count()),
-            
-            'push' => Tab::make(__('campaigns.tabs.push'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'push'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'push')->count()),
+
+            'inactive' => Tab::make($this->label('campaigns.tabs.inactive', 'Inactive'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', false))
+                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_active', false)->count()),
+
+            'featured' => Tab::make($this->label('campaigns.tabs.featured', 'Featured'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_featured', true))
+                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_featured', true)->count()),
         ];
+    }
+
+    private function label(string $key, string $fallback): string
+    {
+        $translated = __($key);
+
+        return $translated === $key ? $fallback : $translated;
     }
 }

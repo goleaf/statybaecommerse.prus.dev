@@ -18,6 +18,8 @@ use App\Models\Product;
 use App\Models\Translations\CampaignTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
+use Faker\Factory as FakerFactory;
 
 final class CampaignSeeder extends Seeder
 {
@@ -60,6 +62,8 @@ final class CampaignSeeder extends Seeder
         } catch (\Exception $e) {
             $customerGroups = collect(range(1, 5))->map(fn ($i) => (object) ['id' => $i]);
         }
+
+        $locales = $this->supportedLocales();
 
         // Create featured campaigns
         $featuredCampaigns = Campaign::factory()
@@ -113,6 +117,10 @@ final class CampaignSeeder extends Seeder
             ->concat($scheduledCampaigns)
             ->concat($expiredCampaigns)
             ->concat($draftCampaigns);
+
+        foreach ($allCampaigns as $campaign) {
+            $this->syncTranslations($campaign, $locales);
+        }
 
         // Create campaign views for active and featured campaigns
         foreach ($featuredCampaigns->concat($activeCampaigns) as $campaign) {
@@ -253,7 +261,6 @@ final class CampaignSeeder extends Seeder
         $locales = $this->supportedLocales();
 
         foreach ($seasonalCampaigns as $campaignData) {
-            // Extract translation data
             $translations = $campaignData['translations'] ?? [];
             unset($campaignData['translations']);
 
@@ -262,19 +269,7 @@ final class CampaignSeeder extends Seeder
                 'zone_id' => $zones->random()->id,
             ]));
 
-            // Create translations for each locale
-            foreach ($locales as $locale) {
-                $translationData = $translations[$locale] ?? [];
-                CampaignTranslation::updateOrCreate([
-                    'campaign_id' => $campaign->id,
-                    'locale' => $locale,
-                ], [
-                    'name' => $translationData['name'] ?? $campaignData['name'] ?? 'Campaign',
-                    'cta_text' => $translationData['cta_text'] ?? $campaignData['cta_text'] ?? 'Learn More',
-                    'meta_title' => $translationData['meta_title'] ?? $campaignData['meta_title'] ?? '',
-                    'meta_description' => $translationData['meta_description'] ?? $campaignData['meta_description'] ?? '',
-                ]);
-            }
+            $this->syncTranslations($campaign, $locales, $translations);
 
             // Add analytics data for active campaigns
             if ($campaign->status === 'active') {
@@ -288,7 +283,99 @@ final class CampaignSeeder extends Seeder
             }
         }
 
-        $this->command->info('Created '.$allCampaigns->count().' campaigns with full analytics and targeting data.');
+        $translationCount = CampaignTranslation::count();
+        $this->command->info(sprintf(
+            'Created %d campaigns with full analytics, targeting data, and %d localized translations.',
+            $allCampaigns->count() + count($seasonalCampaigns),
+            $translationCount
+        ));
+    }
+
+    private function syncTranslations(Campaign $campaign, array $locales, array $overrides = []): void
+    {
+        foreach ($locales as $locale) {
+            $defaults = $this->translationDefaults($campaign, $locale);
+            $data = array_merge($defaults, $overrides[$locale] ?? []);
+
+            CampaignTranslation::updateOrCreate(
+                [
+                    'campaign_id' => $campaign->id,
+                    'locale' => $locale,
+                ],
+                $data
+            );
+        }
+    }
+
+    private function translationDefaults(Campaign $campaign, string $locale): array
+    {
+        $fakerLocale = $this->fakerLocale($locale);
+        $faker = FakerFactory::create($fakerLocale);
+
+        $defaultLocale = config('app.locale', 'en');
+        $isDefaultLocale = $locale === $defaultLocale;
+
+        $baseName = $campaign->name ?? $faker->sentence(3);
+        $baseDescription = $campaign->description ?? $faker->paragraph();
+        $baseSubject = $campaign->metadata['subject'] ?? $campaign->metadata['email_subject'] ?? $campaign->name ?? $faker->sentence(4);
+        $baseContent = $campaign->metadata['content'] ?? $faker->paragraphs(3, true);
+        $baseMetaTitle = $campaign->metadata['meta_title'] ?? $campaign->name ?? $faker->sentence(3);
+        $baseMetaDescription = $campaign->metadata['meta_description'] ?? $campaign->description ?? $faker->sentence(15);
+
+        $name = $isDefaultLocale ? $baseName : $faker->sentence(3);
+        $description = $isDefaultLocale ? $baseDescription : $faker->paragraph();
+        $subject = $isDefaultLocale ? $baseSubject : $faker->sentence(4);
+        $content = $isDefaultLocale ? $baseContent : $faker->paragraphs(3, true);
+        $metaTitle = $isDefaultLocale ? $baseMetaTitle : sprintf('%s - %s', $faker->sentence(3), $faker->words(2, true));
+        $metaDescription = $isDefaultLocale ? $baseMetaDescription : $faker->sentence(16);
+
+        $slugBase = $campaign->slug ?? Str::slug($campaign->name ?? 'campaign-' . $campaign->id);
+        $slug = $isDefaultLocale ? $slugBase : Str::slug($slugBase . '-' . $locale);
+
+        return [
+            'name' => $name,
+            'slug' => $slug,
+            'description' => $description,
+            'subject' => $subject,
+            'content' => $content,
+            'cta_text' => $this->localizedCallToAction($locale),
+            'banner_alt_text' => $this->localizedBannerAltText($locale, $name),
+            'meta_title' => $metaTitle,
+            'meta_description' => $metaDescription,
+        ];
+    }
+
+    private function localizedCallToAction(string $locale): string
+    {
+        return match ($locale) {
+            'lt' => 'Peržiūrėti pasiūlymą',
+            'en' => 'View the offer',
+            'de' => 'Angebot ansehen',
+            'ru' => 'Посмотреть предложение',
+            default => 'View the offer',
+        };
+    }
+
+    private function localizedBannerAltText(string $locale, string $campaignName): string
+    {
+        return match ($locale) {
+            'lt' => $campaignName . ' kampanijos baneris',
+            'en' => $campaignName . ' campaign banner',
+            'de' => 'Kampagnenbanner ' . $campaignName,
+            'ru' => 'Баннер кампании ' . $campaignName,
+            default => $campaignName . ' banner',
+        };
+    }
+
+    private function fakerLocale(string $locale): string
+    {
+        return match ($locale) {
+            'lt' => 'lt_LT',
+            'en' => 'en_US',
+            'de' => 'de_DE',
+            'ru' => 'ru_RU',
+            default => 'en_US',
+        };
     }
 
     private function supportedLocales(): array

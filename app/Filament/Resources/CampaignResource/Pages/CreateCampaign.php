@@ -6,6 +6,7 @@ namespace App\Filament\Resources\CampaignResource\Pages;
 
 use App\Filament\Resources\CampaignResource;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Str;
 
 final class CreateCampaign extends CreateRecord
 {
@@ -18,12 +19,12 @@ final class CreateCampaign extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Set default values
         $data['is_active'] = $data['is_active'] ?? true;
-        $data['status'] = $data['status'] ?? 'draft';
-        $data['is_scheduled'] = $data['is_scheduled'] ?? false;
-        $data['sort_order'] = $data['sort_order'] ?? 0;
-        
+
+        if (empty($data['slug']) && !empty($data['name'])) {
+            $data['slug'] = Str::slug((string) $data['name']);
+        }
+
         return $data;
     }
 }

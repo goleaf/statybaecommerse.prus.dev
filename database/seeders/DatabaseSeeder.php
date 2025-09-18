@@ -39,6 +39,8 @@ class DatabaseSeeder extends Seeder
             CouponSeeder::class,
             // Discounts for admin/discounts CRUD
             DiscountSeeder::class,
+            // Marketing campaigns with localized content
+            CampaignSeeder::class,
             // Partners & tiers
             PartnerTierSeeder::class,
             PartnerSeeder::class,

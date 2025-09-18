@@ -256,7 +256,7 @@ final class AutocompleteService
             // Cache for 1 hour
             $locale = app()->getLocale();
             // Get popular products
-            $popularProducts = Product::query()->with(['media', 'brand'])->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now())->orderBy('views_count', 'desc')->limit($limit)->get();
+            $popularProducts = Product::query()->with(['media', 'brand'])->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now())->orderBy('published_at', 'desc')->limit($limit)->get();
             return Arr::from($popularProducts->skipWhile(function (Product $product) {
                 // Skip popular products that are not properly configured or have missing essential data
                 return empty($product->name) || !$product->is_visible || empty($product->slug) || $product->price <= 0;

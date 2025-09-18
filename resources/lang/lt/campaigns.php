@@ -50,11 +50,18 @@ return [
         'target_products' => 'Tiksliniai produktai',
         'target_categories' => 'Tikslinės kategorijos',
         'target_customer_groups' => 'Tikslinės klientų grupės',
+        'channel' => 'Kanalas',
+        'zone' => 'Zona',
+        'discounts' => 'Nuolaidos',
         'display_priority' => 'Rodymo prioritetas',
         'is_featured' => 'Rekomenduojama',
+        'is_active' => 'Aktyvi',
         'send_notifications' => 'Siųsti pranešimus',
         'track_conversions' => 'Sekti konversijas',
         'max_uses' => 'Maksimalus naudojimų skaičius',
+        'auto_pause_on_budget' => 'Stabdyti viršijus biudžetą',
+        'auto_start' => 'Automatinė pradžia',
+        'auto_end' => 'Automatinė pabaiga',
         'total_views' => 'Iš viso peržiūrų',
         'total_clicks' => 'Iš viso paspaudimų',
         'total_conversions' => 'Iš viso konversijų',
@@ -74,6 +81,7 @@ return [
         'paused' => 'Pristabdyta',
         'completed' => 'Užbaigta',
         'cancelled' => 'Atšaukta',
+        'scheduled' => 'Suplanuota',
     ],
     
     // Types
@@ -126,6 +134,7 @@ return [
         'featured' => 'Rekomenduojamos',
         'active' => 'Aktyvios',
         'completed' => 'Užbaigtos',
+        'inactive' => 'Neaktyvios',
     ],
     
     // Widgets
@@ -138,5 +147,14 @@ return [
         'top_performing_campaigns' => 'Geriausiai veikiančios kampanijos',
         'recent_campaigns' => 'Paskutinės kampanijos',
     ],
-];
 
+    'tabs' => [
+        'all' => 'Visos kampanijos',
+        'active' => 'Aktyvios',
+        'scheduled' => 'Suplanuotos',
+        'draft' => 'Juodraščiai',
+        'paused' => 'Pristabdytos',
+        'inactive' => 'Neaktyvios',
+        'featured' => 'Išskirtinės',
+    ],
+];
