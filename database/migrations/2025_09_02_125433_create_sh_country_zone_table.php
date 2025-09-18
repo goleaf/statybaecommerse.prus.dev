@@ -17,10 +17,20 @@ return new class extends Migration
                 $table->unique(['zone_id', 'country_id'], 'country_zone_unique');
             });
         }
+
+        if (! Schema::hasTable('country_zone')) {
+            Schema::create('country_zone', function (Blueprint $table) {
+                $table->foreignId('zone_id')->constrained('zones')->cascadeOnDelete();
+                $table->foreignId('country_id')->constrained('countries')->cascadeOnDelete();
+
+                $table->unique(['zone_id', 'country_id'], 'country_zone_unique');
+            });
+        }
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('country_zone');
         Schema::dropIfExists('sh_country_zone');
     }
 };

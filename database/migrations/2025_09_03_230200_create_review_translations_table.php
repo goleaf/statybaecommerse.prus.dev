@@ -25,12 +25,27 @@ return new class extends Migration
 
         // Add missing columns to reviews table if they don't exist
         if (Schema::hasTable('reviews')) {
-            Schema::table('reviews', function (Blueprint $table): void {
+            $hasIsApprovedColumn = Schema::hasColumn('reviews', 'is_approved');
+            $hasCommentColumn = Schema::hasColumn('reviews', 'comment');
+            $hasContentColumn = Schema::hasColumn('reviews', 'content');
+
+            Schema::table('reviews', function (Blueprint $table) use ($hasIsApprovedColumn, $hasCommentColumn, $hasContentColumn): void {
                 if (! Schema::hasColumn('reviews', 'is_featured')) {
-                    $table->boolean('is_featured')->default(false)->after('is_approved');
+                    $column = $table->boolean('is_featured')->default(false);
+
+                    if ($hasIsApprovedColumn) {
+                        $column->after('is_approved');
+                    }
                 }
+
                 if (! Schema::hasColumn('reviews', 'metadata')) {
-                    $table->json('metadata')->nullable()->after('comment');
+                    $column = $table->json('metadata')->nullable();
+
+                    if ($hasCommentColumn) {
+                        $column->after('comment');
+                    } elseif ($hasContentColumn) {
+                        $column->after('content');
+                    }
                 }
             });
         }
@@ -42,7 +57,14 @@ return new class extends Migration
 
         if (Schema::hasTable('reviews')) {
             Schema::table('reviews', function (Blueprint $table): void {
-                $table->dropColumn(['is_featured', 'metadata']);
+                $columns = array_filter([
+                    Schema::hasColumn('reviews', 'is_featured') ? 'is_featured' : null,
+                    Schema::hasColumn('reviews', 'metadata') ? 'metadata' : null,
+                ]);
+
+                if ($columns !== []) {
+                    $table->dropColumn($columns);
+                }
             });
         }
     }

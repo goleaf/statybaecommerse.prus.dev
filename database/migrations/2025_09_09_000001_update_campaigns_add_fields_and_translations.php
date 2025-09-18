@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('discount_campaigns')) {
+            return;
+        }
+
         if (Schema::hasTable('discount_campaigns')) {
             Schema::table('discount_campaigns', function (Blueprint $table) {
                 if (! Schema::hasColumn('discount_campaigns', 'is_featured')) {

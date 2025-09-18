@@ -116,6 +116,25 @@ return new class extends Migration
             });
         }
 
+        if (! Schema::hasTable('discount_campaigns')) {
+            Schema::create('discount_campaigns', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('slug')->unique();
+                $table->timestamp('starts_at')->nullable();
+                $table->timestamp('ends_at')->nullable();
+                $table->unsignedBigInteger('channel_id')->nullable();
+                $table->unsignedBigInteger('zone_id')->nullable();
+                $table->string('status')->default('active');
+                $table->json('metadata')->nullable();
+                $table->timestamps();
+
+                $table->index(['status']);
+                $table->index(['channel_id']);
+                $table->index(['zone_id']);
+            });
+        }
+
         if (Schema::hasTable('sh_discounts') && ! Schema::hasTable('sh_campaign_discount')) {
             Schema::create('sh_campaign_discount', function (Blueprint $table) {
                 $table->unsignedBigInteger('campaign_id');
@@ -132,6 +151,7 @@ return new class extends Migration
         Schema::dropIfExists('sh_discount_redemptions');
         Schema::dropIfExists('sh_discount_codes');
         Schema::dropIfExists('sh_discount_conditions');
+        Schema::dropIfExists('discount_campaigns');
 
         if (Schema::hasTable('sh_discounts')) {
             Schema::table('sh_discounts', function (Blueprint $table) {

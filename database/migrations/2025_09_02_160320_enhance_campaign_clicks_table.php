@@ -83,7 +83,7 @@ return new class extends Migration
                 $table->text('notes')->nullable();
                 $table->json('custom_data')->nullable();
 
-                $table->unique(['campaign_click_id', 'locale']);
+                $table->unique(['campaign_click_id', 'locale'], 'campaign_click_locale_unique');
                 $table->index(['locale']);
             });
         }
@@ -99,7 +99,7 @@ return new class extends Migration
                 $table->text('notes')->nullable();
                 $table->json('custom_data')->nullable();
 
-                $table->unique(['campaign_conversion_id', 'locale']);
+                $table->unique(['campaign_conversion_id', 'locale'], 'campaign_conversion_locale_unique');
                 $table->index(['locale']);
             });
         }

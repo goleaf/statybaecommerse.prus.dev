@@ -10,81 +10,96 @@ return new class extends Migration
     {
         // Add campaign analytics and tracking
         if (Schema::hasTable('discount_campaigns')) {
-            Schema::table('discount_campaigns', function (Blueprint $table) {
+            $statusExists = Schema::hasColumn('discount_campaigns', 'status');
+            $startsAtExists = Schema::hasColumn('discount_campaigns', 'starts_at');
+            $endsAtExists = Schema::hasColumn('discount_campaigns', 'ends_at');
+            $isFeaturedExists = Schema::hasColumn('discount_campaigns', 'is_featured');
+            $channelIdExists = Schema::hasColumn('discount_campaigns', 'channel_id');
+            $zoneIdExists = Schema::hasColumn('discount_campaigns', 'zone_id');
+
+            Schema::table('discount_campaigns', function (Blueprint $table) use ($statusExists, $startsAtExists, $endsAtExists, $isFeaturedExists, $channelIdExists, $zoneIdExists) {
                 // Campaign performance metrics
                 if (! Schema::hasColumn('discount_campaigns', 'total_views')) {
-                    $table->unsignedBigInteger('total_views')->default(0)->after('budget_limit');
+                    $table->unsignedBigInteger('total_views')->default(0);
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'total_clicks')) {
-                    $table->unsignedBigInteger('total_clicks')->default(0)->after('total_views');
+                    $table->unsignedBigInteger('total_clicks')->default(0);
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'total_conversions')) {
-                    $table->unsignedBigInteger('total_conversions')->default(0)->after('total_clicks');
+                    $table->unsignedBigInteger('total_conversions')->default(0);
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'total_revenue')) {
-                    $table->decimal('total_revenue', 12, 2)->default(0)->after('total_conversions');
+                    $table->decimal('total_revenue', 12, 2)->default(0);
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'conversion_rate')) {
-                    $table->decimal('conversion_rate', 5, 2)->default(0)->after('total_revenue');
+                    $table->decimal('conversion_rate', 5, 2)->default(0);
                 }
 
                 // Campaign targeting
                 if (! Schema::hasColumn('discount_campaigns', 'target_audience')) {
-                    $table->json('target_audience')->nullable()->after('conversion_rate');
+                    $table->json('target_audience')->nullable();
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'target_categories')) {
-                    $table->json('target_categories')->nullable()->after('target_audience');
+                    $table->json('target_categories')->nullable();
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'target_products')) {
-                    $table->json('target_products')->nullable()->after('target_categories');
+                    $table->json('target_products')->nullable();
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'target_customer_groups')) {
-                    $table->json('target_customer_groups')->nullable()->after('target_products');
+                    $table->json('target_customer_groups')->nullable();
                 }
 
                 // Campaign display settings
                 if (! Schema::hasColumn('discount_campaigns', 'display_priority')) {
-                    $table->integer('display_priority')->default(0)->after('target_customer_groups');
+                    $table->integer('display_priority')->default(0);
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'banner_image')) {
-                    $table->string('banner_image')->nullable()->after('display_priority');
+                    $table->string('banner_image')->nullable();
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'banner_alt_text')) {
-                    $table->string('banner_alt_text')->nullable()->after('banner_image');
+                    $table->string('banner_alt_text')->nullable();
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'cta_text')) {
-                    $table->string('cta_text')->nullable()->after('banner_alt_text');
+                    $table->string('cta_text')->nullable();
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'cta_url')) {
-                    $table->string('cta_url')->nullable()->after('cta_text');
+                    $table->string('cta_url')->nullable();
                 }
 
                 // Campaign automation
                 if (! Schema::hasColumn('discount_campaigns', 'auto_start')) {
-                    $table->boolean('auto_start')->default(false)->after('cta_url');
+                    $table->boolean('auto_start')->default(false);
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'auto_end')) {
-                    $table->boolean('auto_end')->default(false)->after('auto_start');
+                    $table->boolean('auto_end')->default(false);
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'auto_pause_on_budget')) {
-                    $table->boolean('auto_pause_on_budget')->default(false)->after('auto_end');
+                    $table->boolean('auto_pause_on_budget')->default(false);
                 }
 
                 // SEO and marketing
                 if (! Schema::hasColumn('discount_campaigns', 'meta_title')) {
-                    $table->string('meta_title')->nullable()->after('auto_pause_on_budget');
+                    $table->string('meta_title')->nullable();
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'meta_description')) {
-                    $table->text('meta_description')->nullable()->after('meta_title');
+                    $table->text('meta_description')->nullable();
                 }
                 if (! Schema::hasColumn('discount_campaigns', 'social_media_ready')) {
-                    $table->boolean('social_media_ready')->default(false)->after('meta_description');
+                    $table->boolean('social_media_ready')->default(false);
                 }
 
                 // Add indexes for performance
-                $table->index(['status', 'starts_at', 'ends_at'], 'campaigns_status_dates_idx');
-                $table->index(['is_featured', 'display_priority'], 'campaigns_featured_priority_idx');
-                $table->index(['channel_id', 'zone_id'], 'campaigns_channel_zone_idx');
+                if ($statusExists && $startsAtExists && $endsAtExists) {
+                    $table->index(['status', 'starts_at', 'ends_at'], 'campaigns_status_dates_idx');
+                }
+
+                if ($isFeaturedExists && Schema::hasColumn('discount_campaigns', 'display_priority')) {
+                    $table->index(['is_featured', 'display_priority'], 'campaigns_featured_priority_idx');
+                }
+
+                if ($channelIdExists && $zoneIdExists) {
+                    $table->index(['channel_id', 'zone_id'], 'campaigns_channel_zone_idx');
+                }
             });
         }
 

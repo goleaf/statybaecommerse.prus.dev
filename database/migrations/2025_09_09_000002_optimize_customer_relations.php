@@ -67,16 +67,25 @@ return new class extends Migration
 
         // User wishlists pivot
         if (Schema::hasTable('user_wishlists')) {
-            Schema::table('user_wishlists', function (Blueprint $table): void {
-                if (! $this->hasIndex('user_wishlists', 'user_wishlists_user_idx')) {
+            $hasUserIdColumn = Schema::hasColumn('user_wishlists', 'user_id');
+            $hasProductIdColumn = Schema::hasColumn('user_wishlists', 'product_id');
+
+            Schema::table('user_wishlists', function (Blueprint $table) use ($hasUserIdColumn, $hasProductIdColumn): void {
+                if ($hasUserIdColumn && ! $this->hasIndex('user_wishlists', 'user_wishlists_user_idx')) {
                     $table->index('user_id', 'user_wishlists_user_idx');
                 }
-                if (! $this->hasIndex('user_wishlists', 'user_wishlists_product_idx')) {
+                if ($hasProductIdColumn && ! $this->hasIndex('user_wishlists', 'user_wishlists_product_idx')) {
                     $table->index('product_id', 'user_wishlists_product_idx');
                 }
             });
-            $this->safeFk('ALTER TABLE user_wishlists ADD CONSTRAINT user_wishlists_user_fk FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE');
-            $this->safeFk('ALTER TABLE user_wishlists ADD CONSTRAINT user_wishlists_product_fk FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE');
+
+            if ($hasUserIdColumn) {
+                $this->safeFk('ALTER TABLE user_wishlists ADD CONSTRAINT user_wishlists_user_fk FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE');
+            }
+
+            if ($hasProductIdColumn) {
+                $this->safeFk('ALTER TABLE user_wishlists ADD CONSTRAINT user_wishlists_product_fk FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE');
+            }
         }
 
         // Discount redemptions (new table name without sh_ if exists)
@@ -95,16 +104,28 @@ return new class extends Migration
 
         // Customer group user pivot
         if (Schema::hasTable('customer_group_user')) {
-            Schema::table('customer_group_user', function (Blueprint $table): void {
-                if (! $this->hasIndex('customer_group_user', 'customer_group_user_user_idx')) {
+            $hasUserIdColumn = Schema::hasColumn('customer_group_user', 'user_id');
+            $hasCustomerGroupIdColumn = Schema::hasColumn('customer_group_user', 'customer_group_id');
+            $hasGroupIdColumn = Schema::hasColumn('customer_group_user', 'group_id');
+            $groupColumn = $hasCustomerGroupIdColumn ? 'customer_group_id' : ($hasGroupIdColumn ? 'group_id' : null);
+
+            Schema::table('customer_group_user', function (Blueprint $table) use ($hasUserIdColumn, $groupColumn): void {
+                if ($hasUserIdColumn && ! $this->hasIndex('customer_group_user', 'customer_group_user_user_idx')) {
                     $table->index('user_id', 'customer_group_user_user_idx');
                 }
-                if (! $this->hasIndex('customer_group_user', 'customer_group_user_group_idx')) {
-                    $table->index('customer_group_id', 'customer_group_user_group_idx');
+
+                if ($groupColumn !== null && ! $this->hasIndex('customer_group_user', 'customer_group_user_group_idx')) {
+                    $table->index($groupColumn, 'customer_group_user_group_idx');
                 }
             });
-            $this->safeFk('ALTER TABLE customer_group_user ADD CONSTRAINT cgu_user_fk FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE');
-            $this->safeFk('ALTER TABLE customer_group_user ADD CONSTRAINT cgu_group_fk FOREIGN KEY (customer_group_id) REFERENCES customer_groups(id) ON DELETE CASCADE');
+
+            if ($hasUserIdColumn) {
+                $this->safeFk('ALTER TABLE customer_group_user ADD CONSTRAINT cgu_user_fk FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE');
+            }
+
+            if ($groupColumn !== null) {
+                $this->safeFk("ALTER TABLE customer_group_user ADD CONSTRAINT cgu_group_fk FOREIGN KEY ({$groupColumn}) REFERENCES customer_groups(id) ON DELETE CASCADE");
+            }
         }
     }
 

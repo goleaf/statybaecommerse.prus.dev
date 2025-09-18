@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('cart_items')) {
+            return;
+        }
+
         Schema::table('cart_items', function (Blueprint $table) {
             if (!Schema::hasColumn('cart_items', 'price')) {
                 $table->decimal('price', 10, 2)->nullable()->after('total_price');
@@ -16,16 +20,20 @@ return new class extends Migration
                 $table->foreignId('product_variant_id')->nullable()->constrained('product_variants')->nullOnDelete()->after('product_id');
             }
             if (!Schema::hasColumn('cart_items', 'notes')) {
-                $table->text('notes')->nullable()->after('product_snapshot');
+                $table->text('notes')->nullable();
             }
             if (!Schema::hasColumn('cart_items', 'attributes')) {
-                $table->json('attributes')->nullable()->after('notes');
+                $table->json('attributes')->nullable();
             }
         });
     }
 
     public function down(): void
     {
+        if (! Schema::hasTable('cart_items')) {
+            return;
+        }
+
         Schema::table('cart_items', function (Blueprint $table) {
             if (Schema::hasColumn('cart_items', 'price')) {
                 $table->dropColumn('price');

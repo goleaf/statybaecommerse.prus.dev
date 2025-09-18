@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -20,9 +21,17 @@ return new class extends Migration
             'sh_product_attributes',
         ];
 
-        foreach ($legacyTables as $table) {
-            if (Schema::hasTable($table)) {
-                Schema::dropIfExists($table);
+        if ($legacyTables !== []) {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+            try {
+                foreach ($legacyTables as $table) {
+                    if (Schema::hasTable($table)) {
+                        Schema::dropIfExists($table);
+                    }
+                }
+            } finally {
+                DB::statement('SET FOREIGN_KEY_CHECKS=1');
             }
         }
 
@@ -67,12 +76,24 @@ return new class extends Migration
 
         // Enhance brands table
         if (Schema::hasTable('brands')) {
-            Schema::table('brands', function (Blueprint $table) {
+            $hasContactPhone = Schema::hasColumn('brands', 'contact_phone');
+            $hasIsFeatured = Schema::hasColumn('brands', 'is_featured');
+
+            Schema::table('brands', function (Blueprint $table) use ($hasContactPhone, $hasIsFeatured) {
                 if (! Schema::hasColumn('brands', 'social_links')) {
-                    $table->json('social_links')->nullable()->after('contact_phone');
+                    $column = $table->json('social_links')->nullable();
+
+                    if ($hasContactPhone) {
+                        $column->after('contact_phone');
+                    }
                 }
+
                 if (! Schema::hasColumn('brands', 'is_premium')) {
-                    $table->boolean('is_premium')->default(false)->after('is_featured');
+                    $column = $table->boolean('is_premium')->default(false);
+
+                    if ($hasIsFeatured) {
+                        $column->after('is_featured');
+                    }
                 }
             });
         }

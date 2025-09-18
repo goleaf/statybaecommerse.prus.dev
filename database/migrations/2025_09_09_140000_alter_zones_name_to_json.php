@@ -10,17 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (! Schema::hasTable('zones')) {
-            return;
-        }
-
-        Schema::table('zones', function (Blueprint $table) {
-            if (Schema::hasColumn('zones', 'name')) {
-                // On SQLite, altering column types requires recreate or a JSON type can be stored in TEXT.
-                // We'll drop and re-add with JSON where supported; for SQLite it becomes TEXT but casted in model.
-                $table->json('name')->change();
-            }
-        });
+        // Retain string-based column to stay compatible with existing seeders and casts.
     }
 
     public function down(): void

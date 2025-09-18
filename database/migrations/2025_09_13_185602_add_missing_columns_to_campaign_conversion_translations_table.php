@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('campaign_conversion_translations')) {
+            return;
+        }
+
         Schema::table('campaign_conversion_translations', function (Blueprint $table) {
             if (!Schema::hasColumn('campaign_conversion_translations', 'created_at')) {
                 $table->timestamps();
@@ -20,6 +24,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('campaign_conversion_translations')) {
+            return;
+        }
+
         Schema::table('campaign_conversion_translations', function (Blueprint $table) {
             if (Schema::hasColumn('campaign_conversion_translations', 'created_at')) {
                 $table->dropTimestamps();

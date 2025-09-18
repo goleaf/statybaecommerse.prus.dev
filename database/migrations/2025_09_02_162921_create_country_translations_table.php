@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! Schema::hasTable('countries')) {
-            return;
-        }
-
         Schema::create('country_translations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('country_id')->constrained('countries')->cascadeOnDelete();
+            $table->unsignedBigInteger('country_id');
             $table->string('locale', 5);
             $table->string('name');
             $table->string('name_official')->nullable();
@@ -27,6 +23,16 @@ return new class extends Migration
             $table->unique(['country_id', 'locale']);
             $table->index(['locale']);
         });
+
+        if (Schema::hasTable('countries')) {
+            Schema::table('country_translations', function (Blueprint $table) {
+                try {
+                    $table->foreign('country_id')->references('id')->on('countries')->cascadeOnDelete();
+                } catch (\Throwable $e) {
+                    // Foreign key might already exist or countries table missing
+                }
+            });
+        }
     }
 
     /**

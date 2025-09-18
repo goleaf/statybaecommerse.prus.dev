@@ -13,34 +13,34 @@ return new class extends Migration
         Schema::table('variant_inventories', function (Blueprint $table) {
             // Add new columns for enhanced inventory management
             if (! Schema::hasColumn('variant_inventories', 'notes')) {
-                $table->text('notes')->nullable()->after('is_tracked');
+                $table->text('notes')->nullable();
             }
             if (! Schema::hasColumn('variant_inventories', 'last_restocked_at')) {
-                $table->timestamp('last_restocked_at')->nullable()->after('notes');
+                $table->timestamp('last_restocked_at')->nullable();
             }
             if (! Schema::hasColumn('variant_inventories', 'last_sold_at')) {
-                $table->timestamp('last_sold_at')->nullable()->after('last_restocked_at');
+                $table->timestamp('last_sold_at')->nullable();
             }
             if (! Schema::hasColumn('variant_inventories', 'cost_per_unit')) {
-                $table->decimal('cost_per_unit', 10, 2)->nullable()->after('last_sold_at');
+                $table->decimal('cost_per_unit', 10, 2)->nullable();
             }
             if (! Schema::hasColumn('variant_inventories', 'reorder_point')) {
-                $table->integer('reorder_point')->default(0)->after('cost_per_unit');
+                $table->integer('reorder_point')->default(0);
             }
             if (! Schema::hasColumn('variant_inventories', 'max_stock_level')) {
-                $table->integer('max_stock_level')->nullable()->after('reorder_point');
+                $table->integer('max_stock_level')->nullable();
             }
             if (! Schema::hasColumn('variant_inventories', 'supplier_id')) {
-                $table->unsignedBigInteger('supplier_id')->nullable()->after('max_stock_level');
+                $table->unsignedBigInteger('supplier_id')->nullable();
             }
             if (! Schema::hasColumn('variant_inventories', 'batch_number')) {
-                $table->string('batch_number')->nullable()->after('supplier_id');
+                $table->string('batch_number')->nullable();
             }
             if (! Schema::hasColumn('variant_inventories', 'expiry_date')) {
-                $table->date('expiry_date')->nullable()->after('batch_number');
+                $table->date('expiry_date')->nullable();
             }
             if (! Schema::hasColumn('variant_inventories', 'status')) {
-                $table->string('status')->default('active')->after('expiry_date');
+                $table->string('status')->default('active');
             }
 
             // Add soft deletes
@@ -140,26 +140,45 @@ return new class extends Migration
         Schema::dropIfExists('stock_movements');
 
         Schema::table('variant_inventories', function (Blueprint $table) {
-            $table->dropForeign(['supplier_id']);
-            $table->dropIndex(['status', 'is_tracked']);
-            $table->dropIndex(['supplier_id']);
-            $table->dropIndex(['expiry_date']);
-            $table->dropIndex(['last_restocked_at']);
-            $table->dropIndex(['reorder_point']);
+            if (Schema::hasColumn('variant_inventories', 'supplier_id')) {
+                try {
+                    $table->dropForeign(['supplier_id']);
+                } catch (\Throwable $e) {
+                    // Ignore missing foreign key
+                }
+            }
 
-            $table->dropColumn([
-                'notes',
-                'last_restocked_at',
-                'last_sold_at',
-                'cost_per_unit',
-                'reorder_point',
-                'max_stock_level',
-                'supplier_id',
-                'batch_number',
-                'expiry_date',
-                'status',
-                'deleted_at',
+            foreach ([
+                ['status', 'is_tracked'],
+                ['supplier_id'],
+                ['expiry_date'],
+                ['last_restocked_at'],
+                ['reorder_point'],
+            ] as $indexColumns) {
+                try {
+                    $table->dropIndex($indexColumns);
+                } catch (\Throwable $e) {
+                    // Ignore missing indexes
+                }
+            }
+
+            $columnsToDrop = array_filter([
+                Schema::hasColumn('variant_inventories', 'notes') ? 'notes' : null,
+                Schema::hasColumn('variant_inventories', 'last_restocked_at') ? 'last_restocked_at' : null,
+                Schema::hasColumn('variant_inventories', 'last_sold_at') ? 'last_sold_at' : null,
+                Schema::hasColumn('variant_inventories', 'cost_per_unit') ? 'cost_per_unit' : null,
+                Schema::hasColumn('variant_inventories', 'reorder_point') ? 'reorder_point' : null,
+                Schema::hasColumn('variant_inventories', 'max_stock_level') ? 'max_stock_level' : null,
+                Schema::hasColumn('variant_inventories', 'supplier_id') ? 'supplier_id' : null,
+                Schema::hasColumn('variant_inventories', 'batch_number') ? 'batch_number' : null,
+                Schema::hasColumn('variant_inventories', 'expiry_date') ? 'expiry_date' : null,
+                Schema::hasColumn('variant_inventories', 'status') ? 'status' : null,
+                Schema::hasColumn('variant_inventories', 'deleted_at') ? 'deleted_at' : null,
             ]);
+
+            if ($columnsToDrop !== []) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 };
