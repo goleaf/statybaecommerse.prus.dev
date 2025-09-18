@@ -64,7 +64,7 @@ final class Index extends AbstractPageComponent implements HasSchemas
                 ])
                 ->live()
                 ->afterStateUpdated(fn() => $this->resetPage())
-                ->prefixIcon('heroicon-o-arrow-up-down')
+                ->prefixIcon('heroicon-o-arrows-up-down')
         ]);
     }
     /**
