@@ -270,7 +270,7 @@ final class AnalyticsEventTest extends TestCase
     {
         AnalyticsEvent::factory()->create(['created_at' => now()]);
         AnalyticsEvent::factory()->create(['created_at' => now()->subMonth()]);
-        AnalyticsEvent::factory()->create(['created_at' => now()->subDays(15)]);
+        AnalyticsEvent::factory()->create(['created_at' => now()->subMonth()->subDays(10)]);
 
         $events = AnalyticsEvent::withoutGlobalScopes()->thisMonth()->get();
 

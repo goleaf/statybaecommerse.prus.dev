@@ -47,7 +47,21 @@
          style="display: none;">
         @foreach ($supportedLocales as $locale)
             @if ($locale !== $currentLocale)
-                <a href="{{ route('localized.home', ['locale' => $locale]) ?? url('/?locale=' . $locale) }}"
+                @php
+                    $route = request()->route();
+                    $targetUrl = null;
+
+                    if ($route && ($name = $route->getName()) && str_starts_with($name, 'localized.')) {
+                        $parameters = $route->parameters();
+                        $parameters['locale'] = $locale;
+                        $targetUrl = route($name, $parameters, false);
+                    } elseif (Route::has('localized.home')) {
+                        $targetUrl = route('localized.home', ['locale' => $locale], false);
+                    }
+
+                    $targetUrl ??= url('/' . ltrim($locale, '/'));
+                @endphp
+                <a href="{{ $targetUrl }}"
                    class="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
                     <span class="text-lg">{{ $localeFlags[$locale] ?? '🌐' }}</span>
                     <span>{{ $localeNames[$locale] ?? strtoupper($locale) }}</span>

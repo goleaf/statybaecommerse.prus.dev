@@ -190,7 +190,7 @@
                     {{ __('Proceed to Checkout') }}
                 </a>
 
-                <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
                    class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-xl font-semibold text-center block hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
                     {{ __('Continue Shopping') }}
                 </a>
@@ -216,7 +216,7 @@
                     {{ __('Start Shopping') }}
                 </a>
 
-                <a href="{{ route('categories.index', ['locale' => app()->getLocale()]) ?? '/categories' }}"
+                <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                    class="border-2 border-gray-300 text-gray-700 px-8 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
                     {{ __('Browse Categories') }}
                 </a>
@@ -325,4 +325,3 @@
         }
     }
 </script>
-

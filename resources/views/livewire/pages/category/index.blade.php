@@ -72,7 +72,7 @@
                         <div class="bg-white rounded-xl border p-4 shadow-sm">
                             <div class="flex items-center justify-between mb-3">
                                 <h3 class="text-sm font-semibold">{{ __('Filters') }}</h3>
-                                <a href="{{ route('categories.index') }}"
+                                <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                                    class="text-sm text-gray-600 hover:underline">{{ __('Clear all') }}</a>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
@@ -177,7 +177,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <a href="{{ route('categories.index') }}"
+                        <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                            class="text-sm text-gray-600 hover:underline">{{ __('Clear all') }}</a>
 
                         <div class="mt-4 space-y-4">

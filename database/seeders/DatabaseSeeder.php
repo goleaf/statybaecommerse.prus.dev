@@ -52,6 +52,7 @@ class DatabaseSeeder extends Seeder
             // ComprehensiveOrderSeeder::class, // Temporarily disabled due to memory issues
             // Collections for admin/collections CRUD
             CollectionSeeder::class,
+            CollectionProductSeeder::class,
             // Product reviews for admin/reviews CRUD
             ReviewsSeeder::class,
             // Reports CRUD samples

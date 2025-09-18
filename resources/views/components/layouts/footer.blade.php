@@ -63,19 +63,24 @@
                             @if ((bool) ($features['category'] ?? false))
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('categories.index', ['locale' => app()->getLocale()]) }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_categories') }}</x-footer-link>
+                                                   href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_categories') }}</x-footer-link>
                                 </li>
                             @endif
-                            @if ((bool) ($features['collection'] ?? false) && \Illuminate\Support\Facades\Route::has('collections.index'))
+                            @if ((bool) ($features['collection'] ?? false))
+                                @php
+                                    $collectionUrl = \Illuminate\Support\Facades\Route::has('localized.collections.index')
+                                        ? route('localized.collections.index', ['locale' => app()->getLocale()])
+                                        : url('/' . app()->getLocale() . '/collections');
+                                @endphp
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('collections.index', ['locale' => app()->getLocale()]) }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_collections') }}</x-footer-link>
+                                                   href="{{ $collectionUrl }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_collections') }}</x-footer-link>
                                 </li>
                             @endif
                             @if ((bool) ($features['brand'] ?? false))
                                 <li>
                                     <x-footer-link
-                                                   href="{{ route('brands.index', ['locale' => app()->getLocale()]) }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_brands') }}</x-footer-link>
+                                                   href="{{ route('localized.brands.index', ['locale' => app()->getLocale()]) }}" class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_brands') }}</x-footer-link>
                                 </li>
                             @endif
                             <li>

@@ -64,7 +64,7 @@
                 <div class="mt-12">
                     <h3 class="text-lg font-semibold text-gray-700 mb-6">{{ __('Popular Pages') }}</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <a href="{{ route('categories.index', ['locale' => app()->getLocale()]) ?? '/categories' }}"
+                        <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                            class="text-center p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-soft transition-all duration-200">
                             <svg class="w-8 h-8 text-blue-600 mx-auto mb-2" fill="none" stroke="currentColor"
                                  viewBox="0 0 24 24">
@@ -85,7 +85,7 @@
                             <span class="text-sm font-medium text-gray-700">{{ __('Products') }}</span>
                         </a>
 
-                        <a href="{{ route('brands.index', ['locale' => app()->getLocale()]) ?? '/brands' }}"
+                        <a href="{{ route('localized.brands.index', ['locale' => app()->getLocale()]) }}"
                            class="text-center p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-soft transition-all duration-200">
                             <svg class="w-8 h-8 text-blue-600 mx-auto mb-2" fill="none" stroke="currentColor"
                                  viewBox="0 0 24 24">
@@ -112,4 +112,3 @@
         </div>
     </div>
 @endsection
-

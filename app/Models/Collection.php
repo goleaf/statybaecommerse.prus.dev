@@ -1,6 +1,5 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
@@ -8,19 +7,20 @@ use App\Models\Scopes\VisibleScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 /**
  * Collection
- * 
+ *
  * Eloquent model representing the Collection entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property mixed $table
  * @property mixed $fillable
  * @property mixed $translatable
@@ -37,9 +37,11 @@ final class Collection extends Model implements HasMedia
     use HasFactory, SoftDeletes;
     use HasTranslations;
     use InteractsWithMedia;
+
     protected $table = 'collections';
     protected $fillable = ['name', 'slug', 'description', 'is_visible', 'sort_order', 'seo_title', 'seo_description', 'is_automatic', 'rules', 'max_products', 'is_active', 'meta_title', 'meta_description', 'meta_keywords', 'display_type', 'products_per_page', 'show_filters'];
     public static $translatable = ['name', 'description', 'meta_title', 'meta_description', 'meta_keywords'];
+
     /**
      * Handle casts functionality with proper error handling.
      * @return array
@@ -48,13 +50,16 @@ final class Collection extends Model implements HasMedia
     {
         return ['is_visible' => 'boolean', 'sort_order' => 'integer', 'is_automatic' => 'boolean', 'rules' => 'array', 'is_active' => 'boolean', 'products_per_page' => 'integer', 'show_filters' => 'boolean', 'meta_keywords' => 'array'];
     }
+
     /**
      * The accessors to append to the model's array form.
      *
      * @var array<int, string>
      */
     protected $appends = ['products_count', 'image'];
+
     protected string $translationModel = \App\Models\Translations\CollectionTranslation::class;
+
     /**
      * Handle booted functionality with proper error handling.
      * @return void
@@ -68,6 +73,7 @@ final class Collection extends Model implements HasMedia
             self::flushCaches();
         });
     }
+
     /**
      * Handle getRouteKeyName functionality with proper error handling.
      * @return string
@@ -76,6 +82,7 @@ final class Collection extends Model implements HasMedia
     {
         return 'slug';
     }
+
     /**
      * Handle flushCaches functionality with proper error handling.
      * @return void
@@ -87,6 +94,7 @@ final class Collection extends Model implements HasMedia
             Cache::forget("sitemap:urls:{$loc}");
         }
     }
+
     /**
      * Handle products functionality with proper error handling.
      * @return BelongsToMany
@@ -95,6 +103,7 @@ final class Collection extends Model implements HasMedia
     {
         return $this->belongsToMany(Product::class, 'product_collections');
     }
+
     /**
      * Handle rules functionality with proper error handling.
      * @return HasMany
@@ -103,6 +112,7 @@ final class Collection extends Model implements HasMedia
     {
         return $this->hasMany(CollectionRule::class);
     }
+
     /**
      * Handle scopeVisible functionality with proper error handling.
      * @param mixed $query
@@ -111,6 +121,7 @@ final class Collection extends Model implements HasMedia
     {
         return $query->where('is_visible', true);
     }
+
     /**
      * Handle scopeManual functionality with proper error handling.
      * @param mixed $query
@@ -119,6 +130,7 @@ final class Collection extends Model implements HasMedia
     {
         return $query->where('is_automatic', false);
     }
+
     /**
      * Handle scopeAutomatic functionality with proper error handling.
      * @param mixed $query
@@ -127,6 +139,7 @@ final class Collection extends Model implements HasMedia
     {
         return $query->where('is_automatic', true);
     }
+
     /**
      * Handle scopeOrdered functionality with proper error handling.
      * @param mixed $query
@@ -135,6 +148,7 @@ final class Collection extends Model implements HasMedia
     {
         return $query->orderBy('sort_order');
     }
+
     /**
      * Handle scopeActive functionality with proper error handling.
      * @param mixed $query
@@ -143,6 +157,7 @@ final class Collection extends Model implements HasMedia
     {
         return $query->where('is_active', true);
     }
+
     /**
      * Handle isManual functionality with proper error handling.
      * @return bool
@@ -151,6 +166,7 @@ final class Collection extends Model implements HasMedia
     {
         return !$this->is_automatic;
     }
+
     /**
      * Handle isAutomatic functionality with proper error handling.
      * @return bool
@@ -159,6 +175,7 @@ final class Collection extends Model implements HasMedia
     {
         return (bool) $this->is_automatic;
     }
+
     /**
      * Handle getProductsCountAttribute functionality with proper error handling.
      * @return int
@@ -167,6 +184,7 @@ final class Collection extends Model implements HasMedia
     {
         return $this->products()->published()->count();
     }
+
     /**
      * Handle getImageAttribute functionality with proper error handling.
      * @return string|null
@@ -175,6 +193,7 @@ final class Collection extends Model implements HasMedia
     {
         return $this->getFirstMediaUrl('images') ?: null;
     }
+
     /**
      * Handle getImageUrl functionality with proper error handling.
      * @param string|null $size
@@ -189,6 +208,7 @@ final class Collection extends Model implements HasMedia
         $url = $this->getFirstMediaUrl('images', "image-{$size}") ?: $this->getFirstMediaUrl('images');
         return $url ?: '';
     }
+
     /**
      * Handle getBannerUrl functionality with proper error handling.
      * @param string|null $size
@@ -203,6 +223,7 @@ final class Collection extends Model implements HasMedia
         $url = $this->getFirstMediaUrl('banner', "banner-{$size}") ?: $this->getFirstMediaUrl('banner');
         return $url ?: '';
     }
+
     /**
      * Handle registerMediaCollections functionality with proper error handling.
      * @return void
@@ -212,7 +233,9 @@ final class Collection extends Model implements HasMedia
         $this->addMediaCollection('images')->singleFile()->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
         $this->addMediaCollection('banner')->singleFile()->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
+
     // Advanced Translation Methods
+
     /**
      * Handle getTranslatedName functionality with proper error handling.
      * @param string|null $locale
@@ -223,6 +246,7 @@ final class Collection extends Model implements HasMedia
         $translated = $this->trans('name', $locale);
         return $translated ?: $this->name;
     }
+
     /**
      * Handle getTranslatedDescription functionality with proper error handling.
      * @param string|null $locale
@@ -233,6 +257,7 @@ final class Collection extends Model implements HasMedia
         $translated = $this->trans('description', $locale);
         return $translated ?: $this->description;
     }
+
     /**
      * Handle getTranslatedSlug functionality with proper error handling.
      * @param string|null $locale
@@ -243,6 +268,7 @@ final class Collection extends Model implements HasMedia
         $translated = $this->trans('slug', $locale);
         return $translated ?: $this->slug;
     }
+
     /**
      * Handle getTranslatedMetaTitle functionality with proper error handling.
      * @param string|null $locale
@@ -253,6 +279,7 @@ final class Collection extends Model implements HasMedia
         $translated = $this->trans('meta_title', $locale);
         return $translated ?: $this->meta_title;
     }
+
     /**
      * Handle getTranslatedMetaDescription functionality with proper error handling.
      * @param string|null $locale
@@ -263,6 +290,7 @@ final class Collection extends Model implements HasMedia
         $translated = $this->trans('meta_description', $locale);
         return $translated ?: $this->meta_description;
     }
+
     /**
      * Handle getTranslatedMetaKeywords functionality with proper error handling.
      * @param string|null $locale
@@ -273,7 +301,9 @@ final class Collection extends Model implements HasMedia
         $translated = $this->trans('meta_keywords', $locale);
         return $translated ?: $this->meta_keywords;
     }
+
     // Scope for translated collections
+
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      * @param mixed $query
@@ -286,7 +316,9 @@ final class Collection extends Model implements HasMedia
             $q->where('locale', $locale);
         }]);
     }
+
     // Translation Management Methods
+
     /**
      * Handle getAvailableLocales functionality with proper error handling.
      * @return array
@@ -295,6 +327,7 @@ final class Collection extends Model implements HasMedia
     {
         return $this->translations()->pluck('locale')->unique()->values()->toArray();
     }
+
     /**
      * Handle hasTranslationFor functionality with proper error handling.
      * @param string $locale
@@ -304,6 +337,7 @@ final class Collection extends Model implements HasMedia
     {
         return $this->translations()->where('locale', $locale)->exists();
     }
+
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
      * @param string $locale
@@ -313,6 +347,7 @@ final class Collection extends Model implements HasMedia
     {
         return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'meta_title' => $this->meta_title, 'meta_description' => $this->meta_description, 'meta_keywords' => $this->meta_keywords]);
     }
+
     /**
      * Handle updateTranslation functionality with proper error handling.
      * @param string $locale
@@ -324,6 +359,7 @@ final class Collection extends Model implements HasMedia
         $translation = $this->getOrCreateTranslation($locale);
         return $translation->update($data);
     }
+
     /**
      * Handle updateTranslations functionality with proper error handling.
      * @param array $translations
@@ -336,7 +372,9 @@ final class Collection extends Model implements HasMedia
         }
         return true;
     }
+
     // Helper Methods
+
     /**
      * Handle getFullDisplayName functionality with proper error handling.
      * @param string|null $locale
@@ -348,6 +386,7 @@ final class Collection extends Model implements HasMedia
         $type = $this->is_automatic ? 'Auto' : 'Manual';
         return "{$name} ({$type})";
     }
+
     /**
      * Handle getCollectionInfo functionality with proper error handling.
      * @return array
@@ -356,6 +395,7 @@ final class Collection extends Model implements HasMedia
     {
         return ['id' => $this->id, 'name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'type' => $this->is_automatic ? 'automatic' : 'manual', 'is_visible' => $this->is_visible, 'products_count' => $this->getProductsCountAttribute(), 'display_type' => $this->display_type, 'products_per_page' => $this->products_per_page, 'show_filters' => $this->show_filters, 'sort_order' => $this->sort_order];
     }
+
     /**
      * Handle getSeoInfo functionality with proper error handling.
      * @return array
@@ -364,6 +404,7 @@ final class Collection extends Model implements HasMedia
     {
         return ['seo_title' => $this->seo_title, 'seo_description' => $this->seo_description, 'meta_title' => $this->meta_title, 'meta_description' => $this->meta_description, 'meta_keywords' => $this->meta_keywords];
     }
+
     /**
      * Handle getBusinessInfo functionality with proper error handling.
      * @return array
@@ -372,6 +413,7 @@ final class Collection extends Model implements HasMedia
     {
         return ['products_count' => $this->getProductsCountAttribute(), 'max_products' => $this->max_products, 'display_type' => $this->display_type, 'products_per_page' => $this->products_per_page, 'show_filters' => $this->show_filters, 'sort_order' => $this->sort_order, 'is_active' => $this->is_active, 'is_visible' => $this->is_visible, 'is_automatic' => $this->is_automatic];
     }
+
     /**
      * Handle getCompleteInfo functionality with proper error handling.
      * @param string|null $locale
@@ -381,6 +423,7 @@ final class Collection extends Model implements HasMedia
     {
         return array_merge($this->getCollectionInfo(), $this->getSeoInfo(), $this->getBusinessInfo(), ['translations' => $this->getAvailableLocales(), 'has_translations' => count($this->getAvailableLocales()) > 0, 'image_url' => $this->getImageUrl(), 'banner_url' => $this->getBannerUrl(), 'created_at' => $this->created_at?->toISOString(), 'updated_at' => $this->updated_at?->toISOString()]);
     }
+
     /**
      * Handle registerMediaConversions functionality with proper error handling.
      * @param Media|null $media

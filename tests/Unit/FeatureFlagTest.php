@@ -68,7 +68,8 @@ class FeatureFlagTest extends TestCase
         $enabledFlag = FeatureFlag::factory()->create(['is_enabled' => true]);
         $disabledFlag = FeatureFlag::factory()->create(['is_enabled' => false]);
 
-        $disabledFlags = FeatureFlag::disabled()->get();
+        // Use withoutGlobalScopes to bypass the EnabledScope that filters out disabled flags
+        $disabledFlags = FeatureFlag::withoutGlobalScopes()->disabled()->get();
 
         $this->assertFalse($disabledFlags->contains($enabledFlag));
         $this->assertTrue($disabledFlags->contains($disabledFlag));

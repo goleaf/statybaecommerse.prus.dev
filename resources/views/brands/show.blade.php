@@ -18,8 +18,8 @@
         :description="$brand->getTranslatedDescription()"
         icon="heroicon-o-tag"
         :breadcrumbs="[
-            ['title' => __('shared.home'), 'url' => route('home')],
-            ['title' => __('shared.brands'), 'url' => route('localized.brands.index')],
+            ['title' => __('shared.home'), 'url' => route('localized.home', ['locale' => app()->getLocale()])],
+            ['title' => __('shared.brands'), 'url' => route('localized.brands.index', ['locale' => app()->getLocale()])],
             ['title' => $brand->getTranslatedName()]
         ]"
     />
@@ -92,7 +92,7 @@
                 </h2>
                 
                 @if($brand->products()->where('is_visible', true)->whereNotNull('published_at')->count() > 12)
-                    <a href="{{ route('localized.products.index', ['brand' => $brand->getTranslatedSlug()]) }}" 
+                    <a href="{{ route('localized.products.index', ['locale' => app()->getLocale(), 'brand' => $brand->getTranslatedSlug()]) }}" 
                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         {{ __('View All Products') }}
                         <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +156,7 @@
                             </div>
                             
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 p-4">
-                                <a href="{{ route('localized.brands.show', $relatedBrand->getTranslatedSlug()) }}" class="stretched-link">
+                                <a href="{{ route('localized.brands.show', ['locale' => app()->getLocale(), 'slug' => $relatedBrand->getTranslatedSlug()]) }}" class="stretched-link">
                                     {{ $relatedBrand->getTranslatedName() }}
                                 </a>
                             </h3>

@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Menu;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Route;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 /**
@@ -105,7 +106,11 @@ final class NavigationMenu extends Component
         if (empty($this->searchQuery)) {
             return;
         }
-        $this->redirect(route('search', ['q' => $this->searchQuery, 'locale' => app()->getLocale()]));
+        $this->redirect(
+            Route::has('localized.search')
+                ? route('localized.search', ['locale' => app()->getLocale(), 'q' => $this->searchQuery])
+                : route('search', ['q' => $this->searchQuery])
+        );
     }
     /**
      * Render the Livewire component view with current state.

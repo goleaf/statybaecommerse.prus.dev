@@ -71,7 +71,7 @@
 
             <div class="flex items-center space-x-4">
                 <a
-                   href="{{ route('categories.index') }}"
+                   href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                    class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                     {{ __('translations.view_all_categories') }}
                 </a>

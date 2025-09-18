@@ -26,7 +26,23 @@ final class CollectionController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Collection::withTranslations()->visible()->ordered();
+        $query = Collection::withTranslations()
+            ->visible()
+            ->ordered()
+            ->with([
+                'products' => function ($productQuery) {
+                    $productQuery
+                        ->published()
+                        ->with(['media', 'brand', 'categories'])
+                        ->orderByDesc('published_at')
+                        ->limit(4);
+                },
+            ])
+            ->withCount([
+                'products as published_products_count' => function ($countQuery) {
+                    $countQuery->published();
+                },
+            ]);
         // Apply filters
         if ($request->filled('type')) {
             $query->where('is_automatic', $request->get('type') === 'automatic');

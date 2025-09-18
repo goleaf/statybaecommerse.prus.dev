@@ -82,7 +82,7 @@
                     {{ __('Home') }}
                 </a>
 
-                <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
                    class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -91,7 +91,7 @@
                     {{ __('Products') }}
                 </a>
 
-                <a href="{{ route('categories.index', ['locale' => app()->getLocale()]) ?? '/categories' }}"
+                <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                    class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -101,7 +101,7 @@
                     {{ __('Categories') }}
                 </a>
 
-                <a href="{{ route('brands.index', ['locale' => app()->getLocale()]) ?? '/brands' }}"
+                <a href="{{ route('localized.brands.index', ['locale' => app()->getLocale()]) }}"
                    class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -227,4 +227,3 @@
         </div>
     </div>
 </div>
-

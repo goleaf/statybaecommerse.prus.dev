@@ -22,9 +22,24 @@
 
     {{-- Hreflang --}}
     @if (config('app.supported_locales'))
-        @foreach (config('app.supported_locales') as $locale)
-            <link rel="alternate" hreflang="{{ $locale }}"
-                  href="{{ url()->current() }}?locale={{ $locale }}">
+        @php
+            $route = request()->route();
+            $alternateUrls = [];
+
+            if ($route && ($name = $route->getName()) && str_starts_with($name, 'localized.')) {
+                foreach ((array) config('app.supported_locales') as $locale) {
+                    $parameters = $route->parameters();
+                    $parameters['locale'] = $locale;
+                    $alternateUrls[$locale] = route($name, $parameters, true);
+                }
+            } else {
+                foreach ((array) config('app.supported_locales') as $locale) {
+                    $alternateUrls[$locale] = url('/' . ltrim($locale, '/'));
+                }
+            }
+        @endphp
+        @foreach ($alternateUrls as $locale => $alternateUrl)
+            <link rel="alternate" hreflang="{{ $locale }}" href="{{ $alternateUrl }}">
         @endforeach
     @endif
 

@@ -37,7 +37,7 @@
                             
                             <div class="p-4">
                                 <h3 class="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                                    <a href="{{ route('localized.products.show', $product->slug) }}" 
+                                    <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->slug]) }}" 
                                        class="hover:text-blue-600 dark:hover:text-blue-400">
                                         {{ $product->name }}
                                     </a>
@@ -72,7 +72,7 @@
                 
                 @if($brand->products()->where('is_visible', true)->whereNotNull('published_at')->count() > 12)
                     <div class="mt-8 text-center">
-                        <a href="{{ route('localized.products.index', ['brand' => $brand->slug]) }}" 
+                        <a href="{{ route('localized.products.index', ['locale' => app()->getLocale(), 'brand' => $brand->slug]) }}" 
                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             {{ __('View all products by :brand', ['brand' => $brand->name]) }}
                         </a>
@@ -120,7 +120,7 @@
 
         <!-- Back Button -->
         <div class="mt-8 text-center">
-            <a href="{{ route('brands.index', ['locale' => app()->getLocale()]) }}" 
+            <a href="{{ route('localized.brands.index', ['locale' => app()->getLocale()]) }}" 
                class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition duration-200">
                 <x-heroicon-o-arrow-left class="w-4 h-4 mr-2" />
                 {{ __('frontend.buttons.back_to_brands') }}

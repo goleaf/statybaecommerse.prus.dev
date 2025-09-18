@@ -215,11 +215,11 @@
                     {{ __('Start adding products to your wishlist by clicking the heart icon on any product page.') }}
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                    <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
                        class="btn-gradient px-8 py-3 rounded-xl font-semibold">
                         {{ __('Browse Products') }}
                     </a>
-                    <a href="{{ route('categories.index', ['locale' => app()->getLocale()]) ?? '/categories' }}"
+                    <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                        class="border-2 border-gray-300 text-gray-700 px-8 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
                         {{ __('View Categories') }}
                     </a>
@@ -327,4 +327,3 @@
         }
     }
 </script>
-

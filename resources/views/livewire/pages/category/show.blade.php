@@ -3,7 +3,7 @@
         <!-- Enhanced Breadcrumbs -->
         <div class="mb-8">
             <x-breadcrumbs :items="[
-                ['label' => __('translations.categories'), 'url' => route('categories.index')],
+                ['label' => __('translations.categories'), 'url' => route('localized.categories.index', ['locale' => app()->getLocale()])],
                 ['label' => $category->name, 'url' => url()->current()],
             ]" />
         </div>
@@ -258,7 +258,7 @@
                             {{ __('translations.try_different_search') ?? 'Try adjusting your filters or search terms to find what you\'re looking for.' }}
                         </p>
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <a href="{{ route('categories.index') }}"
+                                <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                                class="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-6 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 shadow-sm">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
@@ -280,7 +280,7 @@
 
         <!-- Enhanced Back Button -->
         <div class="mt-12 text-center">
-            <a href="{{ route('categories.index', ['locale' => app()->getLocale()]) }}" 
+            <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}" 
                class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>

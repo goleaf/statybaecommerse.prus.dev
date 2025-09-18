@@ -36,7 +36,13 @@ final class Show extends Component
         // Check if we need to redirect to canonical slug
         $canonicalSlug = $this->getCanonicalSlug($brand);
         if ($canonicalSlug !== $slug) {
-            $this->redirect(route('localized.brands.show', $canonicalSlug), 301);
+            $this->redirect(
+                route('localized.brands.show', [
+                    'locale' => app()->getLocale(),
+                    'slug' => $canonicalSlug,
+                ]),
+                301
+            );
             return;
         }
         $this->brand = $brand;

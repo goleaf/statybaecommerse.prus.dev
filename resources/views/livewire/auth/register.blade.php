@@ -5,127 +5,217 @@
         canonical="{{ url()->current() }}" />
 @endsection
 
-<!-- Modern Registration Page with Enhanced Design -->
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/50 relative overflow-hidden">
-    <!-- Animated Background Elements -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <!-- Floating geometric shapes -->
-        <div class="absolute top-20 left-10 w-32 h-32 bg-blue-400/10 rounded-full blur-xl animate-pulse"></div>
-        <div class="absolute top-40 right-20 w-24 h-24 bg-indigo-400/15 rounded-full blur-lg animate-pulse delay-1000"></div>
-        <div class="absolute bottom-20 left-1/4 w-40 h-40 bg-purple-400/8 rounded-full blur-2xl animate-pulse delay-2000"></div>
-        <div class="absolute bottom-40 right-1/3 w-28 h-28 bg-cyan-400/12 rounded-full blur-xl animate-pulse delay-500"></div>
-        
-        <!-- Grid pattern overlay -->
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
-    </div>
+<x-auth-page>
+    <x-slot:aside>
+        <div class="flex h-full flex-col justify-between">
+            <div class="space-y-8">
+                <div class="space-y-4">
+                    <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
+                        {{ __('Why join us') }}
+                    </span>
 
-    <!-- Main Content Container -->
-    <div class="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
-        <div class="w-full max-w-md space-y-8">
-            <!-- Header Section -->
-            <div class="text-center space-y-4 animate-fade-in-down">
-                <!-- Logo/Brand -->
-                <div class="flex justify-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                    </div>
-                </div>
-                
-                <!-- Title and Description -->
-                <div class="space-y-2">
-                    <h1 class="text-3xl font-bold text-gray-900 font-heading">
-                        {{ __('Create account') }}
-                    </h1>
-                    <p class="text-gray-600 text-sm leading-relaxed">
-                        {{ __('Join our community and start your journey with us') }}
+                    <h2 class="text-3xl font-semibold leading-tight text-white">
+                        {{ __('Unlock curated experiences and faster shopping with Statybae Commerce') }}
+                    </h2>
+
+                    <p class="text-sm leading-relaxed text-white/75">
+                        {{ __('Create a free account to receive exclusive drops, personalised recommendations, and checkout in a fraction of the time on every visit.') }}
                     </p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="rounded-3xl border border-white/15 bg-white/5 p-6">
+                        <p class="text-sm text-white/80">
+                            <span class="block text-xs uppercase tracking-[0.18em] text-white/60">{{ __('Member spotlight') }}</span>
+                            <span class="mt-3 block text-base font-medium text-white">{{ __('“I reorder essentials in seconds and always know what’s arriving.”') }}</span>
+                            <span class="mt-2 block text-xs text-white/60">{{ __('Elena, premium member since 2021') }}</span>
+                        </p>
+                    </div>
+
+                    <ul class="space-y-4 text-sm text-white/80">
+                        <li class="flex items-start gap-3">
+                            <div class="mt-1 flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
+                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <span>{{ __('Earn points and surprise rewards every time you shop.') }}</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="mt-1 flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
+                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l3 2" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 22a10 10 0 100-20 10 10 0 000 20z" />
+                                </svg>
+                            </div>
+                            <span>{{ __('Save multiple addresses and payment preferences for instant checkout.') }}</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="mt-1 flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
+                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m6 14h2a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9h12M7 21H5a2 2 0 01-2-2V9" />
+                                </svg>
+                            </div>
+                            <span>{{ __('Keep order history, invoices, and returns tidy within your dashboard.') }}</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- Registration Form Card -->
-            <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8 space-y-6 animate-fade-in-up">
-                <!-- Form -->
-                <form wire:submit="register" class="space-y-6">
-                    <!-- Form Fields Container -->
-                    <div class="space-y-5">
-                        {!! $this->getSchema('form')?->toEmbeddedHtml() !!}
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="pt-2">
-                        <button 
-                            type="submit" 
-                            wire:loading.attr="disabled"
-                            class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none relative overflow-hidden group">
-                            
-                            <!-- Button Content -->
-                            <span class="relative z-10 flex items-center justify-center space-x-2">
-                                <span wire:loading.remove class="flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                                    </svg>
-                                    <span>{{ __('Create account') }}</span>
-                                </span>
-                                <span wire:loading class="flex items-center space-x-2">
-                                    <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span>{{ __('Creating account...') }}</span>
-                                </span>
-                            </span>
-                            
-                            <!-- Button Shine Effect -->
-                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Divider -->
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-200"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-4 bg-white text-gray-500 font-medium">{{ __('Or continue with') }}</span>
-                    </div>
-                </div>
-
-                <!-- OAuth Section -->
-                <div class="space-y-3">
-                    <x-auth-oauth />
-                </div>
-
-                <!-- Login Link -->
-                <div class="text-center pt-4">
-                    <p class="text-sm text-gray-600">
-                        {{ __('Already registered?') }}
-                        <x-link 
-                            :href="route('login', ['locale' => app()->getLocale()])"
-                            class="font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-200 ml-1">
-                            {{ __('Sign in') }}
-                        </x-link>
-                    </p>
-                </div>
-            </div>
-
-            <!-- Terms and Privacy -->
-            <div class="text-center animate-fade-in-up" style="animation-delay: 0.2s;">
-                <p class="text-xs text-gray-500 leading-relaxed max-w-sm mx-auto">
-                    {{ __('By registering to create an account, you agree to our') }}
-                    <x-link href="#" class="font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200">
-                        {{ __('terms & conditions') }}
+            <div class="mt-10 rounded-2xl border border-white/20 bg-white/5 p-6">
+                <p class="text-sm text-white/80">
+                    {{ __('Already have an account?') }}
+                    <x-link :href="route('login')" class="ml-1 font-semibold text-white hover:text-white/90">
+                        {{ __('Sign in instead') }}
                     </x-link>
-                    {{ __('and') }}
-                    <x-link href="#" class="font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200">
-                        {{ __('privacy policy') }}
-                    </x-link>.
                 </p>
             </div>
         </div>
-    </div>
-</div>
+    </x-slot:aside>
 
-<x-filament-actions::modals />
+    <div class="space-y-10">
+        <div class="space-y-4 text-center">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-indigo-400 to-blue-500 shadow-lg">
+                <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+            </div>
+
+            <div class="space-y-2">
+                <h1 class="text-3xl font-bold text-slate-900 sm:text-4xl">
+                    {{ __('Create your account') }}
+                </h1>
+                <p class="text-base text-slate-600">
+                    {{ __('Join our community and make every order easier, smarter, and more rewarding.') }}
+                </p>
+            </div>
+        </div>
+
+        <form wire:submit="register" class="space-y-7">
+            <div class="grid gap-5 sm:grid-cols-2">
+                <div class="space-y-2">
+                    <x-forms.label for="first_name" :value="__('First name')" />
+                    <x-forms.input
+                        id="first_name"
+                        type="text"
+                        wire:model.defer="registrationForm.first_name"
+                        autocomplete="given-name"
+                        class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        placeholder="{{ __('Jane') }}"
+                    />
+                    <x-forms.errors :messages="$errors->get('registrationForm.first_name')" class="mt-1" />
+                </div>
+
+                <div class="space-y-2">
+                    <x-forms.label for="last_name" :value="__('Last name')" />
+                    <x-forms.input
+                        id="last_name"
+                        type="text"
+                        wire:model.defer="registrationForm.last_name"
+                        autocomplete="family-name"
+                        class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        placeholder="{{ __('Doe') }}"
+                    />
+                    <x-forms.errors :messages="$errors->get('registrationForm.last_name')" class="mt-1" />
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <x-forms.label for="email" :value="__('Email address')" />
+                <x-forms.input
+                    id="email"
+                    type="email"
+                    wire:model.defer="registrationForm.email"
+                    autocomplete="email"
+                    class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                    placeholder="{{ __('you@example.com') }}"
+                />
+                <x-forms.errors :messages="$errors->get('registrationForm.email')" class="mt-1" />
+            </div>
+
+            <div class="grid gap-5 sm:grid-cols-2">
+                <div class="space-y-2">
+                    <x-forms.label for="password" :value="__('Password')" />
+                    <x-forms.input
+                        id="password"
+                        type="password"
+                        wire:model.defer="registrationForm.password"
+                        autocomplete="new-password"
+                        class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        placeholder="••••••••"
+                    />
+                    <x-forms.errors :messages="$errors->get('registrationForm.password')" class="mt-1" />
+                    <p class="text-xs text-slate-400">
+                        {{ __('Use at least 8 characters with a mix of letters, numbers & symbols.') }}
+                    </p>
+                </div>
+
+                <div class="space-y-2">
+                    <x-forms.label for="password_confirmation" :value="__('Confirm password')" />
+                    <x-forms.input
+                        id="password_confirmation"
+                        type="password"
+                        wire:model.defer="registrationForm.password_confirmation"
+                        autocomplete="new-password"
+                        class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        placeholder="••••••••"
+                    />
+                    <x-forms.errors :messages="$errors->get('registrationForm.password_confirmation')" class="mt-1" />
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-3 text-xs text-slate-500">
+                <svg class="h-5 w-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11c0 5-7 10-7 10s-7-5-7-10a7 7 0 1114 0z" />
+                </svg>
+                <p>
+                    {{ __('We safeguard your personal data with enterprise-grade security and never share it without consent.') }}
+                </p>
+            </div>
+
+            <button
+                type="submit"
+                wire:loading.attr="disabled"
+                class="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-500 to-blue-500 px-5 py-3.5 text-base font-semibold text-white shadow-lg transition hover:from-indigo-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70"
+            >
+                <span wire:loading.remove>
+                    {{ __('Create account') }}
+                </span>
+                <span wire:loading class="inline-flex items-center gap-2">
+                    <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {{ __('Creating account...') }}
+                </span>
+            </button>
+        </form>
+
+        <div class="space-y-5">
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div class="w-full border-t border-slate-200"></div>
+                </div>
+                <div class="relative flex justify-center">
+                    <span class="bg-white px-4 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                        {{ __('Or join with') }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid gap-3">
+                <x-auth-oauth />
+            </div>
+        </div>
+
+        <p class="text-center text-xs text-slate-400">
+            {{ __('By creating an account you agree to our') }}
+            <x-link href="#" class="text-indigo-500 hover:text-indigo-600">{{ __('Terms of Service') }}</x-link>
+            {{ __('and') }}
+            <x-link href="#" class="text-indigo-500 hover:text-indigo-600">{{ __('Privacy Policy') }}</x-link>.
+        </p>
+    </div>
+</x-auth-page>

@@ -10,16 +10,21 @@ beforeEach(function () {
     // Run the package/app migrations to ensure tables exist
     $this->artisan('migrate', ['--force' => true]);
     
-    // Clean up any existing data
+    // Clean up any existing data - disable foreign key checks for SQLite
+    DB::statement('PRAGMA foreign_keys=OFF');
+    
     if (Schema::hasTable('discount_codes')) {
-        DB::table('discount_codes')->truncate();
+        DB::table('discount_codes')->delete();
     }
     if (Schema::hasTable('discounts')) {
-        DB::table('discounts')->truncate();
+        DB::table('discounts')->delete();
     }
     if (Schema::hasTable('orders')) {
-        DB::table('orders')->truncate();
+        DB::table('orders')->delete();
     }
+    
+    // Re-enable foreign key checks
+    DB::statement('PRAGMA foreign_keys=ON');
     if (!Schema::hasTable('discounts')) {
         Schema::create('discounts', function ($table) {
             $table->id();
@@ -139,6 +144,7 @@ beforeEach(function () {
 it('applies percentage cart discount with code', function () {
     // seed minimal discount
     $data = [
+        'name' => 'Test Discount',
         'type' => 'percentage',
         'value' => 10,
         'status' => 'active',
@@ -197,6 +203,7 @@ it('respects first order only flag', function () {
     }
     $uid = DB::table('users')->insertGetId($userInsert);
     $data2 = [
+        'name' => 'First Order Discount',
         'type' => 'fixed',
         'value' => 5,
         'status' => 'active',
@@ -227,7 +234,7 @@ it('respects first order only flag', function () {
     $r1 = $engine->evaluate(['user_id' => $uid, 'currency_code' => 'EUR', 'zone_id' => 1, 'now' => now(), 'cart' => ['subtotal' => 20, 'items' => []]]);
     expect($r1['discount_total_amount'])->toBe(5.0);
     // Simulate order
-    DB::table('orders')->insert(['customer_id' => $uid, 'status' => 'completed', 'currency_code' => 'EUR', 'subtotal_amount' => 0, 'discount_total_amount' => 0, 'tax_total_amount' => 0, 'shipping_total_amount' => 0, 'grand_total_amount' => 0, 'number' => 'X', 'created_at' => now(), 'updated_at' => now()]);
+    DB::table('orders')->insert(['user_id' => $uid, 'status' => 'completed', 'currency' => 'EUR', 'subtotal' => 0, 'discount_amount' => 0, 'tax_amount' => 0, 'shipping_amount' => 0, 'total' => 0, 'number' => 'X', 'created_at' => now(), 'updated_at' => now()]);
     $r2 = $engine->evaluate(['user_id' => $uid, 'currency_code' => 'EUR', 'zone_id' => 1, 'now' => now(), 'cart' => ['subtotal' => 20, 'items' => []]]);
     expect($r2['discount_total_amount'])->toBe(0.0);
 });
