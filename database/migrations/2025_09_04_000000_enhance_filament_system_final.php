@@ -22,7 +22,9 @@ return new class extends Migration
         ];
 
         if ($legacyTables !== []) {
-            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            if (DB::getDriverName() === 'mysql') {
+                DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            }
 
             try {
                 foreach ($legacyTables as $table) {
@@ -31,7 +33,9 @@ return new class extends Migration
                     }
                 }
             } finally {
-                DB::statement('SET FOREIGN_KEY_CHECKS=1');
+                if (DB::getDriverName() === 'mysql') {
+                    DB::statement('SET FOREIGN_KEY_CHECKS=1');
+                }
             }
         }
 

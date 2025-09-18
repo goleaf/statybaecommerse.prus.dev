@@ -39,7 +39,7 @@ final class Brand extends Model implements HasMedia
     use HasTranslations;
     use InteractsWithMedia;
     use LogsActivity;
-    protected $fillable = ['name', 'slug', 'description', 'website', 'is_enabled', 'is_featured', 'seo_title', 'seo_description'];
+    protected $fillable = ['name', 'slug', 'description', 'website', 'is_enabled', 'is_visible', 'is_featured', 'seo_title', 'seo_description'];
     /**
      * Handle casts functionality with proper error handling.
      * @return array
@@ -48,6 +48,7 @@ final class Brand extends Model implements HasMedia
     {
         return [
             'is_enabled' => 'boolean',
+            'is_visible' => 'boolean',
             'is_featured' => 'boolean'
         ];
     }
@@ -87,7 +88,7 @@ final class Brand extends Model implements HasMedia
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'website', 'is_enabled'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "Brand {$eventName}")->useLogName('brand');
+        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'website', 'is_enabled', 'is_visible'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "Brand {$eventName}")->useLogName('brand');
     }
     /**
      * Handle flushCaches functionality with proper error handling.
@@ -115,6 +116,14 @@ final class Brand extends Model implements HasMedia
     public function scopeEnabled($query)
     {
         return $query->where('is_enabled', true);
+    }
+    /**
+     * Handle scopeVisible functionality with proper error handling.
+     * @param mixed $query
+     */
+    public function scopeVisible($query)
+    {
+        return $query->where('is_visible', true);
     }
     /**
      * Handle scopeWithProducts functionality with proper error handling.

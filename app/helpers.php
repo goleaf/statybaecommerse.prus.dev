@@ -196,7 +196,7 @@ if (! function_exists('format_time')) {
 if (! function_exists('app_feature_enabled')) {
     function app_feature_enabled(string $featureName): bool
     {
-        $feature = config('app.features.'.$featureName);
+        $feature = config('app-features.features.'.$featureName);
         if ($feature instanceof \App\Support\FeatureState) {
             return $feature === \App\Support\FeatureState::Enabled;
         }

@@ -34,6 +34,7 @@ return [
         'description' => 'Description',
         'website' => 'Website',
         'is_enabled' => 'Enabled',
+        'is_visible' => 'Visible',
         'logo' => 'Logo',
         'banner' => 'Banner',
         'seo_title' => 'SEO Title',

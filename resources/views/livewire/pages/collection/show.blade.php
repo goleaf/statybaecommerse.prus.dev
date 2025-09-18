@@ -51,7 +51,7 @@
         </x-alert>
     @endif
     <x-breadcrumbs :items="[
-        ['label' => __('Collections'), 'url' => route('collection.index', ['locale' => app()->getLocale()])],
+        ['label' => __('Collections'), 'url' => route('localized.collections.index', ['locale' => app()->getLocale()])],
         ['label' => $collection->trans('name') ?? $collection->name],
     ]" />
     <div class="flex items-center justify-between mb-6">

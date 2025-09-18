@@ -54,7 +54,7 @@ class Show extends Component
         $locale = app()->getLocale();
         $canonical = $this->collection->translations()->where('locale', $locale)->value('slug') ?: $this->collection->slug;
         if ($canonical && $canonical !== $this->slug) {
-            redirect()->to(route('collections.show', ['locale' => $locale, 'slug' => $canonical]), 301)->send();
+            redirect()->to(route('localized.collections.show', ['locale' => $locale, 'collection' => $canonical]), 301)->send();
             exit;
         }
     }

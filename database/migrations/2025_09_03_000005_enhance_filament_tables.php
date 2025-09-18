@@ -241,16 +241,29 @@ return new class extends Migration
                 $createdColumn = in_array('created_at', $columns, true) ? 'created_at' : 'CURRENT_TIMESTAMP';
                 $updatedColumn = in_array('updated_at', $columns, true) ? 'updated_at' : 'CURRENT_TIMESTAMP';
 
-                DB::statement('CREATE TABLE tmp_customer_group_user (
-                    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                    customer_group_id BIGINT UNSIGNED NOT NULL,
-                    user_id BIGINT UNSIGNED NOT NULL,
-                    assigned_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-                    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-                    UNIQUE KEY customer_group_user_unique (customer_group_id, user_id),
-                    KEY customer_group_user_user_id_index (user_id)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci');
+                if (DB::getDriverName() === 'mysql') {
+                    DB::statement('CREATE TABLE tmp_customer_group_user (
+                        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        customer_group_id BIGINT UNSIGNED NOT NULL,
+                        user_id BIGINT UNSIGNED NOT NULL,
+                        assigned_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                        created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                        UNIQUE KEY customer_group_user_unique (customer_group_id, user_id),
+                        KEY customer_group_user_user_id_index (user_id)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci');
+                } else {
+                    // SQLite compatible version
+                    DB::statement('CREATE TABLE tmp_customer_group_user (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        customer_group_id INTEGER NOT NULL,
+                        user_id INTEGER NOT NULL,
+                        assigned_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                        created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                        UNIQUE (customer_group_id, user_id)
+                    )');
+                }
 
                 DB::statement("INSERT INTO tmp_customer_group_user (customer_group_id, user_id, assigned_at, created_at, updated_at)
                         SELECT {$groupColumn}, user_id, {$assignedColumn}, {$createdColumn}, {$updatedColumn} FROM customer_group_user");
@@ -258,8 +271,11 @@ return new class extends Migration
                 DB::statement('DROP TABLE customer_group_user');
                 DB::statement('ALTER TABLE tmp_customer_group_user RENAME TO customer_group_user');
 
-                DB::statement('ALTER TABLE customer_group_user ADD CONSTRAINT customer_group_user_customer_group_id_foreign FOREIGN KEY (customer_group_id) REFERENCES customer_groups(id) ON DELETE CASCADE');
-                DB::statement('ALTER TABLE customer_group_user ADD CONSTRAINT customer_group_user_user_id_foreign FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE');
+                if (DB::getDriverName() === 'mysql') {
+                    DB::statement('ALTER TABLE customer_group_user ADD CONSTRAINT customer_group_user_customer_group_id_foreign FOREIGN KEY (customer_group_id) REFERENCES customer_groups(id) ON DELETE CASCADE');
+                    DB::statement('ALTER TABLE customer_group_user ADD CONSTRAINT customer_group_user_user_id_foreign FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE');
+                }
+                // SQLite doesn't support adding foreign key constraints after table creation
             }
         } elseif (! Schema::hasTable('customer_group_user')) {
             Schema::create('customer_group_user', function (Blueprint $table) {

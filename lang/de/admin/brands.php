@@ -34,6 +34,7 @@ return [
         'description' => 'Beschreibung',
         'website' => 'Website',
         'is_enabled' => 'Aktiviert',
+        'is_visible' => 'Sichtbar',
         'logo' => 'Logo',
         'banner' => 'Banner',
         'seo_title' => 'SEO-Titel',

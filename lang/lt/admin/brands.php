@@ -34,6 +34,7 @@ return [
         'description' => 'Aprašymas',
         'website' => 'Svetainė',
         'is_enabled' => 'Aktyvus',
+        'is_visible' => 'Matomas',
         'logo' => 'Logotipas',
         'banner' => 'Baneris',
         'seo_title' => 'SEO pavadinimas',

@@ -40,7 +40,7 @@ final class BrandResource extends Resource
     protected static ?string $model = Brand::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
     
     protected static ?int $navigationSort = 2;
     protected static ?string $recordTitleAttribute = 'name';
@@ -161,10 +161,14 @@ final class BrandResource extends Resource
             
             Section::make(__('brands.settings'))
                 ->schema([
-                    Grid::make(2)
+                    Grid::make(3)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('brands.is_active'))
+                                ->default(true),
+                            
+                            Toggle::make('is_visible')
+                                ->label(__('brands.is_visible'))
                                 ->default(true),
                             
                             Toggle::make('is_featured')
@@ -208,6 +212,11 @@ final class BrandResource extends Resource
                 
                 IconColumn::make('is_active')
                     ->label(__('brands.is_active'))
+                    ->boolean()
+                    ->sortable(),
+                
+                IconColumn::make('is_visible')
+                    ->label(__('brands.is_visible'))
                     ->boolean()
                     ->sortable(),
                 

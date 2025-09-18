@@ -933,6 +933,10 @@ Route::prefix('{locale}')
         // Location show by slug
         Route::get('/locations/{slug}', \App\Livewire\Pages\Location\Show::class)->name('localized.locations.show');
 
+        // Collections routes
+        Route::get('/collections', \App\Livewire\Pages\Collection\Index::class)->name('localized.collections.index');
+        Route::get('/collections/{collection}', \App\Livewire\Pages\Collection\Show::class)->name('localized.collections.show');
+
         // Cpanel redirects to non-localized versions
         Route::get('/cpanel', function () {
             return redirect('/cpanel/login');
