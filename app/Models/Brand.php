@@ -39,14 +39,17 @@ final class Brand extends Model implements HasMedia
     use HasTranslations;
     use InteractsWithMedia;
     use LogsActivity;
-    protected $fillable = ['name', 'slug', 'description', 'website', 'is_enabled', 'seo_title', 'seo_description'];
+    protected $fillable = ['name', 'slug', 'description', 'website', 'is_enabled', 'is_featured', 'seo_title', 'seo_description'];
     /**
      * Handle casts functionality with proper error handling.
      * @return array
      */
     protected function casts(): array
     {
-        return ['is_enabled' => 'boolean'];
+        return [
+            'is_enabled' => 'boolean',
+            'is_featured' => 'boolean'
+        ];
     }
     /**
      * The accessors to append to the model's array form.

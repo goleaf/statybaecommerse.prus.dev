@@ -31,6 +31,7 @@ class BrandSeeder extends Seeder
                 'website' => 'https://www.pulte.com',
                 'logo_url' => 'https://picsum.photos/400/400?random=1',
                 'banner_url' => 'https://picsum.photos/1200/600?random=1',
+                'is_featured' => true,
             ],
             [
                 'name' => 'D.R. Horton',
@@ -72,6 +73,7 @@ class BrandSeeder extends Seeder
                 'website' => 'https://www.dewalt.com',
                 'logo_url' => 'https://picsum.photos/400/400?random=6',
                 'banner_url' => 'https://picsum.photos/1200/600?random=6',
+                'is_featured' => true,
             ],
             [
                 'name' => 'Milwaukee Tool',
@@ -80,6 +82,7 @@ class BrandSeeder extends Seeder
                 'website' => 'https://www.milwaukeetool.com',
                 'logo_url' => 'https://picsum.photos/400/400?random=7',
                 'banner_url' => 'https://picsum.photos/1200/600?random=7',
+                'is_featured' => true,
             ],
             [
                 'name' => 'Makita',
@@ -155,6 +158,7 @@ class BrandSeeder extends Seeder
                     'description' => $brandData['description'],
                     'website' => $brandData['website'],
                     'is_enabled' => true,
+                    'is_featured' => $brandData['is_featured'] ?? false,
                 ]
             );
 

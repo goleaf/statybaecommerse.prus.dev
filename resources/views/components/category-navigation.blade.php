@@ -20,7 +20,7 @@
             @foreach ($categories as $category)
                 <div class="relative group flex-shrink-0" x-data="{ open: false }">
                     {{-- Main Category Link --}}
-                    <a href="{{ route('categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug]) ?? '/categories/' . $category->slug }}"
+                    <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug]) }}"
                        class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors duration-200"
                        @mouseenter="open = true"
                        @mouseleave="open = false">

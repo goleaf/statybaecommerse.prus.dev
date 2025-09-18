@@ -1,377 +1,296 @@
 @section('meta')
     <x-meta
-            :title="__('Categories') . ' - ' . config('app.name')"
-            :description="__('Explore our comprehensive range of categories')"
-            canonical="{{ url()->current() }}" />
+        :title="__('Categories') . ' - ' . config('app.name')"
+        :description="__('Explore our comprehensive range of categories')"
+        canonical="{{ url()->current() }}" />
 @endsection
 
-<div>
-    <x-container class="py-6 md:py-10">
-        <nav class="text-sm text-muted-700 mb-3 md:mb-6" aria-label="Breadcrumb">
-            <ol class="list-reset flex items-center gap-2">
-                <li><a href="{{ route('home') }}" class="hover:text-gray-900">{{ __('Home') }}</a></li>
-                <li class="text-gray-400" aria-hidden="true">/</li>
-                <li aria-current="page" class="text-gray-700 font-medium">{{ __('Categories') }}</li>
-            </ol>
-        </nav>
+@php
+    $locale = app()->getLocale();
+    $paginator = $this->categories;
+    $totalCategories = $paginator->total();
+    $from = $paginator->count() ? ($paginator->firstItem() ?? 0) : 0;
+    $to = $paginator->count() ? ($paginator->lastItem() ?? 0) : 0;
+    $activeFilterCount = collect([
+        !empty($search ?? ''),
+        $inStock ?? false,
+        $onSale ?? false,
+        $hasProducts ?? false,
+        filled($priceMin ?? null),
+        filled($priceMax ?? null),
+        !empty($selectedBrandIds ?? []),
+        !empty($selectedCollectionIds ?? []),
+        !empty($selectedCategoryIds ?? []),
+    ])->filter()->count();
+@endphp
 
-        <div class="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-slate-50 to-white p-6 md:p-10">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h1 class="text-2xl md:text-4xl font-bold tracking-tight text-gray-900">{{ __('Categories') }}</h1>
-                    <p class="mt-1 text-gray-600">{{ __('Explore our comprehensive range of categories') }}</p>
-                </div>
-                <div class="flex items-center gap-2 md:gap-3">
-                    <div class="flex-1 md:flex-none md:w-80">
-                        <label for="category-search" class="sr-only">{{ __('Search categories') }}</label>
-                        <div class="relative">
-                            <svg class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
-                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="m21 21-4.35-4.35M11 19a 8 8 0 1 1 0-16 8 8 0 0 1 0 16z" />
+<div class="bg-slate-50 dark:bg-gray-900">
+    <div class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-100/40 via-white to-slate-100/60 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"></div>
+        <div class="absolute inset-y-10 -left-24 hidden h-64 w-64 rounded-full bg-blue-500/10 blur-3xl lg:block"></div>
+        <x-container class="relative px-4 py-12 sm:py-16">
+            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-slate-500" aria-label="{{ __('Breadcrumb') }}">
+                <ol class="flex items-center gap-3">
+                    <li>
+                        <a href="{{ route('localized.home', ['locale' => $locale]) }}"
+                           class="inline-flex items-center gap-2 text-slate-600 transition hover:text-blue-600">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
                             </svg>
-                            <input id="category-search" type="search" wire:model.live.debounce.400ms="search"
-                                   placeholder="{{ __('Search categories...') }}"
-                                   class="w-full rounded-xl border-gray-300 pl-10 pr-3 py-2 md:py-2.5 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                        </div>
+                            {{ __('Home') }}
+                        </a>
+                    </li>
+                    <li class="text-slate-400">/</li>
+                    <li class="text-slate-700">{{ __('Categories') }}</li>
+                </ol>
+            </nav>
+
+            <div class="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+                <div class="max-w-2xl space-y-5">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-blue-600">
+                        {{ __('Catalogue overview') }}
+                    </span>
+                    <h1 class="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl md:text-5xl">
+                        {{ __('Discover every department in StatyBae Commerce') }}
+                    </h1>
+                    <p class="text-base text-slate-600 sm:text-lg">
+                        {{ __('Browse structured categories curated by our merchandisers to help professionals and DIY enthusiasts find the right materials faster.') }}
+                    </p>
+                </div>
+
+                <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:gap-6">
+                    <div class="rounded-2xl border border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-600 shadow-sm">
+                        {{ __(':count categories in catalogue', ['count' => number_format($totalCategories)]) }}
                     </div>
-                    <div class="hidden md:flex items-center gap-3">
-                        <label class="text-sm text-gray-600">{{ __('Sort') }}</label>
-                        <select wire:model.live="sort" class="rounded-lg border-gray-300 text-sm">
-                            <option value="name_asc">{{ __('Name (A–Z)') }}</option>
-                            <option value="name_desc">{{ __('Name (Z–A)') }}</option>
-                            <option value="products_desc">{{ __('Most products') }}</option>
-                            <option value="products_asc">{{ __('Fewest products') }}</option>
-                        </select>
-                        <label class="text-sm text-gray-600">{{ __('Per page') }}</label>
-                        <select wire:model.live="perPage" class="rounded-lg border-gray-300 text-sm">
-                            <option value="12">12</option>
-                            <option value="24">24</option>
-                            <option value="36">36</option>
-                            <option value="48">48</option>
-                        </select>
+                    <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500 shadow-sm">
+                        @if ($activeFilterCount > 0)
+                            {{ __(':count filters active', ['count' => $activeFilterCount]) }}
+                        @else
+                            {{ __('No filters applied') }}
+                        @endif
                     </div>
-                    <button type="button" wire:click="$toggle('sidebarOpen')"
+                    <button type="button"
+                            wire:click="$toggle('sidebarOpen')"
                             wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
-                            class="md:hidden inline-flex items-center gap-2 px-3 py-2 border rounded-lg text-sm shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M3 6h18M6 12h12M10 18h8" />
+                            class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-blue-300 hover:text-blue-600 lg:hidden">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                         </svg>
                         {{ __('Filters') }}
                     </button>
                 </div>
             </div>
-        </div>
+        </x-container>
+    </div>
 
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-12 gap-6">
-            <!-- Sidebar desktop -->
-            <aside class="md:col-span-3 lg:col-span-3 hidden md:block">
-                <div class="sticky top-24">
-                    <div class="space-y-4">
-                        <div class="bg-white rounded-xl border p-4 shadow-sm">
-                            <div class="flex items-center justify-between mb-3">
-                                <h3 class="text-sm font-semibold">{{ __('Filters') }}</h3>
-                                <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
-                                   class="text-sm text-gray-600 hover:underline">{{ __('Clear all') }}</a>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <label class="flex items-center gap-2 text-sm">
-                                    <input type="checkbox" wire:model.live="inStock"
-                                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                    <span>{{ __('In stock') }}</span>
-                                </label>
-                                <label class="flex items-center gap-2 text-sm">
-                                    <input type="checkbox" wire:model.live="onSale"
-                                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                    <span>{{ __('On sale') }}</span>
-                                </label>
-                                <label class="flex items-center gap-2 text-sm">
-                                    <input type="checkbox" wire:model.live="hasProducts"
-                                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                    <span>{{ __('With products') }}</span>
-                                </label>
-                            </div>
-                            <div class="mt-4 grid grid-cols-2 gap-2">
-                                <input type="number" min="0" step="0.01"
-                                       wire:model.live.debounce.500ms="priceMin"
-                                       class="rounded-lg border-gray-300 text-sm"
-                                       placeholder="{{ __('Min price') }}" />
-                                <input type="number" min="0" step="0.01"
-                                       wire:model.live.debounce.500ms="priceMax"
-                                       class="rounded-lg border-gray-300 text-sm"
-                                       placeholder="{{ __('Max price') }}" />
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-xl border p-4 shadow-sm">
-                            <h3 class="text-sm font-semibold mb-3">{{ __('Brands') }}</h3>
-                            <div class="space-y-2 max-h-64 overflow-auto pr-1">
-                                @foreach ($this->facetBrands as $brand)
-                                    <label class="flex items-center justify-between gap-2 text-sm">
-                                        <div class="flex items-center gap-2">
-                                            <input type="checkbox" value="{{ $brand['id'] }}"
-                                                   wire:model.live="selectedBrandIds"
-                                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                            <span>{{ $brand['name'] }}</span>
-                                        </div>
-                                        <span
-                                              class="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-gray-100 text-gray-600 text-xs">{{ $brand['count'] }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-xl border p-4 shadow-sm">
-                            <h3 class="text-sm font-semibold mb-3">{{ __('Collections') }}</h3>
-                            <div class="space-y-2 max-h-64 overflow-auto pr-1">
-                                @foreach ($this->facetCollections as $collection)
-                                    <label class="flex items-center justify-between gap-2 text-sm">
-                                        <div class="flex items-center gap-2">
-                                            <input type="checkbox" value="{{ $collection['id'] }}"
-                                                   wire:model.live="selectedCollectionIds"
-                                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                            <span>{{ $collection['name'] }}</span>
-                                        </div>
-                                        <span
-                                              class="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-gray-100 text-gray-600 text-xs">{{ $collection['count'] }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-xl border p-4 shadow-sm">
-                            <h3 class="text-sm font-semibold mb-3">{{ __('Categories') }}</h3>
-                            <div class="space-y-2 max-h-64 overflow-auto pr-1">
-                                @foreach ($this->facetCategories as $cat)
-                                    <label class="flex items-center justify-between gap-2 text-sm">
-                                        <div class="flex items-center gap-2">
-                                            <input type="checkbox" value="{{ $cat['id'] }}"
-                                                   wire:model.live="selectedCategoryIds"
-                                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                            <span>{{ $cat['name'] }}</span>
-                                        </div>
-                                        <span
-                                              class="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-gray-100 text-gray-600 text-xs">{{ $cat['count'] }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
+    <x-container class="relative -mt-12 px-4 pb-16">
+        <div class="grid gap-8 lg:grid-cols-12">
+            <aside class="hidden lg:col-span-3 lg:block">
+                <div class="sticky top-28 space-y-6">
+                    <div class="space-y-6">
+                        @include('livewire.pages.category.partials.filters', ['variant' => 'desktop'])
                     </div>
                 </div>
             </aside>
 
-            <!-- Mobile filters drawer -->
-            @if ($sidebarOpen)
-                <div class="fixed inset-0 z-40 md:hidden">
-                    <div class="absolute inset-0 bg-black/30" aria-hidden="true" wire:click="$toggle('sidebarOpen')" wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}">
-                    </div>
-                    <div class="absolute inset-y-0 left-0 w-11/12 max-w-sm bg-white shadow-xl p-4 overflow-y-auto">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-base font-semibold">{{ __('Filters') }}</h3>
-                            <button type="button" class="p-2 rounded-lg hover:bg-gray-100"
-                                    wire:click="$toggle('sidebarOpen')" wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}" aria-label="{{ __('Close') }}">
-                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M6 18 18 6M6 6l12 12" />
+            <section class="lg:col-span-9 space-y-6" x-data="{ view: 'grid' }">
+                <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                            <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                            </button>
+                                {{ __('Real-time results') }}
+                            </span>
+                            @if ($from && $to)
+                                <span>{{ __('Showing :from–:to of :total results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
+                            @else
+                                <span>{{ __('No results to display') }}</span>
+                            @endif
                         </div>
-                        <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
-                           class="text-sm text-gray-600 hover:underline">{{ __('Clear all') }}</a>
 
-                        <div class="mt-4 space-y-4">
-                            <div class="grid grid-cols-2 gap-2">
-                                <label class="flex items-center gap-2 text-sm">
-                                    <input type="checkbox" wire:model.live="inStock"
-                                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                    <span>{{ __('In stock') }}</span>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
+                                <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                    {{ __('Sort') }}
                                 </label>
-                                <label class="flex items-center gap-2 text-sm">
-                                    <input type="checkbox" wire:model.live="onSale"
-                                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                    <span>{{ __('On sale') }}</span>
+                                <select id="sort" wire:model.live="sort" class="border-0 bg-transparent text-sm font-medium focus:outline-none focus:ring-0">
+                                    <option value="name_asc">{{ __('Name (A–Z)') }}</option>
+                                    <option value="name_desc">{{ __('Name (Z–A)') }}</option>
+                                    <option value="products_desc">{{ __('Most products') }}</option>
+                                    <option value="products_asc">{{ __('Fewest products') }}</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
+                                <label for="per-page" class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                    {{ __('Per page') }}
                                 </label>
-                                <label class="flex items-center gap-2 text-sm">
-                                    <input type="checkbox" wire:model.live="hasProducts"
-                                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                    <span>{{ __('With products') }}</span>
-                                </label>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="number" min="0" step="0.01"
-                                       wire:model.live.debounce.500ms="priceMin"
-                                       class="rounded-lg border-gray-300 text-sm"
-                                       placeholder="{{ __('Min price') }}" />
-                                <input type="number" min="0" step="0.01"
-                                       wire:model.live.debounce.500ms="priceMax"
-                                       class="rounded-lg border-gray-300 text-sm"
-                                       placeholder="{{ __('Max price') }}" />
+                                <select id="per-page" wire:model.live="perPage" class="border-0 bg-transparent text-sm font-medium focus:outline-none focus:ring-0">
+                                    <option value="12">12</option>
+                                    <option value="24">24</option>
+                                    <option value="36">36</option>
+                                    <option value="48">48</option>
+                                </select>
                             </div>
 
-                            <div>
-                                <h4 class="text-sm font-semibold mb-2">{{ __('Brands') }}</h4>
-                                <div class="space-y-2 max-h-48 overflow-auto pr-1">
-                                    @foreach ($this->facetBrands as $brand)
-                                        <label class="flex items-center justify-between gap-2 text-sm">
-                                            <div class="flex items-center gap-2">
-                                                <input type="checkbox" value="{{ $brand['id'] }}"
-                                                       wire:model.live="selectedBrandIds"
-                                                       class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                                <span>{{ $brand['name'] }}</span>
-                                            </div>
-                                            <span
-                                                  class="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-gray-100 text-gray-600 text-xs">{{ $brand['count'] }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <div>
-                                <h4 class="text-sm font-semibold mb-2">{{ __('Collections') }}</h4>
-                                <div class="space-y-2 max-h-48 overflow-auto pr-1">
-                                    @foreach ($this->facetCollections as $collection)
-                                        <label class="flex items-center justify-between gap-2 text-sm">
-                                            <div class="flex items-center gap-2">
-                                                <input type="checkbox" value="{{ $collection['id'] }}"
-                                                       wire:model.live="selectedCollectionIds"
-                                                       class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                                <span>{{ $collection['name'] }}</span>
-                                            </div>
-                                            <span
-                                                  class="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-gray-100 text-gray-600 text-xs">{{ $collection['count'] }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <div>
-                                <h4 class="text-sm font-semibold mb-2">{{ __('Categories') }}</h4>
-                                <div class="space-y-2 max-h-48 overflow-auto pr-1">
-                                    @foreach ($this->facetCategories as $cat)
-                                        <label class="flex items-center justify-between gap-2 text-sm">
-                                            <div class="flex items-center gap-2">
-                                                <input type="checkbox" value="{{ $cat['id'] }}"
-                                                       wire:model.live="selectedCategoryIds"
-                                                       class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                                <span>{{ $cat['name'] }}</span>
-                                            </div>
-                                            <span
-                                                  class="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-gray-100 text-gray-600 text-xs">{{ $cat['count'] }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
+                            <div class="hidden items-center gap-1 rounded-xl border border-slate-200 bg-white p-1 text-slate-500 shadow-sm md:flex">
+                                <button type="button"
+                                        @click="view = 'grid'"
+                                        :class="view === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'hover:text-blue-600'"
+                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h7v7H4V6zm9 0h7v7h-7V6zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" />
+                                    </svg>
+                                    {{ __('Grid') }}
+                                </button>
+                                <button type="button"
+                                        @click="view = 'list'"
+                                        :class="view === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'hover:text-blue-600'"
+                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                    {{ __('List') }}
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            @endif
 
-            <!-- Results -->
-            <main class="md:col-span-9 lg:col-span-9">
-                <div class="flex items-center justify-between mb-4">
-                    <p class="text-sm text-gray-600">{{ $this->categories->total() }} {{ __('results') }}</p>
-                    <div class="hidden md:flex items-center gap-2">
-                        <span class="text-sm text-gray-500">{{ __('Showing') }}</span>
-                        <select wire:model.live="perPage" class="rounded-lg border-gray-300 text-sm">
-                            <option value="12">12</option>
-                            <option value="24">24</option>
-                            <option value="36">36</option>
-                            <option value="48">48</option>
-                        </select>
+                <div class="relative">
+                    <div wire:loading.delay.longer class="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-white/80 backdrop-blur-sm">
+                        <div class="h-10 w-10 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
                     </div>
-                </div>
 
-                @if ($this->categories->count() > 0)
-                    <div class="relative" aria-live="polite">
-                        <div wire:loading.delay
-                             class="absolute inset-0 z-10 rounded-xl bg-white/70 backdrop-blur-sm flex items-center justify-center">
-                            <div
-                                 class="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent">
-                            </div>
-                        </div>
+                    @if ($paginator->count() > 0)
+                        <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3" :class="view === 'list' ? 'sm:grid-cols-1 xl:grid-cols-1' : 'sm:grid-cols-2 xl:grid-cols-3'">
+                            @foreach ($paginator as $category)
+                                @php
+                                    $slug = method_exists($category, 'trans')
+                                        ? ($category->trans('slug') ?? $category->slug)
+                                        : ($category->slug ?? (is_string($category) ? $category : null));
+                                    $name = method_exists($category, 'trans')
+                                        ? ($category->trans('name') ?? $category->name)
+                                        : $category->name;
+                                    $description = method_exists($category, 'trans')
+                                        ? ($category->trans('description') ?? $category->description)
+                                        : $category->description;
+                                    $banner = method_exists($category, 'getBannerUrl') ? $category->getBannerUrl('md') : null;
+                                    $image = $category->hero_image_url
+                                        ?? $banner
+                                        ?? (method_exists($category, 'getImageUrl') ? $category->getImageUrl('md') : null)
+                                        ?? (method_exists($category, 'getFirstMediaUrl') ? $category->getFirstMediaUrl('images', 'image-md') : null)
+                                        ?? (method_exists($category, 'getFirstMediaUrl') ? $category->getFirstMediaUrl('images') : null);
+                                    $productCount = $category->products_count
+                                        ?? ($category->published_products_count ?? ($category->products?->count() ?? 0));
+                                @endphp
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                            @foreach ($this->categories as $category)
-                                <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug ?? $category]) }}"
-                                   class="group relative overflow-hidden rounded-xl border bg-white shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                    <div class="aspect-square bg-gray-100 relative overflow-hidden">
-                                        @php
-                                            $imgMd =
-                                                $category->getFirstMediaUrl('images', 'image-md') ?:
-                                                $category->getFirstMediaUrl('images');
-                                            $imgSm = $category->getFirstMediaUrl('images', 'image-sm') ?: $imgMd;
-                                            $imgXs = $category->getFirstMediaUrl('images', 'image-xs') ?: $imgSm;
-                                            $imgLg = $category->getFirstMediaUrl('images', 'image-lg') ?: $imgMd;
-                                        @endphp
-                                        @if ($imgMd)
-                                            <img
-                                                 src="{{ $imgMd }}"
-                                                 srcset="{{ $imgXs }} 150w, {{ $imgSm }} 300w, {{ $imgMd }} 500w, {{ $imgLg }} 800w"
-                                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                                                 alt="{{ $category->name }}"
+                                <article class="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl"
+                                         :class="view === 'list' ? 'sm:flex-row' : ''">
+                                    <div class="relative h-48 overflow-hidden sm:h-52" :class="view === 'list' ? 'sm:h-auto sm:w-64' : ''">
+                                        @if ($image)
+                                            <img src="{{ $image }}"
+                                                 alt="{{ $name }}"
                                                  loading="lazy"
-                                                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                                            <div
-                                                 class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent">
-                                            </div>
-                                            <div
-                                                 class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-xs font-medium text-gray-700 shadow-sm">
-                                                <svg class="h-3.5 w-3.5 text-indigo-600" viewBox="0 0 24 24"
-                                                     fill="none" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
-                                                </svg>
-                                                <span>{{ $category->products_count }}</span>
-                                            </div>
+                                                 class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                                         @else
-                                            <div
-                                                 class="w-full h-full bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
-                                                <span
-                                                      class="text-white text-2xl font-bold">{{ strtoupper(substr($category->name, 0, 2)) }}</span>
+                                            <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100 text-4xl font-semibold text-blue-600">
+                                                {{ mb_strtoupper(mb_substr($name, 0, 2)) }}
                                             </div>
                                         @endif
-                                    </div>
-
-                                    <div class="absolute inset-x-0 bottom-0 p-4">
-                                        <div class="flex items-center justify-between">
-                                            <h3 class="text-base font-semibold text-white drop-shadow-sm">
-                                                {{ $category->name }}</h3>
-                                            <span
-                                                  class="inline-flex items-center justify-center rounded-full bg-white/90 text-gray-900 group-hover:bg-white px-2 py-1 text-[11px] font-medium shadow-sm">
-                                                {{ __('View') }}
-                                                <svg class="ml-1 h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"
-                                                     stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          stroke-width="2" d="M9 5l7 7-7 7" />
-                                                </svg>
+                                        <div class="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-5 pb-4 pt-12">
+                                            <h3 class="text-lg font-semibold text-white drop-shadow-lg">
+                                                {{ $name }}
+                                            </h3>
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm">
+                                                {{ $productCount }}
+                                                <span class="text-slate-400">{{ trans_choice('products', $productCount) }}</span>
                                             </span>
                                         </div>
-                                        @if ($category->description)
-                                            <p class="mt-1 line-clamp-2 text-xs text-white/90">
-                                                {{ $category->description }}</p>
-                                        @endif
                                     </div>
-                                </a>
+
+                                    <div class="flex flex-1 flex-col justify-between gap-4 px-5 py-6">
+                                        @if ($description)
+                                            <p class="text-sm leading-relaxed text-slate-600 line-clamp-3">
+                                                {{ \Illuminate\Support\Str::limit(strip_tags($description), 180) }}
+                                            </p>
+                                        @else
+                                            <p class="text-sm text-slate-400">
+                                                {{ __('Detailed description coming soon.') }}
+                                            </p>
+                                        @endif
+
+                                        <div class="flex items-center justify-between">
+                                            <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
+                                               class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-100">
+                                                {{ __('View category') }}
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </a>
+
+                                            <button type="button"
+                                                    class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:border-blue-300 hover:text-blue-600">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0l3-3m-3 3l-3-3m9 6H6" />
+                                                </svg>
+                                                {{ __('Quick preview') }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </article>
                             @endforeach
                         </div>
-                    </div>
 
-                    <div class="mt-8">
-                        {{ $this->categories->links() }}
-                    </div>
-                @else
-                    <div class="rounded-2xl border bg-white p-10 text-center">
-                        <div
-                             class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-500">
-                            📂</div>
-                        <h3 class="text-lg font-medium text-gray-900">{{ __('No categories available') }}</h3>
-                        <p class="mt-1 text-gray-500">{{ __('Categories will appear here once they are added') }}</p>
-                    </div>
-                @endif
-            </main>
+                        <div class="pt-8">
+                            {{ $paginator->links() }}
+                        </div>
+                    @else
+                        <x-shared.empty-state
+                            title="{{ __('No categories found') }}"
+                            description="{{ __('Try adjusting your filters or search terms to discover available categories.') }}"
+                            icon="heroicon-o-archive-box"
+                            :action-text="__('Reset filters')"
+                            :action-url="route('localized.categories.index', ['locale' => $locale])"
+                        />
+                    @endif
+                </div>
+            </section>
         </div>
     </x-container>
+
+    @if ($sidebarOpen)
+        <div class="fixed inset-0 z-40 lg:hidden">
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                 wire:click="$toggle('sidebarOpen')"
+                 wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"></div>
+
+            <div class="absolute inset-y-0 right-0 w-11/12 max-w-md overflow-y-auto rounded-l-3xl bg-white p-6 shadow-2xl">
+                <div class="mb-6 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-slate-900">{{ __('Filters') }}</h3>
+                        <p class="text-sm text-slate-500">{{ __('Adjust filters to personalise the catalogue view.') }}</p>
+                    </div>
+                    <button type="button"
+                            class="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:border-blue-300 hover:text-blue-600"
+                            wire:click="$toggle('sidebarOpen')"
+                            wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
+                            aria-label="{{ __('Close') }}">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="space-y-6">
+                    @include('livewire.pages.category.partials.filters', ['variant' => 'mobile'])
+                </div>
+            </div>
+        </div>
+    @endif
 
     <x-filament-actions::modals />
 </div>

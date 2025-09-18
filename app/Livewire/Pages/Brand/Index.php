@@ -46,7 +46,26 @@ final class Index extends AbstractPageComponent implements HasSchemas
      */
     public function form(Schema $schema): Schema
     {
-        return $schema->components([TextInput::make('search')->label(__('Search brands'))->placeholder(__('Search brands...'))->live(debounce: 300)->afterStateUpdated(fn() => $this->resetPage()), Select::make('sortBy')->label(__('Sort by'))->options(['name' => __('Name'), 'products_count' => __('Most Products'), 'created_at' => __('Newest')])->live()->afterStateUpdated(fn() => $this->resetPage())]);
+        return $schema->components([
+            TextInput::make('search')
+                ->label(__('Search brands'))
+                ->placeholder(__('Search brands...'))
+                ->live(debounce: 300)
+                ->afterStateUpdated(fn() => $this->resetPage())
+                ->prefixIcon('heroicon-o-magnifying-glass'),
+            Select::make('sortBy')
+                ->label(__('Sort by'))
+                ->options([
+                    'name' => __('Name A-Z'),
+                    'name_desc' => __('Name Z-A'),
+                    'products_count' => __('Most Products'),
+                    'created_at' => __('Newest'),
+                    'featured' => __('Featured First')
+                ])
+                ->live()
+                ->afterStateUpdated(fn() => $this->resetPage())
+                ->prefixIcon('heroicon-o-arrow-up-down')
+        ]);
     }
     /**
      * Handle brands functionality with proper error handling.
@@ -70,8 +89,10 @@ final class Index extends AbstractPageComponent implements HasSchemas
         // Apply sorting
         match ($this->sortBy) {
             'name' => $query->orderBy('name'),
+            'name_desc' => $query->orderByDesc('name'),
             'products_count' => $query->orderByDesc('products_count'),
             'created_at' => $query->orderByDesc('created_at'),
+            'featured' => $query->orderByDesc('is_featured')->orderBy('name'),
             default => $query->orderBy('name'),
         };
         return $query->paginate(12);

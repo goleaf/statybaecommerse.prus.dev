@@ -142,7 +142,7 @@
                                      class="ml-4 space-y-1"
                                      style="display: none;">
                                     @foreach ($category->children as $subcategory)
-                                        <a href="{{ route('categories.show', ['locale' => app()->getLocale(), 'category' => $subcategory->slug]) ?? '/categories/' . $subcategory->slug }}"
+                                        <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $subcategory->slug]) }}"
                                            class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                                             {{ $subcategory->name }}
                                         </a>

@@ -12,6 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            if (! Schema::hasColumn('users', 'website')) {
+                $table->string('website')->nullable()->after('email');
+            }
+
             // Multi-translation support fields
             if (! Schema::hasColumn('users', 'bio')) {
                 $table->json('bio')->nullable()->after('website');
@@ -21,9 +25,6 @@ return new class extends Migration
             }
             if (! Schema::hasColumn('users', 'position')) {
                 $table->json('position')->nullable()->after('company');
-            }
-            if (! Schema::hasColumn('users', 'website')) {
-                $table->string('website')->nullable()->after('position');
             }
 
             // Additional user fields

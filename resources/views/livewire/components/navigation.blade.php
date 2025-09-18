@@ -26,6 +26,11 @@
                     ? route('localized.brands.index', ['locale' => $locale])
                     : url('/' . $locale . '/brands'),
             ],
+            [
+                'key' => 'support',
+                'label' => __('Support centre'),
+                'url' => 'mailto:support@statybae.com',
+            ],
         ])->filter(fn ($link) => !empty($link['url']));
 
         $categoryFeature = config('app-features.features.category') ?? null;
@@ -35,6 +40,33 @@
                 ? strtolower($categoryFeature) === strtolower(\App\Support\FeatureState::Enabled->value)
                 : (bool) $categoryFeature);
     @endphp
+
+    <div class="bg-amber-500 text-white">
+        <x-container class="px-4">
+            <div class="flex flex-col items-center justify-between gap-2 py-2 text-xs font-medium sm:flex-row sm:text-sm">
+                <span class="inline-flex items-center gap-2">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    {{ __('Limited time: express pickup ready within 2 hours for Vilnius orders.') }}
+                </span>
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('localized.locations.index', ['locale' => $locale]) }}" class="inline-flex items-center gap-2 underline-offset-4 hover:underline">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7 7-7 7" />
+                        </svg>
+                        {{ __('Check availability') }}
+                    </a>
+                    <a href="tel:+37060000000" class="inline-flex items-center gap-2 rounded-full border border-white/60 px-3 py-1 text-xs font-semibold uppercase tracking-wide hover:bg-white/10">
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 4.5l2.7-.54a1.5 1.5 0 011.47.55l2.5 3.11a1.5 1.5 0 01-.11 1.98l-1.7 1.7a16 16 0 007.91 7.91l1.7-1.7a1.5 1.5 0 011.98-.11l3.11 2.5a1.5 1.5 0 01.55 1.47l-.54 2.7a1.5 1.5 0 01-1.47 1.23A18.75 18.75 0 012.25 6a1.5 1.5 0 011.23-1.47z" />
+                        </svg>
+                        {{ __('+370 600 00 000') }}
+                    </a>
+                </div>
+            </div>
+        </x-container>
+    </div>
 
     <div class="hidden lg:block bg-slate-900 text-slate-100">
         <x-container class="px-4">
@@ -137,6 +169,12 @@
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h4l2 9h8l2-9h4" />
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M16 17a2 2 0 11-4 0" />
+                                    </svg>
+                                    @break
+                                @case('support')
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13c-2.486 0-4.5 2.014-4.5 4.5v3c0 2.761 2.239 5 5 5s5-2.239 5-5v-3c0-2.486-2.014-4.5-4.5-4.5z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636a9 9 0 10-12.728 0" />
                                     </svg>
                                     @break
                                 @default
@@ -263,6 +301,11 @@
                     @endif
                     @if ($quickLinks->firstWhere('key', 'collections'))
                         <a href="{{ $quickLinks->firstWhere('key', 'collections')['url'] }}" class="rounded-lg bg-slate-100 px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition">{{ __('translations.collections') ?? __('Collections') }}</a>
+                    @endif
+                    @if ($quickLinks->firstWhere('key', 'support'))
+                        <a href="{{ $quickLinks->firstWhere('key', 'support')['url'] }}" class="rounded-lg bg-slate-100 px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition">
+                            {{ __('Support centre') }}
+                        </a>
                     @endif
                     @if (Route::has('localized.locations.index'))
                         <a href="{{ route('localized.locations.index', ['locale' => $locale]) }}" class="rounded-lg bg-slate-100 px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition">{{ __('nav_locations') }}</a>

@@ -15,7 +15,7 @@
                         default => 'from-slate-500/70 to-slate-700/70',
                     };
                 @endphp
-                <a href="{{ route('categories.show', $category) }}"
+                <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug ?? $category]) }}"
                    class="group relative flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
                     <div class="relative aspect-[4/3] overflow-hidden">
                         @if ($image)
