@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', __('admin.system_settings.' . $group) . ' - ' . __('admin.system_settings.frontend.title'))
 

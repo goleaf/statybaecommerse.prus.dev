@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', __('frontend.system_settings.title'))
 @section('description', __('frontend.system_settings.description'))

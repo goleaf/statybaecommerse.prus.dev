@@ -13,7 +13,7 @@ use Livewire\Component;
  * Livewire component for Index with reactive frontend functionality, real-time updates, and user interaction handling.
  * 
  */
-#[Layout('layouts.templates.app')]
+#[Layout('components.layouts.base')]
 class Index extends Component
 {
     public function render(): View

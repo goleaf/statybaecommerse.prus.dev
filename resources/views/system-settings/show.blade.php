@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', $setting->getTranslatedName() . ' - ' . __('frontend.system_settings.title'))
 @section('description', $setting->getTranslatedDescription())

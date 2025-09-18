@@ -11,7 +11,7 @@ use Livewire\Component;
  * Livewire component for AbstractPageComponent with reactive frontend functionality, real-time updates, and user interaction handling.
  * 
  */
-#[Layout(name: 'layouts.templates.app')]
+#[Layout(name: 'components.layouts.base')]
 abstract class AbstractPageComponent extends Component
 {
 }

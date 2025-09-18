@@ -21,7 +21,7 @@ use Livewire\Component;
  * @property string $testSelect
  * @property bool $showModal
  */
-#[Layout('layouts.templates.app')]
+#[Layout('components.layouts.base')]
 final class ComponentShowcase extends Component
 {
     use WithNotifications;

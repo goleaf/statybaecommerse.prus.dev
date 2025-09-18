@@ -1,4 +1,4 @@
-<x-layouts.templates.app :title="__('Update Order')">
+<x-layouts.base :title="__('Update Order')">
     <x-container class="py-8">
         <x-breadcrumbs :items="[['label' => __('Orders')], ['label' => $order->number], ['label' => __('Update')]]" />
 
@@ -64,4 +64,4 @@
             </form>
         </div>
     </x-container>
-</x-layouts.templates.app>
+</x-layouts.base>

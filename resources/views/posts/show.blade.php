@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', $post->getTranslatedMetaTitle() ?: $post->getTranslatedTitle())
 @section('meta_description', $post->getTranslatedMetaDescription() ?: $post->getTranslatedExcerpt())

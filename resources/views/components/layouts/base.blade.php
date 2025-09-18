@@ -7,7 +7,23 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="color-scheme" content="light">
 
-    <title>{{ $title ?? config('app.name', 'E-Commerce') }}</title>
+    @php
+        $sectionTitle = trim($__env->yieldContent('title'));
+        $resolvedTitle = $title ?? ($sectionTitle !== '' ? $sectionTitle : config('app.name', 'E-Commerce'));
+        $sectionDescription = trim($__env->yieldContent('description'));
+        $resolvedDescription = $description ?? ($sectionDescription !== '' ? $sectionDescription : null);
+    @endphp
+
+    <title>{{ $resolvedTitle }}</title>
+
+    @if($resolvedDescription)
+        <meta name="description" content="{{ $resolvedDescription }}">
+    @endif
+
+    @yield('meta')
+
+    @includeWhen(view()->exists('components.hreflang'), 'components.hreflang')
+    @includeWhen(view()->exists('components.canonical'), 'components.canonical')
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -22,8 +38,11 @@
     <!-- Livewire Styles -->
     @livewireStyles
 
+    @stack('styles')
+
     <!-- Additional head content -->
     {{ $head ?? '' }}
+    @stack('head')
 </head>
 
 <body class="font-sans antialiased h-full bg-gray-50">
@@ -33,7 +52,8 @@
 
         <!-- Page Content -->
         <main>
-            {{ $slot }}
+            {{ $slot ?? '' }}
+            @yield('content')
         </main>
 
         <!-- Footer -->
@@ -134,6 +154,7 @@
 
     <!-- Additional scripts -->
     {{ $scripts ?? '' }}
+    @stack('scripts')
 </body>
 
 </html>

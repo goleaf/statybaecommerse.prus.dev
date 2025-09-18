@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', $customer->name)
 @section('description', __('customers.view_description', ['name' => $customer->name]))

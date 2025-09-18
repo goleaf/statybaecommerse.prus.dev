@@ -3,7 +3,7 @@
     use Illuminate\View\ComponentAttributeBag;
 @endphp
 
-<x-layouts.templates.app :title="__('frontend/collections.meta.title') . ' - ' . config('app.name')">
+<x-layouts.base :title="__('frontend/collections.meta.title') . ' - ' . config('app.name')">
     <x-slot:head>
         <x-meta
             :title="__('frontend/collections.meta.title') . ' - ' . config('app.name')"
@@ -116,4 +116,4 @@
             @endif
         </div>
     </div>
-</x-layouts.templates.app>
+</x-layouts.base>

@@ -1,4 +1,4 @@
-<x-layouts.templates.app :title="$title ?? null">
+<x-layouts.base :title="$title ?? null">
     <x-container class="relative py-8 sm:py-12 lg:py-16">
         <div class="grid grid-cols-1 lg:grid-cols-5 lg:gap-x-12">
             <div class="lg:col-span-1">
@@ -45,4 +45,4 @@
             <div class="lg:col-span-4">{{ $slot }}</div>
         </div>
     </x-container>
-</x-layouts.templates.app>
+</x-layouts.base>

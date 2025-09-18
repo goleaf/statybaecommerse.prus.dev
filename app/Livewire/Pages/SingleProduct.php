@@ -258,7 +258,7 @@ final class SingleProduct extends Component
      */
     public function render()
     {
-        return view('livewire.pages.single-product', ['relatedProducts' => $this->relatedProducts])->layout('components.layouts.templates.app', ['title' => $this->product->name]);
+        return view('livewire.pages.single-product', ['relatedProducts' => $this->relatedProducts])->layout('components.layouts.base', ['title' => $this->product->name]);
     }
 
     private function formatMeasurement(null|int|float|string $value, ?string $unit): ?string

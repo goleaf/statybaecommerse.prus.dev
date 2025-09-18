@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', $campaign->trans('meta_title') ?: $campaign->trans('name'))
 @section('description', $campaign->trans('meta_description') ?: $campaign->trans('description'))

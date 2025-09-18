@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', $location->translated_name . ' - ' . __('locations.title'))
 @section('description', $location->translated_description ?: __('locations.subtitle'))

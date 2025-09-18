@@ -20,7 +20,7 @@ use Livewire\WithPagination;
  * @property string $q
  * @property string|null $sort
  */
-#[Layout('layouts.templates.app')]
+#[Layout('components.layouts.base')]
 class Search extends Component
 {
     use WithPagination;

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', __('campaigns.navigation.campaigns'))
 @section('description', __('campaigns.meta.description'))

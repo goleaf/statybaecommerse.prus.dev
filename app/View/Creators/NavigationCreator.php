@@ -45,8 +45,7 @@ final class NavigationCreator
     private function shouldIncludeNavigationData(string $viewName): bool
     {
         $navigationViews = [
-            'layouts.app',
-            'layouts.templates.app',
+            'components.layouts.base',
             'components.layouts.header',
             'components.layouts.navigation',
             'livewire.components.enhanced-navigation',

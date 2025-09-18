@@ -35,6 +35,8 @@ class DatabaseSeeder extends Seeder
             LocationSeeder::class,
             InventorySeeder::class,
             VariantInventorySeeder::class,
+            ProductHistoryExampleSeeder::class,
+            ProductHistorySeeder::class,
             // Marketing: sample coupons for admin CRUD
             CouponSeeder::class,
             // Discounts for admin/discounts CRUD

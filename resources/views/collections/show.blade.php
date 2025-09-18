@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', $collection->meta_title ?: $collection->getTranslatedName())
 @section('description', $collection->meta_description ?: $collection->getTranslatedDescription())

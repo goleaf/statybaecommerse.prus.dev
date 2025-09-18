@@ -23,7 +23,7 @@ use Livewire\Component;
  * @property string|null $sort
  * @property array $selectedValues
  */
-#[Layout('layouts.templates.app')]
+#[Layout('components.layouts.base')]
 class Show extends Component
 {
     public string $slug;

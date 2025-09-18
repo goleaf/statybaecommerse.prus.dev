@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', $attribute->getDisplayName() . ' - ' . __('attributes.attribute_values'))
 

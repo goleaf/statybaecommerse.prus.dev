@@ -145,43 +145,72 @@
         </div>
 
         @if($products->count() > 0)
-            {{-- Product Filters --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Filter by:') }}</span>
-                        <div class="flex flex-wrap gap-2">
-                            <button class="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors">
-                                {{ __('All Products') }}
+            <x-shared.sidebar-layout
+                sidebarWidth="w-full lg:w-72"
+                contentWidth="flex-1"
+                sidebarClass="lg:pr-10"
+                contentClass="space-y-10"
+            >
+                <x-slot name="sidebar">
+                    <x-shared.filter-sidebar
+                        title="{{ __('Explore :brand highlights', ['brand' => $brand->getTranslatedName()]) }}"
+                        description="{{ __('Switch between curated views to explore the assortment faster.') }}"
+                    >
+                        <div class="space-y-3">
+                            <button type="button" class="flex w-full items-center justify-between rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100">
+                                <span>{{ __('All Products') }}</span>
+                                <span class="rounded-full bg-white/70 px-2 py-0.5 text-xs font-semibold text-blue-600">{{ $products->count() }}</span>
                             </button>
-                            <button class="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors">
-                                {{ __('New Arrivals') }}
+                            <button type="button" class="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-blue-200 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-200">
+                                <span>{{ __('New Arrivals') }}</span>
+                                <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
                             </button>
-                            <button class="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors">
-                                {{ __('Best Sellers') }}
+                            <button type="button" class="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-blue-200 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-200">
+                                <span>{{ __('Best Sellers') }}</span>
+                                <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
                             </button>
                         </div>
-                    </div>
-                    
-                    @if($brand->products()->where('is_visible', true)->whereNotNull('published_at')->count() > 12)
-                        <a href="{{ route('localized.products.index', ['locale' => app()->getLocale(), 'brand' => $brand->getTranslatedSlug()]) }}" 
-                           class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            {{ __('View All Products') }}
-                            <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </a>
-                    @endif
-                </div>
-            </div>
 
-            {{-- Products Grid --}}
-            <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                @foreach($products as $product)
-                    <x-shared.product-card :product="$product" />
-                @endforeach
-            </div>
-                            @else
+                        <x-slot name="footer">
+                            @if($brand->products()->where('is_visible', true)->whereNotNull('published_at')->count() > 12)
+                                <x-shared.button
+                                    href="{{ route('localized.products.index', ['locale' => app()->getLocale(), 'brand' => $brand->getTranslatedSlug()]) }}"
+                                    variant="primary"
+                                    size="sm"
+                                    class="w-full"
+                                >
+                                    {{ __('View All Products') }}
+                                </x-shared.button>
+                            @endif
+                        </x-slot>
+                    </x-shared.filter-sidebar>
+                </x-slot>
+
+                <div class="space-y-8">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                            <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-900/40 dark:text-blue-200">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18M9 7h6m-3 0v14" />
+                                </svg>
+                                {{ $products->count() }} {{ trans_choice('products', $products->count()) }}
+                            </span>
+                            <span>{{ __('Updated weekly with fresh arrivals and promotions.') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        @foreach($products as $product)
+                            <x-shared.product-card :product="$product" />
+                        @endforeach
+                    </div>
+                </div>
+            </x-shared.sidebar-layout>
+        @else
             <x-shared.empty-state
                 title="{{ __('No products found') }}"
                 description="{{ __('No products are available for this brand yet.') }}"

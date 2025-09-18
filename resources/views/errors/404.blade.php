@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', __('Page Not Found') . ' - ' . config('app.name'))
 

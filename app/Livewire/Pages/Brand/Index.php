@@ -114,6 +114,15 @@ final class Index extends AbstractPageComponent implements HasSchemas
         return __('Browse all our trusted brand partners and discover quality products');
     }
     /**
+     * Reset filters to their default state.
+     */
+    public function clearFilters(): void
+    {
+        $this->reset(['search', 'sortBy']);
+        $this->resetPage();
+    }
+
+    /**
      * Render the Livewire component view with current state.
      * @return View
      */

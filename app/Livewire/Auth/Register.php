@@ -9,7 +9,7 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.templates.app')]
+#[Layout('components.layouts.base')]
 final class Register extends Component
 {
     public RegistrationForm $registrationForm;

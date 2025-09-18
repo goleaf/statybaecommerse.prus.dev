@@ -114,6 +114,6 @@ final class ProductHistoryPage extends Component
      */
     public function render()
     {
-        return view('livewire.pages.product-history', ['history' => $this->history, 'product' => $this->product, 'totalChanges' => $this->totalChanges, 'priceChanges' => $this->priceChanges, 'stockUpdates' => $this->stockUpdates, 'lastChange' => $this->lastChange])->layout('layouts.app', ['title' => __('frontend.products.history_title', ['product' => $this->product->trans('name') ?? $this->product->name])]);
+        return view('livewire.pages.product-history', ['history' => $this->history, 'product' => $this->product, 'totalChanges' => $this->totalChanges, 'priceChanges' => $this->priceChanges, 'stockUpdates' => $this->stockUpdates, 'lastChange' => $this->lastChange])->layout('components.layouts.base', ['title' => __('frontend.products.history_title', ['product' => $this->product->trans('name') ?? $this->product->name])]);
     }
 }

@@ -1,4 +1,4 @@
-@php($layout = 'layouts.templates.app')
+@php($layout = 'layouts.base')
 
 <x-dynamic-component :component="$layout">
     <div class="container mx-auto px-4 py-8">

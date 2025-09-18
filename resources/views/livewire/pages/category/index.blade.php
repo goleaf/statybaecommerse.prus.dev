@@ -7,10 +7,10 @@
 
 @php
     $locale = app()->getLocale();
-    $paginator = $this->categories;
-    $totalCategories = $paginator->total();
-    $from = $paginator->count() ? ($paginator->firstItem() ?? 0) : 0;
-    $to = $paginator->count() ? ($paginator->lastItem() ?? 0) : 0;
+    $categories = $this->categories;
+    $totalCategories = $categories->count();
+    $from = $categories->count() ? 1 : 0;
+    $to = $categories->count();
     $activeFilterCount = collect([
         !empty($search ?? ''),
         $inStock ?? false,
@@ -86,11 +86,12 @@
     <x-container class="relative -mt-12 px-4 pb-16">
         <div class="grid gap-8 lg:grid-cols-12">
             <aside class="hidden lg:col-span-3 lg:block">
-                <div class="sticky top-28 space-y-6">
-                    <div class="space-y-6">
-                        @include('livewire.pages.category.partials.filters', ['variant' => 'desktop'])
-                    </div>
-                </div>
+                <x-shared.filter-sidebar
+                    title="{{ __('Refine catalogue') }}"
+                    description="{{ __('Combine availability, price, brands and collections to focus your search.') }}"
+                >
+                    @include('livewire.pages.category.partials.filters', ['variant' => 'desktop'])
+                </x-shared.filter-sidebar>
             </aside>
 
             <section class="lg:col-span-9 space-y-6" x-data="{ view: 'grid' }">
@@ -165,9 +166,9 @@
                         <div class="h-10 w-10 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
                     </div>
 
-                    @if ($paginator->count() > 0)
+                    @if ($categories->count() > 0)
                         <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3" :class="view === 'list' ? 'sm:grid-cols-1 xl:grid-cols-1' : 'sm:grid-cols-2 xl:grid-cols-3'">
-                            @foreach ($paginator as $category)
+                            @foreach ($categories as $category)
                                 @php
                                     $slug = method_exists($category, 'trans')
                                         ? ($category->trans('slug') ?? $category->slug)
@@ -245,9 +246,6 @@
                             @endforeach
                         </div>
 
-                        <div class="pt-8">
-                            {{ $paginator->links() }}
-                        </div>
                     @else
                         <x-shared.empty-state
                             title="{{ __('No categories found') }}"
@@ -268,26 +266,39 @@
                  wire:click="$toggle('sidebarOpen')"
                  wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"></div>
 
-            <div class="absolute inset-y-0 right-0 w-11/12 max-w-md overflow-y-auto rounded-l-3xl bg-white p-6 shadow-2xl">
-                <div class="mb-6 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-semibold text-slate-900">{{ __('Filters') }}</h3>
-                        <p class="text-sm text-slate-500">{{ __('Adjust filters to personalise the catalogue view.') }}</p>
-                    </div>
-                    <button type="button"
-                            class="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:border-blue-300 hover:text-blue-600"
-                            wire:click="$toggle('sidebarOpen')"
-                            wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
-                            aria-label="{{ __('Close') }}">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+            <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-white shadow-2xl">
+                <x-shared.filter-sidebar
+                    :sticky="false"
+                    class="h-full overflow-y-auto p-6"
+                    title="{{ __('Filters') }}"
+                    description="{{ __('Adjust filters to personalise the catalogue view.') }}"
+                >
+                    <x-slot name="headerActions">
+                        <button type="button"
+                                class="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:border-blue-300 hover:text-blue-600"
+                                wire:click="$toggle('sidebarOpen')"
+                                wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
+                                aria-label="{{ __('Close') }}">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </x-slot>
 
-                <div class="space-y-6">
                     @include('livewire.pages.category.partials.filters', ['variant' => 'mobile'])
-                </div>
+
+                    <x-slot name="footer">
+                        <x-shared.button
+                            type="button"
+                            variant="primary"
+                            size="sm"
+                            class="w-full"
+                            wire:click="$toggle('sidebarOpen')"
+                        >
+                            {{ __('Apply filters') }}
+                        </x-shared.button>
+                    </x-slot>
+                </x-shared.filter-sidebar>
             </div>
         </div>
     @endif

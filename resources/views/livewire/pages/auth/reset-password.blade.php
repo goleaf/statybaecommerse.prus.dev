@@ -9,7 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.templates.app')] class extends Component {
+new #[Layout('components.layouts.base')] class extends Component {
     #[Locked]
     public string $token = '';
     public string $email = '';

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', $variantStock->display_name)
 @section('description', __('inventory.variant_stock_details'))

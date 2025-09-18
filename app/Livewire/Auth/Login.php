@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.templates.app')]
+#[Layout('components.layouts.base')]
 final class Login extends Component
 {
     public LoginForm $loginForm;

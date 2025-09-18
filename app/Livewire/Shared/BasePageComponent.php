@@ -18,7 +18,7 @@ use Livewire\Component;
  * @property CacheService $cacheService
  * @property TranslationService $translationService
  */
-#[Layout('layouts.templates.app')]
+#[Layout('components.layouts.base')]
 abstract class BasePageComponent extends Component
 {
     use WithCart, WithNotifications;

@@ -240,6 +240,6 @@ final class ProductPage extends Component
     public function render()
     {
         return view('livewire.product-page')
-            ->layout('layouts.app');
+            ->layout('components.layouts.base');
     }
 }

@@ -46,7 +46,7 @@
 
 use function Livewire\Volt\{mount, state, layout};
 
-layout('components.layouts.templates.app');
+layout('components.layouts.base');
 
 state(['order' => null]);
 

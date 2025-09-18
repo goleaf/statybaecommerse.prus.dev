@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', __('frontend.discount_redemptions.title'))
 @section('description', __('frontend.discount_redemptions.description'))

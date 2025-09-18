@@ -1,7 +1,7 @@
 <?php
 use function Livewire\Volt\{layout, title};
 
-layout('components.layouts.templates.frontend');
+layout('components.layouts.base');
 title(__('users.profile'));
 
 ?>

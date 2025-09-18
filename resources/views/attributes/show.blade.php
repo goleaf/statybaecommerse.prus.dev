@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', $attribute->getTranslatedName())
 @section('description', $attribute->getTranslatedDescription())

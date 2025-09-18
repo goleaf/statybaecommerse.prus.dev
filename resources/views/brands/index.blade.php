@@ -1,4 +1,4 @@
-@php($layout = 'layouts.templates.app')
+@php($layout = 'layouts.base')
 
 <x-dynamic-component :component="$layout">
     @section('meta')

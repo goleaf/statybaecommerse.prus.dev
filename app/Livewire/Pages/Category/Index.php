@@ -13,12 +13,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
-use Livewire\WithPagination;
 /**
  * Index
  * 
@@ -34,13 +33,11 @@ use Livewire\WithPagination;
  * @property bool $onSale
  * @property bool $hasProducts
  * @property string $sort
- * @property int $perPage
  * @property bool $sidebarOpen
  */
 final class Index extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
-    use WithPagination;
     #[Url(except: '')]
     public string $search = '';
     #[Url(except: [])]
@@ -61,8 +58,6 @@ final class Index extends Component implements HasSchemas
     public bool $hasProducts = false;
     #[Url(except: 'name_asc')]
     public string $sort = 'name_asc';
-    #[Url(except: 12)]
-    public int $perPage = 12;
     public bool $sidebarOpen = false;
     /**
      * Initialize the Livewire component with parameters.
@@ -82,7 +77,7 @@ final class Index extends Component implements HasSchemas
      */
     public function form(Schema $schema): Schema
     {
-        return $schema->components([TextInput::make('search')->label(__('Search'))->placeholder(__('Search categories...'))->live(debounce: 400)->afterStateUpdated(fn() => $this->resetPage()), Select::make('brandId')->label(__('Brand'))->placeholder(__('All brands'))->options($this->getBrandOptions())->live()->afterStateUpdated(fn() => $this->resetPage()), TextInput::make('priceMin')->label(__('Min price'))->numeric()->step(0.01)->minValue(0)->live(debounce: 500)->afterStateUpdated(fn() => $this->resetPage()), TextInput::make('priceMax')->label(__('Max price'))->numeric()->step(0.01)->minValue(0)->live(debounce: 500)->afterStateUpdated(fn() => $this->resetPage()), Checkbox::make('hasProducts')->label(__('Only categories with products'))->live()->afterStateUpdated(fn() => $this->resetPage()), Select::make('sort')->label(__('Sort by'))->options(['name_asc' => __('Name (A–Z)'), 'name_desc' => __('Name (Z–A)'), 'products_desc' => __('Most products'), 'products_asc' => __('Fewest products')])->live()->afterStateUpdated(fn() => $this->resetPage())]);
+        return $schema->components([TextInput::make('search')->label(__('Search'))->placeholder(__('Search categories...'))->live(debounce: 400), Select::make('brandId')->label(__('Brand'))->placeholder(__('All brands'))->options($this->getBrandOptions())->live(), TextInput::make('priceMin')->label(__('Min price'))->numeric()->step(0.01)->minValue(0)->live(debounce: 500), TextInput::make('priceMax')->label(__('Max price'))->numeric()->step(0.01)->minValue(0)->live(debounce: 500), Checkbox::make('hasProducts')->label(__('Only categories with products'))->live(), Select::make('sort')->label(__('Sort by'))->options(['name_asc' => __('Name (A–Z)'), 'name_desc' => __('Name (Z–A)'), 'products_desc' => __('Most products'), 'products_asc' => __('Fewest products')])->live()]);
     }
     /**
      * Handle brands functionality with proper error handling.
@@ -164,10 +159,10 @@ final class Index extends Component implements HasSchemas
     }
     /**
      * Handle categories functionality with proper error handling.
-     * @return LengthAwarePaginator
+     * @return EloquentCollection
      */
     #[Computed]
-    public function categories(): LengthAwarePaginator
+    public function categories(): EloquentCollection
     {
         $query = Category::query()->with(['media'])->withCount(['products' => function (Builder $q) {
             $q->where('is_visible', true)->when(!empty($this->selectedBrandIds), fn(Builder $qq) => $qq->whereIn('brand_id', $this->selectedBrandIds))->when(!empty($this->selectedCollectionIds), fn(Builder $qq) => $qq->whereHas('collections', fn(Builder $c) => $c->whereIn('collections.id', $this->selectedCollectionIds)))->when($this->priceMin !== null, fn(Builder $qq) => $qq->where('price', '>=', (float) $this->priceMin))->when($this->priceMax !== null, fn(Builder $qq) => $qq->where('price', '<=', (float) $this->priceMax))->when($this->inStock, fn(Builder $qq) => $qq->where('stock_quantity', '>', 0))->when($this->onSale, fn(Builder $qq) => $qq->whereNotNull('sale_price'));
@@ -186,7 +181,7 @@ final class Index extends Component implements HasSchemas
             });
         }
         $query->when($this->sort === 'name_asc', fn($q) => $q->orderBy('name'))->when($this->sort === 'name_desc', fn($q) => $q->orderByDesc('name'))->when($this->sort === 'products_desc', fn($q) => $q->orderByDesc('products_count'))->when($this->sort === 'products_asc', fn($q) => $q->orderBy('products_count'))->when(!in_array($this->sort, ['name_asc', 'name_desc', 'products_desc', 'products_asc']), fn($q) => $q->orderBy('name'));
-        return $query->paginate($this->perPage);
+        return $query->get();
     }
     /**
      * Render the Livewire component view with current state.

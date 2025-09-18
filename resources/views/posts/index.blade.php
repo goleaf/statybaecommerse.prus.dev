@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', __('posts.title'))
 @section('meta_description', __('posts.title'))

@@ -13,7 +13,7 @@ use Livewire\Component;
  * 
  * @property float $subtotal
  */
-#[Layout('layouts.templates.app')]
+#[Layout('components.layouts.base')]
 class Cart extends Component
 {
     public float $subtotal = 0.0;

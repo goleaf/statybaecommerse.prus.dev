@@ -8,261 +8,253 @@ use App\Models\Product;
 use App\Models\ProductHistory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 final class ProductHistorySeeder extends Seeder
 {
+    private const CHUNK_SIZE = 200;
+
     public function run(): void
     {
-        $products = Product::with(['brand', 'categories'])->get();
-        $users = User::all();
-        
-        if ($products->isEmpty() || $users->isEmpty()) {
-            $this->command->warn('No products or users found. Please run ProductSeeder and UserSeeder first.');
+        $query = Product::query()
+            ->with(['brand:id,name', 'categories:id,name'])
+            ->orderBy('id');
+
+        $userIds = User::query()->pluck('id')->all();
+
+        if ($query->doesntExist()) {
+            $this->command?->warn('ProductHistorySeeder skipped: no products found.');
             return;
         }
 
-        $this->command->info('Creating product history entries...');
-
-        foreach ($products as $product) {
-            $this->createProductHistory($product, $users);
+        if (empty($userIds)) {
+            $this->command?->warn('ProductHistorySeeder skipped: no users found. Seed users before seeding histories.');
+            return;
         }
 
-        $this->command->info('Product history seeding completed!');
+        $this->command?->info('Seeding product history entries...');
+
+        $query->chunkById(self::CHUNK_SIZE, function (Collection $products) use ($userIds): void {
+            foreach ($products as $product) {
+                if (ProductHistory::query()->where('product_id', $product->id)->exists()) {
+                    // Skip products that already have history to keep seeding idempotent.
+                    continue;
+                }
+
+                $this->createHistoryForProduct($product, $userIds);
+            }
+        });
+
+        $this->command?->info('Product history seeding completed.');
     }
 
-    private function createProductHistory(Product $product, $users): void
+    /**
+     * Create sample history timeline for a given product.
+     *
+     * @param array<int, int> $userIds
+     */
+    private function createHistoryForProduct(Product $product, array $userIds): void
     {
-        $historyEntries = [];
-        $createdAt = $product->created_at ?? now()->subMonths(6);
-        
-        // Helper method to add causer fields
-        $addCauserFields = function($entry, $users) {
-            $entry['causer_type'] = User::class;
-            $entry['causer_id'] = $users->random()->id;
-            return $entry;
-        };
-        
-        // Product creation history
-        $historyEntries[] = [
-            'product_id' => $product->id,
-            'user_id' => $users->random()->id,
+        $faker = fake();
+        $createdAt = $product->created_at ? Carbon::parse($product->created_at) : Carbon::now()->subMonths(6);
+        $baseMetadata = [
+            'product_name' => $product->name,
+            'product_sku' => $product->sku,
+            'brand' => $product->brand?->name,
+            'categories' => $product->categories->pluck('name')->toArray(),
+        ];
+
+        $pickUserId = fn (): int => Arr::random($userIds);
+
+        $entries = [];
+        $initialUserId = $pickUserId();
+
+        $entries[] = [
             'action' => 'created',
             'field_name' => 'product',
             'old_value' => null,
             'new_value' => [
                 'name' => $product->name,
                 'sku' => $product->sku,
-                'price' => $product->price,
-                'description' => $product->description,
+                'price' => (float) ($product->price ?? 0),
+                'status' => $product->status,
             ],
             'description' => "Product '{$product->name}' was created",
-            'ip_address' => fake()->ipv4(),
-            'user_agent' => fake()->userAgent(),
-            'metadata' => [
-                'product_name' => $product->name,
-                'product_sku' => $product->sku,
-                'brand' => $product->brand?->name,
-                'categories' => $product->categories->pluck('name')->toArray(),
+            'user_id' => $initialUserId,
+            'metadata' => array_merge($baseMetadata, [
                 'timestamp' => $createdAt->format('Y-m-d H:i:s'),
-            ],
+                'source' => 'initial_import',
+            ]),
             'created_at' => $createdAt,
             'updated_at' => $createdAt,
         ];
 
-        // Price changes (2-5 entries per product)
-        $priceChanges = fake()->numberBetween(2, 5);
-        for ($i = 0; $i < $priceChanges; $i++) {
-            $oldPrice = $product->price;
-            $newPrice = fake()->randomFloat(2, $oldPrice * 0.8, $oldPrice * 1.3);
-            $changeDate = fake()->dateTimeBetween($createdAt, 'now');
-            
-            $historyEntries[] = [
-                'product_id' => $product->id,
-                'user_id' => $users->random()->id,
+        $price = (float) ($product->price ?? $faker->randomFloat(2, 5, 100));
+        $priceChangeCount = $faker->numberBetween(2, 4);
+
+        for ($i = 0; $i < $priceChangeCount; $i++) {
+            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
+            $oldPrice = $price;
+            $multiplier = $faker->randomFloat(2, 0.85, 1.25);
+            $price = round(max(0.5, $oldPrice * $multiplier), 2);
+
+            $entries[] = [
                 'action' => 'price_changed',
                 'field_name' => 'price',
                 'old_value' => $oldPrice,
-                'new_value' => $newPrice,
-                'description' => "Price changed from {$oldPrice}€ to {$newPrice}€",
-                'ip_address' => fake()->ipv4(),
-                'user_agent' => fake()->userAgent(),
-                'metadata' => [
-                    'product_name' => $product->name,
-                    'product_sku' => $product->sku,
-                    'price_change_percentage' => round((($newPrice - $oldPrice) / $oldPrice) * 100, 2),
-                    'reason' => fake()->randomElement(['market_adjustment', 'cost_increase', 'promotion', 'competitor_analysis']),
+                'new_value' => $price,
+                'description' => "Price changed from {$oldPrice}€ to {$price}€",
+                'user_id' => $pickUserId(),
+                'metadata' => array_merge($baseMetadata, [
                     'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                ],
+                    'price_change_percentage' => $oldPrice > 0 ? round((($price - $oldPrice) / $oldPrice) * 100, 2) : null,
+                    'reason' => $faker->randomElement(['market_adjustment', 'supplier_update', 'promotion', 'competitor_move']),
+                ]),
                 'created_at' => $changeDate,
                 'updated_at' => $changeDate,
             ];
         }
 
-        // Stock updates (3-8 entries per product)
-        $stockUpdates = fake()->numberBetween(3, 8);
-        $currentStock = $product->stock_quantity ?? 0;
-        
-        for ($i = 0; $i < $stockUpdates; $i++) {
-            $oldStock = $currentStock;
-            $stockChange = fake()->numberBetween(-50, 100);
-            $newStock = max(0, $oldStock + $stockChange);
-            $changeDate = fake()->dateTimeBetween($createdAt, 'now');
-            
-            $historyEntries[] = [
-                'product_id' => $product->id,
-                'user_id' => $users->random()->id,
+        $stock = $product->stock_quantity ?? $faker->numberBetween(0, 250);
+        $stockChanges = $faker->numberBetween(3, 6);
+
+        for ($i = 0; $i < $stockChanges; $i++) {
+            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
+            $delta = $faker->numberBetween(-60, 120);
+            $newStock = max(0, $stock + $delta);
+
+            $entries[] = [
                 'action' => 'stock_updated',
                 'field_name' => 'stock_quantity',
-                'old_value' => $oldStock,
+                'old_value' => $stock,
                 'new_value' => $newStock,
-                'description' => "Stock updated from {$oldStock} to {$newStock} units",
-                'ip_address' => fake()->ipv4(),
-                'user_agent' => fake()->userAgent(),
-                'metadata' => [
-                    'product_name' => $product->name,
-                    'product_sku' => $product->sku,
-                    'stock_change' => $stockChange,
-                    'reason' => fake()->randomElement(['restock', 'sale', 'return', 'damage', 'inventory_adjustment']),
-                    'supplier' => fake()->company(),
+                'description' => "Stock updated from {$stock} to {$newStock} units",
+                'user_id' => $pickUserId(),
+                'metadata' => array_merge($baseMetadata, [
                     'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                ],
+                    'stock_change' => $delta,
+                    'reason' => $faker->randomElement(['restock', 'inventory_adjustment', 'customer_return', 'bulk_order']),
+                ]),
                 'created_at' => $changeDate,
                 'updated_at' => $changeDate,
             ];
-            
-            $currentStock = $newStock;
+
+            $stock = $newStock;
         }
 
-        // Status changes (1-3 entries per product)
-        $statusChanges = fake()->numberBetween(1, 3);
         $statuses = ['draft', 'published', 'archived'];
-        $currentStatus = 'published';
-        
+        $status = $product->status ?? 'published';
+        $statusChanges = $faker->numberBetween(1, 3);
+
         for ($i = 0; $i < $statusChanges; $i++) {
-            $oldStatus = $currentStatus;
-            $newStatus = fake()->randomElement(array_diff($statuses, [$oldStatus]));
-            $changeDate = fake()->dateTimeBetween($createdAt, 'now');
-            
-            $historyEntries[] = [
-                'product_id' => $product->id,
-                'user_id' => $users->random()->id,
+            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
+            $newStatus = $faker->randomElement(array_values(array_diff($statuses, [$status])));
+
+            $entries[] = [
                 'action' => 'status_changed',
                 'field_name' => 'status',
-                'old_value' => $oldStatus,
+                'old_value' => $status,
                 'new_value' => $newStatus,
-                'description' => "Status changed from {$oldStatus} to {$newStatus}",
-                'ip_address' => fake()->ipv4(),
-                'user_agent' => fake()->userAgent(),
-                'metadata' => [
-                    'product_name' => $product->name,
-                    'product_sku' => $product->sku,
-                    'reason' => fake()->randomElement(['quality_control', 'seasonal', 'discontinuation', 'promotion']),
+                'description' => "Status changed from {$status} to {$newStatus}",
+                'user_id' => $pickUserId(),
+                'metadata' => array_merge($baseMetadata, [
                     'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                ],
+                    'reason' => $faker->randomElement(['assortment_review', 'seasonal_adjustment', 'quality_check']),
+                ]),
                 'created_at' => $changeDate,
                 'updated_at' => $changeDate,
             ];
-            
-            $currentStatus = $newStatus;
+
+            $status = $newStatus;
         }
 
-        // Visibility changes (1-2 entries per product)
-        $visibilityChanges = fake()->numberBetween(1, 2);
-        $isVisible = true;
-        
+        $visibility = (bool) ($product->is_visible ?? true);
+        $visibilityChanges = $faker->numberBetween(1, 2);
+
         for ($i = 0; $i < $visibilityChanges; $i++) {
-            $oldVisibility = $isVisible;
-            $newVisibility = !$oldVisibility;
-            $changeDate = fake()->dateTimeBetween($createdAt, 'now');
-            
-            $historyEntries[] = [
-                'product_id' => $product->id,
-                'user_id' => $users->random()->id,
+            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
+            $newVisibility = ! $visibility;
+
+            $entries[] = [
                 'action' => 'updated',
                 'field_name' => 'is_visible',
-                'old_value' => $oldVisibility,
+                'old_value' => $visibility,
                 'new_value' => $newVisibility,
-                'description' => "Visibility changed from " . ($oldVisibility ? 'visible' : 'hidden') . " to " . ($newVisibility ? 'visible' : 'hidden'),
-                'ip_address' => fake()->ipv4(),
-                'user_agent' => fake()->userAgent(),
-                'metadata' => [
-                    'product_name' => $product->name,
-                    'product_sku' => $product->sku,
-                    'reason' => fake()->randomElement(['maintenance', 'seasonal', 'quality_issue', 'promotion']),
+                'description' => sprintf('Visibility changed from %s to %s', $visibility ? 'visible' : 'hidden', $newVisibility ? 'visible' : 'hidden'),
+                'user_id' => $pickUserId(),
+                'metadata' => array_merge($baseMetadata, [
                     'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                ],
+                    'reason' => $faker->randomElement(['maintenance', 'seasonal_visibility', 'content_review']),
+                ]),
                 'created_at' => $changeDate,
                 'updated_at' => $changeDate,
             ];
-            
-            $isVisible = $newVisibility;
+
+            $visibility = $newVisibility;
         }
 
-        // Description updates (1-2 entries per product)
-        $descriptionUpdates = fake()->numberBetween(1, 2);
-        
+        $description = (string) ($product->description ?? '');
+        $descriptionUpdates = $faker->numberBetween(1, 2);
+
         for ($i = 0; $i < $descriptionUpdates; $i++) {
-            $oldDescription = $product->description;
-            $newDescription = $oldDescription . ' ' . fake()->sentence();
-            $changeDate = fake()->dateTimeBetween($createdAt, 'now');
-            
-            $historyEntries[] = [
-                'product_id' => $product->id,
-                'user_id' => $users->random()->id,
+            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
+            $oldDescription = $description;
+            $description = trim($oldDescription . ' ' . $faker->sentence());
+
+            $entries[] = [
                 'action' => 'updated',
                 'field_name' => 'description',
                 'old_value' => $oldDescription,
-                'new_value' => $newDescription,
-                'description' => "Product description updated",
-                'ip_address' => fake()->ipv4(),
-                'user_agent' => fake()->userAgent(),
-                'metadata' => [
-                    'product_name' => $product->name,
-                    'product_sku' => $product->sku,
-                    'reason' => fake()->randomElement(['seo_optimization', 'customer_feedback', 'compliance', 'marketing']),
+                'new_value' => $description,
+                'description' => 'Product description updated',
+                'user_id' => $pickUserId(),
+                'metadata' => array_merge($baseMetadata, [
                     'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                ],
+                    'reason' => $faker->randomElement(['seo_optimization', 'content_refresh', 'supplier_information']),
+                ]),
                 'created_at' => $changeDate,
                 'updated_at' => $changeDate,
             ];
         }
 
-        // Category changes (0-2 entries per product)
-        $categoryChanges = fake()->numberBetween(0, 2);
-        
+        $categoryChanges = $faker->numberBetween(0, 2);
+        $currentCategories = $product->categories->pluck('name')->toArray();
+
         for ($i = 0; $i < $categoryChanges; $i++) {
-            $oldCategories = $product->categories->pluck('name')->toArray();
-            $newCategories = array_merge($oldCategories, [fake()->word()]);
-            $changeDate = fake()->dateTimeBetween($createdAt, 'now');
-            
-            $historyEntries[] = [
-                'product_id' => $product->id,
-                'user_id' => $users->random()->id,
+            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
+            $newCategory = $faker->sentence(2);
+            $newCategories = array_values(array_unique(array_merge($currentCategories, [$newCategory])));
+
+            $entries[] = [
                 'action' => 'updated',
                 'field_name' => 'categories',
-                'old_value' => $oldCategories,
+                'old_value' => $currentCategories,
                 'new_value' => $newCategories,
-                'description' => "Product categories updated",
-                'ip_address' => fake()->ipv4(),
-                'user_agent' => fake()->userAgent(),
-                'metadata' => [
-                    'product_name' => $product->name,
-                    'product_sku' => $product->sku,
-                    'reason' => fake()->randomElement(['reorganization', 'new_category', 'customer_request']),
+                'description' => 'Product categories updated',
+                'user_id' => $pickUserId(),
+                'metadata' => array_merge($baseMetadata, [
                     'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                ],
+                    'reason' => $faker->randomElement(['navigation_update', 'cross_sell', 'merchandising']),
+                ]),
                 'created_at' => $changeDate,
                 'updated_at' => $changeDate,
             ];
+
+            $currentCategories = $newCategories;
         }
 
-        // Insert all history entries for this product one by one to handle JSON properly
-        foreach ($historyEntries as $entry) {
-            $entry = $addCauserFields($entry, $users);
+        foreach ($entries as $entry) {
+            $entry['product_id'] = $product->id;
+            $entry['causer_type'] = User::class;
+            $entry['causer_id'] = $entry['user_id'];
+            $entry['ip_address'] = $entry['ip_address'] ?? $faker->ipv4();
+            $entry['user_agent'] = $entry['user_agent'] ?? $faker->userAgent();
+
             ProductHistory::create($entry);
         }
-        
-        $this->command->info("Created " . count($historyEntries) . " history entries for product: {$product->name}");
+
+        $this->command?->info(sprintf('Seeded %d history entries for product: %s', count($entries), $product->sku));
     }
 }

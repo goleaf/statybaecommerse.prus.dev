@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.base')
 
 @section('title', $discountCondition->translated_name ?? __('discount_conditions.show.title'))
 
