@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 
-use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -43,7 +43,7 @@ final class CampaignsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('campaigns.status'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'active' => 'success',
                         'draft' => 'gray',
                         'paused' => 'warning',
@@ -85,5 +85,3 @@ final class CampaignsRelationManager extends RelationManager
             ]);
     }
 }
-
-

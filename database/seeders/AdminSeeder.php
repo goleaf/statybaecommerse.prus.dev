@@ -745,7 +745,7 @@ final class AdminSeeder extends Seeder
                 ['email' => $email],
                 [
                     'email' => $email,
-                    'is_active' => true,
+                    'status' => 'active',
                     'subscribed_at' => now(),
                 ]
             );

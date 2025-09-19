@@ -22,7 +22,7 @@ final class DashboardTest extends TestCase
     {
         $dashboard = new Dashboard();
         $widgets = $dashboard->getWidgets();
-        
+
         $this->assertIsArray($widgets);
         $this->assertNotEmpty($widgets);
     }
@@ -31,7 +31,7 @@ final class DashboardTest extends TestCase
     {
         $dashboard = new Dashboard();
         $columns = $dashboard->getColumns();
-        
+
         $this->assertIsArray($columns);
         $this->assertArrayHasKey('sm', $columns);
         $this->assertArrayHasKey('md', $columns);
