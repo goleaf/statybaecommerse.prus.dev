@@ -58,15 +58,15 @@ final class Show extends Component
                 }
             ])
             ->select([
-                'id', 'name', 'slug', 'description', 'short_description', 'sku', 'price', 'sale_price', 
-                'compare_price', 'cost_price', 'manage_stock', 'stock_quantity', 'low_stock_threshold',
-                'weight', 'length', 'width', 'height', 'is_visible', 'is_enabled', 'is_featured',
-                'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'type',
-                'created_at', 'updated_at', 'deleted_at'
+                'products.id', 'products.name', 'products.slug', 'products.description', 'products.short_description', 'products.sku', 'products.price', 'products.sale_price', 
+                'products.compare_price', 'products.cost_price', 'products.manage_stock', 'products.stock_quantity', 'products.low_stock_threshold',
+                'products.weight', 'products.length', 'products.width', 'products.height', 'products.is_visible', 'products.is_enabled', 'products.is_featured',
+                'products.published_at', 'products.seo_title', 'products.seo_description', 'products.brand_id', 'products.status', 'products.type',
+                'products.created_at', 'products.updated_at', 'products.deleted_at'
             ])
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
-            ->orderBy($this->sortBy, $this->sortDirection)
+            ->orderBy('products.' . $this->sortBy, $this->sortDirection)
             ->paginate(12);
     }
     /**
