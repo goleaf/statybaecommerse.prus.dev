@@ -5,6 +5,7 @@ namespace App\Livewire\Pages\Account;
 
 use App\Models\UserWishlist;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 /**
  * Wishlist
@@ -13,6 +14,7 @@ use Livewire\Component;
  * 
  * @property array $wishlists
  */
+#[Layout('components.layouts.templates.account')]
 final class Wishlist extends Component
 {
     public array $wishlists = [];

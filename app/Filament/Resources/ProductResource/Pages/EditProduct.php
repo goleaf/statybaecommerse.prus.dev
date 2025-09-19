@@ -9,6 +9,7 @@ use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
+use Filament\Actions\DeleteAction;
 
 final class EditProduct extends EditRecord
 {

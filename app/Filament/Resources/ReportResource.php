@@ -36,6 +36,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Forms\Form;
 
 /**
  * ReportResource
@@ -89,8 +90,8 @@ final class ReportResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {

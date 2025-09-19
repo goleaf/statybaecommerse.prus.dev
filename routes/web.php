@@ -695,9 +695,6 @@ Route::middleware('auth')->group(function (): void {
         return redirect()->route('account.orders');
     })->name('account.index');
     Route::get('/account/orders', Pages\Account\Orders::class)->name('account.orders');
-    Route::get('/account/addresses', function () {
-        return response('Account Addresses Page', 200);
-    })->name('account.addresses');
 });
 
 // Admin language switching

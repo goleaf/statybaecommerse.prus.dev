@@ -7,6 +7,7 @@ namespace App\Filament\Resources\SystemSettingResource\Pages;
 use App\Filament\Resources\SystemSettingResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\DeleteAction;
 
 final class EditSystemSetting extends EditRecord
 {

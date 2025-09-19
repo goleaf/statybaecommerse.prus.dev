@@ -27,12 +27,15 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 /**
  * PriceListItemResource
@@ -86,8 +89,8 @@ final class PriceListItemResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -410,9 +413,9 @@ final class PriceListItemResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 
-                TableAction::make('toggle_active')
+                Action::make('toggle_active')
                     ->label(fn (PriceListItem $record): string => $record->is_active ? __('price_list_items.deactivate') : __('price_list_items.activate'))
                     ->icon(fn (PriceListItem $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (PriceListItem $record): string => $record->is_active ? 'warning' : 'success')
@@ -426,7 +429,7 @@ final class PriceListItemResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('toggle_featured')
+                Action::make('toggle_featured')
                     ->label(fn (PriceListItem $record): string => $record->is_featured ? __('price_list_items.unfeature') : __('price_list_items.feature'))
                     ->icon(fn (PriceListItem $record): string => $record->is_featured ? 'heroicon-o-star' : 'heroicon-o-star')
                     ->color(fn (PriceListItem $record): string => $record->is_featured ? 'warning' : 'success')
@@ -442,7 +445,7 @@ final class PriceListItemResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     
                     BulkAction::make('activate')
                         ->label(__('price_list_items.activate_selected'))

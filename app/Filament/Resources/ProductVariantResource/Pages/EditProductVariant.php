@@ -8,6 +8,7 @@ use App\Filament\Resources\ProductVariantResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
+use Filament\Actions\DeleteAction;
 
 final class EditProductVariant extends EditRecord
 {

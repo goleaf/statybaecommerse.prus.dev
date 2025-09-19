@@ -8,6 +8,8 @@ use App\Models\CartItem;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
 
 final class LowStockCartItemsWidget extends BaseWidget
 {
@@ -95,11 +97,11 @@ final class LowStockCartItemsWidget extends BaseWidget
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')

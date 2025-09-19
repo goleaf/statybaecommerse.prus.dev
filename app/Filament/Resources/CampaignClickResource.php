@@ -25,13 +25,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 /**
  * CampaignClickResource
@@ -43,7 +46,7 @@ final class CampaignClickResource extends Resource
     protected static ?string $model = CampaignClick::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Campaigns;
     
     protected static ?int $navigationSort = 8;
     protected static ?string $recordTitleAttribute = 'campaign_name';
@@ -86,8 +89,8 @@ final class CampaignClickResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -465,9 +468,9 @@ final class CampaignClickResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 
-                TableAction::make('mark_conversion')
+                Action::make('mark_conversion')
                     ->label(__('campaign_clicks.mark_conversion'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -482,7 +485,7 @@ final class CampaignClickResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('unmark_conversion')
+                Action::make('unmark_conversion')
                     ->label(__('campaign_clicks.unmark_conversion'))
                     ->icon('heroicon-o-x-circle')
                     ->color('warning')
@@ -497,7 +500,7 @@ final class CampaignClickResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('mark_bot')
+                Action::make('mark_bot')
                     ->label(__('campaign_clicks.mark_bot'))
                     ->icon('heroicon-o-robot')
                     ->color('danger')
@@ -512,7 +515,7 @@ final class CampaignClickResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('unmark_bot')
+                Action::make('unmark_bot')
                     ->label(__('campaign_clicks.unmark_bot'))
                     ->icon('heroicon-o-user')
                     ->color('info')
@@ -529,7 +532,7 @@ final class CampaignClickResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     
                     BulkAction::make('mark_conversions')
                         ->label(__('campaign_clicks.mark_conversions'))

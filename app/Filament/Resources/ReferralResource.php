@@ -24,13 +24,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 /**
  * ReferralResource
@@ -44,6 +47,7 @@ final class ReferralResource extends Resource
     /** @var UnitEnum|string|null */
         protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
     
+    ;
     protected static ?int $navigationSort = 5;
     protected static ?string $recordTitleAttribute = 'referral_code';
 
@@ -85,8 +89,8 @@ final class ReferralResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -405,9 +409,9 @@ final class ReferralResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 
-                TableAction::make('approve')
+                Action::make('approve')
                     ->label(__('referrals.approve'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -425,7 +429,7 @@ final class ReferralResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('reject')
+                Action::make('reject')
                     ->label(__('referrals.reject'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
@@ -440,7 +444,7 @@ final class ReferralResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('complete')
+                Action::make('complete')
                     ->label(__('referrals.complete'))
                     ->icon('heroicon-o-check-badge')
                     ->color('info')
@@ -458,7 +462,7 @@ final class ReferralResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('toggle_active')
+                Action::make('toggle_active')
                     ->label(fn (Referral $record): string => $record->is_active ? __('referrals.deactivate') : __('referrals.activate'))
                     ->icon(fn (Referral $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (Referral $record): string => $record->is_active ? 'warning' : 'success')
@@ -474,7 +478,7 @@ final class ReferralResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     
                     BulkAction::make('approve')
                         ->label(__('referrals.approve_selected'))

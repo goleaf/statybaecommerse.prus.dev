@@ -7,6 +7,7 @@ namespace App\Filament\Resources\StockResource\Pages;
 use App\Filament\Resources\StockResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Actions\EditAction;
 
 final class ViewStock extends ViewRecord
 {

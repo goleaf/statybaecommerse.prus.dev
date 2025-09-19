@@ -3,13 +3,13 @@
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
 use App\Models\Product;
-use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Actions\EditAction;
 
 final class ProductsRelationManager extends RelationManager
 {
@@ -171,7 +171,7 @@ final class ProductsRelationManager extends RelationManager
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->label(__('admin.collections.actions.edit_product')),
 
                 Tables\Actions\DetachAction::make()

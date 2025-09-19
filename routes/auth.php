@@ -32,7 +32,7 @@ Route::middleware('auth')->group(function (): void {
     Route::view('/account', 'livewire.pages.account.index')->name('account');
 
     Route::prefix('account')->as('account.')->group(function (): void {
-        Route::view('profile', 'livewire.pages.account.profile')->name('profile');
+        Route::get('profile', \App\Livewire\Pages\Account\Profile::class)->name('profile');
         Route::get('addresses', Pages\Account\Addresses::class)->name('addresses');
         Route::get('orders', Pages\Account\Orders::class)->name('orders');
         // Orders invoice view
@@ -55,7 +55,7 @@ Route::middleware('auth')->group(function (): void {
         }
 
         // Wishlist page
-        Route::view('wishlist', 'livewire.pages.account.wishlist')->name('wishlist');
+        Route::get('wishlist', \App\Livewire\Pages\Account\Wishlist::class)->name('wishlist');
 
         // Documents page
         Route::view('documents', 'livewire.pages.account.documents')->name('documents');

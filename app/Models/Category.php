@@ -37,8 +37,8 @@ final class Category extends Model implements HasMedia
 {
     use HasFactory, HasTranslations, InteractsWithMedia, SoftDeletes;
 
-    protected $fillable = ['name', 'slug', 'description', 'short_description', 'parent_id', 'sort_order', 'is_visible', 'is_enabled', 'seo_title', 'seo_description', 'show_in_menu', 'product_limit'];
-    protected $casts = ['is_visible' => 'boolean', 'is_enabled' => 'boolean', 'show_in_menu' => 'boolean', 'sort_order' => 'integer', 'product_limit' => 'integer'];
+    protected $fillable = ['name', 'slug', 'description', 'short_description', 'parent_id', 'sort_order', 'is_visible', 'is_enabled', 'is_active', 'is_featured', 'color', 'seo_title', 'seo_description', 'show_in_menu', 'product_limit'];
+    protected $casts = ['is_visible' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_featured' => 'boolean', 'show_in_menu' => 'boolean', 'sort_order' => 'integer', 'product_limit' => 'integer'];
 
     /**
      * The accessors to append to the model's array form.

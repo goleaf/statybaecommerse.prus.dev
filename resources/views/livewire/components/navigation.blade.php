@@ -48,7 +48,6 @@
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    {{ __('Limited time: express pickup ready within 2 hours for Vilnius orders.') }}
                 </span>
                 <div class="flex items-center gap-4">
                     <a href="{{ route('localized.locations.index', ['locale' => $locale]) }}" class="inline-flex items-center gap-2 underline-offset-4 hover:underline">

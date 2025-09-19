@@ -7,6 +7,7 @@ namespace App\Filament\Resources\DiscountConditionResource\Pages;
 use App\Filament\Resources\DiscountConditionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Actions\EditAction;
 
 final class ViewDiscountCondition extends ViewRecord
 {

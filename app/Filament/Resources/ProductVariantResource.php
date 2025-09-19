@@ -11,10 +11,10 @@ use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Enums\NavigationGroup;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Section;
@@ -33,15 +33,19 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use BackedEnum;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * ProductVariantResource
@@ -695,7 +699,7 @@ final class ProductVariantResource extends Resource
                     ->label(__('product_variants.fields.is_bestseller')),
             ])
             ->actions([
-                TableAction::make('set_default')
+                Action::make('set_default')
                     ->label(__('product_variants.actions.set_default'))
                     ->icon('heroicon-o-star')
                     ->action(function (ProductVariant $record) {
@@ -707,8 +711,8 @@ final class ProductVariantResource extends Resource
                     })
                     ->visible(fn (ProductVariant $record): bool => !$record->is_default_variant),
 
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -734,7 +738,7 @@ final class ProductVariantResource extends Resource
                                 ->send();
                         }),
 
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

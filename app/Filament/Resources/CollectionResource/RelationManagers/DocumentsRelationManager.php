@@ -3,13 +3,15 @@
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
 use App\Models\Document;
-use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 
 final class DocumentsRelationManager extends RelationManager
 {
@@ -217,7 +219,7 @@ final class DocumentsRelationManager extends RelationManager
                 Tables\Actions\ViewAction::make()
                     ->label(__('admin.documents.actions.view_document')),
 
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->label(__('admin.documents.actions.edit_document')),
 
                 Tables\Actions\Action::make('download')
@@ -228,14 +230,14 @@ final class DocumentsRelationManager extends RelationManager
                     ->openUrlInNewTab()
                     ->visible(fn(Document $record): bool => !empty($record->file_path)),
 
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->label(__('admin.documents.actions.delete_document'))
                     ->requiresConfirmation()
                     ->modalHeading(__('admin.documents.confirmations.delete_document')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->label(__('admin.documents.actions.delete_documents'))
                         ->requiresConfirmation()
                         ->modalHeading(__('admin.documents.confirmations.delete_documents')),

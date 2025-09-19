@@ -9,6 +9,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Actions\EditAction;
 
 final class DiscountConditionTableWidget extends BaseWidget
 {
@@ -77,7 +78,7 @@ final class DiscountConditionTableWidget extends BaseWidget
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->defaultSort('created_at', 'desc');
     }

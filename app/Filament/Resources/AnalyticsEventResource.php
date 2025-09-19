@@ -25,13 +25,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 /**
  * AnalyticsEventResource
@@ -45,6 +48,7 @@ final class AnalyticsEventResource extends Resource
     /** @var UnitEnum|string|null */
         protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
     
+    ;
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'event_name';
 
@@ -86,8 +90,8 @@ final class AnalyticsEventResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -496,9 +500,9 @@ final class AnalyticsEventResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 
-                TableAction::make('mark_important')
+                Action::make('mark_important')
                     ->label(__('analytics_events.mark_important'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
@@ -513,7 +517,7 @@ final class AnalyticsEventResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('unmark_important')
+                Action::make('unmark_important')
                     ->label(__('analytics_events.unmark_important'))
                     ->icon('heroicon-o-star')
                     ->color('gray')
@@ -528,7 +532,7 @@ final class AnalyticsEventResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('mark_conversion')
+                Action::make('mark_conversion')
                     ->label(__('analytics_events.mark_conversion'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -543,7 +547,7 @@ final class AnalyticsEventResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('unmark_conversion')
+                Action::make('unmark_conversion')
                     ->label(__('analytics_events.unmark_conversion'))
                     ->icon('heroicon-o-x-circle')
                     ->color('warning')
@@ -560,7 +564,7 @@ final class AnalyticsEventResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     
                     BulkAction::make('mark_important')
                         ->label(__('analytics_events.mark_important_selected'))

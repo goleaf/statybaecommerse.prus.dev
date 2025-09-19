@@ -26,12 +26,15 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 /**
  * SystemSettingResource
@@ -85,8 +88,8 @@ final class SystemSettingResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -468,9 +471,9 @@ final class SystemSettingResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 
-                TableAction::make('reset_to_default')
+                Action::make('reset_to_default')
                     ->label(__('system_settings.reset_to_default'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
@@ -485,7 +488,7 @@ final class SystemSettingResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('toggle_active')
+                Action::make('toggle_active')
                     ->label(fn (SystemSetting $record): string => $record->is_active ? __('system_settings.deactivate') : __('system_settings.activate'))
                     ->icon(fn (SystemSetting $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (SystemSetting $record): string => $record->is_active ? 'warning' : 'success')
@@ -501,7 +504,7 @@ final class SystemSettingResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     
                     BulkAction::make('activate')
                         ->label(__('system_settings.activate_selected'))

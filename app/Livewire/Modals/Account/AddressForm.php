@@ -7,11 +7,11 @@ use App\Actions\CountriesWithZone;
 use App\Actions\ZoneSessionManager;
 use App\Models\Address;
 use App\Models\Country;
+use App\Enums\AddressType;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-// Legacy Shopper\Core\Enum\AddressType removed - using custom enum
 use Livewire\Attributes\Validate;
 use LivewireUI\Modal\ModalComponent;
 /**
@@ -81,11 +81,30 @@ class AddressForm extends ModalComponent
     public function save(): void
     {
         $this->validate();
+        
+        $addressData = [
+            'user_id' => Auth::id(),
+            'type' => $this->type,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'address_line_1' => $this->street_address,
+            'address_line_2' => $this->street_address_plus,
+            'city' => $this->city,
+            'postal_code' => $this->postal_code,
+            'country_id' => $this->country_id,
+            'phone' => $this->phone_number,
+            'is_active' => true,
+            'is_default' => false,
+            'is_billing' => $this->type === AddressType::Billing,
+            'is_shipping' => $this->type === AddressType::Shipping,
+        ];
+        
         if ($this->address->id) {
-            $this->address->update(array_merge($this->validate(), ['user_id' => Auth::id()]));
+            $this->address->update($addressData);
         } else {
-            Address::query()->create(array_merge($this->validate(), ['user_id' => Auth::id()]));
+            Address::query()->create($addressData);
         }
+        
         Notification::make()->title(__('The address has been successfully saved'))->success()->send();
         $this->dispatch('addresses-updated');
         $this->closeModal();

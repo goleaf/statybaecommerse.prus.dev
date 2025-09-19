@@ -22,13 +22,16 @@ use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 /**
  * MenuResource
@@ -40,8 +43,7 @@ final class MenuResource extends Resource
     protected static ?string $model = Menu::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
-    
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
     protected static ?int $navigationSort = 3;
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -83,8 +85,8 @@ final class MenuResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -277,9 +279,9 @@ final class MenuResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 
-                TableAction::make('toggle_active')
+                Action::make('toggle_active')
                     ->label(fn (Menu $record): string => $record->is_active ? __('menus.deactivate') : __('menus.activate'))
                     ->icon(fn (Menu $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (Menu $record): string => $record->is_active ? 'warning' : 'success')
@@ -293,7 +295,7 @@ final class MenuResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('preview')
+                Action::make('preview')
                     ->label(__('menus.preview'))
                     ->icon('heroicon-o-eye')
                     ->color('info')
@@ -302,7 +304,7 @@ final class MenuResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     
                     BulkAction::make('activate')
                         ->label(__('menus.activate_selected'))

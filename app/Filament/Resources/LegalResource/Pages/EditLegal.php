@@ -7,6 +7,7 @@ namespace App\Filament\Resources\LegalResource\Pages;
 use App\Filament\Resources\LegalResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\DeleteAction;
 
 final class EditLegal extends EditRecord
 {

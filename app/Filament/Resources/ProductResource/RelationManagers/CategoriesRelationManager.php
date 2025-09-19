@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Category;
-use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Actions\EditAction;
 final class CategoriesRelationManager extends RelationManager
 {
     protected static string $relationship = 'categories';
@@ -82,7 +82,7 @@ final class CategoriesRelationManager extends RelationManager
                             ->default(false),
                     ]),
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 Tables\Actions\DetachAction::make(),
             ])
             ->bulkActions([

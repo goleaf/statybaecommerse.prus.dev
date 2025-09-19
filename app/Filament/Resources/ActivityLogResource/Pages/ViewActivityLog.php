@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ActivityLogResource\Pages;
 use App\Filament\Resources\ActivityLogResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Actions\EditAction;
 
 final class ViewActivityLog extends ViewRecord
 {

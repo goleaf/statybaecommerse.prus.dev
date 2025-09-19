@@ -7,6 +7,7 @@ namespace App\Filament\Resources\StockResource\Pages;
 use App\Filament\Resources\StockResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\DeleteAction;
 
 final class EditStock extends EditRecord
 {

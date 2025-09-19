@@ -3,13 +3,15 @@
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
 use App\Models\Translations\CollectionTranslation;
-use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 
 final class TranslationsRelationManager extends RelationManager
 {
@@ -152,17 +154,17 @@ final class TranslationsRelationManager extends RelationManager
                     ->label(__('admin.collections.actions.add_translation')),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->label(__('admin.collections.actions.edit_translation')),
 
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->label(__('admin.collections.actions.delete_translation'))
                     ->requiresConfirmation()
                     ->modalHeading(__('admin.collections.confirmations.delete_translation')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->label(__('admin.collections.actions.delete_translations'))
                         ->requiresConfirmation()
                         ->modalHeading(__('admin.collections.confirmations.delete_translations')),

@@ -24,13 +24,16 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 /**
  * SubscriberResource
@@ -44,6 +47,7 @@ final class SubscriberResource extends Resource
     /** @var UnitEnum|string|null */
         protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
     
+    ;
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'email';
 
@@ -85,8 +89,8 @@ final class SubscriberResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -346,9 +350,9 @@ final class SubscriberResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 
-                TableAction::make('verify')
+                Action::make('verify')
                     ->label(__('subscribers.verify'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -363,7 +367,7 @@ final class SubscriberResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('unsubscribe')
+                Action::make('unsubscribe')
                     ->label(__('subscribers.unsubscribe'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
@@ -381,7 +385,7 @@ final class SubscriberResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('resubscribe')
+                Action::make('resubscribe')
                     ->label(__('subscribers.resubscribe'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('success')
@@ -402,7 +406,7 @@ final class SubscriberResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     
                     BulkAction::make('verify')
                         ->label(__('subscribers.verify_selected'))

@@ -7,6 +7,7 @@ namespace App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Filament\Resources\AnalyticsEventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\DeleteAction;
 
 final class EditAnalyticsEvent extends EditRecord
 {

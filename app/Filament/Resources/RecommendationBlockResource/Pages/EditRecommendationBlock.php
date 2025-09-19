@@ -7,6 +7,7 @@ namespace App\Filament\Resources\RecommendationBlockResource\Pages;
 use App\Filament\Resources\RecommendationBlockResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\DeleteAction;
 
 final class EditRecommendationBlock extends EditRecord
 {

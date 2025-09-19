@@ -2,13 +2,15 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Document;
-use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 final class DocumentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'documents';
@@ -102,7 +104,7 @@ final class DocumentsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 Tables\Actions\Action::make('generate')
                     ->label(__('admin.documents.actions.generate'))
                     ->icon('heroicon-o-document-arrow-down')
@@ -122,10 +124,10 @@ final class DocumentsRelationManager extends RelationManager
                     ->url(fn(Document $record): string => $record->file_path ? route('documents.download', $record) : '#')
                     ->openUrlInNewTab()
                     ->visible(fn(Document $record): bool => $record->file_path !== null),
-                Tables\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     Tables\Actions\BulkAction::make('generate')
                         ->label(__('admin.documents.actions.generate_selected'))
                         ->icon('heroicon-o-document-arrow-down')

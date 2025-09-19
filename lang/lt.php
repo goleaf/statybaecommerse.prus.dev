@@ -47,6 +47,13 @@ return [
     'checkout_payment' => 'Mokėjimas',
     'checkout_review' => 'Peržiūra',
     'checkout_confirmation' => 'Patvirtinimas',
+    // Wishlist
+    'wishlist' => 'Pageidavimų sąrašas',
+    'products_you_saved_for_later' => 'Produktai, kuriuos išsaugojote vėlesniam laikui',
+    'your_wishlist_is_empty' => 'Jūsų pageidavimų sąrašas tuščias.',
+    'no_items_in_this_list' => 'Šiame sąraše nėra elementų.',
+    'default' => 'Pagal nutylėjimą',
+    'my_account' => 'Mano paskyra',
     'checkout_order_number' => 'Užsakymo numeris:',
     'checkout_proceed' => 'Tęsti atsiskaitymą',
     'checkout_place_order' => 'Pateikti užsakymą',

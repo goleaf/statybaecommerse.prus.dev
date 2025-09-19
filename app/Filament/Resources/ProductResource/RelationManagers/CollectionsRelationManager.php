@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Collection;
-use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Actions\EditAction;
 final class CollectionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'collections';
@@ -104,7 +104,7 @@ final class CollectionsRelationManager extends RelationManager
                             ->label(__('admin.products.fields.featured_until'))
                             ->visible(fn(Forms\Get $get): bool => $get('is_featured')),
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 Tables\Actions\DetachAction::make(),
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

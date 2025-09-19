@@ -258,7 +258,6 @@ return [
     
     // Homepage translations
     'home' => [
-        'limited_time' => 'Limited time: express pickup ready within 2 hours for Vilnius orders.',
         'check_availability' => 'Check availability',
         'fast_delivery' => 'Fast next-day delivery across Lithuania',
         'secure_payments' => 'Secure payments & 30-day returns',

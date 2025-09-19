@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Sliders\Schemas;
 
-use Filament\Schemas\Schema;
 
 class SliderForm
 {

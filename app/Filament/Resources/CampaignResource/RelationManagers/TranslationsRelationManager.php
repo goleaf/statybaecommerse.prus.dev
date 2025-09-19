@@ -7,12 +7,14 @@ namespace App\Filament\Resources\CampaignResource\RelationManagers;
 use Filament\Forms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 
 final class TranslationsRelationManager extends RelationManager
 {
@@ -22,7 +24,7 @@ final class TranslationsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form->schema([
+        return $schema->components([
             Forms\Components\Select::make('locale')
                 ->label($this->label('Locale'))
                 ->options($this->localeOptions())
@@ -103,12 +105,12 @@ final class TranslationsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('locale');

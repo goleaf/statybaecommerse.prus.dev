@@ -8,6 +8,7 @@ use App\Filament\Resources\UserResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
+use Filament\Actions\DeleteAction;
 
 final class EditUser extends EditRecord
 {

@@ -14,12 +14,12 @@ use App\Models\Country;
 use App\Enums\NavigationGroup;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * CountryResource
@@ -38,7 +38,7 @@ final class CountryResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return CountryForm::configure($schema);
     }

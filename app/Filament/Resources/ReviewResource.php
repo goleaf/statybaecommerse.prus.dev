@@ -26,13 +26,16 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\RatingColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 /**
  * ReviewResource
@@ -46,6 +49,7 @@ final class ReviewResource extends Resource
     /** @var UnitEnum|string|null */
         protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
     
+    ;
     protected static ?int $navigationSort = 4;
     protected static ?string $recordTitleAttribute = 'title';
 
@@ -87,8 +91,8 @@ final class ReviewResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -260,9 +264,9 @@ final class ReviewResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 
-                TableAction::make('approve')
+                Action::make('approve')
                     ->label(__('reviews.approve'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -277,7 +281,7 @@ final class ReviewResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('disapprove')
+                Action::make('disapprove')
                     ->label(__('reviews.disapprove'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
@@ -294,7 +298,7 @@ final class ReviewResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     
                     BulkAction::make('approve')
                         ->label(__('reviews.approve_selected'))

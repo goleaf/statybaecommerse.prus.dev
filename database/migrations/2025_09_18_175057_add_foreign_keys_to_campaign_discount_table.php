@@ -129,9 +129,19 @@ return new class extends Migration
     {
         $connection = Schema::getConnection();
         
-        // SQLite doesn't have information_schema, so we'll assume constraints don't exist
+        // SQLite doesn't have information_schema, so we'll check using PRAGMA
         if ($connection->getDriverName() === 'sqlite') {
-            return false;
+            try {
+                $indexes = DB::select("PRAGMA index_list($table)");
+                foreach ($indexes as $index) {
+                    if ($index->name === $constraintName) {
+                        return true;
+                    }
+                }
+                return false;
+            } catch (\Exception $e) {
+                return false;
+            }
         }
         
         $database = $connection->getDatabaseName();
@@ -148,9 +158,19 @@ return new class extends Migration
     {
         $connection = Schema::getConnection();
         
-        // SQLite doesn't have information_schema, so we'll assume indexes don't exist
+        // SQLite doesn't have information_schema, so we'll check using PRAGMA
         if ($connection->getDriverName() === 'sqlite') {
-            return false;
+            try {
+                $indexes = DB::select("PRAGMA index_list($table)");
+                foreach ($indexes as $index) {
+                    if ($index->name === $indexName) {
+                        return true;
+                    }
+                }
+                return false;
+            } catch (\Exception $e) {
+                return false;
+            }
         }
         
         $database = $connection->getDatabaseName();

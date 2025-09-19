@@ -24,13 +24,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 /**
  * ActivityLogResource
@@ -84,8 +87,8 @@ final class ActivityLogResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -530,9 +533,9 @@ final class ActivityLogResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 
-                TableAction::make('mark_important')
+                Action::make('mark_important')
                     ->label(__('activity_logs.mark_important'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
@@ -547,7 +550,7 @@ final class ActivityLogResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('unmark_important')
+                Action::make('unmark_important')
                     ->label(__('activity_logs.unmark_important'))
                     ->icon('heroicon-o-star')
                     ->color('gray')
@@ -562,7 +565,7 @@ final class ActivityLogResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('mark_system')
+                Action::make('mark_system')
                     ->label(__('activity_logs.mark_system'))
                     ->icon('heroicon-o-cog-6-tooth')
                     ->color('info')
@@ -577,7 +580,7 @@ final class ActivityLogResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('unmark_system')
+                Action::make('unmark_system')
                     ->label(__('activity_logs.unmark_system'))
                     ->icon('heroicon-o-user')
                     ->color('gray')
@@ -594,7 +597,7 @@ final class ActivityLogResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     
                     BulkAction::make('mark_important')
                         ->label(__('activity_logs.mark_important_selected'))

@@ -2,13 +2,15 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Review;
-use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 final class ReviewsRelationManager extends RelationManager
 {
     protected static string $relationship = 'reviews';
@@ -114,11 +116,11 @@ final class ReviewsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     Tables\Actions\BulkAction::make('approve')
                         ->label(__('admin.reviews.actions.approve'))
                         ->icon('heroicon-o-check')

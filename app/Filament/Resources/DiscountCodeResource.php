@@ -25,13 +25,16 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 /**
  * DiscountCodeResource
@@ -45,6 +48,7 @@ final class DiscountCodeResource extends Resource
     /** @var UnitEnum|string|null */
         protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
     
+    ;
     protected static ?int $navigationSort = 3;
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -86,8 +90,8 @@ final class DiscountCodeResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -427,9 +431,9 @@ final class DiscountCodeResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 
-                TableAction::make('toggle_active')
+                Action::make('toggle_active')
                     ->label(fn (DiscountCode $record): string => $record->is_active ? __('discount_codes.deactivate') : __('discount_codes.activate'))
                     ->icon(fn (DiscountCode $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (DiscountCode $record): string => $record->is_active ? 'warning' : 'success')
@@ -443,7 +447,7 @@ final class DiscountCodeResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('duplicate')
+                Action::make('duplicate')
                     ->label(__('discount_codes.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
                     ->color('info')
@@ -463,7 +467,7 @@ final class DiscountCodeResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     
                     BulkAction::make('activate')
                         ->label(__('discount_codes.activate_selected'))

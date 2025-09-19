@@ -25,13 +25,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 /**
  * CampaignConversionResource
@@ -45,6 +48,7 @@ final class CampaignConversionResource extends Resource
     /** @var UnitEnum|string|null */
         protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
     
+    ;
     protected static ?int $navigationSort = 9;
     protected static ?string $recordTitleAttribute = 'campaign_name';
 
@@ -86,8 +90,8 @@ final class CampaignConversionResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
+     * @param Form $form
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -524,9 +528,9 @@ final class CampaignConversionResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 
-                TableAction::make('verify')
+                Action::make('verify')
                     ->label(__('campaign_conversions.verify'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -541,7 +545,7 @@ final class CampaignConversionResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('unverify')
+                Action::make('unverify')
                     ->label(__('campaign_conversions.unverify'))
                     ->icon('heroicon-o-x-circle')
                     ->color('warning')
@@ -556,7 +560,7 @@ final class CampaignConversionResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('attribute')
+                Action::make('attribute')
                     ->label(__('campaign_conversions.attribute'))
                     ->icon('heroicon-o-link')
                     ->color('info')
@@ -571,7 +575,7 @@ final class CampaignConversionResource extends Resource
                     })
                     ->requiresConfirmation(),
                 
-                TableAction::make('unattribute')
+                Action::make('unattribute')
                     ->label(__('campaign_conversions.unattribute'))
                     ->icon('heroicon-o-link-slash')
                     ->color('warning')
@@ -588,7 +592,7 @@ final class CampaignConversionResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                     
                     BulkAction::make('verify')
                         ->label(__('campaign_conversions.verify_selected'))

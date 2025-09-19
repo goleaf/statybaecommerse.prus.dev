@@ -36,6 +36,7 @@ class Addresses extends Component
     #[On('addresses-updated')]
     public function render(): View
     {
-        return view('livewire.pages.account.addresses', ['addresses' => auth()->user()->addresses->load('country')])->title(__('My addresses'));
+        $addresses = auth()->user()->addresses()->where('is_active', true)->with('country')->orderBy('is_default', 'desc')->orderBy('created_at', 'desc')->get();
+        return view('livewire.pages.account.addresses', ['addresses' => $addresses])->title(__('My addresses'));
     }
 }
