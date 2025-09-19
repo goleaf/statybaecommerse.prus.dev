@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -18,11 +16,11 @@ final class SystemResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create test user
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
-        
+
         // Create test category
         $this->category = SystemSettingCategory::factory()->create([
             'name' => 'Test Category',
@@ -163,9 +161,9 @@ final class SystemResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\SystemResource\Pages\CreateSystem::class)
             ->fillForm([
-                'key' => '', // Required field
-                'name' => '', // Required field
-                'type' => '', // Required field
+                'key' => '',  // Required field
+                'name' => '',  // Required field
+                'type' => '',  // Required field
             ])
             ->call('create')
             ->assertHasFormErrors(['key', 'name', 'type']);
@@ -177,7 +175,7 @@ final class SystemResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\SystemResource\Pages\CreateSystem::class)
             ->fillForm([
-                'key' => 'existing_key', // Duplicate key
+                'key' => 'existing_key',  // Duplicate key
                 'name' => 'Test Setting',
                 'type' => 'string',
                 'value' => 'test_value',

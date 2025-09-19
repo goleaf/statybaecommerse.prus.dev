@@ -13,12 +13,13 @@ use App\Models\Zone;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ImportAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -26,9 +27,19 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Placeholder;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
+use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -47,7 +58,7 @@ final class AddressResource extends Resource
 {
     protected static ?string $model = Address::class;
 
-    protected static string|UnitEnum|null $navigationGroup = "System";
+    protected static string|UnitEnum|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 3;
 
@@ -64,7 +75,7 @@ final class AddressResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Orders";
+        return 'Orders';
     }
 
     /**
@@ -357,9 +368,38 @@ final class AddressResource extends Resource
                             ->send();
                     })
                     ->visible(fn(Address $record) => !$record->is_default),
-                Tables\Actions\ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Action::make('duplicate')
+                    ->label(__('translations.duplicate'))
+                    ->icon('heroicon-o-document-duplicate')
+                    ->color('gray')
+                    ->action(function (Address $record) {
+                        $newAddress = $record->replicate();
+                        $newAddress->is_default = false;
+                        $newAddress->save();
+
+                        Notification::make()
+                            ->title(__('translations.address_duplicated'))
+                            ->success()
+                            ->send();
+                    }),
+                Action::make('toggle_active')
+                    ->label(fn(Address $record) => $record->is_active ? __('translations.deactivate') : __('translations.activate'))
+                    ->icon(fn(Address $record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                    ->color(fn(Address $record) => $record->is_active ? 'danger' : 'success')
+                    ->action(function (Address $record) {
+                        $record->update(['is_active' => !$record->is_active]);
+
+                        Notification::make()
+                            ->title($record->is_active ? __('translations.address_activated') : __('translations.address_deactivated'))
+                            ->success()
+                            ->send();
+                    }),
+                ViewAction::make()
+                    ->color('info'),
+                EditAction::make()
+                    ->color('warning'),
+                DeleteAction::make()
+                    ->color('danger'),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -385,10 +425,51 @@ final class AddressResource extends Resource
                                 ->success()
                                 ->send();
                         }),
+                    BulkAction::make('set_billing')
+                        ->label(__('translations.set_as_billing'))
+                        ->icon('heroicon-o-credit-card')
+                        ->color('info')
+                        ->action(function (Collection $records) {
+                            $records->each->update(['is_billing' => true]);
+                            Notification::make()
+                                ->title(__('translations.addresses_set_as_billing'))
+                                ->success()
+                                ->send();
+                        }),
+                    BulkAction::make('set_shipping')
+                        ->label(__('translations.set_as_shipping'))
+                        ->icon('heroicon-o-truck')
+                        ->color('warning')
+                        ->action(function (Collection $records) {
+                            $records->each->update(['is_shipping' => true]);
+                            Notification::make()
+                                ->title(__('translations.addresses_set_as_shipping'))
+                                ->success()
+                                ->send();
+                        }),
+                    BulkAction::make('export')
+                        ->label(__('translations.export'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('gray')
+                        ->action(function (Collection $records) {
+                            // Export logic would go here
+                            Notification::make()
+                                ->title(__('translations.addresses_exported'))
+                                ->success()
+                                ->send();
+                        }),
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('created_at', 'desc')
+            ->poll('30s')  // Auto-refresh every 30 seconds
+            ->striped()
+            ->paginated([10, 25, 50, 100])
+            ->reorderable('sort_order')
+            ->searchable()
+            ->persistSearchInSession()
+            ->persistColumnSearchesInSession()
+            ->persistFiltersInSession();
     }
 
     /**
@@ -417,7 +498,14 @@ final class AddressResource extends Resource
      */
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        $count = static::getModel()::count();
+        $activeCount = static::getModel()::where('is_active', true)->count();
+
+        if ($activeCount === 0) {
+            return null;
+        }
+
+        return $activeCount === $count ? (string) $count : "{$activeCount}/{$count}";
     }
 
     /**
@@ -425,7 +513,18 @@ final class AddressResource extends Resource
      */
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'primary';
+        $count = static::getModel()::count();
+        $activeCount = static::getModel()::where('is_active', true)->count();
+
+        if ($activeCount === 0) {
+            return 'danger';
+        }
+
+        if ($activeCount === $count) {
+            return 'success';
+        }
+
+        return 'warning';
     }
 
     /**

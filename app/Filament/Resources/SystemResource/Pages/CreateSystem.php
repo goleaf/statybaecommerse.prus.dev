@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemResource\Pages;
 
@@ -19,14 +17,14 @@ final class CreateSystem extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['user_id'] = auth()->id();
-        
+
         // Set default values if not provided
         $data['is_required'] ??= false;
         $data['is_public'] ??= false;
         $data['is_readonly'] ??= false;
         $data['is_encrypted'] ??= false;
         $data['cache_ttl'] ??= 3600;
-        
+
         return $data;
     }
 

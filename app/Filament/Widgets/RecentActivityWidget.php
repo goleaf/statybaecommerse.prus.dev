@@ -20,7 +20,6 @@ class RecentActivityWidget extends BaseWidget
 {
     protected static ?int $sort = 3;
     protected int|string|array $columnSpan = 'full';
-    protected static ?string $heading = 'Recent Activity Dashboard';
 
     public function table(Table $table): Table
     {
@@ -132,8 +131,9 @@ class RecentActivityWidget extends BaseWidget
             END as status,
             created_at,
             updated_at
-        ")->where('created_at', '>=', Carbon::now()->subDays(7))
-        ->where('is_approved', true);
+        ")
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
+            ->where('is_approved', true);
 
         // Get recent campaigns - SQLite compatible
         $recentCampaigns = Campaign::selectRaw("

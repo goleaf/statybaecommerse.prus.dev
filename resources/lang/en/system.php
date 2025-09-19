@@ -4,18 +4,15 @@ return [
     'title' => 'System Settings',
     'single' => 'System Setting',
     'plural' => 'System Settings',
-    
     'navigation' => [
         'title' => 'System Settings',
         'description' => 'Manage system configuration and settings',
     ],
-    
     'form' => [
         'basic_settings' => 'Basic Settings',
         'advanced_settings' => 'Advanced Settings',
         'dependencies' => 'Dependencies & Relations',
         'translations' => 'Translations',
-        
         'system_information' => 'System Information',
         'value_configuration' => 'Value Configuration',
         'validation_constraints' => 'Validation & Constraints',
@@ -24,7 +21,6 @@ return [
         'dependencies' => 'Dependencies',
         'relations' => 'Relations',
         'multi_language_support' => 'Multi-language Support',
-        
         'fields' => [
             'key' => 'Setting Key',
             'name' => 'Display Name',
@@ -43,7 +39,6 @@ return [
             'is_public' => 'Public Setting',
             'is_readonly' => 'Read Only',
         ],
-        
         'types' => [
             'string' => 'Text',
             'integer' => 'Number',
@@ -58,14 +53,12 @@ return [
             'url' => 'URL',
             'password' => 'Password',
         ],
-        
         'permissions' => [
             'admin' => 'Admin Only',
             'manager' => 'Manager+',
             'user' => 'Any User',
             'system' => 'System Only',
         ],
-        
         'cache_ttl_options' => [
             0 => 'No Cache',
             60 => '1 Minute',
@@ -75,7 +68,6 @@ return [
             86400 => '1 Day',
         ],
     ],
-    
     'table' => [
         'columns' => [
             'key' => 'Setting Key',
@@ -90,7 +82,6 @@ return [
             'created_at' => 'Created',
             'updated_at' => 'Updated',
         ],
-        
         'actions' => [
             'clear_cache' => 'Clear Cache',
             'export' => 'Export',
@@ -98,13 +89,11 @@ return [
             'optimize_system' => 'Optimize System',
             'clear_all_caches' => 'Clear All Caches',
         ],
-        
         'bulk_actions' => [
             'clear_all_cache' => 'Clear All Cache',
             'export_selected' => 'Export Selected',
         ],
     ],
-    
     'tabs' => [
         'all' => 'All Settings',
         'general' => 'General',
@@ -116,7 +105,6 @@ return [
         'public' => 'Public',
         'readonly' => 'Read Only',
     ],
-    
     'notifications' => [
         'created' => 'System setting created successfully',
         'updated' => 'System setting updated successfully',
@@ -126,7 +114,6 @@ return [
         'system_optimized' => 'System optimized successfully',
         'all_caches_cleared' => 'All caches cleared successfully',
     ],
-    
     'widgets' => [
         'stats' => [
             'total_settings' => 'Total Settings',

@@ -1,14 +1,12 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemResource\Pages;
 
 use App\Filament\Resources\SystemResource;
-use Filament\Actions\ViewAction;
-use Filament\Actions\DeleteAction;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Cache;
 
 final class EditSystem extends EditRecord
@@ -27,11 +25,10 @@ final class EditSystem extends EditRecord
                 ->action(function () {
                     $record = $this->getRecord();
                     Cache::forget($record->cache_key ?? $record->key);
-                    
+
                     $this->notify('success', 'Cache cleared successfully');
                 })
-                ->visible(fn () => !empty($this->getRecord()->cache_key)),
-                
+                ->visible(fn() => !empty($this->getRecord()->cache_key)),
             Action::make('reset_to_default')
                 ->label('Reset to Default')
                 ->icon('heroicon-o-arrow-uturn-left')
@@ -44,7 +41,7 @@ final class EditSystem extends EditRecord
                         $this->notify('success', 'Setting reset to default value');
                     }
                 })
-                ->visible(fn () => !empty($this->getRecord()->default_value)),
+                ->visible(fn() => !empty($this->getRecord()->default_value)),
         ];
     }
 
@@ -55,7 +52,7 @@ final class EditSystem extends EditRecord
             $record = $this->getRecord();
             Cache::forget($record->cache_key ?? $record->key);
         }
-        
+
         return $data;
     }
 

@@ -1,14 +1,12 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemResource\Pages;
 
 use App\Filament\Resources\SystemResource;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Facades\Cache;
 
 final class ViewSystem extends ViewRecord
@@ -27,11 +25,10 @@ final class ViewSystem extends ViewRecord
                 ->action(function () {
                     $record = $this->getRecord();
                     Cache::forget($record->cache_key ?? $record->key);
-                    
+
                     $this->notify('success', 'Cache cleared successfully');
                 })
-                ->visible(fn () => !empty($this->getRecord()->cache_key)),
-                
+                ->visible(fn() => !empty($this->getRecord()->cache_key)),
             Action::make('refresh_value')
                 ->label('Refresh Value')
                 ->icon('heroicon-o-arrow-path')
@@ -39,7 +36,7 @@ final class ViewSystem extends ViewRecord
                 ->action(function () {
                     $record = $this->getRecord();
                     $record->touch();
-                    
+
                     $this->notify('success', 'Value refreshed successfully');
                 }),
         ];

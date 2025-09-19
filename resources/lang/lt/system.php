@@ -4,18 +4,15 @@ return [
     'title' => 'Sistemos Nustatymai',
     'single' => 'Sistemos Nustatymas',
     'plural' => 'Sistemos Nustatymai',
-    
     'navigation' => [
         'title' => 'Sistemos Nustatymai',
         'description' => 'Valdykite sistemos konfigūraciją ir nustatymus',
     ],
-    
     'form' => [
         'basic_settings' => 'Pagrindiniai Nustatymai',
         'advanced_settings' => 'Išplėstiniai Nustatymai',
         'dependencies' => 'Priklausomybės ir Sąsajos',
         'translations' => 'Vertimai',
-        
         'system_information' => 'Sistemos Informacija',
         'value_configuration' => 'Reikšmės Konfigūracija',
         'validation_constraints' => 'Validavimo Apribojimai',
@@ -24,7 +21,6 @@ return [
         'dependencies' => 'Priklausomybės',
         'relations' => 'Sąsajos',
         'multi_language_support' => 'Daugiakalbis Palaikymas',
-        
         'fields' => [
             'key' => 'Nustatymo Raktas',
             'name' => 'Rodomas Pavadinimas',
@@ -43,7 +39,6 @@ return [
             'is_public' => 'Viešas Nustatymas',
             'is_readonly' => 'Tik Skaityti',
         ],
-        
         'types' => [
             'string' => 'Tekstas',
             'integer' => 'Skaičius',
@@ -58,14 +53,12 @@ return [
             'url' => 'URL',
             'password' => 'Slaptažodis',
         ],
-        
         'permissions' => [
             'admin' => 'Tik Administratorius',
             'manager' => 'Vadybininkas+',
             'user' => 'Bet kuris Vartotojas',
             'system' => 'Tik Sistema',
         ],
-        
         'cache_ttl_options' => [
             0 => 'Be Talpyklos',
             60 => '1 Minutė',
@@ -75,7 +68,6 @@ return [
             86400 => '1 Diena',
         ],
     ],
-    
     'table' => [
         'columns' => [
             'key' => 'Nustatymo Raktas',
@@ -90,7 +82,6 @@ return [
             'created_at' => 'Sukurta',
             'updated_at' => 'Atnaujinta',
         ],
-        
         'actions' => [
             'clear_cache' => 'Išvalyti Talpyklą',
             'export' => 'Eksportuoti',
@@ -98,13 +89,11 @@ return [
             'optimize_system' => 'Optimizuoti Sistemą',
             'clear_all_caches' => 'Išvalyti Visas Talpyklas',
         ],
-        
         'bulk_actions' => [
             'clear_all_cache' => 'Išvalyti Visą Talpyklą',
             'export_selected' => 'Eksportuoti Pasirinktus',
         ],
     ],
-    
     'tabs' => [
         'all' => 'Visi Nustatymai',
         'general' => 'Bendri',
@@ -116,7 +105,6 @@ return [
         'public' => 'Vieši',
         'readonly' => 'Tik Skaityti',
     ],
-    
     'notifications' => [
         'created' => 'Sistemos nustatymas sėkmingai sukurtas',
         'updated' => 'Sistemos nustatymas sėkmingai atnaujintas',
@@ -126,7 +114,6 @@ return [
         'system_optimized' => 'Sistema sėkmingai optimizuota',
         'all_caches_cleared' => 'Visos talpyklos sėkmingai išvalytos',
     ],
-    
     'widgets' => [
         'stats' => [
             'total_settings' => 'Iš Viso Nustatymų',

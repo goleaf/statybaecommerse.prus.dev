@@ -1,13 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\LegalResource\Pages;
 
 use App\Filament\Resources\LegalResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Actions\DeleteAction;
+use Filament\Actions;
 
 final class EditLegal extends EditRecord
 {
@@ -19,10 +16,5 @@ final class EditLegal extends EditRecord
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
     }
 }

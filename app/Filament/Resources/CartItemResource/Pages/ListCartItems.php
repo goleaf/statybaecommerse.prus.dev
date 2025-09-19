@@ -7,7 +7,7 @@ namespace App\Filament\Resources\CartItemResource\Pages;
 use App\Filament\Resources\CartItemResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListCartItems extends ListRecords
