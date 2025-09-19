@@ -17,7 +17,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -97,11 +96,11 @@ final class PriceResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('prices.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('priceable_type')
                                 ->label(__('prices.priceable_type'))
                                 ->options([
@@ -130,7 +129,7 @@ final class PriceResource extends Resource
                                 ->live(),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('price')
                                 ->label(__('prices.price'))
                                 ->numeric()
@@ -148,9 +147,9 @@ final class PriceResource extends Resource
                         ]),
                 ]),
             Section::make(__('prices.pricing_details'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('compare_price')
                                 ->label(__('prices.compare_price'))
                                 ->numeric()
@@ -165,7 +164,7 @@ final class PriceResource extends Resource
                                 ->minValue(0),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('sale_price')
                                 ->label(__('prices.sale_price'))
                                 ->numeric()
@@ -181,9 +180,9 @@ final class PriceResource extends Resource
                         ]),
                 ]),
             Section::make(__('prices.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('prices.is_active'))
                                 ->default(true),
@@ -191,7 +190,7 @@ final class PriceResource extends Resource
                                 ->label(__('prices.is_default')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('valid_from')
                                 ->label(__('prices.valid_from'))
                                 ->default(now())

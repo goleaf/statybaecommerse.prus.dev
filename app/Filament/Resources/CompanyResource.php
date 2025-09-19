@@ -31,8 +31,6 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * CompanyResource
  * 
@@ -91,11 +89,11 @@ final class CompanyResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('companies.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('companies.name'))
                                 ->required()
@@ -107,7 +105,7 @@ final class CompanyResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('registration_number')
                                 ->label(__('companies.registration_number'))
                                 ->maxLength(50),
@@ -125,9 +123,9 @@ final class CompanyResource extends Resource
                 ]),
             
             Section::make(__('companies.contact_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('email')
                                 ->label(__('companies.email'))
                                 ->email()
@@ -147,7 +145,7 @@ final class CompanyResource extends Resource
                 ]),
             
             Section::make(__('companies.address_information'))
-                ->schema([
+                ->components([
                     KeyValue::make('address')
                         ->label(__('companies.address'))
                         ->keyLabel(__('companies.address_field'))
@@ -156,9 +154,9 @@ final class CompanyResource extends Resource
                 ]),
             
             Section::make(__('companies.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('companies.is_active'))
                                 ->default(true),
@@ -168,7 +166,7 @@ final class CompanyResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('companies.sort_order'))
                                 ->numeric()

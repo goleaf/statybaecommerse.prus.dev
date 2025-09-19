@@ -30,8 +30,6 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * CountryResource
  * 
@@ -89,11 +87,11 @@ final class CountryResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('countries.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('countries.name'))
                                 ->required()
@@ -109,7 +107,7 @@ final class CountryResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('iso_code')
                                 ->label(__('countries.iso_code'))
                                 ->required()
@@ -132,9 +130,9 @@ final class CountryResource extends Resource
                 ]),
             
             Section::make(__('countries.currency_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('currency_code')
                                 ->label(__('countries.currency_code'))
                                 ->maxLength(3)
@@ -149,9 +147,9 @@ final class CountryResource extends Resource
                 ]),
             
             Section::make(__('countries.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('countries.is_active'))
                                 ->default(true),
@@ -161,7 +159,7 @@ final class CountryResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('countries.sort_order'))
                                 ->numeric()

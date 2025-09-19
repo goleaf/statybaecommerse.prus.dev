@@ -15,7 +15,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -95,11 +94,11 @@ final class DiscountCodeResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('discount_codes.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('code')
                                 ->label(__('discount_codes.code'))
                                 ->required()
@@ -119,9 +118,9 @@ final class DiscountCodeResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('discount_codes.discount_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('type')
                                 ->label(__('discount_codes.type'))
                                 ->options([
@@ -142,7 +141,7 @@ final class DiscountCodeResource extends Resource
                                 ->helperText(__('discount_codes.value_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('minimum_amount')
                                 ->label(__('discount_codes.minimum_amount'))
                                 ->numeric()
@@ -158,9 +157,9 @@ final class DiscountCodeResource extends Resource
                         ]),
                 ]),
             Section::make(__('discount_codes.usage_limits'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('usage_limit')
                                 ->label(__('discount_codes.usage_limit'))
                                 ->numeric()
@@ -173,7 +172,7 @@ final class DiscountCodeResource extends Resource
                                 ->helperText(__('discount_codes.usage_limit_per_user_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('used_count')
                                 ->label(__('discount_codes.used_count'))
                                 ->numeric()
@@ -188,9 +187,9 @@ final class DiscountCodeResource extends Resource
                         ]),
                 ]),
             Section::make(__('discount_codes.validity'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('valid_from')
                                 ->label(__('discount_codes.valid_from'))
                                 ->default(now())
@@ -201,9 +200,9 @@ final class DiscountCodeResource extends Resource
                         ]),
                 ]),
             Section::make(__('discount_codes.targeting'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('customer_group_id')
                                 ->label(__('discount_codes.customer_group'))
                                 ->relationship('customerGroup', 'name')
@@ -222,9 +221,9 @@ final class DiscountCodeResource extends Resource
                         ]),
                 ]),
             Section::make(__('discount_codes.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('discount_codes.is_active'))
                                 ->default(true),
@@ -233,7 +232,7 @@ final class DiscountCodeResource extends Resource
                                 ->default(false),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_auto_apply')
                                 ->label(__('discount_codes.is_auto_apply'))
                                 ->default(false),

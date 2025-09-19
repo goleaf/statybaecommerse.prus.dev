@@ -34,8 +34,6 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * AttributeValueResource
  * 
@@ -94,11 +92,11 @@ final class AttributeValueResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('attribute_values.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('attribute_id')
                                 ->label(__('attribute_values.attribute'))
                                 ->relationship('attribute', 'name')
@@ -124,7 +122,7 @@ final class AttributeValueResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('valueable_type')
                                 ->label(__('attribute_values.valueable_type'))
                                 ->options([
@@ -156,9 +154,9 @@ final class AttributeValueResource extends Resource
                 ]),
             
             Section::make(__('attribute_values.value_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('value')
                                 ->label(__('attribute_values.value'))
                                 ->required()
@@ -178,9 +176,9 @@ final class AttributeValueResource extends Resource
                 ]),
             
             Section::make(__('attribute_values.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('attribute_values.is_active'))
                                 ->default(true),
@@ -190,7 +188,7 @@ final class AttributeValueResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('attribute_values.sort_order'))
                                 ->numeric()

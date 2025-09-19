@@ -24,7 +24,7 @@ final class AddressesRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('address_id')
                     ->label(__('customers.address'))
                     ->relationship('address', 'street')

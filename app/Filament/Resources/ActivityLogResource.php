@@ -16,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -91,11 +90,11 @@ final class ActivityLogResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('activity_logs.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('user_id')
                                 ->label(__('activity_logs.user'))
                                 ->relationship('user', 'name')
@@ -117,7 +116,7 @@ final class ActivityLogResource extends Resource
                                 ->disabled(),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('log_name')
                                 ->label(__('activity_logs.log_name'))
                                 ->maxLength(255)
@@ -130,9 +129,9 @@ final class ActivityLogResource extends Resource
                         ]),
                 ]),
             Section::make(__('activity_logs.event_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('event')
                                 ->label(__('activity_logs.event'))
                                 ->options([
@@ -155,7 +154,7 @@ final class ActivityLogResource extends Resource
                                 ->helperText(__('activity_logs.subject_type_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('subject_id')
                                 ->label(__('activity_logs.subject_id'))
                                 ->numeric()
@@ -167,7 +166,7 @@ final class ActivityLogResource extends Resource
                                 ->helperText(__('activity_logs.causer_type_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('causer_id')
                                 ->label(__('activity_logs.causer_id'))
                                 ->numeric()
@@ -180,7 +179,7 @@ final class ActivityLogResource extends Resource
                         ]),
                 ]),
             Section::make(__('activity_logs.properties'))
-                ->schema([
+                ->components([
                     Textarea::make('properties')
                         ->label(__('activity_logs.properties'))
                         ->rows(5)
@@ -189,9 +188,9 @@ final class ActivityLogResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('activity_logs.context_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('ip_address')
                                 ->label(__('activity_logs.ip_address'))
                                 ->maxLength(45)
@@ -203,7 +202,7 @@ final class ActivityLogResource extends Resource
                                 ->helperText(__('activity_logs.user_agent_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('device_type')
                                 ->label(__('activity_logs.device_type'))
                                 ->maxLength(50)
@@ -214,7 +213,7 @@ final class ActivityLogResource extends Resource
                                 ->helperText(__('activity_logs.browser_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('os')
                                 ->label(__('activity_logs.os'))
                                 ->maxLength(100)
@@ -226,9 +225,9 @@ final class ActivityLogResource extends Resource
                         ]),
                 ]),
             Section::make(__('activity_logs.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_important')
                                 ->label(__('activity_logs.is_important'))
                                 ->default(false),
@@ -237,7 +236,7 @@ final class ActivityLogResource extends Resource
                                 ->default(false),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('severity')
                                 ->label(__('activity_logs.severity'))
                                 ->maxLength(20)

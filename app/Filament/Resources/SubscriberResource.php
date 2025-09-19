@@ -13,7 +13,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -91,11 +90,11 @@ final class SubscriberResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('subscribers.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('email')
                                 ->label(__('subscribers.email'))
                                 ->email()
@@ -112,9 +111,9 @@ final class SubscriberResource extends Resource
                         ->maxLength(20),
                 ]),
             Section::make(__('subscribers.subscription_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('status')
                                 ->label(__('subscribers.status'))
                                 ->options([
@@ -138,7 +137,7 @@ final class SubscriberResource extends Resource
                                 ->default('website'),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_verified')
                                 ->label(__('subscribers.is_verified'))
                                 ->default(false),
@@ -148,9 +147,9 @@ final class SubscriberResource extends Resource
                         ]),
                 ]),
             Section::make(__('subscribers.preferences'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('preferred_language')
                                 ->label(__('subscribers.preferred_language'))
                                 ->options([
@@ -167,7 +166,7 @@ final class SubscriberResource extends Resource
                                 ->default('EUR'),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('newsletter_subscription')
                                 ->label(__('subscribers.newsletter_subscription'))
                                 ->default(true),
@@ -177,9 +176,9 @@ final class SubscriberResource extends Resource
                         ]),
                 ]),
             Section::make(__('subscribers.additional_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('subscribed_at')
                                 ->label(__('subscribers.subscribed_at'))
                                 ->default(now())

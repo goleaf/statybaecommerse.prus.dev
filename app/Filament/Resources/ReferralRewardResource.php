@@ -16,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -92,11 +91,11 @@ final class ReferralRewardResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('referral_rewards.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('referral_id')
                                 ->label(__('referral_rewards.referral'))
                                 ->relationship('referral', 'referral_code')
@@ -121,7 +120,7 @@ final class ReferralRewardResource extends Resource
                                 ->disabled(),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('user_id')
                                 ->label(__('referral_rewards.user'))
                                 ->relationship('user', 'name')
@@ -146,9 +145,9 @@ final class ReferralRewardResource extends Resource
                         ]),
                 ]),
             Section::make(__('referral_rewards.reward_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('amount')
                                 ->label(__('referral_rewards.amount'))
                                 ->numeric()
@@ -169,7 +168,7 @@ final class ReferralRewardResource extends Resource
                                 ->default('referrer'),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('status')
                                 ->label(__('referral_rewards.status'))
                                 ->options([
@@ -190,9 +189,9 @@ final class ReferralRewardResource extends Resource
                         ]),
                 ]),
             Section::make(__('referral_rewards.payment_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('paid_at')
                                 ->label(__('referral_rewards.paid_at'))
                                 ->displayFormat('d/m/Y H:i'),
@@ -202,7 +201,7 @@ final class ReferralRewardResource extends Resource
                                 ->helperText(__('referral_rewards.payment_method_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('transaction_id')
                                 ->label(__('referral_rewards.transaction_id'))
                                 ->maxLength(100)
@@ -214,9 +213,9 @@ final class ReferralRewardResource extends Resource
                         ]),
                 ]),
             Section::make(__('referral_rewards.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('referral_rewards.is_active'))
                                 ->default(true),
@@ -225,7 +224,7 @@ final class ReferralRewardResource extends Resource
                                 ->default(false),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('expires_at')
                                 ->label(__('referral_rewards.expires_at'))
                                 ->displayFormat('d/m/Y H:i'),

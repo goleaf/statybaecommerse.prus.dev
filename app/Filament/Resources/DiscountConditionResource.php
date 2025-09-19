@@ -17,7 +17,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -96,11 +95,11 @@ final class DiscountConditionResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('discount_conditions.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('discount_conditions.name'))
                                 ->required()
@@ -119,9 +118,9 @@ final class DiscountConditionResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('discount_conditions.condition_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('type')
                                 ->label(__('discount_conditions.type'))
                                 ->options([
@@ -153,7 +152,7 @@ final class DiscountConditionResource extends Resource
                                 ->default('equals'),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('value')
                                 ->label(__('discount_conditions.value'))
                                 ->required()
@@ -168,9 +167,9 @@ final class DiscountConditionResource extends Resource
                         ]),
                 ]),
             Section::make(__('discount_conditions.targeting'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('products')
                                 ->label(__('discount_conditions.products'))
                                 ->relationship('products', 'name')
@@ -188,9 +187,9 @@ final class DiscountConditionResource extends Resource
                         ]),
                 ]),
             Section::make(__('discount_conditions.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('discount_conditions.is_active'))
                                 ->default(true),
@@ -199,7 +198,7 @@ final class DiscountConditionResource extends Resource
                                 ->default(false),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_exclusive')
                                 ->label(__('discount_conditions.is_exclusive'))
                                 ->default(false),

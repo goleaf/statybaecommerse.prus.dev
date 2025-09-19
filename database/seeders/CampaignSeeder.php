@@ -1,9 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Translations\CampaignTranslation;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
 use App\Models\CampaignConversion;
@@ -15,14 +14,13 @@ use App\Models\Category;
 use App\Models\Channel;
 use App\Models\CustomerGroup;
 use App\Models\Product;
-use App\Models\Translations\CampaignTranslation;
 use App\Models\Zone;
+use Faker\Factory as FakerFactory;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Faker\Factory as FakerFactory;
 
 final class CampaignSeeder extends Seeder
 {
@@ -159,11 +157,19 @@ final class CampaignSeeder extends Seeder
         // Create customer segments for campaigns
         foreach ($allCampaigns as $campaign) {
             $segmentCount = fake()->numberBetween(1, 3);
+            $usedGroups = collect();
 
             for ($i = 0; $i < $segmentCount; $i++) {
+                $availableGroups = $customerGroupIds->diff($usedGroups);
+                $customerGroupId = $availableGroups->isEmpty() ? null : $availableGroups->random();
+
+                if ($customerGroupId) {
+                    $usedGroups->push($customerGroupId);
+                }
+
                 CampaignCustomerSegment::factory()->create([
                     'campaign_id' => $campaign->id,
-                    'customer_group_id' => $customerGroupIds->isEmpty() ? null : $customerGroupIds->random(),
+                    'customer_group_id' => $customerGroupId,
                     'segment_type' => fake()->randomElement(['group', 'location', 'behavior', 'custom']),
                 ]);
             }
@@ -375,7 +381,7 @@ final class CampaignSeeder extends Seeder
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn ($v) => trim((string) $v))
+            ->map(fn($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()

@@ -105,13 +105,13 @@ final class OrderResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Section::make(__('orders.basic_information'))
                     ->description(__('orders.basic_information_description'))
                     ->icon('heroicon-o-information-circle')
-                    ->schema([
+                    ->components([
                         Grid::make(3)
-                            ->schema([
+                            ->components([
                                 TextInput::make('number')
                                     ->label(__('orders.number'))
                                     ->required()
@@ -150,7 +150,7 @@ final class OrderResource extends Resource
                                     ->prefixIcon('heroicon-o-flag'),
                             ]),
                         Grid::make(3)
-                            ->schema([
+                            ->components([
                                 Select::make('payment_status')
                                     ->label(__('orders.payment_status'))
                                     ->options([
@@ -184,9 +184,9 @@ final class OrderResource extends Resource
                 Section::make(__('orders.pricing'))
                     ->description(__('orders.pricing_description'))
                     ->icon('heroicon-o-currency-euro')
-                    ->schema([
+                    ->components([
                         Grid::make(4)
-                            ->schema([
+                            ->components([
                                 TextInput::make('subtotal')
                                     ->label(__('orders.subtotal'))
                                     ->numeric()
@@ -243,9 +243,9 @@ final class OrderResource extends Resource
                 Section::make(__('orders.addresses'))
                     ->description(__('orders.addresses_description'))
                     ->icon('heroicon-o-map-pin')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 KeyValue::make('billing_address')
                                     ->label(__('orders.billing_address'))
                                     ->keyLabel(__('orders.address_field'))
@@ -264,9 +264,9 @@ final class OrderResource extends Resource
                 Section::make(__('orders.shipping_information'))
                     ->description(__('orders.shipping_information_description'))
                     ->icon('heroicon-o-truck')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 DateTimePicker::make('shipped_at')
                                     ->label(__('orders.shipped_at'))
                                     ->prefixIcon('heroicon-o-truck'),
@@ -283,14 +283,14 @@ final class OrderResource extends Resource
                 Section::make(__('orders.additional_information'))
                     ->description(__('orders.additional_information_description'))
                     ->icon('heroicon-o-document-text')
-                    ->schema([
+                    ->components([
                         Textarea::make('notes')
                             ->label(__('orders.notes'))
                             ->rows(3)
                             ->columnSpanFull()
                             ->helperText(__('orders.notes_help')),
                         Grid::make(3)
-                            ->schema([
+                            ->components([
                                 Select::make('zone_id')
                                     ->label(__('orders.zone'))
                                     ->relationship('zone', 'name')

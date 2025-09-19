@@ -24,7 +24,7 @@ final class WishlistRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('wishlist_id')
                     ->label(__('customers.wishlist'))
                     ->relationship('wishlist', 'name')

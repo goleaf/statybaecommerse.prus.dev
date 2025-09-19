@@ -19,7 +19,7 @@ final class RedemptionsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('user_id')
                     ->label(__('Customer'))
                     ->relationship('user', 'name')

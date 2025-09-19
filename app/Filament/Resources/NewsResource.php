@@ -18,7 +18,6 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -100,11 +99,11 @@ final class NewsResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('news.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('title')
                                 ->label(__('news.title'))
                                 ->required()
@@ -143,7 +142,7 @@ final class NewsResource extends Resource
                         ]),
                 ]),
             Section::make(__('news.media'))
-                ->schema([
+                ->components([
                     FileUpload::make('featured_image')
                         ->label(__('news.featured_image'))
                         ->image()
@@ -166,9 +165,9 @@ final class NewsResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('news.categorization'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('category_id')
                                 ->label(__('news.category'))
                                 ->relationship('category', 'name')
@@ -188,9 +187,9 @@ final class NewsResource extends Resource
                         ]),
                 ]),
             Section::make(__('news.publishing'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_published')
                                 ->label(__('news.is_published'))
                                 ->default(false),
@@ -198,7 +197,7 @@ final class NewsResource extends Resource
                                 ->label(__('news.is_featured')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('published_at')
                                 ->label(__('news.published_at'))
                                 ->default(now())
@@ -209,7 +208,7 @@ final class NewsResource extends Resource
                         ]),
                 ]),
             Section::make(__('news.seo'))
-                ->schema([
+                ->components([
                     TextInput::make('seo_title')
                         ->label(__('news.seo_title'))
                         ->maxLength(255)

@@ -34,8 +34,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * RecommendationConfigResourceSimple
  * 
@@ -93,11 +91,11 @@ final class RecommendationConfigResourceSimple extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('recommendation_configs_simple.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('recommendation_configs_simple.name'))
                                 ->required()
@@ -119,9 +117,9 @@ final class RecommendationConfigResourceSimple extends Resource
                 ]),
             
             Section::make(__('recommendation_configs_simple.algorithm_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('algorithm_type')
                                 ->label(__('recommendation_configs_simple.algorithm_type'))
                                 ->options([
@@ -147,7 +145,7 @@ final class RecommendationConfigResourceSimple extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('max_results')
                                 ->label(__('recommendation_configs_simple.max_results'))
                                 ->numeric()
@@ -168,9 +166,9 @@ final class RecommendationConfigResourceSimple extends Resource
                 ]),
             
             Section::make(__('recommendation_configs_simple.filtering'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('products')
                                 ->label(__('recommendation_configs_simple.products'))
                                 ->relationship('products', 'name')
@@ -201,7 +199,7 @@ final class RecommendationConfigResourceSimple extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('exclude_out_of_stock')
                                 ->label(__('recommendation_configs_simple.exclude_out_of_stock'))
                                 ->default(true),
@@ -213,9 +211,9 @@ final class RecommendationConfigResourceSimple extends Resource
                 ]),
             
             Section::make(__('recommendation_configs_simple.weighting'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('price_weight')
                                 ->label(__('recommendation_configs_simple.price_weight'))
                                 ->numeric()
@@ -236,7 +234,7 @@ final class RecommendationConfigResourceSimple extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('popularity_weight')
                                 ->label(__('recommendation_configs_simple.popularity_weight'))
                                 ->numeric()
@@ -257,7 +255,7 @@ final class RecommendationConfigResourceSimple extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('category_weight')
                                 ->label(__('recommendation_configs_simple.category_weight'))
                                 ->numeric()
@@ -279,9 +277,9 @@ final class RecommendationConfigResourceSimple extends Resource
                 ]),
             
             Section::make(__('recommendation_configs_simple.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('recommendation_configs_simple.is_active'))
                                 ->default(true),
@@ -291,7 +289,7 @@ final class RecommendationConfigResourceSimple extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('cache_duration')
                                 ->label(__('recommendation_configs_simple.cache_duration'))
                                 ->numeric()

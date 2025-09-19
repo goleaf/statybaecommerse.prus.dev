@@ -1,23 +1,24 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+
 /**
  * SystemSettingCategory
- * 
+ *
  * Eloquent model representing the SystemSettingCategory entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property mixed $fillable
  * @property mixed $casts
  * @method static \Illuminate\Database\Eloquent\Builder|SystemSettingCategory newModelQuery()
@@ -29,8 +30,10 @@ use Spatie\Sluggable\SlugOptions;
 final class SystemSettingCategory extends Model
 {
     use HasFactory, HasSlug, LogsActivity, SoftDeletes;
+
     protected $fillable = ['name', 'slug', 'description', 'icon', 'color', 'sort_order', 'is_active', 'parent_id'];
     protected $casts = ['is_active' => 'boolean', 'sort_order' => 'integer', 'parent_id' => 'integer'];
+
     /**
      * Handle getSlugOptions functionality with proper error handling.
      * @return SlugOptions
@@ -39,6 +42,7 @@ final class SystemSettingCategory extends Model
     {
         return SlugOptions::create()->generateSlugsFrom('name')->saveSlugsTo('slug');
     }
+
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
      * @return LogOptions
@@ -47,6 +51,7 @@ final class SystemSettingCategory extends Model
     {
         return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'is_active', 'sort_order'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "System Setting Category {$eventName}")->useLogName('system_setting_categories');
     }
+
     /**
      * Handle settings functionality with proper error handling.
      * @return HasMany
@@ -55,14 +60,16 @@ final class SystemSettingCategory extends Model
     {
         return $this->hasMany(SystemSetting::class, 'category_id');
     }
+
     /**
      * Handle parent functionality with proper error handling.
-     * @return HasMany
+     * @return BelongsTo
      */
-    public function parent(): HasMany
+    public function parent(): BelongsTo
     {
-        return $this->hasMany(SystemSettingCategory::class, 'parent_id');
+        return $this->belongsTo(SystemSettingCategory::class, 'parent_id');
     }
+
     /**
      * Handle children functionality with proper error handling.
      * @return HasMany
@@ -71,6 +78,7 @@ final class SystemSettingCategory extends Model
     {
         return $this->hasMany(SystemSettingCategory::class, 'parent_id');
     }
+
     /**
      * Handle translations functionality with proper error handling.
      * @return HasMany
@@ -79,6 +87,7 @@ final class SystemSettingCategory extends Model
     {
         return $this->hasMany(SystemSettingCategoryTranslation::class);
     }
+
     /**
      * Handle scopeActive functionality with proper error handling.
      * @param mixed $query
@@ -87,6 +96,7 @@ final class SystemSettingCategory extends Model
     {
         return $query->where('is_active', true);
     }
+
     /**
      * Handle scopeOrdered functionality with proper error handling.
      * @param mixed $query
@@ -95,6 +105,7 @@ final class SystemSettingCategory extends Model
     {
         return $query->orderBy('sort_order')->orderBy('name');
     }
+
     /**
      * Handle scopeRoot functionality with proper error handling.
      * @param mixed $query
@@ -103,6 +114,7 @@ final class SystemSettingCategory extends Model
     {
         return $query->whereNull('parent_id');
     }
+
     /**
      * Handle scopeWithSettings functionality with proper error handling.
      * @param mixed $query
@@ -113,6 +125,7 @@ final class SystemSettingCategory extends Model
             $q->active()->ordered();
         }]);
     }
+
     /**
      * Handle getTranslatedName functionality with proper error handling.
      * @param string|null $locale
@@ -124,6 +137,7 @@ final class SystemSettingCategory extends Model
         $translation = $this->translations()->where('locale', $locale)->first();
         return $translation?->name ?? $this->name;
     }
+
     /**
      * Handle getTranslatedDescription functionality with proper error handling.
      * @param string|null $locale
@@ -135,14 +149,16 @@ final class SystemSettingCategory extends Model
         $translation = $this->translations()->where('locale', $locale)->first();
         return $translation?->description ?? $this->description;
     }
+
     /**
      * Handle getSettingsCount functionality with proper error handling.
      * @return int
      */
     public function getSettingsCount(): int
     {
-        return $this->settings()->active()->count();
+        return $this->settings()->count();
     }
+
     /**
      * Handle hasActiveSettings functionality with proper error handling.
      * @return bool
@@ -151,6 +167,7 @@ final class SystemSettingCategory extends Model
     {
         return $this->settings()->active()->exists();
     }
+
     /**
      * Handle getIconClass functionality with proper error handling.
      * @return string
@@ -159,6 +176,7 @@ final class SystemSettingCategory extends Model
     {
         return $this->icon ?? 'heroicon-o-cog-6-tooth';
     }
+
     /**
      * Handle getColorClass functionality with proper error handling.
      * @return string
@@ -175,6 +193,7 @@ final class SystemSettingCategory extends Model
             default => 'text-gray-600',
         };
     }
+
     /**
      * Handle getBadgeColorClass functionality with proper error handling.
      * @return string
@@ -191,6 +210,7 @@ final class SystemSettingCategory extends Model
             default => 'bg-gray-100 text-gray-800',
         };
     }
+
     /**
      * Handle getActiveSettingsCount functionality with proper error handling.
      * @return int
@@ -199,22 +219,25 @@ final class SystemSettingCategory extends Model
     {
         return $this->settings()->active()->count();
     }
+
     /**
      * Handle getPublicSettingsCount functionality with proper error handling.
      * @return int
      */
     public function getPublicSettingsCount(): int
     {
-        return $this->settings()->active()->public()->count();
+        return $this->settings()->public()->count();
     }
+
     /**
      * Handle getSettingsByGroup functionality with proper error handling.
      * @return Illuminate\Database\Eloquent\Collection
      */
     public function getSettingsByGroup(): \Illuminate\Database\Eloquent\Collection
     {
-        return $this->settings()->active()->ordered()->get()->groupBy('group');
+        return $this->settings()->ordered()->get()->groupBy('group');
     }
+
     /**
      * Handle hasPublicSettings functionality with proper error handling.
      * @return bool
@@ -223,14 +246,16 @@ final class SystemSettingCategory extends Model
     {
         return $this->settings()->active()->public()->exists();
     }
+
     /**
      * Handle getParent functionality with proper error handling.
      * @return self|null
      */
     public function getParent(): ?self
     {
-        return $this->parent()->first();
+        return $this->parent;
     }
+
     /**
      * Handle getChildren functionality with proper error handling.
      * @return Illuminate\Database\Eloquent\Collection
@@ -239,33 +264,35 @@ final class SystemSettingCategory extends Model
     {
         return $this->children()->active()->ordered()->get();
     }
+
     /**
      * Handle getAllChildren functionality with proper error handling.
      * @return Illuminate\Database\Eloquent\Collection
      */
     public function getAllChildren(): \Illuminate\Database\Eloquent\Collection
     {
-        $children = collect();
+        $children = $this->getChildren();
         foreach ($this->getChildren() as $child) {
-            $children->push($child);
             $children = $children->merge($child->getAllChildren());
         }
         return $children;
     }
+
     /**
      * Handle getPath functionality with proper error handling.
      * @return string
      */
     public function getPath(): string
     {
-        $path = [$this->getTranslatedName()];
+        $path = [$this->name];
         $parent = $this->getParent();
         while ($parent) {
-            array_unshift($path, $parent->getTranslatedName());
+            array_unshift($path, $parent->name);
             $parent = $parent->getParent();
         }
         return implode(' > ', $path);
     }
+
     /**
      * Handle getDepth functionality with proper error handling.
      * @return int
@@ -280,6 +307,7 @@ final class SystemSettingCategory extends Model
         }
         return $depth;
     }
+
     /**
      * Handle isRoot functionality with proper error handling.
      * @return bool
@@ -288,6 +316,7 @@ final class SystemSettingCategory extends Model
     {
         return is_null($this->parent_id);
     }
+
     /**
      * Handle isLeaf functionality with proper error handling.
      * @return bool
@@ -296,6 +325,7 @@ final class SystemSettingCategory extends Model
     {
         return $this->getChildren()->isEmpty();
     }
+
     /**
      * Handle getBreadcrumb functionality with proper error handling.
      * @return array
@@ -310,12 +340,13 @@ final class SystemSettingCategory extends Model
         }
         return $breadcrumb;
     }
+
     /**
      * Handle getTreeStructure functionality with proper error handling.
      * @return array
      */
     public function getTreeStructure(): array
     {
-        return ['id' => $this->id, 'name' => $this->getTranslatedName(), 'slug' => $this->slug, 'description' => $this->getTranslatedDescription(), 'icon' => $this->getIconClass(), 'color' => $this->color, 'settings_count' => $this->getActiveSettingsCount(), 'public_settings_count' => $this->getPublicSettingsCount(), 'children' => $this->getChildren()->map->getTreeStructure()];
+        return ['id' => $this->id, 'name' => $this->getTranslatedName(), 'slug' => $this->slug, 'description' => $this->getTranslatedDescription(), 'icon' => $this->getIconClass(), 'color' => $this->color, 'settings_count' => $this->getSettingsCount(), 'public_settings_count' => $this->getPublicSettingsCount(), 'children' => $this->getChildren()->map->getTreeStructure()];
     }
 }

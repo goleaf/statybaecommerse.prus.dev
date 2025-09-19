@@ -15,7 +15,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -94,11 +93,11 @@ final class CollectionResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('collections.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('collections.name'))
                                 ->required()
@@ -119,7 +118,7 @@ final class CollectionResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('collections.media'))
-                ->schema([
+                ->components([
                     FileUpload::make('image')
                         ->label(__('collections.image'))
                         ->image()
@@ -146,7 +145,7 @@ final class CollectionResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('collections.products'))
-                ->schema([
+                ->components([
                     Select::make('products')
                         ->label(__('collections.products'))
                         ->relationship('products', 'name')
@@ -156,10 +155,10 @@ final class CollectionResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('collections.rules'))
-                ->schema([
+                ->components([
                     Repeater::make('rules')
                         ->label(__('collections.rules'))
-                        ->schema([
+                        ->components([
                             Select::make('type')
                                 ->label(__('collections.rule_type'))
                                 ->options([
@@ -184,7 +183,7 @@ final class CollectionResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('collections.seo'))
-                ->schema([
+                ->components([
                     TextInput::make('seo_title')
                         ->label(__('collections.seo_title'))
                         ->maxLength(255)
@@ -196,9 +195,9 @@ final class CollectionResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('collections.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('collections.is_active'))
                                 ->default(true),
@@ -206,7 +205,7 @@ final class CollectionResource extends Resource
                                 ->label(__('collections.is_featured')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('sort_order')
                                 ->label(__('collections.sort_order'))
                                 ->options([

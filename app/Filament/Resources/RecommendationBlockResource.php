@@ -16,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -95,11 +94,11 @@ final class RecommendationBlockResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('recommendation_blocks.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('recommendation_blocks.name'))
                                 ->required()
@@ -118,9 +117,9 @@ final class RecommendationBlockResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('recommendation_blocks.configuration'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('recommendation_config_id')
                                 ->label(__('recommendation_blocks.recommendation_config'))
                                 ->relationship('recommendationConfig', 'name')
@@ -143,7 +142,7 @@ final class RecommendationBlockResource extends Resource
                                 ->disabled(),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('config_code')
                                 ->label(__('recommendation_blocks.config_code'))
                                 ->maxLength(50)
@@ -164,9 +163,9 @@ final class RecommendationBlockResource extends Resource
                         ]),
                 ]),
             Section::make(__('recommendation_blocks.display_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('title')
                                 ->label(__('recommendation_blocks.title'))
                                 ->maxLength(255)
@@ -177,7 +176,7 @@ final class RecommendationBlockResource extends Resource
                                 ->helperText(__('recommendation_blocks.subtitle_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('max_items')
                                 ->label(__('recommendation_blocks.max_items'))
                                 ->numeric()
@@ -194,7 +193,7 @@ final class RecommendationBlockResource extends Resource
                                 ->helperText(__('recommendation_blocks.items_per_row_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('height')
                                 ->label(__('recommendation_blocks.height'))
                                 ->maxLength(20)
@@ -206,9 +205,9 @@ final class RecommendationBlockResource extends Resource
                         ]),
                 ]),
             Section::make(__('recommendation_blocks.styling'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('css_class')
                                 ->label(__('recommendation_blocks.css_class'))
                                 ->maxLength(255)
@@ -226,9 +225,9 @@ final class RecommendationBlockResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('recommendation_blocks.placement'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('page_type')
                                 ->label(__('recommendation_blocks.page_type'))
                                 ->options([
@@ -249,7 +248,7 @@ final class RecommendationBlockResource extends Resource
                                 ->helperText(__('recommendation_blocks.position_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('priority')
                                 ->label(__('recommendation_blocks.priority'))
                                 ->numeric()
@@ -262,9 +261,9 @@ final class RecommendationBlockResource extends Resource
                         ]),
                 ]),
             Section::make(__('recommendation_blocks.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('recommendation_blocks.is_active'))
                                 ->default(true),
@@ -273,7 +272,7 @@ final class RecommendationBlockResource extends Resource
                                 ->default(true),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('show_title')
                                 ->label(__('recommendation_blocks.show_title'))
                                 ->default(true),
@@ -282,7 +281,7 @@ final class RecommendationBlockResource extends Resource
                                 ->default(false),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('show_price')
                                 ->label(__('recommendation_blocks.show_price'))
                                 ->default(true),
@@ -291,7 +290,7 @@ final class RecommendationBlockResource extends Resource
                                 ->default(true),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('show_add_to_cart')
                                 ->label(__('recommendation_blocks.show_add_to_cart'))
                                 ->default(true),

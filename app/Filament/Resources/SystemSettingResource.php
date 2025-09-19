@@ -17,7 +17,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -92,11 +91,11 @@ final class SystemSettingResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('system_settings.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('key')
                                 ->label(__('system_settings.key'))
                                 ->required()
@@ -129,7 +128,7 @@ final class SystemSettingResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('system_settings.value'))
-                ->schema([
+                ->components([
                     Forms\Components\ViewField::make('value')
                         ->label(__('system_settings.value'))
                         ->view('filament.forms.components.system-setting-value')
@@ -140,9 +139,9 @@ final class SystemSettingResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('system_settings.categorization'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('category')
                                 ->label(__('system_settings.category'))
                                 ->options([
@@ -167,7 +166,7 @@ final class SystemSettingResource extends Resource
                                 ->helperText(__('system_settings.group_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('system_settings.sort_order'))
                                 ->numeric()
@@ -180,9 +179,9 @@ final class SystemSettingResource extends Resource
                         ]),
                 ]),
             Section::make(__('system_settings.validation'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('min_value')
                                 ->label(__('system_settings.min_value'))
                                 ->maxLength(255)
@@ -193,7 +192,7 @@ final class SystemSettingResource extends Resource
                                 ->helperText(__('system_settings.max_value_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('allowed_values')
                                 ->label(__('system_settings.allowed_values'))
                                 ->maxLength(500)
@@ -205,9 +204,9 @@ final class SystemSettingResource extends Resource
                         ]),
                 ]),
             Section::make(__('system_settings.metadata'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('default_value')
                                 ->label(__('system_settings.default_value'))
                                 ->maxLength(500)
@@ -218,7 +217,7 @@ final class SystemSettingResource extends Resource
                                 ->helperText(__('system_settings.unit_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_required')
                                 ->label(__('system_settings.is_required'))
                                 ->default(false)
@@ -230,9 +229,9 @@ final class SystemSettingResource extends Resource
                         ]),
                 ]),
             Section::make(__('system_settings.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('system_settings.is_active'))
                                 ->default(true),

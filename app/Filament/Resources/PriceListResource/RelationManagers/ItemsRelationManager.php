@@ -25,7 +25,7 @@ final class ItemsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('product_id')
                     ->label(__('price_list_items.product'))
                     ->relationship('product', 'name')

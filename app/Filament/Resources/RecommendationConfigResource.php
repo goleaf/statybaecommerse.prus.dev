@@ -16,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -95,11 +94,11 @@ final class RecommendationConfigResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('recommendation_configs.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('recommendation_configs.name'))
                                 ->required()
@@ -118,9 +117,9 @@ final class RecommendationConfigResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('recommendation_configs.algorithm_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('algorithm_type')
                                 ->label(__('recommendation_configs.algorithm_type'))
                                 ->options([
@@ -144,7 +143,7 @@ final class RecommendationConfigResource extends Resource
                                 ->helperText(__('recommendation_configs.min_score_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('max_results')
                                 ->label(__('recommendation_configs.max_results'))
                                 ->numeric()
@@ -163,9 +162,9 @@ final class RecommendationConfigResource extends Resource
                         ]),
                 ]),
             Section::make(__('recommendation_configs.filtering'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('products')
                                 ->label(__('recommendation_configs.products'))
                                 ->relationship('products', 'name')
@@ -194,7 +193,7 @@ final class RecommendationConfigResource extends Resource
                                 ]),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('exclude_out_of_stock')
                                 ->label(__('recommendation_configs.exclude_out_of_stock'))
                                 ->default(true),
@@ -204,9 +203,9 @@ final class RecommendationConfigResource extends Resource
                         ]),
                 ]),
             Section::make(__('recommendation_configs.weighting'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('price_weight')
                                 ->label(__('recommendation_configs.price_weight'))
                                 ->numeric()
@@ -225,7 +224,7 @@ final class RecommendationConfigResource extends Resource
                                 ->helperText(__('recommendation_configs.rating_weight_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('popularity_weight')
                                 ->label(__('recommendation_configs.popularity_weight'))
                                 ->numeric()
@@ -244,7 +243,7 @@ final class RecommendationConfigResource extends Resource
                                 ->helperText(__('recommendation_configs.recency_weight_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('category_weight')
                                 ->label(__('recommendation_configs.category_weight'))
                                 ->numeric()
@@ -264,9 +263,9 @@ final class RecommendationConfigResource extends Resource
                         ]),
                 ]),
             Section::make(__('recommendation_configs.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('recommendation_configs.is_active'))
                                 ->default(true),
@@ -274,7 +273,7 @@ final class RecommendationConfigResource extends Resource
                                 ->label(__('recommendation_configs.is_default')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('cache_duration')
                                 ->label(__('recommendation_configs.cache_duration'))
                                 ->numeric()

@@ -98,10 +98,10 @@ final class AddressResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('translations.address_information'))
-                ->schema([
-                    Grid::make(2)->schema([
+                ->components([
+                    Grid::make(2)->components([
                         Select::make('user_id')
                             ->label(__('translations.user'))
                             ->relationship('user', 'name')
@@ -114,7 +114,7 @@ final class AddressResource extends Resource
                             ->required()
                             ->default(AddressType::SHIPPING),
                     ]),
-                    Grid::make(2)->schema([
+                    Grid::make(2)->components([
                         TextInput::make('first_name')
                             ->label(__('translations.first_name'))
                             ->required()
@@ -124,7 +124,7 @@ final class AddressResource extends Resource
                             ->required()
                             ->maxLength(255),
                     ]),
-                    Grid::make(2)->schema([
+                    Grid::make(2)->components([
                         TextInput::make('company_name')
                             ->label(__('translations.company'))
                             ->maxLength(255),
@@ -134,7 +134,7 @@ final class AddressResource extends Resource
                     ]),
                 ]),
             Section::make(__('translations.address_details'))
-                ->schema([
+                ->components([
                     TextInput::make('address_line_1')
                         ->label(__('translations.address_line_1'))
                         ->required()
@@ -142,7 +142,7 @@ final class AddressResource extends Resource
                     TextInput::make('address_line_2')
                         ->label(__('translations.address_line_2'))
                         ->maxLength(255),
-                    Grid::make(3)->schema([
+                    Grid::make(3)->components([
                         TextInput::make('apartment')
                             ->label(__('translations.apartment'))
                             ->maxLength(100),
@@ -153,7 +153,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.building'))
                             ->maxLength(100),
                     ]),
-                    Grid::make(2)->schema([
+                    Grid::make(2)->components([
                         TextInput::make('city')
                             ->label(__('translations.city'))
                             ->required()
@@ -162,7 +162,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.state'))
                             ->maxLength(100),
                     ]),
-                    Grid::make(2)->schema([
+                    Grid::make(2)->components([
                         TextInput::make('postal_code')
                             ->label(__('translations.postal_code'))
                             ->required()
@@ -176,8 +176,8 @@ final class AddressResource extends Resource
                     // Removed country_id and zone_id fields as they don't exist in the database
                 ]),
             Section::make(__('translations.contact_information'))
-                ->schema([
-                    Grid::make(2)->schema([
+                ->components([
+                    Grid::make(2)->components([
                         TextInput::make('phone')
                             ->label(__('translations.phone'))
                             ->tel()
@@ -192,7 +192,7 @@ final class AddressResource extends Resource
                         ->maxLength(255),
                 ]),
             Section::make(__('translations.additional_information'))
-                ->schema([
+                ->components([
                     Textarea::make('notes')
                         ->label(__('translations.notes'))
                         ->maxLength(1000)
@@ -205,8 +205,8 @@ final class AddressResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('translations.settings'))
-                ->schema([
-                    Grid::make(2)->schema([
+                ->components([
+                    Grid::make(2)->components([
                         Toggle::make('is_default')
                             ->label(__('translations.is_default'))
                             ->helperText(__('translations.is_default_help')),
@@ -215,7 +215,7 @@ final class AddressResource extends Resource
                             ->default(true)
                             ->helperText(__('translations.is_active_help')),
                     ]),
-                    Grid::make(2)->schema([
+                    Grid::make(2)->components([
                         Toggle::make('is_billing')
                             ->label(__('translations.is_billing'))
                             ->helperText(__('translations.is_billing_help')),

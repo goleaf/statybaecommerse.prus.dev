@@ -19,7 +19,7 @@ final class DocumentsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('template_id')
                     ->label(__('Template'))
                     ->relationship('template', 'name')

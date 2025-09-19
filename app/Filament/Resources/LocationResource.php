@@ -16,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -95,11 +94,11 @@ final class LocationResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('locations.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('locations.name'))
                                 ->required()
@@ -117,9 +116,9 @@ final class LocationResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('locations.geographic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('country_id')
                                 ->label(__('locations.country'))
                                 ->relationship('country', 'name')
@@ -151,7 +150,7 @@ final class LocationResource extends Resource
                                 }),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('country_code')
                                 ->label(__('locations.country_code'))
                                 ->maxLength(3)
@@ -163,9 +162,9 @@ final class LocationResource extends Resource
                         ]),
                 ]),
             Section::make(__('locations.coordinates'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('latitude')
                                 ->label(__('locations.latitude'))
                                 ->numeric()
@@ -181,7 +180,7 @@ final class LocationResource extends Resource
                         ]),
                 ]),
             Section::make(__('locations.address_information'))
-                ->schema([
+                ->components([
                     KeyValue::make('address')
                         ->label(__('locations.address'))
                         ->keyLabel(__('locations.address_field'))
@@ -189,9 +188,9 @@ final class LocationResource extends Resource
                         ->addActionLabel(__('locations.add_address_field')),
                 ]),
             Section::make(__('locations.contact_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('phone')
                                 ->label(__('locations.phone'))
                                 ->tel()
@@ -208,9 +207,9 @@ final class LocationResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('locations.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('locations.is_active'))
                                 ->default(true),
@@ -218,7 +217,7 @@ final class LocationResource extends Resource
                                 ->label(__('locations.is_default')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('locations.sort_order'))
                                 ->numeric()

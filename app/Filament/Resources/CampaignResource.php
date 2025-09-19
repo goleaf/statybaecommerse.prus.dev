@@ -29,8 +29,6 @@ use Illuminate\Support\Str;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 final class CampaignResource extends Resource
 {
     protected static ?string $model = Campaign::class;
@@ -61,11 +59,11 @@ final class CampaignResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('campaigns.sections.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(self::label('campaigns.fields.name', 'Name'))
                                 ->required()
@@ -81,7 +79,7 @@ final class CampaignResource extends Resource
                         ]),
 
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('channel_id')
                                 ->label(self::label('campaigns.fields.channel', 'Channel'))
                                 ->relationship('channel', 'name')
@@ -98,7 +96,7 @@ final class CampaignResource extends Resource
                         ]),
 
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('status')
                                 ->label(self::label('campaigns.fields.status', 'Status'))
                                 ->options([
@@ -118,7 +116,7 @@ final class CampaignResource extends Resource
                         ]),
 
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_featured')
                                 ->label(self::label('campaigns.fields.is_featured', 'Featured'))
                                 ->default(false),
@@ -130,9 +128,9 @@ final class CampaignResource extends Resource
                 ]),
 
             Section::make(__('campaigns.sections.campaign_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('starts_at')
                                 ->label(self::label('campaigns.fields.start_date', 'Start date'))
                                 ->seconds(false),
@@ -143,7 +141,7 @@ final class CampaignResource extends Resource
                         ]),
 
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('max_uses')
                                 ->label(self::label('campaigns.fields.max_uses', 'Max uses'))
                                 ->numeric()
@@ -159,7 +157,7 @@ final class CampaignResource extends Resource
                         ]),
 
                     Grid::make(3)
-                        ->schema([
+                        ->components([
                             Toggle::make('send_notifications')
                                 ->label(self::label('campaigns.fields.send_notifications', 'Send notifications'))
                                 ->default(true),
@@ -175,7 +173,7 @@ final class CampaignResource extends Resource
                 ]),
 
             Section::make(__('campaigns.sections.targeting'))
-                ->schema([
+                ->components([
                     Select::make('targetCategories')
                         ->label(self::label('campaigns.fields.target_categories', 'Target categories'))
                         ->relationship('targetCategories', 'name')
@@ -207,14 +205,14 @@ final class CampaignResource extends Resource
                 ]),
 
             Section::make(__('campaigns.sections.content'))
-                ->schema([
+                ->components([
                     Textarea::make('description')
                         ->label(self::label('campaigns.fields.description', 'Description'))
                         ->rows(4)
                         ->columnSpanFull(),
 
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('cta_text')
                                 ->label(self::label('campaigns.fields.cta_text', 'CTA text'))
                                 ->maxLength(120),
@@ -226,7 +224,7 @@ final class CampaignResource extends Resource
                         ]),
 
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('banner_image')
                                 ->label(self::label('campaigns.fields.banner', 'Banner image'))
                                 ->maxLength(255),
@@ -237,7 +235,7 @@ final class CampaignResource extends Resource
                         ]),
 
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('display_priority')
                                 ->label(self::label('campaigns.fields.display_priority', 'Display priority'))
                                 ->numeric()
@@ -254,7 +252,7 @@ final class CampaignResource extends Resource
                 ]),
 
             Section::make(__('campaigns.sections.seo'))
-                ->schema([
+                ->components([
                     TextInput::make('meta_title')
                         ->label(self::label('campaigns.fields.meta_title', 'Meta title'))
                         ->maxLength(255),

@@ -31,8 +31,6 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * BrandResource
  * 
@@ -91,11 +89,11 @@ final class BrandResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('brands.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('brands.name'))
                                 ->required()
@@ -120,7 +118,7 @@ final class BrandResource extends Resource
                 ]),
             
             Section::make(__('brands.media'))
-                ->schema([
+                ->components([
                     FileUpload::make('logo')
                         ->label(__('brands.logo'))
                         ->image()
@@ -149,7 +147,7 @@ final class BrandResource extends Resource
                 ]),
             
             Section::make(__('brands.seo'))
-                ->schema([
+                ->components([
                     TextInput::make('seo_title')
                         ->label(__('brands.seo_title'))
                         ->maxLength(255)
@@ -163,9 +161,9 @@ final class BrandResource extends Resource
                 ]),
             
             Section::make(__('brands.settings'))
-                ->schema([
+                ->components([
                     Grid::make(3)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('brands.is_active'))
                                 ->default(true),

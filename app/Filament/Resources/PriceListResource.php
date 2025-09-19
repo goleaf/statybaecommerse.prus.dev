@@ -36,8 +36,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * PriceListResource
  * 
@@ -95,11 +93,11 @@ final class PriceListResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('price_lists.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('price_lists.name'))
                                 ->required()
@@ -121,9 +119,9 @@ final class PriceListResource extends Resource
                 ]),
             
             Section::make(__('price_lists.pricing_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('pricing_type')
                                 ->label(__('price_lists.pricing_type'))
                                 ->options([
@@ -148,7 +146,7 @@ final class PriceListResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('min_order_value')
                                 ->label(__('price_lists.min_order_value'))
                                 ->numeric()
@@ -170,9 +168,9 @@ final class PriceListResource extends Resource
                 ]),
             
             Section::make(__('price_lists.targeting'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('customer_groups')
                                 ->label(__('price_lists.customer_groups'))
                                 ->relationship('customerGroups', 'name')
@@ -203,7 +201,7 @@ final class PriceListResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_public')
                                 ->label(__('price_lists.is_public'))
                                 ->default(false)
@@ -216,9 +214,9 @@ final class PriceListResource extends Resource
                 ]),
             
             Section::make(__('price_lists.validity'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('valid_from')
                                 ->label(__('price_lists.valid_from'))
                                 ->default(now())
@@ -231,7 +229,7 @@ final class PriceListResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('price_lists.is_active'))
                                 ->default(true),
@@ -245,12 +243,12 @@ final class PriceListResource extends Resource
                 ]),
             
             Section::make(__('price_lists.tiered_pricing'))
-                ->schema([
+                ->components([
                     Repeater::make('tiered_pricing')
                         ->label(__('price_lists.tiered_pricing'))
-                        ->schema([
+                        ->components([
                             Grid::make(3)
-                                ->schema([
+                                ->components([
                                     TextInput::make('min_quantity')
                                         ->label(__('price_lists.min_quantity'))
                                         ->numeric()
@@ -279,12 +277,12 @@ final class PriceListResource extends Resource
                 ]),
             
             Section::make(__('price_lists.volume_pricing'))
-                ->schema([
+                ->components([
                     Repeater::make('volume_pricing')
                         ->label(__('price_lists.volume_pricing'))
-                        ->schema([
+                        ->components([
                             Grid::make(3)
-                                ->schema([
+                                ->components([
                                     TextInput::make('min_volume')
                                         ->label(__('price_lists.min_volume'))
                                         ->numeric()
@@ -315,7 +313,7 @@ final class PriceListResource extends Resource
                 ]),
             
             Section::make(__('price_lists.settings'))
-                ->schema([
+                ->components([
                     Textarea::make('notes')
                         ->label(__('price_lists.notes'))
                         ->rows(3)

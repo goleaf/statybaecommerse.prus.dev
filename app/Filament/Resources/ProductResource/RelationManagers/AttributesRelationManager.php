@@ -25,7 +25,7 @@ final class AttributesRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('attribute_id')
                     ->label(__('products.attributes.attribute'))
                     ->relationship('attribute', 'name')

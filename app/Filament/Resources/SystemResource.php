@@ -88,12 +88,12 @@ final class SystemResource extends Resource
                     ->tabs([
                         Tab::make('Basic Settings')
                             ->icon('heroicon-o-cog-6-tooth')
-                            ->schema([
+                            ->components([
                                 Section::make('System Information')
                                     ->description('Core system configuration and settings')
-                                    ->schema([
+                                    ->components([
                                         Grid::make(2)
-                                            ->schema([
+                                            ->components([
                                                 TextInput::make('key')
                                                     ->label('Setting Key')
                                                     ->required()
@@ -147,7 +147,7 @@ final class SystemResource extends Resource
                                             ->helperText('Data type for this setting'),
                                     ]),
                                 Section::make('Value Configuration')
-                                    ->schema([
+                                    ->components([
                                         TextInput::make('value')
                                             ->label('Setting Value')
                                             ->required()
@@ -187,9 +187,9 @@ final class SystemResource extends Resource
                             ]),
                         Tab::make('Advanced Settings')
                             ->icon('heroicon-o-adjustments-horizontal')
-                            ->schema([
+                            ->components([
                                 Section::make('Validation & Constraints')
-                                    ->schema([
+                                    ->components([
                                         TextInput::make('validation_rules')
                                             ->label('Validation Rules')
                                             ->helperText('Laravel validation rules for this setting'),
@@ -204,7 +204,7 @@ final class SystemResource extends Resource
                                             ->helperText('Encrypt the stored value for security'),
                                     ]),
                                 Section::make('Access Control')
-                                    ->schema([
+                                    ->components([
                                         Select::make('permission_required')
                                             ->label('Required Permission')
                                             ->options([
@@ -222,7 +222,7 @@ final class SystemResource extends Resource
                                             ->helperText('User who last updated this setting'),
                                     ]),
                                 Section::make('System Integration')
-                                    ->schema([
+                                    ->components([
                                         TextInput::make('cache_key')
                                             ->label('Cache Key')
                                             ->helperText('Custom cache key for this setting'),
@@ -248,9 +248,9 @@ final class SystemResource extends Resource
                             ]),
                         Tab::make('Dependencies & Relations')
                             ->icon('heroicon-o-link')
-                            ->schema([
+                            ->components([
                                 Section::make('Dependencies')
-                                    ->schema([
+                                    ->components([
                                         TextInput::make('dependencies_info')
                                             ->label('Dependencies')
                                             ->helperText('Dependencies are managed through the Dependencies tab in the view page')
@@ -258,7 +258,7 @@ final class SystemResource extends Resource
                                             ->dehydrated(false),
                                     ]),
                                 Section::make('Relations')
-                                    ->schema([
+                                    ->components([
                                         TextInput::make('relations_info')
                                             ->label('Related Settings')
                                             ->helperText('Related settings are managed through the Relations tab in the view page')
@@ -268,9 +268,9 @@ final class SystemResource extends Resource
                             ]),
                         Tab::make('Translations')
                             ->icon('heroicon-o-language')
-                            ->schema([
+                            ->components([
                                 Section::make('Multi-language Support')
-                                    ->schema([
+                                    ->components([
                                         TextInput::make('translations_info')
                                             ->label('Translations')
                                             ->helperText('Translations are managed through the Translations tab in the view page')

@@ -19,7 +19,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -92,11 +91,11 @@ final class SystemSettingsResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('system_settings.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('key')
                                 ->label(__('system_settings.key'))
                                 ->required()
@@ -125,15 +124,15 @@ final class SystemSettingsResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('system_settings.value'))
-                ->schema([
+                ->components([
                     Forms\Components\ViewField::make('value_field')
                         ->view('filament.forms.components.dynamic-value-field')
                         ->live(),
                 ]),
             Section::make(__('system_settings.categorization'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('category_id')
                                 ->label(__('system_settings.category'))
                                 ->relationship('category', 'name')
@@ -153,9 +152,9 @@ final class SystemSettingsResource extends Resource
                         ]),
                 ]),
             Section::make(__('system_settings.validation'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('validation_rules')
                                 ->label(__('system_settings.validation_rules'))
                                 ->maxLength(500)
@@ -166,9 +165,9 @@ final class SystemSettingsResource extends Resource
                         ]),
                 ]),
             Section::make(__('system_settings.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_public')
                                 ->label(__('system_settings.is_public'))
                                 ->default(false)
@@ -179,7 +178,7 @@ final class SystemSettingsResource extends Resource
                                 ->helperText(__('system_settings.is_encrypted_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('system_settings.sort_order'))
                                 ->numeric()

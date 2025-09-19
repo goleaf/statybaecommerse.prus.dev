@@ -16,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -92,11 +91,11 @@ final class VariantPricingRuleResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('variant_pricing_rules.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('variant_pricing_rules.name'))
                                 ->required()
@@ -120,9 +119,9 @@ final class VariantPricingRuleResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('variant_pricing_rules.targeting'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('product_variant_id')
                                 ->label(__('variant_pricing_rules.product_variant'))
                                 ->relationship('productVariant', 'name')
@@ -144,9 +143,9 @@ final class VariantPricingRuleResource extends Resource
                         ]),
                 ]),
             Section::make(__('variant_pricing_rules.pricing'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('value')
                                 ->label(__('variant_pricing_rules.value'))
                                 ->numeric()
@@ -161,7 +160,7 @@ final class VariantPricingRuleResource extends Resource
                                 ->default(1),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('max_quantity')
                                 ->label(__('variant_pricing_rules.max_quantity'))
                                 ->numeric()
@@ -175,9 +174,9 @@ final class VariantPricingRuleResource extends Resource
                         ]),
                 ]),
             Section::make(__('variant_pricing_rules.conditions'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('valid_from')
                                 ->label(__('variant_pricing_rules.valid_from'))
                                 ->default(now())
@@ -187,7 +186,7 @@ final class VariantPricingRuleResource extends Resource
                                 ->displayFormat('d/m/Y H:i'),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('variant_pricing_rules.is_active'))
                                 ->default(true),

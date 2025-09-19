@@ -44,9 +44,9 @@ class ShippingOptionResource extends Resource
         return $schema
             ->components([
                 Section::make('Basic Information')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('name')
                                     ->required()
                                     ->maxLength(255),
@@ -59,9 +59,9 @@ class ShippingOptionResource extends Resource
                             ->rows(3),
                     ]),
                 Section::make('Shipping Details')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('carrier_name')
                                     ->required()
                                     ->maxLength(255),
@@ -70,7 +70,7 @@ class ShippingOptionResource extends Resource
                                     ->maxLength(255),
                             ]),
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('price')
                                     ->required()
                                     ->numeric()
@@ -82,9 +82,9 @@ class ShippingOptionResource extends Resource
                             ]),
                     ]),
                 Section::make('Configuration')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 Select::make('zone_id')
                                     ->required()
                                     ->relationship('zone', 'name')
@@ -95,7 +95,7 @@ class ShippingOptionResource extends Resource
                                     ->default(0),
                             ]),
                         Grid::make(3)
-                            ->schema([
+                            ->components([
                                 Checkbox::make('is_enabled')
                                     ->default(true),
                                 Checkbox::make('is_default')
@@ -103,9 +103,9 @@ class ShippingOptionResource extends Resource
                             ]),
                     ]),
                 Section::make('Weight & Order Limits')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('min_weight')
                                     ->numeric()
                                     ->suffix('kg'),
@@ -114,7 +114,7 @@ class ShippingOptionResource extends Resource
                                     ->suffix('kg'),
                             ]),
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('min_order_amount')
                                     ->numeric()
                                     ->prefix('€'),
@@ -124,9 +124,9 @@ class ShippingOptionResource extends Resource
                             ]),
                     ]),
                 Section::make('Delivery Times')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('estimated_days_min')
                                     ->numeric()
                                     ->suffix('days'),

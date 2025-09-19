@@ -23,7 +23,6 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -103,16 +102,16 @@ final class ProductVariantResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Tabs::make(__('product_variants.tabs.main'))
                 ->tabs([
                     Tab::make(__('product_variants.tabs.basic_information'))
                         ->icon('heroicon-o-information-circle')
-                        ->schema([
+                        ->components([
                             Section::make(__('product_variants.sections.basic_information'))
-                                ->schema([
+                                ->components([
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             Select::make('product_id')
                                                 ->label(__('product_variants.fields.product'))
                                                 ->relationship('product', 'name')
@@ -138,7 +137,7 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('variant_name_lt')
                                                 ->label(__('product_variants.fields.variant_name_lt'))
                                                 ->maxLength(255)
@@ -149,7 +148,7 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             Textarea::make('description_lt')
                                                 ->label(__('product_variants.fields.description_lt'))
                                                 ->rows(3)
@@ -160,7 +159,7 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(3)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('sku')
                                                 ->label(__('product_variants.fields.sku'))
                                                 ->required()
@@ -177,7 +176,7 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             Select::make('variant_type')
                                                 ->label(__('product_variants.fields.variant_type'))
                                                 ->options([
@@ -199,11 +198,11 @@ final class ProductVariantResource extends Resource
                         ]),
                     Tab::make(__('product_variants.tabs.size_information'))
                         ->icon('heroicon-o-cube')
-                        ->schema([
+                        ->components([
                             Section::make(__('product_variants.sections.size_information'))
-                                ->schema([
+                                ->components([
                                     Grid::make(3)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('size')
                                                 ->label(__('product_variants.fields.size'))
                                                 ->maxLength(50)
@@ -225,7 +224,7 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('size_price_modifier')
                                                 ->label(__('product_variants.fields.size_price_modifier'))
                                                 ->numeric()
@@ -244,11 +243,11 @@ final class ProductVariantResource extends Resource
                         ]),
                     Tab::make(__('product_variants.tabs.pricing'))
                         ->icon('heroicon-o-currency-euro')
-                        ->schema([
+                        ->components([
                             Section::make(__('product_variants.sections.pricing'))
-                                ->schema([
+                                ->components([
                                     Grid::make(3)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('price')
                                                 ->label(__('product_variants.fields.price'))
                                                 ->required()
@@ -270,7 +269,7 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(3)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('wholesale_price')
                                                 ->label(__('product_variants.fields.wholesale_price'))
                                                 ->numeric()
@@ -291,7 +290,7 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(3)
-                                        ->schema([
+                                        ->components([
                                             Toggle::make('is_on_sale')
                                                 ->label(__('product_variants.fields.is_on_sale'))
                                                 ->columnSpan(1),
@@ -309,11 +308,11 @@ final class ProductVariantResource extends Resource
                         ]),
                     Tab::make(__('product_variants.tabs.inventory'))
                         ->icon('heroicon-o-archive-box')
-                        ->schema([
+                        ->components([
                             Section::make(__('product_variants.sections.inventory'))
-                                ->schema([
+                                ->components([
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             Toggle::make('track_inventory')
                                                 ->label(__('product_variants.fields.track_inventory'))
                                                 ->default(true)
@@ -323,7 +322,7 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(4)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('stock_quantity')
                                                 ->label(__('product_variants.fields.stock_quantity'))
                                                 ->numeric()
@@ -350,12 +349,12 @@ final class ProductVariantResource extends Resource
                         ]),
                     Tab::make(__('product_variants.tabs.attributes'))
                         ->icon('heroicon-o-tag')
-                        ->schema([
+                        ->components([
                             Section::make(__('product_variants.sections.attributes'))
-                                ->schema([
+                                ->components([
                                     Repeater::make('attributes')
                                         ->relationship()
-                                        ->schema([
+                                        ->components([
                                             Select::make('attribute_id')
                                                 ->label(__('product_variants.fields.attribute'))
                                                 ->relationship('attribute', 'name')
@@ -378,12 +377,12 @@ final class ProductVariantResource extends Resource
                         ]),
                     Tab::make(__('product_variants.tabs.images'))
                         ->icon('heroicon-o-photo')
-                        ->schema([
+                        ->components([
                             Section::make(__('product_variants.sections.images'))
-                                ->schema([
+                                ->components([
                                     Repeater::make('images')
                                         ->relationship()
-                                        ->schema([
+                                        ->components([
                                             FileUpload::make('image_path')
                                                 ->label(__('product_variants.fields.image'))
                                                 ->image()
@@ -407,11 +406,11 @@ final class ProductVariantResource extends Resource
                         ]),
                     Tab::make(__('product_variants.tabs.analytics'))
                         ->icon('heroicon-o-chart-bar')
-                        ->schema([
+                        ->components([
                             Section::make(__('product_variants.sections.analytics'))
-                                ->schema([
+                                ->components([
                                     Grid::make(3)
-                                        ->schema([
+                                        ->components([
                                             Toggle::make('is_featured')
                                                 ->label(__('product_variants.fields.is_featured'))
                                                 ->default(false)
@@ -426,7 +425,7 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(3)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('views_count')
                                                 ->label(__('product_variants.fields.views_count'))
                                                 ->numeric()
@@ -450,11 +449,11 @@ final class ProductVariantResource extends Resource
                         ]),
                     Tab::make(__('product_variants.tabs.seo'))
                         ->icon('heroicon-o-magnifying-glass')
-                        ->schema([
+                        ->components([
                             Section::make(__('product_variants.sections.seo'))
-                                ->schema([
+                                ->components([
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('seo_title_lt')
                                                 ->label(__('product_variants.fields.seo_title_lt'))
                                                 ->maxLength(255)
@@ -465,7 +464,7 @@ final class ProductVariantResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             Textarea::make('seo_description_lt')
                                                 ->label(__('product_variants.fields.seo_description_lt'))
                                                 ->rows(3)
@@ -480,11 +479,11 @@ final class ProductVariantResource extends Resource
                         ]),
                     Tab::make(__('product_variants.tabs.settings'))
                         ->icon('heroicon-o-cog-6-tooth')
-                        ->schema([
+                        ->components([
                             Section::make(__('product_variants.sections.settings'))
-                                ->schema([
+                                ->components([
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             Toggle::make('is_enabled')
                                                 ->label(__('product_variants.fields.is_enabled'))
                                                 ->default(true)

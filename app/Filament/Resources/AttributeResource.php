@@ -32,8 +32,6 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * AttributeResource
  * 
@@ -92,11 +90,11 @@ final class AttributeResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('attributes.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('attributes.name'))
                                 ->required()
@@ -118,9 +116,9 @@ final class AttributeResource extends Resource
                 ]),
             
             Section::make(__('attributes.type_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('type')
                                 ->label(__('attributes.type'))
                                 ->options([
@@ -155,7 +153,7 @@ final class AttributeResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_required')
                                 ->label(__('attributes.is_required'))
                                 ->default(false),
@@ -167,9 +165,9 @@ final class AttributeResource extends Resource
                 ]),
             
             Section::make(__('attributes.validation'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('min_length')
                                 ->label(__('attributes.min_length'))
                                 ->numeric()
@@ -182,7 +180,7 @@ final class AttributeResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('min_value')
                                 ->label(__('attributes.min_value'))
                                 ->numeric(),
@@ -200,10 +198,10 @@ final class AttributeResource extends Resource
                 ]),
             
             Section::make(__('attributes.options'))
-                ->schema([
+                ->components([
                     Repeater::make('options')
                         ->label(__('attributes.options'))
-                        ->schema([
+                        ->components([
                             TextInput::make('value')
                                 ->label(__('attributes.option_value'))
                                 ->required()
@@ -230,9 +228,9 @@ final class AttributeResource extends Resource
                 ]),
             
             Section::make(__('attributes.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('attributes.is_active'))
                                 ->default(true),
@@ -243,7 +241,7 @@ final class AttributeResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('attributes.sort_order'))
                                 ->numeric()

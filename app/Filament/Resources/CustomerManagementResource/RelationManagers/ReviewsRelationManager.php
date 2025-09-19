@@ -24,7 +24,7 @@ final class ReviewsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('review_id')
                     ->label(__('customers.review'))
                     ->relationship('review', 'title')

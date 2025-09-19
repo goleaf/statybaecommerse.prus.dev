@@ -15,7 +15,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -95,11 +94,11 @@ final class LegalResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('legal.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('title')
                                 ->label(__('legal.title'))
                                 ->required()
@@ -137,7 +136,7 @@ final class LegalResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('legal.content'))
-                ->schema([
+                ->components([
                     RichEditor::make('content')
                         ->label(__('legal.content'))
                         ->required()
@@ -158,9 +157,9 @@ final class LegalResource extends Resource
                         ]),
                 ]),
             Section::make(__('legal.publishing'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_published')
                                 ->label(__('legal.is_published'))
                                 ->default(false),
@@ -169,7 +168,7 @@ final class LegalResource extends Resource
                                 ->default(false),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('published_at')
                                 ->label(__('legal.published_at'))
                                 ->default(now())
@@ -181,9 +180,9 @@ final class LegalResource extends Resource
                         ]),
                 ]),
             Section::make(__('legal.versioning'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('version')
                                 ->label(__('legal.version'))
                                 ->required()
@@ -196,7 +195,7 @@ final class LegalResource extends Resource
                         ]),
                 ]),
             Section::make(__('legal.seo'))
-                ->schema([
+                ->components([
                     TextInput::make('seo_title')
                         ->label(__('legal.seo_title'))
                         ->maxLength(255)

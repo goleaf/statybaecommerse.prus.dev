@@ -24,7 +24,7 @@ final class ImagesRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('image_id')
                     ->label(__('news.image'))
                     ->relationship('image', 'filename')

@@ -24,7 +24,7 @@ final class OrdersRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('order_id')
                     ->label(__('customers.order'))
                     ->relationship('order', 'order_number')

@@ -31,8 +31,6 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * MenuResource
  * 
@@ -90,11 +88,11 @@ final class MenuResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('menus.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('menus.name'))
                                 ->required()
@@ -116,10 +114,10 @@ final class MenuResource extends Resource
                 ]),
             
             Section::make(__('menus.menu_items'))
-                ->schema([
+                ->components([
                     Repeater::make('items')
                         ->label(__('menus.menu_items'))
-                        ->schema([
+                        ->components([
                             TextInput::make('label')
                                 ->label(__('menus.item_label'))
                                 ->required()
@@ -167,9 +165,9 @@ final class MenuResource extends Resource
                 ]),
             
             Section::make(__('menus.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('menus.is_active'))
                                 ->default(true),
@@ -180,7 +178,7 @@ final class MenuResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('css_class')
                                 ->label(__('menus.css_class'))
                                 ->maxLength(255)

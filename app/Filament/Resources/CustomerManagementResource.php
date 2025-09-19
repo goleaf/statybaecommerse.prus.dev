@@ -15,7 +15,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -96,11 +95,11 @@ final class CustomerManagementResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('customers.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('customers.name'))
                                 ->required()
@@ -113,7 +112,7 @@ final class CustomerManagementResource extends Resource
                                 ->maxLength(255),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('phone')
                                 ->label(__('customers.phone'))
                                 ->tel()
@@ -124,9 +123,9 @@ final class CustomerManagementResource extends Resource
                         ]),
                 ]),
             Section::make(__('customers.account_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('customers.is_active'))
                                 ->default(true),
@@ -148,9 +147,9 @@ final class CustomerManagementResource extends Resource
                         ]),
                 ]),
             Section::make(__('customers.personal_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('first_name')
                                 ->label(__('customers.first_name'))
                                 ->maxLength(255),
@@ -170,7 +169,7 @@ final class CustomerManagementResource extends Resource
                         ]),
                 ]),
             Section::make(__('customers.address_information'))
-                ->schema([
+                ->components([
                     KeyValue::make('address')
                         ->label(__('customers.address'))
                         ->keyLabel(__('customers.address_field'))
@@ -178,7 +177,7 @@ final class CustomerManagementResource extends Resource
                         ->addActionLabel(__('customers.add_address_field')),
                 ]),
             Section::make(__('customers.preferences'))
-                ->schema([
+                ->components([
                     Select::make('preferred_language')
                         ->label(__('customers.preferred_language'))
                         ->options([
