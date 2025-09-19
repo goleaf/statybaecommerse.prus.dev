@@ -1,123 +1,207 @@
-<x-modal
-    header-classes="p-4 border-b border-gray-100 sm:px-6 sm:py-4"
-    content-classes="relative p-4 flex-1 sm:max-h-[500px] sm:px-6 sm:px-5"
-    footer-classes="px-4 py-3 border-t border-gray-100 sm:px-6 sm:flex sm:flex-row-reverse"
-    form-action="save"
->
+<div>
     <x-slot name="title">
         {{ $title }}
     </x-slot>
 
-    <div class="space-y-4 pb-5">
+    <div class="space-y-4">
         <div class="grid grid-cols-2 gap-4">
             <div class="space-y-2">
-                <x-forms.label for="first_name" :value="__('First name')" required />
-                <x-forms.input wire:model="first_name" id="first_name" name="first_name" type="text"/>
-                <x-forms.errors :messages="$errors->get('first_name')" />
+                <label for="first_name" class="block text-sm font-medium text-gray-700">
+                    {{ __('First name') }} <span class="text-red-500">*</span>
+                </label>
+                <input 
+                    wire:model="first_name" 
+                    id="first_name" 
+                    name="first_name" 
+                    type="text"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                @error('first_name')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="space-y-2">
-                <x-forms.label for="last_name" :value="__('Last name')" required />
-                <x-forms.input wire:model="last_name" id="last_name" name="last_name" type="text"/>
-                <x-forms.errors :messages="$errors->get('last_name')" />
+                <label for="last_name" class="block text-sm font-medium text-gray-700">
+                    {{ __('Last name') }} <span class="text-red-500">*</span>
+                </label>
+                <input 
+                    wire:model="last_name" 
+                    id="last_name" 
+                    name="last_name" 
+                    type="text"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                @error('last_name')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
         </div>
 
         <div class="space-y-2">
-            <x-forms.label for="street_address" :value="__('Street Address')" required />
-            <x-forms.input
+            <label for="street_address" class="block text-sm font-medium text-gray-700">
+                {{ __('Street Address') }} <span class="text-red-500">*</span>
+            </label>
+            <input
                 wire:model="street_address"
                 id="street_address"
-                placeholder="Akwa Avenue 34"
-                class="w-full"
+                placeholder="{{ __('Enter street address') }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 name="street_address"
                 type="text"
             />
-            <x-forms.errors :messages="$errors->get('street_address')" />
+            @error('street_address')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="space-y-2">
-            <x-forms.label for="street_address_plus" :value="__('Apartment, suite, etc.')" />
-            <x-forms.input
+            <label for="street_address_plus" class="block text-sm font-medium text-gray-700">
+                {{ __('Apartment, suite, etc.') }}
+            </label>
+            <input
                 wire:model="street_address_plus"
-                class="w-full"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 id="street_address_plus"
                 name="street_address_plus"
                 type="text"
+                placeholder="{{ __('Apartment, suite, unit, etc.') }}"
             />
-            <x-forms.errors :messages="$errors->get('street_address_plus')" />
+            @error('street_address_plus')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div class="space-y-2">
-                <x-forms.label for="city" :value="__('City')" required/>
-                <x-forms.input wire:model="city" id="city" name="city" type="text" />
-                <x-forms.errors :messages="$errors->get('city')" class="mt-2" />
+                <label for="city" class="block text-sm font-medium text-gray-700">
+                    {{ __('City') }} <span class="text-red-500">*</span>
+                </label>
+                <input 
+                    wire:model="city" 
+                    id="city" 
+                    name="city" 
+                    type="text"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                @error('city')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="space-y-2">
-                <x-forms.label for="postal_code" :value="__('Postal / Zip code')" required />
-                <x-forms.input wire:model="postal_code" id="postal_code" name="postal_code" type="text"/>
-                <x-forms.errors :messages="$errors->get('postal_code')" class="mt-2" />
+                <label for="postal_code" class="block text-sm font-medium text-gray-700">
+                    {{ __('Postal / Zip code') }} <span class="text-red-500">*</span>
+                </label>
+                <input 
+                    wire:model="postal_code" 
+                    id="postal_code" 
+                    name="postal_code" 
+                    type="text"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                @error('postal_code')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
-
         </div>
 
         <div class="space-y-2">
-            <x-forms.label for="country_id" :value="__('Country')" required />
-            <x-forms.select wire:model="country_id" id="country_id" class="w-full">
+            <label for="country_code" class="block text-sm font-medium text-gray-700">
+                {{ __('Country') }} <span class="text-red-500">*</span>
+            </label>
+            <select 
+                wire:model="country_code" 
+                id="country_code" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
                 <option value="">{{ __('Select a country') }}</option>
                 @foreach ($countries as $key => $country)
                     <option value="{{ $key }}">{{ $country }}</option>
                 @endforeach
-            </x-forms.select>
-            <x-forms.errors :messages="$errors->get('country_id')" />
+            </select>
+            @error('country_code')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="space-y-2">
-            <x-forms.label for="phone_number" :value="__('Phone Number')" />
-            <x-forms.input wire:model="phone_number" class="w-full" id="phone_number" name="phone_number" type="text" />
-            <x-forms.errors :messages="$errors->get('phone_number')" />
+            <label for="phone_number" class="block text-sm font-medium text-gray-700">
+                {{ __('Phone Number') }}
+            </label>
+            <input 
+                wire:model="phone_number" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                id="phone_number" 
+                name="phone_number" 
+                type="text"
+                placeholder="{{ __('Enter phone number') }}"
+            />
+            @error('phone_number')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
-        <div class="grid gap-y-2 sm:grid-cols-3 sm:gap-x-4 sm:items-start">
-            <div class="flex items-center justify-between gap-x-3 ">
-                <x-forms.label for="adress_type" :value="__('Address type')" />
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <label class="block text-sm font-medium text-gray-700">
+                    {{ __('Address type') }} <span class="text-red-500">*</span>
+                </label>
             </div>
 
-            <div class="grid auto-cols-fr gap-y-2 sm:col-span-2">
-                <div class="columns-[--cols-default] fi-fo-radio gap-4 flex flex-wrap">
-                    <div>
-                        <x-forms.label class="flex items-center gap-3">
-                            <x-forms.radio id="type-billing" name="type" value="billing" wire:model="type"/>
-                            {{ __('Billing address') }}
-                        </x-forms.label>
-                    </div>
+            <div class="space-y-3">
+                <div class="flex items-center">
+                    <input 
+                        id="type-billing" 
+                        name="type" 
+                        type="radio" 
+                        value="billing" 
+                        wire:model="type"
+                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    />
+                    <label for="type-billing" class="ml-2 text-sm font-medium text-gray-700">
+                        {{ __('Billing address') }}
+                    </label>
+                </div>
 
-                    <div>
-                        <x-forms.label class="flex items-center gap-3">
-                            <x-forms.radio id="type-shipping" name="type" value="shipping" wire:model="type"/>
-                            {{ __('Shipping address') }}
-                        </x-forms.label>
-                    </div>
+                <div class="flex items-center">
+                    <input 
+                        id="type-shipping" 
+                        name="type" 
+                        type="radio" 
+                        value="shipping" 
+                        wire:model="type"
+                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    />
+                    <label for="type-shipping" class="ml-2 text-sm font-medium text-gray-700">
+                        {{ __('Shipping address') }}
+                    </label>
                 </div>
             </div>
-            <x-forms.errors :messages="$errors->get('type')" class="mt-2" />
+            @error('type')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
     </div>
 
-    <x-slot name="buttons">
-        <x-buttons.submit
-            :title="__('shopper::forms.actions.save')"
-            wire:loading.attr="data-loading"
-            class="w-full sm:ml-3 sm:w-auto"
-        />
-        <x-buttons.default
-            type="button"
-            wire:click="$dispatch('closeModal')"
-            class="w-full mt-3 text-sm sm:mt-0 sm:w-auto px-4"
-        >
-            {{ __('shopper::forms.actions.cancel') }}
-        </x-buttons.default>
+    <x-slot name="footer">
+        <div class="flex justify-end space-x-3">
+            <button
+                type="button"
+                wire:click="closeModal"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+                {{ __('Cancel') }}
+            </button>
+            <button
+                type="button"
+                wire:click="save"
+                wire:loading.attr="disabled"
+                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <span wire:loading.remove wire:target="save">{{ __('Save') }}</span>
+                <span wire:loading wire:target="save">{{ __('Saving...') }}</span>
+            </button>
+        </div>
     </x-slot>
-</x-modal>
+</div>
