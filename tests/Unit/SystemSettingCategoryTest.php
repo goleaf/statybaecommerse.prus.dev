@@ -78,7 +78,7 @@ final class SystemSettingCategoryTest extends TestCase
 
         $translatedName = $category->getTranslatedName();
         $translatedDescription = $category->getTranslatedDescription();
-        
+
         $this->assertEquals('Original Name', $translatedName);
         $this->assertEquals('Original Description', $translatedDescription);
     }
@@ -289,7 +289,7 @@ final class SystemSettingCategoryTest extends TestCase
         $category->name = 'Updated Name';
         $category->save();
 
-        $this->assertTrue(true); // If no exception is thrown, activity log works
+        $this->assertTrue(true);  // If no exception is thrown, activity log works
     }
 
     public function test_system_setting_category_model_soft_deletes(): void

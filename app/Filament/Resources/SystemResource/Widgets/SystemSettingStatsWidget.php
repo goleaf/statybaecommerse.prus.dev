@@ -61,7 +61,7 @@ final class SystemSettingStatsWidget extends BaseWidget
             // This is a simplified cache hit rate calculation
             // In a real application, you'd track cache hits/misses
             $store = Cache::getStore();
-            
+
             if (method_exists($store, 'getStats')) {
                 $cacheStats = $store->getStats();
                 if (isset($cacheStats['hits']) && isset($cacheStats['misses'])) {

@@ -1,13 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         Schema::table('system_settings', function (Blueprint $table): void {
@@ -17,9 +14,9 @@ return new class extends Migration
             $table->json('metadata')->nullable()->after('options');
             $table->string('validation_message')->nullable()->after('validation_rules');
             $table->boolean('is_cacheable')->default(true)->after('is_active');
-            $table->integer('cache_ttl')->default(3600)->after('is_cacheable'); // Cache TTL in seconds
-            $table->string('cache_key')->nullable()->after('cache_ttl'); // Custom cache key
-            $table->string('environment')->default('all')->after('cache_ttl'); // all, production, staging, development
+            $table->integer('cache_ttl')->default(3600)->after('is_cacheable');  // Cache TTL in seconds
+            $table->string('cache_key')->nullable()->after('cache_ttl');  // Custom cache key
+            $table->string('environment')->default('all')->after('cache_ttl');  // all, production, staging, development
             $table->json('tags')->nullable()->after('environment');
             $table->string('version')->default('1.0.0')->after('tags');
             $table->timestamp('last_accessed_at')->nullable()->after('version');

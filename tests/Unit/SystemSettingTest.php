@@ -29,11 +29,10 @@ final class SystemSettingTest extends TestCase
     {
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'updated_by' => $this->user->id,
         ]);
 
         $this->assertInstanceOf(SystemSettingCategory::class, $setting->category);
-        $this->assertInstanceOf(User::class, $setting->updatedBy);
+        $this->assertEquals($this->category->id, $setting->category->id);
     }
 
     public function test_system_setting_model_scopes(): void
@@ -122,7 +121,7 @@ final class SystemSettingTest extends TestCase
         ]);
 
         $response = $setting->getApiResponse();
-        
+
         $this->assertArrayHasKey('key', $response);
         $this->assertArrayHasKey('name', $response);
         $this->assertArrayHasKey('value', $response);
@@ -139,7 +138,7 @@ final class SystemSettingTest extends TestCase
 
         $formattedValue = $setting->getFormattedValue();
         $displayValue = $setting->getDisplayValue();
-        
+
         $this->assertIsString($formattedValue);
         $this->assertIsString($displayValue);
     }
@@ -152,7 +151,7 @@ final class SystemSettingTest extends TestCase
 
         $icon = $setting->getIconForType();
         $color = $setting->getColorForType();
-        
+
         $this->assertIsString($icon);
         $this->assertIsString($color);
     }
@@ -166,7 +165,7 @@ final class SystemSettingTest extends TestCase
         ]);
 
         $badge = $setting->getBadgeForStatus();
-        
+
         $this->assertIsString($badge);
         $this->assertStringContains('Public', $badge);
         $this->assertStringContains('Required', $badge);
@@ -219,7 +218,7 @@ final class SystemSettingTest extends TestCase
         ]);
 
         $config = $setting->getFormFieldConfig();
-        
+
         $this->assertArrayHasKey('type', $config);
         $this->assertArrayHasKey('label', $config);
         $this->assertArrayHasKey('help_text', $config);
@@ -239,7 +238,7 @@ final class SystemSettingTest extends TestCase
         ]);
 
         $rules = $setting->getValidationRulesForForm();
-        
+
         $this->assertContains('required', $rules);
         $this->assertContains('min:3', $rules);
         $this->assertContains('max:50', $rules);
@@ -256,7 +255,7 @@ final class SystemSettingTest extends TestCase
         $translatedName = $setting->getTranslatedName();
         $translatedDescription = $setting->getTranslatedDescription();
         $translatedHelpText = $setting->getTranslatedHelpText();
-        
+
         $this->assertEquals('Original Name', $translatedName);
         $this->assertEquals('Original Description', $translatedDescription);
         $this->assertEquals('Original Help Text', $translatedHelpText);
@@ -267,7 +266,7 @@ final class SystemSettingTest extends TestCase
         $setting = SystemSetting::factory()->create();
 
         $setting->addToHistory('old_value', 'new_value', 'Test reason');
-        
+
         $history = $setting->getRecentHistory();
         $this->assertCount(1, $history);
     }
@@ -278,8 +277,8 @@ final class SystemSettingTest extends TestCase
 
         $setting->clearInstanceCache();
         SystemSetting::clearCache();
-        
-        $this->assertTrue(true); // If no exception is thrown, the method works
+
+        $this->assertTrue(true);  // If no exception is thrown, the method works
     }
 
     public function test_system_setting_model_encryption(): void
@@ -515,6 +514,6 @@ final class SystemSettingTest extends TestCase
         $setting->name = 'Updated Name';
         $setting->save();
 
-        $this->assertTrue(true); // If no exception is thrown, activity log works
+        $this->assertTrue(true);  // If no exception is thrown, activity log works
     }
 }

@@ -1,23 +1,23 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Models;
 
 use App\Enums\AddressType;
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
+
 /**
  * Address
- * 
+ *
  * Eloquent model representing the Address entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property mixed $table
  * @property mixed $fillable
  * @property mixed $translatable
@@ -31,9 +31,11 @@ use Spatie\Translatable\HasTranslations;
 final class Address extends Model
 {
     use HasFactory, SoftDeletes, HasTranslations;
+
     protected $table = 'addresses';
     protected $fillable = ['user_id', 'type', 'first_name', 'last_name', 'company', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code', 'phone', 'email', 'is_default', 'is_billing', 'is_shipping', 'notes', 'apartment', 'floor', 'building', 'landmark', 'instructions', 'company_name', 'company_vat', 'is_active'];
     protected $translatable = ['notes', 'instructions'];
+
     /**
      * Handle casts functionality with proper error handling.
      * @return array
@@ -42,12 +44,14 @@ final class Address extends Model
     {
         return ['is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'is_active' => 'boolean', 'type' => AddressType::class];
     }
+
     /**
      * The accessors to append to the model's array form.
      *
      * @var array<int, string>
      */
     protected $appends = ['full_name', 'full_address', 'formatted_address', 'display_name', 'type_label', 'type_icon', 'type_color'];
+
     /**
      * Handle user functionality with proper error handling.
      * @return BelongsTo
@@ -56,6 +60,7 @@ final class Address extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     /**
      * Handle country functionality with proper error handling.
      * @return BelongsTo
@@ -64,6 +69,7 @@ final class Address extends Model
     {
         return $this->belongsTo(Country::class, 'country_code', 'cca2')->withDefault(['name' => 'Unknown Country', 'cca2' => 'XX']);
     }
+
     /**
      * Handle countryById functionality with proper error handling.
      * @return BelongsTo
@@ -72,6 +78,7 @@ final class Address extends Model
     {
         return $this->belongsTo(Country::class, 'country_id');
     }
+
     /**
      * Handle zone functionality with proper error handling.
      * @return BelongsTo
@@ -80,6 +87,7 @@ final class Address extends Model
     {
         return $this->belongsTo(Zone::class);
     }
+
     /**
      * Handle cityById functionality with proper error handling.
      * @return BelongsTo
@@ -88,6 +96,7 @@ final class Address extends Model
     {
         return $this->belongsTo(City::class, 'city_id');
     }
+
     /**
      * Handle orders functionality with proper error handling.
      * @return HasMany
@@ -96,6 +105,7 @@ final class Address extends Model
     {
         return $this->hasMany(Order::class, 'user_id', 'user_id');
     }
+
     /**
      * Handle shippingOrders functionality with proper error handling.
      * @return HasMany
@@ -104,6 +114,7 @@ final class Address extends Model
     {
         return $this->hasMany(Order::class, 'user_id', 'user_id');
     }
+
     /**
      * Handle latestOrder functionality with proper error handling.
      * @return HasOne
@@ -112,6 +123,7 @@ final class Address extends Model
     {
         return $this->orders()->one()->latestOfMany();
     }
+
     /**
      * Handle latestShippingOrder functionality with proper error handling.
      * @return HasOne
@@ -120,6 +132,7 @@ final class Address extends Model
     {
         return $this->shippingOrders()->one()->latestOfMany();
     }
+
     /**
      * Handle scopeDefault functionality with proper error handling.
      * @param mixed $query
@@ -128,6 +141,7 @@ final class Address extends Model
     {
         return $query->where('is_default', true);
     }
+
     /**
      * Handle scopeByType functionality with proper error handling.
      * @param mixed $query
@@ -137,6 +151,7 @@ final class Address extends Model
     {
         return $query->where('type', $type);
     }
+
     /**
      * Handle scopeBilling functionality with proper error handling.
      * @param mixed $query
@@ -145,6 +160,7 @@ final class Address extends Model
     {
         return $query->where('is_billing', true);
     }
+
     /**
      * Handle scopeShipping functionality with proper error handling.
      * @param mixed $query
@@ -153,6 +169,7 @@ final class Address extends Model
     {
         return $query->where('is_shipping', true);
     }
+
     /**
      * Handle scopeActive functionality with proper error handling.
      * @param mixed $query
@@ -161,6 +178,7 @@ final class Address extends Model
     {
         return $query->where('is_active', true);
     }
+
     /**
      * Handle scopeForUser functionality with proper error handling.
      * @param mixed $query
@@ -170,6 +188,7 @@ final class Address extends Model
     {
         return $query->where('user_id', $userId);
     }
+
     /**
      * Handle scopeByCountry functionality with proper error handling.
      * @param mixed $query
@@ -179,6 +198,7 @@ final class Address extends Model
     {
         return $query->where('country_code', $countryCode);
     }
+
     /**
      * Handle scopeByCity functionality with proper error handling.
      * @param mixed $query
@@ -188,6 +208,7 @@ final class Address extends Model
     {
         return $query->where('city', 'like', "%{$city}%");
     }
+
     /**
      * Handle scopeByPostalCode functionality with proper error handling.
      * @param mixed $query
@@ -197,6 +218,7 @@ final class Address extends Model
     {
         return $query->where('postal_code', 'like', "%{$postalCode}%");
     }
+
     /**
      * Handle getFullNameAttribute functionality with proper error handling.
      * @return string
@@ -205,6 +227,7 @@ final class Address extends Model
     {
         return trim("{$this->first_name} {$this->last_name}");
     }
+
     /**
      * Handle getFullAddressAttribute functionality with proper error handling.
      * @return string
@@ -214,6 +237,7 @@ final class Address extends Model
         $parts = array_filter([$this->address_line_1, $this->address_line_2, $this->apartment, $this->floor, $this->building, $this->city, $this->state, $this->postal_code]);
         return implode(', ', $parts);
     }
+
     /**
      * Handle getFormattedAddressAttribute functionality with proper error handling.
      * @return string
@@ -247,6 +271,7 @@ final class Address extends Model
         }
         return implode("\n", $lines);
     }
+
     /**
      * Handle getDisplayNameAttribute functionality with proper error handling.
      * @return string
@@ -259,6 +284,7 @@ final class Address extends Model
         }
         return $name;
     }
+
     /**
      * Handle getTypeLabelAttribute functionality with proper error handling.
      * @return string
@@ -267,6 +293,7 @@ final class Address extends Model
     {
         return $this->type->label();
     }
+
     /**
      * Handle getTypeIconAttribute functionality with proper error handling.
      * @return string
@@ -275,6 +302,7 @@ final class Address extends Model
     {
         return $this->type->icon();
     }
+
     /**
      * Handle getTypeColorAttribute functionality with proper error handling.
      * @return string
@@ -283,6 +311,7 @@ final class Address extends Model
     {
         return $this->type->color();
     }
+
     /**
      * Handle isBilling functionality with proper error handling.
      * @return bool
@@ -291,6 +320,7 @@ final class Address extends Model
     {
         return $this->is_billing || $this->type === AddressType::BILLING;
     }
+
     /**
      * Handle isShipping functionality with proper error handling.
      * @return bool
@@ -299,6 +329,7 @@ final class Address extends Model
     {
         return $this->is_shipping || $this->type === AddressType::SHIPPING;
     }
+
     /**
      * Handle isDefault functionality with proper error handling.
      * @return bool
@@ -307,6 +338,7 @@ final class Address extends Model
     {
         return $this->is_default;
     }
+
     /**
      * Handle isActive functionality with proper error handling.
      * @return bool
@@ -315,6 +347,7 @@ final class Address extends Model
     {
         return $this->is_active;
     }
+
     /**
      * Handle hasCompany functionality with proper error handling.
      * @return bool
@@ -323,6 +356,7 @@ final class Address extends Model
     {
         return !empty($this->company_name);
     }
+
     /**
      * Handle hasAdditionalInfo functionality with proper error handling.
      * @return bool
@@ -331,6 +365,7 @@ final class Address extends Model
     {
         return !empty($this->apartment) || !empty($this->floor) || !empty($this->building) || !empty($this->landmark) || !empty($this->instructions);
     }
+
     /**
      * Handle getValidationRules functionality with proper error handling.
      * @return array
@@ -339,6 +374,7 @@ final class Address extends Model
     {
         return ['user_id' => 'required|exists:users,id', 'type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'zone_id' => 'nullable|exists:zones,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'is_active' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255'];
     }
+
     /**
      * Handle getTypesForSelect functionality with proper error handling.
      * @return array
@@ -347,6 +383,7 @@ final class Address extends Model
     {
         return AddressType::options();
     }
+
     /**
      * Handle getTypesWithDescriptions functionality with proper error handling.
      * @return array
@@ -355,6 +392,7 @@ final class Address extends Model
     {
         return AddressType::optionsWithDescriptions();
     }
+
     /**
      * Handle getDefaultAddressForUser functionality with proper error handling.
      * @param int $userId
@@ -364,6 +402,7 @@ final class Address extends Model
     {
         return static::where('user_id', $userId)->where('is_default', true)->where('is_active', true)->first();
     }
+
     /**
      * Handle getBillingAddressForUser functionality with proper error handling.
      * @param int $userId
@@ -375,6 +414,7 @@ final class Address extends Model
             $query->where('is_billing', true)->orWhere('type', AddressType::BILLING);
         })->where('is_active', true)->first();
     }
+
     /**
      * Handle getShippingAddressForUser functionality with proper error handling.
      * @param int $userId
@@ -388,6 +428,7 @@ final class Address extends Model
             });
         })->orderBy('is_shipping', 'desc')->first();
     }
+
     /**
      * Handle getAddressesForUser functionality with proper error handling.
      * @param int $userId
@@ -397,6 +438,7 @@ final class Address extends Model
     {
         return static::where('user_id', $userId)->where('is_active', true)->orderBy('is_default', 'desc')->orderBy('created_at', 'desc')->get();
     }
+
     /**
      * Handle setAsDefault functionality with proper error handling.
      * @return bool
@@ -408,6 +450,7 @@ final class Address extends Model
         // Set this address as default
         return $this->update(['is_default' => true]);
     }
+
     /**
      * Handle duplicateForUser functionality with proper error handling.
      * @param int $userId

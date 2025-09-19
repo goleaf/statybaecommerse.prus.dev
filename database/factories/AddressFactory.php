@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -57,7 +55,7 @@ final class AddressFactory extends Factory
      */
     public function shipping(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'shipping',
         ]);
     }
@@ -67,7 +65,7 @@ final class AddressFactory extends Factory
      */
     public function billing(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'billing',
         ]);
     }
@@ -77,7 +75,7 @@ final class AddressFactory extends Factory
      */
     public function default(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_default' => true,
         ]);
     }
@@ -87,7 +85,7 @@ final class AddressFactory extends Factory
      */
     public function home(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'home',
         ]);
     }
@@ -97,7 +95,7 @@ final class AddressFactory extends Factory
      */
     public function work(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'work',
         ]);
     }
@@ -107,7 +105,7 @@ final class AddressFactory extends Factory
      */
     public function other(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'other',
         ]);
     }
@@ -117,7 +115,7 @@ final class AddressFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => true,
         ]);
     }
@@ -127,7 +125,7 @@ final class AddressFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => false,
         ]);
     }
@@ -137,7 +135,7 @@ final class AddressFactory extends Factory
      */
     public function withCompany(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'company_name' => fake()->company(),
             'company_vat' => fake()->numerify('LT########'),
         ]);
@@ -148,7 +146,7 @@ final class AddressFactory extends Factory
      */
     public function withAdditionalInfo(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'apartment' => fake()->numerify('Apt ###'),
             'floor' => fake()->numerify('#th Floor'),
             'building' => fake()->buildingNumber(),

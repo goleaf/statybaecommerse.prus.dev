@@ -8,7 +8,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -51,6 +51,10 @@ class ProductResourceTest extends TestCase
         // Test that form method exists and is callable
         $this->assertTrue(method_exists($resource, 'form'));
         $this->assertTrue(is_callable([$resource, 'form']));
+
+        // Test Filament v4 Schema usage
+        $schema = ProductResource::form(Schema::make());
+        $this->assertInstanceOf(Schema::class, $schema);
     }
 
     public function test_product_resource_table_works(): void
@@ -108,5 +112,56 @@ class ProductResourceTest extends TestCase
             'sku' => 'TEST-001',
             'price' => 99.99,
         ]);
+    }
+
+    public function test_product_resource_navigation_group(): void
+    {
+        $this->assertEquals('Products', ProductResource::getNavigationGroup());
+    }
+
+    public function test_product_resource_navigation_label(): void
+    {
+        $this->assertIsString(ProductResource::getNavigationLabel());
+    }
+
+    public function test_product_resource_model_label(): void
+    {
+        $this->assertIsString(ProductResource::getModelLabel());
+        $this->assertIsString(ProductResource::getPluralModelLabel());
+    }
+
+    public function test_product_resource_record_title_attribute(): void
+    {
+        $product = Product::factory()->create(['name' => 'Test Product']);
+        $this->assertEquals('Test Product', $product->name);
+    }
+
+    public function test_product_resource_form_components(): void
+    {
+        $schema = ProductResource::form(Schema::make());
+        $components = $schema->getComponents();
+
+        $this->assertIsArray($components);
+        $this->assertNotEmpty($components);
+    }
+
+    public function test_product_resource_relationships(): void
+    {
+        $category = Category::factory()->create();
+        $brand = Brand::factory()->create();
+
+        $product = Product::factory()->create([
+            'brand_id' => $brand->id,
+        ]);
+
+        // Attach category using many-to-many relationship
+        $product->categories()->attach($category->id);
+
+        $this->assertInstanceOf(Brand::class, $product->brand);
+        $this->assertEquals($brand->id, $product->brand->id);
+
+        // Test many-to-many relationship
+        $this->assertTrue($product->categories->contains($category));
+        $this->assertEquals($category->id, $product->categories->first()->id);
     }
 }

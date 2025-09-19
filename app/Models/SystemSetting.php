@@ -1,26 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 /**
  * SystemSetting
- * 
+ *
  * Eloquent model representing the SystemSetting entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property mixed $fillable
  * @property mixed $casts
  * @method static \Illuminate\Database\Eloquent\Builder|SystemSetting newModelQuery()
@@ -32,8 +32,10 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 final class SystemSetting extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia, LogsActivity, SoftDeletes;
+
     protected $fillable = ['category_id', 'key', 'name', 'value', 'type', 'group', 'description', 'help_text', 'is_public', 'is_required', 'is_encrypted', 'is_readonly', 'validation_rules', 'options', 'default_value', 'sort_order', 'is_active', 'updated_by', 'placeholder', 'tooltip', 'metadata', 'validation_message', 'is_cacheable', 'cache_ttl', 'cache_key', 'environment', 'tags', 'version', 'access_count', 'last_accessed_at'];
     protected $casts = ['is_public' => 'boolean', 'is_required' => 'boolean', 'is_encrypted' => 'boolean', 'is_readonly' => 'boolean', 'is_active' => 'boolean', 'is_cacheable' => 'boolean', 'validation_rules' => 'json', 'options' => 'json', 'metadata' => 'json', 'tags' => 'json', 'sort_order' => 'integer', 'cache_ttl' => 'integer', 'access_count' => 'integer', 'last_accessed_at' => 'datetime'];
+
     /**
      * Handle value functionality with proper error handling.
      * @return Attribute
@@ -70,6 +72,7 @@ final class SystemSetting extends Model implements HasMedia
             };
         });
     }
+
     /**
      * Handle options functionality with proper error handling.
      * @return Attribute
@@ -92,6 +95,7 @@ final class SystemSetting extends Model implements HasMedia
             return $value;
         });
     }
+
     /**
      * Handle validationRules functionality with proper error handling.
      * @return Attribute
@@ -114,6 +118,7 @@ final class SystemSetting extends Model implements HasMedia
             return $value;
         });
     }
+
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
      * @return LogOptions
@@ -122,6 +127,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return LogOptions::defaults()->logOnly(['key', 'name', 'value', 'type', 'group', 'is_active'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "System Setting {$eventName}")->useLogName('system_settings');
     }
+
     /**
      * Handle category functionality with proper error handling.
      * @return BelongsTo
@@ -130,6 +136,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->belongsTo(SystemSettingCategory::class, 'category_id');
     }
+
     /**
      * Handle updatedBy functionality with proper error handling.
      * @return BelongsTo
@@ -138,6 +145,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
     /**
      * Handle translations functionality with proper error handling.
      * @return HasMany
@@ -146,6 +154,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->hasMany(SystemSettingTranslation::class);
     }
+
     /**
      * Handle history functionality with proper error handling.
      * @return HasMany
@@ -154,6 +163,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->hasMany(SystemSettingHistory::class);
     }
+
     /**
      * Handle dependencies functionality with proper error handling.
      * @return HasMany
@@ -162,6 +172,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->hasMany(SystemSettingDependency::class, 'setting_id');
     }
+
     /**
      * Handle dependents functionality with proper error handling.
      * @return HasMany
@@ -170,6 +181,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->hasMany(SystemSettingDependency::class, 'depends_on_setting_id');
     }
+
     /**
      * Handle scopeByGroup functionality with proper error handling.
      * @param mixed $query
@@ -179,6 +191,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $query->where('group', $group);
     }
+
     /**
      * Handle scopeByCategory functionality with proper error handling.
      * @param mixed $query
@@ -190,6 +203,7 @@ final class SystemSetting extends Model implements HasMedia
             $q->where('slug', $category);
         });
     }
+
     /**
      * Handle scopePublic functionality with proper error handling.
      * @param mixed $query
@@ -198,6 +212,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $query->where('is_public', true);
     }
+
     /**
      * Handle scopeActive functionality with proper error handling.
      * @param mixed $query
@@ -206,6 +221,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $query->where('is_active', true);
     }
+
     /**
      * Handle scopeOrdered functionality with proper error handling.
      * @param mixed $query
@@ -214,6 +230,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $query->orderBy('sort_order')->orderBy('name');
     }
+
     /**
      * Handle scopeSearchable functionality with proper error handling.
      * @param mixed $query
@@ -225,6 +242,7 @@ final class SystemSetting extends Model implements HasMedia
             $q->where('key', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%");
         });
     }
+
     /**
      * Handle getValue functionality with proper error handling.
      * @param string $key
@@ -235,6 +253,7 @@ final class SystemSetting extends Model implements HasMedia
         $setting = self::where('key', $key)->active()->first();
         return $setting ? $setting->value : $default;
     }
+
     /**
      * Handle setValue functionality with proper error handling.
      * @param string $key
@@ -248,6 +267,7 @@ final class SystemSetting extends Model implements HasMedia
         $data = array_merge($defaults, $options, ['key' => $key, 'value' => $value, 'updated_by' => auth()->id()]);
         self::updateOrCreate(['key' => $key], $data);
     }
+
     /**
      * Handle getPublic functionality with proper error handling.
      * @param string $key
@@ -258,6 +278,7 @@ final class SystemSetting extends Model implements HasMedia
         $setting = self::where('key', $key)->public()->active()->first();
         return $setting ? $setting->value : $default;
     }
+
     /**
      * Handle getTranslatedName functionality with proper error handling.
      * @param string|null $locale
@@ -269,6 +290,7 @@ final class SystemSetting extends Model implements HasMedia
         $translation = $this->translations()->where('locale', $locale)->first();
         return $translation?->name ?? $this->name;
     }
+
     /**
      * Handle getTranslatedDescription functionality with proper error handling.
      * @param string|null $locale
@@ -280,6 +302,7 @@ final class SystemSetting extends Model implements HasMedia
         $translation = $this->translations()->where('locale', $locale)->first();
         return $translation?->description ?? $this->description;
     }
+
     /**
      * Handle getTranslatedHelpText functionality with proper error handling.
      * @param string|null $locale
@@ -291,6 +314,7 @@ final class SystemSetting extends Model implements HasMedia
         $translation = $this->translations()->where('locale', $locale)->first();
         return $translation?->help_text ?? $this->help_text;
     }
+
     /**
      * Handle registerMediaCollections functionality with proper error handling.
      * @return void
@@ -300,6 +324,7 @@ final class SystemSetting extends Model implements HasMedia
         $this->addMediaCollection('images')->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])->singleFile();
         $this->addMediaCollection('files')->acceptsMimeTypes(['application/pdf', 'text/plain', 'application/json'])->singleFile();
     }
+
     /**
      * Handle registerMediaConversions functionality with proper error handling.
      * @param Media|null $media
@@ -310,6 +335,7 @@ final class SystemSetting extends Model implements HasMedia
         $this->addMediaConversion('thumb')->width(150)->height(150)->sharpen(10)->performOnCollections('images');
         $this->addMediaConversion('small')->width(300)->height(300)->sharpen(10)->performOnCollections('images');
     }
+
     /**
      * Handle getValidationRulesArray functionality with proper error handling.
      * @return array
@@ -322,6 +348,7 @@ final class SystemSetting extends Model implements HasMedia
         }
         return $rules;
     }
+
     /**
      * Handle getOptionsArray functionality with proper error handling.
      * @return array
@@ -330,6 +357,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->options;
     }
+
     /**
      * Handle isType functionality with proper error handling.
      * @param string $type
@@ -339,6 +367,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->type === $type;
     }
+
     /**
      * Handle isGroup functionality with proper error handling.
      * @param string $group
@@ -348,6 +377,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->group === $group;
     }
+
     /**
      * Handle canBeModified functionality with proper error handling.
      * @return bool
@@ -356,6 +386,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return !$this->is_readonly;
     }
+
     /**
      * Handle getFormattedValue functionality with proper error handling.
      * @return string
@@ -369,6 +400,7 @@ final class SystemSetting extends Model implements HasMedia
             default => (string) $this->value,
         };
     }
+
     /**
      * Handle getDisplayValue functionality with proper error handling.
      * @return string
@@ -386,6 +418,7 @@ final class SystemSetting extends Model implements HasMedia
             default => (string) $this->value,
         };
     }
+
     /**
      * Handle getIconForType functionality with proper error handling.
      * @return string
@@ -405,6 +438,7 @@ final class SystemSetting extends Model implements HasMedia
             default => 'heroicon-o-cog-6-tooth',
         };
     }
+
     /**
      * Handle getColorForType functionality with proper error handling.
      * @return string
@@ -423,6 +457,7 @@ final class SystemSetting extends Model implements HasMedia
             default => 'gray',
         };
     }
+
     /**
      * Handle getBadgeForStatus functionality with proper error handling.
      * @return string
@@ -444,6 +479,7 @@ final class SystemSetting extends Model implements HasMedia
         }
         return implode(', ', $badges);
     }
+
     /**
      * Handle hasDependencies functionality with proper error handling.
      * @return bool
@@ -452,6 +488,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->dependencies()->active()->exists();
     }
+
     /**
      * Handle hasDependents functionality with proper error handling.
      * @return bool
@@ -460,6 +497,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->dependents()->exists();
     }
+
     /**
      * Handle getDependencyChain functionality with proper error handling.
      * @return array
@@ -471,6 +509,7 @@ final class SystemSetting extends Model implements HasMedia
         $this->buildDependencyChain($this, $chain, $visited);
         return $chain;
     }
+
     /**
      * Handle buildDependencyChain functionality with proper error handling.
      * @param SystemSetting $setting
@@ -490,6 +529,7 @@ final class SystemSetting extends Model implements HasMedia
             $this->buildDependencyChain($dependency->dependsOn, $chain, $visited);
         }
     }
+
     /**
      * Handle validateValue functionality with proper error handling.
      * @param mixed $value
@@ -504,6 +544,7 @@ final class SystemSetting extends Model implements HasMedia
         $validator = validator([$this->key => $value], [$this->key => $rules]);
         return !$validator->fails();
     }
+
     /**
      * Handle getValidationErrors functionality with proper error handling.
      * @param mixed $value
@@ -518,6 +559,7 @@ final class SystemSetting extends Model implements HasMedia
         $validator = validator([$this->key => $value], [$this->key => $rules]);
         return $validator->fails() ? $validator->errors()->all() : [];
     }
+
     /**
      * Handle getCacheKey functionality with proper error handling.
      * @return string
@@ -526,6 +568,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return 'system_setting_' . $this->key;
     }
+
     /**
      * Handle getCacheTags functionality with proper error handling.
      * @return array
@@ -534,6 +577,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return ['system_settings', 'system_setting_' . $this->id, 'group_' . $this->group];
     }
+
     /**
      * Handle clearCache functionality with proper error handling.
      * @return void
@@ -542,6 +586,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         cache()->tags(['system_settings'])->flush();
     }
+
     /**
      * Handle clearInstanceCache functionality with proper error handling.
      * @return void
@@ -550,6 +595,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         cache()->tags($this->getCacheTags())->forget($this->getCacheKey());
     }
+
     /**
      * Handle getApiResponse functionality with proper error handling.
      * @return array
@@ -558,6 +604,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return ['id' => $this->id, 'key' => $this->key, 'name' => $this->name, 'value' => $this->is_public ? $this->value : null, 'type' => $this->type, 'group' => $this->group, 'description' => $this->description, 'help_text' => $this->help_text, 'is_public' => $this->is_public, 'is_required' => $this->is_required, 'is_readonly' => $this->is_readonly, 'is_active' => $this->is_active, 'sort_order' => $this->sort_order, 'updated_at' => $this->updated_at];
     }
+
     /**
      * Boot the service provider or trait functionality.
      * @return void
@@ -576,6 +623,7 @@ final class SystemSetting extends Model implements HasMedia
             $setting->clearCache();
         });
     }
+
     /**
      * Handle getActiveDependencies functionality with proper error handling.
      */
@@ -583,6 +631,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->dependencies()->active()->with('dependsOnSetting')->get();
     }
+
     /**
      * Handle getActiveDependents functionality with proper error handling.
      */
@@ -590,6 +639,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->dependents()->active()->with('setting')->get();
     }
+
     /**
      * Handle canBeEnabled functionality with proper error handling.
      * @return bool
@@ -604,6 +654,7 @@ final class SystemSetting extends Model implements HasMedia
         }
         return true;
     }
+
     /**
      * Handle getDependencyStatus functionality with proper error handling.
      * @return array
@@ -622,6 +673,7 @@ final class SystemSetting extends Model implements HasMedia
         }
         return $status;
     }
+
     /**
      * Handle addToHistory functionality with proper error handling.
      * @param string|null $oldValue
@@ -633,6 +685,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         $this->history()->create(['old_value' => $oldValue, 'new_value' => $newValue, 'changed_by' => auth()->id(), 'change_reason' => $reason]);
     }
+
     /**
      * Handle getRecentHistory functionality with proper error handling.
      * @param int $limit
@@ -641,6 +694,7 @@ final class SystemSetting extends Model implements HasMedia
     {
         return $this->history()->with('changedBy')->orderBy('created_at', 'desc')->limit($limit)->get();
     }
+
     /**
      * Handle getTranslatedValue functionality with proper error handling.
      * @param string|null $locale
@@ -652,6 +706,7 @@ final class SystemSetting extends Model implements HasMedia
         // In the future, this could be extended to support translated values
         return $this->value;
     }
+
     /**
      * Handle getValidationRulesForForm functionality with proper error handling.
      * @return array
@@ -672,6 +727,7 @@ final class SystemSetting extends Model implements HasMedia
         }
         return $rules;
     }
+
     /**
      * Handle getFormFieldConfig functionality with proper error handling.
      * @return array
