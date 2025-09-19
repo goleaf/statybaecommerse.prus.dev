@@ -260,7 +260,7 @@ final class SystemResource extends Resource
                                             ->schema([
                                                 Select::make('setting_id')
                                                     ->label('Depends On')
-                                                    ->relationship('setting', 'key')
+                                                    ->options(SystemSetting::pluck('name', 'id'))
                                                     ->required(),
                                                 TextInput::make('condition')
                                                     ->label('Condition')

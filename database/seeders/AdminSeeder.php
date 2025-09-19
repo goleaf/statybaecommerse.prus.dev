@@ -276,10 +276,10 @@ final class AdminSeeder extends Seeder
         $this->command->info('👥 Creating customer groups...');
         
         $groups = [
-            ['name' => 'VIP Customers', 'code' => 'VIP', 'description' => 'High-value customers with special privileges', 'discount_percentage' => 15.0],
-            ['name' => 'Regular Customers', 'code' => 'REGULAR', 'description' => 'Standard customers', 'discount_percentage' => 5.0],
-            ['name' => 'New Customers', 'code' => 'NEW', 'description' => 'First-time customers', 'discount_percentage' => 10.0],
-            ['name' => 'Wholesale', 'code' => 'WHOLESALE', 'description' => 'Bulk purchase customers', 'discount_percentage' => 20.0],
+            ['name' => ['lt' => 'VIP Customers', 'en' => 'VIP Customers'], 'code' => 'VIP', 'description' => ['lt' => 'High-value customers with special privileges', 'en' => 'High-value customers with special privileges'], 'discount_percentage' => 15.0],
+            ['name' => ['lt' => 'Regular Customers', 'en' => 'Regular Customers'], 'code' => 'REGULAR', 'description' => ['lt' => 'Standard customers', 'en' => 'Standard customers'], 'discount_percentage' => 5.0],
+            ['name' => ['lt' => 'New Customers', 'en' => 'New Customers'], 'code' => 'NEW', 'description' => ['lt' => 'First-time customers', 'en' => 'First-time customers'], 'discount_percentage' => 10.0],
+            ['name' => ['lt' => 'Wholesale', 'en' => 'Wholesale'], 'code' => 'WHOLESALE', 'description' => ['lt' => 'Bulk purchase customers', 'en' => 'Bulk purchase customers'], 'discount_percentage' => 20.0],
         ];
 
         $createdGroups = [];

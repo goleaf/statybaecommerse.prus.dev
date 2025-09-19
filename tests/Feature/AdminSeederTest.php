@@ -150,21 +150,21 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('currencies', 3);
         
         $this->assertDatabaseHas('currencies', [
-            'name' => 'Euro',
+            'name' => '{"lt":"Euro","en":"Euro"}',
             'code' => 'EUR',
             'symbol' => '€',
             'is_default' => true,
         ]);
         
         $this->assertDatabaseHas('currencies', [
-            'name' => 'US Dollar',
+            'name' => '{"lt":"US Dollar","en":"US Dollar"}',
             'code' => 'USD',
             'symbol' => '$',
             'is_default' => false,
         ]);
         
         $this->assertDatabaseHas('currencies', [
-            'name' => 'British Pound',
+            'name' => '{"lt":"British Pound","en":"British Pound"}',
             'code' => 'GBP',
             'symbol' => '£',
             'is_default' => false,
@@ -181,7 +181,7 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('customer_groups', 4);
         
         $this->assertDatabaseHas('customer_groups', [
-            'name' => 'VIP Customers',
+            'name' => '{"lt":"VIP Customers","en":"VIP Customers"}',
             'code' => 'VIP',
             'discount_percentage' => 15.0,
         ]);

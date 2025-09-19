@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * ShippingOption
@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class ShippingOption extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'name',
@@ -176,7 +176,7 @@ final class ShippingOption extends Model
     public function calculatePriceForOrder(float $weight = 0, float $orderAmount = 0): float
     {
         if (!$this->isEligibleForWeight($weight) || !$this->isEligibleForOrderAmount($orderAmount)) {
-            return 0;
+            return 0.0;
         }
         return (float) $this->price;
     }

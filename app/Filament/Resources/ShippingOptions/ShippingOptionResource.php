@@ -10,6 +10,7 @@ use App\Filament\Resources\ShippingOptions\Pages\ListShippingOptions;
 use App\Models\ShippingOption;
 use App\Models\Zone;
 use BackedEnum;
+use UnitEnum;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -34,15 +35,15 @@ class ShippingOptionResource extends Resource
 {
     protected static ?string $model = ShippingOption::class;
 
-    protected static ?string $navigationGroup = 'Shipping';
+    protected static $navigationGroup = 'Shipping';
 
     protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-truck';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make('Basic Information')
                     ->schema([

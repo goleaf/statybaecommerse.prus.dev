@@ -106,48 +106,64 @@
                                             {{ __('admin.models.customer_groups') }}
                                         </a>
                                     @elseif($group->value === 'Inventory')
-                                        <a href="{{ route('filament.admin.resources.stock.index') }}"
-                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <x-heroicon-o-archive-box class="h-4 w-4 mr-3" />
-                                            {{ __('admin.models.stock') }}
-                                        </a>
-                                        <a href="{{ route('filament.admin.resources.product-variants.index') }}"
-                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <x-heroicon-o-cube-transparent class="h-4 w-4 mr-3" />
-                                            {{ __('admin.models.product_variants') }}
-                                        </a>
+                                        @if (Route::has('filament.admin.resources.stocks.index'))
+                                            <a href="{{ route('filament.admin.resources.stocks.index') }}"
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <x-heroicon-o-archive-box class="h-4 w-4 mr-3" />
+                                                {{ __('admin.models.stock') }}
+                                            </a>
+                                        @endif
+                                        @if (Route::has('filament.admin.resources.product-variants.index'))
+                                            <a href="{{ route('filament.admin.resources.product-variants.index') }}"
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <x-heroicon-o-cube-transparent class="h-4 w-4 mr-3" />
+                                                {{ __('admin.models.product_variants') }}
+                                            </a>
+                                        @endif
                                     @elseif($group->value === 'Locations')
-                                        <a href="{{ route('filament.admin.resources.locations.index') }}"
-                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <x-heroicon-o-map-pin class="h-4 w-4 mr-3" />
-                                            {{ __('admin.models.locations') }}
-                                        </a>
-                                        <a href="{{ route('filament.admin.resources.countries.index') }}"
-                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <x-heroicon-o-globe-alt class="h-4 w-4 mr-3" />
-                                            {{ __('admin.models.countries') }}
-                                        </a>
-                                        <a href="{{ route('filament.admin.resources.zones.index') }}"
-                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <x-heroicon-o-map class="h-4 w-4 mr-3" />
-                                            {{ __('admin.models.zones') }}
-                                        </a>
+                                        @if (Route::has('filament.admin.resources.locations.index'))
+                                            <a href="{{ route('filament.admin.resources.locations.index') }}"
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <x-heroicon-o-map-pin class="h-4 w-4 mr-3" />
+                                                {{ __('admin.models.locations') }}
+                                            </a>
+                                        @endif
+                                        @if (Route::has('filament.admin.resources.countries.index'))
+                                            <a href="{{ route('filament.admin.resources.countries.index') }}"
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <x-heroicon-o-globe-alt class="h-4 w-4 mr-3" />
+                                                {{ __('admin.models.countries') }}
+                                            </a>
+                                        @endif
+                                        @if (Route::has('filament.admin.resources.zones.index'))
+                                            <a href="{{ route('filament.admin.resources.zones.index') }}"
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <x-heroicon-o-map class="h-4 w-4 mr-3" />
+                                                {{ __('admin.models.zones') }}
+                                            </a>
+                                        @endif
                                     @elseif($group->value === 'Marketing')
-                                        <a href="{{ route('filament.admin.resources.campaigns.index') }}"
-                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <x-heroicon-o-megaphone class="h-4 w-4 mr-3" />
-                                            {{ __('admin.models.campaigns') }}
-                                        </a>
-                                        <a href="{{ route('filament.admin.resources.discount-codes.index') }}"
-                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <x-heroicon-o-ticket class="h-4 w-4 mr-3" />
-                                            {{ __('admin.models.discount_codes') }}
-                                        </a>
-                                        <a href="{{ route('filament.admin.resources.coupons.index') }}"
-                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <x-heroicon-o-gift class="h-4 w-4 mr-3" />
-                                            {{ __('admin.models.coupons') }}
-                                        </a>
+                                        @if (Route::has('filament.admin.resources.campaigns.index'))
+                                            <a href="{{ route('filament.admin.resources.campaigns.index') }}"
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <x-heroicon-o-megaphone class="h-4 w-4 mr-3" />
+                                                {{ __('admin.models.campaigns') }}
+                                            </a>
+                                        @endif
+                                        @if (Route::has('filament.admin.resources.discount-codes.index'))
+                                            <a href="{{ route('filament.admin.resources.discount-codes.index') }}"
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <x-heroicon-o-ticket class="h-4 w-4 mr-3" />
+                                                {{ __('admin.models.discount_codes') }}
+                                            </a>
+                                        @endif
+                                        @if (Route::has('filament.admin.resources.coupons.index'))
+                                            <a href="{{ route('filament.admin.resources.coupons.index') }}"
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <x-heroicon-o-gift class="h-4 w-4 mr-3" />
+                                                {{ __('admin.models.coupons') }}
+                                            </a>
+                                        @endif
                                     @elseif($group->value === 'Analytics')
                                         <a href="{{ route('filament.admin.resources.analytics-events.index') }}"
                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
