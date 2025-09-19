@@ -20,8 +20,6 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            // Top Navigation Component
-            \App\Filament\Components\TopNavigation::class,
             // Simplified Comprehensive Statistics Widget
             \App\Filament\Widgets\SimplifiedStatsWidget::class,
             // Comprehensive Analytics Dashboard

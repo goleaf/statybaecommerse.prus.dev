@@ -1,19 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Services;
 
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Section;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 use SolutionForest\TabLayoutPlugin\Schemas\SimpleTabSchema;
+
 /**
  * MultiLanguageTabService
- * 
+ *
  * Service class containing MultiLanguageTabService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class MultiLanguageTabService
 {
@@ -30,6 +29,7 @@ final class MultiLanguageTabService
             return ['code' => $locale, 'name' => self::getLanguageName($locale), 'flag' => self::getLanguageFlag($locale)];
         })->toArray();
     }
+
     /**
      * Handle getLanguageName functionality with proper error handling.
      * @param string $locale
@@ -47,6 +47,7 @@ final class MultiLanguageTabService
             default => strtoupper($locale),
         };
     }
+
     /**
      * Handle getLanguageFlag functionality with proper error handling.
      * @param string $locale
@@ -64,6 +65,7 @@ final class MultiLanguageTabService
             default => '🌐',
         };
     }
+
     /**
      * Handle createSimpleTabs functionality with proper error handling.
      * @param array $fields
@@ -87,6 +89,7 @@ final class MultiLanguageTabService
         }
         return $tabs;
     }
+
     /**
      * Handle createAdvancedTabs functionality with proper error handling.
      * @param callable $schemaBuilder
@@ -103,6 +106,7 @@ final class MultiLanguageTabService
         }
         return $tabs;
     }
+
     /**
      * Handle createSectionedTabs functionality with proper error handling.
      * @param array $sections
@@ -130,6 +134,7 @@ final class MultiLanguageTabService
         }
         return $tabs;
     }
+
     /**
      * Handle createSimpleTabSchemas functionality with proper error handling.
      * @param string $componentClass
@@ -145,6 +150,7 @@ final class MultiLanguageTabService
         }
         return $schemas;
     }
+
     /**
      * Handle getDefaultActiveTab functionality with proper error handling.
      * @return int
@@ -161,6 +167,7 @@ final class MultiLanguageTabService
         // Fallback to first tab
         return 0;
     }
+
     /**
      * Handle prepareTranslationData functionality with proper error handling.
      * @param array $formData
@@ -184,6 +191,7 @@ final class MultiLanguageTabService
         }
         return ['main_data' => $formData, 'translations' => $translations];
     }
+
     /**
      * Handle populateFormWithTranslations functionality with proper error handling.
      * @param mixed $record

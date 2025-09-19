@@ -7,7 +7,7 @@ namespace App\Filament\Resources\RecommendationBlockResource\Pages;
 use App\Filament\Resources\RecommendationBlockResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Forms\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListRecommendationBlocks extends ListRecords

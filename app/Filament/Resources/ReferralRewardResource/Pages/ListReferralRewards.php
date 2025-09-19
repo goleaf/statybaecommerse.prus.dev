@@ -7,7 +7,7 @@ namespace App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Filament\Resources\ReferralRewardResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Forms\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListReferralRewards extends ListRecords

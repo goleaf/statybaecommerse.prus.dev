@@ -4,10 +4,10 @@ namespace App\Filament\Widgets;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\User;
 use App\Models\Review;
-use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Illuminate\Support\Carbon;
 
 final class EcommerceStatsWidget extends BaseWidget
@@ -20,28 +20,23 @@ final class EcommerceStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success')
                 ->chart($this->getOrdersChart()),
-            
             Stat::make(__('admin.dashboard.stats.monthly_revenue'), $this->getMonthlyRevenue())
                 ->description(__('admin.dashboard.stats.monthly_revenue_desc'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('primary')
                 ->chart($this->getRevenueChart()),
-            
             Stat::make(__('admin.dashboard.stats.total_products'), Product::count())
                 ->description(__('admin.dashboard.stats.total_products_desc'))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('info'),
-            
             Stat::make(__('admin.dashboard.stats.total_customers'), User::where('email_verified_at', '!=', null)->count())
                 ->description(__('admin.dashboard.stats.total_customers_desc'))
                 ->descriptionIcon('heroicon-m-users')
                 ->color('warning'),
-            
             Stat::make(__('admin.dashboard.stats.pending_orders'), Order::where('status', 'pending')->count())
                 ->description(__('admin.dashboard.stats.pending_orders_desc'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('danger'),
-            
             Stat::make(__('admin.dashboard.stats.average_rating'), $this->getAverageRating())
                 ->description(__('admin.dashboard.stats.average_rating_desc'))
                 ->descriptionIcon('heroicon-m-star')
@@ -55,7 +50,7 @@ final class EcommerceStatsWidget extends BaseWidget
             ->whereYear('created_at', Carbon::now()->year)
             ->where('status', '!=', 'cancelled')
             ->sum('total') ?? 0);
-        
+
         return '€' . number_format($revenue, 2);
     }
 

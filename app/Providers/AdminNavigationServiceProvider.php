@@ -10,12 +10,6 @@ class AdminNavigationServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        Filament::serving(function () {
-            // Add custom render hook for top navigation
-            Filament::renderHook(
-                'panels::topbar.start',
-                fn(): string => view('filament.components.admin-top-menu')->render()
-            );
-        });
+        // Top navigation is now handled in AdminPanelProvider
     }
 }

@@ -1,15 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Enums;
 
 use Illuminate\Support\Collection;
+
 /**
  * NavigationGroup
- * 
+ *
  * Enumeration defining a set of named constants with type safety.
  */
-enum NavigationGroup : string
+enum NavigationGroup: string
 {
     case Referral = 'Referral System';
     case Products = 'Products';
@@ -23,6 +23,7 @@ enum NavigationGroup : string
     case Inventory = 'Inventory';
     case Reports = 'Reports';
     case Locations = 'Locations';
+
     public function label(): string
     {
         return match ($this) {
@@ -40,6 +41,7 @@ enum NavigationGroup : string
             self::Locations => __('translations.nav_group_locations'),
         };
     }
+
     public function description(): string
     {
         return match ($this) {
@@ -57,23 +59,25 @@ enum NavigationGroup : string
             self::Locations => __('translations.nav_group_locations_description'),
         };
     }
+
     public function icon(): string
     {
         return match ($this) {
-            self::Referral => 'heroicon-o-gift',
-            self::Products => 'heroicon-o-cube',
-            self::Orders => 'heroicon-o-shopping-bag',
-            self::Users => 'heroicon-o-users',
-            self::Settings => 'heroicon-o-cog-6-tooth',
-            self::Analytics => 'heroicon-o-chart-bar',
-            self::Content => 'heroicon-o-document-text',
-            self::System => 'heroicon-o-computer-desktop',
-            self::Marketing => 'heroicon-o-megaphone',
-            self::Inventory => 'heroicon-o-archive-box',
-            self::Reports => 'heroicon-o-document-chart-bar',
-            self::Locations => 'heroicon-o-globe-alt',
+            self::Referral => 'gift',
+            self::Products => 'cube',
+            self::Orders => 'shopping-bag',
+            self::Users => 'users',
+            self::Settings => 'cog-6-tooth',
+            self::Analytics => 'chart-bar',
+            self::Content => 'document-text',
+            self::System => 'computer-desktop',
+            self::Marketing => 'megaphone',
+            self::Inventory => 'archive-box',
+            self::Reports => 'document-chart-bar',
+            self::Locations => 'globe-alt',
         };
     }
+
     public function color(): string
     {
         return match ($this) {
@@ -91,6 +95,7 @@ enum NavigationGroup : string
             self::Locations => 'emerald',
         };
     }
+
     public function priority(): int
     {
         return match ($this) {
@@ -108,6 +113,7 @@ enum NavigationGroup : string
             self::System => 12,
         };
     }
+
     public function isCore(): bool
     {
         return match ($this) {
@@ -115,6 +121,7 @@ enum NavigationGroup : string
             default => false,
         };
     }
+
     public function isAdminOnly(): bool
     {
         return match ($this) {
@@ -122,6 +129,7 @@ enum NavigationGroup : string
             default => false,
         };
     }
+
     public function isPublic(): bool
     {
         return match ($this) {
@@ -129,6 +137,7 @@ enum NavigationGroup : string
             default => false,
         };
     }
+
     public function requiresPermission(): bool
     {
         return match ($this) {
@@ -136,6 +145,7 @@ enum NavigationGroup : string
             default => false,
         };
     }
+
     public function getPermission(): string
     {
         return match ($this) {
@@ -147,46 +157,57 @@ enum NavigationGroup : string
             default => 'view_' . strtolower($this->value),
         };
     }
+
     public static function options(): array
     {
         return collect(self::cases())->sortBy('priority')->mapWithKeys(fn($case) => [$case->value => $case->label()])->toArray();
     }
+
     public static function optionsWithDescriptions(): array
     {
         return collect(self::cases())->sortBy('priority')->mapWithKeys(fn($case) => [$case->value => ['label' => $case->label(), 'description' => $case->description(), 'icon' => $case->icon(), 'color' => $case->color(), 'is_core' => $case->isCore(), 'is_admin_only' => $case->isAdminOnly(), 'is_public' => $case->isPublic(), 'requires_permission' => $case->requiresPermission(), 'permission' => $case->getPermission()]])->toArray();
     }
+
     public static function core(): Collection
     {
         return collect(self::cases())->filter(fn($case) => $case->isCore());
     }
+
     public static function adminOnly(): Collection
     {
         return collect(self::cases())->filter(fn($case) => $case->isAdminOnly());
     }
+
     public static function public(): Collection
     {
         return collect(self::cases())->filter(fn($case) => $case->isPublic());
     }
+
     public static function withPermissions(): Collection
     {
         return collect(self::cases())->filter(fn($case) => $case->requiresPermission());
     }
+
     public static function ordered(): Collection
     {
         return collect(self::cases())->sortBy('priority');
     }
+
     public static function fromLabel(string $label): ?self
     {
         return collect(self::cases())->first(fn($case) => $case->label() === $label);
     }
+
     public static function values(): array
     {
         return array_column(self::cases(), 'value');
     }
+
     public static function labels(): array
     {
         return collect(self::cases())->map(fn($case) => $case->label())->toArray();
     }
+
     public function toArray(): array
     {
         return ['value' => $this->value, 'label' => $this->label(), 'description' => $this->description(), 'icon' => $this->icon(), 'color' => $this->color(), 'priority' => $this->priority(), 'is_core' => $this->isCore(), 'is_admin_only' => $this->isAdminOnly(), 'is_public' => $this->isPublic(), 'requires_permission' => $this->requiresPermission(), 'permission' => $this->getPermission()];

@@ -86,7 +86,7 @@ class UltimateStatsWidget extends BaseWidget
         // === INVENTORY & STOCK ===
         $totalStockMovements = StockMovement::count();
         $totalInventoryItems = Inventory::count();
-        $totalStockValue = Inventory::sum(DB::raw('quantity * 0')); // Simplified calculation
+        $totalStockValue = Inventory::sum(DB::raw('quantity * 0'));  // Simplified calculation
 
         // === ORDERS & CART ===
         $totalOrderItems = OrderItem::count();

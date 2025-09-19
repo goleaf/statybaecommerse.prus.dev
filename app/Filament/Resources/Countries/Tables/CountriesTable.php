@@ -17,9 +17,9 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
 use Filament\Notifications\Notification;
 
 /**

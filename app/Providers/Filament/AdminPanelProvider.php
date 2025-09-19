@@ -134,6 +134,10 @@ final class AdminPanelProvider extends PanelProvider
             //     fn (): string => view('filament.hooks.live-notification-feed-hook')->render()
             // )
             ->renderHook(
+                'panels::topbar.start',
+                fn(): string => view('filament.components.top-navigation')->render()
+            )
+            ->renderHook(
                 'panels::body.end',
                 fn(): string => view('filament.layouts.live-notifications-script')->render()
             );
