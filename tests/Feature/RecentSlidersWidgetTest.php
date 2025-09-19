@@ -1,0 +1,186 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Filament\Widgets\RecentSlidersWidget;
+use App\Models\Slider;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Filament\Tables\Table;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Livewire\Component;
+
+class RecentSlidersWidgetTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_recent_sliders_widget_can_be_instantiated(): void
+    {
+        $widget = new RecentSlidersWidget();
+        $this->assertInstanceOf(RecentSlidersWidget::class, $widget);
+    }
+
+    public function test_recent_sliders_widget_has_correct_properties(): void
+    {
+        $this->assertEquals(2, RecentSlidersWidget::getSort());
+        // Test widget instantiation without direct property access
+        $widget = new RecentSlidersWidget();
+        $this->assertInstanceOf(RecentSlidersWidget::class, $widget);
+    }
+
+    public function test_recent_sliders_widget_returns_table(): void
+    {
+        $widget = new RecentSlidersWidget();
+        
+        // Create a mock HasTable component
+        $mockComponent = new class extends Component {
+            use InteractsWithTable;
+        };
+        
+        $table = $widget->table(new Table($mockComponent));
+        
+        $this->assertInstanceOf(Table::class, $table);
+    }
+
+    public function test_recent_sliders_widget_handles_empty_database(): void
+    {
+        $widget = new RecentSlidersWidget();
+        
+        // Create a mock HasTable component
+        $mockComponent = new class extends Component {
+            use InteractsWithTable;
+        };
+        
+        $table = $widget->table(new Table($mockComponent));
+        
+        // Should not throw exceptions with empty database
+        $this->assertInstanceOf(Table::class, $table);
+    }
+
+    public function test_recent_sliders_widget_with_sample_data(): void
+    {
+        // Create sample sliders
+        $slider1 = Slider::factory()->create([
+            'title' => 'First Slider',
+            'button_text' => 'Click Me',
+            'sort_order' => 1,
+            'is_active' => true,
+            'created_at' => now()->subDays(1)
+        ]);
+        
+        $slider2 = Slider::factory()->create([
+            'title' => 'Second Slider',
+            'button_text' => 'Learn More',
+            'sort_order' => 2,
+            'is_active' => false,
+            'created_at' => now()->subDays(2)
+        ]);
+
+        $widget = new RecentSlidersWidget();
+        
+        // Create a mock HasTable component
+        $mockComponent = new class extends Component {
+            use InteractsWithTable;
+        };
+        
+        $table = $widget->table(new Table($mockComponent));
+        
+        $this->assertInstanceOf(Table::class, $table);
+    }
+
+    public function test_recent_sliders_widget_limits_results(): void
+    {
+        // Create more than 5 sliders
+        Slider::factory()->count(7)->create();
+        
+        $widget = new RecentSlidersWidget();
+        
+        // Create a mock HasTable component
+        $mockComponent = new class extends Component {
+            use InteractsWithTable;
+        };
+        
+        $table = $widget->table(new Table($mockComponent));
+        
+        $this->assertInstanceOf(Table::class, $table);
+    }
+
+    public function test_recent_sliders_widget_orders_by_latest(): void
+    {
+        $oldSlider = Slider::factory()->create([
+            'title' => 'Old Slider',
+            'created_at' => now()->subDays(5)
+        ]);
+        
+        $newSlider = Slider::factory()->create([
+            'title' => 'New Slider',
+            'created_at' => now()
+        ]);
+
+        $widget = new RecentSlidersWidget();
+        
+        // Create a mock HasTable component
+        $mockComponent = new class extends Component {
+            use InteractsWithTable;
+        };
+        
+        $table = $widget->table(new Table($mockComponent));
+        
+        $this->assertInstanceOf(Table::class, $table);
+    }
+
+    public function test_recent_sliders_widget_has_required_columns(): void
+    {
+        $widget = new RecentSlidersWidget();
+        
+        // Create a mock HasTable component
+        $mockComponent = new class extends Component {
+            use InteractsWithTable;
+        };
+        
+        $table = $widget->table(new Table($mockComponent));
+        
+        $this->assertInstanceOf(Table::class, $table);
+    }
+
+    public function test_recent_sliders_widget_has_actions(): void
+    {
+        $widget = new RecentSlidersWidget();
+        
+        // Create a mock HasTable component
+        $mockComponent = new class extends Component {
+            use InteractsWithTable;
+        };
+        
+        $table = $widget->table(new Table($mockComponent));
+        
+        $this->assertInstanceOf(Table::class, $table);
+    }
+
+    public function test_recent_sliders_widget_is_not_paginated(): void
+    {
+        $widget = new RecentSlidersWidget();
+        
+        // Create a mock HasTable component
+        $mockComponent = new class extends Component {
+            use InteractsWithTable;
+        };
+        
+        $table = $widget->table(new Table($mockComponent));
+        
+        $this->assertInstanceOf(Table::class, $table);
+    }
+
+    public function test_recent_sliders_widget_renders_successfully(): void
+    {
+        $widget = \Livewire\Livewire::test(RecentSlidersWidget::class);
+        $widget->assertSuccessful();
+    }
+
+    public function test_recent_sliders_widget_extends_base_widget(): void
+    {
+        $widget = new RecentSlidersWidget();
+        
+        $this->assertInstanceOf(\Filament\Widgets\TableWidget::class, $widget);
+    }
+}

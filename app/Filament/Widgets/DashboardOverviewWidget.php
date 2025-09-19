@@ -41,7 +41,7 @@ class DashboardOverviewWidget extends BaseWidget
     protected static ?int $sort = 0;
     protected int|string|array $columnSpan = 'full';
 
-    protected function getStats(): array
+    public function getStats(): array
     {
         $now = Carbon::now();
         $lastMonth = $now->copy()->subMonth();
@@ -65,7 +65,7 @@ class DashboardOverviewWidget extends BaseWidget
 
         $totalProducts = Product::count();
         $activeProducts = Product::where('is_visible', true)->count();
-        $lowStockProducts = Inventory::where('stock_quantity', '<=', DB::raw('low_stock_threshold'))->count();
+        $lowStockProducts = Inventory::where('stock_quantity', '<=', DB::raw('threshold'))->count();
 
         // Advanced Metrics
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;

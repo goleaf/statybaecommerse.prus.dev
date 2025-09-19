@@ -12,7 +12,7 @@ use Illuminate\Support\Carbon;
 
 final class EcommerceStatsWidget extends BaseWidget
 {
-    protected function getStats(): array
+    public function getStats(): array
     {
         return [
             Stat::make(__('admin.dashboard.stats.total_orders'), Order::count())
@@ -61,7 +61,7 @@ final class EcommerceStatsWidget extends BaseWidget
 
     private function getAverageRating(): string
     {
-        $average = Review::where('approved', true)->avg('rating');
+        $average = Review::where('is_approved', true)->avg('rating');
         return number_format($average ?? 0, 1) . '/5';
     }
 

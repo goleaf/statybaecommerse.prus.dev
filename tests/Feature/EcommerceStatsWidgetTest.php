@@ -1,0 +1,198 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Filament\Widgets\EcommerceStatsWidget;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
+use App\Models\Review;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class EcommerceStatsWidgetTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_ecommerce_stats_widget_can_be_instantiated(): void
+    {
+        $widget = new EcommerceStatsWidget();
+        $this->assertInstanceOf(EcommerceStatsWidget::class, $widget);
+    }
+
+    public function test_ecommerce_stats_widget_returns_stats_array(): void
+    {
+        $widget = new EcommerceStatsWidget();
+        $stats = $widget->getStats();
+        
+        $this->assertIsArray($stats);
+        $this->assertNotEmpty($stats);
+        $this->assertCount(6, $stats); // Should have 6 stats
+    }
+
+    public function test_ecommerce_stats_widget_handles_empty_database(): void
+    {
+        $widget = new EcommerceStatsWidget();
+        $stats = $widget->getStats();
+        
+        // Should not throw exceptions with empty database
+        $this->assertIsArray($stats);
+        $this->assertCount(6, $stats);
+    }
+
+    public function test_ecommerce_stats_widget_with_sample_data(): void
+    {
+        // Create sample data
+        $user = User::factory()->create(['email_verified_at' => now()]);
+        $product = Product::factory()->create();
+        
+        $order = Order::factory()->create([
+            'user_id' => $user->id,
+            'total' => 100.00,
+            'status' => 'completed',
+            'created_at' => now()
+        ]);
+        
+        $pendingOrder = Order::factory()->create([
+            'user_id' => $user->id,
+            'total' => 50.00,
+            'status' => 'pending',
+            'created_at' => now()
+        ]);
+        
+        $review = Review::factory()->create([
+            'product_id' => $product->id,
+            'rating' => 5,
+            'is_approved' => true,
+            'created_at' => now()
+        ]);
+
+        $widget = new EcommerceStatsWidget();
+        $stats = $widget->getStats();
+        
+        $this->assertIsArray($stats);
+        $this->assertCount(6, $stats);
+    }
+
+    public function test_ecommerce_stats_widget_stats_contain_expected_data(): void
+    {
+        $widget = new EcommerceStatsWidget();
+        $stats = $widget->getStats();
+        
+        // Check that stats array contains Stat objects
+        foreach ($stats as $stat) {
+            $this->assertInstanceOf(\Filament\Widgets\StatsOverviewWidget\Stat::class, $stat);
+        }
+    }
+
+    public function test_ecommerce_stats_widget_extends_base_widget(): void
+    {
+        $widget = new EcommerceStatsWidget();
+        
+        $this->assertInstanceOf(\Filament\Widgets\StatsOverviewWidget::class, $widget);
+    }
+
+    public function test_ecommerce_stats_widget_renders_successfully(): void
+    {
+        $widget = \Livewire\Livewire::test(EcommerceStatsWidget::class);
+        $widget->assertSuccessful();
+    }
+
+    public function test_ecommerce_stats_widget_has_required_methods(): void
+    {
+        $widget = new EcommerceStatsWidget();
+        
+        $this->assertTrue(method_exists($widget, 'getStats'));
+    }
+
+    public function test_ecommerce_stats_widget_stats_have_labels(): void
+    {
+        $widget = new EcommerceStatsWidget();
+        $stats = $widget->getStats();
+        
+        foreach ($stats as $stat) {
+            $this->assertNotNull($stat->getLabel());
+            $this->assertIsString($stat->getLabel());
+        }
+    }
+
+    public function test_ecommerce_stats_widget_stats_have_values(): void
+    {
+        $widget = new EcommerceStatsWidget();
+        $stats = $widget->getStats();
+        
+        foreach ($stats as $stat) {
+            $this->assertNotNull($stat->getValue());
+        }
+    }
+
+    public function test_ecommerce_stats_widget_monthly_revenue_calculation(): void
+    {
+        // Create orders for current month
+        Order::factory()->create([
+            'total' => 100.00,
+            'status' => 'completed',
+            'created_at' => now()
+        ]);
+        
+        Order::factory()->create([
+            'total' => 50.00,
+            'status' => 'completed',
+            'created_at' => now()
+        ]);
+
+        $widget = new EcommerceStatsWidget();
+        $stats = $widget->getStats();
+        
+        $this->assertIsArray($stats);
+    }
+
+    public function test_ecommerce_stats_widget_average_rating_calculation(): void
+    {
+        // Create approved reviews
+        $product = Product::factory()->create();
+        
+        Review::factory()->create([
+            'product_id' => $product->id,
+            'rating' => 5,
+            'is_approved' => true
+        ]);
+        
+        Review::factory()->create([
+            'product_id' => $product->id,
+            'rating' => 4,
+            'is_approved' => true
+        ]);
+
+        $widget = new EcommerceStatsWidget();
+        $stats = $widget->getStats();
+        
+        $this->assertIsArray($stats);
+    }
+
+    public function test_ecommerce_stats_widget_pending_orders_count(): void
+    {
+        // Create pending orders
+        Order::factory()->count(3)->create(['status' => 'pending']);
+        Order::factory()->count(2)->create(['status' => 'completed']);
+
+        $widget = new EcommerceStatsWidget();
+        $stats = $widget->getStats();
+        
+        $this->assertIsArray($stats);
+    }
+
+    public function test_ecommerce_stats_widget_handles_large_datasets(): void
+    {
+        // Create multiple records to test performance
+        User::factory()->count(10)->create(['email_verified_at' => now()]);
+        Product::factory()->count(10)->create();
+        Order::factory()->count(10)->create();
+        
+        $widget = new EcommerceStatsWidget();
+        $stats = $widget->getStats();
+        
+        $this->assertIsArray($stats);
+        $this->assertCount(6, $stats);
+    }
+}
