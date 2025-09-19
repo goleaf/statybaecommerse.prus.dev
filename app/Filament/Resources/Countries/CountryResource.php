@@ -71,7 +71,7 @@ final class CountryResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return 'Locations'->label();
+        return 'Locations';
     }
 
     /**

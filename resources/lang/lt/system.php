@@ -1,0 +1,141 @@
+<?php
+
+return [
+    'title' => 'Sistemos Nustatymai',
+    'single' => 'Sistemos Nustatymas',
+    'plural' => 'Sistemos Nustatymai',
+    
+    'navigation' => [
+        'title' => 'Sistemos Nustatymai',
+        'description' => 'Valdykite sistemos konfigūraciją ir nustatymus',
+    ],
+    
+    'form' => [
+        'basic_settings' => 'Pagrindiniai Nustatymai',
+        'advanced_settings' => 'Išplėstiniai Nustatymai',
+        'dependencies' => 'Priklausomybės ir Sąsajos',
+        'translations' => 'Vertimai',
+        
+        'system_information' => 'Sistemos Informacija',
+        'value_configuration' => 'Reikšmės Konfigūracija',
+        'validation_constraints' => 'Validavimo Apribojimai',
+        'access_control' => 'Prieigos Kontrolė',
+        'system_integration' => 'Sistemos Integracija',
+        'dependencies' => 'Priklausomybės',
+        'relations' => 'Sąsajos',
+        'multi_language_support' => 'Daugiakalbis Palaikymas',
+        
+        'fields' => [
+            'key' => 'Nustatymo Raktas',
+            'name' => 'Rodomas Pavadinimas',
+            'description' => 'Aprašymas',
+            'type' => 'Nustatymo Tipas',
+            'value' => 'Nustatymo Reikšmė',
+            'category' => 'Kategorija',
+            'validation_rules' => 'Validavimo Taisyklės',
+            'default_value' => 'Numatytoji Reikšmė',
+            'is_required' => 'Privalomas Nustatymas',
+            'is_encrypted' => 'Šifruoti Reikšmę',
+            'permission_required' => 'Reikalingas Leidimas',
+            'user_id' => 'Sukūrė',
+            'cache_key' => 'Talpyklos Raktas',
+            'cache_ttl' => 'Talpyklos TTL (sekundės)',
+            'is_public' => 'Viešas Nustatymas',
+            'is_readonly' => 'Tik Skaityti',
+        ],
+        
+        'types' => [
+            'string' => 'Tekstas',
+            'integer' => 'Skaičius',
+            'boolean' => 'Taip/Ne',
+            'json' => 'JSON Duomenys',
+            'array' => 'Masyvas',
+            'file' => 'Failo Įkėlimas',
+            'color' => 'Spalva',
+            'date' => 'Data',
+            'datetime' => 'Data ir Laikas',
+            'email' => 'El. Paštas',
+            'url' => 'URL',
+            'password' => 'Slaptažodis',
+        ],
+        
+        'permissions' => [
+            'admin' => 'Tik Administratorius',
+            'manager' => 'Vadybininkas+',
+            'user' => 'Bet kuris Vartotojas',
+            'system' => 'Tik Sistema',
+        ],
+        
+        'cache_ttl_options' => [
+            0 => 'Be Talpyklos',
+            60 => '1 Minutė',
+            300 => '5 Minutės',
+            900 => '15 Minučių',
+            3600 => '1 Valanda',
+            86400 => '1 Diena',
+        ],
+    ],
+    
+    'table' => [
+        'columns' => [
+            'key' => 'Nustatymo Raktas',
+            'name' => 'Rodomas Pavadinimas',
+            'category' => 'Kategorija',
+            'type' => 'Tipas',
+            'value' => 'Reikšmė',
+            'required' => 'Privalomas',
+            'public' => 'Viešas',
+            'readonly' => 'Tik Skaityti',
+            'created_by' => 'Sukūrė',
+            'created_at' => 'Sukurta',
+            'updated_at' => 'Atnaujinta',
+        ],
+        
+        'actions' => [
+            'clear_cache' => 'Išvalyti Talpyklą',
+            'export' => 'Eksportuoti',
+            'system_health' => 'Sistemos Sveikata',
+            'optimize_system' => 'Optimizuoti Sistemą',
+            'clear_all_caches' => 'Išvalyti Visas Talpyklas',
+        ],
+        
+        'bulk_actions' => [
+            'clear_all_cache' => 'Išvalyti Visą Talpyklą',
+            'export_selected' => 'Eksportuoti Pasirinktus',
+        ],
+    ],
+    
+    'tabs' => [
+        'all' => 'Visi Nustatymai',
+        'general' => 'Bendri',
+        'security' => 'Saugumas',
+        'performance' => 'Veikimas',
+        'ui_ux' => 'UI/UX',
+        'api' => 'API',
+        'required' => 'Privalomi',
+        'public' => 'Vieši',
+        'readonly' => 'Tik Skaityti',
+    ],
+    
+    'notifications' => [
+        'created' => 'Sistemos nustatymas sėkmingai sukurtas',
+        'updated' => 'Sistemos nustatymas sėkmingai atnaujintas',
+        'deleted' => 'Sistemos nustatymas sėkmingai ištrintas',
+        'cache_cleared' => 'Talpykla sėkmingai išvalyta',
+        'value_refreshed' => 'Reikšmė sėkmingai atnaujinta',
+        'system_optimized' => 'Sistema sėkmingai optimizuota',
+        'all_caches_cleared' => 'Visos talpyklos sėkmingai išvalytos',
+    ],
+    
+    'widgets' => [
+        'stats' => [
+            'total_settings' => 'Iš Viso Nustatymų',
+            'categories' => 'Kategorijos',
+            'required_settings' => 'Privalomi Nustatymai',
+            'public_settings' => 'Vieši Nustatymai',
+            'readonly_settings' => 'Tik Skaityti Nustatymai',
+            'encrypted_settings' => 'Šifruoti Nustatymai',
+            'cache_hit_rate' => 'Talpyklos Pataikymo Rodiklis',
+        ],
+    ],
+];

@@ -1,51 +1,53 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\CityResource\Pages;
 use App\Models\City;
 use App\Models\Country;
-use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
 
 /**
  * CityResource
- * 
+ *
  * Filament v4 resource for City management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class CityResource extends Resource
 {
     protected static ?string $model = City::class;
-    
-    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = "Products";
+
+    /**
+     * @var UnitEnum|string|null
+     */
+    protected static string|UnitEnum|null $navigationGroup = 'Products';
+
     protected static ?int $navigationSort = 5;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -63,7 +65,7 @@ final class CityResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "System"->label();
+        return 'System';
     }
 
     /**
@@ -100,7 +102,6 @@ final class CityResource extends Resource
                                 ->label(__('cities.name'))
                                 ->required()
                                 ->maxLength(255),
-                            
                             TextInput::make('code')
                                 ->label(__('cities.code'))
                                 ->required()
@@ -108,7 +109,6 @@ final class CityResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
                         ]),
-                    
                     Select::make('country_id')
                         ->label(__('cities.country'))
                         ->relationship('country', 'name')
@@ -124,26 +124,22 @@ final class CityResource extends Resource
                                 }
                             }
                         }),
-                    
                     Grid::make(2)
                         ->schema([
                             TextInput::make('country_code')
                                 ->label(__('cities.country_code'))
                                 ->maxLength(3)
                                 ->disabled(),
-                            
                             TextInput::make('state_province')
                                 ->label(__('cities.state_province'))
                                 ->maxLength(255),
                         ]),
-                    
                     Textarea::make('description')
                         ->label(__('cities.description'))
                         ->rows(3)
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            
             Section::make(__('cities.coordinates'))
                 ->schema([
                     Grid::make(2)
@@ -154,7 +150,6 @@ final class CityResource extends Resource
                                 ->step(0.000001)
                                 ->minValue(-90)
                                 ->maxValue(90),
-                            
                             TextInput::make('longitude')
                                 ->label(__('cities.longitude'))
                                 ->numeric()
@@ -163,7 +158,6 @@ final class CityResource extends Resource
                                 ->maxValue(180),
                         ]),
                 ]),
-            
             Section::make(__('cities.settings'))
                 ->schema([
                     Grid::make(2)
@@ -171,18 +165,15 @@ final class CityResource extends Resource
                             Toggle::make('is_active')
                                 ->label(__('cities.is_active'))
                                 ->default(true),
-                            
                             Toggle::make('is_capital')
                                 ->label(__('cities.is_capital')),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             TextInput::make('population')
                                 ->label(__('cities.population'))
                                 ->numeric()
                                 ->minValue(0),
-                            
                             TextInput::make('sort_order')
                                 ->label(__('cities.sort_order'))
                                 ->numeric()
@@ -207,7 +198,6 @@ final class CityResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
-                
                 TextColumn::make('code')
                     ->label(__('cities.code'))
                     ->searchable()
@@ -215,13 +205,11 @@ final class CityResource extends Resource
                     ->copyable()
                     ->badge()
                     ->color('gray'),
-                
                 TextColumn::make('country.name')
                     ->label(__('cities.country'))
                     ->sortable()
                     ->badge()
                     ->color('blue'),
-                
                 TextColumn::make('country_code')
                     ->label(__('cities.country_code'))
                     ->searchable()
@@ -230,42 +218,35 @@ final class CityResource extends Resource
                     ->badge()
                     ->color('green')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('state_province')
                     ->label(__('cities.state_province'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('population')
                     ->label(__('cities.population'))
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn ($state): string => $state ? number_format($state) : '-')
+                    ->formatStateUsing(fn($state): string => $state ? number_format($state) : '-')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('is_active')
                     ->label(__('cities.is_active'))
                     ->boolean()
                     ->sortable(),
-                
                 IconColumn::make('is_capital')
                     ->label(__('cities.is_capital'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('sort_order')
                     ->label(__('cities.sort_order'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('created_at')
                     ->label(__('cities.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('updated_at')
                     ->label(__('cities.updated_at'))
                     ->dateTime()
@@ -278,14 +259,12 @@ final class CityResource extends Resource
                     ->relationship('country', 'name')
                     ->searchable()
                     ->preload(),
-                
                 TernaryFilter::make('is_active')
                     ->label(__('cities.is_active'))
                     ->boolean()
                     ->trueLabel(__('cities.active_only'))
                     ->falseLabel(__('cities.inactive_only'))
                     ->native(false),
-                
                 TernaryFilter::make('is_capital')
                     ->label(__('cities.is_capital'))
                     ->boolean()
@@ -296,14 +275,13 @@ final class CityResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
-                
                 Action::make('toggle_active')
-                    ->label(fn (City $record): string => $record->is_active ? __('cities.deactivate') : __('cities.activate'))
-                    ->icon(fn (City $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (City $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn(City $record): string => $record->is_active ? __('cities.deactivate') : __('cities.activate'))
+                    ->icon(fn(City $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(City $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (City $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-                        
+
                         Notification::make()
                             ->title($record->is_active ? __('cities.activated_successfully') : __('cities.deactivated_successfully'))
                             ->success()
@@ -314,28 +292,26 @@ final class CityResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    
                     BulkAction::make('activate')
                         ->label(__('cities.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-                            
+
                             Notification::make()
                                 ->title(__('cities.bulk_activated_success'))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    
                     BulkAction::make('deactivate')
                         ->label(__('cities.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-                            
+
                             Notification::make()
                                 ->title(__('cities.bulk_deactivated_success'))
                                 ->success()

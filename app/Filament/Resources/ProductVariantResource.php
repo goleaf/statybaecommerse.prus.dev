@@ -17,7 +17,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
@@ -75,7 +75,7 @@ final class ProductVariantResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Products"->label();
+        return "Products";
     }
 
     /**

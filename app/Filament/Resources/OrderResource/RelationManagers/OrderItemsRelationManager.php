@@ -4,27 +4,27 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
-use Filament\Forms;
-use Filament\Schemas\Schema;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Notifications\Notification;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Hidden;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
@@ -48,7 +48,6 @@ final class OrderItemsRelationManager extends RelationManager
     protected static ?string $modelLabel = 'orders.item';
 
     protected static ?string $pluralModelLabel = 'orders.items';
-
 
     /**
      * Configure the form schema for order items.
@@ -80,7 +79,6 @@ final class OrderItemsRelationManager extends RelationManager
                                         }
                                     })
                                     ->prefixIcon('heroicon-o-cube'),
-                                
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
                                     ->numeric()
@@ -94,7 +92,6 @@ final class OrderItemsRelationManager extends RelationManager
                                     })
                                     ->prefixIcon('heroicon-o-hashtag'),
                             ]),
-                        
                         Grid::make(3)
                             ->schema([
                                 TextInput::make('unit_price')
@@ -109,7 +106,6 @@ final class OrderItemsRelationManager extends RelationManager
                                         $set('total', $state * $quantity);
                                     })
                                     ->prefixIcon('heroicon-o-currency-euro'),
-                                
                                 TextInput::make('discount_amount')
                                     ->label(__('orders.discount_amount'))
                                     ->numeric()
@@ -124,32 +120,29 @@ final class OrderItemsRelationManager extends RelationManager
                                         $set('total', ($unitPrice * $quantity) - $discount);
                                     })
                                     ->prefixIcon('heroicon-o-tag'),
-                                
                                 Placeholder::make('total')
                                     ->label(__('orders.total'))
                                     ->content(function (Forms\Get $get): string {
                                         $unitPrice = (float) $get('unit_price') ?? 0;
                                         $quantity = (int) $get('quantity') ?? 1;
                                         $discount = (float) $get('discount_amount') ?? 0;
-                                        
+
                                         $total = ($unitPrice * $quantity) - $discount;
-                                        
+
                                         return '€' . number_format($total, 2);
                                     })
                                     ->prefixIcon('heroicon-o-banknotes'),
                             ]),
-                        
                         Hidden::make('total')
                             ->default(function (Forms\Get $get): float {
                                 $unitPrice = (float) $get('unit_price') ?? 0;
                                 $quantity = (int) $get('quantity') ?? 1;
                                 $discount = (float) $get('discount_amount') ?? 0;
-                                
+
                                 return ($unitPrice * $quantity) - $discount;
                             }),
                     ])
                     ->collapsible(),
-                
                 Section::make(__('orders.additional_details'))
                     ->description(__('orders.additional_details_description'))
                     ->icon('heroicon-o-document-text')
@@ -181,38 +174,32 @@ final class OrderItemsRelationManager extends RelationManager
                         return strlen($state) > 30 ? $state : null;
                     })
                     ->prefixIcon('heroicon-o-cube'),
-                
                 TextColumn::make('productVariant.sku')
                     ->label(__('orders.sku'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
                     ->prefixIcon('heroicon-o-hashtag'),
-                
                 TextColumn::make('quantity')
                     ->label(__('orders.quantity'))
                     ->sortable()
                     ->prefixIcon('heroicon-o-hashtag'),
-                
                 TextColumn::make('unit_price')
                     ->label(__('orders.unit_price'))
                     ->money('EUR')
                     ->sortable()
                     ->prefixIcon('heroicon-o-currency-euro'),
-                
                 TextColumn::make('discount_amount')
                     ->label(__('orders.discount_amount'))
                     ->money('EUR')
                     ->sortable()
                     ->prefixIcon('heroicon-o-tag'),
-                
                 TextColumn::make('total')
                     ->label(__('orders.total'))
                     ->money('EUR')
                     ->sortable()
                     ->weight('bold')
                     ->prefixIcon('heroicon-o-banknotes'),
-                
                 BadgeColumn::make('status')
                     ->label(__('orders.status'))
                     ->colors([
@@ -222,7 +209,6 @@ final class OrderItemsRelationManager extends RelationManager
                         'danger' => 'cancelled',
                     ])
                     ->formatStateUsing(fn(?string $state): string => $state ? __("orders.item_statuses.{$state}") : '-'),
-                
                 TextColumn::make('created_at')
                     ->label(__('orders.created_at'))
                     ->dateTime()
@@ -240,12 +226,11 @@ final class OrderItemsRelationManager extends RelationManager
                         'cancelled' => __('orders.item_statuses.cancelled'),
                     ])
                     ->multiple(),
-                
                 TernaryFilter::make('has_discount')
                     ->label(__('orders.has_discount'))
                     ->queries(
-                        true: fn (Builder $query) => $query->where('discount_amount', '>', 0),
-                        false: fn (Builder $query) => $query->where('discount_amount', '=', 0),
+                        true: fn(Builder $query) => $query->where('discount_amount', '>', 0),
+                        false: fn(Builder $query) => $query->where('discount_amount', '=', 0),
                     ),
             ])
             ->headerActions([
@@ -257,10 +242,8 @@ final class OrderItemsRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->color('warning'),
-                
                 Tables\Actions\DeleteAction::make()
                     ->color('danger'),
-                
                 Action::make('duplicate_item')
                     ->label(__('orders.duplicate_item'))
                     ->icon('heroicon-o-document-duplicate')
@@ -268,7 +251,7 @@ final class OrderItemsRelationManager extends RelationManager
                     ->action(function (OrderItem $record): void {
                         $newItem = $record->replicate();
                         $newItem->save();
-                        
+
                         Notification::make()
                             ->title(__('orders.item_duplicated'))
                             ->success()
@@ -278,21 +261,19 @@ final class OrderItemsRelationManager extends RelationManager
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    
                     BulkAction::make('mark_completed')
                         ->label(__('orders.bulk_mark_completed'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['status' => 'completed']);
-                            
+
                             Notification::make()
                                 ->title(__('orders.bulk_completed_success'))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    
                     BulkAction::make('apply_discount')
                         ->label(__('orders.bulk_apply_discount'))
                         ->icon('heroicon-o-tag')
@@ -307,7 +288,7 @@ final class OrderItemsRelationManager extends RelationManager
                         ])
                         ->action(function (Collection $records, array $data): void {
                             $records->each->update(['discount_amount' => $data['discount_amount']]);
-                            
+
                             Notification::make()
                                 ->title(__('orders.bulk_discount_applied'))
                                 ->success()

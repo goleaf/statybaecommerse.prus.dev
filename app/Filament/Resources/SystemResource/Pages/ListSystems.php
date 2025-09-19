@@ -7,7 +7,7 @@ namespace App\Filament\Resources\SystemResource\Pages;
 use App\Filament\Resources\SystemResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Components\Tab;
+use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListSystems extends ListRecords

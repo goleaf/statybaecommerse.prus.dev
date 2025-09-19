@@ -37,11 +37,11 @@ final class SystemSettingCategoryFactory extends Factory
             'is_active' => $this->faker->boolean(90), // 90% chance of being active
             'parent_id' => null,
             'template' => $this->faker->boolean(30) ? $this->faker->word() : null,
-            'metadata' => $this->faker->boolean(20) ? ['custom_field' => $this->faker->word()] : null,
+            'metadata' => $this->faker->boolean(20) ? json_encode(['custom_field' => $this->faker->word()]) : null,
             'is_collapsible' => $this->faker->boolean(80), // 80% chance of being collapsible
             'show_in_sidebar' => $this->faker->boolean(90), // 90% chance of showing in sidebar
             'permission' => $this->faker->boolean(40) ? $this->faker->word() : null,
-            'tags' => $this->faker->boolean(50) ? $this->faker->words(3) : null,
+            'tags' => $this->faker->boolean(50) ? implode(',', $this->faker->words(3)) : null,
         ];
     }
 

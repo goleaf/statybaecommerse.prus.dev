@@ -12,7 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
@@ -63,7 +63,7 @@ final class CompanyResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "System"->label();
+        return "System";
     }
 
     /**

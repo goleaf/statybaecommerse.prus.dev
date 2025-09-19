@@ -2,11 +2,10 @@
 
 /**
  * Test Runner by Category
- * 
+ *
  * This script allows running tests by category and provides
  * comprehensive test execution options.
  */
-
 class TestRunner
 {
     private array $categories = [
@@ -62,7 +61,7 @@ class TestRunner
     private function runCategoryTests(string $category, array $options): void
     {
         echo "📁 Running all tests in category: $category\n\n";
-        
+
         foreach ($this->categories[$category] as $subcategory => $path) {
             if (is_dir($path)) {
                 echo "🔍 Running $category/$subcategory tests...\n";
@@ -79,7 +78,7 @@ class TestRunner
         }
 
         $path = $this->categories[$category][$subcategory];
-        
+
         if (!is_dir($path)) {
             echo "❌ Directory does not exist: $path\n";
             return;
@@ -92,42 +91,42 @@ class TestRunner
     private function executeTestCommand(string $path, array $options): void
     {
         $command = 'php artisan test ' . $path;
-        
+
         if (isset($options['stop-on-failure']) && $options['stop-on-failure']) {
             $command .= ' --stop-on-failure';
         }
-        
+
         if (isset($options['filter']) && $options['filter']) {
             $command .= ' --filter=' . $options['filter'];
         }
-        
+
         if (isset($options['coverage']) && $options['coverage']) {
             $command .= ' --coverage';
         }
-        
+
         if (isset($options['parallel']) && $options['parallel']) {
             $command .= ' --parallel';
         }
 
         echo "🚀 Executing: $command\n";
         echo "----------------------------------------\n";
-        
+
         $output = [];
         $returnCode = 0;
         exec($command . ' 2>&1', $output, $returnCode);
-        
+
         foreach ($output as $line) {
             echo $line . "\n";
         }
-        
+
         echo "----------------------------------------\n";
-        
+
         if ($returnCode === 0) {
             echo "✅ Tests completed successfully!\n";
         } else {
             echo "❌ Tests failed with exit code: $returnCode\n";
         }
-        
+
         echo "\n";
     }
 
@@ -163,10 +162,10 @@ class TestRunner
     {
         echo "📊 Test Statistics\n";
         echo "==================\n\n";
-        
+
         $totalTests = 0;
         $totalFiles = 0;
-        
+
         foreach ($this->categories as $category => $subcategories) {
             echo "$category:\n";
             foreach ($subcategories as $subcategory => $path) {
@@ -181,7 +180,7 @@ class TestRunner
             }
             echo "\n";
         }
-        
+
         echo "Total test files: $totalFiles\n";
     }
 }

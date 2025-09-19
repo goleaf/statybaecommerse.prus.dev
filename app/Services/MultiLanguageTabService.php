@@ -5,7 +5,7 @@ namespace App\Services;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 use SolutionForest\TabLayoutPlugin\Schemas\SimpleTabSchema;
 

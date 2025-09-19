@@ -11,7 +11,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -67,7 +67,7 @@ final class RecommendationBlockResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Products"->label();
+        return "Products";
     }
 
     /**

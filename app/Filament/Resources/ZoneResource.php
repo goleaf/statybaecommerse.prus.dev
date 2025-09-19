@@ -10,7 +10,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -63,7 +63,7 @@ final class ZoneResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "System"->label();
+        return "System";
     }
 
     /**

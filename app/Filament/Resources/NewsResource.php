@@ -12,7 +12,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -72,7 +72,7 @@ final class NewsResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Content"->label();
+        return "Content";
     }
 
     /**
