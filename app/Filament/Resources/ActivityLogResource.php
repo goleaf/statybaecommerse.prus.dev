@@ -39,8 +39,7 @@ use UnitEnum;
  */
 final class ActivityLogResource extends Resource
 {
-    protected static ?string $model = ActivityLog::class;
-
+    protected static ?string $model = ActivityLog::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 9;

@@ -40,8 +40,7 @@ use UnitEnum;
  */
 final class StockResource extends Resource
 {
-    protected static ?string $model = Stock::class;
-
+    protected static ?string $model = Stock::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 7;

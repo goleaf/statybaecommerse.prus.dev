@@ -51,8 +51,7 @@ use UnitEnum;
  */
 final class ProductVariantResource extends Resource
 {
-    protected static ?string $model = ProductVariant::class;
-
+    protected static ?string $model = ProductVariant::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 3;

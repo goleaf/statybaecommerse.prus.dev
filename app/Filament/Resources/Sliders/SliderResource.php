@@ -42,6 +42,7 @@ final class SliderResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
+        /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Content';
 
     public static function form(Schema $schema): Schema

@@ -40,8 +40,7 @@ use UnitEnum;
  */
 final class VariantPricingRuleResource extends Resource
 {
-    protected static ?string $model = VariantPricingRule::class;
-
+    protected static ?string $model = VariantPricingRule::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 10;

@@ -82,6 +82,7 @@ final class SystemSettingTest extends TestCase
         $setting = SystemSetting::factory()->public()->create([
             'key' => 'test_public_method',
             'value' => 'public_value',
+            'type' => 'string',  // Ensure type is string to get string value
         ]);
 
         $this->assertEquals('public_value', SystemSetting::getPublic('test_public_method'));

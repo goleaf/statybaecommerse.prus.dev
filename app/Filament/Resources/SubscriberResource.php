@@ -39,8 +39,7 @@ use UnitEnum;
  */
 final class SubscriberResource extends Resource
 {
-    protected static ?string $model = Subscriber::class;
-
+    protected static ?string $model = Subscriber::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 1;

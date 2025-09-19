@@ -40,8 +40,7 @@ use UnitEnum;
  */
 final class SystemSettingsResource extends Resource
 {
-    protected static ?string $model = SystemSetting::class;
-
+    protected static ?string $model = SystemSetting::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 1;

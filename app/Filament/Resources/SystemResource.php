@@ -64,8 +64,7 @@ use UnitEnum;
  */
 final class SystemResource extends Resource
 {
-    protected static ?string $model = SystemSetting::class;
-
+    protected static ?string $model = SystemSetting::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 1;

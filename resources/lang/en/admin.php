@@ -439,6 +439,8 @@ return [
     // Documents
     'documents' => [
         'title' => 'Documents',
+        'single' => 'Document',
+        'plural' => 'Documents',
         'create' => 'Create Document',
         'edit' => 'Edit Document',
         'view' => 'View Document',
@@ -449,6 +451,7 @@ return [
         'send_email' => 'Send by Email',
         'templates' => 'Templates',
         'generated_documents' => 'Generated Documents',
+        'generated_successfully' => 'Documents generated successfully',
         'types' => [
             'invoice' => 'Invoice',
             'receipt' => 'Receipt',
@@ -469,12 +472,20 @@ return [
         ],
         'status' => [
             'draft' => 'Draft',
+            'generated' => 'Generated',
             'published' => 'Published',
             'archived' => 'Archived',
         ],
         'formats' => [
             'html' => 'HTML',
             'pdf' => 'PDF',
+            'docx' => 'DOCX',
+        ],
+        'form' => [
+            'sections' => [
+                'basic_information' => 'Basic Information',
+                'organization' => 'Organization',
+            ],
         ],
         'fields' => [
             'title' => 'Title',
@@ -485,9 +496,19 @@ return [
             'format' => 'Format',
             'file_path' => 'File Path',
             'created_by' => 'Created By',
+            'created_at' => 'Created At',
             'generated_at' => 'Generated At',
             'documentable_type' => 'Object Type',
             'documentable_id' => 'Object ID',
+        ],
+        'actions' => [
+            'generate' => 'Generate',
+        ],
+        'tabs' => [
+            'all' => 'All',
+            'draft' => 'Draft',
+            'generated' => 'Generated',
+            'published' => 'Published',
         ],
     ],
     // Document Templates
@@ -934,7 +955,12 @@ return [
         ],
         'notifications' => [
             'title' => 'Notifications',
+            'single' => 'Notification',
+            'plural' => 'Notifications',
             'mark_all_as_read' => 'Mark all as read',
+            'mark_as_unread' => 'Mark as unread',
+            'marked_as_read' => 'Notifications marked as read',
+            'marked_as_unread' => 'Notifications marked as unread',
             'no_notifications' => 'No notifications',
             'welcome_title' => 'Welcome to Admin Panel',
             'welcome_message' => 'Your e-commerce system has been successfully configured and is ready to use.',
@@ -951,6 +977,26 @@ return [
             'clear_all' => 'Clear All',
             'view_all_notifications' => 'View all notifications',
             'you_are_all_caught_up' => 'You\'re all caught up!',
+            'form' => [
+                'sections' => [
+                    'basic_information' => 'Basic Information',
+                ],
+                'fields' => [
+                    'notifiable_type' => 'Notifiable Type',
+                    'notifiable_id' => 'Notifiable ID',
+                    'type' => 'Type',
+                    'data' => 'Data',
+                    'read_at' => 'Read At',
+                    'is_read' => 'Is Read',
+                    'user' => 'User',
+                    'created_at' => 'Created At',
+                ],
+            ],
+            'tabs' => [
+                'all' => 'All',
+                'unread' => 'Unread',
+                'read' => 'Read',
+            ],
         ],
     ],
     // Language Switcher
@@ -1036,6 +1082,112 @@ return [
         'request_information' => 'Request Information',
         'request_details' => 'Request Details',
         'analytics_settings' => 'Analytics Settings',
+    ],
+    // Inventory
+    'inventory' => [
+        'title' => 'Inventory',
+        'single' => 'Inventory Item',
+        'plural' => 'Inventory Items',
+        'stock_adjusted_successfully' => 'Stock adjusted successfully',
+        'form' => [
+            'sections' => [
+                'basic_information' => 'Basic Information',
+            ],
+            'fields' => [
+                'product' => 'Product',
+                'location' => 'Location',
+                'quantity' => 'Quantity',
+                'reserved' => 'Reserved',
+                'incoming' => 'Incoming',
+                'threshold' => 'Threshold',
+                'is_tracked' => 'Is Tracked',
+                'stock_status' => 'Stock Status',
+                'created_at' => 'Created At',
+            ],
+        ],
+        'actions' => [
+            'adjust_stock' => 'Adjust Stock',
+        ],
+        'stock_status' => [
+            'in_stock' => 'In Stock',
+            'low_stock' => 'Low Stock',
+            'out_of_stock' => 'Out of Stock',
+        ],
+        'tabs' => [
+            'all' => 'All',
+            'in_stock' => 'In Stock',
+            'low_stock' => 'Low Stock',
+            'out_of_stock' => 'Out of Stock',
+        ],
+    ],
+    // Wishlist Items
+    'wishlist_items' => [
+        'title' => 'Wishlist Items',
+        'single' => 'Wishlist Item',
+        'plural' => 'Wishlist Items',
+        'moved_to_cart_successfully' => 'Items moved to cart successfully',
+        'form' => [
+            'sections' => [
+                'basic_information' => 'Basic Information',
+            ],
+            'fields' => [
+                'wishlist' => 'Wishlist',
+                'product' => 'Product',
+                'variant' => 'Variant',
+                'quantity' => 'Quantity',
+                'notes' => 'Notes',
+                'user' => 'User',
+                'created_at' => 'Created At',
+            ],
+        ],
+        'actions' => [
+            'move_to_cart' => 'Move to Cart',
+        ],
+    ],
+    // Stock Movements
+    'stock_movements' => [
+        'title' => 'Stock Movements',
+        'single' => 'Stock Movement',
+        'plural' => 'Stock Movements',
+        'form' => [
+            'sections' => [
+                'basic_information' => 'Basic Information',
+            ],
+            'fields' => [
+                'variant_inventory' => 'Variant Inventory',
+                'product' => 'Product',
+                'location' => 'Location',
+                'type' => 'Type',
+                'quantity' => 'Quantity',
+                'reason' => 'Reason',
+                'reference' => 'Reference',
+                'notes' => 'Notes',
+                'user' => 'User',
+                'moved_at' => 'Moved At',
+            ],
+        ],
+        'types' => [
+            'in' => 'In',
+            'out' => 'Out',
+            'adjustment' => 'Adjustment',
+            'transfer' => 'Transfer',
+            'return' => 'Return',
+        ],
+        'reasons' => [
+            'purchase' => 'Purchase',
+            'sale' => 'Sale',
+            'return' => 'Return',
+            'adjustment' => 'Adjustment',
+            'transfer' => 'Transfer',
+            'damage' => 'Damage',
+            'expired' => 'Expired',
+        ],
+        'tabs' => [
+            'all' => 'All',
+            'in' => 'In',
+            'out' => 'Out',
+            'adjustment' => 'Adjustment',
+        ],
     ],
 
     // Helpers

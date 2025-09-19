@@ -33,6 +33,7 @@ class ShippingOptionResource extends Resource
 {
     protected static ?string $model = ShippingOption::class;
 
+        /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Shipping';
 
     protected static ?int $navigationSort = 1;

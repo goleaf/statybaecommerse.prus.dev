@@ -40,8 +40,7 @@ use UnitEnum;
  */
 final class CategoryResource extends Resource
 {
-    protected static ?string $model = Category::class;
-
+    protected static ?string $model = Category::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 3;

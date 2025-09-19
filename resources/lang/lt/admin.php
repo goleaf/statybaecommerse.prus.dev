@@ -644,6 +644,8 @@ return [
     // Documents
     'documents' => [
         'title' => 'Dokumentai',
+        'single' => 'Dokumentas',
+        'plural' => 'Dokumentai',
         'create' => 'Sukurti dokumentą',
         'edit' => 'Redaguoti dokumentą',
         'view' => 'Peržiūrėti dokumentą',
@@ -654,6 +656,7 @@ return [
         'send_email' => 'Siųsti el. paštu',
         'templates' => 'Šablonai',
         'generated_documents' => 'Sugeneruoti dokumentai',
+        'generated_successfully' => 'Dokumentai sėkmingai sugeneruoti',
         'types' => [
             'invoice' => 'Sąskaita faktūra',
             'receipt' => 'Kvitas',
@@ -674,12 +677,20 @@ return [
         ],
         'status' => [
             'draft' => 'Juodraštis',
+            'generated' => 'Sugeneruotas',
             'published' => 'Publikuotas',
             'archived' => 'Archyvuotas',
         ],
         'formats' => [
             'html' => 'HTML',
             'pdf' => 'PDF',
+            'docx' => 'DOCX',
+        ],
+        'form' => [
+            'sections' => [
+                'basic_information' => 'Pagrindinė informacija',
+                'organization' => 'Organizacija',
+            ],
         ],
         'fields' => [
             'title' => 'Pavadinimas',
@@ -690,9 +701,19 @@ return [
             'format' => 'Formatas',
             'file_path' => 'Failo kelias',
             'created_by' => 'Sukūrė',
+            'created_at' => 'Sukurta',
             'generated_at' => 'Sugeneruota',
             'documentable_type' => 'Objekto tipas',
             'documentable_id' => 'Objekto ID',
+        ],
+        'actions' => [
+            'generate' => 'Generuoti',
+        ],
+        'tabs' => [
+            'all' => 'Visi',
+            'draft' => 'Juodraščiai',
+            'generated' => 'Sugeneruoti',
+            'published' => 'Publikuoti',
         ],
     ],
     // Document Templates
@@ -826,7 +847,12 @@ return [
         ],
         'notifications' => [
             'title' => 'Pranešimai',
+            'single' => 'Pranešimas',
+            'plural' => 'Pranešimai',
             'mark_all_as_read' => 'Pažymėti visus kaip perskaitytus',
+            'mark_as_unread' => 'Pažymėti kaip neperskaitytus',
+            'marked_as_read' => 'Pranešimai pažymėti kaip perskaityti',
+            'marked_as_unread' => 'Pranešimai pažymėti kaip neperskaityti',
             'no_notifications' => 'Nėra pranešimų',
             'welcome_title' => 'Sveiki atvykę į valdymo skydą',
             'welcome_message' => 'Jūsų e-komercijos sistema sėkmingai sukonfigūruota ir paruošta naudojimui.',
@@ -843,6 +869,26 @@ return [
             'clear_all' => 'Išvalyti visus',
             'view_all_notifications' => 'Peržiūrėti visus pranešimus',
             'you_are_all_caught_up' => 'Viskas atnaujinta!',
+            'form' => [
+                'sections' => [
+                    'basic_information' => 'Pagrindinė informacija',
+                ],
+                'fields' => [
+                    'notifiable_type' => 'Pranešimo gavėjo tipas',
+                    'notifiable_id' => 'Pranešimo gavėjo ID',
+                    'type' => 'Tipas',
+                    'data' => 'Duomenys',
+                    'read_at' => 'Perskaityta',
+                    'is_read' => 'Ar perskaityta',
+                    'user' => 'Naudotojas',
+                    'created_at' => 'Sukurta',
+                ],
+            ],
+            'tabs' => [
+                'all' => 'Visi',
+                'unread' => 'Neperskaityti',
+                'read' => 'Perskaityti',
+            ],
         ],
     ],
     // Common
@@ -1310,6 +1356,67 @@ return [
         'request_information' => 'Užklausos informacija',
         'request_details' => 'Užklausos detalės',
         'analytics_settings' => 'Analitikos nustatymai',
+    ],
+    // Inventory
+    'inventory' => [
+        'title' => 'Atsargos',
+        'single' => 'Atsargų elementas',
+        'plural' => 'Atsargų elementai',
+        'stock_adjusted_successfully' => 'Atsargos sėkmingai pakoreguotos',
+        'form' => [
+            'sections' => [
+                'basic_information' => 'Pagrindinė informacija',
+            ],
+            'fields' => [
+                'product' => 'Produktas',
+                'location' => 'Vieta',
+                'quantity' => 'Kiekis',
+                'reserved' => 'Rezervuota',
+                'incoming' => 'Gaunami',
+                'threshold' => 'Slenkstis',
+                'is_tracked' => 'Ar sekama',
+                'stock_status' => 'Atsargų būsena',
+                'created_at' => 'Sukurta',
+            ],
+        ],
+        'actions' => [
+            'adjust_stock' => 'Koreguoti atsargas',
+        ],
+        'stock_status' => [
+            'in_stock' => 'Yra atsargų',
+            'low_stock' => 'Mažai atsargų',
+            'out_of_stock' => 'Nėra atsargų',
+        ],
+        'tabs' => [
+            'all' => 'Visi',
+            'in_stock' => 'Yra atsargų',
+            'low_stock' => 'Mažai atsargų',
+            'out_of_stock' => 'Nėra atsargų',
+        ],
+    ],
+    // Wishlist Items
+    'wishlist_items' => [
+        'title' => 'Norų sąrašo elementai',
+        'single' => 'Norų sąrašo elementas',
+        'plural' => 'Norų sąrašo elementai',
+        'moved_to_cart_successfully' => 'Elementai sėkmingai perkelti į krepšelį',
+        'form' => [
+            'sections' => [
+                'basic_information' => 'Pagrindinė informacija',
+            ],
+            'fields' => [
+                'wishlist' => 'Norų sąrašas',
+                'product' => 'Produktas',
+                'variant' => 'Variantas',
+                'quantity' => 'Kiekis',
+                'notes' => 'Pastabos',
+                'user' => 'Naudotojas',
+                'created_at' => 'Sukurta',
+            ],
+        ],
+        'actions' => [
+            'move_to_cart' => 'Perkelti į krepšelį',
+        ],
     ],
     // Helpers
     'helpers' => [

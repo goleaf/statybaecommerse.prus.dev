@@ -45,7 +45,7 @@ final class CustomerManagementResource extends Resource
 
     /**
      * @var UnitEnum|string|null
-     */
+     */    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 1;

@@ -59,8 +59,7 @@ use UnitEnum;
  */
 final class OrderResource extends Resource
 {
-    protected static ?string $model = Order::class;
-
+    protected static ?string $model = Order::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Orders';
 
     protected static ?int $navigationSort = 1;

@@ -13,8 +13,12 @@ final class SystemSettingCategoryTest extends TestCase
 
     public function test_system_setting_category_model_relationships(): void
     {
+        // Clear any existing data to ensure test isolation
+        SystemSetting::truncate();
+        SystemSettingCategory::truncate();
+
         $category = SystemSettingCategory::factory()->create();
-        $setting = SystemSetting::factory()->create(['category_id' => $category->id]);
+        $setting = SystemSetting::factory()->active()->create(['category_id' => $category->id]);
 
         $this->assertInstanceOf(SystemSetting::class, $category->settings->first());
         $this->assertEquals($setting->id, $category->settings->first()->id);
@@ -65,6 +69,10 @@ final class SystemSettingCategoryTest extends TestCase
 
     public function test_system_setting_category_model_scope_with_settings(): void
     {
+        // Clear any existing data to ensure test isolation
+        SystemSetting::truncate();
+        SystemSettingCategory::truncate();
+
         $category = SystemSettingCategory::factory()->create();
         $setting = SystemSetting::factory()->create(['category_id' => $category->id]);
 
@@ -89,8 +97,12 @@ final class SystemSettingCategoryTest extends TestCase
 
     public function test_system_setting_category_model_settings_count(): void
     {
+        // Clear any existing data to ensure test isolation
+        SystemSetting::truncate();
+        SystemSettingCategory::truncate();
+
         $category = SystemSettingCategory::factory()->create();
-        SystemSetting::factory()->count(3)->create(['category_id' => $category->id]);
+        SystemSetting::factory()->count(3)->active()->create(['category_id' => $category->id]);
 
         $this->assertEquals(3, $category->getSettingsCount());
     }
@@ -150,9 +162,13 @@ final class SystemSettingCategoryTest extends TestCase
 
     public function test_system_setting_category_model_settings_by_group(): void
     {
+        // Clear any existing data to ensure test isolation
+        SystemSetting::truncate();
+        SystemSettingCategory::truncate();
+
         $category = SystemSettingCategory::factory()->create();
-        SystemSetting::factory()->create(['category_id' => $category->id, 'group' => 'group1']);
-        SystemSetting::factory()->create(['category_id' => $category->id, 'group' => 'group2']);
+        SystemSetting::factory()->active()->create(['category_id' => $category->id, 'group' => 'group1']);
+        SystemSetting::factory()->active()->create(['category_id' => $category->id, 'group' => 'group2']);
 
         $settingsByGroup = $category->getSettingsByGroup();
         $this->assertCount(2, $settingsByGroup);
@@ -178,8 +194,12 @@ final class SystemSettingCategoryTest extends TestCase
 
     public function test_system_setting_category_model_children_relationship(): void
     {
+        // Clear any existing data to ensure test isolation
+        SystemSetting::truncate();
+        SystemSettingCategory::truncate();
+
         $parentCategory = SystemSettingCategory::factory()->create();
-        $childCategory = SystemSettingCategory::factory()->create(['parent_id' => $parentCategory->id]);
+        $childCategory = SystemSettingCategory::factory()->active()->create(['parent_id' => $parentCategory->id]);
 
         $children = $parentCategory->getChildren();
         $this->assertCount(1, $children);

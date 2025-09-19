@@ -40,8 +40,7 @@ use UnitEnum;
  */
 final class SeoDataResource extends Resource
 {
-    protected static ?string $model = SeoData::class;
-
+    protected static ?string $model = SeoData::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 3;

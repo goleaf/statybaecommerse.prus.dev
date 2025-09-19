@@ -41,8 +41,7 @@ use UnitEnum;
  */
 final class ReviewResource extends Resource
 {
-    protected static ?string $model = Review::class;
-
+    protected static ?string $model = Review::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 4;

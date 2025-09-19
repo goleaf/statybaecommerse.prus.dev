@@ -39,8 +39,7 @@ use UnitEnum;
  */
 final class ZoneResource extends Resource
 {
-    protected static ?string $model = Zone::class;
-
+    protected static ?string $model = Zone::class;    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Locations';
 
     protected static ?int $navigationSort = 6;

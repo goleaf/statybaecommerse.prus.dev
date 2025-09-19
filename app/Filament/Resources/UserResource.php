@@ -44,6 +44,7 @@ final class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
+    /** @var UnitEnum|string|null */    /** @var UnitEnum|string|null */
     protected static string|UnitEnum|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 1;
