@@ -1,7 +1,7 @@
 <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
     <div class="p-4 border-b border-gray-200">
-        <h3 class="text-lg font-semibold text-gray-900">{{ __('translations.categories') }}</h3>
-        <p class="text-sm text-gray-600 mt-1">{{ __('translations.browse_all_categories') }}</p>
+        <h3 class="text-lg font-semibold text-gray-900">{{ __('home.categories') }}</h3>
+        <p class="text-sm text-gray-600 mt-1">{{ __('home.browse_categories') }}</p>
     </div>
     
     <div class="p-4">

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Spatie\Activitylog\ActivityLogStatus;
 
 class DatabaseSeeder extends Seeder
 {
@@ -11,6 +12,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        /** @var ActivityLogStatus $activityLogStatus */
+        $activityLogStatus = app(ActivityLogStatus::class);
+        $wasLoggingDisabled = $activityLogStatus->disabled();
+
+        if (! $wasLoggingDisabled) {
+            activity()->disableLogging();
+        }
+
         $this->call([
             // Minimal, usable foundation
             CurrencySeeder::class,
@@ -73,5 +82,9 @@ class DatabaseSeeder extends Seeder
             // Build header menu from categories
             MenuSeeder::class,
         ]);
+
+        if (! $wasLoggingDisabled) {
+            activity()->enableLogging();
+        }
     }
 }

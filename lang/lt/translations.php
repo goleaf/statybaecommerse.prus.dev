@@ -3,6 +3,37 @@
 declare(strict_types=1);
 
 return [
+    // Home page translations
+    'home' => [
+        'badge' => 'Statybae Commerce',
+        'title' => 'Įkvėpęs prekybos centras su kategorijomis, kolekcijomis ir akcijomis vienoje vietoje',
+        'subtitle' => 'Atraskite šviežius pasirinkimus, sekite specialius pasiūlymus ir valdykite pirkimus per gerai suprojektuotą Statybae Commerce ekosistemą.',
+        'start_shopping' => 'Pradėti apsipirkinėti',
+        'create_account' => 'Sukurti paskyrą',
+        'store_stats' => 'Parduotuvės statistika',
+        'live' => 'Tiesiogiai',
+        'products' => 'produktų',
+        'categories' => 'kategorijų',
+        'brands' => 'prekės ženklų',
+        'reviews' => 'atsiliepimų',
+        'avg_rating' => 'Vidutinis pirkėjų įvertinimas',
+        'sale' => 'Akcijos',
+        'new' => 'Naujienos',
+        'trending' => 'Populiariausi',
+        'featured' => 'Rekomenduojami',
+        'sale_products' => 'Akcijos produktams',
+        'sale_products_subtitle' => 'Visi produktai su nuolaidomis ir specialiais pasiūlymais dabar prieinami be perėjimų į skyrius — rinkitės ir pridėkite į krepšelį.',
+        'browse_categories' => 'Naršykite visas kategorijas',
+        'catalog_categories' => 'Katalogo kategorijos',
+        'explore_store_sections' => 'Tyrinėkite visus mūsų parduotuvės skyrius',
+        'browse_categories_description' => 'Peržiūrėkite visą kategorijų sąrašą su vizualiais kortelėmis, kad greitai rastumėte reikiamus produktus.',
+        'all_categories' => 'Visos kategorijos',
+        'collections_selections' => 'Kolekcijos ir parinktys',
+        'current_collections' => 'Aktualios kolekcijos su įkvėpimu ir paruoštais pasirinkimais',
+        'collections_description' => 'Kiekviena kolekcija suformuota vizualiai: rinkitės nuotaiką, sezoną ar stilių ir akimirksniu pereikite prie prekių.',
+        'all_collections' => 'Visos kolekcijos',
+    ],
+    
     // Category page sidebar & controls
     'advanced_filters' => 'Išplėstiniai filtrai',
     'filters' => 'Filtrai',

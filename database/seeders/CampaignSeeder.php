@@ -17,51 +17,26 @@ use App\Models\CustomerGroup;
 use App\Models\Product;
 use App\Models\Translations\CampaignTranslation;
 use App\Models\Zone;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Faker\Factory as FakerFactory;
 
 final class CampaignSeeder extends Seeder
 {
+    private bool $skipCampaignClickSeeding = false;
+    private bool $skipCampaignConversionSeeding = false;
+
     public function run(): void
     {
         // Create channels and zones if they don't exist
-        $channels = collect();
-        $zones = collect();
-        $categories = collect();
-        $products = collect();
-        $customerGroups = collect();
-
-        // Try to create or get existing records
-        try {
-            $channels = Channel::factory()->count(3)->create();
-        } catch (\Exception $e) {
-            $channels = collect(range(1, 3))->map(fn ($i) => (object) ['id' => $i]);
-        }
-
-        try {
-            $zones = Zone::factory()->count(5)->create();
-        } catch (\Exception $e) {
-            $zones = collect(range(1, 5))->map(fn ($i) => (object) ['id' => $i]);
-        }
-
-        try {
-            $categories = Category::factory()->count(10)->create();
-        } catch (\Exception $e) {
-            $categories = collect(range(1, 10))->map(fn ($i) => (object) ['id' => $i]);
-        }
-
-        try {
-            $products = Product::factory()->count(20)->create();
-        } catch (\Exception $e) {
-            $products = collect(range(1, 20))->map(fn ($i) => (object) ['id' => $i]);
-        }
-
-        try {
-            $customerGroups = CustomerGroup::factory()->count(5)->create();
-        } catch (\Exception $e) {
-            $customerGroups = collect(range(1, 5))->map(fn ($i) => (object) ['id' => $i]);
-        }
+        $channelIds = $this->ensureRecords(Channel::class, 3);
+        $zoneIds = $this->ensureRecords(Zone::class, 5);
+        $categoryIds = $this->ensureRecords(Category::class, 10);
+        $productIds = $this->ensureRecords(Product::class, 20);
+        $customerGroupIds = $this->ensureRecords(CustomerGroup::class, 5);
 
         $locales = $this->supportedLocales();
 
@@ -72,8 +47,8 @@ final class CampaignSeeder extends Seeder
             ->active()
             ->highPerformance()
             ->create([
-                'channel_id' => $channels->random()->id,
-                'zone_id' => $zones->random()->id,
+                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
+                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
             ]);
 
         // Create regular active campaigns
@@ -81,8 +56,8 @@ final class CampaignSeeder extends Seeder
             ->count(15)
             ->active()
             ->create([
-                'channel_id' => $channels->random()->id,
-                'zone_id' => $zones->random()->id,
+                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
+                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
             ]);
 
         // Create scheduled campaigns
@@ -90,8 +65,8 @@ final class CampaignSeeder extends Seeder
             ->count(8)
             ->scheduled()
             ->create([
-                'channel_id' => $channels->random()->id,
-                'zone_id' => $zones->random()->id,
+                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
+                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
             ]);
 
         // Create expired campaigns
@@ -99,8 +74,8 @@ final class CampaignSeeder extends Seeder
             ->count(5)
             ->expired()
             ->create([
-                'channel_id' => $channels->random()->id,
-                'zone_id' => $zones->random()->id,
+                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
+                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
             ]);
 
         // Create draft campaigns
@@ -108,8 +83,8 @@ final class CampaignSeeder extends Seeder
             ->count(7)
             ->create([
                 'status' => 'draft',
-                'channel_id' => $channels->random()->id,
-                'zone_id' => $zones->random()->id,
+                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
+                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
             ]);
 
         $allCampaigns = $featuredCampaigns
@@ -124,7 +99,7 @@ final class CampaignSeeder extends Seeder
 
         // Create campaign views for active and featured campaigns
         foreach ($featuredCampaigns->concat($activeCampaigns) as $campaign) {
-            $viewCount = fake()->numberBetween(100, 5000);
+            $viewCount = fake()->numberBetween(25, 250);
 
             for ($i = 0; $i < $viewCount; $i++) {
                 CampaignView::factory()->create([
@@ -134,30 +109,50 @@ final class CampaignSeeder extends Seeder
             }
         }
 
-        // Create campaign clicks
-        foreach ($featuredCampaigns->concat($activeCampaigns) as $campaign) {
-            $clickCount = fake()->numberBetween(10, 500);
+        $engagementCampaigns = $featuredCampaigns->concat($activeCampaigns);
 
-            for ($i = 0; $i < $clickCount; $i++) {
-                CampaignClick::factory()->create([
-                    'campaign_id' => $campaign->id,
-                    'click_type' => fake()->randomElement(['cta', 'banner', 'link']),
-                    'clicked_at' => fake()->dateTimeBetween($campaign->starts_at, now()),
-                ]);
+        if (Schema::hasTable('campaign_clicks')) {
+            foreach ($engagementCampaigns as $campaign) {
+                if ($this->skipCampaignClickSeeding) {
+                    break;
+                }
+
+                $clickCount = fake()->numberBetween(5, 75);
+
+                for ($i = 0; $i < $clickCount; $i++) {
+                    $this->createCampaignClickSafely([
+                        'campaign_id' => $campaign->id,
+                        'click_type' => fake()->randomElement(['cta', 'banner', 'link']),
+                        'clicked_at' => fake()->dateTimeBetween($campaign->starts_at, now()),
+                    ]);
+
+                    if ($this->skipCampaignClickSeeding) {
+                        break 2;
+                    }
+                }
             }
         }
 
-        // Create campaign conversions
-        foreach ($featuredCampaigns->concat($activeCampaigns) as $campaign) {
-            $conversionCount = fake()->numberBetween(5, 100);
+        if (Schema::hasTable('campaign_conversions')) {
+            foreach ($engagementCampaigns as $campaign) {
+                if ($this->skipCampaignConversionSeeding) {
+                    break;
+                }
 
-            for ($i = 0; $i < $conversionCount; $i++) {
-                CampaignConversion::factory()->create([
-                    'campaign_id' => $campaign->id,
-                    'conversion_type' => fake()->randomElement(['purchase', 'signup', 'download']),
-                    'conversion_value' => fake()->randomFloat(2, 10, 500),
-                    'converted_at' => fake()->dateTimeBetween($campaign->starts_at, now()),
-                ]);
+                $conversionCount = fake()->numberBetween(1, 25);
+
+                for ($i = 0; $i < $conversionCount; $i++) {
+                    $this->createCampaignConversionSafely([
+                        'campaign_id' => $campaign->id,
+                        'conversion_type' => fake()->randomElement(['purchase', 'signup', 'download']),
+                        'conversion_value' => fake()->randomFloat(2, 10, 500),
+                        'converted_at' => fake()->dateTimeBetween($campaign->starts_at, now()),
+                    ]);
+
+                    if ($this->skipCampaignConversionSeeding) {
+                        break 2;
+                    }
+                }
             }
         }
 
@@ -168,7 +163,7 @@ final class CampaignSeeder extends Seeder
             for ($i = 0; $i < $segmentCount; $i++) {
                 CampaignCustomerSegment::factory()->create([
                     'campaign_id' => $campaign->id,
-                    'customer_group_id' => $customerGroups->random()->id,
+                    'customer_group_id' => $customerGroupIds->isEmpty() ? null : $customerGroupIds->random(),
                     'segment_type' => fake()->randomElement(['group', 'location', 'behavior', 'custom']),
                 ]);
             }
@@ -179,12 +174,11 @@ final class CampaignSeeder extends Seeder
             $targetCount = fake()->numberBetween(2, 8);
 
             for ($i = 0; $i < $targetCount; $i++) {
-                CampaignProductTarget::factory()->create([
-                    'campaign_id' => $campaign->id,
-                    'product_id' => $products->random()->id,
-                    'category_id' => $categories->random()->id,
-                    'target_type' => fake()->randomElement(['product', 'category', 'brand', 'collection']),
-                ]);
+                $productId = $productIds->isEmpty() ? null : $productIds->random();
+                $categoryId = $categoryIds->isEmpty() ? null : $categoryIds->random();
+                $targetType = fake()->randomElement(['product', 'category', 'brand', 'collection']);
+
+                $this->createCampaignProductTargetSafely($campaign->id, $productId, $categoryId, $targetType);
             }
         }
 
@@ -265,8 +259,8 @@ final class CampaignSeeder extends Seeder
             unset($campaignData['translations']);
 
             $campaign = Campaign::factory()->create(array_merge($campaignData, [
-                'channel_id' => $channels->random()->id,
-                'zone_id' => $zones->random()->id,
+                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
+                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
             ]));
 
             $this->syncTranslations($campaign, $locales, $translations);
@@ -386,5 +380,110 @@ final class CampaignSeeder extends Seeder
             ->unique()
             ->values()
             ->toArray();
+    }
+
+    private function ensureRecords(string $modelClass, int $minimum): Collection
+    {
+        $ids = $modelClass::query()->pluck('id');
+
+        if ($ids->count() >= $minimum) {
+            return $ids;
+        }
+
+        $missing = max(0, $minimum - $ids->count());
+
+        if ($missing > 0 && method_exists($modelClass, 'factory')) {
+            try {
+                $modelClass::factory()->count($missing)->create();
+
+                return $modelClass::query()->pluck('id');
+            } catch (\Throwable $exception) {
+                // Swallow factory exceptions to keep seeding resilient
+            }
+        }
+
+        return $modelClass::query()->pluck('id');
+    }
+
+    private function createCampaignClickSafely(array $attributes): void
+    {
+        if ($this->skipCampaignClickSeeding) {
+            return;
+        }
+
+        try {
+            CampaignClick::factory()->create($attributes);
+        } catch (QueryException $exception) {
+            if ($this->isMissingTableException($exception, 'campaign_clicks')) {
+                $this->skipCampaignClickSeeding = true;
+                $this->command?->warn('Skipping campaign click seeding: ' . $exception->getMessage());
+
+                return;
+            }
+
+            throw $exception;
+        }
+    }
+
+    private function createCampaignConversionSafely(array $attributes): void
+    {
+        if ($this->skipCampaignConversionSeeding) {
+            return;
+        }
+
+        try {
+            CampaignConversion::factory()->create($attributes);
+        } catch (QueryException $exception) {
+            if ($this->isMissingTableException($exception, 'campaign_conversions')) {
+                $this->skipCampaignConversionSeeding = true;
+                $this->command?->warn('Skipping campaign conversion seeding: ' . $exception->getMessage());
+
+                return;
+            }
+
+            throw $exception;
+        }
+    }
+
+    private function createCampaignProductTargetSafely(int $campaignId, ?int $productId, ?int $categoryId, string $targetType): void
+    {
+        if ($productId === null && $categoryId === null) {
+            return;
+        }
+
+        try {
+            CampaignProductTarget::query()->create([
+                'campaign_id' => $campaignId,
+                'product_id' => $productId,
+                'category_id' => $categoryId,
+                'target_type' => $targetType,
+            ]);
+        } catch (QueryException $exception) {
+            if ($this->isUniqueConstraintException($exception, 'campaign_product_targets')) {
+                return;
+            }
+
+            throw $exception;
+        }
+    }
+
+    private function isMissingTableException(QueryException $exception, string $table): bool
+    {
+        if ($exception->getCode() === '42S02') {
+            return true;
+        }
+
+        $database = Schema::getConnection()->getDatabaseName();
+
+        return str_contains($exception->getMessage(), "Table '{$database}.{$table}' doesn't exist");
+    }
+
+    private function isUniqueConstraintException(QueryException $exception, string $table): bool
+    {
+        if ($exception->getCode() !== '23000') {
+            return false;
+        }
+
+        return str_contains($exception->getMessage(), $table);
     }
 }

@@ -11,6 +11,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 
 final class ProductHistorySeeder extends Seeder
 {
@@ -18,6 +19,12 @@ final class ProductHistorySeeder extends Seeder
 
     public function run(): void
     {
+        if (! Schema::hasTable('product_histories')) {
+            $this->command?->warn('ProductHistorySeeder skipped: `product_histories` table not found. Run the product history migration first.');
+
+            return;
+        }
+
         $query = Product::query()
             ->with(['brand:id,name', 'categories:id,name'])
             ->orderBy('id');

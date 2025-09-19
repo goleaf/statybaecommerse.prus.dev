@@ -3,6 +3,37 @@
 declare(strict_types=1);
 
 return [
+    // Home page translations
+    'home' => [
+        'badge' => 'Statybae Commerce',
+        'title' => 'Inspiring marketplace with categories, collections and sales in one place',
+        'subtitle' => 'Discover fresh selections, follow special offers and manage purchases through the well-designed Statybae Commerce ecosystem.',
+        'start_shopping' => 'Start Shopping',
+        'create_account' => 'Create Account',
+        'store_stats' => 'Store Statistics',
+        'live' => 'Live',
+        'products' => 'products',
+        'categories' => 'categories',
+        'brands' => 'brands',
+        'reviews' => 'reviews',
+        'avg_rating' => 'Average customer rating',
+        'sale' => 'Sales',
+        'new' => 'New',
+        'trending' => 'Trending',
+        'featured' => 'Featured',
+        'sale_products' => 'Product Sales',
+        'sale_products_subtitle' => 'All products with discounts and special offers are now available without navigating to sections — choose and add to cart.',
+        'browse_categories' => 'Browse all categories',
+        'catalog_categories' => 'Catalog Categories',
+        'explore_store_sections' => 'Explore all sections of our store',
+        'browse_categories_description' => 'Browse the full list of categories with visual cards to quickly find the products you need.',
+        'all_categories' => 'All Categories',
+        'collections_selections' => 'Collections and Selections',
+        'current_collections' => 'Current collections with inspiration and ready-made selections',
+        'collections_description' => 'Each collection is visually designed: choose mood, season or style and instantly move to products.',
+        'all_collections' => 'All Collections',
+    ],
+    
     // Category page sidebar & controls
     'advanced_filters' => 'Advanced filters',
     'filters' => 'Filters',
