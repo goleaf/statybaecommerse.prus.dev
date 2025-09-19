@@ -803,7 +803,8 @@ final class Product extends Model implements HasMedia
      */
     public function getAverageRatingAttribute(): float
     {
-        return $this->reviews()->approved()->avg('rating') ?: 0;
+        $rating = $this->reviews()->approved()->avg('rating');
+        return $rating ? (float) $rating : 0.0;
     }
     /**
      * Handle getReviewsCountAttribute functionality with proper error handling.

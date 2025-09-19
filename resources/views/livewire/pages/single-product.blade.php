@@ -1,19 +1,18 @@
-@section('meta')
-    @php
-        $ogImage =
-            $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?:
-            $product->getFirstMediaUrl(config('media.storage.collection_name'));
-    @endphp
-    <x-meta
-            :title="$product->trans('seo_title') ?? $product->name"
-            :description="$product->trans('seo_description') ?? Str::limit(strip_tags($product->description), 150)"
-            :og-image="$ogImage"
-            ogType="product"
-            :canonical="url()->current()"
-            :preload-image="(string) ($ogImage ?: '')" />
-@endsection
-
 <div class="bg-gradient-to-b from-slate-50 via-white to-white" wire:loading.attr="aria-busy" aria-busy="false">
+    @section('meta')
+        @php
+            $ogImage =
+                $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?:
+                $product->getFirstMediaUrl(config('media.storage.collection_name'));
+        @endphp
+        <x-meta
+                :title="$product->trans('seo_title') ?? $product->name"
+                :description="$product->trans('seo_description') ?? Str::limit(strip_tags($product->description), 150)"
+                :og-image="$ogImage"
+                ogType="product"
+                :canonical="url()->current()"
+                :preload-image="(string) ($ogImage ?: '')" />
+    @endsection
     @if (session('status'))
         <x-container class="max-w-7xl"><x-alert type="success" class="mb-6">{{ session('status') }}</x-alert></x-container>
     @endif
@@ -83,8 +82,11 @@
                                 <div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
                                     <div class="flex items-center gap-1">
                                         @for ($i = 1; $i <= 5; $i++)
-                                            @php($starActive = $averageRating >= $i - 0.25)
-                                            <x-heroicon-o-star class="h-4 w-4 {{ $starActive ? 'text-amber-500' : 'text-slate-200' }}" />
+                                            @if($averageRating >= $i - 0.25)
+                                                <x-heroicon-s-star class="h-4 w-4 text-amber-500" />
+                                            @else
+                                                <x-heroicon-o-star class="h-4 w-4 text-slate-200" />
+                                            @endif
                                         @endfor
                                         <span class="ml-2 font-semibold text-slate-700">{{ number_format($averageRating, 1) }}</span>
                                     </div>
@@ -509,3 +511,4 @@
         <script type="application/ld+json">{!! json_encode($reviewsSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
     @endif
 @endpush
+</div>

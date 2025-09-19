@@ -1,5 +1,5 @@
-@if($this->relatedProducts->isNotEmpty())
-    <section class="bg-white py-16 {{ $class }}" aria-labelledby="related-products-heading">
+<section class="bg-white py-16 {{ $class }}" aria-labelledby="related-products-heading">
+    @if($this->relatedProducts->isNotEmpty())
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             @if($showTitle)
                 <div class="text-center">
@@ -116,5 +116,5 @@
                 </div>
             </div>
         </div>
-    </section>
-@endif
+    @endif
+</section>

@@ -41,7 +41,11 @@
                     class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors duration-200 {{ $isInWishlist ? 'text-red-500' : 'text-gray-400 hover:text-red-500' }}"
                     title="{{ $isInWishlist ? __('translations.remove_from_wishlist') : __('translations.add_to_wishlist') }}"
                 >
-                    <x-heroicon-{{ $isInWishlist ? 's' : 'o' }}-heart class="w-5 h-5" />
+                    @if($isInWishlist)
+                        <x-heroicon-s-heart class="w-5 h-5" />
+                    @else
+                        <x-heroicon-o-heart class="w-5 h-5" />
+                    @endif
                 </button>
             @endif
 
@@ -52,7 +56,11 @@
                     class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors duration-200 {{ $isInComparison ? 'text-blue-500' : 'text-gray-400 hover:text-blue-500' }}"
                     title="{{ $isInComparison ? __('translations.remove_from_comparison') : __('translations.add_to_comparison') }}"
                 >
-                    <x-heroicon-{{ $isInComparison ? 's' : 'o' }}-scale class="w-5 h-5" />
+                    @if($isInComparison)
+                        <x-heroicon-s-scale class="w-5 h-5" />
+                    @else
+                        <x-heroicon-o-scale class="w-5 h-5" />
+                    @endif
                 </button>
             @endif
 
@@ -98,9 +106,11 @@
             <div class="flex items-center gap-1 mb-2">
                 <div class="flex">
                     @for($i = 1; $i <= 5; $i++)
-                        <x-heroicon-{{ $i <= $product->average_rating ? 's' : 'o' }}-star 
-                            class="w-4 h-4 {{ $i <= $product->average_rating ? 'text-yellow-400' : 'text-gray-300' }}" 
-                        />
+                        @if($i <= $product->average_rating)
+                            <x-heroicon-s-star class="w-4 h-4 text-yellow-400" />
+                        @else
+                            <x-heroicon-o-star class="w-4 h-4 text-gray-300" />
+                        @endif
                     @endfor
                 </div>
                 <span class="text-sm text-gray-500">({{ $product->reviews_count }})</span>

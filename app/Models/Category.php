@@ -252,7 +252,7 @@ final class Category extends Model implements HasMedia
      */
     public function getTotalRevenueAttribute(): float
     {
-        return $this->products()->sum('price') ?? 0.0;
+        return (float) ($this->products()->sum('price') ?? 0.0);
     }
 
     /**
@@ -262,7 +262,7 @@ final class Category extends Model implements HasMedia
     public function getAverageProductPriceAttribute(): float
     {
         $productCount = $this->products()->count();
-        return $productCount > 0 ? $this->total_revenue / $productCount : 0.0;
+        return $productCount > 0 ? (float) ($this->total_revenue / $productCount) : 0.0;
     }
 
     /**
@@ -496,7 +496,7 @@ final class Category extends Model implements HasMedia
      */
     public function getTotalRevenue(): float
     {
-        return $this->products()->join('order_items', 'products.id', '=', 'order_items.product_id')->join('orders', 'order_items.order_id', '=', 'orders.id')->where('orders.status', 'completed')->sum(\DB::raw('order_items.quantity * order_items.price'));
+        return (float) ($this->products()->join('order_items', 'products.id', '=', 'order_items.product_id')->join('orders', 'order_items.order_id', '=', 'orders.id')->where('orders.status', 'completed')->sum(\DB::raw('order_items.quantity * order_items.price')) ?? 0.0);
     }
 
     /**
