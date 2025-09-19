@@ -48,18 +48,7 @@ final class AdminPanelProvider extends PanelProvider
             ])
             // ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources([
-                // Temporarily disable most resources to isolate the issue
-                \App\Filament\Resources\OrderResource::class,
-                \App\Filament\Resources\AddressResource::class,
-                \App\Filament\Resources\SystemResource::class,
-                // \App\Filament\Resources\Sliders\SliderResource::class, // Temporarily disabled due to Filament v4 compatibility issues
-                // \App\Filament\Resources\VariantPricingRuleResource::class, // Temporarily disabled - class not found
-                // \App\Filament\Resources\LegalResource::class, // Temporarily disabled
-                // \App\Filament\Resources\RecommendationConfigResource::class, // Temporarily disabled due to Filament v4 compatibility issues
-                // \App\Filament\Resources\RecommendationConfigResourceSimple::class, // Disabled due to Filament v4 compatibility issues
-                // \App\Filament\Resources\SystemSettingResource::class, // Disabled due to Filament v4 compatibility issues
-                // \App\Filament\Resources\PostResource::class, // Temporarily disabled due to Filament v4 compatibility issues
-                // \App\Filament\Resources\SystemSettingsResource::class, // Disabled due to Filament v4 compatibility issues
+                \App\Filament\Resources\ProductResource::class,
             ])
             ->pages([
                 \App\Filament\Pages\Dashboard::class,

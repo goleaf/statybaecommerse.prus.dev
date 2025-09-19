@@ -82,7 +82,7 @@ final class AdminSeeder extends Seeder
         // $this->createDocuments($orders); // Temporarily disabled - requires document_template_id
         
         // Create discount codes
-        $this->createDiscountCodes();
+        // $this->createDiscountCodes(); // Temporarily disabled - table doesn't exist
         
         // Create sliders
         $this->createSliders();
@@ -654,25 +654,28 @@ final class AdminSeeder extends Seeder
         
         $blocks = [
             [
+                'name' => 'featured',
                 'title' => 'Featured Products',
                 'description' => 'Our top-rated products',
-                'type' => 'featured',
+                'config_ids' => [],
                 'is_active' => true,
-                'sort_order' => 1,
+                'max_products' => 10,
             ],
             [
+                'name' => 'bestsellers',
                 'title' => 'Best Sellers',
                 'description' => 'Most popular items',
-                'type' => 'bestsellers',
+                'config_ids' => [],
                 'is_active' => true,
-                'sort_order' => 2,
+                'max_products' => 10,
             ],
             [
+                'name' => 'new_arrivals',
                 'title' => 'New Arrivals',
                 'description' => 'Latest products in store',
-                'type' => 'new_arrivals',
+                'config_ids' => [],
                 'is_active' => true,
-                'sort_order' => 3,
+                'max_products' => 10,
             ],
         ];
 
@@ -690,24 +693,36 @@ final class AdminSeeder extends Seeder
         
         $seoData = [
             [
-                'page' => 'home',
+                'seoable_type' => 'App\Models\Page',
+                'seoable_id' => 1,
+                'locale' => 'en',
                 'title' => 'Home - Your Store',
                 'description' => 'Welcome to our amazing store with great products',
                 'keywords' => 'store, products, shopping, online',
-                'is_active' => true,
+                'canonical_url' => 'https://example.com',
+                'no_index' => false,
+                'no_follow' => false,
             ],
             [
-                'page' => 'products',
+                'seoable_type' => 'App\Models\Page',
+                'seoable_id' => 2,
+                'locale' => 'en',
                 'title' => 'Products - Your Store',
                 'description' => 'Browse our wide selection of products',
                 'keywords' => 'products, items, goods, merchandise',
-                'is_active' => true,
+                'canonical_url' => 'https://example.com/products',
+                'no_index' => false,
+                'no_follow' => false,
             ],
         ];
 
         foreach ($seoData as $seo) {
             SeoData::firstOrCreate(
-                ['page' => $seo['page']],
+                [
+                    'seoable_type' => $seo['seoable_type'],
+                    'seoable_id' => $seo['seoable_id'],
+                    'locale' => $seo['locale'],
+                ],
                 $seo
             );
         }

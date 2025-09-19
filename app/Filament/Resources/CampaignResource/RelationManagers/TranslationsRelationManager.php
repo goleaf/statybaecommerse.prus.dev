@@ -15,6 +15,7 @@ use Filament\Tables\Table;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Form;
 
 final class TranslationsRelationManager extends RelationManager
 {
@@ -22,9 +23,9 @@ final class TranslationsRelationManager extends RelationManager
 
     protected static ?string $title = 'Translations';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->schema([
             Forms\Components\Select::make('locale')
                 ->label($this->label('Locale'))
                 ->options($this->localeOptions())

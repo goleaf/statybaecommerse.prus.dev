@@ -23,11 +23,9 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action as TableAction;
+use Filament\Resources\Resource;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -104,11 +102,11 @@ final class ProductResource extends Resource
                 ->tabs([
                     Tab::make(__('products.tabs.basic_information'))
                         ->icon('heroicon-o-information-circle')
-                        ->schema([
+                        ->components([
                             Section::make(__('products.sections.basic_information'))
-                                ->schema([
+                                ->components([
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('name')
                                                 ->label(__('products.fields.name'))
                                                 ->required()
@@ -133,11 +131,11 @@ final class ProductResource extends Resource
                         ]),
                     Tab::make(__('products.tabs.pricing'))
                         ->icon('heroicon-o-currency-euro')
-                        ->schema([
+                        ->components([
                             Section::make(__('products.sections.pricing'))
-                                ->schema([
+                                ->components([
                                     Grid::make(3)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('price')
                                                 ->label(__('products.fields.price'))
                                                 ->required()
@@ -163,11 +161,11 @@ final class ProductResource extends Resource
                         ]),
                     Tab::make(__('products.tabs.inventory'))
                         ->icon('heroicon-o-archive-box')
-                        ->schema([
+                        ->components([
                             Section::make(__('products.sections.inventory'))
-                                ->schema([
+                                ->components([
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             TextInput::make('sku')
                                                 ->label(__('products.fields.sku'))
                                                 ->required()
@@ -180,7 +178,7 @@ final class ProductResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(3)
-                                        ->schema([
+                                        ->components([
                                             Toggle::make('manage_stock')
                                                 ->label(__('products.fields.manage_stock'))
                                                 ->default(true)
@@ -197,7 +195,7 @@ final class ProductResource extends Resource
                                                 ->columnSpan(1),
                                         ]),
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             Toggle::make('allow_backorder')
                                                 ->label(__('products.fields.allow_backorder'))
                                                 ->columnSpan(1),
@@ -211,11 +209,11 @@ final class ProductResource extends Resource
                         ]),
                     Tab::make(__('products.tabs.organization'))
                         ->icon('heroicon-o-tag')
-                        ->schema([
+                        ->components([
                             Section::make(__('products.sections.organization'))
-                                ->schema([
+                                ->components([
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             Select::make('category_id')
                                                 ->label(__('products.fields.category'))
                                                 ->relationship('categories', 'name')
@@ -234,11 +232,11 @@ final class ProductResource extends Resource
                         ]),
                     Tab::make(__('products.tabs.visibility'))
                         ->icon('heroicon-o-eye')
-                        ->schema([
+                        ->components([
                             Section::make(__('products.sections.visibility'))
-                                ->schema([
+                                ->components([
                                     Grid::make(2)
-                                        ->schema([
+                                        ->components([
                                             Toggle::make('is_visible')
                                                 ->label(__('products.fields.is_visible'))
                                                 ->default(true)
