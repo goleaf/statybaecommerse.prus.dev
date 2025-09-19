@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             CurrencySeeder::class,
             RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
+            // Full admin seeder with all menu items
+            FullAdminSeeder::class,
             // Countries and zones for shipping/tax logic
             CountrySeeder::class,
             ZoneSeeder::class,

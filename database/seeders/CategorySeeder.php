@@ -1372,6 +1372,7 @@ class CategorySeeder extends Seeder
     private function translateSlugToEnglish(string $slug): string
     {
         $translations = [
+            'sandarinimo-pleveles-ir-juostos' => 'sealing-films-and-tapes',
             'juostos-laukui' => 'tapes-for-outdoor',
             'juostos-vidui' => 'tapes-for-indoor',
             'pleveles-vidui' => 'films-for-indoor',
@@ -1497,6 +1498,7 @@ class CategorySeeder extends Seeder
     private function translateSlugToRussian(string $slug): string
     {
         $translations = [
+            'sandarinimo-pleveles-ir-juostos' => 'germetiziruyushchie-plenki-i-lenty',
             'juostos-laukui' => 'lenty-dlya-ulitsy',
             'juostos-vidui' => 'lenty-dlya-vnutri',
             'pleveles-vidui' => 'plenki-dlya-vnutri',
@@ -1622,6 +1624,7 @@ class CategorySeeder extends Seeder
     private function translateSlugToGerman(string $slug): string
     {
         $translations = [
+            'sandarinimo-pleveles-ir-juostos' => 'abdichtungsfolien-und-baender',
             'juostos-laukui' => 'baender-fuer-aussen',
             'juostos-vidui' => 'baender-fuer-innen',
             'pleveles-vidui' => 'folien-fuer-innen',

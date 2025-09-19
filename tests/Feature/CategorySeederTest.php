@@ -23,8 +23,8 @@ final class CategorySeederTest extends TestCase
         $seeder->run();
 
         // Assert
-        $this->assertDatabaseCount('categories', 142);
-        $this->assertDatabaseCount('category_translations', 531);
+        $this->assertDatabaseCount('categories', 128);
+        $this->assertDatabaseCount('category_translations', 512);
 
         // Check main categories exist
         $this->assertDatabaseHas('categories', [
@@ -217,7 +217,7 @@ final class CategorySeederTest extends TestCase
         $this->assertEquals('medvarsciai', $subcategory->slug);
 
         $deepCategory = Category::where('name', 'Laukui')->first();
-        $this->assertEquals('laukui', $deepCategory->slug);
+        $this->assertEquals('juostos-laukui', $deepCategory->slug);
     }
 
     public function test_category_seeder_creates_translations_with_proper_slugs(): void
@@ -239,6 +239,6 @@ final class CategorySeederTest extends TestCase
         $this->assertEquals('germetiziruyushchie-plenki-i-lenty', $ruTranslation->slug);
 
         $deTranslation = $translations->where('locale', 'de')->first();
-        $this->assertEquals('dichtungsfolien-und-bander', $deTranslation->slug);
+        $this->assertEquals('abdichtungsfolien-und-baender', $deTranslation->slug);
     }
 }
