@@ -12,6 +12,14 @@ final class VariantInventoryTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Run migrations to ensure all tables and columns exist
+        $this->artisan('migrate', ['--database' => 'sqlite']);
+    }
+
     public function test_variant_inventory_belongs_to_variant(): void
     {
         $variant = ProductVariant::factory()->create();
