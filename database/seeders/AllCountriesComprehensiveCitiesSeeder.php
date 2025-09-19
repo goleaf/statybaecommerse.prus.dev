@@ -29,11 +29,11 @@ final class AllCountriesComprehensiveCitiesSeeder extends Seeder
                 unset($cityDataForInsert['description']);
 
                 $city = City::updateOrCreate(
-                    ['code' => $cityData['code']],
+                    ['slug' => $cityData['slug']],
                     array_merge($cityDataForInsert, [
                         'country_id' => $country->id,
                         'name' => $cityData['name']['en'],
-                        'slug' => $cityData['slug'],
+                        'code' => $cityData['code'],
                         'is_enabled' => true,
                         'is_default' => false,
                     ])
