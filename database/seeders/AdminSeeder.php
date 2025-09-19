@@ -62,8 +62,11 @@ final class AdminSeeder extends Seeder
         $products = $this->createProducts($categories);
         $variants = $this->createProductVariants($products);
         
+        // Create locations first
+        $locations = $this->createLocations($countries, $zones, $cities);
+        
         // Create stock records
-        $this->createStockRecords($variants);
+        $this->createStockRecords($variants, $locations);
         
         // Create addresses
         $addresses = $this->createAddresses($admin, $countries, $zones, $cities);
@@ -99,8 +102,7 @@ final class AdminSeeder extends Seeder
         // Create product history
         $this->createProductHistory($products);
         
-        // Create locations
-        $this->createLocations($countries, $zones, $cities);
+        // Locations already created above
         
         $this->command->info('✅ Comprehensive Admin Seeder completed successfully!');
         $this->command->info('👤 Admin user: admin@example.com');
@@ -417,18 +419,20 @@ final class AdminSeeder extends Seeder
         return $variants;
     }
 
-    private function createStockRecords(array $variants): void
+    private function createStockRecords(array $variants, array $locations): void
     {
         $this->command->info('📊 Creating stock records...');
         
         foreach ($variants as $variant) {
-            Stock::firstOrCreate(
-                ['product_variant_id' => $variant->id],
+            Inventory::firstOrCreate(
+                ['product_id' => $variant->product_id, 'location_id' => $locations[0]->id],
                 [
-                    'product_variant_id' => $variant->id,
+                    'product_id' => $variant->product_id,
+                    'location_id' => $locations[0]->id,
                     'quantity' => rand(10, 100),
-                    'reserved_quantity' => rand(0, 5),
-                    'location' => 'Main Warehouse',
+                    'reserved' => rand(0, 5),
+                    'threshold' => 10,
+                    'is_tracked' => true,
                 ]
             );
         }
@@ -773,7 +777,7 @@ final class AdminSeeder extends Seeder
         }
     }
 
-    private function createLocations(array $countries, array $zones, array $cities): void
+    private function createLocations(array $countries, array $zones, array $cities): array
     {
         $this->command->info('📍 Creating locations...');
         
@@ -800,11 +804,13 @@ final class AdminSeeder extends Seeder
             ],
         ];
 
+        $createdLocations = [];
         foreach ($locations as $location) {
-            Location::firstOrCreate(
+            $createdLocations[] = Location::firstOrCreate(
                 ['name' => $location['name']],
                 $location
             );
         }
+        return $createdLocations;
     }
 }
