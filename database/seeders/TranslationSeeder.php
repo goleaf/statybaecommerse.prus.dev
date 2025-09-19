@@ -55,7 +55,7 @@ class TranslationSeeder extends Seeder
                         'name' => $suffix($cat->name, $loc),
                         'slug' => $suffix($cat->slug, $loc),
                         'description' => $loc === 'lt'
-                            ? 'Kategorijos '.$cat->name.' aprašymas lietuvių kalba. Čia rasite visus reikalingus produktus.'
+                            ? 'Aprašymas lietuvių kalba. Čia rasite visus reikalingus produktus.'
                             : 'Category '.$cat->name.' description in English. Here you will find all necessary products.',
                         'seo_title' => $loc === 'lt'
                             ? $cat->name.' - Statybos įrankiai ir medžiagos'
@@ -82,7 +82,7 @@ class TranslationSeeder extends Seeder
                         'name' => $suffix($col->name, $loc),
                         'slug' => $suffix($col->slug, $loc),
                         'description' => $loc === 'lt'
-                            ? 'Kolekcijos '.$col->name.' aprašymas lietuvių kalba. Specialiai atrinkti produktai.'
+                            ? 'Aprašymas lietuvių kalba. Specialiai atrinkti produktai.'
                             : 'Collection '.$col->name.' description in English. Specially selected products.',
                         'created_at' => now(),
                         'updated_at' => now(),

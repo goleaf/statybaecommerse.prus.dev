@@ -34,8 +34,6 @@ return [
     'product_type' => 'Produkto tipas',
     'product_type_simple' => 'Paprastas',
     'product_type_variable' => 'Kintamas',
-    'product_categories' => 'Kategorijos',
-    'product_collections' => 'Kolekcijos',
 
     // Product visibility and status
     'product_visibility_status' => 'Matomumas ir būsena',
@@ -134,9 +132,7 @@ return [
 
     // Categories and collections
     'category' => 'Kategorija',
-    'category_name' => 'Kategorijos pavadinimas',
     'collection' => 'Kolekcija',
-    'collection_name' => 'Kolekcijos pavadinimas',
 
     // Images
     'image' => 'Paveikslėlis',

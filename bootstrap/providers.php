@@ -4,6 +4,7 @@ return [
     App\Providers\AppServiceProvider::class,
     App\Providers\DebugServiceProvider::class,
     App\Providers\Filament\AdminPanelProvider::class,
+    App\Providers\AdminNavigationServiceProvider::class,
     App\Providers\HorizonServiceProvider::class,
     App\Providers\SharedComponentServiceProvider::class,
     App\Providers\CodeStyleServiceProvider::class,

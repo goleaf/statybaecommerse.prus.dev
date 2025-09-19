@@ -3,9 +3,6 @@
 return [
     // Navigation
     'nav_home' => 'Pradžia',
-    'nav_categories' => 'Kategorijos',
-    'nav_collections' => 'Kolekcijos',
-    'nav_brands' => 'Prekės ženklai',
     'nav_search' => 'Paieška',
     'nav_cart' => 'Krepšelis',
     'nav_admin' => 'Admin',
@@ -188,9 +185,6 @@ return [
     'JSON format Laravel validation rules' => 'JSON formato Laravel validavimo taisyklės',
     'Enter valid JSON format' => 'Įveskite tinkamą JSON formatą',
     'admin_products' => 'Produktai',
-    'admin_categories' => 'Kategorijos',
-    'admin_brands' => 'Prekės ženklai',
-    'admin_collections' => 'Kolekcijos',
     'admin_orders' => 'Užsakymai',
     'admin_customers' => 'Klientai',
     'admin_settings' => 'Nustatymai',

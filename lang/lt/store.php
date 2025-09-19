@@ -3,9 +3,6 @@
 return [
     'nav' => [
         'home' => 'Pradžia',
-        'categories' => 'Kategorijos',
-        'collections' => 'Kolekcijos',
-        'brands' => 'Prekės ženklai',
         'search' => 'Paieška',
         'cart' => 'Krepšelis',
         'admin' => 'Admin',
@@ -72,7 +69,6 @@ return [
     'fast_next_day_delivery' => 'Greitas pristatymas per dieną visoje Lietuvoje',
     'secure_payments_returns' => 'Saugūs mokėjimai ir 30 dienų grąžinimas',
     'store_locator' => 'Parduotuvių paieška',
-    'support_centre' => 'Pagalbos centras',
     'phone_number' => '+370 600 00 000',
     'support_email' => 'support@statybae.com',
     'building_supplies_marketplace' => 'Statybos medžiagų prekybos platforma',

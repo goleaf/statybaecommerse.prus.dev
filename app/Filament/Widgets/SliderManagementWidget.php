@@ -24,17 +24,14 @@ final class SliderManagementWidget extends BaseWidget
                 ->description(__('translations.all_sliders'))
                 ->descriptionIcon('heroicon-m-rectangle-stack')
                 ->color('primary'),
-            
             Stat::make(__('translations.active_sliders'), \Illuminate\Support\Number::format($activeSliders))
                 ->description(__('translations.currently_active'))
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            
             Stat::make(__('translations.inactive_sliders'), \Illuminate\Support\Number::format($inactiveSliders))
                 ->description(__('translations.currently_inactive'))
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
-            
             Stat::make(__('translations.recent_sliders'), \Illuminate\Support\Number::format($recentSliders))
                 ->description(__('translations.added_this_week'))
                 ->descriptionIcon('heroicon-m-clock')

@@ -12,8 +12,6 @@ return [
     'type' => 'Tipas',
     'all_types' => 'Visi tipai',
     'products' => 'Produktai',
-    'categories' => 'Kategorijos',
-    'brands' => 'Prekės ženklai',
     'filter' => 'Filtruoti',
     'no_title' => 'Nėra pavadinimo',
     'no_description' => 'Nėra aprašymo',

@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         $activityLogStatus = app(ActivityLogStatus::class);
         $wasLoggingDisabled = $activityLogStatus->disabled();
 
-        if (! $wasLoggingDisabled) {
+        if (!$wasLoggingDisabled) {
             activity()->disableLogging();
         }
 
@@ -85,7 +85,7 @@ class DatabaseSeeder extends Seeder
             SliderSeeder::class,
         ]);
 
-        if (! $wasLoggingDisabled) {
+        if (!$wasLoggingDisabled) {
             activity()->enableLogging();
         }
     }

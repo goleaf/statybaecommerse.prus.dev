@@ -24,7 +24,6 @@ return [
 
     // Helpers
     'full_display_name' => 'Pilnas rodymo pavadinimas',
-    'collection_info' => 'Kolekcijos informacija',
     'seo_info' => 'SEO informacija',
     'business_info' => 'Verslo informacija',
     'complete_info' => 'Pilna informacija',
@@ -71,7 +70,6 @@ return [
         'created' => 'Kolekcija sėkmingai sukurta',
         'updated' => 'Kolekcija sėkmingai atnaujinta',
         'deleted' => 'Kolekcija sėkmingai ištrinta',
-        'visibility_toggled' => 'Kolekcijos matomumas sėkmingai perjungtas',
         'products_managed' => 'Produktai sėkmingai sutvarkyti',
     ],
 
@@ -97,7 +95,6 @@ return [
         'visible_to_customers' => 'Matomos klientams',
         'auto_generated' => 'Automatiškai sugeneruotos kolekcijos',
         'manually_created' => 'Rankiniu būdu sukurtos kolekcijos',
-        'have_products' => 'Kolekcijos, kurios turi produktus',
         'average_products' => 'Vidutinis produktų skaičius',
     ],
 
@@ -105,7 +102,6 @@ return [
     'widgets' => [
         'stats_heading' => 'Kolekcijų statistika',
         'performance_heading' => 'Kolekcijų veikimas',
-        'products_heading' => 'Kolekcijos su produktais',
         'charts' => [
             'products_count' => 'Produktų skaičius',
         ],

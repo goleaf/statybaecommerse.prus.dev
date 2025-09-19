@@ -3,9 +3,6 @@
 return [
     'nav' => [
         'home' => 'Pradžia',
-        'categories' => 'Kategorijos',
-        'collections' => 'Kolekcijos',
-        'brands' => 'Prekės ženklai',
         'search' => 'Paieška',
         'cart' => 'Krepšelis',
         'admin' => 'Admin',

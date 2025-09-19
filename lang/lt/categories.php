@@ -3,9 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'title' => 'Kategorijos',
     'single' => 'Kategorija',
-    'plural' => 'Kategorijos',
 
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
@@ -94,14 +92,11 @@ return [
         'deleted' => 'Kategorija sėkmingai ištrinta',
         'restored' => 'Kategorija sėkmingai atkurta',
         'force_deleted' => 'Kategorija galutinai ištrinta',
-        'status_changed' => 'Kategorijos būsena pakeista',
         'featured_toggled' => 'Rekomendacijos būsena pakeista',
         'moved_up' => 'Kategorija perkelta aukštyn',
         'moved_down' => 'Kategorija perkelta žemyn',
         'products_attached' => 'Produktai pridėti prie kategorijos',
         'products_detached' => 'Produktai pašalinti iš kategorijos',
-        'exported' => 'Kategorijos sėkmingai eksportuotos',
-        'imported' => 'Kategorijos sėkmingai importuotos',
         'no_categories_found' => 'Kategorijų nerasta',
         'no_products_in_category' => 'Šioje kategorijoje nėra produktų',
         'cannot_delete_with_products' => 'Negalima ištrinti kategorijos su produktais',
@@ -127,7 +122,6 @@ return [
     ],
 
     'help' => [
-        'name' => 'Kategorijos pavadinimas, kuris bus rodomas vartotojams',
         'slug' => 'URL dalis, kuri bus naudojama adrese (pvz., /kategorijos/elektronika)',
         'description' => 'Išsamus kategorijos aprašymas su HTML formatavimu',
         'short_description' => 'Trumpas kategorijos aprašymas be HTML formatavimo',
@@ -146,8 +140,6 @@ return [
     ],
 
     'validation' => [
-        'name_required' => 'Kategorijos pavadinimas yra privalomas',
-        'name_max' => 'Kategorijos pavadinimas negali būti ilgesnis nei :max simbolių',
         'slug_required' => 'URL dalis yra privaloma',
         'slug_unique' => 'URL dalis jau egzistuoja',
         'slug_format' => 'URL dalis gali turėti tik raides, skaičius ir brūkšnelius',
@@ -173,7 +165,6 @@ return [
     ],
 
     'breadcrumbs' => [
-        'categories' => 'Kategorijos',
         'create' => 'Sukurti kategoriją',
         'edit' => 'Redaguoti kategoriją',
         'view' => 'Peržiūrėti kategoriją',
@@ -238,7 +229,6 @@ return [
     ],
 
     'preview' => [
-        'title' => 'Kategorijos peržiūra',
         'frontend_view' => 'Peržiūrėti svetainėje',
         'seo_preview' => 'SEO peržiūra',
         'mobile_preview' => 'Mobilioji peržiūra',

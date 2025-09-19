@@ -36,7 +36,7 @@ final class CountryResource extends Resource
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedGlobeAlt;
 
     public static function form(Form $form): Form
     {

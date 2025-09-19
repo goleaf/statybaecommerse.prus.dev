@@ -15,11 +15,6 @@ return [
 
     // Form Fields
     'category' => 'Kategorija',
-    'category_name' => 'Kategorijos pavadinimas',
-    'category_slug' => 'Kategorijos slug',
-    'category_description' => 'Kategorijos aprašymas',
-    'category_icon' => 'Kategorijos ikona',
-    'category_color' => 'Kategorijos spalva',
     'key' => 'Raktas',
     'key_help' => 'Unikalus nustatymo raktas (pvz., app.name)',
     'key_copied' => 'Raktas nukopijuotas',

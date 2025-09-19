@@ -114,12 +114,10 @@ return [
     // Navigation
     'home' => 'Pagrindinis',
     'brands' => 'Prekės ženklai',
-    'categories' => 'Kategorijos',
     'products' => 'Produktai',
     'all' => 'Visi',
     // Empty states
     'no_results_found' => 'Rezultatų nerasta',
     'clear_filters' => 'Išvalyti filtrus',
     'cart_empty_description' => 'Jūsų krepšelis tuščias. Pradėkite apsipirkimą, kad pridėtumėte prekių.',
-    'Support centre' => 'Pagalbos centras',
 ];

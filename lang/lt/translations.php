@@ -28,16 +28,12 @@ return [
         'explore_store_sections' => 'Tyrinėkite visus mūsų parduotuvės skyrius',
         'browse_categories_description' => 'Peržiūrėkite visą kategorijų sąrašą su vizualiais kortelėmis, kad greitai rastumėte reikiamus produktus.',
         'all_categories' => 'Visos kategorijos',
-        'collections_selections' => 'Kolekcijos ir parinktys',
-        'current_collections' => 'Aktualios kolekcijos su įkvėpimu ir paruoštais pasirinkimais',
-        'collections_description' => 'Kiekviena kolekcija suformuota vizualiai: rinkitės nuotaiką, sezoną ar stilių ir akimirksniu pereikite prie prekių.',
         'all_collections' => 'Visos kolekcijos',
     ],
     
     // Category page sidebar & controls
     'advanced_filters' => 'Išplėstiniai filtrai',
     'filters' => 'Filtrai',
-    'categories' => 'Kategorijos',
     'products' => 'Produktai',
     'newest' => 'Naujausi',
     'oldest' => 'Seniausi',
@@ -317,10 +313,6 @@ return [
     'coverage' => 'padengimas',
     'have_images' => 'turi paveikslėlių',
     // Category Information
-    'category_information' => 'Kategorijos informacija',
-    'category_images' => 'Kategorijos paveikslėliai',
-    'category_image' => 'Kategorijos paveikslėlis',
-    'category_banner' => 'Kategorijos baneris',
     'category_image_help' => 'Įkelkite kategorijos paveikslėlį. Bus automatiškai konvertuojamas į WebP formatą su keliais skyrų dydžiais.',
     'category_banner_help' => 'Įkelkite kategorijos banerį. Bus automatiškai konvertuojamas į WebP formatą su keliais skyrų dydžiais.',
     'parent_category' => 'Tėvinė kategorija',
@@ -330,8 +322,6 @@ return [
     'detach_child' => 'Atsieti',
     'bulk_detach' => 'Masinis atsiejimas',
     // Collection Information
-    'collection_information' => 'Kolekcijos informacija',
-    'collection_rules' => 'Kolekcijos taisyklės',
     'collection_rules_help' => 'JSON sąlygos automatinei kolekcijai',
     'max_products' => 'Maksimalus produktų skaičius',
     'max_products_help' => 'Maksimalus produktų skaičius šioje kolekcijoje (palikite tuščią neribotam skaičiui)',
@@ -589,16 +579,11 @@ return [
     'usage_limit_per_customer' => 'Limitas vienam klientui',
     'exclude_sale_items' => 'Neįskaičiuoti išpardavimo prekių',
     // Category Information
-    'category_information' => 'Kategorijos informacija',
-    'category_images' => 'Kategorijos paveikslėliai',
     'parent_category' => 'Tėvinė kategorija',
     'visible' => 'Matoma',
     // Collection Information
-    'collection_information' => 'Kolekcijos informacija',
-    'collection_rules' => 'Kolekcijos taisyklės',
     'automatic_collection' => 'Automatinė kolekcija',
     'manual_collection' => 'Rankinė kolekcija',
-    'collection_type' => 'Kolekcijos tipas',
     'conditions' => 'Sąlygos',
     // Order Information
     'order_information' => 'Užsakymo informacija',

@@ -12,11 +12,6 @@ return [
 
     // Form Fields
     'category' => 'Kategorija',
-    'category_name' => 'Kategorijos pavadinimas',
-    'category_slug' => 'Kategorijos slug',
-    'category_description' => 'Kategorijos aprašymas',
-    'category_icon' => 'Kategorijos ikona',
-    'category_color' => 'Kategorijos spalva',
     'key' => 'Raktas',
     'name' => 'Pavadinimas',
     'value' => 'Reikšmė',
@@ -120,7 +115,6 @@ return [
     'active_settings' => 'Aktyvūs nustatymai',
     'public_settings' => 'Vieši nustatymai',
     'encrypted_settings' => 'Šifruoti nustatymai',
-    'categories' => 'Kategorijos',
     'total_settings_description' => 'Bendras sistemos nustatymų skaičius',
     'active_settings_description' => 'Šiuo metu aktyvūs nustatymai',
     'public_settings_description' => 'Nustatymai, pasiekiami iš frontend',

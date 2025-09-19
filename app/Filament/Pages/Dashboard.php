@@ -23,6 +23,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            \App\Filament\Components\TopNavigation::class,
             // Only include concrete widget implementations, not abstract base classes
             // StatsOverviewWidget::class, // This is also abstract
             // ChartWidget::class, // This is abstract - cannot be instantiated

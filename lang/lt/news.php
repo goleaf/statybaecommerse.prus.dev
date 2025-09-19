@@ -4,7 +4,6 @@ return [
     'title' => 'Naujienos',
     'latest_news' => 'Naujausios naujienos',
     'featured_news' => 'Išskirtinės naujienos',
-    'categories' => 'Kategorijos',
     'tags' => 'Žymės',
     'author' => 'Autorius',
     'published_on' => 'Paskelbta',

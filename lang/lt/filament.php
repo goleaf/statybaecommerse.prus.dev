@@ -13,7 +13,6 @@ return [
         'sections' => [
             'basic_information' => 'Pagrindinė informacija',
             'translations' => 'Vertimai',
-            'categories_and_tags' => 'Kategorijos ir žymės',
             'images' => 'Paveikslėliai',
             'meta_data' => 'Meta duomenys',
         ],
@@ -32,7 +31,6 @@ return [
             'content' => 'Turinys',
             'seo_title' => 'SEO pavadinimas',
             'seo_description' => 'SEO aprašymas',
-            'categories' => 'Kategorijos',
             'tags' => 'Žymės',
             'images' => 'Paveikslėliai',
             'image_file' => 'Paveikslėlio failas',

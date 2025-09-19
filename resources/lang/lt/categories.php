@@ -2,9 +2,7 @@
 
 return [
     // Basic fields
-    'title' => 'Kategorijos',
     'single' => 'Kategorija',
-    'plural' => 'Kategorijos',
     'fields' => [
         'name' => 'Pavadinimas',
         'slug' => 'Slug',
@@ -92,8 +90,6 @@ return [
         'created' => 'Kategorija sėkmingai sukurta',
         'updated' => 'Kategorija sėkmingai atnaujinta',
         'deleted' => 'Kategorija sėkmingai ištrinta',
-        'status_changed' => 'Kategorijos būsena sėkmingai pakeista',
-        'featured_toggled' => 'Kategorijos išskirtinio statuso perjungimas sėkmingas',
         'no_categories_found' => 'Kategorijų nerasta',
         'create_first_category' => 'Sukurkite savo pirmąją kategoriją, kad pradėtumėte',
     ],
@@ -105,13 +101,6 @@ return [
 
     // Validation
     'validation' => [
-        'name_required' => 'Kategorijos pavadinimas yra privalomas',
-        'name_max' => 'Kategorijos pavadinimas negali viršyti 255 simbolių',
-        'slug_required' => 'Kategorijos slug yra privalomas',
-        'slug_unique' => 'Kategorijos slug turi būti unikalus',
-        'slug_alpha_dash' => 'Kategorijos slug gali turėti tik raides, skaičius, brūkšnelius ir pabraukimus',
-        'description_max' => 'Kategorijos aprašymas negali viršyti 1000 simbolių',
-        'short_description_max' => 'Kategorijos trumpas aprašymas negali viršyti 500 simbolių',
         'seo_title_max' => 'SEO pavadinimas negali viršyti 255 simbolių',
         'seo_description_max' => 'SEO aprašymas negali viršyti 500 simbolių',
         'seo_keywords_max' => 'SEO raktažodžiai negali viršyti 255 simbolių',
