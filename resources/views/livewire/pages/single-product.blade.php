@@ -84,7 +84,7 @@
                                     <div class="flex items-center gap-1">
                                         @for ($i = 1; $i <= 5; $i++)
                                             @php($starActive = $averageRating >= $i - 0.25)
-                                            <x-heroicon-s-star class="h-4 w-4 {{ $starActive ? 'text-amber-500' : 'text-slate-200' }}" />
+                                            <x-heroicon-o-star class="h-4 w-4 {{ $starActive ? 'text-amber-500' : 'text-slate-200' }}" />
                                         @endfor
                                         <span class="ml-2 font-semibold text-slate-700">{{ number_format($averageRating, 1) }}</span>
                                     </div>
@@ -153,7 +153,7 @@
                                     @foreach($this->attributeFeatures as $feature)
                                         <div class="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
                                             <div class="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm">
-                                                <x-heroicon-s-check-badge class="h-5 w-5 text-emerald-500" />
+                                                <x-heroicon-o-check-badge class="h-5 w-5 text-emerald-500" />
                                             </div>
                                             <div class="space-y-1">
                                                 <p class="text-sm font-semibold text-slate-900">{{ $feature['label'] }}</p>
@@ -206,7 +206,7 @@
                             <div class="flex flex-wrap items-center justify-between gap-4">
                                 <h2 class="text-lg font-semibold text-slate-900">{{ __('Change History Snapshot') }}</h2>
                                 <a href="{{ route('localized.products.history', ['locale' => app()->getLocale(), 'product' => $product->trans('slug') ?? $product->slug]) }}" class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700">
-                                    <x-heroicon-s-clock class="h-4 w-4" />
+                                    <x-heroicon-o-clock class="h-4 w-4" />
                                     {{ __('frontend.products.view_full_history') }}
                                 </a>
                             </div>
@@ -235,16 +235,16 @@
                                             <div class="flex items-center gap-2">
                                                 @switch($history->action)
                                                     @case('price_changed')
-                                                        <x-heroicon-s-currency-euro class="h-4 w-4 text-emerald-500" />
+                                                        <x-heroicon-o-currency-euro class="h-4 w-4 text-emerald-500" />
                                                         @break
                                                     @case('stock_updated')
-                                                        <x-heroicon-s-cube class="h-4 w-4 text-sky-500" />
+                                                        <x-heroicon-o-cube class="h-4 w-4 text-sky-500" />
                                                         @break
                                                     @case('status_changed')
-                                                        <x-heroicon-s-check-circle class="h-4 w-4 text-amber-500" />
+                                                        <x-heroicon-o-check-circle class="h-4 w-4 text-amber-500" />
                                                         @break
                                                     @default
-                                                        <x-heroicon-s-pencil class="h-4 w-4 text-slate-400" />
+                                                        <x-heroicon-o-pencil class="h-4 w-4 text-slate-400" />
                                                 @endswitch
                                                 <span class="font-medium text-slate-700">{{ __('frontend.events.' . $history->action) }}</span>
                                             </div>
@@ -313,7 +313,7 @@
                                     @foreach($product->documents as $document)
                                         <li class="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
                                             <div class="flex items-center gap-3">
-                                                <x-heroicon-s-document-text class="h-5 w-5 text-primary-500" />
+                                                <x-heroicon-o-document-text class="h-5 w-5 text-primary-500" />
                                                 <span class="font-medium text-slate-700">{{ $document->name }}</span>
                                             </div>
                                             <a href="{{ $document->url }}" target="_blank" rel="noopener" class="text-sm font-medium text-primary-600 hover:text-primary-700">
@@ -353,7 +353,7 @@
                             </div>
                             <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 text-sm text-slate-600">
                                 <p class="flex items-center gap-2 text-slate-700">
-                                    <x-heroicon-s-shield-check class="h-5 w-5 text-primary-500" />
+                                    <x-heroicon-o-shield-check class="h-5 w-5 text-primary-500" />
                                     {{ __('Original supplier certified quality guarantee.') }}
                                 </p>
                             </div>
@@ -404,7 +404,7 @@
                             <h2 class="text-base font-semibold text-slate-900">{{ __('Need a tailored offer?') }}</h2>
                             <p class="text-sm text-slate-600">{{ __('Contact our specialists for bulk pricing, project support, or technical consultations.') }}</p>
                             <a href="{{ $contactUrl }}" class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">
-                                <x-heroicon-s-phone class="mr-2 h-4 w-4" />
+                                <x-heroicon-o-phone class="mr-2 h-4 w-4" />
                                 {{ __('translations.contact_us') }}
                             </a>
                         </div>
