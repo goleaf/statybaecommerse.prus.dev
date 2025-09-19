@@ -1,23 +1,21 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
+use App\Models\StockMovement;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\StockMovement;
 
 /**
  * VariantInventory
- * 
+ *
  * Eloquent model representing the VariantInventory entity for variant stock management.
- * 
+ *
  * @property mixed $table
  * @property mixed $fillable
  * @property mixed $casts
@@ -33,7 +31,7 @@ final class VariantInventory extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'variant_inventories';
-    
+
     protected $fillable = [
         'variant_id',
         'location_id',
@@ -131,11 +129,11 @@ final class VariantInventory extends Model
         if ($this->is_out_of_stock) {
             return 'out_of_stock';
         }
-        
+
         if ($this->is_low_stock) {
             return 'low_stock';
         }
-        
+
         return 'in_stock';
     }
 
@@ -148,7 +146,7 @@ final class VariantInventory extends Model
         if ($this->stock <= 0) {
             return 0.0;
         }
-        
+
         return ($this->reserved / $this->stock) * 100;
     }
 
@@ -208,10 +206,10 @@ final class VariantInventory extends Model
         if ($this->available < $quantity) {
             return false;
         }
-        
+
         $this->reserved += $quantity;
         $this->available = $this->stock - $this->reserved;
-        
+
         return $this->save();
     }
 
@@ -225,10 +223,10 @@ final class VariantInventory extends Model
         if ($this->reserved < $quantity) {
             return false;
         }
-        
+
         $this->reserved -= $quantity;
         $this->available = $this->stock - $this->reserved;
-        
+
         return $this->save();
     }
 
@@ -242,7 +240,7 @@ final class VariantInventory extends Model
         $this->stock += $quantity;
         $this->available = $this->stock - $this->reserved;
         $this->last_restocked_at = now();
-        
+
         return $this->save();
     }
 
@@ -256,10 +254,10 @@ final class VariantInventory extends Model
         if ($this->stock < $quantity) {
             return false;
         }
-        
+
         $this->stock -= $quantity;
         $this->available = $this->stock - $this->reserved;
-        
+
         return $this->save();
     }
 
