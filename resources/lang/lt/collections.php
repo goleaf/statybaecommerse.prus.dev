@@ -21,7 +21,6 @@ return [
     'show_filters' => 'Rodyti filtrus',
     'image' => 'Paveikslėlis',
     'banner' => 'Baneris',
-
     // Helpers
     'full_display_name' => 'Pilnas rodymo pavadinimas',
     'seo_info' => 'SEO informacija',
@@ -31,7 +30,6 @@ return [
     'type' => 'Tipas',
     'automatic' => 'Automatinis',
     'manual' => 'Rankinis',
-
     // Filters
     'filters' => [
         'is_visible' => 'Matomumas',
@@ -42,7 +40,6 @@ return [
         'display_type' => 'Rodymo tipas',
         'show_filters' => 'Rodyti filtrus',
     ],
-
     // Actions
     'actions' => [
         'view' => 'Peržiūrėti',
@@ -51,20 +48,17 @@ return [
         'toggle_visibility' => 'Perjungti matomumą',
         'manage_products' => 'Tvarkyti produktus',
     ],
-
     // Confirmations
     'confirmations' => [
         'toggle_visibility' => 'Ar tikrai norite perjungti šios kolekcijos matomumą?',
         'delete' => 'Ar tikrai norite ištrinti šią kolekciją? Šis veiksmas negali būti atšauktas.',
     ],
-
     // Empty states
     'empty_states' => [
         'no_collections' => 'Kolekcijų nerasta',
         'no_products' => 'Šioje kolekcijoje nėra produktų',
         'no_translations' => 'Vertimų nėra',
     ],
-
     // Messages
     'messages' => [
         'created' => 'Kolekcija sėkmingai sukurta',
@@ -72,7 +66,6 @@ return [
         'deleted' => 'Kolekcija sėkmingai ištrinta',
         'products_managed' => 'Produktai sėkmingai sutvarkyti',
     ],
-
     // Validation
     'validation' => [
         'name_required' => 'Pavadinimas yra privalomas',
@@ -82,7 +75,6 @@ return [
         'max_products_numeric' => 'Maksimalus produktų skaičius turi būti skaičius',
         'sort_order_numeric' => 'Rūšiavimo tvarka turi būti skaičius',
     ],
-
     // Statistics
     'stats' => [
         'total_collections' => 'Iš viso kolekcijų',
@@ -97,7 +89,6 @@ return [
         'manually_created' => 'Rankiniu būdu sukurtos kolekcijos',
         'average_products' => 'Vidutinis produktų skaičius',
     ],
-
     // Widgets
     'widgets' => [
         'stats_heading' => 'Kolekcijų statistika',
@@ -106,26 +97,22 @@ return [
             'products_count' => 'Produktų skaičius',
         ],
     ],
-
     // Display types
     'display_types' => [
         'grid' => 'Tinklelis',
         'list' => 'Sąrašas',
         'carousel' => 'Karuselė',
     ],
-
     // Status
     'status' => [
         'visible' => 'Matomas',
         'hidden' => 'Paslėptas',
     ],
-
     // Types
     'types' => [
         'automatic' => 'Automatinis',
         'manual' => 'Rankinis',
     ],
-
     // Placeholders
     'placeholders' => [
         'name' => 'Įveskite kolekcijos pavadinimą',
@@ -137,7 +124,6 @@ return [
         'meta_description' => 'Įveskite meta aprašymą',
         'meta_keywords' => 'Įveskite meta raktažodžius (atskirtus kableliais)',
     ],
-
     // Help text
     'help' => [
         'slug' => 'URL draugiška pavadinimo versija',

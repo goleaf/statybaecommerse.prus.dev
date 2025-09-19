@@ -1,13 +1,11 @@
 <?php
 
 return [
-    
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
         'seo_settings' => 'SEO nustatymai',
         'media' => 'Medija',
     ],
-    
     'fields' => [
         'name' => 'Pavadinimas',
         'slug' => 'URL slug',
@@ -30,7 +28,6 @@ return [
         'image' => 'Paveikslėlis',
         'banner' => 'Baneris',
     ],
-    
     'placeholders' => [
         'name' => 'Įveskite kolekcijos pavadinimą',
         'slug' => 'kolekcijos-url',
@@ -41,7 +38,6 @@ return [
         'meta_description' => 'Meta aprašymas',
         'meta_keywords' => 'raktažodis1, raktažodis2, raktažodis3',
     ],
-    
     'help' => [
         'slug' => 'URL dalis, kuri bus naudojama kolekcijos puslapyje',
         'is_visible' => 'Ar kolekcija bus matoma klientams',
@@ -54,13 +50,11 @@ return [
         'products_per_page' => 'Kiek produktų rodyti viename puslapyje',
         'show_filters' => 'Ar rodyti filtrus kolekcijos puslapyje',
     ],
-    
     'display_types' => [
         'grid' => 'Tinklelis',
         'list' => 'Sąrašas',
         'carousel' => 'Karuselė',
     ],
-    
     'table' => [
         'name' => 'Pavadinimas',
         'slug' => 'URL slug',
@@ -76,7 +70,6 @@ return [
         'updated_at' => 'Atnaujinta',
         'image' => 'Paveikslėlis',
     ],
-    
     'filters' => [
         'is_visible' => 'Matomumas',
         'is_automatic' => 'Tipas',
@@ -86,17 +79,14 @@ return [
         'display_type' => 'Rodymo tipas',
         'show_filters' => 'Rodo filtrus',
     ],
-    
     'status' => [
         'visible' => 'Matoma',
         'hidden' => 'Paslėpta',
     ],
-    
     'types' => [
         'manual' => 'Rankinė',
         'automatic' => 'Automatinė',
     ],
-    
     'actions' => [
         'view' => 'Peržiūrėti',
         'edit' => 'Redaguoti',
@@ -104,12 +94,10 @@ return [
         'toggle_visibility' => 'Perjungti matomumą',
         'manage_products' => 'Valdyti produktus',
     ],
-    
     'confirmations' => [
         'toggle_visibility' => 'Ar tikrai norite pakeisti kolekcijos matomumą?',
         'delete' => 'Ar tikrai norite ištrinti šią kolekciją?',
     ],
-    
     'stats' => [
         'total_collections' => 'Iš viso kolekcijų',
         'all_collections' => 'Visos kolekcijos',
@@ -123,12 +111,9 @@ return [
         'avg_products_per_collection' => 'Vid. produktų per kolekciją',
         'average_products' => 'Vidutinis produktų skaičius',
     ],
-    
     'charts' => [
         'performance_heading' => 'Kolekcijų našumas',
         'products_count' => 'Produktų skaičius',
     ],
-    
-    'widgets' => [
-    ],
+    'widgets' => [],
 ];

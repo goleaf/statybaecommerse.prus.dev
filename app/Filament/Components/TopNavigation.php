@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class TopNavigation extends Widget
 {
-    protected static string $view = 'filament.components.top-navigation';
+    protected string $view = 'filament.components.top-navigation';
 
     protected int|string|array $columnSpan = 'full';
 

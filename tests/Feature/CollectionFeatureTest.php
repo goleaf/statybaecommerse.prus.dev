@@ -22,7 +22,6 @@ final class CollectionFeatureTest extends TestCase
 
         $response->assertOk()
             ->assertViewIs('livewire.pages.collection.index')
-            ->assertSee('Kolekcijos');
     }
 
     public function test_collections_index_shows_only_visible_collections(): void

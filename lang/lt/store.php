@@ -63,7 +63,6 @@ return [
             'manual' => 'manual',
         ],
     ],
-    
     // E-commerce specific translations from user content
     'check_availability' => 'Patikrinti prieinamumą',
     'fast_next_day_delivery' => 'Greitas pristatymas per dieną visoje Lietuvoje',
@@ -117,7 +116,6 @@ return [
     'time_5_04s' => '5.04s',
     'size_26mb' => '26MB',
     'get_account_orders' => 'GET account/orders',
-    
     // Newsletter specific translations
     'newsletter' => [
         'email_address' => 'El. pašto adresas',

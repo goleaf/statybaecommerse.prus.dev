@@ -2,23 +2,17 @@
 
 return [
     // Navigation
-    'navigation' => [
-        'label' => 'Prekių ženklai',
-    ],
-
+    'navigation' => [],
     // Model labels
     'model' => [
         'singular' => 'Prekių ženklas',
-        'plural' => 'Prekių ženklai',
     ],
-
     // Sections
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
         'seo' => 'SEO nustatymai',
         'translations' => 'Vertimai',
     ],
-
     // Fields
     'fields' => [
         'name' => 'Pavadinimas',
@@ -35,19 +29,16 @@ return [
         'created_at' => 'Sukurta',
         'updated_at' => 'Atnaujinta',
     ],
-
     // Helpers
     'helpers' => [
         'enabled' => 'Ar šis prekių ženklas yra aktyvus ir matomas',
         'seo_title' => 'Rekomenduojamas ilgis: 50-60 simbolių',
         'seo_description' => 'Rekomenduojamas ilgis: 150-160 simbolių',
     ],
-
     // Placeholders
     'placeholders' => [
         'no_website' => 'Nėra svetainės',
     ],
-
     // Actions
     'actions' => [
         'add_translation' => 'Pridėti vertimą',
@@ -58,7 +49,6 @@ return [
         'manage_translations' => 'Valdyti vertimus',
         'bulk_actions' => 'Masiniai veiksmai',
     ],
-
     // Filters
     'filters' => [
         'enabled_only' => 'Tik įjungti',
@@ -66,33 +56,25 @@ return [
         'has_translations' => 'Turi vertimų',
         'translation_locale' => 'Vertimo kalba',
     ],
-
     // Statistics
     'stats' => [
         'total_brands' => 'Iš viso prekių ženklų',
         'total_brands_description' => 'Visi sistemos prekių ženklai',
         'enabled_brands' => 'Įjungti prekių ženklai',
         'enabled_brands_description' => 'Aktyvūs ir matomi prekių ženklai',
-        'brands_with_products' => 'Prekių ženklai su produktais',
-        'brands_with_products_description' => 'Prekių ženklai, turintys produktų',
-        'brands_with_translations' => 'Prekių ženklai su vertimais',
-        'brands_with_translations_description' => 'Prekių ženklai su daugiakalbės palaikymu',
     ],
-
     // Widgets
     'widgets' => [
         'brand_overview' => 'Prekių ženklų apžvalga',
         'brand_performance' => 'Prekių ženklų veikla',
         'brand_analytics' => 'Prekių ženklų analitika',
     ],
-
     // Empty states
     'empty_states' => [
         'no_brands' => 'Prekių ženklų nerasta',
         'no_enabled_brands' => 'Nėra įjungtų prekių ženklų',
         'no_brands_with_products' => 'Nėra prekių ženklų su produktais',
     ],
-
     // Messages
     'messages' => [
         'created' => 'Prekių ženklas sėkmingai sukurtas',
@@ -101,7 +83,6 @@ return [
         'enabled' => 'Prekių ženklas sėkmingai įjungtas',
         'disabled' => 'Prekių ženklas sėkmingai išjungtas',
     ],
-
     // Validation
     'validation' => [
         'name_required' => 'Prekių ženklo pavadinimas yra privalomas',

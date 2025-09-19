@@ -1,11 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 return [
     // Brand
     'brand_name' => 'Logotipas',
-    
     // Navigation
     'navigation' => [
         'dashboard' => 'Valdymo skydas',
@@ -76,7 +73,6 @@ return [
         'in_stock' => 'Sandėlyje',
         'low_stock' => 'Mažos atsargos',
         'out_of_stock' => 'Nėra sandėlyje',
-
         // Report Types
         'types' => [
             'sales' => 'Pardavimai',
@@ -88,7 +84,6 @@ return [
             'marketing' => 'Rinkodara',
             'custom' => 'Pritaikytas',
         ],
-
         // Report Categories
         'categories' => [
             'sales' => 'Pardavimai',
@@ -99,7 +94,6 @@ return [
             'inventory' => 'Atsargos',
             'analytics' => 'Analitika',
         ],
-
         // Date Ranges
         'date_ranges' => [
             'today' => 'Šiandien',
@@ -110,7 +104,6 @@ return [
             'this_year' => 'Šie metai',
             'custom' => 'Pasirinkti laikotarpį',
         ],
-
         // Schedule Frequencies
         'schedule_frequencies' => [
             'daily' => 'Kasdien',
@@ -119,7 +112,6 @@ return [
             'quarterly' => 'Kas ketvirtį',
             'yearly' => 'Kasmet',
         ],
-
         // Fields
         'fields' => [
             'name' => 'Pavadinimas',
@@ -154,7 +146,6 @@ return [
             'metadata_value' => 'Metaduomenų reikšmė',
             'advanced_filters' => 'Išplėstiniai filtrai',
         ],
-
         // Filter Fields
         'filter_fields' => [
             'status' => 'Būsena',
@@ -163,7 +154,6 @@ return [
             'price_range' => 'Kainų intervalas',
             'date_range' => 'Datos intervalas',
         ],
-
         // Filter Operators
         'filter_operators' => [
             'equals' => 'Lygu',
@@ -174,7 +164,6 @@ return [
             'less_than' => 'Mažiau nei',
             'between' => 'Tarp',
         ],
-
         // Actions
         'actions' => [
             'generate' => 'Generuoti',
@@ -188,7 +177,6 @@ return [
             'add_setting' => 'Pridėti nustatymą',
             'add_metadata' => 'Pridėti metaduomenis',
         ],
-
         // Tabs
         'tabs' => [
             'all' => 'Visi',
@@ -201,7 +189,6 @@ return [
             'filters' => 'Filtrai',
             'settings' => 'Nustatymai',
         ],
-
         // Stats
         'stats' => [
             'total_reports' => 'Iš viso ataskaitų',
@@ -217,12 +204,10 @@ return [
             'total_downloads' => 'Iš viso atsisiuntimų',
             'total_downloads_description' => 'Bendras atsisiuntimų skaičius',
         ],
-
         // Charts
         'charts' => [
             'report_types' => 'Ataskaitų tipai',
         ],
-
         // Notifications
         'notifications' => [
             'generated' => 'Ataskaita sėkmingai sugeneruota',
@@ -890,7 +875,6 @@ return [
         'enable' => 'Įjungti',
         'disable' => 'Išjungti',
     ],
-
     // Actions
     'actions' => [
         'create' => 'Sukurti',
@@ -1024,7 +1008,6 @@ return [
             'deleted' => 'Krepšelio prekė sėkmingai ištrinta',
         ],
     ],
-
     // Models
     'models' => [
         'brand' => 'Prekės ženklas',
@@ -1102,7 +1085,6 @@ return [
         'seo_data' => 'SEO duomenys',
         'seo_entries' => 'SEO įrašai',
     ],
-
     // SEO Data
     'seo_data' => [
         'title' => 'SEO duomenys',
@@ -1316,7 +1298,6 @@ return [
             'is_default' => 'Pagrindinės valiutos būsena',
         ],
     ],
-
     // Sections
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
@@ -1330,7 +1311,6 @@ return [
         'request_details' => 'Užklausos detalės',
         'analytics_settings' => 'Analitikos nustatymai',
     ],
-
     // Helpers
     'helpers' => [
         'requestable' => 'Pažymėkite, jei šis produktas reikalauja užklausos prieš pirkimą',
@@ -1338,7 +1318,6 @@ return [
         'minimum_quantity' => 'Minimalus kiekis, kuris turi būti užsakytas',
         'request_message' => 'Pranešimas, kuris bus rodomas klientams apie užklausos reikalavimą',
     ],
-
     // Status
     'status' => [
         'pending' => 'Laukiantis',
@@ -1347,7 +1326,6 @@ return [
         'cancelled' => 'Atšauktas',
         'unknown' => 'Nežinomas',
     ],
-
     // Actions
     'actions' => [
         'mark_requestable' => 'Pažymėti kaip užsakomą',
@@ -1356,7 +1334,6 @@ return [
         'mark_completed' => 'Pažymėti kaip užbaigtą',
         'mark_cancelled' => 'Pažymėti kaip atšauktą',
     ],
-
     // Filters
     'filters' => [
         'visible_only' => 'Tik matomi',
@@ -1364,13 +1341,11 @@ return [
         'with_requests' => 'Su užklausomis',
         'needs_restocking' => 'Reikia papildyti atsargas',
     ],
-
     // Models
     'models' => [
         'product_request' => 'Produkto užklausa',
         'product_requests' => 'Produkto užklausos',
     ],
-
     // News
     'news' => [
         'title' => 'Naujienos',
@@ -1548,7 +1523,6 @@ return [
             ],
         ],
     ],
-
     // Search Insights Widget
     'search_insights' => 'Paieškos įžvalgos',
     'enter_search_query' => 'Įveskite paieškos užklausą...',

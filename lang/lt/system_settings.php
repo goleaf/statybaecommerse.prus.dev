@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 return [
     // Navigation and Labels
@@ -9,7 +7,6 @@ return [
     'plural_model_label' => 'Sistemos nustatymai',
     'setting' => 'Nustatymas',
     'settings' => 'Nustatymai',
-
     // Form Fields
     'category' => 'Kategorija',
     'key' => 'Raktas',
@@ -32,7 +29,6 @@ return [
     'sort_order' => 'Rūšiavimo tvarka',
     'updated_by' => 'Atnaujino',
     'updated_at' => 'Atnaujinta',
-
     // Groups
     'general' => 'Bendri',
     'ecommerce' => 'E-parduotuvė',
@@ -44,7 +40,6 @@ return [
     'api' => 'API',
     'appearance' => 'Išvaizda',
     'notifications' => 'Pranešimai',
-
     // Types
     'string' => 'Tekstas',
     'text' => 'Ilgas tekstas',
@@ -58,7 +53,6 @@ return [
     'color' => 'Spalva',
     'date' => 'Data',
     'datetime' => 'Data ir laikas',
-
     // Form Sections
     'setting_information' => 'Nustatymo informacija',
     'value_configuration' => 'Reikšmės konfigūracija',
@@ -70,7 +64,6 @@ return [
     'display_settings' => 'Rodymo nustatymai',
     'value_configuration' => 'Reikšmės konfigūracija',
     'advanced_options' => 'Papildomi nustatymai',
-
     // Actions
     'create_setting' => 'Sukurti nustatymą',
     'save_settings' => 'Išsaugoti nustatymus',
@@ -78,7 +71,6 @@ return [
     'export_settings' => 'Eksportuoti nustatymus',
     'import_settings' => 'Importuoti nustatymus',
     'reset_to_default' => 'Atkurti į numatytąją',
-
     // Messages
     'setting_created' => 'Nustatymas sėkmingai sukurtas',
     'setting_updated' => 'Nustatymas sėkmingai atnaujintas',
@@ -89,14 +81,12 @@ return [
     'key_copied' => 'Raktas nukopijuotas į iškarpinę',
     'export_success' => 'Nustatymai sėkmingai eksportuoti',
     'import_success' => 'Nustatymai sėkmingai importuoti',
-
     // Errors
     'save_error' => 'Klaida išsaugant nustatymus',
     'reset_error' => 'Klaida atkuriant nustatymus',
     'export_error' => 'Klaida eksportuojant nustatymus',
     'import_error' => 'Klaida importuojant nustatymus',
     'invalid_import_file' => 'Netinkamas importo failo formatas',
-
     // Help Text
     'key_help' => 'Naudokite tik mažąsias raides, skaičius, pabraukimus ir taškus',
     'type_help' => 'Duomenų tipas šiam nustatymui',
@@ -109,7 +99,6 @@ return [
     'options_help' => 'Parinktys select tipo nustatymams',
     'default_value_help' => 'Numatytoji reikšmė, kai nustatymas nėra nustatytas',
     'help_text_help' => 'Papildomas pagalbos tekstas vartotojams',
-
     // Stats
     'total_settings' => 'Iš viso nustatymų',
     'active_settings' => 'Aktyvūs nustatymai',
@@ -120,7 +109,6 @@ return [
     'public_settings_description' => 'Nustatymai, pasiekiami iš frontend',
     'encrypted_settings_description' => 'Nustatymai su užšifruotomis reikšmėmis',
     'categories_description' => 'Nustatymų kategorijų skaičius',
-
     // Activity
     'recent_activity' => 'Naujausi veiksmai',
     'old_value' => 'Sena reikšmė',
@@ -128,34 +116,27 @@ return [
     'changed_by' => 'Keitė',
     'change_reason' => 'Keitimo priežastis',
     'changed_at' => 'Keista',
-
     // Overview
     'settings_overview' => 'Nustatymų apžvalga',
     'by_categories' => 'Pagal kategorijas',
     'by_types' => 'Pagal tipus',
     'by_groups' => 'Pagal grupes',
     'settings_count' => 'Nustatymų skaičius',
-
     // Confirmations
     'reset_confirm' => 'Atkurti nustatymus',
     'reset_description' => 'Ar tikrai norite atkurti visus nustatymus į numatytąsias reikšmes? Šis veiksmas negali būti atšauktas.',
     'reset_to_default_confirm' => 'Atkurti į numatytąją',
     'reset_to_default_description' => 'Ar tikrai norite atkurti šį nustatymą į numatytąją reikšmę?',
-
     // Import/Export
     'import_file' => 'Importo failas',
     'export_file' => 'Eksporto failas',
-
     // All Settings Tabs
     'all_settings' => 'Visi nustatymai',
-
     // Not Set
     'not_set' => 'Nenustatyta',
-
     // Yes/No
     'yes' => 'Taip',
     'no' => 'Ne',
-
     // Widget Labels
     'widgets' => [
         'settings_overview' => 'Nustatymų apžvalga',
@@ -169,7 +150,6 @@ return [
         'settings_stats' => 'Nustatymų statistika',
         'category_stats' => 'Kategorijų statistika',
     ],
-
     // Frontend Labels
     'frontend' => [
         'title' => 'Sistemos nustatymai',
@@ -198,7 +178,6 @@ return [
         'is_readonly_label' => 'Tik skaitymui',
         'is_active_label' => 'Aktyvus nustatymas',
     ],
-
     // API Labels
     'api' => [
         'title' => 'Sistemos nustatymų API',
@@ -218,7 +197,6 @@ return [
         'create_setting' => 'Sukurti nustatymą',
         'delete_setting' => 'Ištrinti nustatymą',
     ],
-
     // Advanced Features
     'advanced' => [
         'bulk_operations' => 'Masinės operacijos',
@@ -248,7 +226,6 @@ return [
         'revert_changes' => 'Atšaukti pakeitimus',
         'changes_reverted' => 'Pakeitimai atšaukti',
     ],
-
     // Validation Messages
     'validation' => [
         'key_required' => 'Raktas yra privalomas',
@@ -269,7 +246,6 @@ return [
         'setting_inactive' => 'Nustatymas yra neaktyvus',
         'permission_denied' => 'Nėra teisių atlikti šį veiksmą',
     ],
-
     // Status Messages
     'status' => [
         'active' => 'Aktyvus',

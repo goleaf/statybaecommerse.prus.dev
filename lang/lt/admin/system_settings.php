@@ -1,18 +1,14 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 return [
     // Navigation and Labels
     'navigation_label' => 'Sistemos nustatymai',
     'model_label' => 'Sistemos nustatymas',
     'plural_model_label' => 'Sistemos nustatymai',
-
     // Form Sections
     'setting_information' => 'Nustatymo informacija',
     'value_configuration' => 'Reikšmės konfigūracija',
     'advanced_options' => 'Papildomi nustatymai',
-
     // Form Fields
     'category' => 'Kategorija',
     'key' => 'Raktas',
@@ -38,7 +34,6 @@ return [
     'validation_rules_help' => 'Laravel validacijos taisyklės (pvz., min:1, max:100)',
     'validation_message' => 'Validacijos pranešimas',
     'validation_message_help' => 'Pritaikytas validacijos klaidos pranešimas',
-
     // Advanced Fields
     'placeholder' => 'Vietos žymeklis',
     'placeholder_help' => 'Tekstas, kuris rodomas tuščiame lauke',
@@ -48,7 +43,6 @@ return [
     'metadata_key' => 'Metaduomenų raktas',
     'metadata_value' => 'Metaduomenų reikšmė',
     'metadata_help' => 'Papildomi metaduomenys JSON formatu',
-
     // Status Fields
     'is_public' => 'Viešas',
     'is_public_help' => 'Ar nustatymas gali būti pasiekiamas viešai',
@@ -62,7 +56,6 @@ return [
     'is_active_help' => 'Ar nustatymas yra aktyvus',
     'is_cacheable' => 'Talpinamas',
     'is_cacheable_help' => 'Ar nustatymas gali būti talpinamas',
-
     // Cache and Environment
     'cache_ttl' => 'Talpyklos laikas',
     'cache_ttl_help' => 'Talpyklos laikas sekundėmis',
@@ -72,7 +65,6 @@ return [
     'production' => 'Gamybos',
     'staging' => 'Testavimo',
     'development' => 'Plėtros',
-
     // Additional Fields
     'tags' => 'Žymės',
     'tags_help' => 'Žymės nustatymo kategorizavimui',
@@ -80,17 +72,14 @@ return [
     'version_help' => 'Nustatymo versija',
     'access_count' => 'Prieigos skaičius',
     'last_accessed_at' => 'Paskutinė prieiga',
-
     // Table Columns
     'updated_by' => 'Atnaujino',
     'updated_at' => 'Atnaujinta',
-
     // Filters
     'has_dependencies' => 'Turi priklausomybių',
     'has_dependents' => 'Turi priklausančių',
     'recently_updated' => 'Neseniai atnaujinta',
     'frequently_accessed' => 'Dažnai naudojama',
-
     // Actions
     'view_history' => 'Žiūrėti istoriją',
     'view_dependencies' => 'Žiūrėti priklausomybes',
@@ -99,7 +88,6 @@ return [
     'activate_selected' => 'Aktyvuoti pasirinktus',
     'deactivate_selected' => 'Deaktyvuoti pasirinktus',
     'export_selected' => 'Eksportuoti pasirinktus',
-
     // Widgets
     'total_settings' => 'Iš viso nustatymų',
     'active_settings' => 'Aktyvūs nustatymai',
@@ -113,7 +101,6 @@ return [
     'settings_by_group' => 'Nustatymai pagal grupę',
     'recent_activity' => 'Neseniai atlikti veiksmai',
     'settings_by_category' => 'Nustatymai pagal kategoriją',
-
     // History
     'change_type' => 'Pakeitimo tipas',
     'old_value' => 'Sena reikšmė',
@@ -121,13 +108,11 @@ return [
     'reason' => 'Priežastis',
     'changed_by' => 'Pakeitė',
     'changed_at' => 'Pakeista',
-
     // Dependencies
     'dependencies' => 'Priklausomybės',
     'dependents' => 'Priklausantys',
     'condition' => 'Sąlyga',
     'condition_value' => 'Sąlygos reikšmė',
-
     // Common
     'yes' => 'Taip',
     'no' => 'Ne',

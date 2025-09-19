@@ -14,7 +14,7 @@ final class EmailMarketingPage extends Page
     // /** @var BackedEnum|string|null */
     // protected static $navigationIcon = 'heroicon-o-envelope-open';
 
-    protected static string $view = 'filament.pages.email-marketing-page';
+    protected string $view = 'filament.pages.email-marketing-page';
 
 
     protected static ?int $navigationSort = 3;

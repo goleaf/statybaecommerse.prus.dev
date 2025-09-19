@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 return [
     // Home page translations
@@ -30,7 +28,6 @@ return [
         'all_categories' => 'Visos kategorijos',
         'all_collections' => 'Visos kolekcijos',
     ],
-    
     // Category page sidebar & controls
     'advanced_filters' => 'Išplėstiniai filtrai',
     'filters' => 'Filtrai',
@@ -54,7 +51,6 @@ return [
     'address_type_home_description' => 'Namų adresas',
     'address_type_work_description' => 'Darbo adresas',
     'address_type_other_description' => 'Kitas adresas',
-
     // Payment Types
     'payment_type_stripe' => 'Stripe',
     'payment_type_notch_pay' => 'NotchPay',
@@ -64,7 +60,6 @@ return [
     'payment_type_cash_description' => 'Mokėjimas grynaisiais',
     'payment_processing_instant' => 'Momentinis',
     'payment_processing_immediate' => 'Nedelsiant',
-
     // Order Status
     'order_status_pending' => 'Laukiantis',
     'order_status_confirmed' => 'Patvirtintas',
@@ -75,7 +70,6 @@ return [
     'order_status_refunded' => 'Grąžintas',
     'order_status_partially_refunded' => 'Dalinai grąžintas',
     'order_status_failed' => 'Nepavyko',
-
     // Confirmation Messages
     'confirm_remove_cart_item' => 'Ar tikrai norite pašalinti šį elementą iš krepšelio?',
     'confirm_clear_cart' => 'Ar tikrai norite išvalyti visą krepšelį?',
@@ -144,7 +138,6 @@ return [
     'order_status_partially_refunded_description' => 'Užsakymas dalinai grąžintas',
     'order_status_failed_description' => 'Užsakymas nepavyko',
     'order_status_on_hold_description' => 'Užsakymas sulaikytas',
-
     // Product Status
     'product_status_draft' => 'Juodraštis',
     'product_status_active' => 'Aktyvus',
@@ -162,7 +155,6 @@ return [
     'product_status_archived_description' => 'Produktas archyvuotas',
     'product_status_pending_review_description' => 'Produktas laukia peržiūros',
     'product_status_rejected_description' => 'Produktas atmestas',
-
     // User Roles
     'user_role_super_admin' => 'Super administratorius',
     'user_role_admin' => 'Administratorius',
@@ -176,7 +168,6 @@ return [
     'user_role_editor_description' => 'Turinio redagavimo teisės',
     'user_role_customer_description' => 'Kliento teisės',
     'user_role_guest_description' => 'Svečio teisės',
-
     // Navigation Groups
     'nav_group_referral' => 'Referral sistema',
     'nav_group_products' => 'Produktai',
@@ -360,7 +351,6 @@ return [
     'campaign_description' => 'Kampanijos aprašymas',
     'campaign_content' => 'Kampanijos turinys',
     'campaign_settings' => 'Kampanijos nustatymai',
-
     // Campaign translations
     'campaigns' => [
         'navigation' => [
@@ -875,10 +865,8 @@ return [
     'this_month' => 'Šį mėnesį',
     // Brands
     'brands' => 'Prekės ženklai',
-
     // Additional translations for attributes
     'updated_at' => 'Atnaujinta',
-    
     // Attribute specific translations
     'attributes' => 'Atributai',
     'attribute' => 'Atributas',
@@ -970,7 +958,6 @@ return [
     'searchable_only' => 'Tik ieškomi',
     'enabled_only' => 'Tik įjungti',
     'with_values_only' => 'Tik su reikšmėmis',
-    
     // Address specific translations
     'add_new_address' => 'Pridėti naują adresą',
     'address_type' => 'Adreso tipas',
@@ -1094,7 +1081,6 @@ return [
     'add_metadata' => 'Pridėti metaduomenis',
     'active_only' => 'Tik aktyvūs',
     'inactive_only' => 'Tik neaktyvūs',
-    
     // Navigation and UI translations
     'logo' => 'Logotipas',
     'global_search' => 'Globali paieška',
@@ -1105,7 +1091,6 @@ return [
     'recommendation_system' => 'Rekomendacijų sistema',
     'recommendation_system_management' => 'Rekomendacijų sistemos valdymas',
     'content_management' => 'Turinio valdymas',
-    
     // System management translations
     'clear_cache' => 'Išvalyti kešą',
     'optimize_system' => 'Optimizuoti sistemą',
@@ -1124,7 +1109,6 @@ return [
     'total_requests' => 'Iš viso užklausų',
     'avg_ctr' => 'Vid. CTR',
     'avg_conversion' => 'Vid. konversija',
-    
     // Recommendation block names
     'related_products' => 'Susiję produktai',
     'you_might_also_like' => 'Jums gali patikti',
@@ -1134,14 +1118,12 @@ return [
     'customers_also_bought' => 'Klientai taip pat pirko',
     'complete_your_purchase' => 'Užbaikite pirkimą',
     'upgrade_your_choice' => 'Pagerinkite savo pasirinkimą',
-    
     // Quick actions
     'quick_actions' => 'Greiti veiksmai',
     'clear_recommendation_cache' => 'Išvalyti rekomendacijų kešą',
     'optimize_recommendation_system' => 'Optimizuoti rekomendacijų sistemą',
     'manage_configurations' => 'Valdyti konfigūracijas',
     'system_information' => 'Sistemos informacija',
-    
     // Available algorithms
     'available_algorithms' => 'Galimi algoritmai',
     'content_based_filtering' => 'Turinio pagrindu filtravimas',
@@ -1151,7 +1133,6 @@ return [
     'trending_products' => 'Populiarėjantys produktai',
     'cross_sell' => 'Kryžminis pardavimas',
     'up_sell' => 'Papildomas pardavimas',
-    
     // Features
     'features' => 'Funkcijos',
     'realtime_caching' => 'Realiuoju laiku kešavimas',
@@ -1160,13 +1141,11 @@ return [
     'ab_testing_support' => 'A/B testavimo palaikymas',
     'dynamic_algorithm_weights' => 'Dinaminiai algoritmo svoriai',
     'multilanguage_support' => 'Daugiakalbis palaikymas',
-    
     // System information
     'php_version' => 'PHP versija',
     'response_time' => 'Atsako laikas',
     'memory_usage' => 'Atminties naudojimas',
     'request_method' => 'Užklausos metodas',
-    
     // Cache and optimization messages
     'cache_cleared_successfully' => 'Kešas sėkmingai išvalytas',
     'cache_clear_failed' => 'Kešo išvalymas nepavyko',

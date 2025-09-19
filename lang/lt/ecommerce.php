@@ -240,7 +240,6 @@ return [
     'guest' => 'Svečias',
     'order_created_from' => 'Užsakymas sukurtas nuo',
     'order_created_until' => 'Užsakymas sukurtas iki',
-    
     // Additional product page translations
     'related_products' => 'Susiję produktai',
     'related_products_description' => 'Produktai, kurie gali jus sudominti',

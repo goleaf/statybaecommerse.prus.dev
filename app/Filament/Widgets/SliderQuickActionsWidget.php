@@ -22,7 +22,7 @@ final class SliderQuickActionsWidget extends Widget implements HasForms, HasActi
 {
     use InteractsWithActions, InteractsWithForms;
 
-    protected static string $view = 'filament.widgets.slider-quick-actions';
+    protected string $view = 'filament.widgets.slider-quick-actions';
     protected int|string|array $columnSpan = 'full';
 
     public function createSliderAction(): Action

@@ -1,25 +1,22 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Grid;
-use Filament\Schemas\Schema;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Schema;
 
 class EditProfile extends BaseEditProfile
 {
-
     public function form(Schema $schema): Schema
     {
         return $schema
@@ -33,24 +30,20 @@ class EditProfile extends BaseEditProfile
                                     ->label(__('admin.profile.first_name'))
                                     ->maxLength(255)
                                     ->required(),
-
                                 TextInput::make('last_name')
                                     ->label(__('admin.profile.last_name'))
                                     ->maxLength(255)
                                     ->required(),
                             ]),
-
                         TextInput::make('email')
                             ->label(__('admin.profile.email'))
                             ->email()
                             ->required()
                             ->unique(ignoreRecord: true),
-
                         TextInput::make('phone_number')
                             ->label(__('admin.profile.phone_number'))
                             ->tel()
                             ->maxLength(20),
-
                         Select::make('gender')
                             ->label(__('admin.profile.gender'))
                             ->options([
@@ -59,12 +52,10 @@ class EditProfile extends BaseEditProfile
                                 'other' => __('admin.gender.other'),
                             ])
                             ->native(false),
-
                         DatePicker::make('birth_date')
                             ->label(__('admin.profile.birth_date'))
                             ->displayFormat('Y-m-d')
                             ->maxDate(now()),
-
                         FileUpload::make('avatar_url')
                             ->label(__('admin.profile.avatar'))
                             ->image()
@@ -76,30 +67,25 @@ class EditProfile extends BaseEditProfile
                             ->visibility('public'),
                     ])
                     ->columns(2),
-
                 Section::make(__('admin.profile.professional_information'))
                     ->description(__('admin.profile.professional_information_description'))
                     ->components([
                         TextInput::make('company')
                             ->label(__('admin.profile.company'))
                             ->maxLength(255),
-
                         TextInput::make('position')
                             ->label(__('admin.profile.position'))
                             ->maxLength(255),
-
                         TextInput::make('website')
                             ->label(__('admin.profile.website'))
                             ->url()
                             ->maxLength(255),
-
                         Textarea::make('bio')
                             ->label(__('admin.profile.bio'))
                             ->maxLength(1000)
                             ->rows(3),
                     ])
                     ->columns(2),
-
                 Section::make(__('admin.profile.preferences'))
                     ->description(__('admin.profile.preferences_description'))
                     ->components([
@@ -111,7 +97,6 @@ class EditProfile extends BaseEditProfile
                             ])
                             ->native(false)
                             ->required(),
-
                         Select::make('timezone')
                             ->label(__('admin.profile.timezone'))
                             ->options([
@@ -122,17 +107,14 @@ class EditProfile extends BaseEditProfile
                             ])
                             ->native(false)
                             ->default('Europe/Vilnius'),
-
                         Toggle::make('accepts_marketing')
                             ->label(__('admin.profile.accepts_marketing'))
                             ->default(false),
-
                         Toggle::make('two_factor_enabled')
                             ->label(__('admin.profile.two_factor_enabled'))
                             ->default(false),
                     ])
                     ->columns(2),
-
                 Section::make(__('admin.profile.security'))
                     ->description(__('admin.profile.security_description'))
                     ->components([
@@ -140,15 +122,14 @@ class EditProfile extends BaseEditProfile
                             ->label(__('admin.profile.new_password'))
                             ->password()
                             ->minLength(8)
-                            ->dehydrated(fn ($state) => filled($state))
-                            ->required(fn (string $context): bool => $context === 'create')
+                            ->dehydrated(fn($state) => filled($state))
+                            ->required(fn(string $context): bool => $context === 'create')
                             ->same('passwordConfirmation')
                             ->validationAttribute(__('admin.profile.new_password')),
-
                         TextInput::make('passwordConfirmation')
                             ->label(__('admin.profile.confirm_password'))
                             ->password()
-                            ->required(fn (string $context): bool => $context === 'create')
+                            ->required(fn(string $context): bool => $context === 'create')
                             ->dehydrated(false),
                     ])
                     ->columns(2),

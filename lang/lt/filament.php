@@ -5,18 +5,15 @@ return [
         'content_management' => 'Turinio valdymas',
         'news' => 'Naujienos',
     ],
-
     'news' => [
         'model_label' => 'Naujiena',
         'plural_model_label' => 'Naujienos',
-
         'sections' => [
             'basic_information' => 'Pagrindinė informacija',
             'translations' => 'Vertimai',
             'images' => 'Paveikslėliai',
             'meta_data' => 'Meta duomenys',
         ],
-
         'fields' => [
             'author_name' => 'Autoriaus vardas',
             'author_email' => 'Autoriaus el. paštas',
@@ -45,7 +42,6 @@ return [
             'view_count' => 'Peržiūrų skaičius',
             'created_at' => 'Sukurta',
         ],
-
         'filters' => [
             'published_at' => 'Paskelbimo data',
             'published_from' => 'Paskelbta nuo',
@@ -54,7 +50,6 @@ return [
             'view_count_from' => 'Peržiūrų skaičius nuo',
             'view_count_to' => 'Peržiūrų skaičius iki',
         ],
-
         'actions' => [
             'duplicate' => 'Kopijuoti',
             'mark_visible' => 'Pažymėti kaip matomą',

@@ -27,7 +27,6 @@ return [
         'created_at' => 'Sukurta',
         'updated_at' => 'Atnaujinta',
     ],
-
     // Sections
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
@@ -35,14 +34,12 @@ return [
         'media' => 'Medija',
         'hierarchy' => 'Kategorijų hierarchija',
     ],
-
     // Tabs
     'tabs' => [
         'translations' => 'Vertimai',
         'lithuanian' => 'Lietuvių',
         'english' => 'Anglų',
     ],
-
     // Filters
     'filters' => [
         'is_enabled' => 'Įjungta',
@@ -67,7 +64,6 @@ return [
         'has_seo' => 'Turi SEO',
         'root_categories' => 'Pagrindinės kategorijos',
     ],
-
     // Actions
     'actions' => [
         'translate' => 'Versti',
@@ -77,14 +73,12 @@ return [
         'disable_selected' => 'Išjungti pasirinktus',
         'feature_selected' => 'Išskirti pasirinktus',
     ],
-
     // Bulk Actions
     'bulk_actions' => [
         'enable_selected' => 'Įjungti pasirinktus',
         'disable_selected' => 'Išjungti pasirinktus',
         'feature_selected' => 'Išskirti pasirinktus',
     ],
-
     // Messages
     'messages' => [
         'created' => 'Kategorija sėkmingai sukurta',
@@ -93,12 +87,10 @@ return [
         'no_categories_found' => 'Kategorijų nerasta',
         'create_first_category' => 'Sukurkite savo pirmąją kategoriją, kad pradėtumėte',
     ],
-
     // Help
     'help' => [
         'create_first_category' => 'Sukurkite savo pirmąją kategoriją, kad organizuotumėte savo produktus',
     ],
-
     // Validation
     'validation' => [
         'seo_title_max' => 'SEO pavadinimas negali viršyti 255 simbolių',
