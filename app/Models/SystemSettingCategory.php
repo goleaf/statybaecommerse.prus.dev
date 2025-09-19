@@ -37,7 +37,7 @@ final class SystemSettingCategory extends Model
      */
     public function getSlugOptions(): SlugOptions
     {
-        return SlugOptions::create()->generateSlugsFrom('name')->saveSlugsTo('slug')->doNotGenerateSlugsWhenUpdating();
+        return SlugOptions::create()->generateSlugsFrom('name')->saveSlugsTo('slug');
     }
     /**
      * Handle getActivitylogOptions functionality with proper error handling.

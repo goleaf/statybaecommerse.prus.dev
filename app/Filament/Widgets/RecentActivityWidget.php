@@ -83,23 +83,23 @@ class RecentActivityWidget extends BaseWidget
             ->poll('30s');
     }
 
-    protected function getTableQuery(): Builder
+    public function getTableQuery(): Builder
     {
-        // Get recent orders
+        // Get recent orders - SQLite compatible
         $recentOrders = Order::selectRaw("
             'Order' as type,
-            CONCAT('Order #', id) as title,
-            CONCAT('Total: €', FORMAT(total, 2), ' - Status: ', status) as description,
+            'Order #' || id as title,
+            'Total: €' || printf('%.2f', total) || ' - Status: ' || status as description,
             status,
             created_at,
             updated_at
         ")->where('created_at', '>=', Carbon::now()->subDays(7));
 
-        // Get recent products
+        // Get recent products - SQLite compatible
         $recentProducts = Product::selectRaw("
             'Product' as type,
             name as title,
-            CONCAT('SKU: ', COALESCE(sku, 'N/A'), ' - Price: €', FORMAT(price, 2)) as description,
+            'SKU: ' || COALESCE(sku, 'N/A') || ' - Price: €' || printf('%.2f', price) as description,
             CASE 
                 WHEN is_visible = 1 THEN 'active'
                 ELSE 'inactive'
@@ -108,11 +108,11 @@ class RecentActivityWidget extends BaseWidget
             updated_at
         ")->where('created_at', '>=', Carbon::now()->subDays(7));
 
-        // Get recent users
+        // Get recent users - SQLite compatible
         $recentUsers = User::selectRaw("
             'User' as type,
-            CONCAT(first_name, ' ', last_name) as title,
-            CONCAT('Email: ', email, ' - Role: ', COALESCE(role, 'user')) as description,
+            first_name || ' ' || last_name as title,
+            'Email: ' || email as description,
             CASE 
                 WHEN is_active = 1 THEN 'active'
                 ELSE 'inactive'
@@ -121,47 +121,35 @@ class RecentActivityWidget extends BaseWidget
             updated_at
         ")->where('created_at', '>=', Carbon::now()->subDays(7));
 
-        // Get recent reviews
+        // Get recent reviews - SQLite compatible
         $recentReviews = Review::selectRaw("
             'Review' as type,
-            CONCAT('Review for Product #', product_id) as title,
-            CONCAT('Rating: ', rating, '/5 - ', COALESCE(SUBSTRING(comment, 1, 50), 'No comment')) as description,
+            'Review for Product #' || product_id as title,
+            'Rating: ' || rating || '/5 - ' || COALESCE(substr(content, 1, 50), 'No content') as description,
             CASE 
                 WHEN is_approved = 1 THEN 'approved'
                 ELSE 'pending'
             END as status,
             created_at,
             updated_at
-        ")->where('created_at', '>=', Carbon::now()->subDays(7));
+        ")->where('created_at', '>=', Carbon::now()->subDays(7))
+        ->where('is_approved', true);
 
-        // Get recent campaigns
+        // Get recent campaigns - SQLite compatible
         $recentCampaigns = Campaign::selectRaw("
             'Campaign' as type,
             name as title,
-            CONCAT('Type: ', COALESCE(campaign_type, 'N/A'), ' - Budget: €', FORMAT(COALESCE(budget, 0), 2)) as description,
+            'Status: ' || status || ' - Budget: €' || printf('%.2f', COALESCE(budget_limit, 0)) as description,
             status,
             created_at,
             updated_at
         ")->where('created_at', '>=', Carbon::now()->subDays(7));
 
-        // Get recent news
-        $recentNews = News::selectRaw("
-            'News' as type,
-            title,
-            CONCAT('Category: ', COALESCE(category, 'General'), ' - ', COALESCE(SUBSTRING(content, 1, 50), 'No content')) as description,
-            CASE 
-                WHEN is_published = 1 THEN 'published'
-                ELSE 'draft'
-            END as status,
-            created_at,
-            updated_at
-        ")->where('created_at', '>=', Carbon::now()->subDays(7));
-
-        // Get recent sliders
+        // Get recent sliders - SQLite compatible
         $recentSliders = Slider::selectRaw("
             'Slider' as type,
             title,
-            CONCAT('Order: ', sort_order, ' - ', CASE WHEN is_active = 1 THEN 'Active' ELSE 'Inactive' END) as description,
+            'Order: ' || sort_order || ' - ' || CASE WHEN is_active = 1 THEN 'Active' ELSE 'Inactive' END as description,
             CASE 
                 WHEN is_active = 1 THEN 'active'
                 ELSE 'inactive'
@@ -170,11 +158,11 @@ class RecentActivityWidget extends BaseWidget
             updated_at
         ")->where('created_at', '>=', Carbon::now()->subDays(7));
 
-        // Get recent system settings
+        // Get recent system settings - SQLite compatible
         $recentSettings = SystemSetting::selectRaw("
             'System Setting' as type,
-            CONCAT('Setting: ', `key`) as title,
-            CONCAT('Value: ', COALESCE(SUBSTRING(value, 1, 50), 'NULL'), ' - Type: ', type) as description,
+            'Setting: ' || `key` as title,
+            'Value: ' || COALESCE(substr(value, 1, 50), 'NULL') || ' - Type: ' || type as description,
             CASE 
                 WHEN is_public = 1 THEN 'active'
                 ELSE 'inactive'
@@ -189,9 +177,18 @@ class RecentActivityWidget extends BaseWidget
             ->union($recentUsers)
             ->union($recentReviews)
             ->union($recentCampaigns)
-            ->union($recentNews)
             ->union($recentSliders)
             ->union($recentSettings)
             ->orderBy('created_at', 'desc');
+    }
+
+    public function getHeading(): string
+    {
+        return static::$heading ?? 'Recent Activity Dashboard';
+    }
+
+    public function getColumnSpan(): int|string|array
+    {
+        return $this->columnSpan;
     }
 }

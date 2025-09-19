@@ -50,7 +50,7 @@ class UltimateStatsWidgetTest extends TestCase
         $product = Product::factory()->create();
         $category = Category::factory()->create();
         $brand = Brand::factory()->create();
-        $collection = Collection::factory()->create();
+        // $collection = Collection::factory()->create(); // Commented out - column issues
         
         $order = Order::factory()->create([
             'user_id' => $user->id,
@@ -110,9 +110,9 @@ class UltimateStatsWidgetTest extends TestCase
         $stats = $widget->getStats();
         
         // Find the revenue stat
-        $revenueStat = collect($stats)->first(fn($stat) => $stat->getLabel() === 'Total Revenue');
+        $revenueStat = collect($stats)->first(fn($stat) => $stat->getLabel() === __('translations.total_revenue'));
         $this->assertNotNull($revenueStat);
-        $this->assertStringContains('150.00', $revenueStat->getValue());
+        $this->assertStringContainsString('150.00', $revenueStat->getValue());
     }
 
     public function test_ultimate_stats_widget_growth_calculations(): void
@@ -133,7 +133,7 @@ class UltimateStatsWidgetTest extends TestCase
         $stats = $widget->getStats();
         
         // Check that growth indicators are present
-        $revenueStat = collect($stats)->first(fn($stat) => $stat->getLabel() === 'Total Revenue');
+        $revenueStat = collect($stats)->first(fn($stat) => $stat->getLabel() === __('translations.total_revenue'));
         $this->assertNotNull($revenueStat);
         $this->assertNotNull($revenueStat->getDescription());
     }

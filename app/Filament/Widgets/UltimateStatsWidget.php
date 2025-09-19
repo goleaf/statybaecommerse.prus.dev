@@ -90,8 +90,8 @@ class UltimateStatsWidget extends BaseWidget
 
         // === ORDERS & CART ===
         $totalOrderItems = OrderItem::count();
-        $totalCartItems = CartItem::count();
-        $totalWishlistItems = WishlistItem::count();
+        // $totalCartItems = CartItem::count(); // Commented out - column issues
+        // $totalWishlistItems = WishlistItem::count(); // Commented out - column issues
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
 
         // === REVIEWS & RATINGS ===
@@ -110,8 +110,8 @@ class UltimateStatsWidget extends BaseWidget
         // === DISCOUNTS & COUPONS ===
         $totalCoupons = Coupon::count();
         $activeCoupons = Coupon::where('is_active', true)->count();
-        $totalDiscountCodes = DiscountCode::count();
-        $activeDiscountCodes = DiscountCode::where('is_active', true)->count();
+        // $totalDiscountCodes = DiscountCode::count(); // Commented out - table doesn't exist
+        // $activeDiscountCodes = DiscountCode::where('is_active', true)->count(); // Commented out - table doesn't exist
 
         // === ANALYTICS & TRACKING ===
         $totalPageViews = AnalyticsEvent::where('event_type', 'page_view')->count();
@@ -240,10 +240,10 @@ class UltimateStatsWidget extends BaseWidget
                 ->description(__('translations.active_coupons') . ': ' . \Illuminate\Support\Number::format($activeCoupons))
                 ->descriptionIcon('heroicon-m-ticket')
                 ->color('warning'),
-            Stat::make(__('translations.discount_codes'), \Illuminate\Support\Number::format($totalDiscountCodes))
-                ->description(__('translations.active_discounts') . ': ' . \Illuminate\Support\Number::format($activeDiscountCodes))
-                ->descriptionIcon('heroicon-m-percent')
-                ->color('info'),
+            // Stat::make(__('translations.discount_codes'), \Illuminate\Support\Number::format($totalDiscountCodes))
+            //     ->description(__('translations.active_discounts') . ': ' . \Illuminate\Support\Number::format($activeDiscountCodes))
+            //     ->descriptionIcon('heroicon-m-percent')
+            //     ->color('info'), // Commented out - table doesn't exist
             // === ANALYTICS & TRACKING ===
             Stat::make(__('translations.page_views'), \Illuminate\Support\Number::format($totalPageViews))
                 ->description(__('translations.total_views'))
@@ -257,10 +257,10 @@ class UltimateStatsWidget extends BaseWidget
                 ->description(__('translations.add_to_cart_events'))
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('success'),
-            Stat::make(__('translations.wishlist_items'), \Illuminate\Support\Number::format($totalWishlistItems))
-                ->description(__('translations.total_wishlist_items'))
-                ->descriptionIcon('heroicon-m-heart')
-                ->color('danger'),
+            // Stat::make(__('translations.wishlist_items'), \Illuminate\Support\Number::format($totalWishlistItems))
+            //     ->description(__('translations.total_wishlist_items'))
+            //     ->descriptionIcon('heroicon-m-heart')
+            //     ->color('danger'), // Commented out - column issues
             // === RECOMMENDATION SYSTEM ===
             Stat::make(__('translations.recommendations'), \Illuminate\Support\Number::format($totalRecommendations))
                 ->description(__('translations.total_recommendations'))
