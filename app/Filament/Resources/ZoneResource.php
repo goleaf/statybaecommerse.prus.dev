@@ -1,54 +1,51 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ZoneResource\Pages;
-use App\Models\Zone;
-use App\Models\Country;
 use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Section;
+use App\Filament\Resources\ZoneResource\Pages;
+use App\Models\Country;
+use App\Models\Zone;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Repeater;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Notifications\Notification;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
 
 /**
  * ZoneResource
- * 
+ *
  * Filament v4 resource for Zone management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class ZoneResource extends Resource
 {
     protected static ?string $model = Zone::class;
-    
-    /** @var UnitEnum|string|null */
-        protected static $navigationGroup = NavigationGroup::
-    
-    ;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Locations';
+
     protected static ?int $navigationSort = 6;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -103,7 +100,6 @@ final class ZoneResource extends Resource
                                 ->label(__('zones.name'))
                                 ->required()
                                 ->maxLength(255),
-                            
                             TextInput::make('code')
                                 ->label(__('zones.code'))
                                 ->required()
@@ -111,14 +107,12 @@ final class ZoneResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
                         ]),
-                    
                     Textarea::make('description')
                         ->label(__('zones.description'))
                         ->rows(3)
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            
             Section::make(__('zones.countries'))
                 ->schema([
                     Select::make('countries')
@@ -129,7 +123,6 @@ final class ZoneResource extends Resource
                         ->preload()
                         ->columnSpanFull(),
                 ]),
-            
             Section::make(__('zones.shipping_settings'))
                 ->schema([
                     Grid::make(2)
@@ -140,7 +133,6 @@ final class ZoneResource extends Resource
                                 ->prefix('€')
                                 ->step(0.01)
                                 ->minValue(0),
-                            
                             TextInput::make('free_shipping_threshold')
                                 ->label(__('zones.free_shipping_threshold'))
                                 ->numeric()
@@ -148,7 +140,6 @@ final class ZoneResource extends Resource
                                 ->step(0.01)
                                 ->minValue(0),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             TextInput::make('estimated_delivery_days')
@@ -156,12 +147,10 @@ final class ZoneResource extends Resource
                                 ->numeric()
                                 ->minValue(1)
                                 ->maxValue(365),
-                            
                             Toggle::make('supports_express_shipping')
                                 ->label(__('zones.supports_express_shipping')),
                         ]),
                 ]),
-            
             Section::make(__('zones.settings'))
                 ->schema([
                     Grid::make(2)
@@ -169,11 +158,9 @@ final class ZoneResource extends Resource
                             Toggle::make('is_active')
                                 ->label(__('zones.is_active'))
                                 ->default(true),
-                            
                             Toggle::make('is_default')
                                 ->label(__('zones.is_default')),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             TextInput::make('sort_order')
@@ -181,7 +168,6 @@ final class ZoneResource extends Resource
                                 ->numeric()
                                 ->default(0)
                                 ->minValue(0),
-                            
                             Select::make('type')
                                 ->label(__('zones.type'))
                                 ->options([
@@ -209,7 +195,6 @@ final class ZoneResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
-                
                 TextColumn::make('code')
                     ->label(__('zones.code'))
                     ->searchable()
@@ -217,68 +202,57 @@ final class ZoneResource extends Resource
                     ->copyable()
                     ->badge()
                     ->color('gray'),
-                
                 TextColumn::make('type')
                     ->label(__('zones.type'))
-                    ->formatStateUsing(fn (string $state): string => __("zones.types.{$state}"))
+                    ->formatStateUsing(fn(string $state): string => __("zones.types.{$state}"))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'domestic' => 'green',
                         'international' => 'blue',
                         'regional' => 'purple',
                         default => 'gray',
                     }),
-                
                 TextColumn::make('countries_count')
                     ->label(__('zones.countries_count'))
                     ->counts('countries')
                     ->sortable(),
-                
                 TextColumn::make('shipping_cost')
                     ->label(__('zones.shipping_cost'))
                     ->money('EUR')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('free_shipping_threshold')
                     ->label(__('zones.free_shipping_threshold'))
                     ->money('EUR')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('estimated_delivery_days')
                     ->label(__('zones.estimated_delivery_days'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('supports_express_shipping')
                     ->label(__('zones.supports_express_shipping'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('is_active')
                     ->label(__('zones.is_active'))
                     ->boolean()
                     ->sortable(),
-                
                 IconColumn::make('is_default')
                     ->label(__('zones.is_default'))
                     ->boolean()
                     ->sortable(),
-                
                 TextColumn::make('sort_order')
                     ->label(__('zones.sort_order'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('created_at')
                     ->label(__('zones.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('updated_at')
                     ->label(__('zones.updated_at'))
                     ->dateTime()
@@ -293,21 +267,18 @@ final class ZoneResource extends Resource
                         'international' => __('zones.types.international'),
                         'regional' => __('zones.types.regional'),
                     ]),
-                
                 TernaryFilter::make('is_active')
                     ->label(__('zones.is_active'))
                     ->boolean()
                     ->trueLabel(__('zones.active_only'))
                     ->falseLabel(__('zones.inactive_only'))
                     ->native(false),
-                
                 TernaryFilter::make('is_default')
                     ->label(__('zones.is_default'))
                     ->boolean()
                     ->trueLabel(__('zones.default_only'))
                     ->falseLabel(__('zones.non_default_only'))
                     ->native(false),
-                
                 TernaryFilter::make('supports_express_shipping')
                     ->label(__('zones.supports_express_shipping'))
                     ->boolean()
@@ -318,33 +289,31 @@ final class ZoneResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
-                
                 Action::make('toggle_active')
-                    ->label(fn (Zone $record): string => $record->is_active ? __('zones.deactivate') : __('zones.activate'))
-                    ->icon(fn (Zone $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (Zone $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn(Zone $record): string => $record->is_active ? __('zones.deactivate') : __('zones.activate'))
+                    ->icon(fn(Zone $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(Zone $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Zone $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-                        
+
                         Notification::make()
                             ->title($record->is_active ? __('zones.activated_successfully') : __('zones.deactivated_successfully'))
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation(),
-                
                 Action::make('set_default')
                     ->label(__('zones.set_default'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn (Zone $record): bool => !$record->is_default)
+                    ->visible(fn(Zone $record): bool => !$record->is_default)
                     ->action(function (Zone $record): void {
                         // Remove default from other zones
                         Zone::where('is_default', true)->update(['is_default' => false]);
-                        
+
                         // Set this zone as default
                         $record->update(['is_default' => true]);
-                        
+
                         Notification::make()
                             ->title(__('zones.set_as_default_successfully'))
                             ->success()
@@ -355,28 +324,26 @@ final class ZoneResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    
                     BulkAction::make('activate')
                         ->label(__('zones.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-                            
+
                             Notification::make()
                                 ->title(__('zones.bulk_activated_success'))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    
                     BulkAction::make('deactivate')
                         ->label(__('zones.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-                            
+
                             Notification::make()
                                 ->title(__('zones.bulk_deactivated_success'))
                                 ->success()

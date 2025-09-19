@@ -1,15 +1,14 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
-use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
+use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Models\ProductHistory;
-use Filament\Forms;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
@@ -17,27 +16,27 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
+use BackedEnum;
 
 final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-clock';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
 
     protected static ?int $navigationSort = 11;
 
@@ -109,14 +108,14 @@ final class ProductHistoryResource extends Resource
                             ->label(__('product_history.old_value'))
                             ->rows(4)
                             ->helperText(__('product_history.old_value_help'))
-                            ->formatStateUsing(fn ($state) => self::encodeJsonForTextarea($state))
-                            ->dehydrateStateUsing(fn (?string $state) => self::decodeJsonFromTextarea($state)),
+                            ->formatStateUsing(fn($state) => self::encodeJsonForTextarea($state))
+                            ->dehydrateStateUsing(fn(?string $state) => self::decodeJsonFromTextarea($state)),
                         Textarea::make('new_value')
                             ->label(__('product_history.new_value'))
                             ->rows(4)
                             ->helperText(__('product_history.new_value_help'))
-                            ->formatStateUsing(fn ($state) => self::encodeJsonForTextarea($state))
-                            ->dehydrateStateUsing(fn (?string $state) => self::decodeJsonFromTextarea($state)),
+                            ->formatStateUsing(fn($state) => self::encodeJsonForTextarea($state))
+                            ->dehydrateStateUsing(fn(?string $state) => self::decodeJsonFromTextarea($state)),
                         Textarea::make('description')
                             ->label(__('product_history.description'))
                             ->rows(4)
@@ -147,8 +146,8 @@ final class ProductHistoryResource extends Resource
                     ->label(__('product_history.action'))
                     ->badge()
                     ->sortable()
-                    ->formatStateUsing(fn (string $state): string => self::actionOptions()[$state] ?? $state)
-                    ->color(fn (string $state): string => self::actionColor($state)),
+                    ->formatStateUsing(fn(string $state): string => self::actionOptions()[$state] ?? $state)
+                    ->color(fn(string $state): string => self::actionColor($state)),
                 TextColumn::make('field_name')
                     ->label(__('product_history.field_name'))
                     ->sortable()
@@ -156,12 +155,12 @@ final class ProductHistoryResource extends Resource
                 TextColumn::make('old_value')
                     ->label(__('product_history.old_value'))
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->formatStateUsing(fn ($state): string => self::formatValueForTable($state))
+                    ->formatStateUsing(fn($state): string => self::formatValueForTable($state))
                     ->limit(60),
                 TextColumn::make('new_value')
                     ->label(__('product_history.new_value'))
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->formatStateUsing(fn ($state): string => self::formatValueForTable($state))
+                    ->formatStateUsing(fn($state): string => self::formatValueForTable($state))
                     ->limit(60),
                 TextColumn::make('user.name')
                     ->label(__('product_history.user'))
@@ -191,10 +190,10 @@ final class ProductHistoryResource extends Resource
                     ])
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        if (! empty($data['from'])) {
+                        if (!empty($data['from'])) {
                             $indicators[] = __('product_history.filters.from_indicator', ['date' => Carbon::parse($data['from'])->toFormattedDateString()]);
                         }
-                        if (! empty($data['until'])) {
+                        if (!empty($data['until'])) {
                             $indicators[] = __('product_history.filters.until_indicator', ['date' => Carbon::parse($data['until'])->toFormattedDateString()]);
                         }
 
@@ -202,8 +201,8 @@ final class ProductHistoryResource extends Resource
                     })
                     ->query(function (Builder $query, array $data): void {
                         $query
-                            ->when($data['from'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date))
-                            ->when($data['until'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date));
+                            ->when($data['from'] ?? null, fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date))
+                            ->when($data['until'] ?? null, fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date));
                     }),
             ])
             ->defaultSort('created_at', 'desc')

@@ -1,54 +1,54 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\OrderItemResource\Pages;
-use App\Models\OrderItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Section;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Notifications\Notification;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
 
 /**
  * OrderItemResource
- * 
+ *
  * Filament v4 resource for OrderItem management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class OrderItemResource extends Resource
 {
     protected static ?string $model = OrderItem::class;
-    
-    /** @var UnitEnum|string|null */
-        protected static $navigationGroup = NavigationGroup::
-    
-    ;
+
+    /**
+     * @var UnitEnum|string|null
+     */
+    protected static string|UnitEnum|null $navigationGroup = 'Products';
+
     protected static ?int $navigationSort = 2;
+
     protected static ?string $recordTitleAttribute = 'product_name';
 
     /**
@@ -105,7 +105,6 @@ final class OrderItemResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->required(),
-                            
                             Select::make('product_id')
                                 ->label(__('order_items.product'))
                                 ->relationship('product', 'name')
@@ -124,7 +123,6 @@ final class OrderItemResource extends Resource
                                     }
                                 }),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             Select::make('product_variant_id')
@@ -143,19 +141,16 @@ final class OrderItemResource extends Resource
                                         }
                                     }
                                 }),
-                            
                             TextInput::make('product_name')
                                 ->label(__('order_items.product_name'))
                                 ->required()
                                 ->maxLength(255),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             TextInput::make('product_sku')
                                 ->label(__('order_items.product_sku'))
                                 ->maxLength(255),
-                            
                             TextInput::make('quantity')
                                 ->label(__('order_items.quantity'))
                                 ->numeric()
@@ -171,7 +166,6 @@ final class OrderItemResource extends Resource
                                 }),
                         ]),
                 ]),
-            
             Section::make(__('order_items.pricing'))
                 ->schema([
                     Grid::make(3)
@@ -188,7 +182,6 @@ final class OrderItemResource extends Resource
                                     $total = $unitPrice * $quantity;
                                     $set('total', number_format($total, 2, '.', ''));
                                 }),
-                            
                             TextInput::make('discount_amount')
                                 ->label(__('order_items.discount_amount'))
                                 ->numeric()
@@ -202,7 +195,6 @@ final class OrderItemResource extends Resource
                                     $total = ($unitPrice * $quantity) - $discount;
                                     $set('total', number_format($total, 2, '.', ''));
                                 }),
-                            
                             TextInput::make('total')
                                 ->label(__('order_items.total'))
                                 ->numeric()
@@ -211,7 +203,6 @@ final class OrderItemResource extends Resource
                                 ->disabled(),
                         ]),
                 ]),
-            
             Section::make(__('order_items.additional_information'))
                 ->schema([
                     Textarea::make('notes')
@@ -236,49 +227,41 @@ final class OrderItemResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->copyable(),
-                
                 TextColumn::make('product_name')
                     ->label(__('order_items.product_name'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
-                
                 TextColumn::make('product_sku')
                     ->label(__('order_items.product_sku'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('quantity')
                     ->label(__('order_items.quantity'))
                     ->numeric()
                     ->sortable()
                     ->alignCenter(),
-                
                 TextColumn::make('unit_price')
                     ->label(__('order_items.unit_price'))
                     ->money('EUR')
                     ->sortable(),
-                
                 TextColumn::make('discount_amount')
                     ->label(__('order_items.discount_amount'))
                     ->money('EUR')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('total')
                     ->label(__('order_items.total'))
                     ->money('EUR')
                     ->sortable()
                     ->weight('bold'),
-                
                 TextColumn::make('created_at')
                     ->label(__('order_items.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('updated_at')
                     ->label(__('order_items.updated_at'))
                     ->dateTime()
@@ -291,13 +274,11 @@ final class OrderItemResource extends Resource
                     ->relationship('order', 'number')
                     ->searchable()
                     ->preload(),
-                
                 SelectFilter::make('product_id')
                     ->label(__('order_items.product'))
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload(),
-                
                 Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
@@ -309,11 +290,11 @@ final class OrderItemResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])

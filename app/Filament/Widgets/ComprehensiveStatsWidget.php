@@ -16,41 +16,41 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 
     public function getStats(): array
     {
-        $totalRevenue = Order::where('status', 'completed')
-            ->sum('total');
+        $totalRevenue = (float) (Order::where('status', 'completed')
+            ->sum('total') ?? 0);
 
-        $monthlyRevenue = Order::where('status', 'completed')
+        $monthlyRevenue = (float) (Order::where('status', 'completed')
             ->whereMonth('created_at', now()->month)
-            ->sum('total');
+            ->sum('total') ?? 0);
 
-        $lastMonthRevenue = Order::where('status', 'completed')
+        $lastMonthRevenue = (float) (Order::where('status', 'completed')
             ->whereMonth('created_at', now()->subMonth()->month)
-            ->sum('total');
+            ->sum('total') ?? 0);
 
         $revenueChange = $lastMonthRevenue > 0
             ? (($monthlyRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100
             : 0;
 
-        $totalOrders = Order::count();
-        $monthlyOrders = Order::whereMonth('created_at', now()->month)->count();
-        $lastMonthOrders = Order::whereMonth('created_at', now()->subMonth()->month)->count();
+        $totalOrders = (int) Order::count();
+        $monthlyOrders = (int) Order::whereMonth('created_at', now()->month)->count();
+        $lastMonthOrders = (int) Order::whereMonth('created_at', now()->subMonth()->month)->count();
 
         $ordersChange = $lastMonthOrders > 0
             ? (($monthlyOrders - $lastMonthOrders) / $lastMonthOrders) * 100
             : 0;
 
-        $totalProducts = Product::count();
-        $activeProducts = Product::where('is_visible', true)->count();
+        $totalProducts = (int) Product::count();
+        $activeProducts = (int) Product::where('is_visible', true)->count();
 
-        $totalCustomers = User::whereHas('orders')->count();
-        $newCustomers = User::whereHas('orders')
+        $totalCustomers = (int) User::whereHas('orders')->count();
+        $newCustomers = (int) User::whereHas('orders')
             ->whereMonth('created_at', now()->month)
             ->count();
 
         $averageOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
 
-        $totalReviews = Review::count();
-        $averageRating = Review::avg('rating') ?? 0;
+        $totalReviews = (int) Review::count();
+        $averageRating = (float) (Review::avg('rating') ?? 0);
 
         return [
             Stat::make(__('Total Revenue'), '€' . number_format($totalRevenue, 2))

@@ -70,7 +70,7 @@ class DashboardOverviewWidget extends BaseWidget
         // Advanced Metrics
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
         $totalReviews = Review::where('is_approved', true)->count();
-        $avgRating = Review::where('is_approved', true)->avg('rating') ?? 0;
+        $avgRating = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
         $activeCampaigns = Campaign::where('status', 'active')->count();
         $totalCampaignViews = CampaignView::sum('views_count');
         $totalCampaignClicks = CampaignClick::sum('clicks_count');

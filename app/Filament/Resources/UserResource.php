@@ -1,55 +1,54 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Notifications\Notification;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
 use UnitEnum;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
 
 /**
  * UserResource
- * 
+ *
  * Filament v4 resource for User management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-    
-    protected static $navigationGroup = 'Users';
-    
+
+    protected static string|UnitEnum|null $navigationGroup = 'Users';
+
     protected static ?int $navigationSort = 1;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -105,7 +104,6 @@ final class UserResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->columnSpan(1),
-
                             TextInput::make('email')
                                 ->label(__('users.fields.email'))
                                 ->email()
@@ -114,7 +112,6 @@ final class UserResource extends Resource
                                 ->maxLength(255)
                                 ->columnSpan(1),
                         ]),
-
                     Grid::make(2)
                         ->schema([
                             TextInput::make('phone')
@@ -122,19 +119,16 @@ final class UserResource extends Resource
                                 ->tel()
                                 ->maxLength(20)
                                 ->columnSpan(1),
-
                             DatePicker::make('date_of_birth')
                                 ->label(__('users.fields.date_of_birth'))
                                 ->columnSpan(1),
                         ]),
-
                     Textarea::make('bio')
                         ->label(__('users.fields.bio'))
                         ->maxLength(1000)
                         ->rows(3),
                 ])
                 ->columns(1),
-
             Section::make(__('users.sections.preferences'))
                 ->schema([
                     Grid::make(2)
@@ -147,7 +141,6 @@ final class UserResource extends Resource
                                 ])
                                 ->default('lt')
                                 ->columnSpan(1),
-
                             Select::make('timezone')
                                 ->label(__('users.fields.timezone'))
                                 ->options([
@@ -157,17 +150,14 @@ final class UserResource extends Resource
                                 ->default('Europe/Vilnius')
                                 ->columnSpan(1),
                         ]),
-
                     Toggle::make('email_notifications')
                         ->label(__('users.fields.email_notifications'))
                         ->default(true),
-
                     Toggle::make('sms_notifications')
                         ->label(__('users.fields.sms_notifications'))
                         ->default(false),
                 ])
                 ->columns(1),
-
             Section::make(__('users.sections.status'))
                 ->schema([
                     Grid::make(2)
@@ -176,7 +166,6 @@ final class UserResource extends Resource
                                 ->label(__('users.fields.is_active'))
                                 ->default(true)
                                 ->columnSpan(1),
-
                             DatePicker::make('email_verified_at')
                                 ->label(__('users.fields.email_verified_at'))
                                 ->columnSpan(1),
@@ -199,34 +188,28 @@ final class UserResource extends Resource
                     ->label(__('users.fields.name'))
                     ->searchable()
                     ->sortable(),
-
                 TextColumn::make('email')
                     ->label(__('users.fields.email'))
                     ->searchable()
                     ->sortable(),
-
                 TextColumn::make('phone')
                     ->label(__('users.fields.phone'))
                     ->searchable()
                     ->toggleable(),
-
                 TextColumn::make('locale')
                     ->label(__('users.fields.locale'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'lt' => 'success',
                         'en' => 'info',
                         default => 'gray',
                     }),
-
                 IconColumn::make('is_active')
                     ->label(__('users.fields.is_active'))
                     ->boolean(),
-
                 IconColumn::make('email_verified_at')
                     ->label(__('users.fields.email_verified'))
                     ->boolean(),
-
                 TextColumn::make('created_at')
                     ->label(__('users.fields.created_at'))
                     ->dateTime()
@@ -240,10 +223,8 @@ final class UserResource extends Resource
                         'lt' => 'Lietuvių',
                         'en' => 'English',
                     ]),
-
                 TernaryFilter::make('is_active')
                     ->label(__('users.fields.is_active')),
-
                 TernaryFilter::make('email_verified_at')
                     ->label(__('users.fields.email_verified')),
             ])
@@ -263,7 +244,6 @@ final class UserResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-
                     BulkAction::make('deactivate')
                         ->label(__('users.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
@@ -274,7 +254,6 @@ final class UserResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-
                     DeleteBulkAction::make(),
                 ]),
             ])

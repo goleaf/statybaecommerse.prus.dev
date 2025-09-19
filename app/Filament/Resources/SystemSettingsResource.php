@@ -1,55 +1,52 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\SystemSettingsResource\Pages;
 use App\Models\SystemSetting;
-use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Notifications\Notification;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
 
 /**
  * SystemSettingsResource
- * 
+ *
  * Filament v4 resource for System Settings management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class SystemSettingsResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;
-    
-    /** @var UnitEnum|string|null */
-        protected static $navigationGroup = NavigationGroup::
-    
-    ;
+
+    protected static string|UnitEnum|null $navigationGroup = 'System';
+
     protected static ?int $navigationSort = 1;
+
     protected static ?string $recordTitleAttribute = 'key';
 
     /**
@@ -107,7 +104,6 @@ final class SystemSettingsResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash'])
                                 ->helperText(__('system_settings.key_help')),
-                            
                             Select::make('type')
                                 ->label(__('system_settings.type'))
                                 ->options([
@@ -123,20 +119,17 @@ final class SystemSettingsResource extends Resource
                                 ->live()
                                 ->default('string'),
                         ]),
-                    
                     Textarea::make('description')
                         ->label(__('system_settings.description'))
                         ->rows(3)
                         ->columnSpanFull(),
                 ]),
-            
             Section::make(__('system_settings.value'))
                 ->schema([
                     Forms\Components\ViewField::make('value_field')
                         ->view('filament.forms.components.dynamic-value-field')
                         ->live(),
                 ]),
-            
             Section::make(__('system_settings.categorization'))
                 ->schema([
                     Grid::make(2)
@@ -153,14 +146,12 @@ final class SystemSettingsResource extends Resource
                                     Textarea::make('description')
                                         ->maxLength(500),
                                 ]),
-                            
                             TextInput::make('group')
                                 ->label(__('system_settings.group'))
                                 ->maxLength(255)
                                 ->helperText(__('system_settings.group_help')),
                         ]),
                 ]),
-            
             Section::make(__('system_settings.validation'))
                 ->schema([
                     Grid::make(2)
@@ -169,13 +160,11 @@ final class SystemSettingsResource extends Resource
                                 ->label(__('system_settings.validation_rules'))
                                 ->maxLength(500)
                                 ->helperText(__('system_settings.validation_rules_help')),
-                            
                             TextInput::make('default_value')
                                 ->label(__('system_settings.default_value'))
                                 ->maxLength(500),
                         ]),
                 ]),
-            
             Section::make(__('system_settings.settings'))
                 ->schema([
                     Grid::make(2)
@@ -184,13 +173,11 @@ final class SystemSettingsResource extends Resource
                                 ->label(__('system_settings.is_public'))
                                 ->default(false)
                                 ->helperText(__('system_settings.is_public_help')),
-                            
                             Toggle::make('is_encrypted')
                                 ->label(__('system_settings.is_encrypted'))
                                 ->default(false)
                                 ->helperText(__('system_settings.is_encrypted_help')),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             TextInput::make('sort_order')
@@ -198,7 +185,6 @@ final class SystemSettingsResource extends Resource
                                 ->numeric()
                                 ->default(0)
                                 ->minValue(0),
-                            
                             Toggle::make('is_required')
                                 ->label(__('system_settings.is_required'))
                                 ->default(false),
@@ -222,12 +208,11 @@ final class SystemSettingsResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->copyable(),
-                
                 TextColumn::make('type')
                     ->label(__('system_settings.type'))
-                    ->formatStateUsing(fn (string $state): string => __("system_settings.types.{$state}"))
+                    ->formatStateUsing(fn(string $state): string => __("system_settings.types.{$state}"))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'string' => 'gray',
                         'integer' => 'blue',
                         'boolean' => 'green',
@@ -237,7 +222,6 @@ final class SystemSettingsResource extends Resource
                         'file' => 'pink',
                         default => 'gray',
                     }),
-                
                 TextColumn::make('value')
                     ->label(__('system_settings.value'))
                     ->limit(50)
@@ -245,45 +229,37 @@ final class SystemSettingsResource extends Resource
                         $state = $column->getState();
                         return strlen($state) > 50 ? $state : null;
                     }),
-                
                 TextColumn::make('category.name')
                     ->label(__('system_settings.category'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('group')
                     ->label(__('system_settings.group'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('is_public')
                     ->label(__('system_settings.is_public'))
                     ->boolean()
                     ->sortable(),
-                
                 IconColumn::make('is_encrypted')
                     ->label(__('system_settings.is_encrypted'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('is_required')
                     ->label(__('system_settings.is_required'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('sort_order')
                     ->label(__('system_settings.sort_order'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('created_at')
                     ->label(__('system_settings.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('updated_at')
                     ->label(__('system_settings.updated_at'))
                     ->dateTime()
@@ -302,27 +278,23 @@ final class SystemSettingsResource extends Resource
                         'json' => __('system_settings.types.json'),
                         'file' => __('system_settings.types.file'),
                     ]),
-                
                 SelectFilter::make('category_id')
                     ->label(__('system_settings.category'))
                     ->relationship('category', 'name')
                     ->searchable()
                     ->preload(),
-                
                 TernaryFilter::make('is_public')
                     ->label(__('system_settings.is_public'))
                     ->boolean()
                     ->trueLabel(__('system_settings.public_only'))
                     ->falseLabel(__('system_settings.private_only'))
                     ->native(false),
-                
                 TernaryFilter::make('is_encrypted')
                     ->label(__('system_settings.is_encrypted'))
                     ->boolean()
                     ->trueLabel(__('system_settings.encrypted_only'))
                     ->falseLabel(__('system_settings.unencrypted_only'))
                     ->native(false),
-                
                 TernaryFilter::make('is_required')
                     ->label(__('system_settings.is_required'))
                     ->boolean()
@@ -333,7 +305,6 @@ final class SystemSettingsResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
-                
                 Action::make('reset_to_default')
                     ->label(__('system_settings.reset_to_default'))
                     ->icon('heroicon-o-arrow-path')
@@ -341,7 +312,7 @@ final class SystemSettingsResource extends Resource
                     ->action(function (SystemSetting $record): void {
                         if ($record->default_value) {
                             $record->update(['value' => $record->default_value]);
-                            
+
                             Notification::make()
                                 ->title(__('system_settings.reset_successfully'))
                                 ->success()
@@ -349,12 +320,11 @@ final class SystemSettingsResource extends Resource
                         }
                     })
                     ->requiresConfirmation()
-                    ->visible(fn (SystemSetting $record): bool => !empty($record->default_value)),
+                    ->visible(fn(SystemSetting $record): bool => !empty($record->default_value)),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    
                     BulkAction::make('export_settings')
                         ->label(__('system_settings.export_settings'))
                         ->icon('heroicon-o-arrow-down-tray')
@@ -366,7 +336,6 @@ final class SystemSettingsResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    
                     BulkAction::make('clear_cache')
                         ->label(__('system_settings.clear_cache'))
                         ->icon('heroicon-o-trash')

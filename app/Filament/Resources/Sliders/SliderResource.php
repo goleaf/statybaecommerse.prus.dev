@@ -40,7 +40,7 @@ final class SliderResource extends Resource
     protected static ?string $model = Slider::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static $navigationGroup = 'Content';
+    protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup = 'Content';
 
     public static function form(Form $form): Form
     {

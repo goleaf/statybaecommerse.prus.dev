@@ -46,7 +46,7 @@ final class PriceListItemResource extends Resource
 {
     protected static ?string $model = PriceListItem::class;
     
-    protected static $navigationGroup = 'Products';
+    protected static string | UnitEnum | null $navigationGroup = 'Products';
     
     protected static ?int $navigationSort = 16;
     protected static ?string $recordTitleAttribute = 'product.name';

@@ -97,7 +97,7 @@ class UltimateStatsWidget extends BaseWidget
         // === REVIEWS & RATINGS ===
         $totalReviews = Review::count();
         $approvedReviews = Review::where('is_approved', true)->count();
-        $avgRating = Review::where('is_approved', true)->avg('rating') ?? 0;
+        $avgRating = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
         $pendingReviews = Review::where('is_approved', false)->count();
 
         // === CAMPAIGNS & MARKETING ===

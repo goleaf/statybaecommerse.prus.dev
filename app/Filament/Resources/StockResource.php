@@ -1,55 +1,52 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\StockResource\Pages;
-use App\Models\Stock;
+use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Location;
-use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Section;
+use App\Models\Stock;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Notifications\Notification;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
 
 /**
  * StockResource
- * 
+ *
  * Filament v4 resource for Stock management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class StockResource extends Resource
 {
     protected static ?string $model = Stock::class;
-    
-    /** @var UnitEnum|string|null */
-        protected static $navigationGroup = NavigationGroup::
-    
-    ;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
+
     protected static ?int $navigationSort = 7;
+
     protected static ?string $recordTitleAttribute = 'product_name';
 
     /**
@@ -116,7 +113,6 @@ final class StockResource extends Resource
                                         }
                                     }
                                 }),
-                            
                             Select::make('product_variant_id')
                                 ->label(__('stocks.product_variant'))
                                 ->relationship('productVariant', 'name')
@@ -133,19 +129,16 @@ final class StockResource extends Resource
                                     }
                                 }),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             TextInput::make('product_name')
                                 ->label(__('stocks.product_name'))
                                 ->required()
                                 ->maxLength(255),
-                            
                             TextInput::make('product_sku')
                                 ->label(__('stocks.product_sku'))
                                 ->maxLength(255),
                         ]),
-                    
                     Select::make('location_id')
                         ->label(__('stocks.location'))
                         ->relationship('location', 'name')
@@ -153,7 +146,6 @@ final class StockResource extends Resource
                         ->preload()
                         ->required(),
                 ]),
-            
             Section::make(__('stocks.stock_information'))
                 ->schema([
                     Grid::make(2)
@@ -164,14 +156,12 @@ final class StockResource extends Resource
                                 ->required()
                                 ->minValue(0)
                                 ->default(0),
-                            
                             TextInput::make('reserved_quantity')
                                 ->label(__('stocks.reserved_quantity'))
                                 ->numeric()
                                 ->minValue(0)
                                 ->default(0),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             TextInput::make('available_quantity')
@@ -180,7 +170,6 @@ final class StockResource extends Resource
                                 ->minValue(0)
                                 ->default(0)
                                 ->disabled(),
-                            
                             TextInput::make('low_stock_threshold')
                                 ->label(__('stocks.low_stock_threshold'))
                                 ->numeric()
@@ -188,7 +177,6 @@ final class StockResource extends Resource
                                 ->default(0),
                         ]),
                 ]),
-            
             Section::make(__('stocks.settings'))
                 ->schema([
                     Grid::make(2)
@@ -196,23 +184,19 @@ final class StockResource extends Resource
                             Toggle::make('is_active')
                                 ->label(__('stocks.is_active'))
                                 ->default(true),
-                            
                             Toggle::make('track_stock')
                                 ->label(__('stocks.track_stock'))
                                 ->default(true),
                         ]),
-                    
                     Grid::make(2)
                         ->schema([
                             Toggle::make('allow_backorder')
                                 ->label(__('stocks.allow_backorder'))
                                 ->default(false),
-                            
                             Toggle::make('manage_stock')
                                 ->label(__('stocks.manage_stock'))
                                 ->default(true),
                         ]),
-                    
                     Textarea::make('notes')
                         ->label(__('stocks.notes'))
                         ->rows(3)
@@ -237,7 +221,6 @@ final class StockResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->limit(50),
-                
                 TextColumn::make('product_sku')
                     ->label(__('stocks.product_sku'))
                     ->searchable()
@@ -245,70 +228,59 @@ final class StockResource extends Resource
                     ->copyable()
                     ->badge()
                     ->color('gray'),
-                
                 TextColumn::make('location.name')
                     ->label(__('stocks.location'))
                     ->sortable()
                     ->badge()
                     ->color('blue'),
-                
                 TextColumn::make('quantity')
                     ->label(__('stocks.quantity'))
                     ->numeric()
                     ->sortable()
                     ->alignCenter()
                     ->weight('bold'),
-                
                 TextColumn::make('reserved_quantity')
                     ->label(__('stocks.reserved_quantity'))
                     ->numeric()
                     ->sortable()
                     ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('available_quantity')
                     ->label(__('stocks.available_quantity'))
                     ->numeric()
                     ->sortable()
                     ->alignCenter()
-                    ->color(fn ($state): string => $state <= 0 ? 'danger' : ($state <= 10 ? 'warning' : 'success')),
-                
+                    ->color(fn($state): string => $state <= 0 ? 'danger' : ($state <= 10 ? 'warning' : 'success')),
                 TextColumn::make('low_stock_threshold')
                     ->label(__('stocks.low_stock_threshold'))
                     ->numeric()
                     ->sortable()
                     ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('is_active')
                     ->label(__('stocks.is_active'))
                     ->boolean()
                     ->sortable(),
-                
                 IconColumn::make('track_stock')
                     ->label(__('stocks.track_stock'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('allow_backorder')
                     ->label(__('stocks.allow_backorder'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 IconColumn::make('manage_stock')
                     ->label(__('stocks.manage_stock'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('created_at')
                     ->label(__('stocks.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('updated_at')
                     ->label(__('stocks.updated_at'))
                     ->dateTime()
@@ -321,27 +293,23 @@ final class StockResource extends Resource
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload(),
-                
                 SelectFilter::make('location_id')
                     ->label(__('stocks.location'))
                     ->relationship('location', 'name')
                     ->searchable()
                     ->preload(),
-                
                 TernaryFilter::make('is_active')
                     ->label(__('stocks.is_active'))
                     ->boolean()
                     ->trueLabel(__('stocks.active_only'))
                     ->falseLabel(__('stocks.inactive_only'))
                     ->native(false),
-                
                 TernaryFilter::make('track_stock')
                     ->label(__('stocks.track_stock'))
                     ->boolean()
                     ->trueLabel(__('stocks.tracked_only'))
                     ->falseLabel(__('stocks.not_tracked'))
                     ->native(false),
-                
                 TernaryFilter::make('allow_backorder')
                     ->label(__('stocks.allow_backorder'))
                     ->boolean()
@@ -352,7 +320,6 @@ final class StockResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
-                
                 Action::make('adjust_stock')
                     ->label(__('stocks.adjust_stock'))
                     ->icon('heroicon-o-adjustments-horizontal')
@@ -363,7 +330,6 @@ final class StockResource extends Resource
                             ->numeric()
                             ->required()
                             ->helperText(__('stocks.adjustment_quantity_help')),
-                        
                         Textarea::make('adjustment_reason')
                             ->label(__('stocks.adjustment_reason'))
                             ->rows(3)
@@ -373,21 +339,20 @@ final class StockResource extends Resource
                         $record->update([
                             'quantity' => $record->quantity + $data['adjustment_quantity'],
                         ]);
-                        
+
                         Notification::make()
                             ->title(__('stocks.stock_adjusted_successfully'))
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation(),
-                
                 Action::make('toggle_active')
-                    ->label(fn (Stock $record): string => $record->is_active ? __('stocks.deactivate') : __('stocks.activate'))
-                    ->icon(fn (Stock $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (Stock $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn(Stock $record): string => $record->is_active ? __('stocks.deactivate') : __('stocks.activate'))
+                    ->icon(fn(Stock $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(Stock $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Stock $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-                        
+
                         Notification::make()
                             ->title($record->is_active ? __('stocks.activated_successfully') : __('stocks.deactivated_successfully'))
                             ->success()
@@ -398,28 +363,26 @@ final class StockResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    
                     BulkAction::make('activate')
                         ->label(__('stocks.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-                            
+
                             Notification::make()
                                 ->title(__('stocks.bulk_activated_success'))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    
                     BulkAction::make('deactivate')
                         ->label(__('stocks.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-                            
+
                             Notification::make()
                                 ->title(__('stocks.bulk_deactivated_success'))
                                 ->success()

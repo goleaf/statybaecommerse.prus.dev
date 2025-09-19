@@ -42,7 +42,7 @@ final class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static $navigationGroup = 'Orders';
+    protected static string | UnitEnum | null $navigationGroup = 'Orders';
 
     protected static ?int $navigationSort = 1;
 

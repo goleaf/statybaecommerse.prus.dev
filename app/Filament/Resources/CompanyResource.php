@@ -43,7 +43,7 @@ final class CompanyResource extends Resource
     protected static ?string $model = Company::class;
     
     /** @var UnitEnum|string|null */
-        protected static $navigationGroup = NavigationGroup::
+        protected static string | UnitEnum | null $navigationGroup = "Products";
     
     ;
     protected static ?int $navigationSort = 8;

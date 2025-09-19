@@ -44,7 +44,7 @@ final class ActivityLogResource extends Resource
 {
     protected static ?string $model = ActivityLog::class;
     
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::System;
+    protected static string | UnitEnum | null $navigationGroup = System;
     
     protected static ?int $navigationSort = 9;
     protected static ?string $recordTitleAttribute = 'description';

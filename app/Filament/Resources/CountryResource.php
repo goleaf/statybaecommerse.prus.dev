@@ -42,7 +42,7 @@ final class CountryResource extends Resource
     protected static ?string $model = Country::class;
     
     /** @var UnitEnum|string|null */
-    protected static $navigationGroup = 'Products';
+    protected static string | UnitEnum | null $navigationGroup = 'Products';
     protected static ?int $navigationSort = 4;
     protected static ?string $recordTitleAttribute = 'name';
 

@@ -51,18 +51,18 @@ final class EcommerceStatsWidget extends BaseWidget
 
     private function getMonthlyRevenue(): string
     {
-        $revenue = Order::whereMonth('created_at', Carbon::now()->month)
+        $revenue = (float) (Order::whereMonth('created_at', Carbon::now()->month)
             ->whereYear('created_at', Carbon::now()->year)
             ->where('status', '!=', 'cancelled')
-            ->sum('total');
+            ->sum('total') ?? 0);
         
         return '€' . number_format($revenue, 2);
     }
 
     private function getAverageRating(): string
     {
-        $average = Review::where('is_approved', true)->avg('rating');
-        return number_format($average ?? 0, 1) . '/5';
+        $average = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
+        return number_format($average, 1) . '/5';
     }
 
     private function getOrdersChart(): array

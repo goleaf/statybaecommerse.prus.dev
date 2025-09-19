@@ -46,7 +46,7 @@ final class CampaignClickResource extends Resource
     protected static ?string $model = CampaignClick::class;
     
     /** @var UnitEnum|string|null */
-    protected static $navigationGroup = 'Campaigns';
+    protected static string | UnitEnum | null $navigationGroup = 'Campaigns';
     
     protected static ?int $navigationSort = 8;
     protected static ?string $recordTitleAttribute = 'campaign_name';

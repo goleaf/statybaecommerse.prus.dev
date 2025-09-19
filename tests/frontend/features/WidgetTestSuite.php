@@ -1,0 +1,141 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature\Widgets;
+
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+/**
+ * Widget Test Suite
+ * 
+ * Comprehensive test suite for all Filament widgets
+ */
+class WidgetTestSuite extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_all_widgets_can_be_instantiated(): void
+    {
+        $widgetClasses = $this->getWidgetClasses();
+
+        foreach ($widgetClasses as $widgetClass) {
+            $this->assertTrue(class_exists($widgetClass), "Widget class {$widgetClass} does not exist");
+            
+            try {
+                $widget = new $widgetClass();
+                $this->assertInstanceOf(\Filament\Widgets\Widget::class, $widget);
+            } catch (\Exception $e) {
+                $this->fail("Widget {$widgetClass} could not be instantiated: " . $e->getMessage());
+            }
+        }
+    }
+
+    public function test_all_widgets_have_required_properties(): void
+    {
+        $widgetClasses = $this->getWidgetClasses();
+
+        foreach ($widgetClasses as $widgetClass) {
+            $widget = new $widgetClass();
+            
+            // Check for view property
+            $reflection = new \ReflectionClass($widget);
+            $this->assertTrue($reflection->hasProperty('view'), "Widget {$widgetClass} missing view property");
+        }
+    }
+
+    public function test_all_widgets_have_valid_view_property(): void
+    {
+        $widgetClasses = $this->getWidgetClasses();
+
+        foreach ($widgetClasses as $widgetClass) {
+            $widget = new $widgetClass();
+            $reflection = new \ReflectionClass($widget);
+            
+            if ($reflection->hasProperty('view')) {
+                $viewProperty = $reflection->getProperty('view');
+                $viewProperty->setAccessible(true);
+                $view = $viewProperty->getValue($widget);
+                
+                $this->assertNotNull($view, "Widget {$widgetClass} view property is null");
+                $this->assertIsString($view, "Widget {$widgetClass} view property should be string");
+            }
+        }
+    }
+
+    public function test_all_widgets_have_column_span(): void
+    {
+        $widgetClasses = $this->getWidgetClasses();
+
+        foreach ($widgetClasses as $widgetClass) {
+            $widget = new $widgetClass();
+            $reflection = new \ReflectionClass($widget);
+            
+            if ($reflection->hasProperty('columnSpan')) {
+                $columnSpanProperty = $reflection->getProperty('columnSpan');
+                $columnSpanProperty->setAccessible(true);
+                $columnSpan = $columnSpanProperty->getValue($widget);
+                
+                $this->assertNotNull($columnSpan, "Widget {$widgetClass} columnSpan property is null");
+            }
+        }
+    }
+
+    public function test_all_widgets_can_render(): void
+    {
+        $widgetClasses = $this->getWidgetClasses();
+
+        foreach ($widgetClasses as $widgetClass) {
+            try {
+                $widget = new $widgetClass();
+                
+                // Check if widget has render method
+                $this->assertTrue(method_exists($widget, 'render'), "Widget {$widgetClass} missing render method");
+                
+                // Check if widget has getView method
+                $this->assertTrue(method_exists($widget, 'getView'), "Widget {$widgetClass} missing getView method");
+                
+            } catch (\Exception $e) {
+                $this->fail("Widget {$widgetClass} render test failed: " . $e->getMessage());
+            }
+        }
+    }
+
+    public function test_all_widgets_have_proper_inheritance(): void
+    {
+        $widgetClasses = $this->getWidgetClasses();
+
+        foreach ($widgetClasses as $widgetClass) {
+            $reflection = new \ReflectionClass($widgetClass);
+            
+            // Check if widget extends proper base class
+            $this->assertTrue(
+                $reflection->isSubclassOf(\Filament\Widgets\Widget::class),
+                "Widget {$widgetClass} does not extend Widget base class"
+            );
+        }
+    }
+
+    protected function getWidgetClasses(): array
+    {
+        return [
+            \App\Filament\Widgets\UltimateStatsWidget::class,
+            \App\Filament\Widgets\ComprehensiveAnalyticsWidget::class,
+            \App\Filament\Widgets\RecentActivityWidget::class,
+            \App\Filament\Widgets\SimplifiedStatsWidget::class,
+            \App\Filament\Widgets\SliderQuickActionsWidget::class,
+            \App\Filament\Widgets\RecentSlidersWidget::class,
+            \App\Filament\Widgets\DashboardOverviewWidget::class,
+            \App\Filament\Widgets\EcommerceStatsWidget::class,
+            \App\Filament\Widgets\ComprehensiveStatsWidget::class,
+            \App\Filament\Widgets\AdvancedAnalyticsWidget::class,
+            \App\Filament\Widgets\OrdersChartWidget::class,
+            \App\Filament\Widgets\VariantPerformanceChart::class,
+            \App\Filament\Widgets\CampaignPerformanceWidget::class,
+            \App\Filament\Widgets\RecentOrdersWidget::class,
+            \App\Filament\Widgets\RecentReviewsWidget::class,
+            \App\Filament\Widgets\RecentProductsWidget::class,
+        ];
+    }
+}

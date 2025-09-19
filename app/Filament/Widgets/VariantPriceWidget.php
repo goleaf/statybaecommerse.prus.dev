@@ -15,16 +15,16 @@ final class VariantPriceWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        $averagePrice = ProductVariant::avg('price');
-        $highestPrice = ProductVariant::max('price');
-        $lowestPrice = ProductVariant::min('price');
+        $averagePrice = (float) (ProductVariant::avg('price') ?? 0);
+        $highestPrice = (float) (ProductVariant::max('price') ?? 0);
+        $lowestPrice = (float) (ProductVariant::min('price') ?? 0);
         
         $onSaleCount = ProductVariant::where('is_on_sale', true)->count();
-        $totalRevenue = ProductVariant::sum(DB::raw('sold_quantity * price'));
+        $totalRevenue = (float) (ProductVariant::sum(DB::raw('sold_quantity * price')) ?? 0);
         
-        $averageDiscount = ProductVariant::where('is_on_sale', true)
+        $averageDiscount = (float) (ProductVariant::where('is_on_sale', true)
             ->whereNotNull('compare_price')
-            ->avg(DB::raw('((compare_price - price) / compare_price) * 100'));
+            ->avg(DB::raw('((compare_price - price) / compare_price) * 100')) ?? 0);
 
         $priceRanges = [
             'under_50' => ProductVariant::where('price', '<', 50)->count(),

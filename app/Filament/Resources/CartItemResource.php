@@ -44,7 +44,7 @@ final class CartItemResource extends Resource
     protected static ?string $model = CartItem::class;
     
     /** @var UnitEnum|string|null */
-        protected static $navigationGroup = NavigationGroup::
+        protected static string | UnitEnum | null $navigationGroup = "Products";
     
     ;
     protected static ?int $navigationSort = 3;
