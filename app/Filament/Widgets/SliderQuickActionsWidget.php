@@ -105,7 +105,13 @@ final class SliderQuickActionsWidget extends Widget implements HasForms, HasActi
             ->label(__('translations.reorder_sliders'))
             ->icon('heroicon-m-arrows-up-down')
             ->color('info')
-            ->url(route('filament.admin.resources.sliders.index'))
+            ->url(function () {
+                try {
+                    return route('filament.admin.resources.sliders.index');
+                } catch (\Exception $e) {
+                    return '#';
+                }
+            })
             ->openUrlInNewTab();
     }
 }

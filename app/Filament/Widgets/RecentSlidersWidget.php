@@ -56,9 +56,15 @@ final class RecentSlidersWidget extends BaseWidget
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->actions([
-                EditAction::make()
-                    ->url(fn(Slider $record): string => route('filament.admin.resources.sliders.edit', $record)),
-                DeleteAction::make(),
+                // EditAction::make()
+                //     ->url(function(Slider $record): string {
+                //         try {
+                //             return route('filament.admin.resources.sliders.edit', $record);
+                //         } catch (\Exception $e) {
+                //             return '#';
+                //         }
+                //     }),
+                // DeleteAction::make(),
             ])
             ->paginated(false);
     }

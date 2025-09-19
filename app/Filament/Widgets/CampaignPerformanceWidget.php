@@ -17,10 +17,10 @@ class CampaignPerformanceWidget extends ChartWidget
     protected int|string|array $columnSpan = 2;
     protected ?string $maxHeight = '300px';
 
-    protected function getData(): array
+    public function getData(): array
     {
         // Get top 10 campaigns by views
-        $topCampaigns = CampaignView::select('campaign_id', DB::raw('SUM(views_count) as total_views'))
+        $topCampaigns = CampaignView::select('campaign_id', DB::raw('COUNT(*) as total_views'))
             ->with('campaign:id,name')
             ->groupBy('campaign_id')
             ->orderBy('total_views', 'desc')
@@ -41,12 +41,12 @@ class CampaignPerformanceWidget extends ChartWidget
 
                 // Get clicks for this campaign
                 $clicks = CampaignClick::where('campaign_id', $item->campaign_id)
-                    ->sum('clicks_count');
+                    ->count();
                 $clicksData[] = $clicks;
 
                 // Get conversions for this campaign
                 $conversions = CampaignConversion::where('campaign_id', $item->campaign_id)
-                    ->sum('conversions_count');
+                    ->count();
                 $conversionsData[] = $conversions;
 
                 // Calculate CTR (Click Through Rate)
@@ -101,12 +101,12 @@ class CampaignPerformanceWidget extends ChartWidget
         ];
     }
 
-    protected function getType(): string
+    public function getType(): string
     {
         return 'bar';
     }
 
-    protected function getOptions(): array
+    public function getOptions(): array
     {
         return [
             'responsive' => true,
@@ -147,5 +147,10 @@ class CampaignPerformanceWidget extends ChartWidget
                 ],
             ],
         ];
+    }
+
+    public function getMaxHeight(): ?string
+    {
+        return $this->maxHeight;
     }
 }

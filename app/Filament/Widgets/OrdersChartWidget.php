@@ -15,7 +15,7 @@ final class OrdersChartWidget extends ChartWidget
         return 'Orders Overview';
     }
 
-    protected function getData(): array
+    public function getData(): array
     {
         $data = collect(range(0, 11))->map(function ($month) {
             $date = now()->subMonths($month);
@@ -52,12 +52,12 @@ final class OrdersChartWidget extends ChartWidget
         ];
     }
 
-    protected function getType(): string
+    public function getType(): string
     {
         return 'line';
     }
 
-    protected function getOptions(): array
+    public function getOptions(): array
     {
         return [
             'responsive' => true,

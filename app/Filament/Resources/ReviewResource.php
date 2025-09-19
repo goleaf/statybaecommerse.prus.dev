@@ -47,7 +47,7 @@ final class ReviewResource extends Resource
     protected static ?string $model = Review::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+        protected static $navigationGroup = NavigationGroup::
     
     ;
     protected static ?int $navigationSort = 4;
@@ -68,7 +68,7 @@ final class ReviewResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Products->label();
+        return 'Products'->label();
     }
 
     /**

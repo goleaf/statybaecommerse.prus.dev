@@ -14,18 +14,18 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 {
     protected static ?int $sort = 1;
 
-    protected function getStats(): array
+    public function getStats(): array
     {
         $totalRevenue = Order::where('status', 'completed')
-            ->sum('total_amount');
+            ->sum('total');
 
         $monthlyRevenue = Order::where('status', 'completed')
             ->whereMonth('created_at', now()->month)
-            ->sum('total_amount');
+            ->sum('total');
 
         $lastMonthRevenue = Order::where('status', 'completed')
             ->whereMonth('created_at', now()->subMonth()->month)
-            ->sum('total_amount');
+            ->sum('total');
 
         $revenueChange = $lastMonthRevenue > 0
             ? (($monthlyRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100
@@ -94,7 +94,7 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
     {
         return Order::where('status', 'completed')
             ->whereDate('created_at', '>=', now()->subDays(30))
-            ->selectRaw('DATE(created_at) as date, SUM(total_amount) as revenue')
+            ->selectRaw('DATE(created_at) as date, SUM(total) as revenue')
             ->groupBy('date')
             ->orderBy('date')
             ->pluck('revenue')

@@ -44,7 +44,7 @@ final class CityResource extends Resource
     protected static ?string $model = City::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+        protected static $navigationGroup = NavigationGroup::
     
     ;
     protected static ?int $navigationSort = 5;
@@ -65,7 +65,7 @@ final class CityResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::System->label();
+        return 'System'->label();
     }
 
     /**

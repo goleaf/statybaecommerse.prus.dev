@@ -45,7 +45,7 @@ final class RecommendationConfigResourceSimple extends Resource
 {
     protected static ?string $model = RecommendationConfigSimple::class;
     
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
+    protected static $navigationGroup = 'Products';
     
     protected static ?int $navigationSort = 14;
     protected static ?string $recordTitleAttribute = 'name';
@@ -65,7 +65,7 @@ final class RecommendationConfigResourceSimple extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Products->label();
+        return 'Products'->label();
     }
 
     /**

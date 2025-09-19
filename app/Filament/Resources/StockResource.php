@@ -46,7 +46,7 @@ final class StockResource extends Resource
     protected static ?string $model = Stock::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+        protected static $navigationGroup = NavigationGroup::
     
     ;
     protected static ?int $navigationSort = 7;
@@ -67,7 +67,7 @@ final class StockResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Products->label();
+        return 'Products'->label();
     }
 
     /**

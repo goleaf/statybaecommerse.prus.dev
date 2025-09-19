@@ -56,7 +56,7 @@ final class ProductVariantResource extends Resource
 {
     protected static ?string $model = ProductVariant::class;
     
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
+    protected static $navigationGroup = 'Products';
     
     protected static ?int $navigationSort = 3;
     protected static ?string $recordTitleAttribute = 'display_name';
@@ -76,7 +76,7 @@ final class ProductVariantResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Products->label();
+        return 'Products'->label();
     }
 
     /**

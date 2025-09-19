@@ -42,7 +42,7 @@ final class CountryResource extends Resource
     protected static ?string $model = Country::class;
     
     /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
+    protected static $navigationGroup = 'Products';
     protected static ?int $navigationSort = 4;
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -61,7 +61,7 @@ final class CountryResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::System->label();
+        return 'System'->label();
     }
 
     /**

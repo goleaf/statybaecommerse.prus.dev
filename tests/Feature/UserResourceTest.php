@@ -2,15 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\CategoryResource;
-use App\Models\Category;
+use App\Filament\Resources\UserResource;
 use App\Models\User;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class CategoryResourceTest extends TestCase
+class UserResourceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -24,15 +23,15 @@ class CategoryResourceTest extends TestCase
         ]));
     }
 
-    public function test_category_resource_can_be_instantiated(): void
+    public function test_user_resource_can_be_instantiated(): void
     {
-        $resource = new CategoryResource();
-        $this->assertInstanceOf(CategoryResource::class, $resource);
+        $resource = new UserResource();
+        $this->assertInstanceOf(UserResource::class, $resource);
     }
 
-    public function test_category_resource_has_required_methods(): void
+    public function test_user_resource_has_required_methods(): void
     {
-        $resource = new CategoryResource();
+        $resource = new UserResource();
 
         $this->assertTrue(method_exists($resource, 'form'));
         $this->assertTrue(method_exists($resource, 'table'));
@@ -40,36 +39,36 @@ class CategoryResourceTest extends TestCase
         $this->assertTrue(method_exists($resource, 'getModel'));
     }
 
-    public function test_category_resource_form_works(): void
+    public function test_user_resource_form_works(): void
     {
-        $resource = new CategoryResource();
+        $resource = new UserResource();
 
         // Test that form method exists and is callable
         $this->assertTrue(method_exists($resource, 'form'));
         $this->assertTrue(is_callable([$resource, 'form']));
     }
 
-    public function test_category_resource_table_works(): void
+    public function test_user_resource_table_works(): void
     {
-        $resource = new CategoryResource();
+        $resource = new UserResource();
 
         // Test that table method exists and is callable
         $this->assertTrue(method_exists($resource, 'table'));
         $this->assertTrue(is_callable([$resource, 'table']));
     }
 
-    public function test_category_resource_has_valid_model(): void
+    public function test_user_resource_has_valid_model(): void
     {
-        $resource = new CategoryResource();
+        $resource = new UserResource();
         $model = $resource->getModel();
 
-        $this->assertEquals(Category::class, $model);
+        $this->assertEquals(User::class, $model);
         $this->assertTrue(class_exists($model));
     }
 
-    public function test_category_resource_handles_empty_database(): void
+    public function test_user_resource_handles_empty_database(): void
     {
-        $resource = new CategoryResource();
+        $resource = new UserResource();
 
         // Test that methods exist and are callable
         $this->assertTrue(method_exists($resource, 'form'));
@@ -78,14 +77,16 @@ class CategoryResourceTest extends TestCase
         $this->assertTrue(is_callable([$resource, 'table']));
     }
 
-    public function test_category_resource_with_sample_data(): void
+    public function test_user_resource_with_sample_data(): void
     {
-        $category = Category::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+        $user = User::factory()->create([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john@example.com',
+            'is_active' => true,
         ]);
 
-        $resource = new CategoryResource();
+        $resource = new UserResource();
 
         // Test that methods exist and are callable
         $this->assertTrue(method_exists($resource, 'form'));
@@ -93,10 +94,9 @@ class CategoryResourceTest extends TestCase
         $this->assertTrue(is_callable([$resource, 'form']));
         $this->assertTrue(is_callable([$resource, 'table']));
 
-        // Test that category was created
-        $this->assertDatabaseHas('categories', [
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+        // Test that user was created
+        $this->assertDatabaseHas('users', [
+            'email' => 'john@example.com',
         ]);
     }
 }

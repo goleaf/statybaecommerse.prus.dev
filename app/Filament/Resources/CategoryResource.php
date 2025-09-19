@@ -45,7 +45,7 @@ final class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
     
-    protected static string | UnitEnum | null $navigationGroup = 'Products';
+    protected static $navigationGroup = 'Products';
     protected static ?int $navigationSort = 3;
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -64,7 +64,7 @@ final class CategoryResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Products->label();
+        return 'Products'->label();
     }
 
     /**

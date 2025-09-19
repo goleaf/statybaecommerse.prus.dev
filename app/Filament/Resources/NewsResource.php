@@ -51,7 +51,7 @@ final class NewsResource extends Resource
     protected static ?string $model = News::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+        protected static $navigationGroup = NavigationGroup::
     
     ;
     protected static ?int $navigationSort = 1;
@@ -72,7 +72,7 @@ final class NewsResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Content->label();
+        return 'Content'->label();
     }
 
     /**

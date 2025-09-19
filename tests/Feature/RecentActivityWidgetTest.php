@@ -3,13 +3,13 @@
 namespace Tests\Feature;
 
 use App\Filament\Widgets\RecentActivityWidget;
+use App\Models\Campaign;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\User;
 use App\Models\Review;
-use App\Models\Campaign;
 use App\Models\Slider;
 use App\Models\SystemSetting;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -27,7 +27,7 @@ class RecentActivityWidgetTest extends TestCase
     {
         $widget = new RecentActivityWidget();
         $query = $widget->getTableQuery();
-        
+
         // Should not throw exceptions with empty database
         $this->assertNotNull($query);
     }
@@ -37,14 +37,14 @@ class RecentActivityWidgetTest extends TestCase
         // Create only basic data that we know works
         $user = User::factory()->create();
         $product = Product::factory()->create();
-        
+
         $order = Order::factory()->create([
             'user_id' => $user->id,
-            'total' => 100.00,
+            'total' => 100.0,
             'status' => 'completed',
             'created_at' => now()
         ]);
-        
+
         $review = Review::factory()->create([
             'product_id' => $product->id,
             'rating' => 5,
@@ -54,9 +54,9 @@ class RecentActivityWidgetTest extends TestCase
 
         $widget = new RecentActivityWidget();
         $query = $widget->getTableQuery();
-        
+
         $this->assertNotNull($query);
-        
+
         // Test that the query can be executed
         $results = $query->get();
         $this->assertIsIterable($results);
@@ -85,16 +85,19 @@ class RecentActivityWidgetTest extends TestCase
         $user = User::factory()->create(['created_at' => now()]);
         $product = Product::factory()->create(['created_at' => now()]);
         $order = Order::factory()->create(['created_at' => now()]);
-        $review = Review::factory()->create(['created_at' => now()]);
+        $review = Review::factory()->create([
+            'created_at' => now(),
+            'is_approved' => true
+        ]);
 
         $widget = new RecentActivityWidget();
         $query = $widget->getTableQuery();
-        
+
         $results = $query->get();
-        
+
         // Should have results from basic models
         $this->assertGreaterThan(0, $results->count());
-        
+
         // Check that we have different types
         $types = $results->pluck('type')->unique();
         $this->assertTrue($types->contains('Order'));
@@ -109,7 +112,7 @@ class RecentActivityWidgetTest extends TestCase
         $oldOrder = Order::factory()->create([
             'created_at' => now()->subDays(10)
         ]);
-        
+
         // Create recent data (should appear)
         $recentOrder = Order::factory()->create([
             'created_at' => now()->subDays(3)
@@ -117,12 +120,12 @@ class RecentActivityWidgetTest extends TestCase
 
         $widget = new RecentActivityWidget();
         $query = $widget->getTableQuery();
-        
+
         $results = $query->get();
-        
+
         // Should only include recent data (last 7 days)
         $this->assertGreaterThan(0, $results->count());
-        
+
         // Check that old data is not included
         $orderIds = $results->where('type', 'Order')->pluck('title');
         $this->assertStringContainsString('Order #' . $recentOrder->id, $orderIds->first());

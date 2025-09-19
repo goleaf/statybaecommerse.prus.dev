@@ -47,7 +47,7 @@ final class UserResource extends Resource
 {
     protected static ?string $model = User::class;
     
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Users;
+    protected static $navigationGroup = 'Users';
     
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'name';
@@ -67,7 +67,7 @@ final class UserResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Users->label();
+        return 'Users'->label();
     }
 
     /**

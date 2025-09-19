@@ -42,7 +42,7 @@ final class CurrencyResource extends Resource
     protected static ?string $model = Currency::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+        protected static $navigationGroup = NavigationGroup::
     
     ;
     protected static ?int $navigationSort = 7;
@@ -63,7 +63,7 @@ final class CurrencyResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::System->label();
+        return 'System'->label();
     }
 
     /**

@@ -31,7 +31,7 @@ final class CountryResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Locations;
+    protected static $navigationGroup = 'Locations';
 
     protected static ?int $navigationSort = 1;
 
@@ -71,7 +71,7 @@ final class CountryResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Locations->label();
+        return 'Locations'->label();
     }
 
     /**

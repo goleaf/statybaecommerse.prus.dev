@@ -45,7 +45,7 @@ final class ZoneResource extends Resource
     protected static ?string $model = Zone::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+        protected static $navigationGroup = NavigationGroup::
     
     ;
     protected static ?int $navigationSort = 6;
@@ -66,7 +66,7 @@ final class ZoneResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::System->label();
+        return 'System'->label();
     }
 
     /**

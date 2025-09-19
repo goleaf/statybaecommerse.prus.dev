@@ -46,7 +46,7 @@ final class ReferralRewardResource extends Resource
     protected static ?string $model = ReferralReward::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+        protected static $navigationGroup = NavigationGroup::
     
     ;
     protected static ?int $navigationSort = 6;

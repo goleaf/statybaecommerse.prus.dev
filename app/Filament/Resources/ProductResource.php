@@ -52,7 +52,7 @@ final class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
     
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
+    protected static $navigationGroup = 'Products';
     
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'name';
@@ -72,7 +72,7 @@ final class ProductResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Products->label();
+        return 'Products'->label();
     }
 
     /**

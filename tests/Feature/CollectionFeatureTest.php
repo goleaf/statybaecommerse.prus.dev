@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -20,8 +18,9 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get('/lt/collections');
 
-        $response->assertOk()
-            ->assertViewIs('livewire.pages.collection.index')
+        $response
+            ->assertOk()
+            ->assertViewIs('livewire.pages.collection.index');
     }
 
     public function test_collections_index_shows_only_visible_collections(): void
@@ -31,7 +30,8 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get('/lt/collections');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertSee($visibleCollection->name)
             ->assertDontSee($hiddenCollection->name);
     }
@@ -47,7 +47,8 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get("/lt/collections/{$collection->slug}");
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertViewIs('livewire.pages.collection.show')
             ->assertSee($collection->name);
     }
@@ -77,7 +78,8 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get('/lt/collections?search=Summer');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertSee($collection1->name)
             ->assertDontSee($collection2->name);
     }
@@ -110,7 +112,8 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get("/lt/collections/{$collection->slug}");
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertSee($product->name);
     }
 
@@ -155,14 +158,15 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get("/lt/collections/{$collection->slug}");
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertSee('No products in this collection');
     }
 
     public function test_collection_redirects_to_canonical_slug(): void
     {
         $collection = Collection::factory()->create(['slug' => 'old-slug']);
-        
+
         // Create translation with different slug
         \App\Models\Translations\CollectionTranslation::factory()->create([
             'collection_id' => $collection->id,
@@ -172,7 +176,7 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get("/lt/collections/{$collection->slug}");
 
-        $response->assertRedirect("/lt/collections/new-slug");
+        $response->assertRedirect('/lt/collections/new-slug');
     }
 
     public function test_collections_api_endpoint(): void
@@ -181,7 +185,8 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get('/collections/api/search');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJsonStructure([
                 'data' => [
                     '*' => [
@@ -205,7 +210,8 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get('/collections/api/search?search=Summer');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJsonFragment(['name' => 'Summer Collection'])
             ->assertJsonMissing(['name' => 'Winter Collection']);
     }
@@ -217,7 +223,8 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get('/collections/api/by-type/manual');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJsonFragment(['name' => $manualCollection->name])
             ->assertJsonMissing(['name' => $automaticCollection->name]);
     }
@@ -226,13 +233,14 @@ final class CollectionFeatureTest extends TestCase
     {
         $collectionWithProducts = Collection::factory()->create(['is_visible' => true]);
         $collectionWithoutProducts = Collection::factory()->create(['is_visible' => true]);
-        
+
         $product = Product::factory()->create(['is_visible' => true]);
         $collectionWithProducts->products()->attach($product->id);
 
         $response = $this->get('/collections/api/with-products');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJsonFragment(['name' => $collectionWithProducts->name])
             ->assertJsonMissing(['name' => $collectionWithoutProducts->name]);
     }
@@ -243,7 +251,8 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get('/collections/api/popular');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJsonStructure([
                 'data' => [
                     '*' => [
@@ -262,7 +271,8 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get('/collections/api/statistics');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJsonStructure([
                 'total_collections',
                 'visible_collections',
@@ -280,7 +290,8 @@ final class CollectionFeatureTest extends TestCase
 
         $response = $this->get("/collections/{$collection->slug}/products");
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJsonStructure([
                 'data' => [
                     '*' => [

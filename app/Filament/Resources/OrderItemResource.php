@@ -45,7 +45,7 @@ final class OrderItemResource extends Resource
     protected static ?string $model = OrderItem::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = NavigationGroup::
+        protected static $navigationGroup = NavigationGroup::
     
     ;
     protected static ?int $navigationSort = 2;
@@ -66,7 +66,7 @@ final class OrderItemResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Orders->label();
+        return 'Orders'->label();
     }
 
     /**

@@ -23,7 +23,7 @@ class AdvancedAnalyticsWidget extends ChartWidget
     protected int|string|array $columnSpan = 'full';
     protected ?string $maxHeight = '400px';
 
-    protected function getData(): array
+    public function getData(): array
     {
         $now = Carbon::now();
         $last30Days = $now->copy()->subDays(30);
@@ -43,7 +43,7 @@ class AdvancedAnalyticsWidget extends ChartWidget
             // Revenue
             $revenue = Order::where('status', '!=', 'cancelled')
                 ->whereDate('created_at', $date)
-                ->sum('total_amount');
+                ->sum('total');
             $revenueData[] = $revenue;
 
             // Orders
@@ -113,12 +113,12 @@ class AdvancedAnalyticsWidget extends ChartWidget
         ];
     }
 
-    protected function getType(): string
+    public function getType(): string
     {
         return 'line';
     }
 
-    protected function getOptions(): array
+    public function getOptions(): array
     {
         return [
             'responsive' => true,
@@ -150,5 +150,10 @@ class AdvancedAnalyticsWidget extends ChartWidget
                 'mode' => 'index',
             ],
         ];
+    }
+
+    public function getMaxHeight(): ?string
+    {
+        return $this->maxHeight;
     }
 }
