@@ -56,6 +56,9 @@ final class ProductFilterWidget extends Component
      */
     public function mount(): void
     {
+        // Ensure proper type casting for URL parameters
+        $this->minPrice = (float) $this->minPrice;
+        $this->maxPrice = (float) $this->maxPrice;
         $this->updatePriceRange();
     }
     /**
@@ -96,6 +99,7 @@ final class ProductFilterWidget extends Component
      */
     public function updatedMinPrice(): void
     {
+        $this->minPrice = (float) $this->minPrice;
         $this->dispatch('filter-updated');
     }
     /**
@@ -104,6 +108,7 @@ final class ProductFilterWidget extends Component
      */
     public function updatedMaxPrice(): void
     {
+        $this->maxPrice = (float) $this->maxPrice;
         $this->dispatch('filter-updated');
     }
     /**
@@ -155,8 +160,8 @@ final class ProductFilterWidget extends Component
     public function updatePriceRange(): void
     {
         $priceRange = Product::where('is_visible', true)->selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
-        $this->minPrice = $priceRange->min_price ?? 0;
-        $this->maxPrice = $priceRange->max_price ?? 10000;
+        $this->minPrice = (float) ($priceRange->min_price ?? 0);
+        $this->maxPrice = (float) ($priceRange->max_price ?? 10000);
     }
     /**
      * Handle availableCategories functionality with proper error handling.
