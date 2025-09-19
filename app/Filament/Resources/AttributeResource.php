@@ -65,7 +65,7 @@ final class AttributeResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return 'Products'->label();
+        return NavigationGroup::Products->label();
     }
 
     /**

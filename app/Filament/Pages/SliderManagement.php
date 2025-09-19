@@ -17,7 +17,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Support\Enums\ActionSize;
+use Filament\Support\Enums\Size;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
@@ -54,7 +54,7 @@ class SliderManagement extends Page implements HasForms, HasActions
             ->label(__('translations.create_slider'))
             ->icon('heroicon-o-plus')
             ->color('primary')
-            ->size(ActionSize::Large)
+            ->size(Size::Large)
             ->form([
                 TextInput::make('title')
                     ->label(__('translations.title'))

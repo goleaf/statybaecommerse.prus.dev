@@ -64,7 +64,7 @@ final class SystemSettingsResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return 'System'->label();
+        return NavigationGroup::System->label();
     }
 
     /**

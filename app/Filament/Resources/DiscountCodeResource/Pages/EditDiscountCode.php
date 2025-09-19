@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace App\Filament\Resources\CustomerGroupResource\Pages;
+namespace App\Filament\Resources\DiscountCodeResource\Pages;
 
-use App\Filament\Resources\CustomerGroupResource;
+use App\Filament\Resources\DiscountCodeResource;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
 
-final class EditCustomerGroup extends EditRecord
+final class EditDiscountCode extends EditRecord
 {
-    protected static string $resource = CustomerGroupResource::class;
+    protected static string $resource = DiscountCodeResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -18,4 +18,3 @@ final class EditCustomerGroup extends EditRecord
         ];
     }
 }
-

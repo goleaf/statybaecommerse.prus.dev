@@ -65,7 +65,7 @@ final class CartItemResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return 'Orders'->label();
+        return NavigationGroup::Orders->label();
     }
 
     /**

@@ -66,7 +66,7 @@ final class UserResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return 'Users'->label();
+        return NavigationGroup::Users->label();
     }
 
     /**

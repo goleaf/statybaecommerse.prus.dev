@@ -62,7 +62,7 @@ final class MenuResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return 'Content'->label();
+        return NavigationGroup::Content->label();
     }
 
     /**

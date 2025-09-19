@@ -47,7 +47,7 @@ final class ProductHistoryResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Products'->label();
+        return NavigationGroup::Products->label();
     }
 
     public static function getPluralModelLabel(): string

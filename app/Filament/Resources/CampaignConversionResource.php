@@ -67,7 +67,7 @@ final class CampaignConversionResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return 'Marketing'->label();
+        return NavigationGroup::Marketing->label();
     }
 
     /**

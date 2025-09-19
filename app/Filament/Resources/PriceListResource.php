@@ -67,7 +67,7 @@ final class PriceListResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return 'Products'->label();
+        return NavigationGroup::Products->label();
     }
 
     /**

@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace App\Filament\Resources\OrderResource\Pages;
+namespace App\Filament\Resources\DiscountCodeResource\Pages;
 
-use App\Filament\Resources\OrderResource;
+use App\Filament\Resources\DiscountCodeResource;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions;
 
-final class ViewOrder extends ViewRecord
+final class ViewDiscountCode extends ViewRecord
 {
-    protected static string $resource = OrderResource::class;
+    protected static string $resource = DiscountCodeResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -17,4 +17,3 @@ final class ViewOrder extends ViewRecord
         ];
     }
 }
-
