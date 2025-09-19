@@ -28,7 +28,7 @@ final class AdminPanelTest extends TestCase
 
     public function test_dashboard_route_exists(): void
     {
-        $this->assertTrue(route_exists('filament.admin.pages.dashboard'));
+        $this->assertTrue(\Illuminate\Support\Facades\Route::has('filament.admin.pages.dashboard'));
     }
 
     public function test_admin_login_page_is_accessible(): void

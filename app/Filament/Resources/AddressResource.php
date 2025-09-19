@@ -174,18 +174,7 @@ final class AddressResource extends Resource
                             ->maxLength(2)
                             ->default('LT'),
                     ]),
-                    Grid::make(2)->schema([
-                        Select::make('country_id')
-                            ->label(__('translations.country'))
-                            ->relationship('country', 'name')
-                            ->searchable()
-                            ->preload(),
-                        Select::make('zone_id')
-                            ->label(__('translations.zone'))
-                            ->relationship('zone', 'name')
-                            ->searchable()
-                            ->preload(),
-                    ]),
+                    // Removed country_id and zone_id fields as they don't exist in the database
                 ]),
             Section::make(__('translations.contact_information'))
                 ->schema([

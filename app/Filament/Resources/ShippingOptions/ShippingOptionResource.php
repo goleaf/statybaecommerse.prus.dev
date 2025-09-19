@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\ShippingOptions;
 
@@ -9,33 +7,33 @@ use App\Filament\Resources\ShippingOptions\Pages\EditShippingOption;
 use App\Filament\Resources\ShippingOptions\Pages\ListShippingOptions;
 use App\Models\ShippingOption;
 use App\Models\Zone;
-use BackedEnum;
-use UnitEnum;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use BackedEnum;
+use UnitEnum;
 
 class ShippingOptionResource extends Resource
 {
     protected static ?string $model = ShippingOption::class;
 
-    protected static $navigationGroup = 'Shipping';
+    protected static string|UnitEnum|null $navigationGroup = 'Shipping';
 
     protected static ?int $navigationSort = 1;
 
@@ -44,7 +42,7 @@ class ShippingOptionResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Section::make('Basic Information')
                     ->schema([
                         Grid::make(2)
@@ -60,7 +58,6 @@ class ShippingOptionResource extends Resource
                         Textarea::make('description')
                             ->rows(3),
                     ]),
-                
                 Section::make('Shipping Details')
                     ->schema([
                         Grid::make(2)
@@ -84,7 +81,6 @@ class ShippingOptionResource extends Resource
                                     ->default('EUR'),
                             ]),
                     ]),
-                
                 Section::make('Configuration')
                     ->schema([
                         Grid::make(2)
@@ -106,7 +102,6 @@ class ShippingOptionResource extends Resource
                                     ->default(false),
                             ]),
                     ]),
-                
                 Section::make('Weight & Order Limits')
                     ->schema([
                         Grid::make(2)
@@ -128,7 +123,6 @@ class ShippingOptionResource extends Resource
                                     ->prefix('€'),
                             ]),
                     ]),
-                
                 Section::make('Delivery Times')
                     ->schema([
                         Grid::make(2)

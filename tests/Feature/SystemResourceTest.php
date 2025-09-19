@@ -13,6 +13,9 @@ final class SystemResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected User $user;
+    protected SystemSettingCategory $category;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -47,6 +50,10 @@ final class SystemResourceTest extends TestCase
             'type' => 'string',
             'value' => 'test_value',
             'category_id' => $this->category->id,
+            'is_required' => false,
+            'is_public' => false,
+            'is_readonly' => false,
+            'is_encrypted' => false,
         ];
 
         Livewire::test(\App\Filament\Resources\SystemResource\Pages\CreateSystem::class)
@@ -71,6 +78,7 @@ final class SystemResourceTest extends TestCase
         $data = [
             'name' => 'Updated Setting Name',
             'value' => 'updated_value',
+            'type' => 'string',
         ];
 
         Livewire::test(\App\Filament\Resources\SystemResource\Pages\EditSystem::class, [

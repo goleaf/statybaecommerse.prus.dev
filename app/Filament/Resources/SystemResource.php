@@ -255,32 +255,19 @@ final class SystemResource extends Resource
                             ->schema([
                                 Section::make('Dependencies')
                                     ->schema([
-                                        Repeater::make('dependencies')
-                                            ->label('Setting Dependencies')
-                                            ->schema([
-                                                Select::make('setting_id')
-                                                    ->label('Depends On')
-                                                    ->options(SystemSetting::pluck('name', 'id'))
-                                                    ->required(),
-                                                TextInput::make('condition')
-                                                    ->label('Condition')
-                                                    ->helperText('When this dependency should be active'),
-                                            ])
-                                            ->helperText('Other settings that this setting depends on'),
+                                        TextInput::make('dependencies_info')
+                                            ->label('Dependencies')
+                                            ->helperText('Dependencies are managed through the Dependencies tab in the view page')
+                                            ->disabled()
+                                            ->dehydrated(false),
                                     ]),
                                 Section::make('Relations')
                                     ->schema([
-                                        Repeater::make('related_settings')
+                                        TextInput::make('relations_info')
                                             ->label('Related Settings')
-                                            ->schema([
-                                                TextInput::make('setting_key')
-                                                    ->label('Related Setting Key')
-                                                    ->required(),
-                                                TextInput::make('relation_type')
-                                                    ->label('Relation Type')
-                                                    ->helperText('Type of relationship'),
-                                            ])
-                                            ->helperText('Settings that are related to this one'),
+                                            ->helperText('Related settings are managed through the Relations tab in the view page')
+                                            ->disabled()
+                                            ->dehydrated(false),
                                     ]),
                             ]),
                         Tab::make('Translations')
@@ -288,23 +275,11 @@ final class SystemResource extends Resource
                             ->schema([
                                 Section::make('Multi-language Support')
                                     ->schema([
-                                        Repeater::make('translations')
+                                        TextInput::make('translations_info')
                                             ->label('Translations')
-                                            ->schema([
-                                                Select::make('locale')
-                                                    ->label('Language')
-                                                    ->options([
-                                                        'en' => 'English',
-                                                        'lt' => 'Lithuanian',
-                                                    ])
-                                                    ->required(),
-                                                TextInput::make('name')
-                                                    ->label('Translated Name')
-                                                    ->required(),
-                                                Textarea::make('description')
-                                                    ->label('Translated Description'),
-                                            ])
-                                            ->helperText('Translations for this setting'),
+                                            ->helperText('Translations are managed through the Translations tab in the view page')
+                                            ->disabled()
+                                            ->dehydrated(false),
                                     ]),
                             ]),
                     ])

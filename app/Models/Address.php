@@ -32,7 +32,7 @@ final class Address extends Model
 {
     use HasFactory, SoftDeletes, HasTranslations;
     protected $table = 'addresses';
-    protected $fillable = ['user_id', 'type', 'first_name', 'last_name', 'company', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code', 'country_id', 'zone_id', 'city_id', 'phone', 'email', 'is_default', 'is_billing', 'is_shipping', 'notes', 'apartment', 'floor', 'building', 'landmark', 'instructions', 'company_name', 'company_vat', 'is_active'];
+    protected $fillable = ['user_id', 'type', 'first_name', 'last_name', 'company', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code', 'phone', 'email', 'is_default', 'is_billing', 'is_shipping', 'notes', 'apartment', 'floor', 'building', 'landmark', 'instructions', 'company_name', 'company_vat', 'is_active'];
     protected $translatable = ['notes', 'instructions'];
     /**
      * Handle casts functionality with proper error handling.

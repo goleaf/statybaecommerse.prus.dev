@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use App\Models\ShippingOption;
 use App\Models\Zone;
@@ -39,7 +37,7 @@ test('shipping option belongs to zone', function () {
 
 test('shipping option has formatted price accessor', function () {
     $shippingOption = ShippingOption::factory()->create([
-        'price' => 25.50,
+        'price' => 25.5,
         'currency_code' => 'EUR',
     ]);
 
@@ -101,7 +99,7 @@ test('shipping option can check order amount eligibility', function () {
 
 test('shipping option can calculate price for order', function () {
     $shippingOption = ShippingOption::factory()->create([
-        'price' => 20.00,
+        'price' => 20.0,
         'min_weight' => 1,
         'max_weight' => 10,
         'min_order_amount' => 50,
@@ -109,25 +107,74 @@ test('shipping option can calculate price for order', function () {
     ]);
 
     // Eligible order
-    expect($shippingOption->calculatePriceForOrder(5, 100))->toBe(20.00);
-    
+    expect($shippingOption->calculatePriceForOrder(5, 100))->toBe(20.0);
+
     // Ineligible due to weight
     expect($shippingOption->calculatePriceForOrder(15, 100))->toBe(0.0);
-    
+
     // Ineligible due to order amount
     expect($shippingOption->calculatePriceForOrder(5, 25))->toBe(0.0);
 });
 
 test('shipping option scopes work correctly', function () {
-    ShippingOption::factory()->create(['is_enabled' => true]);
-    ShippingOption::factory()->create(['is_enabled' => false]);
-    ShippingOption::factory()->create(['is_default' => true]);
-    ShippingOption::factory()->create(['carrier_name' => 'DHL']);
+    $zone1 = Zone::factory()->create();
+    $zone2 = Zone::factory()->create();
+    $zone3 = Zone::factory()->create();
+    $zone4 = Zone::factory()->create();
 
-    expect(ShippingOption::enabled()->count())->toBe(1);
+    ShippingOption::create([
+        'name' => 'DHL Express',
+        'slug' => 'dhl-express-1',
+        'carrier_name' => 'DHL',
+        'service_type' => 'Express',
+        'price' => 15.99,
+        'currency_code' => 'EUR',
+        'zone_id' => $zone1->id,
+        'is_enabled' => true,
+        'is_default' => false,
+    ]);
+
+    ShippingOption::create([
+        'name' => 'UPS Standard',
+        'slug' => 'ups-standard-1',
+        'carrier_name' => 'UPS',
+        'service_type' => 'Standard',
+        'price' => 12.99,
+        'currency_code' => 'EUR',
+        'zone_id' => $zone2->id,
+        'is_enabled' => false,
+        'is_default' => false,
+    ]);
+
+    ShippingOption::create([
+        'name' => 'FedEx Priority',
+        'slug' => 'fedex-priority-1',
+        'carrier_name' => 'FedEx',
+        'service_type' => 'Priority',
+        'price' => 20.99,
+        'currency_code' => 'EUR',
+        'zone_id' => $zone3->id,
+        'is_enabled' => true,
+        'is_default' => true,
+    ]);
+
+    ShippingOption::create([
+        'name' => 'DHL Economy',
+        'slug' => 'dhl-economy-1',
+        'carrier_name' => 'DHL',
+        'service_type' => 'Economy',
+        'price' => 8.99,
+        'currency_code' => 'EUR',
+        'zone_id' => $zone4->id,
+        'is_enabled' => true,
+        'is_default' => false,
+    ]);
+
+    expect(ShippingOption::count())->toBe(4);
+    expect(ShippingOption::enabled()->count())->toBe(3);  // 3 enabled
     expect(ShippingOption::default()->count())->toBe(1);
-    expect(ShippingOption::byCarrier('DHL')->count())->toBe(1);
-    expect(ShippingOption::byZone($this->zone->id)->count())->toBe(4);
+    expect(ShippingOption::byCarrier('DHL')->count())->toBe(2);  // 2 DHL options
+    expect(ShippingOption::byZone($zone1->id)->count())->toBe(1);
 });
 
 test('shipping option casts work correctly', function () {

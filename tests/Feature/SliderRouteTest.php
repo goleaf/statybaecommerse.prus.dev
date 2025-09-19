@@ -13,7 +13,7 @@ final class SliderRouteTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create test user
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
@@ -21,13 +21,15 @@ final class SliderRouteTest extends TestCase
 
     public function test_sliders_index_route_exists(): void
     {
-        $this->get('/admin/sliders')
+        $this
+            ->get('/admin/sliders')
             ->assertStatus(200);
     }
 
     public function test_sliders_create_route_exists(): void
     {
-        $this->get('/admin/sliders/create')
+        $this
+            ->get('/admin/sliders/create')
             ->assertStatus(200);
     }
 

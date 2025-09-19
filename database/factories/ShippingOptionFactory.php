@@ -20,10 +20,10 @@ class ShippingOptionFactory extends Factory
         $services = ['Standard', 'Express', 'Overnight', 'Economy', 'Priority'];
         $carrier = fake()->randomElement($carriers);
         $service = fake()->randomElement($services);
-        
+
         return [
             'name' => $carrier . ' ' . $service,
-            'slug' => fake()->unique()->slug(),
+            'slug' => fake()->unique()->slug(2),
             'description' => fake()->sentence(),
             'carrier_name' => $carrier,
             'service_type' => $service,
@@ -39,31 +39,27 @@ class ShippingOptionFactory extends Factory
             'max_order_amount' => fake()->optional(0.2)->randomFloat(2, 100, 1000),
             'estimated_days_min' => fake()->numberBetween(1, 3),
             'estimated_days_max' => fake()->numberBetween(3, 7),
-            'metadata' => fake()->optional(0.3)->randomElements([
-                'tracking_available' => true,
-                'signature_required' => fake()->boolean(),
-                'insurance_included' => fake()->boolean(),
-            ]),
+            'metadata' => null,
         ];
     }
 
     public function enabled(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_enabled' => true,
         ]);
     }
 
     public function disabled(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_enabled' => false,
         ]);
     }
 
     public function default(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_default' => true,
             'sort_order' => 0,
         ]);
@@ -71,7 +67,7 @@ class ShippingOptionFactory extends Factory
 
     public function free(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'price' => 0,
             'name' => 'Free Shipping',
             'carrier_name' => 'Standard',

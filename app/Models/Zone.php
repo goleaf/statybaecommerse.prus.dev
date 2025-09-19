@@ -1,6 +1,5 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
@@ -9,18 +8,19 @@ use App\Models\Scopes\StatusScope;
 use App\Models\Translations\ZoneTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 /**
  * Zone
- * 
+ *
  * Eloquent model representing the Zone entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property string $translationModel
  * @property mixed $table
  * @property mixed $fillable
@@ -33,9 +33,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 final class Zone extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
+
     protected string $translationModel = ZoneTranslation::class;
     protected $table = 'zones';
     protected $fillable = ['name', 'slug', 'code', 'description', 'is_enabled', 'is_default', 'currency_id', 'tax_rate', 'shipping_rate', 'sort_order', 'metadata', 'type', 'priority', 'min_order_amount', 'max_order_amount', 'free_shipping_threshold', 'is_active'];
+
     /**
      * Handle casts functionality with proper error handling.
      * @return array
@@ -44,6 +46,7 @@ final class Zone extends Model
     {
         return ['is_enabled' => 'boolean', 'is_default' => 'boolean', 'is_active' => 'boolean', 'tax_rate' => 'decimal:4', 'shipping_rate' => 'decimal:2', 'sort_order' => 'integer', 'priority' => 'integer', 'min_order_amount' => 'decimal:2', 'max_order_amount' => 'decimal:2', 'free_shipping_threshold' => 'decimal:2', 'metadata' => 'array'];
     }
+
     /**
      * Handle discounts functionality with proper error handling.
      * @return HasMany
@@ -52,6 +55,7 @@ final class Zone extends Model
     {
         return $this->hasMany(Discount::class);
     }
+
     /**
      * Handle currency functionality with proper error handling.
      * @return BelongsTo
@@ -60,6 +64,7 @@ final class Zone extends Model
     {
         return $this->belongsTo(Currency::class);
     }
+
     /**
      * Handle countries functionality with proper error handling.
      * @return BelongsToMany
@@ -68,6 +73,7 @@ final class Zone extends Model
     {
         return $this->belongsToMany(Country::class, 'country_zone', 'zone_id', 'country_id');
     }
+
     /**
      * Handle regions functionality with proper error handling.
      * @return HasMany
@@ -76,6 +82,7 @@ final class Zone extends Model
     {
         return $this->hasMany(Region::class);
     }
+
     /**
      * Handle cities functionality with proper error handling.
      * @return HasMany
@@ -84,6 +91,7 @@ final class Zone extends Model
     {
         return $this->hasMany(City::class);
     }
+
     /**
      * Handle orders functionality with proper error handling.
      * @return HasMany
@@ -92,6 +100,7 @@ final class Zone extends Model
     {
         return $this->hasMany(Order::class);
     }
+
     /**
      * Handle shippingOptions functionality with proper error handling.
      * @return HasMany
@@ -100,6 +109,7 @@ final class Zone extends Model
     {
         return $this->hasMany(ShippingOption::class);
     }
+
     /**
      * Handle priceLists functionality with proper error handling.
      * @return HasMany
@@ -108,7 +118,9 @@ final class Zone extends Model
     {
         return $this->hasMany(PriceList::class);
     }
+
     // Scopes
+
     /**
      * Handle scopeEnabled functionality with proper error handling.
      * @param Builder $query
@@ -118,6 +130,7 @@ final class Zone extends Model
     {
         return $query->where('is_enabled', true);
     }
+
     /**
      * Handle scopeDefault functionality with proper error handling.
      * @param Builder $query
@@ -127,6 +140,7 @@ final class Zone extends Model
     {
         return $query->where('is_default', true);
     }
+
     /**
      * Handle scopeActive functionality with proper error handling.
      * @param Builder $query
@@ -136,6 +150,7 @@ final class Zone extends Model
     {
         return $query->where('is_active', true);
     }
+
     /**
      * Handle scopeByType functionality with proper error handling.
      * @param Builder $query
@@ -146,6 +161,7 @@ final class Zone extends Model
     {
         return $query->where('type', $type);
     }
+
     /**
      * Handle scopeByCurrency functionality with proper error handling.
      * @param Builder $query
@@ -156,6 +172,7 @@ final class Zone extends Model
     {
         return $query->where('currency_id', $currencyId);
     }
+
     /**
      * Handle scopeOrdered functionality with proper error handling.
      * @param Builder $query
@@ -165,6 +182,7 @@ final class Zone extends Model
     {
         return $query->orderBy('sort_order')->orderBy('priority')->orderBy('name');
     }
+
     /**
      * Handle scopeWithCountries functionality with proper error handling.
      * @param Builder $query
@@ -174,7 +192,9 @@ final class Zone extends Model
     {
         return $query->withCount('countries');
     }
+
     // Business Logic Methods
+
     /**
      * Handle calculateTax functionality with proper error handling.
      * @param float $amount
@@ -184,6 +204,7 @@ final class Zone extends Model
     {
         return $amount * ($this->tax_rate / 100);
     }
+
     /**
      * Handle calculateShipping functionality with proper error handling.
      * @param float $weight
@@ -205,6 +226,7 @@ final class Zone extends Model
         }
         return $this->shipping_rate * max(1, $weight);
     }
+
     /**
      * Handle isEligibleForOrder functionality with proper error handling.
      * @param float $orderAmount
@@ -220,6 +242,7 @@ final class Zone extends Model
         }
         return true;
     }
+
     /**
      * Handle hasFreeShipping functionality with proper error handling.
      * @param float $orderAmount
@@ -229,7 +252,9 @@ final class Zone extends Model
     {
         return $this->free_shipping_threshold && $orderAmount >= $this->free_shipping_threshold;
     }
+
     // Translation Methods
+
     /**
      * Handle getTranslatedNameAttribute functionality with proper error handling.
      * @return string
@@ -238,6 +263,7 @@ final class Zone extends Model
     {
         return ($this->trans('name') ?: $this->getOriginal('name')) ?: 'Unknown';
     }
+
     /**
      * Handle getTranslatedDescriptionAttribute functionality with proper error handling.
      * @return string
@@ -246,7 +272,9 @@ final class Zone extends Model
     {
         return ($this->trans('description') ?: $this->getOriginal('description')) ?: '';
     }
+
     // Accessor Methods
+
     /**
      * Handle getFormattedTaxRateAttribute functionality with proper error handling.
      * @return string
@@ -255,6 +283,7 @@ final class Zone extends Model
     {
         return number_format($this->tax_rate, 2) . '%';
     }
+
     /**
      * Handle getFormattedShippingRateAttribute functionality with proper error handling.
      * @return string
@@ -263,6 +292,7 @@ final class Zone extends Model
     {
         return '€' . number_format($this->shipping_rate, 2);
     }
+
     /**
      * Handle getFormattedMinOrderAmountAttribute functionality with proper error handling.
      * @return string
@@ -271,6 +301,7 @@ final class Zone extends Model
     {
         return $this->min_order_amount ? '€' . number_format($this->min_order_amount, 2) : 'N/A';
     }
+
     /**
      * Handle getFormattedMaxOrderAmountAttribute functionality with proper error handling.
      * @return string
@@ -279,6 +310,7 @@ final class Zone extends Model
     {
         return $this->max_order_amount ? '€' . number_format($this->max_order_amount, 2) : 'N/A';
     }
+
     /**
      * Handle getFormattedFreeShippingThresholdAttribute functionality with proper error handling.
      * @return string
@@ -287,7 +319,9 @@ final class Zone extends Model
     {
         return $this->free_shipping_threshold ? '€' . number_format($this->free_shipping_threshold, 2) : 'N/A';
     }
+
     // Static Methods
+
     /**
      * Handle getDefaultZone functionality with proper error handling.
      * @return self|null
@@ -296,6 +330,7 @@ final class Zone extends Model
     {
         return self::default()->first();
     }
+
     /**
      * Handle getActiveZones functionality with proper error handling.
      * @return Builder
@@ -304,6 +339,7 @@ final class Zone extends Model
     {
         return self::active()->enabled()->ordered();
     }
+
     /**
      * Handle getZonesByCurrency functionality with proper error handling.
      * @param int $currencyId

@@ -57,6 +57,7 @@ final class AdminPanelProvider extends PanelProvider
                 // Orders
                 \App\Filament\Resources\OrderResource::class,
                 \App\Filament\Resources\CartItemResource::class,
+                \App\Filament\Resources\AddressResource::class,
                 // Users
                 \App\Filament\Resources\UserResource::class,
                 \App\Filament\Resources\CustomerGroupResource::class,
@@ -67,7 +68,6 @@ final class AdminPanelProvider extends PanelProvider
                 \App\Filament\Resources\LocationResource::class,
                 \App\Filament\Resources\CountryResource::class,
                 \App\Filament\Resources\ZoneResource::class,
-                
                 // Shipping
                 // \App\Filament\Resources\ShippingOptions\ShippingOptionResource::class,
                 // Marketing

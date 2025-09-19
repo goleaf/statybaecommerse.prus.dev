@@ -24,6 +24,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ColorColumn;
@@ -92,8 +93,7 @@ final class SliderResource extends Resource
                                     ->defaultItems(1)
                                     ->collapsible()
                                     ->itemLabel(fn(array $state): ?string => $state['title'] ?? __('translations.new_translation'))
-                                    ->addActionLabel(__('translations.add_translation'))
-                                    ->deleteActionLabel(__('translations.delete_translation')),
+                                    ->addActionLabel(__('translations.add_translation')),
                             ]),
                         Tab::make('Media & Styling')
                             ->icon('heroicon-o-photo')

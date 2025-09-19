@@ -11,6 +11,7 @@ use App\Models\Currency;
 use App\Models\CustomerGroup;
 use App\Models\DiscountCode;
 use App\Models\Document;
+use App\Models\Inventory;
 use App\Models\Location;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -22,7 +23,6 @@ use App\Models\RecommendationBlock;
 use App\Models\ReferralReward;
 use App\Models\SeoData;
 use App\Models\Slider;
-use App\Models\Inventory;
 use App\Models\Subscriber;
 use App\Models\User;
 use App\Models\Zone;
@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Hash;
 
 /**
  * AdminSeeder
- * 
+ *
  * Comprehensive seeder for admin@example.com user with all menu items
  * and sample data for testing and demonstration purposes.
  */
@@ -43,67 +43,67 @@ final class AdminSeeder extends Seeder
 
         // Create admin user
         $admin = $this->createAdminUser();
-        
+
         // Create countries and zones
         $countries = $this->createCountries();
         $zones = $this->createZones();
         $cities = $this->createCities($countries);
-        
+
         // Create currencies
         $currencies = $this->createCurrencies();
-        
+
         // Create customer groups
         $customerGroups = $this->createCustomerGroups();
-        
+
         // Create categories
         $categories = $this->createCategories();
-        
+
         // Create products and variants
         $products = $this->createProducts($categories);
         $variants = $this->createProductVariants($products);
-        
+
         // Create locations first
         $locations = $this->createLocations($countries, $zones, $cities);
-        
+
         // Create stock records
         $this->createStockRecords($variants, $locations);
-        
+
         // Create addresses
         $addresses = $this->createAddresses($admin, $countries, $zones, $cities);
-        
+
         // Create orders and order items
         $orders = $this->createOrders($admin, $addresses);
         $this->createOrderItems($orders, $variants);
-        
+
         // Create order shipping
         $this->createOrderShipping($orders);
-        
+
         // Create documents
         // $this->createDocuments($orders); // Temporarily disabled - requires document_template_id
-        
+
         // Create discount codes
         // $this->createDiscountCodes(); // Temporarily disabled - table doesn't exist
-        
+
         // Create sliders
         $this->createSliders();
-        
+
         // Create recommendation blocks
         $this->createRecommendationBlocks();
-        
+
         // Create SEO data
         $this->createSeoData();
-        
+
         // Create subscribers
         $this->createSubscribers();
-        
+
         // Create referral rewards
         // $this->createReferralRewards($admin); // Temporarily disabled - requires referral_id
-        
+
         // Create product history
         $this->createProductHistory($products);
-        
+
         // Locations already created above
-        
+
         $this->command->info('✅ Comprehensive Admin Seeder completed successfully!');
         $this->command->info('👤 Admin user: admin@example.com');
         $this->command->info('🔑 Password: password');
@@ -112,7 +112,7 @@ final class AdminSeeder extends Seeder
     private function createAdminUser(): User
     {
         $this->command->info('👤 Creating admin user...');
-        
+
         return User::firstOrCreate(
             ['email' => 'admin@example.com'],
             [
@@ -128,7 +128,7 @@ final class AdminSeeder extends Seeder
     private function createCountries(): array
     {
         $this->command->info('🌍 Creating countries...');
-        
+
         $countries = [
             [
                 'name' => 'Lithuania',
@@ -214,7 +214,7 @@ final class AdminSeeder extends Seeder
     private function createZones(): array
     {
         $this->command->info('🗺️ Creating zones...');
-        
+
         $zones = [
             ['name' => 'Europe', 'code' => 'EU'],
             ['name' => 'North America', 'code' => 'NA'],
@@ -234,7 +234,7 @@ final class AdminSeeder extends Seeder
     private function createCities(array $countries): array
     {
         $this->command->info('🏙️ Creating cities...');
-        
+
         $cities = [
             ['name' => 'Vilnius', 'slug' => 'vilnius', 'code' => 'VIL', 'country_id' => $countries[0]->id, 'is_active' => true, 'is_enabled' => true],
             ['name' => 'Riga', 'slug' => 'riga', 'code' => 'RIG', 'country_id' => $countries[1]->id, 'is_active' => true, 'is_enabled' => true],
@@ -254,7 +254,7 @@ final class AdminSeeder extends Seeder
     private function createCurrencies(): array
     {
         $this->command->info('💰 Creating currencies...');
-        
+
         $currencies = [
             ['name' => ['lt' => 'Euro', 'en' => 'Euro'], 'code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1.0, 'is_default' => true, 'is_enabled' => true, 'decimal_places' => 2],
             ['name' => ['lt' => 'US Dollar', 'en' => 'US Dollar'], 'code' => 'USD', 'symbol' => '$', 'exchange_rate' => 0.85, 'is_default' => false, 'is_enabled' => true, 'decimal_places' => 2],
@@ -274,7 +274,7 @@ final class AdminSeeder extends Seeder
     private function createCustomerGroups(): array
     {
         $this->command->info('👥 Creating customer groups...');
-        
+
         $groups = [
             ['name' => ['lt' => 'VIP Customers', 'en' => 'VIP Customers'], 'code' => 'VIP', 'description' => ['lt' => 'High-value customers with special privileges', 'en' => 'High-value customers with special privileges'], 'discount_percentage' => 15.0],
             ['name' => ['lt' => 'Regular Customers', 'en' => 'Regular Customers'], 'code' => 'REGULAR', 'description' => ['lt' => 'Standard customers', 'en' => 'Standard customers'], 'discount_percentage' => 5.0],
@@ -295,7 +295,7 @@ final class AdminSeeder extends Seeder
     private function createCategories(): array
     {
         $this->command->info('📂 Creating categories...');
-        
+
         $categories = [
             ['name' => 'Electronics', 'slug' => 'electronics', 'description' => 'Electronic devices and gadgets'],
             ['name' => 'Clothing', 'slug' => 'clothing', 'description' => 'Fashion and apparel'],
@@ -317,7 +317,7 @@ final class AdminSeeder extends Seeder
     private function createProducts(array $categories): array
     {
         $this->command->info('📦 Creating products...');
-        
+
         $products = [
             [
                 'name' => 'Smartphone Pro',
@@ -377,12 +377,12 @@ final class AdminSeeder extends Seeder
                 ['sku' => $product['sku']],
                 $product
             );
-            
+
             // Attach category to product if not already attached
             if (isset($categories[$index]) && !$createdProduct->categories()->where('category_id', $categories[$index]->id)->exists()) {
                 $createdProduct->categories()->attach($categories[$index]->id);
             }
-            
+
             $createdProducts[] = $createdProduct;
         }
         return $createdProducts;
@@ -391,13 +391,13 @@ final class AdminSeeder extends Seeder
     private function createProductVariants(array $products): array
     {
         $this->command->info('🔧 Creating product variants...');
-        
+
         $variants = [];
-        
+
         foreach ($products as $product) {
             // Create 2-3 variants per product
             $variantCount = rand(2, 3);
-            
+
             for ($i = 0; $i < $variantCount; $i++) {
                 $variants[] = ProductVariant::firstOrCreate(
                     ['product_id' => $product->id, 'sku' => $product->sku . '-' . ($i + 1)],
@@ -422,26 +422,28 @@ final class AdminSeeder extends Seeder
     private function createStockRecords(array $variants, array $locations): void
     {
         $this->command->info('📊 Creating stock records...');
-        
+
         foreach ($variants as $variant) {
-            Inventory::firstOrCreate(
-                ['product_id' => $variant->product_id, 'location_id' => $locations[0]->id],
-                [
-                    'product_id' => $variant->product_id,
-                    'location_id' => $locations[0]->id,
-                    'quantity' => rand(10, 100),
-                    'reserved' => rand(0, 5),
-                    'threshold' => 10,
-                    'is_tracked' => true,
-                ]
-            );
+            foreach ($locations as $location) {
+                Inventory::firstOrCreate(
+                    ['product_id' => $variant->product_id, 'location_id' => $location->id],
+                    [
+                        'product_id' => $variant->product_id,
+                        'location_id' => $location->id,
+                        'quantity' => rand(10, 100),
+                        'reserved' => rand(0, 5),
+                        'threshold' => 10,
+                        'is_tracked' => true,
+                    ]
+                );
+            }
         }
     }
 
     private function createAddresses(User $admin, array $countries, array $zones, array $cities): array
     {
         $this->command->info('🏠 Creating addresses...');
-        
+
         $addresses = [
             [
                 'user_id' => $admin->id,
@@ -492,11 +494,11 @@ final class AdminSeeder extends Seeder
     private function createOrders(User $admin, array $addresses): array
     {
         $this->command->info('🛒 Creating orders...');
-        
+
         $orders = [];
-        
+
         for ($i = 0; $i < 5; $i++) {
-            $orderNumber = 'ORD-' . str_pad((string)($i + 1), 6, '0', STR_PAD_LEFT);
+            $orderNumber = 'ORD-' . str_pad((string) ($i + 1), 6, '0', STR_PAD_LEFT);
             $orders[] = Order::firstOrCreate(
                 ['number' => $orderNumber],
                 [
@@ -519,11 +521,11 @@ final class AdminSeeder extends Seeder
     private function createOrderItems(array $orders, array $variants): void
     {
         $this->command->info('📦 Creating order items...');
-        
+
         foreach ($orders as $order) {
             $itemCount = rand(1, 3);
             $selectedVariants = collect($variants)->random($itemCount);
-            
+
             foreach ($selectedVariants as $variant) {
                 OrderItem::firstOrCreate(
                     [
@@ -537,8 +539,8 @@ final class AdminSeeder extends Seeder
                         'name' => $variant->name,
                         'sku' => $variant->sku,
                         'quantity' => rand(1, 5),
-                        'unit_price' => $variant->price,
-                        'total' => $variant->price * rand(1, 5),
+                        'unit_price' => abs($variant->price),
+                        'total' => abs($variant->price) * rand(1, 5),
                     ]
                 );
             }
@@ -548,7 +550,7 @@ final class AdminSeeder extends Seeder
     private function createOrderShipping(array $orders): void
     {
         $this->command->info('🚚 Creating order shipping...');
-        
+
         foreach ($orders as $order) {
             OrderShipping::firstOrCreate(
                 ['order_id' => $order->id],
@@ -566,7 +568,7 @@ final class AdminSeeder extends Seeder
     private function createDocuments(array $orders): void
     {
         $this->command->info('📄 Creating documents...');
-        
+
         foreach ($orders as $order) {
             Document::firstOrCreate(
                 [
@@ -588,7 +590,7 @@ final class AdminSeeder extends Seeder
     private function createDiscountCodes(): void
     {
         $this->command->info('🎫 Creating discount codes...');
-        
+
         $codes = [
             ['code' => 'WELCOME10', 'description' => 'Welcome discount', 'discount_percentage' => 10.0, 'is_active' => true],
             ['code' => 'SAVE20', 'description' => 'Save 20% on all items', 'discount_percentage' => 20.0, 'is_active' => true],
@@ -606,7 +608,7 @@ final class AdminSeeder extends Seeder
     private function createSliders(): void
     {
         $this->command->info('🎠 Creating sliders...');
-        
+
         $sliders = [
             [
                 'title' => 'Welcome to Our Store',
@@ -630,7 +632,7 @@ final class AdminSeeder extends Seeder
             ],
             [
                 'title' => 'Special Offers',
-                'description' => 'Limited time offers - Don\'t miss out!',
+                'description' => "Limited time offers - Don't miss out!",
                 'button_text' => 'Get Offers',
                 'button_url' => '/offers',
                 'background_color' => '#F59E0B',
@@ -651,7 +653,7 @@ final class AdminSeeder extends Seeder
     private function createRecommendationBlocks(): void
     {
         $this->command->info('💡 Creating recommendation blocks...');
-        
+
         $blocks = [
             [
                 'name' => 'featured',
@@ -690,7 +692,7 @@ final class AdminSeeder extends Seeder
     private function createSeoData(): void
     {
         $this->command->info('🔍 Creating SEO data...');
-        
+
         $seoData = [
             [
                 'seoable_type' => 'App\Models\Page',
@@ -731,7 +733,7 @@ final class AdminSeeder extends Seeder
     private function createSubscribers(): void
     {
         $this->command->info('📧 Creating subscribers...');
-        
+
         $emails = [
             'subscriber1@example.com',
             'subscriber2@example.com',
@@ -755,7 +757,7 @@ final class AdminSeeder extends Seeder
     private function createReferralRewards(User $admin): void
     {
         $this->command->info('🎁 Creating referral rewards...');
-        
+
         ReferralReward::firstOrCreate(
             ['user_id' => $admin->id],
             [
@@ -773,7 +775,7 @@ final class AdminSeeder extends Seeder
     private function createProductHistory(array $products): void
     {
         $this->command->info('📈 Creating product history...');
-        
+
         foreach ($products as $product) {
             ProductHistory::firstOrCreate(
                 [
@@ -785,9 +787,9 @@ final class AdminSeeder extends Seeder
                     'action' => 'created',
                     'old_value' => null,
                     'new_value' => $product->toArray(),
-                    'user_id' => 1, // Admin user
+                    'user_id' => 1,  // Admin user
                     'causer_type' => 'App\Models\User',
-                    'causer_id' => 1, // Admin user
+                    'causer_id' => 1,  // Admin user
                 ]
             );
         }
@@ -796,7 +798,7 @@ final class AdminSeeder extends Seeder
     private function createLocations(array $countries, array $zones, array $cities): array
     {
         $this->command->info('📍 Creating locations...');
-        
+
         $locations = [
             [
                 'name' => 'Main Warehouse',

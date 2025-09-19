@@ -1,6 +1,5 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Livewire\Components\Checkout;
 
 use App\Models\Country;
@@ -10,11 +9,12 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Validate;
 use Spatie\LivewireWizard\Components\StepComponent;
+
 /**
  * Delivery
- * 
+ *
  * Livewire component for Delivery with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property mixed $options
  * @property int|null $currentSelected
  */
@@ -24,8 +24,10 @@ class Delivery extends StepComponent
      * @var array|Collection
      */
     public $options = [];
+
     #[Validate('required', message: 'You must select a delivery method')]
     public ?int $currentSelected = null;
+
     /**
      * Initialize the Livewire component with parameters.
      * @return void
@@ -40,6 +42,7 @@ class Delivery extends StepComponent
         $zone = $country->zones()->with('shippingOptions')->where('is_enabled', true)->first();
         $this->options = $zone ? $zone->shippingOptions()->where('is_enabled', true)->get() : [];
     }
+
     /**
      * Handle save functionality with proper error handling.
      * @return void
@@ -61,6 +64,7 @@ class Delivery extends StepComponent
         $this->dispatch('cart-price-update');
         $this->nextStep();
     }
+
     /**
      * Handle stepInfo functionality with proper error handling.
      * @return array
@@ -69,6 +73,7 @@ class Delivery extends StepComponent
     {
         return ['label' => __('Delivery method'), 'complete' => session()->exists('checkout') && data_get(session()->get('checkout'), 'shipping_option') !== null];
     }
+
     /**
      * Render the Livewire component view with current state.
      * @return View
