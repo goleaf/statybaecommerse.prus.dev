@@ -22,9 +22,9 @@ final class AttributesRelationManager extends RelationManager
 
     protected static ?string $title = 'Product Attributes';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('attribute_id')
                     ->label(__('products.attributes.attribute'))

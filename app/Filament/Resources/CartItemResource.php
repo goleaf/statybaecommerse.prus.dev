@@ -46,7 +46,6 @@ final class CartItemResource extends Resource
     /** @var UnitEnum|string|null */
         protected static string | UnitEnum | null $navigationGroup = "Products";
     
-    ;
     protected static ?int $navigationSort = 3;
     protected static ?string $recordTitleAttribute = 'product_name';
 
@@ -65,7 +64,7 @@ final class CartItemResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Orders->label();
+        return "Orders"->label();
     }
 
     /**

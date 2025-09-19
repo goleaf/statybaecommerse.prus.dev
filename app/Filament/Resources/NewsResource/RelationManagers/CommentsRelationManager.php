@@ -21,9 +21,9 @@ final class CommentsRelationManager extends RelationManager
 
     protected static ?string $title = 'Comments';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('comment_id')
                     ->label(__('news.comment'))

@@ -75,3 +75,4 @@ foreach ($files as $file) {
 }
 
 echo "Navigation group fixes completed!\n";
+

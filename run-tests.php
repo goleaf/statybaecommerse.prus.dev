@@ -164,3 +164,4 @@ switch ($command) {
             exit(1);
         }
 }
+

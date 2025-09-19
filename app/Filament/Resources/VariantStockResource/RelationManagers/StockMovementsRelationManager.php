@@ -28,9 +28,9 @@ class StockMovementsRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Stock Movements';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 TextInput::make('quantity')
                     ->label(__('inventory.quantity'))

@@ -45,7 +45,7 @@ final class SystemSettingResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;
     
-    protected static string | UnitEnum | null $navigationGroup = 'System';
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::System;
     
     protected static ?int $navigationSort = 18;
     protected static ?string $recordTitleAttribute = 'key';
@@ -65,7 +65,7 @@ final class SystemSettingResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::System->label();
+        return "System"->label();
     }
 
     /**

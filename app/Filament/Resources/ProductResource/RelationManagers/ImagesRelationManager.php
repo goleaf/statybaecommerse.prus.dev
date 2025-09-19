@@ -20,9 +20,9 @@ final class ImagesRelationManager extends RelationManager
 
     protected static ?string $title = 'Product Images';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\FileUpload::make('image')
                     ->label(__('products.images.image'))

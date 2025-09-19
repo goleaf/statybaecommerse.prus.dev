@@ -36,7 +36,7 @@ final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-clock';
 
     protected static ?int $navigationSort = 11;
 
@@ -47,7 +47,7 @@ final class ProductHistoryResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Products->label();
+        return "Products"->label();
     }
 
     public static function getPluralModelLabel(): string
@@ -62,7 +62,7 @@ final class ProductHistoryResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('product_history.basic_information'))
                     ->columns(2)

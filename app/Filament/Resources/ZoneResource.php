@@ -63,7 +63,7 @@ final class ZoneResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::System->label();
+        return "System"->label();
     }
 
     /**

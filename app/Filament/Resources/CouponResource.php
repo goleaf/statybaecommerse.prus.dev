@@ -48,7 +48,6 @@ final class CouponResource extends Resource
     /** @var UnitEnum|string|null */
         protected static string | UnitEnum | null $navigationGroup = "Products";
     
-    ;
     protected static ?int $navigationSort = 2;
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -67,7 +66,7 @@ final class CouponResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Marketing->label();
+        return "Marketing"->label();
     }
 
     /**

@@ -13,9 +13,9 @@ final class OrdersRelationManager extends RelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\TextInput::make('order_number')
                     ->label(__('Order Number'))

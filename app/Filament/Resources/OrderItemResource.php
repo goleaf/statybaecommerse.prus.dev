@@ -66,7 +66,7 @@ final class OrderItemResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Orders->label();
+        return "Orders"->label();
     }
 
     /**

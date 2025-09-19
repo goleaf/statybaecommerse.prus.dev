@@ -16,9 +16,9 @@ final class DocumentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'documents';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('template_id')
                     ->label(__('Template'))

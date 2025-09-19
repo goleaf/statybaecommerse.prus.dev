@@ -46,7 +46,7 @@ final class CampaignResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Marketing->label();
+        return "Marketing"->label();
     }
 
     public static function getPluralModelLabel(): string

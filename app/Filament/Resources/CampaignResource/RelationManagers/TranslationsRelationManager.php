@@ -22,7 +22,7 @@ final class TranslationsRelationManager extends RelationManager
 
     protected static ?string $title = 'Translations';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
         return $schema->components([
             Forms\Components\Select::make('locale')

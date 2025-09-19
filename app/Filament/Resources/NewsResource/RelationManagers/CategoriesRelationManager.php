@@ -21,9 +21,9 @@ final class CategoriesRelationManager extends RelationManager
 
     protected static ?string $title = 'Categories';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('category_id')
                     ->label(__('news.category'))

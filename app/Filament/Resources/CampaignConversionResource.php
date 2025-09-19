@@ -46,9 +46,7 @@ final class CampaignConversionResource extends Resource
     protected static ?string $model = CampaignConversion::class;
     
     /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = "Products";
-    
-    ;
+    protected static string | UnitEnum | null $navigationGroup = "Products";
     protected static ?int $navigationSort = 9;
     protected static ?string $recordTitleAttribute = 'campaign_name';
 
@@ -67,7 +65,7 @@ final class CampaignConversionResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Marketing->label();
+        return "Marketing"->label();
     }
 
     /**

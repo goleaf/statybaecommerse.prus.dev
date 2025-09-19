@@ -31,7 +31,7 @@ final class CountryResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
-    protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup = 'Locations';
+    protected static string | UnitEnum | null $navigationGroup = "Locations";
 
     protected static ?int $navigationSort = 1;
 
@@ -39,7 +39,7 @@ final class CountryResource extends Resource
 
     protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return CountryForm::configure($schema);
     }

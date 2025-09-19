@@ -21,9 +21,9 @@ final class ReviewsRelationManager extends RelationManager
 
     protected static ?string $title = 'Reviews';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('review_id')
                     ->label(__('customers.review'))

@@ -45,7 +45,6 @@ final class CompanyResource extends Resource
     /** @var UnitEnum|string|null */
         protected static string | UnitEnum | null $navigationGroup = "Products";
     
-    ;
     protected static ?int $navigationSort = 8;
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -64,7 +63,7 @@ final class CompanyResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::System->label();
+        return "System"->label();
     }
 
     /**

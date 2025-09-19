@@ -21,7 +21,7 @@ final class DocumentsRelationManager extends RelationManager
 
     public function form(Schema $formSchema): Schema
     {
-        return $formSchema
+        return $schemaSchema
             ->components([
                 Forms\Components\Select::make('document_template_id')
                     ->label(__('admin.documents.fields.template'))

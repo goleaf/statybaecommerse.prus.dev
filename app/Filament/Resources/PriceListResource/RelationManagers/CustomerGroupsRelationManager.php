@@ -21,9 +21,9 @@ final class CustomerGroupsRelationManager extends RelationManager
 
     protected static ?string $title = 'Customer Groups';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('customer_group_id')
                     ->label(__('price_lists.customer_group'))

@@ -65,7 +65,7 @@ final class ReviewResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Products->label();
+        return "Products"->label();
     }
 
     /**

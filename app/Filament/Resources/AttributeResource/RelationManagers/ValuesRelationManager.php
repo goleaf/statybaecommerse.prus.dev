@@ -21,7 +21,7 @@ final class ValuesRelationManager extends RelationManager
 
     public function form(Schema $formSchema): Schema
     {
-        return $formSchema
+        return $schemaSchema
             ->components([
                 Forms\Components\TextInput::make('value')
                     ->label(__('translations.value'))

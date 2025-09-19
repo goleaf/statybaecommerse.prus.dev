@@ -61,3 +61,4 @@ foreach ($files as $file) {
 }
 
 echo "All resource fixes completed!\n";
+

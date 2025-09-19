@@ -21,9 +21,9 @@ final class PartnersRelationManager extends RelationManager
 
     protected static ?string $title = 'Partners';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('company_id')
                     ->label(__('price_lists.partner'))

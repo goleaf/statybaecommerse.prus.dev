@@ -64,7 +64,7 @@ final class SeoDataResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Content->label();
+        return "Content"->label();
     }
 
     /**

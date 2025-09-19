@@ -68,7 +68,7 @@ final class CustomerManagementResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Customers->label();
+        return "Customers"->label();
     }
 
     /**

@@ -47,7 +47,7 @@ final class AddressResource extends Resource
 {
     protected static ?string $model = Address::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
+    protected static string|UnitEnum|null $navigationGroup = "System";
 
     protected static ?int $navigationSort = 3;
 
@@ -64,7 +64,7 @@ final class AddressResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Orders->label();
+        return "Orders"->label();
     }
 
     /**

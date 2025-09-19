@@ -7,29 +7,19 @@ This document describes the organized test structure for the Laravel e-commerce 
 ```
 tests/
 ├── admin/                          # Admin panel tests
-│   ├── resources/                  # Filament Resource tests
-│   ├── pages/                      # Admin page tests
-│   ├── widgets/                    # Admin widget tests
-│   ├── actions/                    # Admin action tests
-│   ├── forms/                      # Admin form tests
-│   └── tables/                     # Admin table tests
+│   ├── resources/                  # Filament Resource tests (40+ files)
+│   └── widgets/                    # Admin widget tests (20+ files)
 ├── frontend/                       # Frontend tests
-│   ├── pages/                      # Frontend page tests
-│   ├── components/                 # Frontend component tests
-│   ├── features/                  # Frontend feature tests
-│   └── integration/               # Frontend integration tests
+│   ├── features/                   # Frontend feature tests
+│   └── admin/                      # Frontend admin tests (7 files)
 ├── api/                           # API tests
-│   ├── endpoints/                  # API endpoint tests
-│   ├── auth/                      # API authentication tests
-│   └── validation/                 # API validation tests
+│   └── endpoints/                  # API endpoint tests (1 file)
 ├── models/                        # Model tests
-│   ├── core/                      # Core model tests (User, System, etc.)
-│   ├── business/                  # Business model tests (Product, Order, etc.)
+│   ├── core/                      # Core model tests (60+ files)
+│   ├── business/                  # Business model tests
 │   └── relationships/             # Model relationship tests
 ├── services/                      # Service tests
-│   ├── business/                  # Business service tests
-│   ├── integration/               # Integration service tests
-│   └── external/                  # External service tests
+│   └── business/                  # Business service tests
 ├── browser/                       # Browser/Dusk tests
 │   ├── admin/                     # Admin panel browser tests
 │   ├── frontend/                  # Frontend browser tests

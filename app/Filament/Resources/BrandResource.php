@@ -43,7 +43,7 @@ final class BrandResource extends Resource
     protected static ?string $model = Brand::class;
     
     /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = 'Products';
+    protected static string | UnitEnum | null $navigationGroup = "Products";
     
     protected static ?int $navigationSort = 2;
     protected static ?string $recordTitleAttribute = 'name';
@@ -63,7 +63,7 @@ final class BrandResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Products->label();
+        return "Products"->label();
     }
 
     /**

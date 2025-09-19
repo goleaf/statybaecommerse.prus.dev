@@ -47,7 +47,7 @@ final class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;
     
-    protected static string | UnitEnum | null $navigationGroup = 'System';
+    protected static string | UnitEnum | null $navigationGroup = "System";
     
     protected static ?int $navigationSort = 17;
     protected static ?string $recordTitleAttribute = 'name';
@@ -67,7 +67,7 @@ final class ReportResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::System->label();
+        return "System"->label();
     }
 
     /**

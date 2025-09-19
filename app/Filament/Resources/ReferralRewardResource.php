@@ -64,7 +64,7 @@ final class ReferralRewardResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Marketing->label();
+        return "Marketing"->label();
     }
 
     /**

@@ -21,9 +21,9 @@ final class ProductsRelationManager extends RelationManager
 
     protected static ?string $title = 'Products';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('product_id')
                     ->label(__('attributes.product'))

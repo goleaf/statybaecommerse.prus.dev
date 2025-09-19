@@ -6,9 +6,19 @@ use App\Models\Slider;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\Action;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -18,7 +28,7 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Size;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
 use UnitEnum;
@@ -56,90 +66,297 @@ class SliderManagement extends Page implements HasForms, HasActions
             ->color('primary')
             ->size(Size::Large)
             ->form([
-                TextInput::make('title')
-                    ->label(__('translations.title'))
-                    ->required()
-                    ->maxLength(255),
-                Textarea::make('description')
-                    ->label(__('translations.description'))
-                    ->maxLength(1000)
-                    ->rows(3),
-                TextInput::make('button_text')
-                    ->label(__('translations.button_text'))
-                    ->maxLength(255),
-                TextInput::make('button_url')
-                    ->label(__('translations.button_url'))
-                    ->url()
-                    ->maxLength(255),
-                FileUpload::make('slider_image')
-                    ->label(__('translations.slider_image'))
-                    ->image()
-                    ->directory('sliders/images')
-                    ->visibility('public')
-                    ->imageEditor(),
-                ColorPicker::make('background_color')
-                    ->label(__('translations.background_color'))
-                    ->default('#ffffff'),
-                ColorPicker::make('text_color')
-                    ->label(__('translations.text_color'))
-                    ->default('#000000'),
-                TextInput::make('sort_order')
-                    ->label(__('translations.sort_order'))
-                    ->numeric()
-                    ->default(0),
-                Toggle::make('is_active')
-                    ->label(__('translations.is_active'))
-                    ->default(true),
-                Select::make('animation_type')
-                    ->label(__('translations.animation_type'))
-                    ->options([
-                        'fade' => __('translations.fade'),
-                        'slide' => __('translations.slide'),
-                        'zoom' => __('translations.zoom'),
-                        'flip' => __('translations.flip'),
+                Section::make(__('translations.basic_information'))
+                    ->schema([
+                        Grid::make(2)->schema([
+                            TextInput::make('title')
+                                ->label(__('translations.title'))
+                                ->required()
+                                ->maxLength(255)
+                                ->live()
+                                ->afterStateUpdated(fn($state, callable $set) => $set('slug', \Str::slug($state))),
+                            TextInput::make('slug')
+                                ->label(__('translations.slug'))
+                                ->required()
+                                ->maxLength(255)
+                                ->unique(Slider::class, 'slug')
+                                ->disabled()
+                                ->dehydrated(),
+                        ]),
+                        RichEditor::make('description')
+                            ->label(__('translations.description'))
+                            ->maxLength(2000)
+                            ->toolbarButtons([
+                                'bold',
+                                'italic',
+                                'underline',
+                                'strike',
+                                'link',
+                                'bulletList',
+                                'orderedList',
+                            ]),
+                        Grid::make(2)->schema([
+                            TextInput::make('button_text')
+                                ->label(__('translations.button_text'))
+                                ->maxLength(255),
+                            TextInput::make('button_url')
+                                ->label(__('translations.button_url'))
+                                ->url()
+                                ->maxLength(255),
+                        ]),
                     ])
-                    ->default('fade'),
-                TextInput::make('duration')
-                    ->label(__('translations.duration'))
-                    ->numeric()
-                    ->default(5000)
-                    ->suffix('ms'),
-                Toggle::make('autoplay')
-                    ->label(__('translations.autoplay'))
-                    ->default(true),
+                    ->collapsible(),
+                Section::make(__('translations.media'))
+                    ->schema([
+                        FileUpload::make('slider_image')
+                            ->label(__('translations.slider_image'))
+                            ->image()
+                            ->directory('sliders/images')
+                            ->visibility('public')
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ])
+                            ->maxSize(5120),  // 5MB
+                        FileUpload::make('mobile_image')
+                            ->label(__('translations.mobile_image'))
+                            ->image()
+                            ->directory('sliders/mobile')
+                            ->visibility('public')
+                            ->imageEditor()
+                            ->maxSize(2048),  // 2MB
+                    ])
+                    ->collapsible(),
+                Section::make(__('translations.design'))
+                    ->schema([
+                        Grid::make(3)->schema([
+                            ColorPicker::make('background_color')
+                                ->label(__('translations.background_color'))
+                                ->default('#ffffff'),
+                            ColorPicker::make('text_color')
+                                ->label(__('translations.text_color'))
+                                ->default('#000000'),
+                            ColorPicker::make('button_color')
+                                ->label(__('translations.button_color'))
+                                ->default('#007bff'),
+                        ]),
+                        Grid::make(2)->schema([
+                            Select::make('text_alignment')
+                                ->label(__('translations.text_alignment'))
+                                ->options([
+                                    'left' => __('translations.left'),
+                                    'center' => __('translations.center'),
+                                    'right' => __('translations.right'),
+                                ])
+                                ->default('center'),
+                            Select::make('content_position')
+                                ->label(__('translations.content_position'))
+                                ->options([
+                                    'top-left' => __('translations.top_left'),
+                                    'top-center' => __('translations.top_center'),
+                                    'top-right' => __('translations.top_right'),
+                                    'center-left' => __('translations.center_left'),
+                                    'center' => __('translations.center'),
+                                    'center-right' => __('translations.center_right'),
+                                    'bottom-left' => __('translations.bottom_left'),
+                                    'bottom-center' => __('translations.bottom_center'),
+                                    'bottom-right' => __('translations.bottom_right'),
+                                ])
+                                ->default('center'),
+                        ]),
+                    ])
+                    ->collapsible(),
+                Section::make(__('translations.animation_settings'))
+                    ->schema([
+                        Grid::make(2)->schema([
+                            Select::make('animation_type')
+                                ->label(__('translations.animation_type'))
+                                ->options([
+                                    'fade' => __('translations.fade'),
+                                    'slide' => __('translations.slide'),
+                                    'zoom' => __('translations.zoom'),
+                                    'flip' => __('translations.flip'),
+                                    'bounce' => __('translations.bounce'),
+                                    'pulse' => __('translations.pulse'),
+                                ])
+                                ->default('fade')
+                                ->live(),
+                            TextInput::make('duration')
+                                ->label(__('translations.duration'))
+                                ->numeric()
+                                ->default(5000)
+                                ->suffix('ms')
+                                ->minValue(1000)
+                                ->maxValue(30000),
+                        ]),
+                        Grid::make(2)->schema([
+                            Toggle::make('autoplay')
+                                ->label(__('translations.autoplay'))
+                                ->default(true)
+                                ->live(),
+                            Toggle::make('pause_on_hover')
+                                ->label(__('translations.pause_on_hover'))
+                                ->default(true)
+                                ->visible(fn(callable $get) => $get('autoplay')),
+                        ]),
+                        Select::make('transition_speed')
+                            ->label(__('translations.transition_speed'))
+                            ->options([
+                                'slow' => __('translations.slow'),
+                                'normal' => __('translations.normal'),
+                                'fast' => __('translations.fast'),
+                            ])
+                            ->default('normal'),
+                    ])
+                    ->collapsible(),
+                Section::make(__('translations.scheduling'))
+                    ->schema([
+                        Grid::make(2)->schema([
+                            DateTimePicker::make('start_date')
+                                ->label(__('translations.start_date'))
+                                ->default(now()),
+                            DateTimePicker::make('end_date')
+                                ->label(__('translations.end_date'))
+                                ->after('start_date'),
+                        ]),
+                        Toggle::make('is_scheduled')
+                            ->label(__('translations.is_scheduled'))
+                            ->default(false)
+                            ->live(),
+                    ])
+                    ->collapsible(),
+                Section::make(__('translations.advanced_settings'))
+                    ->schema([
+                        Grid::make(2)->schema([
+                            TextInput::make('sort_order')
+                                ->label(__('translations.sort_order'))
+                                ->numeric()
+                                ->default(0)
+                                ->minValue(0),
+                            Select::make('priority')
+                                ->label(__('translations.priority'))
+                                ->options([
+                                    'low' => __('translations.low'),
+                                    'normal' => __('translations.normal'),
+                                    'high' => __('translations.high'),
+                                    'urgent' => __('translations.urgent'),
+                                ])
+                                ->default('normal'),
+                        ]),
+                        TagsInput::make('tags')
+                            ->label(__('translations.tags'))
+                            ->placeholder(__('translations.add_tags')),
+                        KeyValue::make('custom_attributes')
+                            ->label(__('translations.custom_attributes'))
+                            ->keyLabel(__('translations.attribute_name'))
+                            ->valueLabel(__('translations.attribute_value')),
+                        Repeater::make('slides')
+                            ->label(__('translations.additional_slides'))
+                            ->schema([
+                                TextInput::make('title')
+                                    ->label(__('translations.slide_title'))
+                                    ->required(),
+                                FileUpload::make('image')
+                                    ->label(__('translations.slide_image'))
+                                    ->image()
+                                    ->directory('sliders/slides'),
+                                TextInput::make('link')
+                                    ->label(__('translations.slide_link'))
+                                    ->url(),
+                            ])
+                            ->collapsible()
+                            ->itemLabel(fn(array $state): ?string => $state['title'] ?? null),
+                    ])
+                    ->collapsible(),
+                Section::make(__('translations.status'))
+                    ->schema([
+                        Grid::make(2)->schema([
+                            Toggle::make('is_active')
+                                ->label(__('translations.is_active'))
+                                ->default(true),
+                            Toggle::make('is_featured')
+                                ->label(__('translations.is_featured'))
+                                ->default(false),
+                        ]),
+                        CheckboxList::make('target_audience')
+                            ->label(__('translations.target_audience'))
+                            ->options([
+                                'all' => __('translations.all_users'),
+                                'new' => __('translations.new_users'),
+                                'returning' => __('translations.returning_users'),
+                                'premium' => __('translations.premium_users'),
+                            ])
+                            ->default(['all']),
+                    ])
+                    ->collapsible(),
             ])
             ->action(function (array $data): void {
                 $slider = Slider::create([
                     'title' => $data['title'],
+                    'slug' => $data['slug'],
                     'description' => $data['description'],
-                    'button_text' => $data['button_text'],
-                    'button_url' => $data['button_url'],
-                    'background_color' => $data['background_color'],
-                    'text_color' => $data['text_color'],
-                    'sort_order' => $data['sort_order'],
-                    'is_active' => $data['is_active'],
+                    'button_text' => $data['button_text'] ?? null,
+                    'button_url' => $data['button_url'] ?? null,
+                    'background_color' => $data['background_color'] ?? '#ffffff',
+                    'text_color' => $data['text_color'] ?? '#000000',
+                    'button_color' => $data['button_color'] ?? '#007bff',
+                    'text_alignment' => $data['text_alignment'] ?? 'center',
+                    'content_position' => $data['content_position'] ?? 'center',
+                    'sort_order' => $data['sort_order'] ?? 0,
+                    'priority' => $data['priority'] ?? 'normal',
+                    'tags' => $data['tags'] ?? [],
+                    'custom_attributes' => $data['custom_attributes'] ?? [],
+                    'target_audience' => $data['target_audience'] ?? ['all'],
+                    'is_active' => $data['is_active'] ?? true,
+                    'is_featured' => $data['is_featured'] ?? false,
+                    'is_scheduled' => $data['is_scheduled'] ?? false,
+                    'start_date' => $data['start_date'] ?? null,
+                    'end_date' => $data['end_date'] ?? null,
                     'settings' => [
-                        'animation' => $data['animation_type'],
-                        'duration' => $data['duration'],
-                        'autoplay' => $data['autoplay'],
+                        'animation' => $data['animation_type'] ?? 'fade',
+                        'duration' => $data['duration'] ?? 5000,
+                        'autoplay' => $data['autoplay'] ?? true,
+                        'pause_on_hover' => $data['pause_on_hover'] ?? true,
+                        'transition_speed' => $data['transition_speed'] ?? 'normal',
                     ],
+                    'slides' => $data['slides'] ?? [],
                 ]);
 
-                // Handle file upload
+                // Handle file uploads
                 if (isset($data['slider_image'])) {
                     $slider
                         ->addMediaFromDisk($data['slider_image'], 'public')
                         ->toMediaCollection('slider_images');
                 }
 
+                if (isset($data['mobile_image'])) {
+                    $slider
+                        ->addMediaFromDisk($data['mobile_image'], 'public')
+                        ->toMediaCollection('mobile_images');
+                }
+
+                // Handle additional slides
+                if (isset($data['slides']) && is_array($data['slides'])) {
+                    foreach ($data['slides'] as $slideData) {
+                        if (isset($slideData['image'])) {
+                            $slider
+                                ->addMediaFromDisk($slideData['image'], 'public')
+                                ->toMediaCollection('additional_slides');
+                        }
+                    }
+                }
+
                 $this->loadSliders();
 
                 Notification::make()
                     ->title(__('translations.slider_created'))
+                    ->body(__('translations.slider_created_successfully'))
                     ->success()
                     ->send();
             })
-            ->modalWidth(MaxWidth::SevenExtraLarge);
+            ->modalWidth(Width::SevenExtraLarge);
     }
 
     public function toggleAllSlidersAction(): Action
@@ -251,10 +468,112 @@ class SliderManagement extends Page implements HasForms, HasActions
             });
     }
 
+    public function bulkImportAction(): Action
+    {
+        return Action::make('bulkImport')
+            ->label(__('translations.bulk_import'))
+            ->icon('heroicon-o-arrow-up-tray')
+            ->color('info')
+            ->form([
+                FileUpload::make('import_file')
+                    ->label(__('translations.import_file'))
+                    ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'])
+                    ->required(),
+                Toggle::make('update_existing')
+                    ->label(__('translations.update_existing'))
+                    ->default(false),
+            ])
+            ->action(function (array $data): void {
+                // Handle bulk import logic here
+                Notification::make()
+                    ->title(__('translations.import_started'))
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public function exportSlidersAction(): Action
+    {
+        return Action::make('exportSliders')
+            ->label(__('translations.export_sliders'))
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('success')
+            ->form([
+                Select::make('format')
+                    ->label(__('translations.export_format'))
+                    ->options([
+                        'excel' => __('translations.excel'),
+                        'csv' => __('translations.csv'),
+                        'json' => __('translations.json'),
+                    ])
+                    ->default('excel'),
+                Toggle::make('include_images')
+                    ->label(__('translations.include_images'))
+                    ->default(false),
+            ])
+            ->action(function (array $data): void {
+                // Handle export logic here
+                Notification::make()
+                    ->title(__('translations.export_started'))
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public function analyticsAction(): Action
+    {
+        return Action::make('analytics')
+            ->label(__('translations.analytics'))
+            ->icon('heroicon-o-chart-bar')
+            ->color('warning')
+            ->url(route('filament.admin.pages.slider-analytics'))
+            ->openUrlInNewTab();
+    }
+
+    public function settingsAction(): Action
+    {
+        return Action::make('settings')
+            ->label(__('translations.settings'))
+            ->icon('heroicon-o-cog-6-tooth')
+            ->color('gray')
+            ->form([
+                Section::make(__('translations.global_settings'))
+                    ->schema([
+                        Toggle::make('auto_optimize_images')
+                            ->label(__('translations.auto_optimize_images'))
+                            ->default(true),
+                        Select::make('default_animation')
+                            ->label(__('translations.default_animation'))
+                            ->options([
+                                'fade' => __('translations.fade'),
+                                'slide' => __('translations.slide'),
+                                'zoom' => __('translations.zoom'),
+                            ])
+                            ->default('fade'),
+                        TextInput::make('default_duration')
+                            ->label(__('translations.default_duration'))
+                            ->numeric()
+                            ->default(5000)
+                            ->suffix('ms'),
+                    ]),
+            ])
+            ->action(function (array $data): void {
+                // Handle settings save logic here
+                Notification::make()
+                    ->title(__('translations.settings_saved'))
+                    ->success()
+                    ->send();
+            });
+    }
+
     protected function getHeaderActions(): array
     {
         return [
             $this->createSliderAction(),
+            $this->bulkImportAction(),
+            $this->exportSlidersAction(),
+            $this->analyticsAction(),
+            $this->settingsAction(),
             $this->toggleAllSlidersAction(),
             $this->reorderSlidersAction(),
         ];

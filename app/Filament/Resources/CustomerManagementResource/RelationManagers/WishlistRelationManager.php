@@ -21,9 +21,9 @@ final class WishlistRelationManager extends RelationManager
 
     protected static ?string $title = 'Wishlist';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('wishlist_id')
                     ->label(__('customers.wishlist'))

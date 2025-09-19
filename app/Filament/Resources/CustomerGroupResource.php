@@ -40,7 +40,7 @@ final class CustomerGroupResource extends Resource
 {
     protected static ?string $model = CustomerGroup::class;
 
-    protected static string | UnitEnum | null $navigationGroup = 'Products';
+    protected static string | UnitEnum | null $navigationGroup = "Products";
 
     protected static ?int $navigationSort = 2;
 
@@ -61,7 +61,7 @@ final class CustomerGroupResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Customers->label();
+        return "Customers"->label();
     }
 
     /**

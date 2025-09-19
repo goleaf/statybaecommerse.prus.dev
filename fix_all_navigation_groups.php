@@ -54,3 +54,4 @@ foreach ($files as $file) {
 }
 
 echo "All navigation group fixes completed!\n";
+
