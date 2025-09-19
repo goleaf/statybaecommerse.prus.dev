@@ -41,7 +41,7 @@ final class SliderAnalytics extends BaseDashboard
 
     protected static ?int $navigationSort = 3;
 
-    protected static ?string $slug = 'slider-analytics';
+    protected static string $routePath = 'slider-analytics';
 
     protected int|string|array $columnSpan = 'full';
 
@@ -170,7 +170,7 @@ final class SliderAnalytics extends BaseDashboard
 
     public function getTitle(): string
     {
-        return 'Slider Analytics Dashboard';
+        return 'Slider Analytics';
     }
 
     public function getHeading(): string
@@ -184,5 +184,10 @@ final class SliderAnalytics extends BaseDashboard
         $endDate = $this->pageFilters['endDate'] ?? now();
 
         return "Analytics for period: {$startDate->format('M d, Y')} - {$endDate->format('M d, Y')}";
+    }
+
+    public static function getSlug(?\Filament\Panel $panel = null): string
+    {
+        return 'slider-analytics';
     }
 }

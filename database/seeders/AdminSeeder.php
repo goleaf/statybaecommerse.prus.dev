@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Enums\AddressType;
-use App\Enums\NavigationGroup;
 use App\Models\Address;
 use App\Models\Category;
 use App\Models\City;
@@ -23,7 +22,7 @@ use App\Models\RecommendationBlock;
 use App\Models\ReferralReward;
 use App\Models\SeoData;
 use App\Models\Slider;
-use App\Models\Stock;
+use App\Models\Inventory;
 use App\Models\Subscriber;
 use App\Models\User;
 use App\Models\Zone;
@@ -31,16 +30,16 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * FullAdminSeeder
+ * AdminSeeder
  * 
  * Comprehensive seeder for admin@example.com user with all menu items
  * and sample data for testing and demonstration purposes.
  */
-final class FullAdminSeeder extends Seeder
+final class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->command->info('🌱 Starting Full Admin Seeder...');
+        $this->command->info('🌱 Starting Comprehensive Admin Seeder...');
 
         // Create admin user
         $admin = $this->createAdminUser();
@@ -100,15 +99,12 @@ final class FullAdminSeeder extends Seeder
         // Create product history
         $this->createProductHistory($products);
         
-        // Create reports
-        $this->createReports();
-        
         // Create locations
         $this->createLocations($countries, $zones, $cities);
         
-        $this->command->info('✅ Full Admin Seeder completed successfully!');
-        $this->command->info("👤 Admin user: admin@example.com");
-        $this->command->info("🔑 Password: password");
+        $this->command->info('✅ Comprehensive Admin Seeder completed successfully!');
+        $this->command->info('👤 Admin user: admin@example.com');
+        $this->command->info('🔑 Password: password');
     }
 
     private function createAdminUser(): User
@@ -133,8 +129,8 @@ final class FullAdminSeeder extends Seeder
         
         $countries = [
             [
-                'name' => 'Lithuania', 
-                'code' => 'LT', 
+                'name' => 'Lithuania',
+                'code' => 'LT',
                 'currency_code' => 'EUR',
                 'cca2' => 'LT',
                 'cca3' => 'LTU',
@@ -156,8 +152,8 @@ final class FullAdminSeeder extends Seeder
                 'sort_order' => 1,
             ],
             [
-                'name' => 'Latvia', 
-                'code' => 'LV', 
+                'name' => 'Latvia',
+                'code' => 'LV',
                 'currency_code' => 'EUR',
                 'cca2' => 'LV',
                 'cca3' => 'LVA',
@@ -179,8 +175,8 @@ final class FullAdminSeeder extends Seeder
                 'sort_order' => 2,
             ],
             [
-                'name' => 'Estonia', 
-                'code' => 'EE', 
+                'name' => 'Estonia',
+                'code' => 'EE',
                 'currency_code' => 'EUR',
                 'cca2' => 'EE',
                 'cca3' => 'EST',
@@ -221,8 +217,6 @@ final class FullAdminSeeder extends Seeder
             ['name' => 'Europe', 'code' => 'EU'],
             ['name' => 'North America', 'code' => 'NA'],
             ['name' => 'Asia', 'code' => 'AS'],
-            ['name' => 'Africa', 'code' => 'AF'],
-            ['name' => 'Oceania', 'code' => 'OC'],
         ];
 
         $createdZones = [];
@@ -240,9 +234,9 @@ final class FullAdminSeeder extends Seeder
         $this->command->info('🏙️ Creating cities...');
         
         $cities = [
-            ['name' => 'Vilnius', 'country_id' => $countries[0]->id, 'is_active' => true, 'is_enabled' => true],
-            ['name' => 'Riga', 'country_id' => $countries[1]->id, 'is_active' => true, 'is_enabled' => true],
-            ['name' => 'Tallinn', 'country_id' => $countries[2]->id, 'is_active' => true, 'is_enabled' => true],
+            ['name' => 'Vilnius', 'slug' => 'vilnius', 'code' => 'VIL', 'country_id' => $countries[0]->id, 'is_active' => true, 'is_enabled' => true],
+            ['name' => 'Riga', 'slug' => 'riga', 'code' => 'RIG', 'country_id' => $countries[1]->id, 'is_active' => true, 'is_enabled' => true],
+            ['name' => 'Tallinn', 'slug' => 'tallinn', 'code' => 'TAL', 'country_id' => $countries[2]->id, 'is_active' => true, 'is_enabled' => true],
         ];
 
         $createdCities = [];
@@ -260,18 +254,19 @@ final class FullAdminSeeder extends Seeder
         $this->command->info('💰 Creating currencies...');
         
         $currencies = [
-            ['name' => 'Euro', 'code' => 'EUR', 'symbol' => '€', 'rate' => 1.0, 'is_default' => true],
-            ['name' => 'US Dollar', 'code' => 'USD', 'symbol' => '$', 'rate' => 0.85],
-            ['name' => 'British Pound', 'code' => 'GBP', 'symbol' => '£', 'rate' => 1.15],
-            ['name' => 'Polish Zloty', 'code' => 'PLN', 'symbol' => 'zł', 'rate' => 0.22],
+            ['name' => 'Euro', 'code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1.0, 'is_default' => true, 'is_enabled' => true, 'decimal_places' => 2],
+            ['name' => 'US Dollar', 'code' => 'USD', 'symbol' => '$', 'exchange_rate' => 0.85, 'is_default' => false, 'is_enabled' => true, 'decimal_places' => 2],
+            ['name' => 'British Pound', 'code' => 'GBP', 'symbol' => '£', 'exchange_rate' => 1.15, 'is_default' => false, 'is_enabled' => true, 'decimal_places' => 2],
         ];
 
-        return collect($currencies)->map(function ($currency) {
-            return Currency::firstOrCreate(
+        $createdCurrencies = [];
+        foreach ($currencies as $currency) {
+            $createdCurrencies[] = Currency::firstOrCreate(
                 ['code' => $currency['code']],
                 $currency
             );
-        })->toArray();
+        }
+        return $createdCurrencies;
     }
 
     private function createCustomerGroups(): array
@@ -327,51 +322,68 @@ final class FullAdminSeeder extends Seeder
                 'slug' => 'smartphone-pro',
                 'description' => 'Latest generation smartphone with advanced features',
                 'price' => 899.99,
-                'category_id' => $categories[0]->id,
-                'is_active' => true,
+                'is_visible' => true,
                 'sku' => 'SP-001',
+                'status' => 'published',
+                'published_at' => now(),
             ],
             [
                 'name' => 'Wireless Headphones',
                 'slug' => 'wireless-headphones',
                 'description' => 'High-quality wireless headphones with noise cancellation',
                 'price' => 199.99,
-                'category_id' => $categories[0]->id,
-                'is_active' => true,
+                'is_visible' => true,
                 'sku' => 'WH-002',
+                'status' => 'published',
+                'published_at' => now(),
             ],
             [
                 'name' => 'Cotton T-Shirt',
                 'slug' => 'cotton-t-shirt',
                 'description' => 'Comfortable cotton t-shirt in various colors',
                 'price' => 29.99,
-                'category_id' => $categories[1]->id,
-                'is_active' => true,
+                'is_visible' => true,
                 'sku' => 'CT-003',
+                'status' => 'published',
+                'published_at' => now(),
             ],
             [
                 'name' => 'Garden Tools Set',
                 'slug' => 'garden-tools-set',
                 'description' => 'Complete set of professional garden tools',
                 'price' => 149.99,
-                'category_id' => $categories[2]->id,
-                'is_active' => true,
+                'is_visible' => true,
                 'sku' => 'GT-004',
+                'status' => 'published',
+                'published_at' => now(),
             ],
             [
                 'name' => 'Yoga Mat',
                 'slug' => 'yoga-mat',
                 'description' => 'Premium yoga mat for all fitness activities',
                 'price' => 49.99,
-                'category_id' => $categories[3]->id,
-                'is_active' => true,
+                'is_visible' => true,
                 'sku' => 'YM-005',
+                'status' => 'published',
+                'published_at' => now(),
             ],
         ];
 
-        return collect($products)->map(function ($product) {
-            return Product::create($product);
-        })->toArray();
+        $createdProducts = [];
+        foreach ($products as $index => $product) {
+            $createdProduct = Product::firstOrCreate(
+                ['sku' => $product['sku']],
+                $product
+            );
+            
+            // Attach category to product if not already attached
+            if (isset($categories[$index]) && !$createdProduct->categories()->where('category_id', $categories[$index]->id)->exists()) {
+                $createdProduct->categories()->attach($categories[$index]->id);
+            }
+            
+            $createdProducts[] = $createdProduct;
+        }
+        return $createdProducts;
     }
 
     private function createProductVariants(array $products): array
@@ -385,17 +397,20 @@ final class FullAdminSeeder extends Seeder
             $variantCount = rand(2, 3);
             
             for ($i = 0; $i < $variantCount; $i++) {
-                $variants[] = ProductVariant::create([
-                    'product_id' => $product->id,
-                    'name' => $product->name . ' - Variant ' . ($i + 1),
-                    'sku' => $product->sku . '-' . ($i + 1),
-                    'price' => $product->price + rand(-50, 50),
-                    'is_enabled' => true,
-                    'attributes' => json_encode([
-                        'color' => ['Red', 'Blue', 'Green', 'Black', 'White'][$i % 5],
-                        'size' => ['S', 'M', 'L', 'XL'][$i % 4],
-                    ]),
-                ]);
+                $variants[] = ProductVariant::firstOrCreate(
+                    ['product_id' => $product->id, 'sku' => $product->sku . '-' . ($i + 1)],
+                    [
+                        'product_id' => $product->id,
+                        'name' => $product->name . ' - Variant ' . ($i + 1),
+                        'sku' => $product->sku . '-' . ($i + 1),
+                        'price' => $product->price + rand(-50, 50),
+                        'is_enabled' => true,
+                        'attributes' => json_encode([
+                            'color' => ['Red', 'Blue', 'Green', 'Black', 'White'][$i % 5],
+                            'size' => ['S', 'M', 'L', 'XL'][$i % 4],
+                        ]),
+                    ]
+                );
             }
         }
 
@@ -407,12 +422,15 @@ final class FullAdminSeeder extends Seeder
         $this->command->info('📊 Creating stock records...');
         
         foreach ($variants as $variant) {
-            Stock::create([
-                'product_variant_id' => $variant->id,
-                'quantity' => rand(10, 100),
-                'reserved_quantity' => rand(0, 5),
-                'location' => 'Main Warehouse',
-            ]);
+            Stock::firstOrCreate(
+                ['product_variant_id' => $variant->id],
+                [
+                    'product_variant_id' => $variant->id,
+                    'quantity' => rand(10, 100),
+                    'reserved_quantity' => rand(0, 5),
+                    'location' => 'Main Warehouse',
+                ]
+            );
         }
     }
 
@@ -430,8 +448,6 @@ final class FullAdminSeeder extends Seeder
                 'city' => 'Vilnius',
                 'postal_code' => '01234',
                 'country_code' => 'LT',
-                'country_id' => $countries[0]->id,
-                'zone_id' => $zones[0]->id,
                 'phone' => '+37012345678',
                 'email' => 'admin@example.com',
                 'is_default' => true,
@@ -447,8 +463,6 @@ final class FullAdminSeeder extends Seeder
                 'city' => 'Vilnius',
                 'postal_code' => '01235',
                 'country_code' => 'LT',
-                'country_id' => $countries[0]->id,
-                'zone_id' => $zones[0]->id,
                 'phone' => '+37012345679',
                 'email' => 'admin@example.com',
                 'is_default' => false,
@@ -457,9 +471,18 @@ final class FullAdminSeeder extends Seeder
             ],
         ];
 
-        return collect($addresses)->map(function ($address) {
-            return Address::create($address);
-        })->toArray();
+        $createdAddresses = [];
+        foreach ($addresses as $address) {
+            $createdAddresses[] = Address::firstOrCreate(
+                [
+                    'user_id' => $address['user_id'],
+                    'type' => $address['type'],
+                    'address_line_1' => $address['address_line_1'],
+                ],
+                $address
+            );
+        }
+        return $createdAddresses;
     }
 
     private function createOrders(User $admin, array $addresses): array
@@ -469,15 +492,21 @@ final class FullAdminSeeder extends Seeder
         $orders = [];
         
         for ($i = 0; $i < 5; $i++) {
-            $orders[] = Order::create([
-                'user_id' => $admin->id,
-                'order_number' => 'ORD-' . str_pad($i + 1, 6, '0', STR_PAD_LEFT),
-                'status' => ['pending', 'processing', 'shipped', 'delivered', 'cancelled'][$i % 5],
-                'total_amount' => rand(100, 1000),
-                'shipping_address_id' => $addresses[0]->id,
-                'billing_address_id' => $addresses[1]->id,
-                'notes' => 'Sample order ' . ($i + 1),
-            ]);
+            $orderNumber = 'ORD-' . str_pad((string)($i + 1), 6, '0', STR_PAD_LEFT);
+            $orders[] = Order::firstOrCreate(
+                ['number' => $orderNumber],
+                [
+                    'user_id' => $admin->id,
+                    'number' => $orderNumber,
+                    'status' => ['pending', 'processing', 'shipped', 'delivered', 'cancelled'][$i % 5],
+                    'total' => rand(100, 1000),
+                    'subtotal' => rand(80, 800),
+                    'tax_amount' => rand(10, 100),
+                    'shipping_amount' => rand(5, 50),
+                    'currency' => 'EUR',
+                    'notes' => 'Sample order ' . ($i + 1),
+                ]
+            );
         }
 
         return $orders;
@@ -492,14 +521,22 @@ final class FullAdminSeeder extends Seeder
             $selectedVariants = collect($variants)->random($itemCount);
             
             foreach ($selectedVariants as $variant) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_variant_id' => $variant->id,
-                    'quantity' => rand(1, 5),
-                    'unit_price' => $variant->price,
-                    'total' => $variant->price * rand(1, 5),
-                    'status' => ['pending', 'processing', 'shipped', 'delivered'][rand(0, 3)],
-                ]);
+                OrderItem::firstOrCreate(
+                    [
+                        'order_id' => $order->id,
+                        'product_variant_id' => $variant->id,
+                    ],
+                    [
+                        'order_id' => $order->id,
+                        'product_id' => $variant->product_id,
+                        'product_variant_id' => $variant->id,
+                        'name' => $variant->name,
+                        'sku' => $variant->sku,
+                        'quantity' => rand(1, 5),
+                        'unit_price' => $variant->price,
+                        'total' => $variant->price * rand(1, 5),
+                    ]
+                );
             }
         }
     }
@@ -509,15 +546,18 @@ final class FullAdminSeeder extends Seeder
         $this->command->info('🚚 Creating order shipping...');
         
         foreach ($orders as $order) {
-            OrderShipping::create([
-                'order_id' => $order->id,
-                'shipping_method' => ['standard', 'express', 'overnight'][rand(0, 2)],
-                'carrier' => ['DHL', 'UPS', 'FedEx', 'Post'][rand(0, 3)],
-                'tracking_number' => 'TRK' . rand(100000, 999999),
-                'status' => ['pending', 'shipped', 'in_transit', 'delivered'][rand(0, 3)],
-                'base_cost' => rand(10, 50),
-                'total_cost' => rand(15, 75),
-            ]);
+            OrderShipping::firstOrCreate(
+                ['order_id' => $order->id],
+                [
+                    'order_id' => $order->id,
+                    'shipping_method' => ['standard', 'express', 'overnight'][rand(0, 2)],
+                    'carrier' => ['DHL', 'UPS', 'FedEx', 'Post'][rand(0, 3)],
+                    'tracking_number' => 'TRK' . rand(100000, 999999),
+                    'status' => ['pending', 'shipped', 'in_transit', 'delivered'][rand(0, 3)],
+                    'base_cost' => rand(10, 50),
+                    'total_cost' => rand(15, 75),
+                ]
+            );
         }
     }
 
@@ -526,14 +566,20 @@ final class FullAdminSeeder extends Seeder
         $this->command->info('📄 Creating documents...');
         
         foreach ($orders as $order) {
-            Document::create([
-                'order_id' => $order->id,
-                'type' => ['invoice', 'receipt', 'shipping_label'][rand(0, 2)],
-                'title' => 'Document for Order ' . $order->order_number,
-                'content' => 'Sample document content',
-                'is_public' => rand(0, 1),
-                'status' => ['draft', 'approved', 'rejected'][rand(0, 2)],
-            ]);
+            Document::firstOrCreate(
+                [
+                    'order_id' => $order->id,
+                    'type' => 'invoice',
+                ],
+                [
+                    'order_id' => $order->id,
+                    'type' => 'invoice',
+                    'title' => 'Invoice for Order ' . $order->number,
+                    'content' => 'Sample document content',
+                    'is_public' => rand(0, 1),
+                    'status' => ['draft', 'approved', 'rejected'][rand(0, 2)],
+                ]
+            );
         }
     }
 
@@ -548,7 +594,10 @@ final class FullAdminSeeder extends Seeder
         ];
 
         foreach ($codes as $code) {
-            DiscountCode::create($code);
+            DiscountCode::firstOrCreate(
+                ['code' => $code['code']],
+                $code
+            );
         }
     }
 
@@ -590,7 +639,10 @@ final class FullAdminSeeder extends Seeder
         ];
 
         foreach ($sliders as $slider) {
-            Slider::create($slider);
+            Slider::firstOrCreate(
+                ['title' => $slider['title']],
+                $slider
+            );
         }
     }
 
@@ -623,7 +675,10 @@ final class FullAdminSeeder extends Seeder
         ];
 
         foreach ($blocks as $block) {
-            RecommendationBlock::create($block);
+            RecommendationBlock::firstOrCreate(
+                ['title' => $block['title']],
+                $block
+            );
         }
     }
 
@@ -649,7 +704,10 @@ final class FullAdminSeeder extends Seeder
         ];
 
         foreach ($seoData as $seo) {
-            SeoData::create($seo);
+            SeoData::firstOrCreate(
+                ['page' => $seo['page']],
+                $seo
+            );
         }
     }
 
@@ -666,11 +724,14 @@ final class FullAdminSeeder extends Seeder
         ];
 
         foreach ($emails as $email) {
-            Subscriber::create([
-                'email' => $email,
-                'is_active' => true,
-                'subscribed_at' => now(),
-            ]);
+            Subscriber::firstOrCreate(
+                ['email' => $email],
+                [
+                    'email' => $email,
+                    'is_active' => true,
+                    'subscribed_at' => now(),
+                ]
+            );
         }
     }
 
@@ -678,14 +739,17 @@ final class FullAdminSeeder extends Seeder
     {
         $this->command->info('🎁 Creating referral rewards...');
         
-        ReferralReward::create([
-            'user_id' => $admin->id,
-            'referral_code' => 'ADMIN' . rand(100, 999),
-            'reward_type' => 'discount',
-            'reward_value' => 15.0,
-            'is_active' => true,
-            'expires_at' => now()->addMonths(6),
-        ]);
+        ReferralReward::firstOrCreate(
+            ['user_id' => $admin->id],
+            [
+                'user_id' => $admin->id,
+                'referral_code' => 'ADMIN' . rand(100, 999),
+                'reward_type' => 'discount',
+                'reward_value' => 15.0,
+                'is_active' => true,
+                'expires_at' => now()->addMonths(6),
+            ]
+        );
     }
 
     private function createProductHistory(array $products): void
@@ -693,23 +757,20 @@ final class FullAdminSeeder extends Seeder
         $this->command->info('📈 Creating product history...');
         
         foreach ($products as $product) {
-            ProductHistory::create([
-                'product_id' => $product->id,
-                'action' => 'created',
-                'old_data' => null,
-                'new_data' => json_encode($product->toArray()),
-                'user_id' => 1, // Admin user
-            ]);
+            ProductHistory::firstOrCreate(
+                [
+                    'product_id' => $product->id,
+                    'action' => 'created',
+                ],
+                [
+                    'product_id' => $product->id,
+                    'action' => 'created',
+                    'old_data' => null,
+                    'new_data' => json_encode($product->toArray()),
+                    'user_id' => 1, // Admin user
+                ]
+            );
         }
-    }
-
-    private function createReports(): void
-    {
-        $this->command->info('📊 Creating reports...');
-        
-        // This would create report records if you have a reports table
-        // For now, we'll just log that reports would be created
-        $this->command->info('📊 Reports would be created here (if reports table exists)');
     }
 
     private function createLocations(array $countries, array $zones, array $cities): void
@@ -740,7 +801,10 @@ final class FullAdminSeeder extends Seeder
         ];
 
         foreach ($locations as $location) {
-            Location::create($location);
+            Location::firstOrCreate(
+                ['name' => $location['name']],
+                $location
+            );
         }
     }
 }

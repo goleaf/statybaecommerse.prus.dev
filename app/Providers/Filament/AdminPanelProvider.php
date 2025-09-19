@@ -61,6 +61,9 @@ final class AdminPanelProvider extends PanelProvider
                 // \App\Filament\Resources\SystemSettingsResource::class, // Disabled due to Filament v4 compatibility issues
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->pages([
+                \App\Filament\Pages\SliderAnalytics::class,
+            ])
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\Filament\Clusters')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([

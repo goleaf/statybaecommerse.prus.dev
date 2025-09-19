@@ -873,7 +873,7 @@ class CategorySeeder extends Seeder
             // Use the original slug as base and make it unique per locale
             $baseSlug = $categoryData['slug'];
             $translatedSlug = $this->translateSlug($baseSlug, $loc);
-            
+
             $trRows[] = [
                 'category_id' => $category->id,
                 'locale' => $loc,
