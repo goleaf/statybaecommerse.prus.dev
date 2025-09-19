@@ -3,20 +3,19 @@
 namespace App\Filament\Resources;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
-use UnitEnum;
 use BackedEnum;
+use App\Enums\NavigationGroup;
 final class VariantPriceHistoryResource extends Resource
 {
     protected static ?string $model = VariantPriceHistory::class;
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-currency-euro';
-    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
+    // protected static $navigationGroup = NavigationGroup::System;
     protected static ?int $navigationSort = 20;
     public static function form(Schema $schema): Schema
     {

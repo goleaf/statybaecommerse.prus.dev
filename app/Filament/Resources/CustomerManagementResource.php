@@ -32,41 +32,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * CustomerManagementResource
- *
- * Filament v4 resource for Customer management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class CustomerManagementResource extends Resource
-{
-    protected static ?string $model = User::class;
-
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static string|UnitEnum|null $navigationGroup = "Products";
-
-    protected static ?int $navigationSort = 1;
-
-    protected static ?string $recordTitleAttribute = 'name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('customers.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Customers';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -359,7 +324,11 @@ final class CustomerManagementResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\OrdersRelationManager::class,
+            RelationManagers\AddressesRelationManager::class,
+            RelationManagers\ReviewsRelationManager::class,
+            RelationManagers\CartItemsRelationManager::class,
+            RelationManagers\DiscountRedemptionsRelationManager::class,
         ];
     }
 

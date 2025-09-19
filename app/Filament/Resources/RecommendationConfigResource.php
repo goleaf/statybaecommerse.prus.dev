@@ -30,7 +30,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 /**
  * RecommendationConfigResource
  *
@@ -40,9 +39,7 @@ final class RecommendationConfigResource extends Resource
 {
     protected static ?string $model = RecommendationConfig::class;
     /**
-     * @var UnitEnum|string|null
-     */    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = "Products";
+    // protected static $navigationGroup = NavigationGroup::Products;
     protected static ?int $navigationSort = 12;
     protected static ?string $recordTitleAttribute = 'name';
      * Handle getNavigationLabel functionality with proper error handling.
@@ -66,138 +63,7 @@ final class RecommendationConfigResource extends Resource
      * @param Form $schema
      * @return Form
     public static function form(Schema $schema): Schema
-        return $schema->components([
-            Section::make(__('recommendation_configs.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            TextInput::make('name')
-                                ->label(__('recommendation_configs.name'))
-                                ->required()
-                                ->maxLength(255),
-                            TextInput::make('code')
-                                ->label(__('recommendation_configs.code'))
-                                ->maxLength(50)
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
-                        ]),
-                    Textarea::make('description')
-                        ->label(__('recommendation_configs.description'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                ]),
-            Section::make(__('recommendation_configs.algorithm_settings'))
-                            Select::make('algorithm_type')
-                                ->label(__('recommendation_configs.algorithm_type'))
-                                ->options([
-                                    'collaborative' => __('recommendation_configs.algorithm_types.collaborative'),
-                                    'content_based' => __('recommendation_configs.algorithm_types.content_based'),
-                                    'hybrid' => __('recommendation_configs.algorithm_types.hybrid'),
-                                    'popularity' => __('recommendation_configs.algorithm_types.popularity'),
-                                    'trending' => __('recommendation_configs.algorithm_types.trending'),
-                                    'similarity' => __('recommendation_configs.algorithm_types.similarity'),
-                                    'custom' => __('recommendation_configs.algorithm_types.custom'),
-                                ])
-                                ->default('collaborative'),
-                            TextInput::make('min_score')
-                                ->label(__('recommendation_configs.min_score'))
-                                ->numeric()
-                                ->step(0.01)
-                                ->minValue(0)
-                                ->maxValue(1)
-                                ->default(0.1)
-                                ->helperText(__('recommendation_configs.min_score_help')),
-                            TextInput::make('max_results')
-                                ->label(__('recommendation_configs.max_results'))
-                                ->minValue(1)
-                                ->maxValue(100)
-                                ->default(10)
-                                ->helperText(__('recommendation_configs.max_results_help')),
-                            TextInput::make('decay_factor')
-                                ->label(__('recommendation_configs.decay_factor'))
-                                ->default(0.9)
-                                ->helperText(__('recommendation_configs.decay_factor_help')),
-            Section::make(__('recommendation_configs.filtering'))
-                            Select::make('products')
-                                ->label(__('recommendation_configs.products'))
-                                ->relationship('products', 'name')
-                                ->multiple()
-                                ->searchable()
-                                ->preload()
-                                ->createOptionForm([
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255),
-                                    Textarea::make('description')
-                                        ->maxLength(500),
-                                ]),
-                            Select::make('categories')
-                                ->label(__('recommendation_configs.categories'))
-                                ->relationship('categories', 'name')
-                            Toggle::make('exclude_out_of_stock')
-                                ->label(__('recommendation_configs.exclude_out_of_stock'))
-                                ->default(true),
-                            Toggle::make('exclude_inactive')
-                                ->label(__('recommendation_configs.exclude_inactive'))
-            Section::make(__('recommendation_configs.weighting'))
-                            TextInput::make('price_weight')
-                                ->label(__('recommendation_configs.price_weight'))
-                                ->default(0.2)
-                                ->helperText(__('recommendation_configs.price_weight_help')),
-                            TextInput::make('rating_weight')
-                                ->label(__('recommendation_configs.rating_weight'))
-                                ->default(0.3)
-                                ->helperText(__('recommendation_configs.rating_weight_help')),
-                            TextInput::make('popularity_weight')
-                                ->label(__('recommendation_configs.popularity_weight'))
-                                ->helperText(__('recommendation_configs.popularity_weight_help')),
-                            TextInput::make('recency_weight')
-                                ->label(__('recommendation_configs.recency_weight'))
-                                ->helperText(__('recommendation_configs.recency_weight_help')),
-                            TextInput::make('category_weight')
-                                ->label(__('recommendation_configs.category_weight'))
-                                ->helperText(__('recommendation_configs.category_weight_help')),
-                            TextInput::make('custom_weight')
-                                ->label(__('recommendation_configs.custom_weight'))
-                                ->default(0)
-                                ->helperText(__('recommendation_configs.custom_weight_help')),
-            Section::make(__('recommendation_configs.settings'))
-                            Toggle::make('is_active')
-                                ->label(__('recommendation_configs.is_active'))
-                            Toggle::make('is_default')
-                                ->label(__('recommendation_configs.is_default')),
-                            TextInput::make('cache_duration')
-                                ->label(__('recommendation_configs.cache_duration'))
-                                ->maxValue(1440)
-                                ->default(60)
-                                ->suffix('minutes')
-                                ->helperText(__('recommendation_configs.cache_duration_help')),
-                            TextInput::make('sort_order')
-                                ->label(__('recommendation_configs.sort_order'))
-                                ->minValue(0),
-                    Textarea::make('notes')
-                        ->label(__('recommendation_configs.notes'))
-        ]);
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-    public static function table(Table $table): Table
-        return $table
-            ->columns([
-                TextColumn::make('name')
-                    ->label(__('recommendation_configs.name'))
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold'),
-                TextColumn::make('code')
-                    ->label(__('recommendation_configs.code'))
-                    ->copyable()
-                    ->badge()
-                    ->color('gray'),
-                TextColumn::make('algorithm_type')
-                    ->label(__('recommendation_configs.algorithm_type'))
-                    ->formatStateUsing(fn(string $state): string => __("recommendation_configs.algorithm_types.{$state}"))
+    {$state}"))
                     ->color(fn(string $state): string => match ($state) {
                         'collaborative' => 'blue',
                         'content_based' => 'green',

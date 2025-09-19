@@ -3,19 +3,19 @@
 namespace App\Filament\Resources;
 use App\Filament\Resources\UserBehaviorResource\Pages;
 use App\Models\UserBehavior;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
-use UnitEnum;
 use BackedEnum;
+use App\Enums\NavigationGroup;
 final class UserBehaviorResource extends Resource
 {
     protected static ?string $model = UserBehavior::class;
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Analytics;
+    // protected static $navigationGroup = NavigationGroup::System;
     protected static ?int $navigationSort = 1;
     public static function form(Schema $schema): Schema
     {
@@ -62,47 +62,7 @@ final class UserBehaviorResource extends Resource
             ]);
     }
     public static function table(Table $table): Table
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('User')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('session_id')
-                    ->label('Session')
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('product.name')
-                    ->label('Product')
-                    ->sortable()
-                    ->limit(30),
-                Tables\Columns\TextColumn::make('category.name')
-                    ->label('Category')
-                Tables\Columns\BadgeColumn::make('behavior_type')
-                    ->colors([
-                        'primary' => 'view',
-                        'success' => 'click',
-                        'warning' => 'add_to_cart',
-                        'danger' => 'remove_from_cart',
-                        'info' => 'purchase',
-                        'secondary' => 'search',
-                    ]),
-                Tables\Columns\TextColumn::make('referrer')
-                    ->limit(30)
-                Tables\Columns\TextColumn::make('ip_address')
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-            ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('behavior_type')
-                Tables\Filters\SelectFilter::make('user_id')
-                Tables\Filters\SelectFilter::make('product_id')
-                Tables\Filters\SelectFilter::make('category_id')
-                Tables\Filters\Filter::make('created_at')
-                    ->form([
-                        Forms\Components\DatePicker::make('created_from')
-                            ->label('Created From'),
-                        Forms\Components\DatePicker::make('created_until')
-                            ->label('Created Until'),
-                    ->query(function ($query, array $data) {
+    {
                         return $query
                             ->when(
                                 $data['created_from'],

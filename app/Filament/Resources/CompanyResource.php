@@ -10,7 +10,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -22,43 +22,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * CompanyResource
- *
- * Filament v4 resource for Company management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class CompanyResource extends Resource
-{
-    protected static ?string $model = Company::class;
-
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static string|UnitEnum|null $navigationGroup = "Products";
-
-    protected static ?int $navigationSort = 8;
-
-    protected static ?string $recordTitleAttribute = 'name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('companies.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return "System"->value;
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

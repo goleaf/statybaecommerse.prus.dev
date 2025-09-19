@@ -34,6 +34,8 @@ final class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->profile()
+            ->authGuard('admin')
+            ->authPasswordBroker('admin_users')
             ->brandName(__('admin.brand_name'))
             ->brandLogo(asset('images/logo-admin.svg'))
             ->brandLogoHeight('2rem')
@@ -49,9 +51,10 @@ final class AdminPanelProvider extends PanelProvider
             // ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources([
                 \App\Filament\Resources\DiscountConditionResource::class,
-                // \App\Filament\Resources\AttributeValueResource::class, // Temporarily disabled due to navigation group type issue
-                // \App\Filament\Resources\ActivityLogResource::class, // Temporarily disabled due to navigation group type issue
-                // \App\Filament\Resources\DiscountCodeResource::class, // Temporarily disabled due to navigation group type issue
+                \App\Filament\Resources\CampaignCustomerSegmentResource::class,
+                \App\Filament\Resources\CampaignProductTargetResource::class,
+                \App\Filament\Resources\CampaignViewResource::class,
+                \App\Filament\Resources\NormalSettingResource::class,
             ])
             ->pages([
                 \App\Filament\Pages\Dashboard::class,

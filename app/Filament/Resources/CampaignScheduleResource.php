@@ -10,16 +10,16 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -29,46 +29,14 @@ use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use BackedEnum;
-use UnitEnum;
-
-/**
- * CampaignScheduleResource
- *
- * Filament v4 resource for CampaignSchedule management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class CampaignScheduleResource extends Resource
-{
-    protected static ?string $model = CampaignSchedule::class;
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Marketing;
-    protected static ?int $navigationSort = 5;
-    protected static ?string $recordTitleAttribute = 'campaign.name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('admin.campaign_schedules.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Marketing';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -171,10 +139,9 @@ final class CampaignScheduleResource extends Resource
                                         ->content(fn($record) => $record?->campaign?->type ?? '-'),
                                     Placeholder::make('schedule_status')
                                         ->label(__('admin.campaign_schedules.form.fields.schedule_status'))
-                                        ->content(fn($record) => $record?->is_active ? 
-                                            __('admin.campaign_schedules.status.active') : 
-                                            __('admin.campaign_schedules.status.inactive')
-                                        ),
+                                        ->content(fn($record) => $record?->is_active
+                                            ? __('admin.campaign_schedules.status.active')
+                                            : __('admin.campaign_schedules.status.inactive')),
                                 ])
                                 ->columns(2),
                         ]),
@@ -198,7 +165,7 @@ final class CampaignScheduleResource extends Resource
                     ->sortable(),
                 BadgeColumn::make('schedule_type')
                     ->label(__('admin.campaign_schedules.form.fields.schedule_type'))
-                    ->formatStateUsing(fn(string $state): string => 
+                    ->formatStateUsing(fn(string $state): string =>
                         match ($state) {
                             'once' => __('admin.campaign_schedules.schedule_types.once'),
                             'daily' => __('admin.campaign_schedules.schedule_types.daily'),
@@ -206,8 +173,7 @@ final class CampaignScheduleResource extends Resource
                             'monthly' => __('admin.campaign_schedules.schedule_types.monthly'),
                             'custom' => __('admin.campaign_schedules.schedule_types.custom'),
                             default => $state,
-                        }
-                    )
+                        })
                     ->colors([
                         'primary' => 'once',
                         'success' => 'daily',
@@ -233,7 +199,8 @@ final class CampaignScheduleResource extends Resource
                 BadgeColumn::make('status')
                     ->label(__('admin.campaign_schedules.form.fields.status'))
                     ->formatStateUsing(function ($record) {
-                        if (!$record->is_active) return __('admin.campaign_schedules.status.inactive');
+                        if (!$record->is_active)
+                            return __('admin.campaign_schedules.status.inactive');
                         if ($record->next_run_at && $record->next_run_at->isFuture()) {
                             return __('admin.campaign_schedules.status.scheduled');
                         }
@@ -268,9 +235,8 @@ final class CampaignScheduleResource extends Resource
                     ->label(__('admin.campaign_schedules.filters.last_run_at')),
                 Filter::make('overdue')
                     ->label(__('admin.campaign_schedules.filters.overdue'))
-                    ->query(fn(Builder $query): Builder => 
-                        $query->where('next_run_at', '<', now())->where('is_active', true)
-                    ),
+                    ->query(fn(Builder $query): Builder =>
+                        $query->where('next_run_at', '<', now())->where('is_active', true)),
             ])
             ->actions([
                 ViewAction::make(),

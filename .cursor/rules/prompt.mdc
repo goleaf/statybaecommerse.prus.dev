@@ -79,7 +79,6 @@ You are acting as a senior Laravel/Filament engineer inside this repository. Fol
    * Admin: sign in → create product with variant → adjust stock → verify visible on storefront.
 
 **Coverage**: Aim ≥ 85% statements on domain + HTTP + component layers.
-Use `.env.testing` with an isolated sqlite/mysql database as appropriate.
 
 ## Upgrade Plan (MCP-driven, iterative)
 

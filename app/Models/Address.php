@@ -80,15 +80,6 @@ final class Address extends Model
     }
 
     /**
-     * Handle zone functionality with proper error handling.
-     * @return BelongsTo
-     */
-    public function zone(): BelongsTo
-    {
-        return $this->belongsTo(Zone::class);
-    }
-
-    /**
      * Handle cityById functionality with proper error handling.
      * @return BelongsTo
      */
@@ -372,7 +363,7 @@ final class Address extends Model
      */
     public function getValidationRules(): array
     {
-        return ['user_id' => 'required|exists:users,id', 'type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'zone_id' => 'nullable|exists:zones,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'is_active' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255'];
+        return ['user_id' => 'required|exists:users,id', 'type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'is_active' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255'];
     }
 
     /**

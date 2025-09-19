@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CampaignScheduleResource\Pages;
 
 use App\Filament\Resources\CampaignScheduleResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Actions;
 
 class ViewCampaignSchedule extends ViewRecord
 {
@@ -17,4 +17,3 @@ class ViewCampaignSchedule extends ViewRecord
         ];
     }
 }
-

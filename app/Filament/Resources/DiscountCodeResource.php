@@ -30,40 +30,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * DiscountCodeResource
- *
- * Filament v4 resource for DiscountCode management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class DiscountCodeResource extends Resource
-{
-    protected static ?string $model = DiscountCode::class;
-
-    /**protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
-
-    protected static ?int $navigationSort = 3;
-
-    protected static ?string $recordTitleAttribute = 'code';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('discount_codes.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Marketing';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

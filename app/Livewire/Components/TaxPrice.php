@@ -1,17 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Livewire\Components;
 
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
+
 /**
  * TaxPrice
- * 
+ *
  * Livewire component for TaxPrice with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
  */
 class TaxPrice extends Component
 {
@@ -47,15 +46,15 @@ class TaxPrice extends Component
                     $items = [];
                 }
             }
-            $context = ['zone_id' => session('zone.id'), 'currency_code' => current_currency(), 'channel_id' => optional(config('app.url')), 'user_id' => optional(auth()->user())->id, 'group_ids' => [], 'partner_tier' => null, 'now' => now(), 'code' => $code, 'cart' => ['subtotal' => $subtotal, 'items' => $items]];
+            $context = ['currency_code' => current_currency(), 'channel_id' => optional(config('app.url')), 'user_id' => optional(auth()->user())->id, 'group_ids' => [], 'partner_tier' => null, 'now' => now(), 'code' => $code, 'cart' => ['subtotal' => $subtotal, 'items' => $items]];
             $result = (array) app(\App\Services\Discounts\DiscountEngine::class)->evaluate($context);
             $discount = (float) ($result['discount_total_amount'] ?? 0.0);
         } catch (\Throwable $e) {
             $discount = 0.0;
         }
-        $zoneCode = (string) (session('zone.code') ?? session('zoneCode') ?? '');
-        return app(\App\Services\Taxes\TaxCalculator::class)->compute(max(0.0, $subtotal - $discount), $zoneCode ?: null);
+        return app(\App\Services\Taxes\TaxCalculator::class)->compute(max(0.0, $subtotal - $discount), null);
     }
+
     /**
      * Handle taxBreakdown functionality with proper error handling.
      * @return array
@@ -63,10 +62,10 @@ class TaxPrice extends Component
     #[Computed]
     public function taxBreakdown(): array
     {
-        $zoneCode = (string) (session('zone.code') ?? session('zoneCode') ?? '');
-        $taxRate = app(\App\Services\Taxes\TaxCalculator::class)->getTaxRate($zoneCode ?: null);
-        return ['zone_code' => $zoneCode, 'tax_rate' => $taxRate, 'tax_amount' => $this->taxAmount, 'taxable_amount' => $this->taxAmount / ($taxRate / 100)];
+        $taxRate = app(\App\Services\Taxes\TaxCalculator::class)->getTaxRate(null);
+        return ['tax_rate' => $taxRate, 'tax_amount' => $this->taxAmount, 'taxable_amount' => $this->taxAmount / ($taxRate / 100)];
     }
+
     /**
      * Handle updateAmounts functionality with proper error handling.
      * @return void
@@ -77,6 +76,7 @@ class TaxPrice extends Component
     {
         // Computed properties will automatically update
     }
+
     /**
      * Initialize the Livewire component with parameters.
      * @return void
@@ -85,6 +85,7 @@ class TaxPrice extends Component
     {
         // Computed properties will be calculated on first access
     }
+
     /**
      * Render the Livewire component view with current state.
      * @return View

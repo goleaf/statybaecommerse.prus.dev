@@ -381,7 +381,6 @@ return [
             'budget' => 'Biudžetas',
             'budget_limit' => 'Biudžeto limitas',
             'channel_id' => 'Kanalas',
-            'zone_id' => 'Zona',
             'display_priority' => 'Rodymo prioritetas',
             'max_uses' => 'Maksimalus naudojimas',
             'subject' => 'Tema',
@@ -590,7 +589,6 @@ return [
     'roles_permissions' => 'Vaidmenys ir leidimai',
     // Currency & Zone
     'currency_information' => 'Valiutos informacija',
-    'zone_information' => 'Zonos informacija',
     'country_information' => 'Šalies informacija',
     // Discount & Coupon
     'discount_information' => 'Nuolaidos informacija',
@@ -741,10 +739,6 @@ return [
     'contact_information' => 'Kontaktinė informacija',
     'notes' => 'Pastabos',
     'full_name' => 'Pilnas vardas',
-    // Zones
-    'zone_settings' => 'Zonos nustatymai',
-    'zone_information' => 'Zonos informacija',
-    'zone_description_help' => 'Aprašykite geografinę ar pristatymo zoną',
     // Currencies
     'currency_settings' => 'Valiutos nustatymai',
     'currency_information' => 'Valiutos informacija',

@@ -297,11 +297,7 @@ final class AdminSeeder extends Seeder
         $this->command->info('📂 Creating categories...');
 
         $categories = [
-            ['name' => 'Electronics', 'slug' => 'electronics', 'description' => 'Electronic devices and gadgets'],
-            ['name' => 'Clothing', 'slug' => 'clothing', 'description' => 'Fashion and apparel'],
-            ['name' => 'Home & Garden', 'slug' => 'home-garden', 'description' => 'Home improvement and gardening'],
-            ['name' => 'Sports', 'slug' => 'sports', 'description' => 'Sports and fitness equipment'],
-            ['name' => 'Books', 'slug' => 'books', 'description' => 'Books and literature'],
+            // All non-building categories removed - keeping only building-related categories
         ];
 
         $createdCategories = [];
@@ -802,6 +798,7 @@ final class AdminSeeder extends Seeder
         $locations = [
             [
                 'name' => 'Main Warehouse',
+                'code' => 'MAIN-WH',
                 'type' => 'warehouse',
                 'address_line_1' => '123 Warehouse Street',
                 'city' => 'Vilnius',
@@ -810,6 +807,7 @@ final class AdminSeeder extends Seeder
             ],
             [
                 'name' => 'Store Location',
+                'code' => 'STORE-01',
                 'type' => 'store',
                 'address_line_1' => '456 Main Street',
                 'city' => 'Vilnius',

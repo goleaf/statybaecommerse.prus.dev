@@ -2,224 +2,191 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsCategoryResource\Pages;
 use App\Models\NewsCategory;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Infolists;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 
-/**
- * NewsCategoryResource
- *
- * Filament v4 resource for NewsCategory management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class NewsCategoryResource extends Resource
+class NewsCategoryResource extends Resource
 {
     protected static ?string $model = NewsCategory::class;
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Content;
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
+
+    protected static ?string $navigationGroup = 'Content Management';
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $modelLabel = 'News Category';
 
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static ?string $pluralModelLabel = 'News Categories';
 
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
+    public static function form(Schema $schema): Schema
     {
-        return __('news.categories');
+        return $schema
+            ->components([
+                Forms\Components\Section::make('Category Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label(__('news_categories.fields.name'))
+                            ->required()
+                            ->maxLength(255)
+                            ->live()
+                            ->afterStateUpdated(fn($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                        Forms\Components\TextInput::make('slug')
+                            ->label(__('news_categories.fields.slug'))
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(NewsCategory::class, 'slug', ignoreRecord: true),
+                        Forms\Components\Textarea::make('description')
+                            ->label(__('news_categories.fields.description'))
+                            ->maxLength(1000)
+                            ->rows(3),
+                    ])
+                    ->columns(2),
+                Forms\Components\Section::make('Hierarchy & Display')
+                    ->schema([
+                        Forms\Components\Select::make('parent_id')
+                            ->label(__('news_categories.fields.parent_id'))
+                            ->relationship('parent', 'name')
+                            ->searchable()
+                            ->preload(),
+                        Forms\Components\TextInput::make('sort_order')
+                            ->label(__('news_categories.fields.sort_order'))
+                            ->numeric()
+                            ->default(0),
+                        Forms\Components\TextInput::make('color')
+                            ->label(__('news_categories.fields.color'))
+                            ->maxLength(7)
+                            ->placeholder('#000000'),
+                        Forms\Components\TextInput::make('icon')
+                            ->label(__('news_categories.fields.icon'))
+                            ->maxLength(255)
+                            ->placeholder('heroicon-o-tag'),
+                    ])
+                    ->columns(2),
+                Forms\Components\Section::make('Visibility')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_visible')
+                            ->label(__('news_categories.fields.is_visible'))
+                            ->default(true),
+                    ])
+                    ->columns(1),
+            ]);
     }
 
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return __('news.navigation_group');
-    }
-
-    /**
-     * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getPluralModelLabel(): string
-    {
-        return __('news.categories');
-    }
-
-    /**
-     * Handle getModelLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getModelLabel(): string
-    {
-        return __('news.category');
-    }
-
-    /**
-     * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
-     */
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
-            Section::make(__('news.basic_information'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('news.category_name'))
-                                ->required()
-                                ->maxLength(255)
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) =>
-                                    $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
-                            TextInput::make('slug')
-                                ->label(__('news.slug'))
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
-                        ]),
-                    Textarea::make('description')
-                        ->label(__('news.description'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                ]),
-            Section::make(__('news.settings'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            Select::make('parent_id')
-                                ->label(__('news.parent_category'))
-                                ->relationship('parent', 'name')
-                                ->searchable()
-                                ->preload(),
-                            TextInput::make('sort_order')
-                                ->label(__('news.sort_order'))
-                                ->numeric()
-                                ->default(0),
-                        ]),
-                    Grid::make(2)
-                        ->schema([
-                            Toggle::make('is_visible')
-                                ->label(__('news.is_visible'))
-                                ->default(true),
-                            ColorPicker::make('color')
-                                ->label(__('news.color'))
-                                ->default('#3B82F6'),
-                        ]),
-                ]),
-        ]);
-    }
-
-    /**
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->label(__('news.category_name'))
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('news_categories.fields.name'))
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('slug')
+                    ->label(__('news_categories.fields.slug'))
                     ->searchable()
                     ->sortable()
-                    ->weight('bold')
-                    ->limit(50),
-                TextColumn::make('parent.name')
-                    ->label(__('news.parent_category'))
-                    ->badge()
-                    ->color('gray')
-                    ->placeholder(__('news.no_parent')),
-                TextColumn::make('description')
-                    ->label(__('news.description'))
-                    ->limit(100)
                     ->toggleable(isToggledHiddenByDefault: true),
-                BadgeColumn::make('is_visible')
-                    ->label(__('news.status'))
-                    ->formatStateUsing(fn(bool $state): string => $state ? __('news.visible') : __('news.hidden'))
-                    ->colors([
-                        'success' => true,
-                        'warning' => false,
-                    ]),
-                TextColumn::make('sort_order')
-                    ->label(__('news.sort_order'))
+                Tables\Columns\TextColumn::make('parent.name')
+                    ->label(__('news_categories.fields.parent'))
+                    ->sortable()
+                    ->placeholder('Root'),
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->label(__('news_categories.fields.sort_order'))
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('news_count')
-                    ->label(__('news.news_count'))
+                Tables\Columns\ColorColumn::make('color')
+                    ->label(__('news_categories.fields.color')),
+                Tables\Columns\TextColumn::make('icon')
+                    ->label(__('news_categories.fields.icon'))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\IconColumn::make('is_visible')
+                    ->label(__('news_categories.fields.is_visible'))
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('news_count')
+                    ->label(__('news_categories.fields.news_count'))
                     ->counts('news')
-                    ->numeric()
                     ->sortable(),
-                TextColumn::make('created_at')
-                    ->label(__('news.created_at'))
-                    ->dateTime()
-                    ->sortable(),
-                TextColumn::make('updated_at')
-                    ->label(__('news.updated_at'))
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('news_categories.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('is_visible')
-                    ->label(__('news.is_visible'))
-                    ->trueLabel(__('news.visible_only'))
-                    ->falseLabel(__('news.hidden_only'))
-                    ->native(false),
-                Filter::make('has_parent')
-                    ->label(__('news.has_parent'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('parent_id')),
-                Filter::make('no_parent')
-                    ->label(__('news.no_parent'))
-                    ->query(fn(Builder $query): Builder => $query->whereNull('parent_id')),
+                Tables\Filters\SelectFilter::make('parent_id')
+                    ->relationship('parent', 'name')
+                    ->label(__('news_categories.filters.parent')),
+                Tables\Filters\TernaryFilter::make('is_visible')
+                    ->label(__('news_categories.fields.is_visible')),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                EditAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('sort_order', 'asc');
+            ->defaultSort('sort_order');
     }
 
-    /**
-     * Get the relations for this resource.
-     * @return array
-     */
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Category Details')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('name')
+                            ->label(__('news_categories.fields.name')),
+                        Infolists\Components\TextEntry::make('slug')
+                            ->label(__('news_categories.fields.slug'))
+                            ->copyable(),
+                        Infolists\Components\TextEntry::make('description')
+                            ->label(__('news_categories.fields.description'))
+                            ->columnSpanFull(),
+                        Infolists\Components\TextEntry::make('parent.name')
+                            ->label(__('news_categories.fields.parent'))
+                            ->placeholder('Root'),
+                    ])
+                    ->columns(2),
+                Infolists\Components\Section::make('Display Settings')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('sort_order')
+                            ->label(__('news_categories.fields.sort_order'))
+                            ->numeric(),
+                        Infolists\Components\TextEntry::make('color')
+                            ->label(__('news_categories.fields.color'))
+                            ->color(fn($state) => $state),
+                        Infolists\Components\TextEntry::make('icon')
+                            ->label(__('news_categories.fields.icon')),
+                        Infolists\Components\IconEntry::make('is_visible')
+                            ->label(__('news_categories.fields.is_visible'))
+                            ->boolean(),
+                    ])
+                    ->columns(2),
+                Infolists\Components\Section::make('Statistics')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('news_count')
+                            ->label(__('news_categories.fields.news_count'))
+                            ->numeric(),
+                        Infolists\Components\TextEntry::make('children_count')
+                            ->label(__('news_categories.fields.children_count'))
+                            ->numeric(),
+                    ])
+                    ->columns(2),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -227,10 +194,6 @@ final class NewsCategoryResource extends Resource
         ];
     }
 
-    /**
-     * Get the pages for this resource.
-     * @return array
-     */
     public static function getPages(): array
     {
         return [

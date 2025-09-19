@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Actions\EditAction;
@@ -22,26 +23,21 @@ final class AddressesRelationManager extends RelationManager
         return $schema
             ->components([
                 Forms\Components\TextInput::make('first_name')
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\TextInput::make('last_name')
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\TextInput::make('company')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('address_line_1')
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\TextInput::make('address_line_2')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('city')
-                    ->required(),
-                    ->maxLength(100),
+                    ->required()\n                    ->maxLength(100),
                 Forms\Components\TextInput::make('state')
                     ->maxLength(100),
                 Forms\Components\TextInput::make('postal_code')
-                    ->required(),
-                    ->maxLength(20),
+                    ->required()\n                    ->maxLength(20),
                 Forms\Components\Select::make('country')
                     ->options([
                         'LT' => 'Lithuania',
@@ -69,14 +65,12 @@ final class AddressesRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('full_address')
             ->columns([
                 Tables\Columns\TextColumn::make('full_address')
                     ->label(__('admin.fields.full_address'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('admin.fields.type'))
                     ->badge(),

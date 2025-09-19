@@ -9,4 +9,3 @@ final class CreateReferralCode extends CreateRecord
 {
     protected static string $resource = ReferralCodeResource::class;
 }
-

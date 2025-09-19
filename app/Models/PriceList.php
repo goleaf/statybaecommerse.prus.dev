@@ -1,6 +1,5 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\DateRangeScope;
@@ -9,18 +8,19 @@ use App\Models\Translations\PriceListTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+
 /**
  * PriceList
- * 
+ *
  * Eloquent model representing the PriceList entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property string $translationModel
  * @property mixed $table
  * @property mixed $fillable
@@ -33,9 +33,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
 final class PriceList extends Model
 {
     use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
+
     protected string $translationModel = PriceListTranslation::class;
     protected $table = 'price_lists';
-    protected $fillable = ['name', 'code', 'currency_id', 'zone_id', 'is_enabled', 'priority', 'starts_at', 'ends_at', 'description', 'metadata', 'is_default', 'auto_apply', 'min_order_amount', 'max_order_amount'];
+    protected $fillable = ['name', 'code', 'currency_id', 'is_enabled', 'priority', 'starts_at', 'ends_at', 'description', 'metadata', 'is_default', 'auto_apply', 'min_order_amount', 'max_order_amount'];
+
     /**
      * Handle casts functionality with proper error handling.
      * @return array
@@ -44,6 +46,7 @@ final class PriceList extends Model
     {
         return ['is_enabled' => 'boolean', 'is_default' => 'boolean', 'auto_apply' => 'boolean', 'priority' => 'integer', 'starts_at' => 'datetime', 'ends_at' => 'datetime', 'min_order_amount' => 'decimal:2', 'max_order_amount' => 'decimal:2', 'metadata' => 'array'];
     }
+
     /**
      * Handle currency functionality with proper error handling.
      * @return BelongsTo
@@ -52,14 +55,7 @@ final class PriceList extends Model
     {
         return $this->belongsTo(Currency::class);
     }
-    /**
-     * Handle zone functionality with proper error handling.
-     * @return BelongsTo
-     */
-    public function zone(): BelongsTo
-    {
-        return $this->belongsTo(Zone::class);
-    }
+
     /**
      * Handle items functionality with proper error handling.
      * @return HasMany
@@ -68,6 +64,7 @@ final class PriceList extends Model
     {
         return $this->hasMany(PriceListItem::class);
     }
+
     /**
      * Handle customerGroups functionality with proper error handling.
      * @return BelongsToMany
@@ -76,6 +73,7 @@ final class PriceList extends Model
     {
         return $this->belongsToMany(CustomerGroup::class, 'group_price_list', 'price_list_id', 'group_id');
     }
+
     /**
      * Handle partners functionality with proper error handling.
      * @return BelongsToMany
@@ -84,6 +82,7 @@ final class PriceList extends Model
     {
         return $this->belongsToMany(Partner::class, 'partner_price_list', 'price_list_id', 'partner_id');
     }
+
     /**
      * Handle scopeEnabled functionality with proper error handling.
      * @param mixed $query
@@ -92,6 +91,7 @@ final class PriceList extends Model
     {
         return $query->where('is_enabled', true);
     }
+
     /**
      * Handle scopeActive functionality with proper error handling.
      * @param mixed $query
@@ -104,6 +104,7 @@ final class PriceList extends Model
             $q->whereNull('ends_at')->orWhere('ends_at', '>=', now());
         });
     }
+
     /**
      * Handle scopeByPriority functionality with proper error handling.
      * @param mixed $query
@@ -113,6 +114,7 @@ final class PriceList extends Model
     {
         return $query->orderBy('priority', $direction);
     }
+
     /**
      * Handle scopeDefault functionality with proper error handling.
      * @param mixed $query
@@ -121,6 +123,7 @@ final class PriceList extends Model
     {
         return $query->where('is_default', true);
     }
+
     /**
      * Handle scopeAutoApply functionality with proper error handling.
      * @param mixed $query
@@ -129,6 +132,7 @@ final class PriceList extends Model
     {
         return $query->where('auto_apply', true);
     }
+
     /**
      * Handle scopeByCurrency functionality with proper error handling.
      * @param mixed $query
@@ -138,15 +142,7 @@ final class PriceList extends Model
     {
         return $query->where('currency_id', $currencyId);
     }
-    /**
-     * Handle scopeByZone functionality with proper error handling.
-     * @param mixed $query
-     * @param int $zoneId
-     */
-    public function scopeByZone($query, int $zoneId)
-    {
-        return $query->where('zone_id', $zoneId);
-    }
+
     /**
      * Handle scopeForOrderAmount functionality with proper error handling.
      * @param mixed $query
@@ -160,6 +156,7 @@ final class PriceList extends Model
             $q->whereNull('max_order_amount')->orWhere('max_order_amount', '>=', $amount);
         });
     }
+
     /**
      * Handle isActive functionality with proper error handling.
      * @return bool
@@ -178,6 +175,7 @@ final class PriceList extends Model
         }
         return true;
     }
+
     /**
      * Handle isDefault functionality with proper error handling.
      * @return bool
@@ -186,6 +184,7 @@ final class PriceList extends Model
     {
         return (bool) $this->is_default;
     }
+
     /**
      * Handle canAutoApply functionality with proper error handling.
      * @return bool
@@ -194,6 +193,7 @@ final class PriceList extends Model
     {
         return (bool) $this->auto_apply;
     }
+
     /**
      * Handle getEffectivePriceForProduct functionality with proper error handling.
      * @param Product $product
@@ -204,6 +204,7 @@ final class PriceList extends Model
         $item = $this->items()->where('product_id', $product->id)->first();
         return $item ? $item->net_amount : null;
     }
+
     /**
      * Handle getEffectivePriceForVariant functionality with proper error handling.
      * @param ProductVariant $variant
@@ -214,6 +215,7 @@ final class PriceList extends Model
         $item = $this->items()->where('variant_id', $variant->id)->first();
         return $item ? $item->net_amount : null;
     }
+
     /**
      * Handle getItemsCountAttribute functionality with proper error handling.
      * @return int
@@ -222,6 +224,7 @@ final class PriceList extends Model
     {
         return $this->items()->count();
     }
+
     /**
      * Handle getCustomerGroupsCountAttribute functionality with proper error handling.
      * @return int
@@ -230,6 +233,7 @@ final class PriceList extends Model
     {
         return $this->customerGroups()->count();
     }
+
     /**
      * Handle getPartnersCountAttribute functionality with proper error handling.
      * @return int
@@ -238,12 +242,13 @@ final class PriceList extends Model
     {
         return $this->partners()->count();
     }
+
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
      * @return LogOptions
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['name', 'code', 'currency_id', 'zone_id', 'is_enabled', 'priority', 'starts_at', 'ends_at'])->logOnlyDirty()->dontSubmitEmptyLogs();
+        return LogOptions::defaults()->logOnly(['name', 'code', 'currency_id', 'is_enabled', 'priority', 'starts_at', 'ends_at'])->logOnlyDirty()->dontSubmitEmptyLogs();
     }
 }

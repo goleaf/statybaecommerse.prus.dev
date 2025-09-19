@@ -28,8 +28,6 @@ class ShippingOptionsTable
                     ->sortable(),
                 TextColumn::make('currency_code')
                     ->searchable(),
-                TextColumn::make('zone.name')
-                    ->searchable(),
                 IconColumn::make('is_enabled')
                     ->boolean(),
                 IconColumn::make('is_default')

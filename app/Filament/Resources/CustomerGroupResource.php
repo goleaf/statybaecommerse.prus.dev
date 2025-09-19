@@ -30,37 +30,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * CustomerGroupResource
- *
- * Filament v4 resource for CustomerGroup management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class CustomerGroupResource extends Resource
-{
-    protected static ?string $model = CustomerGroup::class;
-    protected static string|UnitEnum|null $navigationGroup = "Products";
-    protected static ?int $navigationSort = 2;
-    protected static ?string $recordTitleAttribute = 'name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('customer_groups.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Customers';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

@@ -3,20 +3,19 @@
 namespace App\Filament\Resources;
 use App\Filament\Resources\VariantAttributeValueResource\Pages;
 use App\Models\VariantAttributeValue;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
-use UnitEnum;
 use BackedEnum;
+use App\Enums\NavigationGroup;
 final class VariantAttributeValueResource extends Resource
 {
     protected static ?string $model = VariantAttributeValue::class;
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
-    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
+    // protected static $navigationGroup = NavigationGroup::System;
     protected static ?int $navigationSort = 18;
     public static function form(Schema $schema): Schema
     {

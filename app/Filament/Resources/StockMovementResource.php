@@ -21,7 +21,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Table;
-use UnitEnum;
+use App\Enums\NavigationGroup;
 /**
  * StockMovementResource
  *
@@ -29,8 +29,7 @@ use UnitEnum;
  */
 final class StockMovementResource extends Resource
 {
-    protected static ?string $model = StockMovement::class;    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Inventory;
+    // protected static $navigationGroup = NavigationGroup::System;
     protected static ?int $navigationSort = 3;
     protected static ?string $recordTitleAttribute = 'id';
     public static function getNavigationLabel(): string

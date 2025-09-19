@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Document;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,8 +28,7 @@ final class DocumentsRelationManager extends RelationManager
                     ->required(),
                 Forms\Components\TextInput::make('title')
                     ->label(__('admin.documents.fields.title'))
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->label(__('admin.documents.fields.description'))
                     ->rows(3),
@@ -66,9 +66,7 @@ final class DocumentsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('title')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('documentTemplate.name')
-                    ->sortable(),
-                    ->badge(),
-                    ->color('info'),
+                    ->sortable()\n                    ->badge()\n                    ->color('info'),
                 Tables\Columns\TextColumn::make('status')
                     ->color(fn(string $state): string => match ($state) {
                         'draft' => 'gray',
@@ -89,8 +87,7 @@ final class DocumentsRelationManager extends RelationManager
                         return $state;
                 Tables\Columns\TextColumn::make('generated_at')
                     ->label(__('admin.documents.fields.generated_at'))
-                    ->dateTime(),
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime()\n                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.documents.fields.created_at'))
             ])

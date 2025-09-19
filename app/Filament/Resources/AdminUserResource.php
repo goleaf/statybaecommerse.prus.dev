@@ -9,13 +9,13 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -25,46 +25,14 @@ use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
-use UnitEnum;
-
-/**
- * AdminUserResource
- *
- * Filament v4 resource for AdminUser management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class AdminUserResource extends Resource
-{
-    protected static ?string $model = AdminUser::class;
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Users;
-    protected static ?int $navigationSort = 1;
-    protected static ?string $recordTitleAttribute = 'name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('admin.admin_users.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Users';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -119,13 +87,13 @@ final class AdminUserResource extends Resource
                                             TextInput::make('password')
                                                 ->label(__('admin.admin_users.form.fields.password'))
                                                 ->password()
-                                                ->required(fn (string $context): bool => $context === 'create')
+                                                ->required(fn(string $context): bool => $context === 'create')
                                                 ->minLength(8)
                                                 ->columnSpan(1),
                                             TextInput::make('password_confirmation')
                                                 ->label(__('admin.admin_users.form.fields.password_confirmation'))
                                                 ->password()
-                                                ->required(fn (string $context): bool => $context === 'create')
+                                                ->required(fn(string $context): bool => $context === 'create')
                                                 ->same('password')
                                                 ->columnSpan(1),
                                         ]),
@@ -139,13 +107,13 @@ final class AdminUserResource extends Resource
                                 ->schema([
                                     Placeholder::make('email_verified_at')
                                         ->label(__('admin.admin_users.form.fields.email_verified_at'))
-                                        ->content(fn ($record) => $record?->email_verified_at?->format('Y-m-d H:i:s') ?? '-'),
+                                        ->content(fn($record) => $record?->email_verified_at?->format('Y-m-d H:i:s') ?? '-'),
                                     Placeholder::make('created_at')
                                         ->label(__('admin.admin_users.form.fields.created_at'))
-                                        ->content(fn ($record) => $record?->created_at?->format('Y-m-d H:i:s') ?? '-'),
+                                        ->content(fn($record) => $record?->created_at?->format('Y-m-d H:i:s') ?? '-'),
                                     Placeholder::make('updated_at')
                                         ->label(__('admin.admin_users.form.fields.updated_at'))
-                                        ->content(fn ($record) => $record?->updated_at?->format('Y-m-d H:i:s') ?? '-'),
+                                        ->content(fn($record) => $record?->updated_at?->format('Y-m-d H:i:s') ?? '-'),
                                 ])
                                 ->columns(2),
                         ]),
@@ -207,7 +175,7 @@ final class AdminUserResource extends Resource
                     ->label(__('admin.admin_users.filters.created_at')),
                 Filter::make('recent')
                     ->label(__('admin.admin_users.filters.recent'))
-                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
+                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
             ])
             ->actions([
                 ViewAction::make(),

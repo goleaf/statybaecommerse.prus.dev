@@ -1,14 +1,12 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\CountryResource\Pages;
 
 use App\Filament\Resources\CountryResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
 
-final class EditCountry extends EditRecord
+class EditCountry extends EditRecord
 {
     protected static string $resource = CountryResource::class;
 
@@ -18,5 +16,15 @@ final class EditCountry extends EditRecord
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
+    protected function getSavedNotificationTitle(): ?string
+    {
+        return __('countries.notifications.updated');
     }
 }

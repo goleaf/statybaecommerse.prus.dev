@@ -310,7 +310,6 @@ This repository is a full-stack, multilingual e‑commerce platform built on Lar
   - Spatie: Activitylog, MediaLibrary, Permission
   - Filament: Media Library Plugin, Tab Layout Plugin
   - Predis/Redis, Barrryvdh DomPDF, Pest (tests)
-- **Database**: SQLite (by default), extensive migrations and indices
 
 ---
 
@@ -815,8 +814,7 @@ Use this document as a compact guide when implementing new features or refactors
 
 ## Core Stack & Conventions
 - Laravel 12, PHP 8.2+, Livewire, Filament v4, Tailwind + Vite
-- SQLite by default (do not switch to MySQL). ENV: `DB_CONNECTION=sqlite`
-- Strict typing, PSR‑12, final classes, explicit return types
+s- Strict typing, PSR‑12, final classes, explicit return types
 - Use services for domain logic, keep controllers thin
 - Prefer `match` over `switch`; use constructor property promotion
 - Default locale: Lithuanian (`lt`), currency: EUR (`€`)

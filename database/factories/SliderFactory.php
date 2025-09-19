@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Slider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,26 +10,23 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class SliderFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Slider::class;
+
     public function definition(): array
     {
         return [
             'title' => fake()->sentence(3),
             'description' => fake()->paragraph(2),
-            'button_text' => fake()->randomElement(['Learn More', 'Get Started', 'Shop Now', 'Discover', 'Explore']),
+            'button_text' => fake()->words(2, true),
             'button_url' => fake()->url(),
             'background_color' => fake()->hexColor(),
-            'text_color' => fake()->randomElement(['#000000', '#ffffff', '#333333']),
+            'text_color' => fake()->hexColor(),
             'sort_order' => fake()->numberBetween(0, 100),
-            'is_active' => fake()->boolean(80), // 80% chance of being active
+            'is_active' => fake()->boolean(80),
             'settings' => [
-                'animation_duration' => fake()->numberBetween(500, 2000),
-                'show_indicators' => fake()->boolean(),
-                'show_arrows' => fake()->boolean(),
+                'animation' => fake()->randomElement(['fade', 'slide', 'zoom']),
+                'duration' => fake()->numberBetween(3000, 8000),
+                'autoplay' => fake()->boolean(),
             ],
         ];
     }
@@ -44,6 +42,22 @@ class SliderFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_active' => false,
+        ]);
+    }
+
+    public function withButton(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'button_text' => fake()->words(2, true),
+            'button_url' => fake()->url(),
+        ]);
+    }
+
+    public function withoutButton(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'button_text' => null,
+            'button_url' => null,
         ]);
     }
 }

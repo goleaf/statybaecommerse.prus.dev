@@ -32,43 +32,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * CampaignClickResource
- *
- * Filament v4 resource for CampaignClick management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class CampaignClickResource extends Resource
-{
-    protected static ?string $model = CampaignClick::class;
-
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static string|UnitEnum|null $navigationGroup = "Marketing";
-
-    protected static ?int $navigationSort = 8;
-
-    protected static ?string $recordTitleAttribute = 'campaign_name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('campaign_clicks.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Marketing';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

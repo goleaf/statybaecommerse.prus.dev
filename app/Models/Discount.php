@@ -1,23 +1,23 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 /**
  * Discount
- * 
+ *
  * Eloquent model representing the Discount entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property mixed $table
  * @property mixed $fillable
  * @method static \Illuminate\Database\Eloquent\Builder|Discount newModelQuery()
@@ -29,8 +29,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 final class Discount extends Model
 {
     use HasFactory, SoftDeletes;
+
     protected $table = 'discounts';
-    protected $fillable = ['name', 'slug', 'description', 'type', 'value', 'is_active', 'is_enabled', 'starts_at', 'ends_at', 'usage_limit', 'usage_count', 'minimum_amount', 'maximum_amount', 'zone_id', 'status', 'scope', 'stacking_policy', 'metadata', 'priority', 'exclusive', 'applies_to_shipping', 'free_shipping', 'first_order_only', 'per_customer_limit', 'per_code_limit', 'per_day_limit', 'channel_restrictions', 'currency_restrictions', 'weekday_mask', 'time_window'];
+    protected $fillable = ['name', 'slug', 'description', 'type', 'value', 'is_active', 'is_enabled', 'starts_at', 'ends_at', 'usage_limit', 'usage_count', 'minimum_amount', 'maximum_amount', 'status', 'scope', 'stacking_policy', 'metadata', 'priority', 'exclusive', 'applies_to_shipping', 'free_shipping', 'first_order_only', 'per_customer_limit', 'per_code_limit', 'per_day_limit', 'channel_restrictions', 'currency_restrictions', 'weekday_mask', 'time_window'];
+
     /**
      * Handle casts functionality with proper error handling.
      * @return array
@@ -39,6 +41,7 @@ final class Discount extends Model
     {
         return ['value' => 'float', 'minimum_amount' => 'decimal:2', 'maximum_amount' => 'decimal:2', 'starts_at' => 'datetime', 'ends_at' => 'datetime', 'is_active' => 'boolean', 'is_enabled' => 'boolean', 'scope' => 'array', 'metadata' => 'array', 'exclusive' => 'boolean', 'applies_to_shipping' => 'boolean', 'free_shipping' => 'boolean', 'first_order_only' => 'boolean', 'channel_restrictions' => 'array', 'currency_restrictions' => 'array', 'time_window' => 'array', 'usage_limit' => 'integer', 'usage_count' => 'integer', 'per_customer_limit' => 'integer', 'per_code_limit' => 'integer', 'per_day_limit' => 'integer', 'priority' => 'integer'];
     }
+
     /**
      * Handle scopeActive functionality with proper error handling.
      * @param Builder $query
@@ -52,6 +55,7 @@ final class Discount extends Model
             $q->whereNull('ends_at')->orWhere('ends_at', '>=', now());
         });
     }
+
     /**
      * Handle scopeScheduled functionality with proper error handling.
      * @param Builder $query
@@ -61,6 +65,7 @@ final class Discount extends Model
     {
         return $query->where('status', 'scheduled');
     }
+
     /**
      * Handle scopeExpired functionality with proper error handling.
      * @param Builder $query
@@ -72,6 +77,7 @@ final class Discount extends Model
             $q->whereNotNull('ends_at')->where('ends_at', '<', now());
         });
     }
+
     /**
      * Handle hasReachedLimit functionality with proper error handling.
      * @return bool
@@ -83,6 +89,7 @@ final class Discount extends Model
         }
         return false;
     }
+
     /**
      * Handle isValid functionality with proper error handling.
      * @return bool
@@ -104,6 +111,7 @@ final class Discount extends Model
         }
         return true;
     }
+
     /**
      * Handle conditions functionality with proper error handling.
      * @return HasMany
@@ -112,6 +120,7 @@ final class Discount extends Model
     {
         return $this->hasMany(DiscountCondition::class);
     }
+
     /**
      * Handle codes functionality with proper error handling.
      * @return HasMany
@@ -120,6 +129,7 @@ final class Discount extends Model
     {
         return $this->hasMany(DiscountCode::class);
     }
+
     /**
      * Handle redemptions functionality with proper error handling.
      * @return HasMany
@@ -128,14 +138,7 @@ final class Discount extends Model
     {
         return $this->hasMany(DiscountRedemption::class);
     }
-    /**
-     * Handle zone functionality with proper error handling.
-     * @return BelongsTo
-     */
-    public function zone(): BelongsTo
-    {
-        return $this->belongsTo(Zone::class);
-    }
+
     /**
      * Handle brands functionality with proper error handling.
      * @return BelongsToMany
@@ -144,6 +147,7 @@ final class Discount extends Model
     {
         return $this->belongsToMany(Brand::class, 'discount_brands');
     }
+
     /**
      * Handle categories functionality with proper error handling.
      * @return BelongsToMany
@@ -152,6 +156,7 @@ final class Discount extends Model
     {
         return $this->belongsToMany(Category::class, 'discount_categories');
     }
+
     /**
      * Handle collections functionality with proper error handling.
      * @return BelongsToMany
@@ -160,6 +165,7 @@ final class Discount extends Model
     {
         return $this->belongsToMany(Collection::class, 'discount_collections');
     }
+
     /**
      * Handle customers functionality with proper error handling.
      * @return BelongsToMany
@@ -168,14 +174,7 @@ final class Discount extends Model
     {
         return $this->belongsToMany(User::class, 'discount_customers', 'discount_id', 'user_id');
     }
-    /**
-     * Handle zones functionality with proper error handling.
-     * @return BelongsToMany
-     */
-    public function zones(): BelongsToMany
-    {
-        return $this->belongsToMany(Zone::class, 'discount_zones');
-    }
+
     /**
      * Handle campaigns functionality with proper error handling.
      * @return BelongsToMany
@@ -184,6 +183,7 @@ final class Discount extends Model
     {
         return $this->belongsToMany(Campaign::class, 'campaign_discount');
     }
+
     /**
      * Handle products functionality with proper error handling.
      * @return BelongsToMany
@@ -192,6 +192,7 @@ final class Discount extends Model
     {
         return $this->belongsToMany(Product::class, 'discount_products');
     }
+
     /**
      * Handle customerGroups functionality with proper error handling.
      * @return BelongsToMany
@@ -200,6 +201,7 @@ final class Discount extends Model
     {
         return $this->belongsToMany(CustomerGroup::class, 'discount_customer_groups');
     }
+
     /**
      * Handle scopeByType functionality with proper error handling.
      * @param Builder $query
@@ -210,6 +212,7 @@ final class Discount extends Model
     {
         return $query->where('type', $type);
     }
+
     /**
      * Handle scopeExclusive functionality with proper error handling.
      * @param Builder $query
@@ -219,6 +222,7 @@ final class Discount extends Model
     {
         return $query->where('exclusive', true);
     }
+
     /**
      * Handle scopeStackable functionality with proper error handling.
      * @param Builder $query
@@ -228,6 +232,7 @@ final class Discount extends Model
     {
         return $query->where('exclusive', false);
     }
+
     /**
      * Handle scopeByPriority functionality with proper error handling.
      * @param Builder $query
@@ -238,6 +243,7 @@ final class Discount extends Model
     {
         return $query->orderBy('priority', $direction);
     }
+
     /**
      * Handle getDiscountAmountAttribute functionality with proper error handling.
      * @return float
@@ -251,6 +257,7 @@ final class Discount extends Model
             default => 0,
         };
     }
+
     /**
      * Handle isExclusive functionality with proper error handling.
      * @return bool
@@ -259,6 +266,7 @@ final class Discount extends Model
     {
         return (bool) $this->exclusive;
     }
+
     /**
      * Handle canStackWith functionality with proper error handling.
      * @param Discount $other
@@ -268,6 +276,7 @@ final class Discount extends Model
     {
         return !$this->isExclusive() && !$other->isExclusive();
     }
+
     /**
      * Handle isCurrentlyActive functionality with proper error handling.
      * @return bool
@@ -286,6 +295,7 @@ final class Discount extends Model
         }
         return true;
     }
+
     /**
      * Handle calculateDiscountAmount functionality with proper error handling.
      * @param float $amount
@@ -299,6 +309,7 @@ final class Discount extends Model
             default => 0.0,
         };
     }
+
     /**
      * Handle incrementUsage functionality with proper error handling.
      * @return void
@@ -307,6 +318,7 @@ final class Discount extends Model
     {
         $this->increment('usage_count');
     }
+
     /**
      * Handle isUsageLimitReached functionality with proper error handling.
      * @return bool

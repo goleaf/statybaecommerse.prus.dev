@@ -30,40 +30,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * ActivityLogResource
- *
- * Filament v4 resource for ActivityLog management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class ActivityLogResource extends Resource
-{
-    protected static ?string $model = ActivityLog::class;
-
-    protected static string|UnitEnum|null $navigationGroup = 'System';
-
-    protected static ?int $navigationSort = 9;
-
-    protected static ?string $recordTitleAttribute = 'description';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('activity_logs.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'System';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -85,12 +51,12 @@ final class ActivityLogResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
+     * @param Schema $schema
      * @return Form
      */
     public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('activity_logs.basic_information'))
                 ->schema([
                     Grid::make(2)

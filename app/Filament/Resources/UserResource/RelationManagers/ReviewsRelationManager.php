@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Actions\EditAction;
@@ -45,7 +46,6 @@ final class ReviewsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('product.name')
             ->columns([
@@ -54,8 +54,7 @@ final class ReviewsRelationManager extends RelationManager
                     ->circular(),
                 Tables\Columns\TextColumn::make('product.name')
                     ->label(__('admin.fields.product_name'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 Tables\Columns\TextColumn::make('rating')
                     ->label(__('admin.fields.rating'))
                     ->badge(),

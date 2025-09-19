@@ -30,7 +30,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 /**
  * StockResource
  *
@@ -38,8 +37,7 @@ use UnitEnum;
  */
 final class StockResource extends Resource
 {
-    protected static ?string $model = Stock::class;    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Inventory;
+    // protected static $navigationGroup = NavigationGroup::Inventory;
     protected static ?int $navigationSort = 7;
     protected static ?string $recordTitleAttribute = 'product_name';
     /**
@@ -64,19 +62,7 @@ final class StockResource extends Resource
      * @param Form $schema
      * @return Form
     public static function form(Schema $schema): Schema
-        return $schema->components([
-            Section::make(__('stocks.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            Select::make('product_id')
-                                ->label(__('stocks.product'))
-                                ->relationship('product', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->required()
-                                ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+    {
                                     if ($state) {
                                         $product = Product::find($state);
                                         if ($product) {
@@ -140,87 +126,7 @@ final class StockResource extends Resource
      * @param Table $table
      * @return Table
     public static function table(Table $table): Table
-        return $table
-            ->columns([
-                TextColumn::make('product_name')
-                    ->label(__('stocks.product_name'))
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold')
-                    ->limit(50),
-                TextColumn::make('product_sku')
-                    ->label(__('stocks.product_sku'))
-                    ->copyable()
-                    ->badge()
-                    ->color('gray'),
-                TextColumn::make('location.name')
-                    ->label(__('stocks.location'))
-                    ->color('blue'),
-                TextColumn::make('quantity')
-                    ->label(__('stocks.quantity'))
-                    ->numeric()
-                    ->alignCenter()
-                    ->weight('bold'),
-                TextColumn::make('reserved_quantity')
-                    ->label(__('stocks.reserved_quantity'))
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('available_quantity')
-                    ->label(__('stocks.available_quantity'))
-                    ->color(fn($state): string => $state <= 0 ? 'danger' : ($state <= 10 ? 'warning' : 'success')),
-                TextColumn::make('low_stock_threshold')
-                    ->label(__('stocks.low_stock_threshold'))
-                IconColumn::make('is_active')
-                    ->label(__('stocks.is_active'))
-                    ->boolean()
-                    ->sortable(),
-                IconColumn::make('track_stock')
-                    ->label(__('stocks.track_stock'))
-                IconColumn::make('allow_backorder')
-                    ->label(__('stocks.allow_backorder'))
-                IconColumn::make('manage_stock')
-                    ->label(__('stocks.manage_stock'))
-                TextColumn::make('created_at')
-                    ->label(__('stocks.created_at'))
-                    ->dateTime()
-                TextColumn::make('updated_at')
-                    ->label(__('stocks.updated_at'))
-            ])
-            ->filters([
-                SelectFilter::make('product_id')
-                    ->label(__('stocks.product'))
-                    ->relationship('product', 'name')
-                    ->preload(),
-                SelectFilter::make('location_id')
-                    ->relationship('location', 'name')
-                TernaryFilter::make('is_active')
-                    ->trueLabel(__('stocks.active_only'))
-                    ->falseLabel(__('stocks.inactive_only'))
-                    ->native(false),
-                TernaryFilter::make('track_stock')
-                    ->trueLabel(__('stocks.tracked_only'))
-                    ->falseLabel(__('stocks.not_tracked'))
-                TernaryFilter::make('allow_backorder')
-                    ->trueLabel(__('stocks.backorder_allowed'))
-                    ->falseLabel(__('stocks.backorder_not_allowed'))
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                EditAction::make(),
-                Action::make('adjust_stock')
-                    ->label(__('stocks.adjust_stock'))
-                    ->icon('heroicon-o-adjustments-horizontal')
-                    ->color('info')
-                    ->form([
-                        TextInput::make('adjustment_quantity')
-                            ->label(__('stocks.adjustment_quantity'))
-                            ->numeric()
-                            ->required()
-                            ->helperText(__('stocks.adjustment_quantity_help')),
-                        Textarea::make('adjustment_reason')
-                            ->label(__('stocks.adjustment_reason'))
-                            ->rows(3)
-                            ->maxLength(500),
-                    ])
-                    ->action(function (Stock $record, array $data): void {
+    {
                         $record->update([
                             'quantity' => $record->quantity + $data['adjustment_quantity'],
                         ]);

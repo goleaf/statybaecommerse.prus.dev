@@ -35,7 +35,7 @@ final class Order extends Model
     use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
 
     public array $translatable = ['notes', 'billing_address', 'shipping_address'];
-    protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'zone_id', 'shipping_option_id', 'partner_id', 'payment_status', 'payment_method', 'payment_reference'];
+    protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'payment_status', 'payment_method', 'payment_reference'];
 
     /**
      * Handle casts functionality with proper error handling.
@@ -150,15 +150,6 @@ final class Order extends Model
     public function highestValueDiscountRedemption(): HasOne
     {
         return $this->discountRedemptions()->one()->ofMany('discount_amount', 'max');
-    }
-
-    /**
-     * Handle zone functionality with proper error handling.
-     * @return BelongsTo
-     */
-    public function zone(): BelongsTo
-    {
-        return $this->belongsTo(Zone::class);
     }
 
     /**

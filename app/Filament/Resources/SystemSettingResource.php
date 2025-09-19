@@ -30,7 +30,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 /**
  * SystemSettingResource
  *
@@ -38,8 +37,7 @@ use UnitEnum;
  */
 final class SystemSettingResource extends Resource
 {
-    protected static ?string $model = SystemSetting::class;    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = "System";
+    // protected static $navigationGroup = NavigationGroup::System;
     protected static ?int $navigationSort = 18;
     protected static ?string $recordTitleAttribute = 'key';
     /**
@@ -64,131 +62,7 @@ final class SystemSettingResource extends Resource
      * @param Form $schema
      * @return Form
     public static function form(Schema $schema): Schema
-        return $schema->components([
-            Section::make(__('system_settings.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            TextInput::make('key')
-                                ->label(__('system_settings.key'))
-                                ->required()
-                                ->maxLength(255)
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash'])
-                                ->helperText(__('system_settings.key_help')),
-                            Select::make('type')
-                                ->label(__('system_settings.type'))
-                                ->options([
-                                    'string' => __('system_settings.types.string'),
-                                    'integer' => __('system_settings.types.integer'),
-                                    'float' => __('system_settings.types.float'),
-                                    'boolean' => __('system_settings.types.boolean'),
-                                    'array' => __('system_settings.types.array'),
-                                    'json' => __('system_settings.types.json'),
-                                    'file' => __('system_settings.types.file'),
-                                    'url' => __('system_settings.types.url'),
-                                    'email' => __('system_settings.types.email'),
-                                    'password' => __('system_settings.types.password'),
-                                ])
-                                ->default('string')
-                                ->reactive(),
-                        ]),
-                    Textarea::make('description')
-                        ->label(__('system_settings.description'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                ]),
-            Section::make(__('system_settings.value'))
-                    Forms\Components\ViewField::make('value')
-                        ->label(__('system_settings.value'))
-                        ->view('filament.forms.components.system-setting-value')
-                        ->viewData(fn(Forms\Get $get): array => [
-                            'type' => $get('type'),
-                            'value' => $get('value'),
-                        ])
-            Section::make(__('system_settings.categorization'))
-                            Select::make('category')
-                                ->label(__('system_settings.category'))
-                                    'general' => __('system_settings.categories.general'),
-                                    'appearance' => __('system_settings.categories.appearance'),
-                                    'email' => __('system_settings.categories.email'),
-                                    'payment' => __('system_settings.categories.payment'),
-                                    'shipping' => __('system_settings.categories.shipping'),
-                                    'security' => __('system_settings.categories.security'),
-                                    'performance' => __('system_settings.categories.performance'),
-                                    'integration' => __('system_settings.categories.integration'),
-                                    'analytics' => __('system_settings.categories.analytics'),
-                                    'maintenance' => __('system_settings.categories.maintenance'),
-                                    'custom' => __('system_settings.categories.custom'),
-                                ->default('general')
-                                ->searchable(),
-                            TextInput::make('group')
-                                ->label(__('system_settings.group'))
-                                ->maxLength(100)
-                                ->helperText(__('system_settings.group_help')),
-                            TextInput::make('sort_order')
-                                ->label(__('system_settings.sort_order'))
-                                ->numeric()
-                                ->default(0)
-                                ->minValue(0),
-                            Toggle::make('is_public')
-                                ->label(__('system_settings.is_public'))
-                                ->default(false)
-                                ->helperText(__('system_settings.is_public_help')),
-            Section::make(__('system_settings.validation'))
-                            TextInput::make('min_value')
-                                ->label(__('system_settings.min_value'))
-                                ->helperText(__('system_settings.min_value_help')),
-                            TextInput::make('max_value')
-                                ->label(__('system_settings.max_value'))
-                                ->helperText(__('system_settings.max_value_help')),
-                            TextInput::make('allowed_values')
-                                ->label(__('system_settings.allowed_values'))
-                                ->maxLength(500)
-                                ->helperText(__('system_settings.allowed_values_help')),
-                            TextInput::make('regex_pattern')
-                                ->label(__('system_settings.regex_pattern'))
-                                ->helperText(__('system_settings.regex_pattern_help')),
-            Section::make(__('system_settings.metadata'))
-                            TextInput::make('default_value')
-                                ->label(__('system_settings.default_value'))
-                                ->helperText(__('system_settings.default_value_help')),
-                            TextInput::make('unit')
-                                ->label(__('system_settings.unit'))
-                                ->maxLength(50)
-                                ->helperText(__('system_settings.unit_help')),
-                            Toggle::make('is_required')
-                                ->label(__('system_settings.is_required'))
-                                ->helperText(__('system_settings.is_required_help')),
-                            Toggle::make('is_encrypted')
-                                ->label(__('system_settings.is_encrypted'))
-                                ->helperText(__('system_settings.is_encrypted_help')),
-            Section::make(__('system_settings.settings'))
-                            Toggle::make('is_active')
-                                ->label(__('system_settings.is_active'))
-                                ->default(true),
-                            Toggle::make('is_readonly')
-                                ->label(__('system_settings.is_readonly'))
-                                ->helperText(__('system_settings.is_readonly_help')),
-                    Textarea::make('notes')
-                        ->label(__('system_settings.notes'))
-        ]);
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-    public static function table(Table $table): Table
-        return $table
-            ->columns([
-                TextColumn::make('key')
-                    ->label(__('system_settings.key'))
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold')
-                    ->copyable(),
-                TextColumn::make('type')
-                    ->label(__('system_settings.type'))
-                    ->formatStateUsing(fn(string $state): string => __("system_settings.types.{$state}"))
+    {$state}"))
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'string' => 'blue',

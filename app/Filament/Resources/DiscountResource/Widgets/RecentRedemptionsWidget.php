@@ -60,3 +60,4 @@ final class RecentRedemptionsWidget extends BaseWidget
     }
 }
 
+

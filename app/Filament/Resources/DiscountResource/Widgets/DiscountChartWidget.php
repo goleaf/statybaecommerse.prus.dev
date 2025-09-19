@@ -53,3 +53,4 @@ final class DiscountChartWidget extends ChartWidget
     }
 }
 
+

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Collection;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;

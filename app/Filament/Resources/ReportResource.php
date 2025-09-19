@@ -7,7 +7,6 @@ use App\Models\Report;
 use App\Models\User;
 use App\Enums\NavigationGroup;
 use Filament\Forms;
-use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -43,7 +42,7 @@ final class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;
     
-    protected static string | UnitEnum | null $navigationGroup = "System";
+    // protected static $navigationGroup = NavigationGroup::System;
     protected static ?int $navigationSort = 17;
     protected static ?string $recordTitleAttribute = 'name';
     /**
@@ -68,177 +67,7 @@ final class ReportResource extends Resource
      * @param Form $schema
      * @return Form
     public static function form(Schema $schema): Schema
-        return $schema->components([
-            Section::make(__('reports.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            TextInput::make('name')
-                                ->label(__('reports.name'))
-                                ->required()
-                                ->maxLength(255),
-                            
-                            TextInput::make('code')
-                                ->label(__('reports.code'))
-                                ->maxLength(50)
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
-                        ]),
-                    
-                    Textarea::make('description')
-                        ->label(__('reports.description'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                ]),
-            
-            Section::make(__('reports.report_settings'))
-                            Select::make('type')
-                                ->label(__('reports.type'))
-                                ->options([
-                                    'sales' => __('reports.types.sales'),
-                                    'inventory' => __('reports.types.inventory'),
-                                    'customer' => __('reports.types.customer'),
-                                    'product' => __('reports.types.product'),
-                                    'financial' => __('reports.types.financial'),
-                                    'analytics' => __('reports.types.analytics'),
-                                    'custom' => __('reports.types.custom'),
-                                ])
-                                ->default('sales'),
-                            Select::make('format')
-                                ->label(__('reports.format'))
-                                    'pdf' => __('reports.formats.pdf'),
-                                    'excel' => __('reports.formats.excel'),
-                                    'csv' => __('reports.formats.csv'),
-                                    'json' => __('reports.formats.json'),
-                                    'html' => __('reports.formats.html'),
-                                ->default('pdf'),
-                            Select::make('frequency')
-                                ->label(__('reports.frequency'))
-                                    'once' => __('reports.frequencies.once'),
-                                    'daily' => __('reports.frequencies.daily'),
-                                    'weekly' => __('reports.frequencies.weekly'),
-                                    'monthly' => __('reports.frequencies.monthly'),
-                                    'quarterly' => __('reports.frequencies.quarterly'),
-                                    'yearly' => __('reports.frequencies.yearly'),
-                                ->default('once'),
-                            TextInput::make('max_rows')
-                                ->label(__('reports.max_rows'))
-                                ->numeric()
-                                ->minValue(1)
-                                ->maxValue(100000)
-                                ->default(1000)
-                                ->helperText(__('reports.max_rows_help')),
-            Section::make(__('reports.scheduling'))
-                            DateTimePicker::make('scheduled_at')
-                                ->label(__('reports.scheduled_at'))
-                                ->helperText(__('reports.scheduled_at_help')),
-                            Select::make('timezone')
-                                ->label(__('reports.timezone'))
-                                    'UTC' => 'UTC',
-                                    'Europe/Vilnius' => 'Europe/Vilnius',
-                                    'Europe/London' => 'Europe/London',
-                                    'America/New_York' => 'America/New_York',
-                                    'Asia/Tokyo' => 'Asia/Tokyo',
-                                ->default('Europe/Vilnius')
-                                ->searchable(),
-                            Toggle::make('is_scheduled')
-                                ->label(__('reports.is_scheduled'))
-                                ->default(false)
-                                ->helperText(__('reports.is_scheduled_help')),
-                            Toggle::make('auto_generate')
-                                ->label(__('reports.auto_generate'))
-                                ->helperText(__('reports.auto_generate_help')),
-            Section::make(__('reports.recipients'))
-                            Select::make('recipients')
-                                ->label(__('reports.recipients'))
-                                ->relationship('users', 'name')
-                                ->multiple()
-                                ->searchable()
-                                ->preload()
-                                ->createOptionForm([
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255),
-                                    TextInput::make('email')
-                                        ->email()
-                                ]),
-                            TextInput::make('email_recipients')
-                                ->label(__('reports.email_recipients'))
-                                ->email()
-                                ->helperText(__('reports.email_recipients_help')),
-            Section::make(__('reports.parameters'))
-                    Forms\Components\Repeater::make('parameters')
-                        ->label(__('reports.parameters'))
-                            Grid::make(3)
-                                ->components([
-                                        ->label(__('reports.parameter_name'))
-                                        ->maxLength(100),
-                                    
-                                    Select::make('type')
-                                        ->label(__('reports.parameter_type'))
-                                        ->options([
-                                            'string' => __('reports.parameter_types.string'),
-                                            'integer' => __('reports.parameter_types.integer'),
-                                            'float' => __('reports.parameter_types.float'),
-                                            'boolean' => __('reports.parameter_types.boolean'),
-                                            'date' => __('reports.parameter_types.date'),
-                                            'datetime' => __('reports.parameter_types.datetime'),
-                                        ])
-                                        ->default('string'),
-                                    TextInput::make('default_value')
-                                        ->label(__('reports.parameter_default_value'))
-                            Textarea::make('description')
-                                ->label(__('reports.parameter_description'))
-                                ->rows(2)
-                                ->maxLength(255)
-                                ->columnSpanFull(),
-                        ])
-                        ->collapsible()
-                        ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
-                        ->addActionLabel(__('reports.add_parameter'))
-                        ->helperText(__('reports.parameters_help')),
-            Section::make(__('reports.output'))
-                            FileUpload::make('template_file')
-                                ->label(__('reports.template_file'))
-                                ->acceptedFileTypes(['pdf', 'xlsx', 'xls', 'csv', 'html'])
-                                ->maxSize(10240)
-                                ->helperText(__('reports.template_file_help')),
-                            TextInput::make('output_path')
-                                ->label(__('reports.output_path'))
-                                ->maxLength(500)
-                                ->helperText(__('reports.output_path_help')),
-                            Toggle::make('is_active')
-                                ->label(__('reports.is_active'))
-                                ->default(true),
-                            TextInput::make('sort_order')
-                                ->label(__('reports.sort_order'))
-                                ->default(0)
-                                ->minValue(0),
-            Section::make(__('reports.settings'))
-                    Textarea::make('notes')
-                        ->label(__('reports.notes'))
-        ]);
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-    public static function table(Table $table): Table
-        return $table
-            ->columns([
-                TextColumn::make('name')
-                    ->label(__('reports.name'))
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold'),
-                
-                TextColumn::make('code')
-                    ->label(__('reports.code'))
-                    ->copyable()
-                    ->badge()
-                    ->color('gray'),
-                TextColumn::make('type')
-                    ->label(__('reports.type'))
-                    ->formatStateUsing(fn (string $state): string => __("reports.types.{$state}"))
+    {$state}"))
                     ->color(fn (string $state): string => match ($state) {
                         'sales' => 'blue',
                         'inventory' => 'green',

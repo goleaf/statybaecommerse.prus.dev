@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\DocumentTemplateResource\Pages;
 
 use App\Filament\Resources\DocumentTemplateResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Actions;
 
 class ViewDocumentTemplate extends ViewRecord
 {

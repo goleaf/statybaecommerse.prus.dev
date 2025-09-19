@@ -5,6 +5,7 @@ namespace App\Filament\Resources\CollectionResource\RelationManagers;
 use App\Models\Document;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,8 +33,7 @@ final class DocumentsRelationManager extends RelationManager
 
                 Forms\Components\TextInput::make('title')
                     ->label(__('admin.documents.fields.title'))
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
 
                 Forms\Components\Textarea::make('description')
                     ->label(__('admin.documents.fields.description'))
@@ -79,14 +79,12 @@ final class DocumentsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('title')
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('admin.documents.fields.title'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                     ->weight('medium')
                     ->wrap(),
 

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\CollectionResource\RelationManagers;
 use App\Models\Translations\CollectionTranslation;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -36,8 +37,7 @@ final class TranslationsRelationManager extends RelationManager
 
                 Forms\Components\TextInput::make('name')
                     ->label(__('admin.collections.fields.name'))
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                     ->placeholder(__('admin.collections.placeholders.name')),
 
                 Forms\Components\Textarea::make('description')
@@ -60,7 +60,6 @@ final class TranslationsRelationManager extends RelationManager
     }
 
     public function table(Table $table): Table
-    {
     {
         return $table
             ->recordTitleAttribute('name')
@@ -86,8 +85,7 @@ final class TranslationsRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('admin.collections.fields.name'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                     ->weight('medium')
                     ->wrap(),
 

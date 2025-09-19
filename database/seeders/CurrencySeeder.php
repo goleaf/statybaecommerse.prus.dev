@@ -1,17 +1,19 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Currency;
 use App\Models\Translations\CurrencyTranslation;
+use App\Models\Currency;
 use Illuminate\Database\Seeder;
 
 final class CurrencySeeder extends Seeder
 {
     public function run(): void
     {
+        // Clear existing currencies and translations
+        // CurrencyTranslation::query()->delete();
+        // Currency::query()->delete();
+
         $currencies = [
             [
                 'name' => [
@@ -201,8 +203,8 @@ final class CurrencySeeder extends Seeder
             $translations = $currencyData['name'] ?? [];
             // Set a default name from translations or use code as fallback
             $defaultName = $translations['en'] ?? $currencyData['code'];
-            unset($currencyData['name']); // Remove the translations array
-            $currencyData['name'] = $defaultName; // Set the default name
+            unset($currencyData['name']);  // Remove the translations array
+            $currencyData['name'] = $defaultName;  // Set the default name
 
             $currency = Currency::updateOrCreate(
                 ['code' => $currencyData['code']],
@@ -221,13 +223,13 @@ final class CurrencySeeder extends Seeder
         }
 
         $this->command->info('Currency seeder completed successfully!');
-        $this->command->info('Created '.count($currencies).' currencies with translations (locales: '.implode(',', $locales).').');
+        $this->command->info('Created ' . count($currencies) . ' currencies with translations (locales: ' . implode(',', $locales) . ').');
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn ($v) => trim((string) $v))
+            ->map(fn($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()

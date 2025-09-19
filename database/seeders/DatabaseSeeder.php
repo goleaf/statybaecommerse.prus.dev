@@ -27,9 +27,8 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             // Comprehensive admin seeder with all menu items
             AdminSeeder::class,
-            // Countries and zones for shipping/tax logic
+            // Countries for shipping/tax logic
             CountrySeeder::class,
-            ZoneSeeder::class,
             // RegionSeeder::class, // Regions table is dropped in migration 2025_09_14_204041
             // Comprehensive cities seeding with multilingual support
             AllCountriesComprehensiveCitiesSeeder::class,
@@ -74,6 +73,10 @@ class DatabaseSeeder extends Seeder
             ReportSeeder::class,
             // Cart items for admin/cart-items CRUD
             CartItemSeeder::class,
+            // Wishlist items for admin/wishlist-items CRUD
+            WishlistItemSeeder::class,
+            // Variant stock history for admin/variant-stock-histories CRUD
+            VariantStockHistorySeeder::class,
             // Analytics & SEO
             AnalyticsEventSeeder::class,
             SeoDataSeeder::class,
@@ -85,6 +88,10 @@ class DatabaseSeeder extends Seeder
             MenuSeeder::class,
             // Sliders for homepage
             SliderSeeder::class,
+            // New admin resources
+            CampaignScheduleSeeder::class,
+            DocumentTemplateSeeder::class,
+            EnumValueSeeder::class,
         ]);
 
         if (!$wasLoggingDisabled) {

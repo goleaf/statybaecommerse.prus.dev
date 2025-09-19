@@ -28,44 +28,14 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
-/**
- * CartItemResource
- *
- * Filament v4 resource for CartItem management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
 final class CartItemResource extends Resource
 {
     protected static ?string $model = CartItem::class;
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static string|UnitEnum|null $navigationGroup = "Products";
-
     protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'product_name';
-
-    /**
-     * /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('cart_items.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return __('cart_items.navigation_group');
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

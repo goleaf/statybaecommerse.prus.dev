@@ -5,6 +5,7 @@ namespace App\Filament\Resources\CollectionResource\RelationManagers;
 use App\Models\Product;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -51,7 +52,6 @@ final class ProductsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('name')
             ->columns([
@@ -64,15 +64,13 @@ final class ProductsRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('admin.products.fields.name'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                     ->weight('medium')
                     ->wrap(),
 
                 Tables\Columns\TextColumn::make('sku')
                     ->label(__('admin.products.fields.sku'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                     ->copyable(),
                     ->copyMessage(__('admin.copied'))
                     ->weight('mono'),

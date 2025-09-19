@@ -42,7 +42,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use BackedEnum;
-use UnitEnum;
+use App\Enums\NavigationGroup;
 /**
  * System Resource - Comprehensive System Management
  *
@@ -62,8 +62,7 @@ use UnitEnum;
  */
 final class SystemResource extends Resource
 {
-    protected static ?string $model = SystemSetting::class;    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = "System";
+    // protected static $navigationGroup = NavigationGroup::System;
     protected static ?int $navigationSort = 1;
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static ?string $navigationLabel = 'system.title';

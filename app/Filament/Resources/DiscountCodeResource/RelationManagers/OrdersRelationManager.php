@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -19,8 +20,7 @@ final class OrdersRelationManager extends RelationManager
             ->components([
                 Forms\Components\TextInput::make('order_number')
                     ->label(__('Order Number'))
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 
                 Forms\Components\Select::make('status')
                     ->label(__('Status'))
@@ -43,20 +43,17 @@ final class OrdersRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('order_number')
             ->columns([
                 Tables\Columns\TextColumn::make('order_number')
                     ->label(__('Order Number'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                     ->weight('bold'),
                 
                 Tables\Columns\TextColumn::make('customer.name')
                     ->label(__('Customer'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('Status'))

@@ -41,39 +41,6 @@ use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
-use UnitEnum;
-
-/**
- * InventoryResource
- *
- * Filament v4 resource for Inventory management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class InventoryResource extends Resource
-{
-    protected static ?string $model = Inventory::class;
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
-    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Inventory;
-    protected static ?int $navigationSort = 1;
-    protected static ?string $recordTitleAttribute = 'product.name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('admin.inventory.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Inventory';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

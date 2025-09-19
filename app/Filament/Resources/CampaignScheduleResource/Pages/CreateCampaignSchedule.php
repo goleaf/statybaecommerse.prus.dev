@@ -9,4 +9,3 @@ class CreateCampaignSchedule extends CreateRecord
 {
     protected static string $resource = CampaignScheduleResource::class;
 }
-

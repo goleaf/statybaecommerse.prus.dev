@@ -31,43 +31,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * AnalyticsEventResource
- *
- * Filament v4 resource for AnalyticsEvent management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class AnalyticsEventResource extends Resource
-{
-    protected static ?string $model = AnalyticsEvent::class;
-
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Analytics;
-
-    protected static ?int $navigationSort = 1;
-
-    protected static ?string $recordTitleAttribute = 'event_name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('analytics_events.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return NavigationGroup::Analytics->value;
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

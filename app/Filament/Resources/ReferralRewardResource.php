@@ -1,357 +1,229 @@
 <?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralRewardResource\Pages;
-use App\Models\Referral;
 use App\Models\ReferralReward;
-use App\Models\User;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-/**
- * ReferralRewardResource
- *
- * Filament v4 resource for ReferralReward management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
+use BackedEnum;
+
 final class ReferralRewardResource extends Resource
 {
-    protected static ?string $model = ReferralReward::class;    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = "Products";
-    protected static ?int $navigationSort = 6;
-    protected static ?string $recordTitleAttribute = 'amount';
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
+    protected static ?string $model = ReferralReward::class;
+    protected static ?string $navigationIcon = 'heroicon-o-gift';
+    protected static ?int $navigationSort = 15;
+    protected static ?string $recordTitleAttribute = 'title';
+
+    public static function getNavigationGroup(): string
     {
-        return __('referral_rewards.title');
+        return NavigationGroup::Referrals->getLabel();
     }
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-    public static function getNavigationGroup(): ?string
-        return "Marketing";
-     * Handle getPluralModelLabel functionality with proper error handling.
-    public static function getPluralModelLabel(): string
-        return __('referral_rewards.plural');
-     * Handle getModelLabel functionality with proper error handling.
-    public static function getModelLabel(): string
-        return __('referral_rewards.single');
-     * Configure the Filament form schema with fields and validation.
-     * @param Form $schema
-     * @return Form
+
     public static function form(Schema $schema): Schema
-        return $schema->components([
-            Section::make(__('referral_rewards.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            Select::make('referral_id')
-                                ->label(__('referral_rewards.referral'))
-                                ->relationship('referral', 'referral_code')
-                                ->searchable()
-                                ->preload()
-                                ->required()
-                                ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                    if ($state) {
-                                        $referral = Referral::find($state);
-                                        if ($referral) {
-                                            $set('referral_code', $referral->referral_code);
-                                            $set('referrer_id', $referral->referrer_id);
-                                            $set('referred_id', $referral->referred_id);
-                                        }
-                                    }
-                                }),
-                            TextInput::make('referral_code')
-                                ->label(__('referral_rewards.referral_code'))
-                                ->maxLength(50)
-                                ->disabled(),
-                        ]),
-                            Select::make('user_id')
-                                ->label(__('referral_rewards.user'))
-                                ->relationship('user', 'name')
-                                        $user = User::find($state);
-                                        if ($user) {
-                                            $set('user_name', $user->name);
-                                            $set('user_email', $user->email);
-                            TextInput::make('user_name')
-                                ->label(__('referral_rewards.user_name'))
-                                ->maxLength(255)
-                ]),
-            Section::make(__('referral_rewards.reward_information'))
-                            TextInput::make('amount')
-                                ->label(__('referral_rewards.amount'))
-                                ->numeric()
-                                ->prefix('€')
-                                ->step(0.01)
-                                ->minValue(0)
-                                ->helperText(__('referral_rewards.amount_help')),
-                            Select::make('type')
-                                ->label(__('referral_rewards.type'))
-                                ->options([
-                                    'referrer' => __('referral_rewards.types.referrer'),
-                                    'referred' => __('referral_rewards.types.referred'),
-                                    'bonus' => __('referral_rewards.types.bonus'),
-                                    'penalty' => __('referral_rewards.types.penalty'),
-                                ])
-                                ->default('referrer'),
-                            Select::make('status')
-                                ->label(__('referral_rewards.status'))
-                                    'pending' => __('referral_rewards.statuses.pending'),
-                                    'approved' => __('referral_rewards.statuses.approved'),
-                                    'paid' => __('referral_rewards.statuses.paid'),
-                                    'cancelled' => __('referral_rewards.statuses.cancelled'),
-                                    'expired' => __('referral_rewards.statuses.expired'),
-                                ->default('pending'),
-                            TextInput::make('currency')
-                                ->label(__('referral_rewards.currency'))
-                                ->maxLength(3)
-                                ->default('EUR')
-                                ->rules(['alpha']),
-            Section::make(__('referral_rewards.payment_information'))
-                            DateTimePicker::make('paid_at')
-                                ->label(__('referral_rewards.paid_at'))
-                                ->displayFormat('d/m/Y H:i'),
-                            TextInput::make('payment_method')
-                                ->label(__('referral_rewards.payment_method'))
-                                ->helperText(__('referral_rewards.payment_method_help')),
-                            TextInput::make('transaction_id')
-                                ->label(__('referral_rewards.transaction_id'))
-                                ->maxLength(100)
-                                ->helperText(__('referral_rewards.transaction_id_help')),
-                            TextInput::make('payment_reference')
-                                ->label(__('referral_rewards.payment_reference'))
-                                ->helperText(__('referral_rewards.payment_reference_help')),
-            Section::make(__('referral_rewards.settings'))
-                            Toggle::make('is_active')
-                                ->label(__('referral_rewards.is_active'))
-                                ->default(true),
-                            Toggle::make('is_automatic')
-                                ->label(__('referral_rewards.is_automatic'))
-                                ->default(false),
-                            DateTimePicker::make('expires_at')
-                                ->label(__('referral_rewards.expires_at'))
-                            TextInput::make('priority')
-                                ->label(__('referral_rewards.priority'))
-                                ->default(0)
-                                ->helperText(__('referral_rewards.priority_help')),
-                    Textarea::make('notes')
-                        ->label(__('referral_rewards.notes'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-        ]);
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
+    {
+        return $schema
+            ->columns(3)
+            ->schema([
+                Section::make('Reward Details')
+                    ->columns(2)
+                    ->schema([
+                        Select::make('referral_id')
+                            ->relationship('referral', 'code')
+                            ->required(),
+                        Select::make('user_id')
+                            ->relationship('user', 'name')
+                            ->required(),
+                        Select::make('order_id')
+                            ->relationship('order', 'id')
+                            ->nullable(),
+                        Select::make('type')
+                            ->options([
+                                'discount' => 'Discount',
+                                'credit' => 'Credit',
+                                'points' => 'Points',
+                                'gift' => 'Gift',
+                            ])
+                            ->required(),
+                        TextInput::make('amount')
+                            ->numeric()
+                            ->required()
+                            ->default(0.00),
+                        TextInput::make('currency_code')
+                            ->required()
+                            ->maxLength(3),
+                        Select::make('status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'active' => 'Active',
+                                'applied' => 'Applied',
+                                'expired' => 'Expired',
+                                'cancelled' => 'Cancelled',
+                            ])
+                            ->required(),
+                        DatePicker::make('applied_at')
+                            ->nullable(),
+                        DatePicker::make('expires_at')
+                            ->nullable(),
+                        TextInput::make('title')
+                            ->required()
+                            ->maxLength(255),
+                        Textarea::make('description')
+                            ->maxLength(65535)
+                            ->nullable(),
+                        Toggle::make('is_active')
+                            ->label('Active')
+                            ->inline(false)
+                            ->default(true),
+                        TextInput::make('priority')
+                            ->numeric()
+                            ->integer()
+                            ->default(0),
+                        KeyValue::make('conditions')
+                            ->label('Conditions (JSON)')
+                            ->keyLabel('Key')
+                            ->valueLabel('Value')
+                            ->reorderable()
+                            ->addActionLabel('Add Condition')
+                            ->columnSpanFull(),
+                        KeyValue::make('reward_data')
+                            ->label('Reward Data (JSON)')
+                            ->keyLabel('Key')
+                            ->valueLabel('Value')
+                            ->reorderable()
+                            ->addActionLabel('Add Reward Data')
+                            ->columnSpanFull(),
+                        KeyValue::make('metadata')
+                            ->label('Metadata (JSON)')
+                            ->keyLabel('Key')
+                            ->valueLabel('Value')
+                            ->reorderable()
+                            ->addActionLabel('Add Metadata Item')
+                            ->columnSpanFull(),
+                    ]),
+            ]);
+    }
+
     public static function table(Table $table): Table
+    {
         return $table
             ->columns([
-                TextColumn::make('referral_code')
-                    ->label(__('referral_rewards.referral_code'))
+                TextColumn::make('title')
                     ->searchable()
-                    ->sortable()
-                    ->copyable()
-                    ->badge()
-                    ->color('blue'),
-                TextColumn::make('user.name')
-                    ->label(__('referral_rewards.user'))
-                    ->limit(50),
-                TextColumn::make('amount')
-                    ->label(__('referral_rewards.amount'))
-                    ->money('EUR')
-                    ->weight('bold')
-                    ->alignCenter(),
-                TextColumn::make('type')
-                    ->label(__('referral_rewards.type'))
-                    ->formatStateUsing(fn(string $state): string => __("referral_rewards.types.{$state}"))
-                    ->color(fn(string $state): string => match ($state) {
-                        'referrer' => 'green',
-                        'referred' => 'blue',
-                        'bonus' => 'purple',
-                        'penalty' => 'red',
-                        default => 'gray',
-                    }),
-                TextColumn::make('status')
-                    ->label(__('referral_rewards.status'))
-                    ->formatStateUsing(fn(string $state): string => __("referral_rewards.statuses.{$state}"))
-                        'pending' => 'warning',
-                        'approved' => 'success',
-                        'paid' => 'info',
-                        'cancelled' => 'danger',
-                        'expired' => 'gray',
-                TextColumn::make('currency')
-                    ->label(__('referral_rewards.currency'))
-                    ->color('gray')
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('payment_method')
-                    ->label(__('referral_rewards.payment_method'))
-                TextColumn::make('transaction_id')
-                    ->label(__('referral_rewards.transaction_id'))
-                TextColumn::make('payment_reference')
-                    ->label(__('referral_rewards.payment_reference'))
-                IconColumn::make('is_active')
-                    ->label(__('referral_rewards.is_active'))
-                    ->boolean()
                     ->sortable(),
-                IconColumn::make('is_automatic')
-                    ->label(__('referral_rewards.is_automatic'))
-                TextColumn::make('paid_at')
-                    ->label(__('referral_rewards.paid_at'))
+                TextColumn::make('referral.code')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('user.name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('type')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('amount')
+                    ->money(fn (ReferralReward $record) => $record->currency_code)
+                    ->sortable(),
+                TextColumn::make('status')
+                    ->searchable()
+                    ->sortable(),
+                IconColumn::make('is_active')
+                    ->boolean()
+                    ->label('Active'),
+                TextColumn::make('applied_at')
                     ->dateTime()
+                    ->sortable(),
                 TextColumn::make('expires_at')
-                    ->label(__('referral_rewards.expires_at'))
-                TextColumn::make('priority')
-                    ->label(__('referral_rewards.priority'))
-                    ->numeric()
-                    ->alignCenter()
+                    ->dateTime()
+                    ->sortable(),
                 TextColumn::make('created_at')
-                    ->label(__('referral_rewards.created_at'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->label(__('referral_rewards.updated_at'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('referral_id')
-                    ->label(__('referral_rewards.referral'))
-                    ->relationship('referral', 'referral_code')
-                    ->preload(),
-                SelectFilter::make('user_id')
-                    ->relationship('user', 'name')
+                TernaryFilter::make('is_active')
+                    ->label('Active')
+                    ->boolean(),
                 SelectFilter::make('type')
                     ->options([
-                        'referrer' => __('referral_rewards.types.referrer'),
-                        'referred' => __('referral_rewards.types.referred'),
-                        'bonus' => __('referral_rewards.types.bonus'),
-                        'penalty' => __('referral_rewards.types.penalty'),
+                        'discount' => 'Discount',
+                        'credit' => 'Credit',
+                        'points' => 'Points',
+                        'gift' => 'Gift',
                     ]),
                 SelectFilter::make('status')
-                        'pending' => __('referral_rewards.statuses.pending'),
-                        'approved' => __('referral_rewards.statuses.approved'),
-                        'paid' => __('referral_rewards.statuses.paid'),
-                        'cancelled' => __('referral_rewards.statuses.cancelled'),
-                        'expired' => __('referral_rewards.statuses.expired'),
-                TernaryFilter::make('is_active')
-                    ->trueLabel(__('referral_rewards.active_only'))
-                    ->falseLabel(__('referral_rewards.inactive_only'))
-                    ->native(false),
-                TernaryFilter::make('is_automatic')
-                    ->trueLabel(__('referral_rewards.automatic_only'))
-                    ->falseLabel(__('referral_rewards.manual_only'))
+                    ->options([
+                        'pending' => 'Pending',
+                        'active' => 'Active',
+                        'applied' => 'Applied',
+                        'expired' => 'Expired',
+                        'cancelled' => 'Cancelled',
+                    ]),
+                SelectFilter::make('referral_id')
+                    ->relationship('referral', 'code'),
+                SelectFilter::make('user_id')
+                    ->relationship('user', 'name'),
+            ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 EditAction::make(),
-                Action::make('approve')
-                    ->label(__('referral_rewards.approve'))
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->visible(fn(ReferralReward $record): bool => $record->status === 'pending')
-                    ->action(function (ReferralReward $record): void {
-                        $record->update(['status' => 'approved']);
-                        Notification::make()
-                            ->title(__('referral_rewards.approved_successfully'))
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
-                Action::make('pay')
-                    ->label(__('referral_rewards.pay'))
-                    ->icon('heroicon-o-currency-euro')
-                    ->color('info')
-                    ->visible(fn(ReferralReward $record): bool => $record->status === 'approved')
-                        $record->update([
-                            'status' => 'paid',
-                            'paid_at' => now(),
-                        ]);
-                            ->title(__('referral_rewards.paid_successfully'))
-                Action::make('cancel')
-                    ->label(__('referral_rewards.cancel'))
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->visible(fn(ReferralReward $record): bool => in_array($record->status, ['pending', 'approved']))
-                        $record->update(['status' => 'cancelled']);
-                            ->title(__('referral_rewards.cancelled_successfully'))
-                Action::make('toggle_active')
-                    ->label(fn(ReferralReward $record): string => $record->is_active ? __('referral_rewards.deactivate') : __('referral_rewards.activate'))
-                    ->icon(fn(ReferralReward $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(ReferralReward $record): string => $record->is_active ? 'warning' : 'success')
-                        $record->update(['is_active' => !$record->is_active]);
-                            ->title($record->is_active ? __('referral_rewards.activated_successfully') : __('referral_rewards.deactivated_successfully'))
+                DeleteAction::make(),
+            ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    BulkAction::make('approve')
-                        ->label(__('referral_rewards.approve_selected'))
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->action(function (Collection $records): void {
-                            $records->each->update(['status' => 'approved']);
-                            Notification::make()
-                                ->title(__('referral_rewards.bulk_approved_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
-                    BulkAction::make('pay')
-                        ->label(__('referral_rewards.pay_selected'))
-                        ->icon('heroicon-o-currency-euro')
-                        ->color('info')
-                            $records->each->update([
-                                'status' => 'paid',
-                                'paid_at' => now(),
-                            ]);
-                                ->title(__('referral_rewards.bulk_paid_success'))
-                    BulkAction::make('cancel')
-                        ->label(__('referral_rewards.cancel_selected'))
-                        ->icon('heroicon-o-x-circle')
-                        ->color('danger')
-                            $records->each->update(['status' => 'cancelled']);
-                                ->title(__('referral_rewards.bulk_cancelled_success'))
-                    BulkAction::make('activate')
-                        ->label(__('referral_rewards.activate_selected'))
-                        ->icon('heroicon-o-eye')
-                            $records->each->update(['is_active' => true]);
-                                ->title(__('referral_rewards.bulk_activated_success'))
-                    BulkAction::make('deactivate')
-                        ->label(__('referral_rewards.deactivate_selected'))
-                        ->icon('heroicon-o-eye-slash')
-                        ->color('warning')
-                            $records->each->update(['is_active' => false]);
-                                ->title(__('referral_rewards.bulk_deactivated_success'))
-            ->defaultSort('created_at', 'desc');
-     * Get the relations for this resource.
-     * @return array
+                ]),
+            ]);
+    }
+
     public static function getRelations(): array
+    {
         return [
             //
         ];
-     * Get the pages for this resource.
+    }
+
     public static function getPages(): array
+    {
+        return [
             'index' => Pages\ListReferralRewards::route('/'),
             'create' => Pages\CreateReferralReward::route('/create'),
             'view' => Pages\ViewReferralReward::route('/{record}'),
             'edit' => Pages\EditReferralReward::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'description', 'type', 'status'];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::$model::count();
+    }
 }

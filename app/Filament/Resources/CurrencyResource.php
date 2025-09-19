@@ -27,38 +27,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * CurrencyResource
- *
- * Filament v4 resource for Currency management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class CurrencyResource extends Resource
-{
-    protected static ?string $model = Currency::class;
-    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = "Products";
-    protected static ?int $navigationSort = 7;
-    protected static ?string $recordTitleAttribute = 'name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('currencies.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return "System"->value;
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

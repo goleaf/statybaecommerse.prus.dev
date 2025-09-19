@@ -30,7 +30,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 /**
  * RecommendationBlockResource
  *
@@ -40,9 +39,7 @@ final class RecommendationBlockResource extends Resource
 {
     protected static ?string $model = RecommendationBlock::class;
     /**
-     * @var UnitEnum|string|null
-     */    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = "Products";
+    // protected static $navigationGroup = NavigationGroup::Products;
     protected static ?int $navigationSort = 13;
     protected static ?string $recordTitleAttribute = 'name';
      * Handle getNavigationLabel functionality with proper error handling.
@@ -66,35 +63,7 @@ final class RecommendationBlockResource extends Resource
      * @param Form $schema
      * @return Form
     public static function form(Schema $schema): Schema
-        return $schema->components([
-            Section::make(__('recommendation_blocks.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            TextInput::make('name')
-                                ->label(__('recommendation_blocks.name'))
-                                ->required()
-                                ->maxLength(255),
-                            TextInput::make('code')
-                                ->label(__('recommendation_blocks.code'))
-                                ->maxLength(50)
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
-                        ]),
-                    Textarea::make('description')
-                        ->label(__('recommendation_blocks.description'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                ]),
-            Section::make(__('recommendation_blocks.configuration'))
-                            Select::make('recommendation_config_id')
-                                ->label(__('recommendation_blocks.recommendation_config'))
-                                ->relationship('recommendationConfig', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+    {
                                     if ($state) {
                                         $config = RecommendationConfig::find($state);
                                         if ($config) {
@@ -208,24 +177,7 @@ final class RecommendationBlockResource extends Resource
      * @param Table $table
      * @return Table
     public static function table(Table $table): Table
-        return $table
-            ->columns([
-                TextColumn::make('name')
-                    ->label(__('recommendation_blocks.name'))
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold'),
-                TextColumn::make('code')
-                    ->label(__('recommendation_blocks.code'))
-                    ->copyable()
-                    ->badge()
-                    ->color('gray'),
-                TextColumn::make('recommendationConfig.name')
-                    ->label(__('recommendation_blocks.recommendation_config'))
-                    ->limit(50),
-                TextColumn::make('type')
-                    ->label(__('recommendation_blocks.type'))
-                    ->formatStateUsing(fn(string $state): string => __("recommendation_blocks.types.{$state}"))
+    {$state}"))
                     ->color(fn(string $state): string => match ($state) {
                         'product_list' => 'blue',
                         'carousel' => 'green',

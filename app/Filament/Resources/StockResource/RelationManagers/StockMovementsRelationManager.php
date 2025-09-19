@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -99,7 +100,6 @@ class StockMovementsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('reference')
             ->columns([
@@ -152,10 +152,7 @@ class StockMovementsRelationManager extends RelationManager
 
                 TextColumn::make('user.name')
                     ->label(__('inventory.user'))
-                    ->searchable(),
-                    ->sortable(),
-                    ->badge(),
-                    ->color('gray')
+                    ->searchable()\n                    ->sortable()\n                    ->badge()\n                    ->color('gray')
                     ->placeholder(__('inventory.system')),
 
                 TextColumn::make('notes')

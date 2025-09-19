@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -19,18 +20,15 @@ final class ActivityLogRelationManager extends RelationManager
         return $schema
             ->components([
                 Forms\Components\TextInput::make('log_name')
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\TextInput::make('description')
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\Textarea::make('properties')
                     ->json(),
             ]);
     }
 
     public function table(Table $table): Table
-    {
     {
         return $table
             ->recordTitleAttribute('description')
@@ -41,8 +39,7 @@ final class ActivityLogRelationManager extends RelationManager
                     ->color('info'),
                 Tables\Columns\TextColumn::make('description')
                     ->label(__('admin.fields.description'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 Tables\Columns\TextColumn::make('event')
                     ->label(__('admin.fields.event'))
                     ->badge(),

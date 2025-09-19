@@ -1,19 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Livewire\Shared;
 
-use App\Actions\ZoneSessionManager;
 use App\Models\Country;
 use App\Models\Currency;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Arr;
 use Livewire\Component;
+
 /**
  * CurrencySelector
- * 
+ *
  * Livewire component for CurrencySelector with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property array $currencies
  * @property string|null $activeCurrencyCode
  */
@@ -21,6 +20,7 @@ class CurrencySelector extends Component
 {
     public array $currencies = [];
     public ?string $activeCurrencyCode = null;
+
     /**
      * Initialize the Livewire component with parameters.
      * @return void
@@ -54,6 +54,7 @@ class CurrencySelector extends Component
         });
         $this->activeCurrencyCode = $defaultCurrencyCode ?: $this->currencies[0]['code'] ?? null;
     }
+
     /**
      * Render the Livewire component view with current state.
      */
@@ -61,6 +62,7 @@ class CurrencySelector extends Component
     {
         return view('livewire.shared.currency-selector');
     }
+
     /**
      * Handle getCountryFlagProperty functionality with proper error handling.
      * @return string|null
@@ -68,9 +70,6 @@ class CurrencySelector extends Component
     public function getCountryFlagProperty(): ?string
     {
         try {
-            if (class_exists(ZoneSessionManager::class) && session()->has('zone')) {
-                return ZoneSessionManager::getSession()->countryFlag ?? null;
-            }
             try {
                 $countryId = \App\Models\Setting::where('key', 'country_id')->value('value');
                 if (!empty($countryId)) {

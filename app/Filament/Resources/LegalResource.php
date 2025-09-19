@@ -1,457 +1,353 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\LegalResource\Pages;
-use App\Models\Translations\LegalTranslation;
+use App\Filament\Resources\LegalResource\RelationManagers;
 use App\Models\Legal;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Fieldset;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-/**
- * LegalResource
- *
- * Filament v4 resource for Legal document management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class LegalResource extends Resource
+class LegalResource extends Resource
 {
     protected static ?string $model = Legal::class;
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static string | UnitEnum | null $navigationGroup = "Products";
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup = 'Content Management';
 
-    protected static ?string $recordTitleAttribute = 'title';
+    protected static ?string $navigationLabel = 'Legal Documents';
 
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('legal.title');
-    }
+    protected static ?string $modelLabel = 'Legal Document';
 
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return "System"->value;
-    }
+    protected static ?string $pluralModelLabel = 'Legal Documents';
 
-    /**
-     * Handle getPluralModelLabel functionality with proper error handling.
-     */
-    public static function getPluralModelLabel(): string
-    {
-        return __('legal.plural');
-    }
+    protected static ?int $navigationSort = 1;
 
-    /**
-     * Handle getModelLabel functionality with proper error handling.
-     */
-    public static function getModelLabel(): string
-    {
-        return __('legal.single');
-    }
-
-    /**
-     * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
-     */
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            Tabs::make('Legal Document')
-                ->tabs([
-                    Tab::make(__('legal.basic_information'))
-                        ->schema([
-                            Grid::make(2)
-                                ->schema([
-                                    TextInput::make('key')
-                                        ->label(__('legal.key'))
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->unique(ignoreRecord: true)
-                                        ->helperText(__('legal.key_help')),
-                                    Select::make('type')
-                                        ->label(__('legal.type'))
-                                        ->options(Legal::getTypes())
-                                        ->required()
-                                        ->default('privacy_policy')
-                                        ->searchable(),
-                                ]),
-                            Grid::make(2)
-                                ->schema([
-                                    Toggle::make('is_enabled')
-                                        ->label(__('legal.is_enabled'))
-                                        ->default(true),
-                                    Toggle::make('is_required')
-                                        ->label(__('legal.is_required'))
-                                        ->default(false),
-                                ]),
-                            Grid::make(2)
-                                ->schema([
-                                    TextInput::make('sort_order')
-                                        ->label(__('legal.sort_order'))
-                                        ->numeric()
-                                        ->default(0),
-                                    DateTimePicker::make('published_at')
-                                        ->label(__('legal.published_at'))
-                                        ->displayFormat('d/m/Y H:i'),
-                                ]),
-                            KeyValue::make('meta_data')
-                                ->label(__('legal.meta_data'))
-                                ->helperText(__('legal.meta_data_help')),
-                        ]),
-                    Tab::make(__('legal.translations'))
-                        ->schema([
-                            Repeater::make('translations')
-                                ->label(__('legal.translations'))
-                                ->schema([
-                                    Grid::make(2)
-                                        ->schema([
-                                            Select::make('locale')
-                                                ->label(__('legal.locale'))
-                                                ->options([
-                                                    'lt' => 'Lietuvių',
-                                                    'en' => 'English',
-                                                ])
-                                                ->required(),
-                                            TextInput::make('title')
-                                                ->label(__('legal.title'))
-                                                ->required()
-                                                ->maxLength(255)
-                                                ->live(onBlur: true)
-                                                ->afterStateUpdated(function (Forms\Set $set, $state, $get) {
-                                                    if ($get('locale') && $state) {
-                                                        $set('slug', \Str::slug($state) . '-' . $get('locale'));
-                                                    }
-                                                }),
-                                        ]),
-                                    TextInput::make('slug')
-                                        ->label(__('legal.slug'))
-                                        ->maxLength(255)
-                                        ->helperText(__('legal.slug_help')),
-                                    Textarea::make('content')
-                                        ->label(__('legal.content'))
-                                        ->rows(10)
-                                        ->columnSpanFull(),
-                                    Grid::make(2)
-                                        ->schema([
-                                            TextInput::make('seo_title')
-                                                ->label(__('legal.seo_title'))
-                                                ->maxLength(255),
-                                            Textarea::make('seo_description')
-                                                ->label(__('legal.seo_description'))
-                                                ->rows(2)
-                                                ->maxLength(500),
-                                        ]),
-                                ])
-                                ->defaultItems(2)
-                                ->addActionLabel(__('legal.add_translation'))
-                                ->reorderable(false)
-                                ->collapsible(),
-                        ]),
-                ])
-                ->columnSpanFull(),
-        ]);
+        return $form
+            ->schema([
+                Tabs::make('Legal Document')
+                    ->tabs([
+                        Tabs\Tab::make('Basic Information')
+                            ->schema([
+                                Grid::make(2)
+                                    ->schema([
+                                        TextInput::make('key')
+                                            ->label('Document Key')
+                                            ->required()
+                                            ->unique(ignoreRecord: true)
+                                            ->maxLength(255)
+                                            ->helperText('Unique identifier for this legal document'),
+
+                                        Select::make('type')
+                                            ->label('Document Type')
+                                            ->required()
+                                            ->options(Legal::getTypes())
+                                            ->searchable()
+                                            ->preload(),
+                                    ]),
+
+                                Grid::make(3)
+                                    ->schema([
+                                        Toggle::make('is_enabled')
+                                            ->label('Enabled')
+                                            ->default(true)
+                                            ->helperText('Enable this legal document'),
+
+                                        Toggle::make('is_required')
+                                            ->label('Required')
+                                            ->default(false)
+                                            ->helperText('Mark as required document'),
+
+                                        TextInput::make('sort_order')
+                                            ->label('Sort Order')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->helperText('Order in which documents appear'),
+                                    ]),
+
+                                DateTimePicker::make('published_at')
+                                    ->label('Published At')
+                                    ->helperText('When this document was published')
+                                    ->displayFormat('d/m/Y H:i'),
+                            ]),
+
+                        Tabs\Tab::make('Translations')
+                            ->schema([
+                                Repeater::make('translations')
+                                    ->label('Translations')
+                                    ->relationship('translations')
+                                    ->schema([
+                                        Grid::make(2)
+                                            ->schema([
+                                                Select::make('locale')
+                                                    ->label('Language')
+                                                    ->required()
+                                                    ->options([
+                                                        'lt' => 'Lithuanian',
+                                                        'en' => 'English',
+                                                        'ru' => 'Russian',
+                                                        'de' => 'German',
+                                                    ])
+                                                    ->searchable()
+                                                    ->preload(),
+
+                                                TextInput::make('slug')
+                                                    ->label('URL Slug')
+                                                    ->required()
+                                                    ->maxLength(255)
+                                                    ->helperText('URL-friendly version of the title'),
+                                            ]),
+
+                                        TextInput::make('title')
+                                            ->label('Title')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->columnSpanFull(),
+
+                                        RichEditor::make('content')
+                                            ->label('Content')
+                                            ->required()
+                                            ->columnSpanFull()
+                                            ->toolbarButtons([
+                                                'bold',
+                                                'italic',
+                                                'underline',
+                                                'strike',
+                                                'link',
+                                                'bulletList',
+                                                'orderedList',
+                                                'h2',
+                                                'h3',
+                                                'blockquote',
+                                                'codeBlock',
+                                            ]),
+
+                                        Grid::make(2)
+                                            ->schema([
+                                                TextInput::make('seo_title')
+                                                    ->label('SEO Title')
+                                                    ->maxLength(255)
+                                                    ->helperText('Title for search engines'),
+
+                                                Textarea::make('seo_description')
+                                                    ->label('SEO Description')
+                                                    ->maxLength(500)
+                                                    ->rows(3)
+                                                    ->helperText('Description for search engines'),
+                                            ]),
+                                    ])
+                                    ->collapsible()
+                                    ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null)
+                                    ->addActionLabel('Add Translation')
+                                    ->defaultItems(1),
+                            ]),
+
+                        Tabs\Tab::make('Metadata')
+                            ->schema([
+                                KeyValue::make('meta_data')
+                                    ->label('Metadata')
+                                    ->helperText('Additional metadata for this document')
+                                    ->keyLabel('Key')
+                                    ->valueLabel('Value')
+                                    ->addActionLabel('Add Metadata'),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
+            ]);
     }
 
-    /**
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 TextColumn::make('key')
-                    ->label(__('legal.key'))
+                    ->label('Key')
                     ->searchable()
                     ->sortable()
-                    ->weight('bold')
-                    ->limit(30),
+                    ->copyable()
+                    ->copyMessage('Key copied')
+                    ->copyMessageDuration(1500),
+
                 TextColumn::make('type')
-                    ->label(__('legal.type'))
-                    ->formatStateUsing(fn(string $state): string => __("legal.types.{$state}"))
+                    ->label('Type')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'privacy_policy' => 'blue',
-                        'terms_of_use' => 'green',
-                        'cookie_policy' => 'yellow',
-                        'refund_policy' => 'orange',
-                        'shipping_policy' => 'purple',
-                        'return_policy' => 'pink',
-                        'disclaimer' => 'gray',
-                        'gdpr_policy' => 'red',
-                        'imprint' => 'indigo',
-                        'legal_document' => 'slate',
+                    ->color(fn (string $state): string => match ($state) {
+                        'privacy_policy' => 'success',
+                        'terms_of_use' => 'warning',
+                        'refund_policy' => 'info',
+                        'shipping_policy' => 'primary',
+                        'cookie_policy' => 'secondary',
+                        'gdpr_policy' => 'danger',
+                        'legal_notice' => 'gray',
+                        'imprint' => 'success',
+                        'legal_document' => 'warning',
                         default => 'gray',
-                    }),
+                    })
+                    ->formatStateUsing(fn (string $state): string => Legal::getTypes()[$state] ?? $state)
+                    ->sortable(),
+
                 TextColumn::make('translations.title')
-                    ->label(__('legal.title'))
+                    ->label('Title')
                     ->searchable()
                     ->limit(50)
-                    ->formatStateUsing(function ($record) {
-                        return $record->getTranslatedTitle() ?? $record->key;
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 50) {
+                            return null;
+                        }
+                        return $state;
                     }),
-                BadgeColumn::make('is_enabled')
-                    ->label(__('legal.status'))
-                    ->formatStateUsing(fn(bool $state): string => $state ? __('legal.enabled') : __('legal.disabled'))
-                    ->colors([
-                        'success' => true,
-                        'danger' => false,
-                    ]),
-                IconColumn::make('is_required')
-                    ->label(__('legal.is_required'))
+
+                IconColumn::make('is_enabled')
+                    ->label('Enabled')
                     ->boolean()
                     ->sortable(),
+
+                IconColumn::make('is_required')
+                    ->label('Required')
+                    ->boolean()
+                    ->sortable(),
+
                 TextColumn::make('sort_order')
-                    ->label(__('legal.sort_order'))
+                    ->label('Order')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->alignCenter(),
+
                 TextColumn::make('published_at')
-                    ->label(__('legal.published_at'))
-                    ->dateTime()
+                    ->label('Published')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
+
                 TextColumn::make('created_at')
-                    ->label(__('legal.created_at'))
-                    ->dateTime()
+                    ->label('Created')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
-                    ->label(__('legal.updated_at'))
-                    ->dateTime()
+                    ->label('Updated')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('type')
+                    ->label('Document Type')
                     ->options(Legal::getTypes())
-                    ->searchable(),
+                    ->multiple(),
+
                 TernaryFilter::make('is_enabled')
-                    ->label(__('legal.is_enabled'))
-                    ->trueLabel(__('legal.enabled_only'))
-                    ->falseLabel(__('legal.disabled_only'))
+                    ->label('Enabled')
+                    ->boolean()
+                    ->trueLabel('Enabled only')
+                    ->falseLabel('Disabled only')
                     ->native(false),
+
                 TernaryFilter::make('is_required')
-                    ->label(__('legal.is_required'))
-                    ->trueLabel(__('legal.required_only'))
-                    ->falseLabel(__('legal.optional_only'))
+                    ->label('Required')
+                    ->boolean()
+                    ->trueLabel('Required only')
+                    ->falseLabel('Optional only')
                     ->native(false),
-                Tables\Filters\Filter::make('published_at')
-                    ->form([
-                        DateTimePicker::make('published_from')
-                            ->label(__('legal.published_from')),
-                        DateTimePicker::make('published_until')
-                            ->label(__('legal.published_until')),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['published_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('published_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['published_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('published_at', '<=', $date),
-                            );
-                    }),
+
+                TernaryFilter::make('published_at')
+                    ->label('Published')
+                    ->nullable()
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereNotNull('published_at'),
+                        false: fn (Builder $query) => $query->whereNull('published_at'),
+                        blank: fn (Builder $query) => $query,
+                    )
+                    ->trueLabel('Published only')
+                    ->falseLabel('Draft only')
+                    ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
-                Action::make('enable')
-                    ->label(__('legal.enable'))
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->visible(fn(Legal $record): bool => !$record->is_enabled)
-                    ->action(function (Legal $record): void {
-                        $record->enable();
-                        Notification::make()
-                            ->title(__('legal.enabled_successfully'))
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
-                Action::make('disable')
-                    ->label(__('legal.disable'))
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->visible(fn(Legal $record): bool => $record->is_enabled)
-                    ->action(function (Legal $record): void {
-                        $record->disable();
-                        Notification::make()
-                            ->title(__('legal.disabled_successfully'))
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
-                Action::make('publish')
-                    ->label(__('legal.publish'))
-                    ->icon('heroicon-o-eye')
-                    ->color('info')
-                    ->visible(fn(Legal $record): bool => !$record->published_at)
-                    ->action(function (Legal $record): void {
-                        $record->publish();
-                        Notification::make()
-                            ->title(__('legal.published_successfully'))
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
-                Action::make('unpublish')
-                    ->label(__('legal.unpublish'))
-                    ->icon('heroicon-o-eye-slash')
-                    ->color('warning')
-                    ->visible(fn(Legal $record): bool => $record->published_at)
-                    ->action(function (Legal $record): void {
-                        $record->unpublish();
-                        Notification::make()
-                            ->title(__('legal.unpublished_successfully'))
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
-                Action::make('duplicate')
-                    ->label(__('legal.duplicate'))
-                    ->icon('heroicon-o-document-duplicate')
-                    ->color('gray')
-                    ->action(function (Legal $record): void {
-                        $newRecord = $record->replicate();
-                        $newRecord->key = $record->key . '-copy-' . time();
-                        $newRecord->save();
-
-                        // Copy translations
-                        foreach ($record->translations as $translation) {
-                            $newTranslation = $translation->replicate();
-                            $newTranslation->legal_id = $newRecord->id;
-                            $newTranslation->save();
-                        }
-
-                        Notification::make()
-                            ->title(__('legal.duplicated_successfully'))
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    BulkAction::make('enable')
-                        ->label(__('legal.enable_selected'))
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->action(function (Collection $records): void {
-                            $records->each->enable();
-                            Notification::make()
-                                ->title(__('legal.bulk_enabled_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
-                    BulkAction::make('disable')
-                        ->label(__('legal.disable_selected'))
-                        ->icon('heroicon-o-x-circle')
-                        ->color('danger')
-                        ->action(function (Collection $records): void {
-                            $records->each->disable();
-                            Notification::make()
-                                ->title(__('legal.bulk_disabled_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
-                    BulkAction::make('publish')
-                        ->label(__('legal.publish_selected'))
-                        ->icon('heroicon-o-eye')
-                        ->color('info')
-                        ->action(function (Collection $records): void {
-                            $records->each->publish();
-                            Notification::make()
-                                ->title(__('legal.bulk_published_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
-                    BulkAction::make('unpublish')
-                        ->label(__('legal.unpublish_selected'))
-                        ->icon('heroicon-o-eye-slash')
-                        ->color('warning')
-                        ->action(function (Collection $records): void {
-                            $records->each->unpublish();
-                            Notification::make()
-                                ->title(__('legal.bulk_unpublished_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('sort_order', 'asc')
+            ->reorderable('sort_order')
+            ->emptyStateHeading('No legal documents')
+            ->emptyStateDescription('Create your first legal document to get started.')
+            ->emptyStateIcon('heroicon-o-document-text')
+            ->emptyStateActions([
+                CreateAction::make()
+                    ->label('Create Legal Document')
+                    ->icon('heroicon-o-plus'),
+            ]);
     }
 
-    /**
-     * Get the relations for this resource.
-     * @return array
-     */
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\TranslationsRelationManager::class,
         ];
     }
 
-    /**
-     * Get the pages for this resource.
-     */
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLegal::route('/'),
+            'index' => Pages\ListLegals::route('/'),
             'create' => Pages\CreateLegal::route('/create'),
             'view' => Pages\ViewLegal::route('/{record}'),
             'edit' => Pages\EditLegal::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'success';
     }
 }

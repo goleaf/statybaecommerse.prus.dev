@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Actions\EditAction;
@@ -29,8 +30,7 @@ final class DocumentsRelationManager extends RelationManager
                 
                 Forms\Components\TextInput::make('title')
                     ->label(__('Title'))
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 
                 Forms\Components\Select::make('status')
                     ->label(__('Status'))
@@ -53,20 +53,17 @@ final class DocumentsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('title')
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('Title'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                     ->weight('bold'),
                 
                 Tables\Columns\TextColumn::make('template.name')
                     ->label(__('Template'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('Status'))

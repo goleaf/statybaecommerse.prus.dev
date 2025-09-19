@@ -31,40 +31,6 @@ use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * CategoryResource
- *
- * Filament v4 resource for Category management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class CategoryResource extends Resource
-{
-    protected static ?string $model = Category::class;
-
-    protected static string|UnitEnum|null $navigationGroup = "Products";
-
-    protected static ?int $navigationSort = 3;
-
-    protected static ?string $recordTitleAttribute = 'name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('categories.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return "Products"->value;
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

@@ -209,7 +209,6 @@ final class DiscountCondition extends Model
             'attribute_value' => __('discount_conditions.types.attribute_value'),
             'cart_total' => __('discount_conditions.types.cart_total'),
             'item_qty' => __('discount_conditions.types.item_qty'),
-            'zone' => __('discount_conditions.types.zone'),
             'channel' => __('discount_conditions.types.channel'),
             'currency' => __('discount_conditions.types.currency'),
             'customer_group' => __('discount_conditions.types.customer_group'),
@@ -253,7 +252,7 @@ final class DiscountCondition extends Model
      */
     public static function getTypes(): array
     {
-        return ['product' => __('discount_conditions.types.product'), 'category' => __('discount_conditions.types.category'), 'brand' => __('discount_conditions.types.brand'), 'collection' => __('discount_conditions.types.collection'), 'attribute_value' => __('discount_conditions.types.attribute_value'), 'cart_total' => __('discount_conditions.types.cart_total'), 'item_qty' => __('discount_conditions.types.item_qty'), 'zone' => __('discount_conditions.types.zone'), 'channel' => __('discount_conditions.types.channel'), 'currency' => __('discount_conditions.types.currency'), 'customer_group' => __('discount_conditions.types.customer_group'), 'user' => __('discount_conditions.types.user'), 'partner_tier' => __('discount_conditions.types.partner_tier'), 'first_order' => __('discount_conditions.types.first_order'), 'day_time' => __('discount_conditions.types.day_time'), 'custom_script' => __('discount_conditions.types.custom_script')];
+        return ['product' => __('discount_conditions.types.product'), 'category' => __('discount_conditions.types.category'), 'brand' => __('discount_conditions.types.brand'), 'collection' => __('discount_conditions.types.collection'), 'attribute_value' => __('discount_conditions.types.attribute_value'), 'cart_total' => __('discount_conditions.types.cart_total'), 'item_qty' => __('discount_conditions.types.item_qty'), 'channel' => __('discount_conditions.types.channel'), 'currency' => __('discount_conditions.types.currency'), 'customer_group' => __('discount_conditions.types.customer_group'), 'user' => __('discount_conditions.types.user'), 'partner_tier' => __('discount_conditions.types.partner_tier'), 'first_order' => __('discount_conditions.types.first_order'), 'day_time' => __('discount_conditions.types.day_time'), 'custom_script' => __('discount_conditions.types.custom_script')];
     }
 
     /**
@@ -277,7 +276,7 @@ final class DiscountCondition extends Model
         $arrayOperators = ['in_array' => __('discount_conditions.operators.in_array'), 'not_in_array' => __('discount_conditions.operators.not_in_array')];
         return match ($type) {
             'cart_total', 'item_qty', 'priority' => $numericOperators,
-            'product', 'category', 'brand', 'collection', 'attribute_value', 'zone', 'channel', 'currency', 'customer_group', 'user', 'partner_tier' => $stringOperators,
+            'product', 'category', 'brand', 'collection', 'attribute_value', 'channel', 'currency', 'customer_group', 'user', 'partner_tier' => $stringOperators,
             'first_order', 'day_time' => array_merge($stringOperators, $arrayOperators),
             default => array_merge($numericOperators, $stringOperators, $arrayOperators),
         };

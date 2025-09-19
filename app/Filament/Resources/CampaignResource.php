@@ -77,11 +77,6 @@ final class CampaignResource extends Resource
                         ->searchable()
                         ->preload()
                         ->nullable(),
-                    Select::make('zone_id')
-                        ->label(self::label('campaigns.fields.zone', 'Zone'))
-                        ->relationship('zone', 'name')
-                        ->searchable()
-                        ->preload()
                         ->nullable(),
                     Select::make('status')
                         ->label(self::label('campaigns.fields.status', 'Status'))
@@ -242,10 +237,6 @@ final class CampaignResource extends Resource
                     ->boolean(),
                 TextColumn::make('channel.name')
                     ->label(self::label('campaigns.fields.channel', 'Channel'))
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('zone.name')
-                    ->label(self::label('campaigns.fields.zone', 'Zone'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('starts_at')

@@ -30,7 +30,6 @@ use App\Models\User;
 use App\Models\UserBehavior;
 use App\Models\VariantAnalytics;
 use App\Models\WishlistItem;
-use App\Models\Zone;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -84,7 +83,6 @@ class DashboardOverviewWidget extends BaseWidget
 
         // Geographic & System Metrics
         $totalCountries = Country::count();
-        $totalZones = Zone::count();
         $totalLocations = Location::count();
         $totalAddresses = Address::count();
         $totalSystemSettings = SystemSetting::count();
@@ -153,10 +151,6 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.supported_countries'))
                 ->descriptionIcon('heroicon-m-globe-alt')
                 ->color('info'),
-            Stat::make(__('translations.zones'), \Illuminate\Support\Number::format($totalZones))
-                ->description(__('translations.shipping_zones'))
-                ->descriptionIcon('heroicon-m-map')
-                ->color('primary'),
             Stat::make(__('translations.locations'), \Illuminate\Support\Number::format($totalLocations))
                 ->description(__('translations.warehouse_locations'))
                 ->descriptionIcon('heroicon-m-building-office')

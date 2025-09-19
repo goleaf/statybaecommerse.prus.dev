@@ -3,11 +3,11 @@
 namespace App\Filament\Resources\EnumManagementResource\Pages;
 
 use App\Filament\Resources\EnumManagementResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ViewRecord;
-use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Filament\Resources\Pages\ViewRecord;
 use Filament\Support\Enums\FontWeight;
+use Filament\Actions;
+use Filament\Infolists;
 
 class ViewEnumManagement extends ViewRecord
 {
@@ -39,10 +39,10 @@ class ViewEnumManagement extends ViewRecord
                         Infolists\Components\TextEntry::make('color')
                             ->label('Color')
                             ->badge()
-                            ->color(fn (string $state): string => $state),
+                            ->color(fn(string $state): string => $state),
                         Infolists\Components\TextEntry::make('icon')
                             ->label('Icon')
-                            ->icon(fn (string $state): string => $state)
+                            ->icon(fn(string $state): string => $state)
                             ->toggleable(),
                         Infolists\Components\TextEntry::make('symbol')
                             ->label('Symbol')

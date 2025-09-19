@@ -10,13 +10,13 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -26,46 +26,14 @@ use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use BackedEnum;
-use UnitEnum;
-
-/**
- * CollectionRuleResource
- *
- * Filament v4 resource for CollectionRule management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class CollectionRuleResource extends Resource
-{
-    protected static ?string $model = CollectionRule::class;
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-funnel';
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
-    protected static ?int $navigationSort = 3;
-    protected static ?string $recordTitleAttribute = 'field';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('admin.collection_rules.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Products';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -108,7 +76,7 @@ final class CollectionRuleResource extends Resource
                                                 ->searchable()
                                                 ->preload()
                                                 ->required()
-                                                ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name}")
+                                                ->getOptionLabelFromRecordUsing(fn($record) => "{$record->name}")
                                                 ->columnSpan(1),
                                             TextInput::make('field')
                                                 ->label(__('admin.collection_rules.form.fields.field'))
@@ -155,12 +123,12 @@ final class CollectionRuleResource extends Resource
                                 ->schema([
                                     Placeholder::make('collection_name')
                                         ->label(__('admin.collection_rules.form.fields.collection_name'))
-                                        ->content(fn ($record) => $record?->collection?->name ?? '-'),
+                                        ->content(fn($record) => $record?->collection?->name ?? '-'),
                                     Placeholder::make('rule_description')
                                         ->label(__('admin.collection_rules.form.fields.rule_description'))
-                                        ->content(fn ($record) => $record ? 
-                                            "{$record->field} {$record->operator} {$record->value}" : '-'
-                                        ),
+                                        ->content(fn($record) => $record
+                                            ? "{$record->field} {$record->operator} {$record->value}"
+                                            : '-'),
                                 ])
                                 ->columns(2),
                         ]),
@@ -188,7 +156,7 @@ final class CollectionRuleResource extends Resource
                     ->sortable(),
                 BadgeColumn::make('operator')
                     ->label(__('admin.collection_rules.form.fields.operator'))
-                    ->formatStateUsing(fn (string $state): string => 
+                    ->formatStateUsing(fn(string $state): string =>
                         match ($state) {
                             'equals' => __('admin.collection_rules.operators.equals'),
                             'not_equals' => __('admin.collection_rules.operators.not_equals'),
@@ -201,8 +169,7 @@ final class CollectionRuleResource extends Resource
                             'greater_than_or_equal' => __('admin.collection_rules.operators.greater_than_or_equal'),
                             'less_than_or_equal' => __('admin.collection_rules.operators.less_than_or_equal'),
                             default => $state,
-                        }
-                    )
+                        })
                     ->colors([
                         'primary' => 'equals',
                         'success' => 'contains',
@@ -245,7 +212,7 @@ final class CollectionRuleResource extends Resource
                     ->label(__('admin.collection_rules.filters.created_at')),
                 Filter::make('recent')
                     ->label(__('admin.collection_rules.filters.recent'))
-                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
+                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
             ])
             ->actions([
                 ViewAction::make(),

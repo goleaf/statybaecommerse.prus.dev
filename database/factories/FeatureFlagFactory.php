@@ -1,59 +1,54 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
 use App\Models\FeatureFlag;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-final class FeatureFlagFactory extends Factory
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\FeatureFlag>
+ */
+class FeatureFlagFactory extends Factory
 {
     protected $model = FeatureFlag::class;
 
     public function definition(): array
     {
         return [
-            'name' => $this->faker->words(3, true),
-            'key' => $this->faker->slug(),
-            'description' => $this->faker->sentence(),
-            'is_active' => true,
-            'is_enabled' => true,
-            'is_global' => false,
-            'conditions' => null,
-            'rollout_percentage' => null,
-            'environment' => null,
-            'starts_at' => now()->subDays(1),
-            'ends_at' => now()->addDays(30),
-            'start_date' => now()->subDays(1),
-            'end_date' => now()->addDays(30),
-            'metadata' => null,
-            'priority' => $this->faker->randomElement(['low', 'medium', 'high']),
-            'category' => $this->faker->randomElement(['checkout', 'payment', 'ux', 'performance']),
-            'impact_level' => $this->faker->randomElement(['low', 'medium', 'high']),
-            'rollout_strategy' => $this->faker->randomElement(['gradual', 'immediate', 'canary']),
-            'rollback_plan' => $this->faker->sentence(),
-            'success_metrics' => null,
-            'approval_status' => $this->faker->randomElement(['pending', 'approved', 'rejected']),
-            'approval_notes' => $this->faker->sentence(),
-            'created_by' => $this->faker->name(),
-            'updated_by' => $this->faker->name(),
-            'last_activated' => now()->subDays(1),
-            'last_deactivated' => null,
+            'name' => fake()->words(3, true),
+            'key' => fake()->unique()->slug(),
+            'description' => fake()->sentence(10),
+            'is_active' => fake()->boolean(70),
+            'is_enabled' => fake()->boolean(30),
+            'is_global' => fake()->boolean(20),
+            'environment' => fake()->randomElement(['local', 'staging', 'production', null]),
+            'category' => fake()->randomElement(['ui', 'performance', 'security', 'analytics', 'payment', 'shipping']),
+            'priority' => fake()->numberBetween(0, 100),
+            'conditions' => [
+                'user_type' => fake()->randomElement(['admin', 'customer', 'guest']),
+                'country' => fake()->countryCode(),
+            ],
+            'starts_at' => fake()->optional(0.7)->dateTimeBetween('-1 month', '+1 month'),
+            'ends_at' => fake()->optional(0.5)->dateTimeBetween('+1 month', '+3 months'),
+            'metadata' => [
+                'version' => fake()->semver(),
+                'team' => fake()->randomElement(['frontend', 'backend', 'devops', 'qa']),
+            ],
         ];
+    }
+
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => true,
+        ]);
     }
 
     public function enabled(): static
     {
         return $this->state(fn (array $attributes) => [
+            'is_active' => true,
             'is_enabled' => true,
-        ]);
-    }
-
-    public function disabled(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'is_enabled' => false,
         ]);
     }
 
@@ -64,37 +59,45 @@ final class FeatureFlagFactory extends Factory
         ]);
     }
 
-    public function withConditions(): static
+    public function production(): static
     {
         return $this->state(fn (array $attributes) => [
-            'conditions' => [
-                'user_type' => 'premium',
-                'country' => 'LT',
-                'browser' => 'chrome',
-            ],
+            'environment' => 'production',
         ]);
     }
 
-    public function withMetadata(): static
+    public function staging(): static
     {
         return $this->state(fn (array $attributes) => [
-            'metadata' => [
-                'owner' => 'development_team',
-                'priority' => 'high',
-                'tags' => ['checkout', 'payment', 'ux'],
-            ],
+            'environment' => 'staging',
         ]);
     }
 
-    public function withSuccessMetrics(): static
+    public function local(): static
     {
         return $this->state(fn (array $attributes) => [
-            'success_metrics' => [
-                'conversion_rate' => 'increase',
-                'checkout_time' => 'decrease',
-                'user_satisfaction' => 'increase',
-            ],
+            'environment' => 'local',
+        ]);
+    }
+
+    public function ui(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'category' => 'ui',
+        ]);
+    }
+
+    public function performance(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'category' => 'performance',
+        ]);
+    }
+
+    public function security(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'category' => 'security',
         ]);
     }
 }
-

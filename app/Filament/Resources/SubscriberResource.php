@@ -29,7 +29,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 /**
  * SubscriberResource
  *
@@ -37,8 +36,7 @@ use UnitEnum;
  */
 final class SubscriberResource extends Resource
 {
-    protected static ?string $model = Subscriber::class;    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = "Products";
+    // protected static $navigationGroup = NavigationGroup::Products;
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'email';
     /**
@@ -63,106 +61,7 @@ final class SubscriberResource extends Resource
      * @param Form $schema
      * @return Form
     public static function form(Schema $schema): Schema
-        return $schema->components([
-            Section::make(__('subscribers.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            TextInput::make('email')
-                                ->label(__('subscribers.email'))
-                                ->email()
-                                ->required()
-                                ->unique(ignoreRecord: true)
-                                ->maxLength(255),
-                            TextInput::make('name')
-                                ->label(__('subscribers.name'))
-                        ]),
-                    TextInput::make('phone')
-                        ->label(__('subscribers.phone'))
-                        ->tel()
-                        ->maxLength(20),
-                ]),
-            Section::make(__('subscribers.subscription_settings'))
-                            Select::make('status')
-                                ->label(__('subscribers.status'))
-                                ->options([
-                                    'active' => __('subscribers.statuses.active'),
-                                    'inactive' => __('subscribers.statuses.inactive'),
-                                    'unsubscribed' => __('subscribers.statuses.unsubscribed'),
-                                    'bounced' => __('subscribers.statuses.bounced'),
-                                    'complained' => __('subscribers.statuses.complained'),
-                                ])
-                                ->default('active'),
-                            Select::make('source')
-                                ->label(__('subscribers.source'))
-                                    'website' => __('subscribers.sources.website'),
-                                    'admin' => __('subscribers.sources.admin'),
-                                    'import' => __('subscribers.sources.import'),
-                                    'api' => __('subscribers.sources.api'),
-                                    'other' => __('subscribers.sources.other'),
-                                ->default('website'),
-                            Toggle::make('is_verified')
-                                ->label(__('subscribers.is_verified'))
-                                ->default(false),
-                            Toggle::make('accepts_marketing')
-                                ->label(__('subscribers.accepts_marketing'))
-                                ->default(true),
-            Section::make(__('subscribers.preferences'))
-                            Select::make('preferred_language')
-                                ->label(__('subscribers.preferred_language'))
-                                    'lt' => __('subscribers.languages.lt'),
-                                    'en' => __('subscribers.languages.en'),
-                                ->default('lt'),
-                            Select::make('preferred_currency')
-                                ->label(__('subscribers.preferred_currency'))
-                                    'EUR' => 'EUR (€)',
-                                    'USD' => 'USD ($)',
-                                ->default('EUR'),
-                            Toggle::make('newsletter_subscription')
-                                ->label(__('subscribers.newsletter_subscription'))
-                            Toggle::make('promotional_emails')
-                                ->label(__('subscribers.promotional_emails'))
-            Section::make(__('subscribers.additional_information'))
-                            DateTimePicker::make('subscribed_at')
-                                ->label(__('subscribers.subscribed_at'))
-                                ->default(now())
-                                ->displayFormat('d/m/Y H:i'),
-                            DateTimePicker::make('unsubscribed_at')
-                                ->label(__('subscribers.unsubscribed_at'))
-                    TextInput::make('unsubscribe_reason')
-                        ->label(__('subscribers.unsubscribe_reason'))
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-        ]);
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-    public static function table(Table $table): Table
-        return $table
-            ->columns([
-                TextColumn::make('email')
-                    ->label(__('subscribers.email'))
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold')
-                    ->copyable(),
-                TextColumn::make('name')
-                    ->label(__('subscribers.name'))
-                    ->limit(30),
-                TextColumn::make('phone')
-                    ->label(__('subscribers.phone'))
-                    ->copyable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                BadgeColumn::make('status')
-                    ->label(__('subscribers.status'))
-                    ->colors([
-                        'success' => 'active',
-                        'warning' => 'inactive',
-                        'danger' => 'unsubscribed',
-                        'gray' => 'bounced',
-                        'red' => 'complained',
-                    ])
-                    ->formatStateUsing(fn(string $state): string => __("subscribers.statuses.{$state}")),
+    {$state}")),
                 TextColumn::make('source')
                     ->label(__('subscribers.source'))
                     ->formatStateUsing(fn(string $state): string => __("subscribers.sources.{$state}"))

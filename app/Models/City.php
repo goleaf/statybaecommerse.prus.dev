@@ -1,6 +1,5 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
@@ -9,15 +8,16 @@ use App\Models\Translations\CityTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 /**
  * City
- * 
+ *
  * Eloquent model representing the City entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property string $translationModel
  * @property mixed $table
  * @property mixed $fillable
@@ -30,9 +30,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 final class City extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
+
     protected string $translationModel = CityTranslation::class;
     protected $table = 'cities';
-    protected $fillable = ['name', 'slug', 'code', 'description', 'is_enabled', 'is_default', 'is_capital', 'country_id', 'zone_id', 'parent_id', 'level', 'latitude', 'longitude', 'population', 'postal_codes', 'sort_order', 'metadata', 'type', 'area', 'density', 'elevation', 'timezone', 'currency_code', 'currency_symbol', 'language_code', 'language_name', 'phone_code', 'postal_code', 'is_active'];
+    protected $fillable = ['name', 'slug', 'code', 'description', 'is_enabled', 'is_default', 'is_capital', 'country_id', 'parent_id', 'level', 'latitude', 'longitude', 'population', 'postal_codes', 'sort_order', 'metadata', 'type', 'area', 'density', 'elevation', 'timezone', 'currency_code', 'currency_symbol', 'language_code', 'language_name', 'phone_code', 'postal_code', 'is_active'];
+
     /**
      * Handle casts functionality with proper error handling.
      * @return array
@@ -41,6 +43,7 @@ final class City extends Model
     {
         return ['is_enabled' => 'boolean', 'is_default' => 'boolean', 'is_capital' => 'boolean', 'level' => 'integer', 'latitude' => 'decimal:8', 'longitude' => 'decimal:8', 'population' => 'integer', 'postal_codes' => 'array', 'sort_order' => 'integer', 'metadata' => 'array', 'area' => 'decimal:2', 'density' => 'decimal:2', 'elevation' => 'decimal:2', 'is_active' => 'boolean'];
     }
+
     /**
      * Handle country functionality with proper error handling.
      * @return BelongsTo
@@ -49,14 +52,7 @@ final class City extends Model
     {
         return $this->belongsTo(Country::class);
     }
-    /**
-     * Handle zone functionality with proper error handling.
-     * @return BelongsTo
-     */
-    public function zone(): BelongsTo
-    {
-        return $this->belongsTo(Zone::class);
-    }
+
     /**
      * Handle parent functionality with proper error handling.
      * @return BelongsTo
@@ -65,6 +61,7 @@ final class City extends Model
     {
         return $this->belongsTo(City::class, 'parent_id');
     }
+
     /**
      * Handle children functionality with proper error handling.
      * @return HasMany
@@ -73,6 +70,7 @@ final class City extends Model
     {
         return $this->hasMany(City::class, 'parent_id');
     }
+
     /**
      * Handle addresses functionality with proper error handling.
      * @return HasMany
@@ -81,7 +79,9 @@ final class City extends Model
     {
         return $this->hasMany(Address::class);
     }
+
     // Additional relations for comprehensive city management
+
     /**
      * Handle users functionality with proper error handling.
      * @return HasMany
@@ -90,6 +90,7 @@ final class City extends Model
     {
         return $this->hasMany(User::class);
     }
+
     /**
      * Handle orders functionality with proper error handling.
      * @return HasMany
@@ -98,6 +99,7 @@ final class City extends Model
     {
         return $this->hasMany(Order::class);
     }
+
     /**
      * Handle customers functionality with proper error handling.
      * @return HasMany
@@ -106,6 +108,7 @@ final class City extends Model
     {
         return $this->hasMany(Customer::class);
     }
+
     /**
      * Handle locations functionality with proper error handling.
      * @return HasMany
@@ -114,6 +117,7 @@ final class City extends Model
     {
         return $this->hasMany(Location::class);
     }
+
     /**
      * Handle scopeEnabled functionality with proper error handling.
      * @param mixed $query
@@ -122,6 +126,7 @@ final class City extends Model
     {
         return $query->where('is_enabled', true);
     }
+
     /**
      * Handle scopeActive functionality with proper error handling.
      * @param mixed $query
@@ -130,6 +135,7 @@ final class City extends Model
     {
         return $query->where('is_active', true);
     }
+
     /**
      * Handle scopeOrdered functionality with proper error handling.
      * @param mixed $query
@@ -138,6 +144,7 @@ final class City extends Model
     {
         return $query->orderBy('sort_order');
     }
+
     /**
      * Handle scopeDefault functionality with proper error handling.
      * @param mixed $query
@@ -146,6 +153,7 @@ final class City extends Model
     {
         return $query->where('is_default', true);
     }
+
     /**
      * Handle scopeCapital functionality with proper error handling.
      * @param mixed $query
@@ -154,6 +162,7 @@ final class City extends Model
     {
         return $query->where('is_capital', true);
     }
+
     /**
      * Handle scopeByLevel functionality with proper error handling.
      * @param mixed $query
@@ -163,6 +172,7 @@ final class City extends Model
     {
         return $query->where('level', $level);
     }
+
     /**
      * Handle scopeByCountry functionality with proper error handling.
      * @param mixed $query
@@ -172,15 +182,7 @@ final class City extends Model
     {
         return $query->where('country_id', $countryId);
     }
-    /**
-     * Handle scopeByZone functionality with proper error handling.
-     * @param mixed $query
-     * @param string $zoneId
-     */
-    public function scopeByZone($query, string $zoneId)
-    {
-        return $query->where('zone_id', $zoneId);
-    }
+
     /**
      * Handle scopeRoot functionality with proper error handling.
      * @param mixed $query
@@ -189,6 +191,7 @@ final class City extends Model
     {
         return $query->whereNull('parent_id');
     }
+
     /**
      * Handle scopeByCode functionality with proper error handling.
      * @param mixed $query
@@ -198,6 +201,7 @@ final class City extends Model
     {
         return $query->where('code', $code);
     }
+
     /**
      * Handle scopeByType functionality with proper error handling.
      * @param mixed $query
@@ -207,6 +211,7 @@ final class City extends Model
     {
         return $query->where('type', $type);
     }
+
     /**
      * Handle scopeByPopulation functionality with proper error handling.
      * @param mixed $query
@@ -216,6 +221,7 @@ final class City extends Model
     {
         return $query->where('population', '>=', $minPopulation);
     }
+
     /**
      * Handle scopeByArea functionality with proper error handling.
      * @param mixed $query
@@ -225,6 +231,7 @@ final class City extends Model
     {
         return $query->where('area', '>=', $minArea);
     }
+
     /**
      * Handle scopeByDensity functionality with proper error handling.
      * @param mixed $query
@@ -234,6 +241,7 @@ final class City extends Model
     {
         return $query->where('density', '>=', $minDensity);
     }
+
     /**
      * Handle scopeByElevation functionality with proper error handling.
      * @param mixed $query
@@ -243,6 +251,7 @@ final class City extends Model
     {
         return $query->where('elevation', '>=', $minElevation);
     }
+
     /**
      * Handle scopeByTimezone functionality with proper error handling.
      * @param mixed $query
@@ -252,6 +261,7 @@ final class City extends Model
     {
         return $query->where('timezone', $timezone);
     }
+
     /**
      * Handle scopeByCurrency functionality with proper error handling.
      * @param mixed $query
@@ -261,6 +271,7 @@ final class City extends Model
     {
         return $query->where('currency_code', $currencyCode);
     }
+
     /**
      * Handle scopeByLanguage functionality with proper error handling.
      * @param mixed $query
@@ -270,6 +281,7 @@ final class City extends Model
     {
         return $query->where('language_code', $languageCode);
     }
+
     /**
      * Handle scopeByPhoneCode functionality with proper error handling.
      * @param mixed $query
@@ -279,6 +291,7 @@ final class City extends Model
     {
         return $query->where('phone_code', $phoneCode);
     }
+
     /**
      * Handle scopeByPostalCode functionality with proper error handling.
      * @param mixed $query
@@ -288,6 +301,7 @@ final class City extends Model
     {
         return $query->where('postal_code', $postalCode);
     }
+
     /**
      * Handle scopeByLatitude functionality with proper error handling.
      * @param mixed $query
@@ -297,6 +311,7 @@ final class City extends Model
     {
         return $query->where('latitude', $latitude);
     }
+
     /**
      * Handle scopeByLongitude functionality with proper error handling.
      * @param mixed $query
@@ -306,6 +321,7 @@ final class City extends Model
     {
         return $query->where('longitude', $longitude);
     }
+
     /**
      * Handle scopeByCoordinates functionality with proper error handling.
      * @param mixed $query
@@ -316,6 +332,7 @@ final class City extends Model
     {
         return $query->where('latitude', $latitude)->where('longitude', $longitude);
     }
+
     /**
      * Handle scopeByCountryCode functionality with proper error handling.
      * @param mixed $query
@@ -327,6 +344,7 @@ final class City extends Model
             $q->where('code', $code);
         });
     }
+
     /**
      * Handle scopeByCountryIsoCode functionality with proper error handling.
      * @param mixed $query
@@ -338,6 +356,7 @@ final class City extends Model
             $q->where('iso_code', $isoCode);
         });
     }
+
     /**
      * Handle scopeByCountryContinent functionality with proper error handling.
      * @param mixed $query
@@ -349,6 +368,7 @@ final class City extends Model
             $q->where('continent', $continent);
         });
     }
+
     /**
      * Handle scopeByCountryCapital functionality with proper error handling.
      * @param mixed $query
@@ -360,6 +380,7 @@ final class City extends Model
             $q->where('capital', $capital);
         });
     }
+
     /**
      * Handle scopeByCountryCurrency functionality with proper error handling.
      * @param mixed $query
@@ -371,6 +392,7 @@ final class City extends Model
             $q->where('currency_code', $currencyCode);
         });
     }
+
     /**
      * Handle scopeByCountryLanguage functionality with proper error handling.
      * @param mixed $query
@@ -382,6 +404,7 @@ final class City extends Model
             $q->where('language_code', $languageCode);
         });
     }
+
     /**
      * Handle scopeByCountryTimezone functionality with proper error handling.
      * @param mixed $query
@@ -393,6 +416,7 @@ final class City extends Model
             $q->where('timezone', $timezone);
         });
     }
+
     /**
      * Handle scopeByCountryPhoneCode functionality with proper error handling.
      * @param mixed $query
@@ -404,121 +428,7 @@ final class City extends Model
             $q->where('phone_code', $phoneCode);
         });
     }
-    /**
-     * Handle scopeByZoneCode functionality with proper error handling.
-     * @param mixed $query
-     * @param string $code
-     */
-    public function scopeByZoneCode($query, string $code)
-    {
-        return $query->whereHas('zone', function ($q) use ($code) {
-            $q->where('code', $code);
-        });
-    }
-    /**
-     * Handle scopeByZoneType functionality with proper error handling.
-     * @param mixed $query
-     * @param string $type
-     */
-    public function scopeByZoneType($query, string $type)
-    {
-        return $query->whereHas('zone', function ($q) use ($type) {
-            $q->where('type', $type);
-        });
-    }
-    /**
-     * Handle scopeByZoneCurrency functionality with proper error handling.
-     * @param mixed $query
-     * @param string $currencyCode
-     */
-    public function scopeByZoneCurrency($query, string $currencyCode)
-    {
-        return $query->whereHas('zone', function ($q) use ($currencyCode) {
-            $q->where('currency_code', $currencyCode);
-        });
-    }
-    /**
-     * Handle scopeByZoneLanguage functionality with proper error handling.
-     * @param mixed $query
-     * @param string $languageCode
-     */
-    public function scopeByZoneLanguage($query, string $languageCode)
-    {
-        return $query->whereHas('zone', function ($q) use ($languageCode) {
-            $q->where('default_language', $languageCode);
-        });
-    }
-    /**
-     * Handle scopeByZoneTimezone functionality with proper error handling.
-     * @param mixed $query
-     * @param string $timezone
-     */
-    public function scopeByZoneTimezone($query, string $timezone)
-    {
-        return $query->whereHas('zone', function ($q) use ($timezone) {
-            $q->where('timezone', $timezone);
-        });
-    }
-    /**
-     * Handle scopeByZonePhoneCode functionality with proper error handling.
-     * @param mixed $query
-     * @param string $phoneCode
-     */
-    public function scopeByZonePhoneCode($query, string $phoneCode)
-    {
-        return $query->whereHas('zone', function ($q) use ($phoneCode) {
-            $q->where('phone_code', $phoneCode);
-        });
-    }
-    /**
-     * Handle scopeByZoneCurrencyAndLanguage functionality with proper error handling.
-     * @param mixed $query
-     * @param string $currencyCode
-     * @param string $languageCode
-     */
-    public function scopeByZoneCurrencyAndLanguage($query, string $currencyCode, string $languageCode)
-    {
-        return $query->whereHas('zone', function ($q) use ($currencyCode, $languageCode) {
-            $q->where('currency_code', $currencyCode)->where('default_language', $languageCode);
-        });
-    }
-    /**
-     * Handle scopeByZoneCurrencyAndTimezone functionality with proper error handling.
-     * @param mixed $query
-     * @param string $currencyCode
-     * @param string $timezone
-     */
-    public function scopeByZoneCurrencyAndTimezone($query, string $currencyCode, string $timezone)
-    {
-        return $query->whereHas('zone', function ($q) use ($currencyCode, $timezone) {
-            $q->where('currency_code', $currencyCode)->where('timezone', $timezone);
-        });
-    }
-    /**
-     * Handle scopeByZoneLanguageAndTimezone functionality with proper error handling.
-     * @param mixed $query
-     * @param string $languageCode
-     * @param string $timezone
-     */
-    public function scopeByZoneLanguageAndTimezone($query, string $languageCode, string $timezone)
-    {
-        return $query->whereHas('zone', function ($q) use ($languageCode, $timezone) {
-            $q->where('default_language', $languageCode)->where('timezone', $timezone);
-        });
-    }
-    /**
-     * Handle scopeByZoneCurrencyLanguageAndTimezone functionality with proper error handling.
-     * @param mixed $query
-     * @param string $currencyCode
-     * @param string $languageCode
-     * @param string $timezone
-     */
-    public function scopeByZoneCurrencyLanguageAndTimezone($query, string $currencyCode, string $languageCode, string $timezone)
-    {
-        return $query->whereHas('zone', function ($q) use ($currencyCode, $languageCode, $timezone) {
-            $q->where('currency_code', $currencyCode)->where('default_language', $languageCode)->where('timezone', $timezone);
-        });
-    }
+
     /**
      * Handle getTranslatedNameAttribute functionality with proper error handling.
      * @return string
@@ -527,6 +437,7 @@ final class City extends Model
     {
         return ($this->trans('name') ?: $this->getOriginal('name')) ?: 'Unknown';
     }
+
     /**
      * Handle getTranslatedDescriptionAttribute functionality with proper error handling.
      * @return string
@@ -535,7 +446,9 @@ final class City extends Model
     {
         return ($this->trans('description') ?: $this->getOriginal('description')) ?: '';
     }
+
     // Enhanced translation methods
+
     /**
      * Handle getTranslatedName functionality with proper error handling.
      * @param string|null $locale
@@ -545,6 +458,7 @@ final class City extends Model
     {
         return $this->trans('name', $locale) ?: $this->name;
     }
+
     /**
      * Handle getTranslatedDescription functionality with proper error handling.
      * @param string|null $locale
@@ -554,7 +468,9 @@ final class City extends Model
     {
         return $this->trans('description', $locale) ?: $this->description;
     }
+
     // Scope for translated cities
+
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      * @param mixed $query
@@ -567,7 +483,9 @@ final class City extends Model
             $q->where('locale', $locale);
         }]);
     }
+
     // Get all available locales for this city
+
     /**
      * Handle getAvailableLocales functionality with proper error handling.
      * @return array
@@ -576,7 +494,9 @@ final class City extends Model
     {
         return $this->translations()->pluck('locale')->toArray();
     }
+
     // Check if city has translation for specific locale
+
     /**
      * Handle hasTranslationFor functionality with proper error handling.
      * @param string $locale
@@ -586,7 +506,9 @@ final class City extends Model
     {
         return $this->translations()->where('locale', $locale)->exists();
     }
+
     // Get or create translation for locale
+
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
      * @param string $locale
@@ -596,7 +518,9 @@ final class City extends Model
     {
         return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'description' => $this->description]);
     }
+
     // Update translation for specific locale
+
     /**
      * Handle updateTranslation functionality with proper error handling.
      * @param string $locale
@@ -611,7 +535,9 @@ final class City extends Model
         }
         return $this->translations()->create(array_merge(['locale' => $locale], $data)) !== null;
     }
+
     // Bulk update translations
+
     /**
      * Handle updateTranslations functionality with proper error handling.
      * @param array $translations
@@ -624,6 +550,7 @@ final class City extends Model
         }
         return true;
     }
+
     /**
      * Handle getFullPathAttribute functionality with proper error handling.
      * @return string
@@ -636,6 +563,7 @@ final class City extends Model
         }
         return $path->implode(' > ');
     }
+
     /**
      * Handle getAncestorsAttribute functionality with proper error handling.
      */
@@ -649,6 +577,7 @@ final class City extends Model
         }
         return $ancestors;
     }
+
     /**
      * Handle getDescendantsAttribute functionality with proper error handling.
      */
@@ -661,6 +590,7 @@ final class City extends Model
         }
         return $descendants;
     }
+
     /**
      * Handle getCoordinatesAttribute functionality with proper error handling.
      * @return array

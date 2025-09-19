@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Review;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -57,9 +58,7 @@ final class ReviewsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('user.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rating')
-                    ->sortable(),
-                    ->badge(),
-                    ->color(fn($state) => match (true) {
+                    ->sortable()\n                    ->badge()\n                    ->color(fn($state) => match (true) {
                         $state >= 4 => 'success',
                         $state >= 3 => 'warning',
                         default => 'danger',
@@ -80,8 +79,7 @@ final class ReviewsRelationManager extends RelationManager
                 Tables\Columns\IconColumn::make('is_featured')
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.reviews.fields.created_at'))
-                    ->dateTime(),
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime()\n                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('rating')

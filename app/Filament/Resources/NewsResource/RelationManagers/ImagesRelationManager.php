@@ -1,19 +1,17 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\RelationManagers;
 
 use App\Models\Image;
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class ImagesRelationManager extends RelationManager
 {
@@ -54,7 +52,6 @@ final class ImagesRelationManager extends RelationManager
                         Forms\Components\Toggle::make('is_active')
                             ->default(true),
                     ]),
-
                 Forms\Components\TextInput::make('sort_order')
                     ->label(__('news.sort_order'))
                     ->numeric()
@@ -72,29 +69,25 @@ final class ImagesRelationManager extends RelationManager
                     ->label(__('news.image'))
                     ->size(60)
                     ->square(),
-
                 Tables\Columns\TextColumn::make('image.alt_text')
                     ->label(__('news.alt_text'))
                     ->searchable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('image.title')
                     ->label(__('news.title'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('image.caption')
                     ->label(__('news.caption'))
                     ->searchable()
                     ->limit(100)
                     ->toggleable(isToggledHiddenByDefault: true),
-
                 Tables\Columns\TextColumn::make('image.type')
                     ->label(__('news.type'))
-                    ->formatStateUsing(fn (string $state): string => __("images.types.{$state}"))
+                    ->formatStateUsing(fn(string $state): string => __("images.types.{$state}"))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'featured' => 'primary',
                         'gallery' => 'info',
                         'thumbnail' => 'success',
@@ -102,24 +95,21 @@ final class ImagesRelationManager extends RelationManager
                         default => 'gray',
                     })
                     ->sortable(),
-
                 Tables\Columns\IconColumn::make('image.is_active')
                     ->label(__('news.is_active'))
                     ->boolean()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label(__('news.sort_order'))
                     ->sortable()
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
+                    ->color(fn(int $state): string => match (true) {
                         $state >= 100 => 'danger',
                         $state >= 50 => 'warning',
                         $state >= 20 => 'info',
                         $state >= 10 => 'success',
                         default => 'gray',
                     }),
-
                 Tables\Columns\TextColumn::make('image.created_at')
                     ->label(__('news.created_at'))
                     ->dateTime()
@@ -132,7 +122,6 @@ final class ImagesRelationManager extends RelationManager
                     ->relationship('image', 'filename')
                     ->searchable()
                     ->preload(),
-
                 Tables\Filters\SelectFilter::make('type')
                     ->label(__('news.type'))
                     ->options([
@@ -141,7 +130,6 @@ final class ImagesRelationManager extends RelationManager
                         'thumbnail' => __('images.types.thumbnail'),
                         'banner' => __('images.types.banner'),
                     ]),
-
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label(__('news.is_active'))
                     ->boolean()

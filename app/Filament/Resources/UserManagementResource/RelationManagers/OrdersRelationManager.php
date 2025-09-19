@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Actions\EditAction;
@@ -20,8 +21,7 @@ final class OrdersRelationManager extends RelationManager
         return $schema
             ->components([
                 Forms\Components\TextInput::make('order_number')
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\Select::make('status')
                     ->options([
                         'pending' => 'Pending',
@@ -44,8 +44,7 @@ final class OrdersRelationManager extends RelationManager
             ->recordTitleAttribute('order_number')
             ->columns([
                 Tables\Columns\TextColumn::make('order_number')
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
                     ->color(fn (string $state): string => match ($state) {

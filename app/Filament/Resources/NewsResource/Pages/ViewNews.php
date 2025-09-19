@@ -6,7 +6,7 @@ use App\Filament\Resources\NewsResource;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions;
 
-final class ViewNews extends ViewRecord
+class ViewNews extends ViewRecord
 {
     protected static string $resource = NewsResource::class;
 

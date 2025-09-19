@@ -5,6 +5,7 @@ namespace App\Filament\Resources\CurrencyResource\RelationManagers;
 use App\Models\Price;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -63,7 +64,6 @@ final class PricesRelationManager extends RelationManager
     }
 
     public function table(Table $table): Table
-    {
     {
         return $table
             ->recordTitleAttribute('amount')

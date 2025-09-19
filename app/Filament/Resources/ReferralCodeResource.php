@@ -1,151 +1,214 @@
 <?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
+
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralCodeResource\Pages;
 use App\Models\ReferralCode;
-use Filament\Forms\Form;
-use Filament\Schemas\Schema;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use UnitEnum;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
+
 final class ReferralCodeResource extends Resource
 {
     protected static ?string $model = ReferralCode::class;
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-gift';
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = NavigationGroup::Marketing;
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationIcon = 'heroicon-o-ticket';
+    protected static ?int $navigationSort = 16;
+    protected static ?string $recordTitleAttribute = 'code';
+
+    public static function getNavigationGroup(): string
+    {
+        return NavigationGroup::Referrals->getLabel();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(3)
             ->schema([
-                Forms\Components\Section::make('Basic Information')
+                Section::make('Code Details')
+                    ->columns(2)
                     ->schema([
-                        Forms\Components\Select::make('user_id')
+                        Select::make('user_id')
                             ->relationship('user', 'name')
-                            ->required()
-                            ->searchable()
-                            ->preload(),
-                        Forms\Components\TextInput::make('code')
-                            ->maxLength(255)
-                            ->unique(ReferralCode::class, 'code', ignoreRecord: true),
-                        Forms\Components\TextInput::make('title')
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('description')
-                            ->columnSpanFull(),
-                        Forms\Components\Toggle::make('is_active')
-                            ->label('Active')
-                            ->default(true),
-                    ])
-                    ->columns(2),
-                Forms\Components\Section::make('Reward Settings')
-                        Forms\Components\TextInput::make('reward_amount')
-                            ->label('Reward Amount')
-                            ->numeric()
-                            ->minValue(0)
-                            ->step(0.01),
-                        Forms\Components\Select::make('reward_type')
-                            ->options([
-                                'percentage' => 'Percentage',
-                                'fixed' => 'Fixed Amount',
-                                'points' => 'Points',
-                            ])
                             ->required(),
-                        Forms\Components\TextInput::make('usage_limit')
-                            ->label('Usage Limit')
-                            ->minValue(0),
-                        Forms\Components\TextInput::make('usage_count')
-                            ->label('Usage Count')
-                            ->disabled(),
-                Forms\Components\Section::make('Validity & Campaign')
-                        Forms\Components\DateTimePicker::make('expires_at')
-                            ->label('Expires At'),
-                        Forms\Components\Select::make('campaign_id')
-                            ->relationship('campaign', 'name')
-                        Forms\Components\Select::make('source')
-                                'admin' => 'Admin Created',
-                                'user' => 'User Generated',
-                                'api' => 'API Generated',
-                                'import' => 'Imported',
-                            ->default('admin'),
-                Forms\Components\Section::make('Tags & Metadata')
-                        Forms\Components\TagsInput::make('tags')
-                            ->placeholder('Add tags...'),
-                        Forms\Components\KeyValue::make('metadata')
+                        TextInput::make('code')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
+                        TextInput::make('title')
+                            ->required()
+                            ->maxLength(255),
+                        Textarea::make('description')
+                            ->maxLength(65535)
+                            ->nullable(),
+                        Toggle::make('is_active')
+                            ->label('Active')
+                            ->inline(false)
+                            ->default(true),
+                        DatePicker::make('expires_at')
+                            ->nullable(),
+                        TextInput::make('usage_limit')
+                            ->numeric()
+                            ->integer()
+                            ->nullable(),
+                        TextInput::make('usage_count')
+                            ->numeric()
+                            ->integer()
+                            ->default(0),
+                        TextInput::make('reward_amount')
+                            ->numeric()
+                            ->default(0.00),
+                        Select::make('reward_type')
+                            ->options([
+                                'discount' => 'Discount',
+                                'credit' => 'Credit',
+                                'points' => 'Points',
+                                'gift' => 'Gift',
+                            ])
+                            ->nullable(),
+                        TextInput::make('campaign_id')
+                            ->maxLength(255)
+                            ->nullable(),
+                        TextInput::make('source')
+                            ->maxLength(255)
+                            ->nullable(),
+                        KeyValue::make('conditions')
+                            ->label('Conditions (JSON)')
                             ->keyLabel('Key')
                             ->valueLabel('Value')
+                            ->reorderable()
+                            ->addActionLabel('Add Condition')
+                            ->columnSpanFull(),
+                        KeyValue::make('tags')
+                            ->label('Tags (JSON)')
+                            ->keyLabel('Tag')
+                            ->valueLabel('Value')
+                            ->reorderable()
+                            ->addActionLabel('Add Tag')
+                            ->columnSpanFull(),
+                        KeyValue::make('metadata')
+                            ->label('Metadata (JSON)')
+                            ->keyLabel('Key')
+                            ->valueLabel('Value')
+                            ->reorderable()
+                            ->addActionLabel('Add Metadata Item')
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
+
     public static function table(Table $table): Table
+    {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('code')
+                TextColumn::make('code')
                     ->searchable()
-                    ->sortable()
-                    ->copyable(),
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('User')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('title')
-                Tables\Columns\TextColumn::make('reward_amount')
-                    ->label('Reward')
-                    ->formatStateUsing(fn($state, $record) =>
-                        $record->reward_type === 'percentage' ? $state . '%' : '€' . number_format($state, 2))
-                Tables\Columns\BadgeColumn::make('reward_type')
-                    ->colors([
-                        'primary' => 'percentage',
-                        'success' => 'fixed',
-                        'info' => 'points',
-                Tables\Columns\TextColumn::make('usage_count')
-                    ->label('Used')
-                Tables\Columns\TextColumn::make('usage_limit')
-                    ->label('Limit')
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('expires_at')
-                    ->label('Expires')
+                TextColumn::make('user.name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('title')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('usage_count')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('usage_limit')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('reward_amount')
+                    ->money('EUR')
+                    ->sortable(),
+                TextColumn::make('reward_type')
+                    ->searchable()
+                    ->sortable(),
+                IconColumn::make('is_active')
+                    ->boolean()
+                    ->label('Active'),
+                TextColumn::make('expires_at')
                     ->dateTime()
-                Tables\Columns\TextColumn::make('campaign.name')
-                    ->label('Campaign')
-                Tables\Columns\TextColumn::make('created_at')
+                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('reward_type')
+                TernaryFilter::make('is_active')
+                    ->label('Active')
+                    ->boolean(),
+                SelectFilter::make('reward_type')
                     ->options([
-                        'percentage' => 'Percentage',
-                        'fixed' => 'Fixed Amount',
+                        'discount' => 'Discount',
+                        'credit' => 'Credit',
                         'points' => 'Points',
-                Tables\Filters\SelectFilter::make('source')
-                        'admin' => 'Admin Created',
-                        'user' => 'User Generated',
-                        'api' => 'API Generated',
-                        'import' => 'Imported',
-                Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Active Only'),
-                Tables\Filters\Filter::make('expired')
-                    ->query(fn($query) => $query->where('expires_at', '<', now())),
-                Tables\Filters\SelectFilter::make('campaign_id')
-                    ->relationship('campaign', 'name')
-                    ->preload(),
+                        'gift' => 'Gift',
+                    ]),
+                SelectFilter::make('user_id')
+                    ->relationship('user', 'name'),
+                SelectFilter::make('campaign_id')
+                    ->options(ReferralCode::distinct()->pluck('campaign_id', 'campaign_id')->toArray()),
+            ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
-            ->defaultSort('created_at', 'desc');
+            ]);
+    }
+
     public static function getRelations(): array
+    {
         return [
             //
         ];
+    }
+
     public static function getPages(): array
+    {
+        return [
             'index' => Pages\ListReferralCodes::route('/'),
             'create' => Pages\CreateReferralCode::route('/create'),
+            'view' => Pages\ViewReferralCode::route('/{record}'),
             'edit' => Pages\EditReferralCode::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['code', 'title', 'description', 'campaign_id', 'source'];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::$model::count();
+    }
 }

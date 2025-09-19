@@ -7,7 +7,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\TernaryFilter;
@@ -15,13 +15,12 @@ use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use BackedEnum;
-use UnitEnum;
+use App\Enums\NavigationGroup;
 final class VariantImageResource extends Resource
 {
     protected static ?string $model = VariantImage::class;
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-photo';
-    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
+    // protected static $navigationGroup = NavigationGroup::System;
     protected static ?int $navigationSort = 15;
     public static function form(Schema $schema): Schema
     {

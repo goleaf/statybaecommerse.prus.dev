@@ -27,7 +27,7 @@ enum CurrencyEnum: string
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::EUR => 'Euro (€)',
             self::USD => 'US Dollar ($)',
             self::GBP => 'British Pound (£)',
@@ -53,7 +53,7 @@ enum CurrencyEnum: string
 
     public function getSymbol(): string
     {
-        return match($this) {
+        return match ($this) {
             self::EUR => '€',
             self::USD => '$',
             self::GBP => '£',
@@ -79,7 +79,7 @@ enum CurrencyEnum: string
 
     public function getDecimalPlaces(): int
     {
-        return match($this) {
+        return match ($this) {
             self::JPY, self::KRW => 0,
             default => 2,
         };

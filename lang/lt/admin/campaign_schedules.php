@@ -4,7 +4,6 @@ return [
     'title' => 'Kampanijų grafikai',
     'plural' => 'Kampanijų grafikai',
     'single' => 'Kampanijos grafikas',
-    
     'form' => [
         'tabs' => [
             'basic_information' => 'Pagrindinė informacija',
@@ -31,7 +30,6 @@ return [
             'schedule_status' => 'Grafiko būsena',
         ],
     ],
-    
     'schedule_types' => [
         'once' => 'Vieną kartą',
         'daily' => 'Kasdien',
@@ -39,14 +37,12 @@ return [
         'monthly' => 'Kas mėnesį',
         'custom' => 'Pasirinktinis',
     ],
-    
     'status' => [
         'active' => 'Aktyvus',
         'inactive' => 'Neaktyvus',
         'scheduled' => 'Suplanuotas',
         'ready' => 'Paruoštas',
     ],
-    
     'filters' => [
         'campaign' => 'Kampanija',
         'schedule_type' => 'Grafiko tipas',
@@ -55,7 +51,6 @@ return [
         'last_run_at' => 'Paskutinis paleidimas',
         'overdue' => 'Pavėluotas',
     ],
-    
     'actions' => [
         'activate' => 'Aktyvuoti',
         'deactivate' => 'Deaktyvuoti',
@@ -63,7 +58,6 @@ return [
         'activate_bulk' => 'Aktyvuoti masiniškai',
         'deactivate_bulk' => 'Deaktyvuoti masiniškai',
     ],
-    
     'notifications' => [
         'activated_successfully' => 'Sėkmingai aktyvuotas',
         'deactivated_successfully' => 'Sėkmingai deaktyvuotas',
@@ -72,4 +66,3 @@ return [
         'bulk_deactivated_successfully' => 'Sėkmingai deaktyvuoti masiniškai',
     ],
 ];
-

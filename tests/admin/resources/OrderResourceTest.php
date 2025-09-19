@@ -3,13 +3,13 @@
 namespace Tests\Feature;
 
 use App\Filament\Resources\OrderResource;
-use App\Models\Order;
-use App\Models\User;
 use App\Models\Channel;
-use App\Models\Zone;
 use App\Models\Currency;
-use App\Models\Product;
+use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\User;
+use App\Models\Zone;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -193,13 +193,13 @@ class OrderResourceTest extends TestCase
     public function test_order_resource_status_actions(): void
     {
         $user = User::factory()->create();
-        
+
         // Test pending order can be marked as processing
         $pendingOrder = Order::factory()->create([
             'user_id' => $user->id,
             'status' => 'pending',
         ]);
-        
+
         $this->assertTrue($pendingOrder->canBeCancelled());
         $this->assertFalse($pendingOrder->isPaid());
         $this->assertFalse($pendingOrder->isShippable());
@@ -209,7 +209,7 @@ class OrderResourceTest extends TestCase
             'user_id' => $user->id,
             'status' => 'processing',
         ]);
-        
+
         $this->assertFalse($processingOrder->canBeCancelled());
         $this->assertTrue($processingOrder->isPaid());
         $this->assertTrue($processingOrder->isShippable());
@@ -219,7 +219,7 @@ class OrderResourceTest extends TestCase
             'user_id' => $user->id,
             'status' => 'shipped',
         ]);
-        
+
         $this->assertFalse($shippedOrder->canBeCancelled());
         $this->assertTrue($shippedOrder->isPaid());
         $this->assertFalse($shippedOrder->isShippable());
@@ -230,7 +230,7 @@ class OrderResourceTest extends TestCase
         $user = User::factory()->create(['name' => 'John Doe']);
         $order = Order::factory()->create([
             'user_id' => $user->id,
-            'total' => 150.00,
+            'total' => 150.0,
             'status' => 'pending',
         ]);
 
@@ -240,7 +240,7 @@ class OrderResourceTest extends TestCase
         $this->assertArrayHasKey('Customer', $details);
         $this->assertArrayHasKey('Total', $details);
         $this->assertArrayHasKey('Status', $details);
-        
+
         // Verify the content of the details
         $this->assertEquals('John Doe', $details['Customer']);
         $this->assertStringContainsString('€150.00', $details['Total']);

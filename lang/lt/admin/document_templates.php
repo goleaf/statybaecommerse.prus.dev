@@ -4,7 +4,6 @@ return [
     'title' => 'Dokumentų šablonai',
     'plural' => 'Dokumentų šablonai',
     'single' => 'Dokumento šablonas',
-    
     'form' => [
         'tabs' => [
             'basic_information' => 'Pagrindinė informacija',
@@ -42,7 +41,6 @@ return [
             'created_at' => 'Sukurta',
         ],
     ],
-    
     'types' => [
         'invoice' => 'Sąskaita faktūra',
         'quote' => 'Pasiūlymas',
@@ -52,7 +50,6 @@ return [
         'email' => 'El. laiškas',
         'other' => 'Kitas',
     ],
-    
     'categories' => [
         'business' => 'Verslas',
         'legal' => 'Teisinė',
@@ -61,7 +58,6 @@ return [
         'technical' => 'Techninė',
         'other' => 'Kita',
     ],
-    
     'filters' => [
         'type' => 'Tipas',
         'category' => 'Kategorija',
@@ -70,14 +66,12 @@ return [
         'with_variables' => 'Su kintamaisiais',
         'recent' => 'Nauji (30 dienų)',
     ],
-    
     'actions' => [
         'preview_template' => 'Peržiūrėti šabloną',
         'duplicate_template' => 'Dublikuoti šabloną',
         'activate_bulk' => 'Aktyvuoti masiniškai',
         'deactivate_bulk' => 'Deaktyvuoti masiniškai',
     ],
-    
     'notifications' => [
         'preview_opened_successfully' => 'Peržiūra sėkmingai atidaryta',
         'duplicated_successfully' => 'Sėkmingai dublikuotas',

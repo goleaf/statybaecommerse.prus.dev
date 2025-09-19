@@ -30,7 +30,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 /**
  * OrderItemResource
@@ -41,10 +40,7 @@ final class OrderItemResource extends Resource
 {
     protected static ?string $model = OrderItem::class;
 
-    /**
-     * @var string|UnitEnum|null
-     */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Orders;
+    // protected static $navigationGroup = NavigationGroup::Orders;
 
     protected static ?int $navigationSort = 2;
 
@@ -57,15 +53,6 @@ final class OrderItemResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('orders.models.order_items');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return __('orders.navigation.orders');
     }
 
     /**

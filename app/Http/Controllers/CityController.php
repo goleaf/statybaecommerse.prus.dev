@@ -1,17 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\City;
 use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+
 /**
  * CityController
- * 
+ *
  * HTTP controller handling CityController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class CityController extends Controller
 {
@@ -22,7 +21,7 @@ final class CityController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = City::with(['country', 'zone', 'parent'])->withTranslations()->enabled()->active();
+        $query = City::with(['country', 'parent'])->withTranslations()->enabled()->active();
         // Search
         if ($request->filled('search')) {
             $search = $request->get('search');
@@ -62,6 +61,7 @@ final class CityController extends Controller
         $countries = Country::withTranslations()->enabled()->active()->ordered()->orderBy('name')->get();
         return view('cities.index', compact('cities', 'countries'));
     }
+
     /**
      * Display the specified resource with related data.
      * @param City $city
@@ -70,8 +70,8 @@ final class CityController extends Controller
     public function show(City $city): View
     {
         // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
-        if (!$city->relationLoaded('country.translations') || !$city->relationLoaded('region.translations') || !$city->relationLoaded('zone.translations') || !$city->relationLoaded('parent.translations') || !$city->relationLoaded('children.translations') || !$city->relationLoaded('translations')) {
-            $city->load(['country.translations', 'region.translations', 'zone.translations', 'parent.translations', 'children.translations', 'translations']);
+        if (!$city->relationLoaded('country.translations') || !$city->relationLoaded('region.translations') || !$city->relationLoaded('parent.translations') || !$city->relationLoaded('children.translations') || !$city->relationLoaded('translations')) {
+            $city->load(['country.translations', 'region.translations', 'parent.translations', 'children.translations', 'translations']);
         }
         // Get nearby cities (within 50km radius if coordinates available)
         $nearbyCities = collect();
@@ -96,6 +96,7 @@ final class CityController extends Controller
         });
         return view('cities.show', compact('city', 'nearbyCities', 'relatedCities'));
     }
+
     /**
      * Handle search functionality with proper error handling.
      * @param Request $request
@@ -116,6 +117,7 @@ final class CityController extends Controller
         });
         return response()->json($cities);
     }
+
     /**
      * Handle byCountry functionality with proper error handling.
      * @param Country $country
@@ -123,9 +125,10 @@ final class CityController extends Controller
      */
     public function byCountry(Country $country): View
     {
-        $cities = City::with(['zone'])->withTranslations()->enabled()->active()->byCountry($country->id)->ordered()->orderBy('name')->paginate(24);
+        $cities = City::withTranslations()->enabled()->active()->byCountry($country->id)->ordered()->orderBy('name')->paginate(24);
         return view('cities.by-country', compact('cities', 'country'));
     }
+
     /**
      * Handle calculateDistance functionality with proper error handling.
      * @param float $lat1

@@ -30,7 +30,6 @@ final class ShippingOption extends Model
         'service_type',
         'price',
         'currency_code',
-        'zone_id',
         'is_enabled',
         'is_default',
         'sort_order',
@@ -63,14 +62,6 @@ final class ShippingOption extends Model
     protected $appends = ['formatted_price', 'estimated_delivery_text'];
 
     /**
-     * Handle zone functionality with proper error handling.
-     */
-    public function zone(): BelongsTo
-    {
-        return $this->belongsTo(Zone::class);
-    }
-
-    /**
      * Handle orders functionality with proper error handling.
      */
     public function orders(): HasMany
@@ -92,14 +83,6 @@ final class ShippingOption extends Model
     public function scopeDefault(Builder $query): Builder
     {
         return $query->where('is_default', true);
-    }
-
-    /**
-     * Handle scopeByZone functionality with proper error handling.
-     */
-    public function scopeByZone(Builder $query, int $zoneId): Builder
-    {
-        return $query->where('zone_id', $zoneId);
     }
 
     /**

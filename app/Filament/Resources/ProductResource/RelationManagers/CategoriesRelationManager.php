@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Category;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -33,7 +34,6 @@ final class CategoriesRelationManager extends RelationManager
             ]);
     }
     public function table(Table $table): Table
-    {
     {
         return $table
             ->recordTitleAttribute('name')

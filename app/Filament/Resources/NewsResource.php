@@ -2,320 +2,169 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsResource\Pages;
+use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
-use App\Models\NewsCategory;
-use App\Models\NewsComment;
-use App\Models\NewsImage;
-use App\Models\NewsTag;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tab;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Notifications\Notification;
+use Filament\Schemas\Schema;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Infolists;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-/**
- * NewsResource
- *
- * Filament v4 resource for News management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class NewsResource extends Resource
+class NewsResource extends Resource
 {
     protected static ?string $model = News::class;
-    /** @var UnitEnum|string|null */
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Content;
-    protected static ?int $navigationSort = 1;
-    protected static ?string $recordTitleAttribute = 'title';
+
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
+    protected static ?string $navigationGroup = 'Content Management';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $modelLabel = 'News Article';
+
+    protected static ?string $pluralModelLabel = 'News Articles';
+
+    public static function form(Schema $schema): Schema
     {
-        return __('news.title');
+        return $schema
+            ->components([
+                Forms\Components\Section::make('Article Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('title')
+                            ->label(__('news.fields.title'))
+                            ->required()
+                            ->maxLength(255)
+                            ->live()
+                            ->afterStateUpdated(fn($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                        Forms\Components\TextInput::make('slug')
+                            ->label(__('news.fields.slug'))
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(News::class, 'slug', ignoreRecord: true),
+                        Forms\Components\Textarea::make('excerpt')
+                            ->label(__('news.fields.excerpt'))
+                            ->maxLength(500)
+                            ->rows(3),
+                        Forms\Components\RichEditor::make('content')
+                            ->label(__('news.fields.content'))
+                            ->required()
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+                Forms\Components\Section::make('Publishing')
+                    ->schema([
+                        Forms\Components\DateTimePicker::make('published_at')
+                            ->label(__('news.fields.published_at'))
+                            ->default(now()),
+                        Forms\Components\TextInput::make('author_name')
+                            ->label(__('news.fields.author_name'))
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('author_email')
+                            ->label(__('news.fields.author_email'))
+                            ->email()
+                            ->maxLength(255),
+                        Forms\Components\Toggle::make('is_visible')
+                            ->label(__('news.fields.is_visible'))
+                            ->default(true),
+                        Forms\Components\Toggle::make('is_featured')
+                            ->label(__('news.fields.is_featured')),
+                    ])
+                    ->columns(2),
+                Forms\Components\Section::make('SEO & Metadata')
+                    ->schema([
+                        Forms\Components\TextInput::make('meta_title')
+                            ->label(__('news.fields.meta_title'))
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('meta_description')
+                            ->label(__('news.fields.meta_description'))
+                            ->maxLength(500)
+                            ->rows(3),
+                        Forms\Components\TextInput::make('meta_keywords')
+                            ->label(__('news.fields.meta_keywords'))
+                            ->maxLength(255),
+                    ])
+                    ->columns(1),
+                Forms\Components\Section::make('Categories & Tags')
+                    ->schema([
+                        Forms\Components\Select::make('categories')
+                            ->label(__('news.fields.categories'))
+                            ->relationship('categories', 'name')
+                            ->multiple()
+                            ->preload(),
+                        Forms\Components\Select::make('tags')
+                            ->label(__('news.fields.tags'))
+                            ->relationship('tags', 'name')
+                            ->multiple()
+                            ->preload(),
+                    ])
+                    ->columns(2),
+            ]);
     }
 
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return __('news.navigation_group');
-    }
-
-    /**
-     * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getPluralModelLabel(): string
-    {
-        return __('news.plural');
-    }
-
-    /**
-     * Handle getModelLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getModelLabel(): string
-    {
-        return __('news.single');
-    }
-
-    /**
-     * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
-     */
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
-            Tabs::make('news_tabs')
-                ->tabs([
-                    Tab::make(__('news.basic_information'))
-                        ->schema([
-                            Grid::make(2)
-                                ->schema([
-                                    TextInput::make('title')
-                                        ->label(__('news.title'))
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->live(onBlur: true)
-                                        ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) =>
-                                            $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
-                                    TextInput::make('slug')
-                                        ->label(__('news.slug'))
-                                        ->unique(ignoreRecord: true)
-                                        ->rules(['alpha_dash']),
-                                ]),
-                            Textarea::make('excerpt')
-                                ->label(__('news.excerpt'))
-                                ->rows(3)
-                                ->maxLength(500)
-                                ->columnSpanFull(),
-                            RichEditor::make('content')
-                                ->label(__('news.content'))
-                                ->required()
-                                ->columnSpanFull()
-                                ->toolbarButtons([
-                                    'bold',
-                                    'italic',
-                                    'underline',
-                                    'strike',
-                                    'link',
-                                    'bulletList',
-                                    'orderedList',
-                                    'h2',
-                                    'h3',
-                                    'blockquote',
-                                    'codeBlock',
-                                ]),
-                        ]),
-                    Tab::make(__('news.media'))
-                        ->schema([
-                            FileUpload::make('featured_image')
-                                ->label(__('news.featured_image'))
-                                ->image()
-                                ->imageEditor()
-                                ->imageEditorAspectRatios([
-                                    '16:9',
-                                    '4:3',
-                                    '1:1',
-                                ])
-                                ->directory('news/featured')
-                                ->visibility('public'),
-                            FileUpload::make('gallery')
-                                ->label(__('news.gallery'))
-                                ->multiple()
-                                ->directory('news/gallery')
-                                ->visibility('public'),
-                        ]),
-                    Tab::make(__('news.categorization'))
-                        ->schema([
-                            Select::make('category_id')
-                                ->label(__('news.category'))
-                                ->relationship('categories', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->multiple()
-                                ->createOptionForm([
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255),
-                                    Textarea::make('description')
-                                        ->maxLength(500),
-                                ]),
-                            TagsInput::make('tags')
-                                ->label(__('news.tags'))
-                                ->placeholder(__('news.add_tag'))
-                                ->separator(','),
-                        ]),
-                    Tab::make(__('news.publishing'))
-                        ->schema([
-                            Toggle::make('is_published')
-                                ->label(__('news.is_published'))
-                                ->default(false),
-                            Toggle::make('is_featured')
-                                ->label(__('news.is_featured')),
-                            DateTimePicker::make('published_at')
-                                ->label(__('news.published_at'))
-                                ->default(now())
-                                ->displayFormat('Y-m-d H:i'),
-                            DateTimePicker::make('expires_at')
-                                ->label(__('news.expires_at'))
-                                ->displayFormat('Y-m-d H:i'),
-                        ]),
-                    Tab::make(__('news.seo'))
-                        ->schema([
-                            TextInput::make('seo_title')
-                                ->label(__('news.seo_title'))
-                                ->maxLength(255),
-                            Textarea::make('seo_description')
-                                ->label(__('news.seo_description'))
-                                ->rows(2)
-                                ->maxLength(500),
-                            TextInput::make('seo_keywords')
-                                ->label(__('news.seo_keywords'))
-                                ->maxLength(255),
-                        ]),
-                    Tab::make(__('news.relations'))
-                        ->schema([
-                            Repeater::make('images')
-                                ->label(__('news.images'))
-                                ->relationship()
-                                ->schema([
-                                    FileUpload::make('image_path')
-                                        ->label(__('news.image'))
-                                        ->image()
-                                        ->directory('news/images')
-                                        ->visibility('public'),
-                                    TextInput::make('alt_text')
-                                        ->label(__('news.alt_text'))
-                                        ->maxLength(255),
-                                    TextInput::make('caption')
-                                        ->label(__('news.caption'))
-                                        ->maxLength(500),
-                                ])
-                                ->collapsible()
-                                ->itemLabel(fn(array $state): ?string => $state['alt_text'] ?? null)
-                                ->defaultItems(0)
-                                ->addActionLabel(__('news.add_image')),
-                        ]),
-                ])
-        ]);
-    }
-
-    /**
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                ImageColumn::make('featured_image')
-                    ->label(__('news.featured_image'))
+                Tables\Columns\ImageColumn::make('featured_image')
+                    ->label(__('news.fields.featured_image'))
                     ->circular()
-                    ->size(40),
-                TextColumn::make('title')
-                    ->label(__('news.title'))
+                    ->size(50),
+                Tables\Columns\TextColumn::make('title')
+                    ->label(__('news.fields.title'))
                     ->searchable()
                     ->sortable()
-                    ->weight('bold')
                     ->limit(50),
-                TextColumn::make('categories.name')
-                    ->label(__('news.categories'))
-                    ->badge()
-                    ->color('gray')
-                    ->separator(','),
-                TextColumn::make('excerpt')
-                    ->label(__('news.excerpt'))
-                    ->limit(100)
-                    ->toggleable(isToggledHiddenByDefault: true),
-                BadgeColumn::make('is_published')
-                    ->label(__('news.status'))
-                    ->formatStateUsing(fn(bool $state): string => $state ? __('news.published') : __('news.draft'))
-                    ->colors([
-                        'success' => true,
-                        'warning' => false,
-                    ]),
-                IconColumn::make('is_featured')
-                    ->label(__('news.is_featured'))
-                    ->boolean()
+                Tables\Columns\TextColumn::make('author_name')
+                    ->label(__('news.fields.author_name'))
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('published_at')
-                    ->label(__('news.published_at'))
+                Tables\Columns\TextColumn::make('categories.name')
+                    ->label(__('news.fields.categories'))
+                    ->badge()
+                    ->separator(','),
+                Tables\Columns\TextColumn::make('published_at')
+                    ->label(__('news.fields.published_at'))
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('view_count')
-                    ->label(__('news.views_count'))
+                Tables\Columns\IconColumn::make('is_visible')
+                    ->label(__('news.fields.is_visible'))
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('is_featured')
+                    ->label(__('news.fields.is_featured'))
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('view_count')
+                    ->label(__('news.fields.view_count'))
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('created_at')
-                    ->label(__('news.created_at'))
-                    ->dateTime()
-                    ->sortable(),
-                TextColumn::make('updated_at')
-                    ->label(__('news.updated_at'))
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('news.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('categories')
+                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('categories')
                     ->relationship('categories', 'name')
-                    ->preload()
                     ->multiple(),
-                TernaryFilter::make('is_published')
-                    ->label(__('news.is_published'))
-                    ->trueLabel(__('news.published_only'))
-                    ->falseLabel(__('news.draft_only'))
-                    ->native(false),
-                TernaryFilter::make('is_featured')
-                    ->label(__('news.is_featured'))
-                    ->trueLabel(__('news.featured_only'))
-                    ->falseLabel(__('news.not_featured'))
-                    ->native(false),
-                Filter::make('published_at')
+                Tables\Filters\SelectFilter::make('tags')
+                    ->relationship('tags', 'name')
+                    ->multiple(),
+                Tables\Filters\TernaryFilter::make('is_visible')
+                    ->label(__('news.fields.is_visible')),
+                Tables\Filters\TernaryFilter::make('is_featured')
+                    ->label(__('news.fields.is_featured')),
+                Tables\Filters\Filter::make('published_at')
                     ->form([
                         Forms\Components\DatePicker::make('published_from')
-                            ->label(__('news.published_from')),
+                            ->label(__('news.filters.published_from')),
                         Forms\Components\DatePicker::make('published_until')
-                            ->label(__('news.published_until')),
+                            ->label(__('news.filters.published_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -331,87 +180,84 @@ final class NewsResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                EditAction::make(),
-                Action::make('publish')
-                    ->label(__('news.publish'))
-                    ->icon('heroicon-o-eye')
-                    ->color('success')
-                    ->visible(fn(News $record): bool => !$record->is_published)
-                    ->action(function (News $record): void {
-                        $record->update([
-                            'is_published' => true,
-                            'published_at' => now(),
-                        ]);
-                        Notification::make()
-                            ->title(__('news.published_successfully'))
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
-                Action::make('unpublish')
-                    ->label(__('news.unpublish'))
-                    ->icon('heroicon-o-eye-slash')
-                    ->color('warning')
-                    ->visible(fn(News $record): bool => $record->is_published)
-                    ->action(function (News $record): void {
-                        $record->update(['is_published' => false]);
-                        Notification::make()
-                            ->title(__('news.unpublished_successfully'))
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    BulkAction::make('publish')
-                        ->label(__('news.publish_selected'))
-                        ->icon('heroicon-o-eye')
-                        ->color('success')
-                        ->action(function (Collection $records): void {
-                            $records->each->update([
-                                'is_published' => true,
-                                'published_at' => now(),
-                            ]);
-                            Notification::make()
-                                ->title(__('news.bulk_published_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
-                    BulkAction::make('unpublish')
-                        ->label(__('news.unpublish_selected'))
-                        ->icon('heroicon-o-eye-slash')
-                        ->color('warning')
-                        ->action(function (Collection $records): void {
-                            $records->each->update(['is_published' => false]);
-                            Notification::make()
-                                ->title(__('news.bulk_unpublished_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('published_at', 'desc');
     }
 
-    /**
-     * Get the relations for this resource.
-     * @return array
-     */
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Article Details')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('title')
+                            ->label(__('news.fields.title')),
+                        Infolists\Components\TextEntry::make('slug')
+                            ->label(__('news.fields.slug'))
+                            ->copyable(),
+                        Infolists\Components\TextEntry::make('excerpt')
+                            ->label(__('news.fields.excerpt'))
+                            ->columnSpanFull(),
+                        Infolists\Components\TextEntry::make('content')
+                            ->label(__('news.fields.content'))
+                            ->html()
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+                Infolists\Components\Section::make('Publishing Information')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('author_name')
+                            ->label(__('news.fields.author_name')),
+                        Infolists\Components\TextEntry::make('author_email')
+                            ->label(__('news.fields.author_email')),
+                        Infolists\Components\TextEntry::make('published_at')
+                            ->label(__('news.fields.published_at'))
+                            ->dateTime(),
+                        Infolists\Components\IconEntry::make('is_visible')
+                            ->label(__('news.fields.is_visible'))
+                            ->boolean(),
+                        Infolists\Components\IconEntry::make('is_featured')
+                            ->label(__('news.fields.is_featured'))
+                            ->boolean(),
+                        Infolists\Components\TextEntry::make('view_count')
+                            ->label(__('news.fields.view_count'))
+                            ->numeric(),
+                    ])
+                    ->columns(3),
+                Infolists\Components\Section::make('Categories & Tags')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('categories.name')
+                            ->label(__('news.fields.categories'))
+                            ->badge()
+                            ->separator(','),
+                        Infolists\Components\TextEntry::make('tags.name')
+                            ->label(__('news.fields.tags'))
+                            ->badge()
+                            ->separator(','),
+                    ])
+                    ->columns(2),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\CommentsRelationManager::class,
+            RelationManagers\ImagesRelationManager::class,
         ];
     }
 
-    /**
-     * Get the pages for this resource.
-     * @return array
-     */
     public static function getPages(): array
     {
         return [
@@ -420,5 +266,13 @@ final class NewsResource extends Resource
             'view' => Pages\ViewNews::route('/{record}'),
             'edit' => Pages\EditNews::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 }

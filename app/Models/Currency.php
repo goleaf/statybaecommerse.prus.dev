@@ -73,15 +73,6 @@ final class Currency extends Model
     // Relationships
 
     /**
-     * Handle zones functionality with proper error handling.
-     * @return HasMany
-     */
-    public function zones(): HasMany
-    {
-        return $this->hasMany(Zone::class);
-    }
-
-    /**
      * Handle prices functionality with proper error handling.
      * @return HasMany
      */

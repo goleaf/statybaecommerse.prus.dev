@@ -4,7 +4,6 @@ return [
     'title' => 'Document Templates',
     'plural' => 'Document Templates',
     'single' => 'Document Template',
-    
     'form' => [
         'tabs' => [
             'basic_information' => 'Basic Information',
@@ -42,7 +41,6 @@ return [
             'created_at' => 'Created At',
         ],
     ],
-    
     'types' => [
         'invoice' => 'Invoice',
         'quote' => 'Quote',
@@ -52,7 +50,6 @@ return [
         'email' => 'Email',
         'other' => 'Other',
     ],
-    
     'categories' => [
         'business' => 'Business',
         'legal' => 'Legal',
@@ -61,7 +58,6 @@ return [
         'technical' => 'Technical',
         'other' => 'Other',
     ],
-    
     'filters' => [
         'type' => 'Type',
         'category' => 'Category',
@@ -70,14 +66,12 @@ return [
         'with_variables' => 'With Variables',
         'recent' => 'Recent (30 days)',
     ],
-    
     'actions' => [
         'preview_template' => 'Preview Template',
         'duplicate_template' => 'Duplicate Template',
         'activate_bulk' => 'Bulk Activate',
         'deactivate_bulk' => 'Bulk Deactivate',
     ],
-    
     'notifications' => [
         'preview_opened_successfully' => 'Preview opened successfully',
         'duplicated_successfully' => 'Duplicated successfully',

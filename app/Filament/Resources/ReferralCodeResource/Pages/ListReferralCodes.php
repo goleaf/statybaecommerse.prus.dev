@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ReferralCodeResource\Pages;
 
 use App\Filament\Resources\ReferralCodeResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 
 final class ListReferralCodes extends ListRecords
 {
@@ -17,4 +17,3 @@ final class ListReferralCodes extends ListRecords
         ];
     }
 }
-

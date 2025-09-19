@@ -35,7 +35,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 /**
  * DiscountConditionResource
@@ -46,7 +45,8 @@ final class DiscountConditionResource extends Resource
 {
     protected static ?string $model = DiscountCondition::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
+    // /** @var UnitEnum|string|null */
+    // // protected static $navigationGroup = NavigationGroup::Marketing;
 
     protected static ?int $navigationSort = 4;
 
@@ -59,15 +59,6 @@ final class DiscountConditionResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('discount_conditions.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Marketing';
     }
 
     /**

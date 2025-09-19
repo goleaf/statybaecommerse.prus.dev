@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Actions\EditAction;
@@ -20,8 +21,7 @@ final class AddressesRelationManager extends RelationManager
         return $schema
             ->components([
                 Forms\Components\TextInput::make('name')
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\TextInput::make('address_line_1')
                 Forms\Components\TextInput::make('address_line_2')
                 Forms\Components\TextInput::make('city')
@@ -44,8 +44,7 @@ final class AddressesRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 Tables\Columns\TextColumn::make('address_line_1')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('city')

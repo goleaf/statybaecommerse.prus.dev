@@ -32,7 +32,6 @@ final class ConditionsRelationManager extends RelationManager
                         'customer_group' => 'Customer Group',
                         'product_category' => 'Product Category',
                         'product_brand' => 'Product Brand',
-                        'shipping_zone' => 'Shipping Zone',
                         'time_period' => 'Time Period',
                         'day_of_week' => 'Day of Week',
                         'first_time_customer' => 'First Time Customer',
@@ -85,7 +84,6 @@ final class ConditionsRelationManager extends RelationManager
                         'customer_group' => 'Customer Group',
                         'product_category' => 'Product Category',
                         'product_brand' => 'Product Brand',
-                        'shipping_zone' => 'Shipping Zone',
                         'time_period' => 'Time Period',
                         'day_of_week' => 'Day of Week',
                         'first_time_customer' => 'First Time Customer',
@@ -118,7 +116,6 @@ final class ConditionsRelationManager extends RelationManager
                         'customer_group' => 'Customer Group',
                         'product_category' => 'Product Category',
                         'product_brand' => 'Product Brand',
-                        'shipping_zone' => 'Shipping Zone',
                         'time_period' => 'Time Period',
                         'day_of_week' => 'Day of Week',
                         'first_time_customer' => 'First Time Customer',
@@ -142,4 +139,3 @@ final class ConditionsRelationManager extends RelationManager
             ->defaultSort('created_at', 'desc');
     }
 }
-

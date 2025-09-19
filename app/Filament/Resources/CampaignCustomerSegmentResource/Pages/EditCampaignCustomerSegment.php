@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CampaignCustomerSegmentResource\Pages;
 
 use App\Filament\Resources\CampaignCustomerSegmentResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
 
 class EditCampaignCustomerSegment extends EditRecord
 {
@@ -17,3 +17,4 @@ class EditCampaignCustomerSegment extends EditRecord
         ];
     }
 }
+

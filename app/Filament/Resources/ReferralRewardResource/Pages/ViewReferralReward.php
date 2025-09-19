@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ReferralRewardResource\Pages;
 
 use App\Filament\Resources\ReferralRewardResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
 
 final class ViewReferralReward extends ViewRecord
 {

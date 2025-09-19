@@ -1,0 +1,273 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\Product;
+use App\Models\User;
+use App\Models\UserProductInteraction;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+/**
+ * UserProductInteractionTest
+ *
+ * Simple test suite for UserProductInteraction model functionality.
+ */
+final class UserProductInteractionTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_can_create_user_product_interaction(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+
+        // Act
+        $interaction = UserProductInteraction::create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'interaction_type' => 'view',
+            'rating' => 4.5,
+            'count' => 3,
+            'first_interaction' => now()->subDays(7),
+            'last_interaction' => now(),
+        ]);
+
+        // Assert
+        $this->assertDatabaseHas('user_product_interactions', [
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'interaction_type' => 'view',
+            'rating' => 4.5,
+            'count' => 3,
+        ]);
+
+        $this->assertEquals($user->id, $interaction->user_id);
+        $this->assertEquals($product->id, $interaction->product_id);
+        $this->assertEquals('view', $interaction->interaction_type);
+        $this->assertEquals(4.5, $interaction->rating);
+        $this->assertEquals(3, $interaction->count);
+    }
+
+    public function test_can_increment_interaction(): void
+    {
+        // Arrange
+        $interaction = UserProductInteraction::factory()->create([
+            'count' => 5,
+            'rating' => 3.0,
+        ]);
+
+        $originalCount = $interaction->count;
+        $originalRating = $interaction->rating;
+
+        // Act
+        $interaction->incrementInteraction(4.0);
+
+        // Assert
+        $interaction->refresh();
+        $this->assertEquals($originalCount + 1, $interaction->count);
+        $this->assertEquals(4.0, $interaction->rating);
+    }
+
+    public function test_can_filter_by_type(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'interaction_type' => 'view',
+        ]);
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'interaction_type' => 'purchase',
+        ]);
+
+        // Act
+        $viewInteractions = UserProductInteraction::byType('view')->get();
+        $purchaseInteractions = UserProductInteraction::byType('purchase')->get();
+
+        // Assert
+        $this->assertCount(1, $viewInteractions);
+        $this->assertCount(1, $purchaseInteractions);
+        $this->assertEquals('view', $viewInteractions->first()->interaction_type);
+        $this->assertEquals('purchase', $purchaseInteractions->first()->interaction_type);
+    }
+
+    public function test_can_filter_by_user(): void
+    {
+        // Arrange
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        $product = Product::factory()->create();
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user1->id,
+            'product_id' => $product->id,
+        ]);
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user2->id,
+            'product_id' => $product->id,
+        ]);
+
+        // Act
+        $user1Interactions = UserProductInteraction::byUser($user1->id)->get();
+        $user2Interactions = UserProductInteraction::byUser($user2->id)->get();
+
+        // Assert
+        $this->assertCount(1, $user1Interactions);
+        $this->assertCount(1, $user2Interactions);
+        $this->assertEquals($user1->id, $user1Interactions->first()->user_id);
+        $this->assertEquals($user2->id, $user2Interactions->first()->user_id);
+    }
+
+    public function test_can_filter_by_product(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $product1 = Product::factory()->create();
+        $product2 = Product::factory()->create();
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product1->id,
+        ]);
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product2->id,
+        ]);
+
+        // Act
+        $product1Interactions = UserProductInteraction::byProduct($product1->id)->get();
+        $product2Interactions = UserProductInteraction::byProduct($product2->id)->get();
+
+        // Assert
+        $this->assertCount(1, $product1Interactions);
+        $this->assertCount(1, $product2Interactions);
+        $this->assertEquals($product1->id, $product1Interactions->first()->product_id);
+        $this->assertEquals($product2->id, $product2Interactions->first()->product_id);
+    }
+
+    public function test_can_filter_by_min_count(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'count' => 3,
+        ]);
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'count' => 8,
+        ]);
+
+        // Act
+        $highCountInteractions = UserProductInteraction::withMinCount(5)->get();
+
+        // Assert
+        $this->assertCount(1, $highCountInteractions);
+        $this->assertEquals(8, $highCountInteractions->first()->count);
+    }
+
+    public function test_can_filter_by_min_rating(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'rating' => 3.0,
+        ]);
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'rating' => 4.5,
+        ]);
+
+        // Act
+        $highRatingInteractions = UserProductInteraction::withMinRating(4.0)->get();
+
+        // Assert
+        $this->assertCount(1, $highRatingInteractions);
+        $this->assertEquals(4.5, $highRatingInteractions->first()->rating);
+    }
+
+    public function test_can_filter_recent_interactions(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'last_interaction' => now()->subDays(10),
+        ]);
+
+        UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'last_interaction' => now()->subDays(3),
+        ]);
+
+        // Act
+        $recentInteractions = UserProductInteraction::recent(7)->get();
+
+        // Assert
+        $this->assertCount(1, $recentInteractions);
+        $this->assertTrue($recentInteractions->first()->last_interaction->isAfter(now()->subDays(7)));
+    }
+
+    public function test_has_user_relationship(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+        $interaction = UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+        ]);
+
+        // Act
+        $relatedUser = $interaction->user;
+
+        // Assert
+        $this->assertNotNull($relatedUser);
+        $this->assertEquals($user->id, $relatedUser->id);
+        $this->assertEquals($user->name, $relatedUser->name);
+    }
+
+    public function test_has_product_relationship(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+        $interaction = UserProductInteraction::factory()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+        ]);
+
+        // Act
+        $relatedProduct = $interaction->product;
+
+        // Assert
+        $this->assertNotNull($relatedProduct);
+        $this->assertEquals($product->id, $relatedProduct->id);
+        $this->assertEquals($product->name, $relatedProduct->name);
+    }
+}

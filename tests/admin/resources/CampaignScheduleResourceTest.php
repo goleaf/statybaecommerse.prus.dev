@@ -124,7 +124,7 @@ it('validates required fields', function () {
 it('can filter campaign schedules by campaign', function () {
     $campaign1 = Campaign::factory()->create(['name' => 'Campaign 1']);
     $campaign2 = Campaign::factory()->create(['name' => 'Campaign 2']);
-    
+
     CampaignSchedule::factory()->create(['campaign_id' => $campaign1->id]);
     CampaignSchedule::factory()->create(['campaign_id' => $campaign2->id]);
 
@@ -369,4 +369,3 @@ it('handles campaign schedule with complex configuration', function () {
         'is_active' => true,
     ]);
 });
-

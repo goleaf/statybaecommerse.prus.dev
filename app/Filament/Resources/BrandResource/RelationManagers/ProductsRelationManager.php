@@ -5,6 +5,7 @@ namespace App\Filament\Resources\BrandResource\RelationManagers;
 use App\Models\Product;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,12 +26,10 @@ final class ProductsRelationManager extends RelationManager
             ->components([
                 Forms\Components\TextInput::make('name')
                     ->label(__('admin.products.fields.name'))
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\TextInput::make('sku')
                     ->label(__('admin.products.fields.sku'))
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                     ->unique(Product::class, 'sku', ignoreRecord: true),
                 Forms\Components\Textarea::make('description')
                     ->label(__('admin.products.fields.description'))
@@ -56,18 +55,15 @@ final class ProductsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('admin.products.fields.name'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 Tables\Columns\TextColumn::make('sku')
                     ->label(__('admin.products.fields.sku'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                     ->copyable(),
                     ->copyMessage(__('admin.common.copied')),
                 Tables\Columns\TextColumn::make('price')
@@ -77,9 +73,7 @@ final class ProductsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('stock_quantity')
                     ->label(__('admin.products.fields.stock_quantity'))
                     ->numeric(),
-                    ->sortable(),
-                    ->badge(),
-                    ->color(fn($state) => match (true) {
+                    ->sortable()\n                    ->badge()\n                    ->color(fn($state) => match (true) {
                         $state <= 0 => 'danger',
                         $state <= 5 => 'warning',
                         default => 'success',

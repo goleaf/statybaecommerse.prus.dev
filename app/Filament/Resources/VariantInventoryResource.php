@@ -22,7 +22,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use UnitEnum;
+use App\Enums\NavigationGroup;
 /**
  * VariantInventoryResource
  *
@@ -30,8 +30,7 @@ use UnitEnum;
  */
 final class VariantInventoryResource extends Resource
 {
-    protected static ?string $model = VariantInventory::class;    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Inventory;
+    // protected static $navigationGroup = NavigationGroup::System;
     protected static ?int $navigationSort = 2;
     protected static ?string $recordTitleAttribute = 'variant_id';
     public static function getNavigationLabel(): string

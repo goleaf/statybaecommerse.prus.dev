@@ -38,38 +38,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use BackedEnum;
-use UnitEnum;
-
-/**
- * CouponUsageResource
- *
- * Filament v4 resource for CouponUsage management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class CouponUsageResource extends Resource
-{
-    protected static ?string $model = CouponUsage::class;
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-ticket';
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Marketing;
-    protected static ?int $navigationSort = 4;
-    protected static ?string $recordTitleAttribute = 'coupon.code';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('admin.coupon_usages.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Marketing';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -316,3 +284,4 @@ final class CouponUsageResource extends Resource
         ];
     }
 }
+

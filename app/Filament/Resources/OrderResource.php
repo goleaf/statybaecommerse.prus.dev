@@ -9,7 +9,6 @@ use App\Models\Channel;
 use App\Models\Order;
 use App\Models\Partner;
 use App\Models\User;
-use App\Models\Zone;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -17,17 +16,17 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Placeholder;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Placeholder;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -43,7 +42,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use BackedEnum;
-use UnitEnum;
 
 /**
  * OrderResource
@@ -61,7 +59,7 @@ final class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Orders;
+    // protected static $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'number';
@@ -70,7 +68,9 @@ final class OrderResource extends Resource
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static ?string $navigationLabel = 'orders.navigation.orders';
+
     protected static ?string $modelLabel = 'orders.models.order';
+
     protected static ?string $pluralModelLabel = 'orders.models.orders';
 
     /**
@@ -275,14 +275,9 @@ final class OrderResource extends Resource
                             ->label(__('orders.fields.notes'))
                             ->rows(3)
                             ->columnSpanFull()
-                                    ->helperText(__('orders.fields.internal_notes')),
+                            ->helperText(__('orders.fields.internal_notes')),
                         Grid::make(3)
                             ->components([
-                                Select::make('zone_id')
-                                    ->label(__('orders.fields.currency'))
-                                    ->relationship('zone', 'name')
-                                    ->searchable()
-                                    ->preload()
                                     ->prefixIcon('heroicon-o-globe-alt'),
                                 Select::make('channel_id')
                                     ->label(__('orders.fields.customer'))
@@ -361,9 +356,6 @@ final class OrderResource extends Resource
                     ->label(__('orders.fields.payment_method'))
                     ->formatStateUsing(fn(?string $state): string => $state ? __("orders.payment_methods.{$state}") : '-')
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('zone.name')
-                    ->label(__('orders.fields.currency'))
-                    ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 TextColumn::make('channel.name')
                     ->label(__('orders.fields.customer'))
@@ -411,9 +403,6 @@ final class OrderResource extends Resource
                         'google_pay' => __('orders.payment_methods.google_pay'),
                     ])
                     ->multiple(),
-                SelectFilter::make('zone')
-                    ->relationship('zone', 'name')
-                    ->preload(),
                 SelectFilter::make('channel')
                     ->relationship('channel', 'name')
                     ->preload(),
@@ -645,7 +634,7 @@ final class OrderResource extends Resource
     public static function getGlobalSearchResultActions($record): array
     {
         $actions = [];
-        
+
         try {
             $actions[] = Action::make('view')
                 ->label(__('orders.actions.view'))
@@ -654,7 +643,7 @@ final class OrderResource extends Resource
         } catch (\Exception $e) {
             // Route might not exist, skip this action
         }
-        
+
         try {
             $actions[] = Action::make('edit')
                 ->label(__('orders.actions.edit'))
@@ -663,7 +652,7 @@ final class OrderResource extends Resource
         } catch (\Exception $e) {
             // Route might not exist, skip this action
         }
-        
+
         return $actions;
     }
 }

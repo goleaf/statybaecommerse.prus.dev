@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\DocumentTemplateResource\Pages;
 
 use App\Filament\Resources\DocumentTemplateResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
 
 class EditDocumentTemplate extends EditRecord
 {

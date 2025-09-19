@@ -15,7 +15,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use BackedEnum;
-use UnitEnum;
 /**
  * CountryResource
  *
@@ -24,8 +23,7 @@ use UnitEnum;
 final class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
-        /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Locations;
+    // protected static $navigationGroup = NavigationGroup::System;
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'name';
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-globe-alt';

@@ -45,13 +45,14 @@ final class CampaignConversionResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Marketing;
-
-    protected static ?int $navigationSort = 9;
-
-    protected static ?string $recordTitleAttribute = 'campaign_name';
-
-    /**
+    /*
+     * protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Marketing;
+     *
+     * protected static ?int $navigationSort = 9;
+     *
+     * protected static ?string $recordTitleAttribute = 'campaign_name';
+     *
+     * /**
      * Handle getNavigationLabel functionality with proper error handling.
      * @return string
      */

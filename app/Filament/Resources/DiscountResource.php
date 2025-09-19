@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
+
 use App\Filament\Resources\DiscountResource\Pages;
 use App\Models\Brand;
 use App\Models\Category;
@@ -10,14 +12,14 @@ use App\Models\CustomerGroup;
 use App\Models\Discount;
 use App\Models\Product;
 use App\Models\User;
-use App\Models\Zone;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\BelongsToManyRelationManager;
 use Filament\Resources\RelationManagers\HasManyRelationManager;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Widgets\ChartWidget;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\TableWidget;
@@ -28,7 +30,6 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use BackedEnum;
-use UnitEnum;
 
 final class DiscountResource extends Resource
 {
@@ -36,7 +37,7 @@ final class DiscountResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Marketing;
+    // protected static $navigationGroup = NavigationGroup::Marketing;
 
     protected static ?int $navigationSort = 1;
 
@@ -153,10 +154,6 @@ final class DiscountResource extends Resource
                             ->schema([
                                 Forms\Components\Section::make('Advanced Settings')
                                     ->schema([
-                                        Forms\Components\Select::make('zone_id')
-                                            ->relationship('zone', 'name')
-                                            ->searchable()
-                                            ->preload()
                                             ->createOptionForm([
                                                 Forms\Components\TextInput::make('name')
                                                     ->required()
@@ -388,10 +385,10 @@ final class DiscountResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDiscounts::route('/'),
-            'create' => Pages\CreateDiscount::route('/create'),
-            'view' => Pages\ViewDiscount::route('/{record}'),
-            'edit' => Pages\EditDiscount::route('/{record}/edit'),
+            'index' => Pages\ListRecords::route('/'),
+            'create' => Pages\CreateRecord::route('/create'),
+            'view' => Pages\ViewRecord::route('/{record}'),
+            'edit' => Pages\EditRecord::route('/{record}/edit'),
         ];
     }
 
@@ -405,7 +402,7 @@ final class DiscountResource extends Resource
 
     public static function getGlobalSearchEloquentQuery(): Builder
     {
-        return parent::getGlobalSearchEloquentQuery()->with(['zone']);
+        return parent::getGlobalSearchEloquentQuery();
     }
 
     public static function getGloballySearchableAttributes(): array

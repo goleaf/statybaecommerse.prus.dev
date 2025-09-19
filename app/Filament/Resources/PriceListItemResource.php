@@ -8,7 +8,6 @@ use App\Models\PriceList;
 use App\Models\Product;
 use App\Enums\NavigationGroup;
 use Filament\Forms;
-use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -42,7 +41,7 @@ final class PriceListItemResource extends Resource
 {
     protected static ?string $model = PriceListItem::class;
     
-    protected static string | UnitEnum | null $navigationGroup = "Products";
+    // protected static $navigationGroup = NavigationGroup::Products;
     protected static ?int $navigationSort = 16;
     protected static ?string $recordTitleAttribute = 'product.name';
     /**
@@ -67,85 +66,7 @@ final class PriceListItemResource extends Resource
      * @param Form $schema
      * @return Form
     public static function form(Schema $schema): Schema
-        return $schema->components([
-            Section::make(__('price_list_items.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            Select::make('price_list_id')
-                                ->label(__('price_list_items.price_list'))
-                                ->relationship('priceList', 'name')
-                                ->required()
-                                ->searchable()
-                                ->preload()
-                                ->createOptionForm([
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255),
-                                    TextInput::make('code')
-                                        ->maxLength(50)
-                                        ->rules(['alpha_dash']),
-                                    Textarea::make('description')
-                                        ->maxLength(500),
-                                ]),
-                            
-                            Select::make('product_id')
-                                ->label(__('price_list_items.product'))
-                                ->relationship('product', 'name')
-                        ]),
-                ]),
-            
-            Section::make(__('price_list_items.pricing'))
-                            TextInput::make('base_price')
-                                ->label(__('price_list_items.base_price'))
-                                ->numeric()
-                                ->step(0.01)
-                                ->minValue(0)
-                                ->prefix('€')
-                                ->helperText(__('price_list_items.base_price_help')),
-                            TextInput::make('discount_price')
-                                ->label(__('price_list_items.discount_price'))
-                                ->helperText(__('price_list_items.discount_price_help')),
-                    
-                            TextInput::make('discount_percentage')
-                                ->label(__('price_list_items.discount_percentage'))
-                                ->maxValue(100)
-                                ->suffix('%')
-                                ->helperText(__('price_list_items.discount_percentage_help')),
-                            TextInput::make('min_quantity')
-                                ->label(__('price_list_items.min_quantity'))
-                                ->minValue(1)
-                                ->default(1)
-                                ->helperText(__('price_list_items.min_quantity_help')),
-                            TextInput::make('max_quantity')
-                                ->label(__('price_list_items.max_quantity'))
-                                ->helperText(__('price_list_items.max_quantity_help')),
-                            TextInput::make('sort_order')
-                                ->label(__('price_list_items.sort_order'))
-                                ->default(0)
-                                ->minValue(0),
-            Section::make(__('price_list_items.tiered_pricing'))
-                    Forms\Components\Repeater::make('tiered_pricing')
-                        ->label(__('price_list_items.tiered_pricing'))
-                            Grid::make(3)
-                                ->components([
-                                    TextInput::make('min_quantity')
-                                        ->label(__('price_list_items.tier_min_quantity'))
-                                        ->numeric()
-                                        ->minValue(1)
-                                        ->required(),
-                                    
-                                    TextInput::make('max_quantity')
-                                        ->label(__('price_list_items.tier_max_quantity'))
-                                        ->minValue(1),
-                                    TextInput::make('price')
-                                        ->label(__('price_list_items.tier_price'))
-                                        ->step(0.01)
-                                        ->minValue(0)
-                                        ->prefix('€'),
-                        ])
-                        ->collapsible()
-                        ->itemLabel(fn (array $state): ?string => $state['min_quantity'] ? "Qty {$state['min_quantity']}+" : null)
+    {$state['min_quantity']}+" : null)
                         ->addActionLabel(__('price_list_items.add_tier'))
                         ->helperText(__('price_list_items.tiered_pricing_help')),
             Section::make(__('price_list_items.validity'))
@@ -174,26 +95,7 @@ final class PriceListItemResource extends Resource
      * @param Table $table
      * @return Table
     public static function table(Table $table): Table
-        return $table
-            ->columns([
-                TextColumn::make('priceList.name')
-                    ->label(__('price_list_items.price_list'))
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold'),
-                
-                TextColumn::make('product.name')
-                    ->label(__('price_list_items.product'))
-                    ->limit(50),
-                TextColumn::make('product.sku')
-                    ->label(__('price_list_items.product_sku'))
-                    ->copyable()
-                    ->badge()
-                    ->color('gray')
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('base_price')
-                    ->label(__('price_list_items.base_price'))
-                    ->formatStateUsing(fn (?float $state): string => $state ? "€{$state}" : '€0')
+    {$state}" : '€0')
                     ->alignCenter(),
                 TextColumn::make('discount_price')
                     ->label(__('price_list_items.discount_price'))

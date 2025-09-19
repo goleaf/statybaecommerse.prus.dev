@@ -106,7 +106,6 @@ return [
     'working_hours' => 'Darbo laikas',
     'monday_friday_hours' => 'Pirmadienis - Penktadienis: 9:00 - 17:00',
     'shipping_to_country' => 'Pristatymas į:',
-    'change_zone_text' => ', keisti zoną',
     'all_rights_reserved' => 'Visos teisės saugomos',
     'created_with_filament' => 'Sukurta su Filament',
     'exports' => 'Eksportai',

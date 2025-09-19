@@ -4,7 +4,6 @@ return [
     'title' => 'Campaign Schedules',
     'plural' => 'Campaign Schedules',
     'single' => 'Campaign Schedule',
-    
     'form' => [
         'tabs' => [
             'basic_information' => 'Basic Information',
@@ -31,7 +30,6 @@ return [
             'schedule_status' => 'Schedule Status',
         ],
     ],
-    
     'schedule_types' => [
         'once' => 'Once',
         'daily' => 'Daily',
@@ -39,14 +37,12 @@ return [
         'monthly' => 'Monthly',
         'custom' => 'Custom',
     ],
-    
     'status' => [
         'active' => 'Active',
         'inactive' => 'Inactive',
         'scheduled' => 'Scheduled',
         'ready' => 'Ready',
     ],
-    
     'filters' => [
         'campaign' => 'Campaign',
         'schedule_type' => 'Schedule Type',
@@ -55,7 +51,6 @@ return [
         'last_run_at' => 'Last Run At',
         'overdue' => 'Overdue',
     ],
-    
     'actions' => [
         'activate' => 'Activate',
         'deactivate' => 'Deactivate',
@@ -63,7 +58,6 @@ return [
         'activate_bulk' => 'Bulk Activate',
         'deactivate_bulk' => 'Bulk Deactivate',
     ],
-    
     'notifications' => [
         'activated_successfully' => 'Activated successfully',
         'deactivated_successfully' => 'Deactivated successfully',
@@ -72,4 +66,3 @@ return [
         'bulk_deactivated_successfully' => 'Bulk deactivated successfully',
     ],
 ];
-

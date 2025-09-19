@@ -3,19 +3,19 @@
 namespace App\Filament\Resources;
 use App\Filament\Resources\ProductImageResource\Pages;
 use App\Models\ProductImage;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
-use UnitEnum;
 use BackedEnum;
+use App\Enums\NavigationGroup;
 final class ProductImageResource extends Resource
 {
     protected static ?string $model = ProductImage::class;
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-photo';
-    protected static string | UnitEnum | null $navigationGroup = "Products";
+    // protected static $navigationGroup = NavigationGroup::Products;
     protected static ?int $navigationSort = 14;
     public static function form(Schema $schema): Schema
     {

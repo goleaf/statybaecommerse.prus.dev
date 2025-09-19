@@ -1,14 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Enums;
 
 /**
  * NavigationIcon
- * 
+ *
  * Enumeration defining a set of named constants with type safety.
  */
-enum NavigationIcon : string
+enum NavigationIcon: string
 {
     case Document = 'heroicon-o-document-text';
     case RectangleStack = 'heroicon-o-rectangle-stack';
@@ -55,6 +54,7 @@ enum NavigationIcon : string
     case Seo = 'heroicon-o-magnifying-glass';
     case SystemSetting = 'heroicon-o-cog-6-tooth';
     case SystemSettings = 'heroicon-o-cog-6-tooth';
+
     public function label(): string
     {
         return match ($this) {
@@ -105,6 +105,7 @@ enum NavigationIcon : string
             self::SystemSettings => 'System Settings',
         };
     }
+
     public static function fromResource(string $resourceName): self
     {
         return match (strtolower($resourceName)) {
@@ -131,7 +132,6 @@ enum NavigationIcon : string
             'menu' => self::Menu,
             'city' => self::City,
             'country' => self::Country,
-            'zone' => self::Zone,
             'address' => self::Address,
             'customer' => self::Customer,
             'cart' => self::Cart,

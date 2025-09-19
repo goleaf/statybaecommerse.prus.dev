@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CampaignScheduleResource\Pages;
 
 use App\Filament\Resources\CampaignScheduleResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
 
 class EditCampaignSchedule extends EditRecord
 {
@@ -18,4 +18,3 @@ class EditCampaignSchedule extends EditRecord
         ];
     }
 }
-

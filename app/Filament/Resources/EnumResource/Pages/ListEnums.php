@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\EnumResource\Pages;
 
 use App\Filament\Resources\EnumResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
 
 class ListEnums extends ListRecords
 {

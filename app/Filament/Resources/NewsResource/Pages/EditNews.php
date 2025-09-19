@@ -1,13 +1,11 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\Pages;
 
 use App\Filament\Resources\NewsResource;
-use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions\DeleteAction;
+use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
 
 final class EditNews extends EditRecord
 {

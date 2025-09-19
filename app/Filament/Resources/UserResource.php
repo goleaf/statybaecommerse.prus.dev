@@ -32,7 +32,6 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
-use UnitEnum;
 /**
  * UserResource
  *
@@ -41,8 +40,6 @@ use UnitEnum;
 final class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-    /** @var UnitEnum|string|null */    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Users;
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'name';
     /**
@@ -67,78 +64,7 @@ final class UserResource extends Resource
      * @param Schema $schema
      * @return Schema
     public static function form(Schema $schema): Schema
-        return $schema->components([
-            Section::make(__('users.sections.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            TextInput::make('name')
-                                ->label(__('users.fields.name'))
-                                ->required()
-                                ->maxLength(255)
-                                ->columnSpan(1),
-                            TextInput::make('email')
-                                ->label(__('users.fields.email'))
-                                ->email()
-                                ->unique(ignoreRecord: true)
-                        ]),
-                            TextInput::make('phone')
-                                ->label(__('users.fields.phone'))
-                                ->tel()
-                                ->maxLength(20)
-                            DatePicker::make('date_of_birth')
-                                ->label(__('users.fields.date_of_birth'))
-                    Textarea::make('bio')
-                        ->label(__('users.fields.bio'))
-                        ->maxLength(1000)
-                        ->rows(3),
-                ])
-                ->columns(1),
-            Section::make(__('users.sections.preferences'))
-                            Select::make('locale')
-                                ->label(__('users.fields.locale'))
-                                ->options([
-                                    'lt' => 'Lietuvių',
-                                    'en' => 'English',
-                                ])
-                                ->default('lt')
-                            Select::make('timezone')
-                                ->label(__('users.fields.timezone'))
-                                    'Europe/Vilnius' => 'Europe/Vilnius',
-                                    'UTC' => 'UTC',
-                                ->default('Europe/Vilnius')
-                    Toggle::make('email_notifications')
-                        ->label(__('users.fields.email_notifications'))
-                        ->default(true),
-                    Toggle::make('sms_notifications')
-                        ->label(__('users.fields.sms_notifications'))
-                        ->default(false),
-            Section::make(__('users.sections.status'))
-                            Toggle::make('is_active')
-                                ->label(__('users.fields.is_active'))
-                                ->default(true)
-                            DatePicker::make('email_verified_at')
-                                ->label(__('users.fields.email_verified_at'))
-        ]);
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-    public static function table(Table $table): Table
-        return $table
-            ->columns([
-                TextColumn::make('name')
-                    ->label(__('users.fields.name'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('email')
-                    ->label(__('users.fields.email'))
-                TextColumn::make('phone')
-                    ->label(__('users.fields.phone'))
-                    ->toggleable(),
-                TextColumn::make('locale')
-                    ->label(__('users.fields.locale'))
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+    {
                         'lt' => 'success',
                         'en' => 'info',
                         default => 'gray',

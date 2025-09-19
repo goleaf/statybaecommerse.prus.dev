@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 return [
     // Navigation
@@ -43,11 +41,123 @@ return [
         'currencies' => 'Currencies',
         'partner_tiers' => 'Partner Tiers',
         'discount_codes' => 'Discount Codes',
+        'user_product_interactions' => 'User Product Interactions',
         'document_templates' => 'Document Templates',
         'enhanced_settings' => 'Settings',
         'system_settings' => 'System Settings',
         'product_requests' => 'Product Requests',
         'sales' => 'Sales',
+    ],
+    // User Product Interactions
+    'user_product_interactions' => [
+        'navigation_label' => 'User Product Interactions',
+        'plural_model_label' => 'User Product Interactions',
+        'model_label' => 'User Product Interaction',
+        'basic_information' => 'Basic Information',
+        'user' => 'User',
+        'product' => 'Product',
+        'interaction_type' => 'Interaction Type',
+        'rating' => 'Rating',
+        'count' => 'Count',
+        'first_interaction' => 'First Interaction',
+        'last_interaction' => 'Last Interaction',
+        'has_rating' => 'Has Rating',
+        'high_rating' => 'High Rating',
+        'recent_interactions' => 'Recent Interactions',
+        'increment' => 'Increment',
+        'increment_all' => 'Increment All',
+        'interaction_types' => [
+            'view' => 'View',
+            'click' => 'Click',
+            'add_to_cart' => 'Add to Cart',
+            'purchase' => 'Purchase',
+            'review' => 'Review',
+            'share' => 'Share',
+        ],
+    ],
+
+    // News Comments
+    'news_comments' => [
+        'navigation_label' => 'News Comments',
+        'plural_model_label' => 'News Comments',
+        'model_label' => 'News Comment',
+        'basic_information' => 'Basic Information',
+        'basic_information_description' => 'Comment basic information',
+        'news' => 'News',
+        'parent_comment' => 'Parent Comment',
+        'author_name' => 'Author Name',
+        'author_email' => 'Author Email',
+        'content' => 'Content',
+        'is_approved' => 'Approved',
+        'is_visible' => 'Visible',
+        'approve_selected' => 'Approve Selected',
+        'disapprove_selected' => 'Disapprove Selected',
+    ],
+
+    // News Images
+    'news_images' => [
+        'navigation_label' => 'News Images',
+        'plural_model_label' => 'News Images',
+        'model_label' => 'News Image',
+        'basic_information' => 'Basic Information',
+        'basic_information_description' => 'Image basic information',
+        'news' => 'News',
+        'file_path' => 'File Path',
+        'alt_text' => 'Alt Text',
+        'caption' => 'Caption',
+        'is_featured' => 'Featured',
+        'sort_order' => 'Sort Order',
+        'file_size' => 'File Size',
+        'mime_type' => 'MIME Type',
+        'image' => 'Image',
+        'set_featured' => 'Set as Featured',
+        'unset_featured' => 'Remove from Featured',
+    ],
+
+    // Order Shippings
+    'order_shippings' => [
+        'navigation_label' => 'Order Shippings',
+        'plural_model_label' => 'Order Shippings',
+        'model_label' => 'Order Shipping',
+        'basic_information' => 'Basic Information',
+        'basic_information_description' => 'Shipping basic information',
+        'order' => 'Order',
+        'carrier_name' => 'Carrier Name',
+        'service' => 'Service',
+        'tracking_number' => 'Tracking Number',
+        'tracking_url' => 'Tracking URL',
+        'shipped_at' => 'Shipped At',
+        'estimated_delivery' => 'Estimated Delivery',
+        'delivered_at' => 'Delivered At',
+        'weight' => 'Weight',
+        'cost' => 'Cost',
+        'dimensions' => 'Dimensions',
+        'metadata' => 'Metadata',
+        'metadata_key' => 'Key',
+        'metadata_value' => 'Value',
+        'status' => 'Status',
+        'shipped_from' => 'Shipped From',
+        'shipped_until' => 'Shipped Until',
+        'mark_shipped' => 'Mark as Shipped',
+        'mark_delivered' => 'Mark as Delivered',
+    ],
+
+    // Zones
+    'zones' => [
+        'navigation_label' => 'Zones',
+        'plural_model_label' => 'Zones',
+        'model_label' => 'Zone',
+        'basic_information' => 'Basic Information',
+        'basic_information_description' => 'Zone basic information',
+        'name' => 'Name',
+        'code' => 'Code',
+        'code_helper' => 'Short unique zone code',
+        'currency' => 'Currency',
+        'is_enabled' => 'Enabled',
+        'countries_count' => 'Countries Count',
+        'cities_count' => 'Cities Count',
+        'enable_selected' => 'Enable Selected',
+        'disable_selected' => 'Disable Selected',
     ],
     // Dashboard
     'dashboard' => [
@@ -596,7 +706,6 @@ return [
         'enable' => 'Enable',
         'disable' => 'Disable',
     ],
-
     // Actions
     'actions' => [
         'create' => 'Create',
@@ -684,7 +793,6 @@ return [
         'in_stock' => 'In Stock',
         'low_stock' => 'Low Stock',
         'out_of_stock' => 'Out of Stock',
-
         // Report Types
         'types' => [
             'sales' => 'Sales',
@@ -696,7 +804,6 @@ return [
             'marketing' => 'Marketing',
             'custom' => 'Custom',
         ],
-
         // Report Categories
         'categories' => [
             'sales' => 'Sales',
@@ -707,7 +814,6 @@ return [
             'inventory' => 'Inventory',
             'analytics' => 'Analytics',
         ],
-
         // Date Ranges
         'date_ranges' => [
             'today' => 'Today',
@@ -718,7 +824,6 @@ return [
             'this_year' => 'This Year',
             'custom' => 'Custom Range',
         ],
-
         // Schedule Frequencies
         'schedule_frequencies' => [
             'daily' => 'Daily',
@@ -727,7 +832,6 @@ return [
             'quarterly' => 'Quarterly',
             'yearly' => 'Yearly',
         ],
-
         // Fields
         'fields' => [
             'name' => 'Name',
@@ -762,7 +866,6 @@ return [
             'metadata_value' => 'Metadata Value',
             'advanced_filters' => 'Advanced Filters',
         ],
-
         // Filter Fields
         'filter_fields' => [
             'status' => 'Status',
@@ -771,7 +874,6 @@ return [
             'price_range' => 'Price Range',
             'date_range' => 'Date Range',
         ],
-
         // Filter Operators
         'filter_operators' => [
             'equals' => 'Equals',
@@ -782,7 +884,6 @@ return [
             'less_than' => 'Less Than',
             'between' => 'Between',
         ],
-
         // Actions
         'actions' => [
             'generate' => 'Generate',
@@ -796,7 +897,6 @@ return [
             'add_setting' => 'Add Setting',
             'add_metadata' => 'Add Metadata',
         ],
-
         // Tabs
         'tabs' => [
             'all' => 'All',
@@ -809,7 +909,6 @@ return [
             'filters' => 'Filters',
             'settings' => 'Settings',
         ],
-
         // Stats
         'stats' => [
             'total_reports' => 'Total Reports',
@@ -825,12 +924,10 @@ return [
             'total_downloads' => 'Total Downloads',
             'total_downloads_description' => 'Total number of downloads',
         ],
-
         // Charts
         'charts' => [
             'report_types' => 'Report Types',
         ],
-
         // Notifications
         'notifications' => [
             'generated' => 'Report generated successfully',
@@ -976,7 +1073,7 @@ return [
             'delete' => 'Delete',
             'clear_all' => 'Clear All',
             'view_all_notifications' => 'View all notifications',
-            'you_are_all_caught_up' => 'You\'re all caught up!',
+            'you_are_all_caught_up' => "You're all caught up!",
             'form' => [
                 'sections' => [
                     'basic_information' => 'Basic Information',
@@ -1069,7 +1166,6 @@ return [
         'orders' => 'Orders',
         'users' => 'Users',
     ],
-
     // Sections
     'sections' => [
         'basic_information' => 'Basic Information',
@@ -1189,7 +1285,6 @@ return [
             'adjustment' => 'Adjustment',
         ],
     ],
-
     // Helpers
     'helpers' => [
         'requestable' => 'Check if this product requires a request before purchase',
@@ -1197,7 +1292,6 @@ return [
         'minimum_quantity' => 'Minimum quantity that must be ordered',
         'request_message' => 'Message to be shown to customers about the request requirement',
     ],
-
     // Status
     'status' => [
         'pending' => 'Pending',
@@ -1206,7 +1300,6 @@ return [
         'cancelled' => 'Cancelled',
         'unknown' => 'Unknown',
     ],
-
     // Actions
     'actions' => [
         'mark_requestable' => 'Mark as Requestable',
@@ -1215,7 +1308,6 @@ return [
         'mark_completed' => 'Mark as Completed',
         'mark_cancelled' => 'Mark as Cancelled',
     ],
-
     // Filters
     'filters' => [
         'visible_only' => 'Visible Only',
@@ -1223,7 +1315,6 @@ return [
         'with_requests' => 'With Requests',
         'needs_restocking' => 'Needs Restocking',
     ],
-
     // Cart Items
     'cart_items' => [
         'title' => 'Cart Items',
@@ -1261,7 +1352,6 @@ return [
             'deleted' => 'Cart item successfully deleted',
         ],
     ],
-
     // Models
     'models' => [
         'analytics' => 'Analytics',
@@ -1280,7 +1370,6 @@ return [
         'news_image' => 'News Image',
         'news_images' => 'News Images',
     ],
-
     // SEO Data
     'seo_data' => [
         'title' => 'SEO Data',
@@ -1450,7 +1539,6 @@ return [
             'no_data_description' => 'No SEO data for analysis',
         ],
     ],
-
     // News
     'news' => [
         'title' => 'News',
@@ -1629,7 +1717,6 @@ return [
             ],
         ],
     ],
-
     // Search Insights Widget
     'search_insights' => 'Search Insights',
     'enter_search_query' => 'Enter search query...',

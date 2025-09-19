@@ -45,40 +45,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
-use UnitEnum;
-
-/**
- * DocumentResource
- *
- * Filament v4 resource for Document management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class DocumentResource extends Resource
-{
-    protected static ?string $model = Document::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-document-text';
-    /** @var string|UnitEnum|null */
-    protected static string | UnitEnum | null $navigationGroup = "Content";
-    protected static ?int $navigationSort = 1;
-    protected static ?string $recordTitleAttribute = 'title';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('admin.documents.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Documents';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

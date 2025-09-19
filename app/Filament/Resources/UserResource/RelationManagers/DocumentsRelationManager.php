@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Actions\EditAction;
@@ -22,8 +23,7 @@ final class DocumentsRelationManager extends RelationManager
         return $schema
             ->components([
                 Forms\Components\TextInput::make('title')
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\Select::make('type')
                     ->options([
                         'invoice' => 'Invoice',
@@ -49,14 +49,12 @@ final class DocumentsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('title')
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('admin.fields.title'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('admin.fields.type'))
                     ->badge(),

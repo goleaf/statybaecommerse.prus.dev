@@ -136,7 +136,7 @@ final class VariantAnalytics extends Model
      */
     public static function recordAnalytics(
         int $variantId,
-        \DateTime $date,
+        string|\DateTime $date,
         array $data = []
     ): self {
         $defaultData = [
@@ -161,7 +161,7 @@ final class VariantAnalytics extends Model
      */
     public function incrementMetric(string $metric, int $amount = 1): bool
     {
-        return $this->increment($metric, $amount);
+        return (bool) $this->increment($metric, $amount);
     }
 
     /**

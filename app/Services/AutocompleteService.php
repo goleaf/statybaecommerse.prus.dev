@@ -1,31 +1,29 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Address;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\City;
 use App\Models\Collection;
+use App\Models\Country;
+use App\Models\Location;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use App\Models\Address;
-use App\Models\Location;
-use App\Models\Country;
-use App\Models\City;
-use App\Models\Order;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
+
 /**
  * AutocompleteService
- * 
+ *
  * Service class containing AutocompleteService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class AutocompleteService
 {
@@ -33,6 +31,7 @@ final class AutocompleteService
     // 5 minutes
     private const DEFAULT_LIMIT = 10;
     private const MAX_LIMIT = 50;
+
     /**
      * Handle search functionality with proper error handling.
      * @param string $query
@@ -48,11 +47,11 @@ final class AutocompleteService
 
         $startTime = microtime(true);
         $cacheKey = $this->generateCacheKey($query, $limit, $types);
-        
+
         // Try to get from intelligent cache first
         $cacheService = app(\App\Services\SearchCacheService::class);
         $results = $cacheService->getCachedResults($cacheKey);
-        
+
         if ($results === null) {
             $results = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit, $types) {
                 $results = [];
@@ -74,7 +73,7 @@ final class AutocompleteService
                 // Sort by relevance and limit final results
                 return $this->sortByRelevance($results, $query, $limit);
             });
-            
+
             // Store in intelligent cache
             $context = [
                 'user_id' => auth()->id(),
@@ -97,6 +96,7 @@ final class AutocompleteService
 
         return $results;
     }
+
     /**
      * Handle searchProducts functionality with proper error handling.
      * @param string $query
@@ -129,6 +129,7 @@ final class AutocompleteService
             }));
         });
     }
+
     /**
      * Handle searchCategories functionality with proper error handling.
      * @param string $query
@@ -156,6 +157,7 @@ final class AutocompleteService
             }));
         });
     }
+
     /**
      * Handle searchBrands functionality with proper error handling.
      * @param string $query
@@ -183,6 +185,7 @@ final class AutocompleteService
             }));
         });
     }
+
     /**
      * Handle searchCollections functionality with proper error handling.
      * @param string $query
@@ -210,6 +213,7 @@ final class AutocompleteService
             }));
         });
     }
+
     /**
      * Handle searchAttributes functionality with proper error handling.
      * @param string $query
@@ -244,6 +248,7 @@ final class AutocompleteService
             return $results;
         });
     }
+
     /**
      * Handle getPopularSuggestions functionality with proper error handling.
      * @param int $limit
@@ -265,6 +270,7 @@ final class AutocompleteService
             }));
         });
     }
+
     /**
      * Handle getRecentSuggestions functionality with proper error handling.
      * @param int $limit
@@ -287,6 +293,7 @@ final class AutocompleteService
         }
         return $results;
     }
+
     /**
      * Handle addToRecentSearches functionality with proper error handling.
      * @param string $query
@@ -306,6 +313,7 @@ final class AutocompleteService
         $recentSearches = array_slice($recentSearches, 0, 10);
         session(['recent_searches' => $recentSearches]);
     }
+
     /**
      * Handle clearRecentSearches functionality with proper error handling.
      * @return void
@@ -314,6 +322,7 @@ final class AutocompleteService
     {
         session()->forget('recent_searches');
     }
+
     /**
      * Handle searchByType functionality with proper error handling.
      * @param string $type
@@ -333,6 +342,7 @@ final class AutocompleteService
             default => [],
         };
     }
+
     /**
      * Handle calculateTypeLimits functionality with proper error handling.
      * @param array $types
@@ -350,6 +360,7 @@ final class AutocompleteService
         }
         return $limits;
     }
+
     /**
      * Handle sortByRelevance functionality with proper error handling.
      * @param array $results
@@ -372,6 +383,7 @@ final class AutocompleteService
         });
         return array_slice($results, 0, $limit);
     }
+
     /**
      * Handle calculateRelevanceScore functionality with proper error handling.
      * @param string $text
@@ -402,6 +414,7 @@ final class AutocompleteService
         $similarity = similar_text($text, $query, $percent);
         return (int) $percent;
     }
+
     /**
      * Handle prepareSearchTerm functionality with proper error handling.
      * @param string $query
@@ -411,6 +424,7 @@ final class AutocompleteService
     {
         return '%' . str_replace(['%', '_'], ['\%', '\_'], $query) . '%';
     }
+
     /**
      * Handle generateCacheKey functionality with proper error handling.
      * @param string $query
@@ -479,7 +493,7 @@ final class AutocompleteService
                 'search_history' => $this->getUserSearchHistory(),
                 'location' => $this->getUserLocation(),
             ];
-            
+
             $rankedResults = $rankingService->rankResults($results, $query, $context);
             return $rankingService->applyBusinessRules($rankedResults);
         } catch (\Exception $e) {
@@ -499,7 +513,7 @@ final class AutocompleteService
             if (!$userId) {
                 return [];
             }
-            
+
             $cacheKey = "user_search_history_{$userId}";
             return Cache::get($cacheKey, []);
         } catch (\Exception $e) {
@@ -530,7 +544,7 @@ final class AutocompleteService
     {
         $variations = [];
         $words = explode(' ', $query);
-        
+
         foreach ($words as $word) {
             if (strlen($word) > 3) {
                 // Common typos: double letters, missing letters, swapped letters
@@ -539,7 +553,7 @@ final class AutocompleteService
                 $variations[] = $this->swapAdjacentLetters($word);
             }
         }
-        
+
         return array_filter(array_unique($variations));
     }
 
@@ -548,8 +562,9 @@ final class AutocompleteService
      */
     private function addDoubleLetter(string $word): string
     {
-        if (strlen($word) < 4) return $word;
-        
+        if (strlen($word) < 4)
+            return $word;
+
         $pos = rand(1, strlen($word) - 2);
         return substr($word, 0, $pos) . $word[$pos] . substr($word, $pos);
     }
@@ -572,12 +587,13 @@ final class AutocompleteService
      */
     private function swapAdjacentLetters(string $word): string
     {
-        if (strlen($word) < 3) return $word;
-        
+        if (strlen($word) < 3)
+            return $word;
+
         $pos = rand(0, strlen($word) - 2);
         $chars = str_split($word);
         [$chars[$pos], $chars[$pos + 1]] = [$chars[$pos + 1], $chars[$pos]];
-        
+
         return implode('', $chars);
     }
 
@@ -592,15 +608,15 @@ final class AutocompleteService
 
         // First try exact search
         $results = $this->search($query, $limit, $types);
-        
+
         // If we don't have enough results, try fuzzy search
         if (count($results) < $limit * 0.5) {
             $typoVariations = $this->generateTypoVariations($query);
-            
+
             foreach ($typoVariations as $variation) {
                 $fuzzyResults = $this->search($variation, $limit, $types);
                 $results = array_merge($results, $fuzzyResults);
-                
+
                 if (count($results) >= $limit) {
                     break;
                 }
@@ -621,7 +637,7 @@ final class AutocompleteService
     {
         $seen = [];
         $unique = [];
-        
+
         foreach ($results as $result) {
             $key = $result['id'] . '_' . $result['type'];
             if (!isset($seen[$key])) {
@@ -629,7 +645,7 @@ final class AutocompleteService
                 $unique[] = $result;
             }
         }
-        
+
         return $unique;
     }
 
@@ -639,18 +655,18 @@ final class AutocompleteService
     public function getPersonalizedSuggestions(int $userId, int $limit = 5): array
     {
         $cacheKey = "personalized_suggestions_{$userId}_{$limit}";
-        
+
         return Cache::remember($cacheKey, 1800, function () use ($userId, $limit) {
             // Get user's recent searches
             $recentSearches = $this->getRecentSearches($userId, 10);
-            
+
             // Get popular searches in user's categories
             $userCategories = $this->getUserPreferredCategories($userId);
             $popularInCategories = $this->getPopularSearchesInCategories($userCategories, 5);
-            
+
             // Combine and rank suggestions
             $suggestions = array_merge($recentSearches, $popularInCategories);
-            
+
             return array_slice($suggestions, 0, $limit);
         });
     }
@@ -681,12 +697,12 @@ final class AutocompleteService
     private function getPopularSearchesInCategories(array $categories, int $limit): array
     {
         $suggestions = [];
-        
+
         foreach ($categories as $category) {
             $popular = $this->getPopularSuggestions(3);
             $suggestions = array_merge($suggestions, $popular);
         }
-        
+
         return array_slice($suggestions, 0, $limit);
     }
 
@@ -699,22 +715,23 @@ final class AutocompleteService
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
-            
+
             $customers = User::query()
                 ->where('is_active', true)
                 ->where(function ($q) use ($searchTerm) {
-                    $q->where('name', 'like', $searchTerm)
-                      ->orWhere('email', 'like', $searchTerm)
-                      ->orWhere('phone', 'like', $searchTerm);
+                    $q
+                        ->where('name', 'like', $searchTerm)
+                        ->orWhere('email', 'like', $searchTerm)
+                        ->orWhere('phone', 'like', $searchTerm);
                 })
-                ->orderByRaw("
+                ->orderByRaw('
                     CASE 
                         WHEN name LIKE ? THEN 1
                         WHEN email LIKE ? THEN 2
                         WHEN phone LIKE ? THEN 3
                         ELSE 4
                     END
-                ", ["%{$query}%", "%{$query}%", "%{$query}%"])
+                ', ["%{$query}%", "%{$query}%", "%{$query}%"])
                 ->limit($limit)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))
@@ -747,26 +764,28 @@ final class AutocompleteService
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
-            
+
             $addresses = Address::query()
                 ->with(['user', 'city', 'country'])
                 ->where(function ($q) use ($searchTerm) {
-                    $q->where('street', 'like', $searchTerm)
-                      ->orWhere('city_name', 'like', $searchTerm)
-                      ->orWhere('postal_code', 'like', $searchTerm)
-                      ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
-                          $userQuery->where('name', 'like', $searchTerm)
-                                   ->orWhere('email', 'like', $searchTerm);
-                      });
+                    $q
+                        ->where('street', 'like', $searchTerm)
+                        ->orWhere('city_name', 'like', $searchTerm)
+                        ->orWhere('postal_code', 'like', $searchTerm)
+                        ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
+                            $userQuery
+                                ->where('name', 'like', $searchTerm)
+                                ->orWhere('email', 'like', $searchTerm);
+                        });
                 })
-                ->orderByRaw("
+                ->orderByRaw('
                     CASE 
                         WHEN street LIKE ? THEN 1
                         WHEN city_name LIKE ? THEN 2
                         WHEN postal_code LIKE ? THEN 3
                         ELSE 4
                     END
-                ", ["%{$query}%", "%{$query}%", "%{$query}%"])
+                ', ["%{$query}%", "%{$query}%", "%{$query}%"])
                 ->limit($limit)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))
@@ -778,7 +797,7 @@ final class AutocompleteService
                     'type' => 'address',
                     'title' => $address->full_address,
                     'subtitle' => $address->user?->name,
-                    'description' => "Type: " . ucfirst($address->type),
+                    'description' => 'Type: ' . ucfirst($address->type),
                     'url' => route('filament.admin.resources.addresses.edit', $address),
                     'image' => null,
                     'user_id' => $address->user_id,
@@ -799,23 +818,24 @@ final class AutocompleteService
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
-            
+
             $locations = Location::query()
                 ->where('is_enabled', true)
                 ->where(function ($q) use ($searchTerm) {
-                    $q->where('name', 'like', $searchTerm)
-                      ->orWhere('code', 'like', $searchTerm)
-                      ->orWhere('city', 'like', $searchTerm)
-                      ->orWhere('address_line_1', 'like', $searchTerm);
+                    $q
+                        ->where('name', 'like', $searchTerm)
+                        ->orWhere('code', 'like', $searchTerm)
+                        ->orWhere('city', 'like', $searchTerm)
+                        ->orWhere('address_line_1', 'like', $searchTerm);
                 })
-                ->orderByRaw("
+                ->orderByRaw('
                     CASE 
                         WHEN name LIKE ? THEN 1
                         WHEN code LIKE ? THEN 2
                         WHEN city LIKE ? THEN 3
                         ELSE 4
                     END
-                ", ["%{$query}%", "%{$query}%", "%{$query}%"])
+                ', ["%{$query}%", "%{$query}%", "%{$query}%"])
                 ->limit($limit)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))
@@ -848,22 +868,23 @@ final class AutocompleteService
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
-            
+
             $countries = Country::query()
                 ->where(function ($q) use ($searchTerm) {
-                    $q->where('name', 'like', $searchTerm)
-                      ->orWhere('cca2', 'like', $searchTerm)
-                      ->orWhere('cca3', 'like', $searchTerm)
-                      ->orWhere('name_common', 'like', $searchTerm);
+                    $q
+                        ->where('name', 'like', $searchTerm)
+                        ->orWhere('cca2', 'like', $searchTerm)
+                        ->orWhere('cca3', 'like', $searchTerm)
+                        ->orWhere('name_common', 'like', $searchTerm);
                 })
-                ->orderByRaw("
+                ->orderByRaw('
                     CASE 
                         WHEN name LIKE ? THEN 1
                         WHEN name_common LIKE ? THEN 2
                         WHEN cca2 LIKE ? THEN 3
                         ELSE 4
                     END
-                ", ["%{$query}%", "%{$query}%", "%{$query}%"])
+                ', ["%{$query}%", "%{$query}%", "%{$query}%"])
                 ->limit($limit)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))
@@ -896,23 +917,24 @@ final class AutocompleteService
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
-            
+
             $cities = City::query()
-                ->with(['country', 'zone', 'region'])
+                ->with(['country', 'region'])
                 ->where(function ($q) use ($searchTerm) {
-                    $q->where('name', 'like', $searchTerm)
-                      ->orWhere('code', 'like', $searchTerm)
-                      ->orWhereHas('country', function ($countryQuery) use ($searchTerm) {
-                          $countryQuery->where('name', 'like', $searchTerm);
-                      });
+                    $q
+                        ->where('name', 'like', $searchTerm)
+                        ->orWhere('code', 'like', $searchTerm)
+                        ->orWhereHas('country', function ($countryQuery) use ($searchTerm) {
+                            $countryQuery->where('name', 'like', $searchTerm);
+                        });
                 })
-                ->orderByRaw("
+                ->orderByRaw('
                     CASE 
                         WHEN name LIKE ? THEN 1
                         WHEN code LIKE ? THEN 2
                         ELSE 3
                     END
-                ", ["%{$query}%", "%{$query}%"])
+                ', ["%{$query}%", "%{$query}%"])
                 ->limit($limit)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))
@@ -923,13 +945,12 @@ final class AutocompleteService
                     'id' => $city->id,
                     'type' => 'city',
                     'title' => $city->getTranslatedName($locale),
-                    'subtitle' => $city->country?->name . ', ' . $city->zone?->name,
+                    'subtitle' => $city->country?->name,
                     'description' => $city->getTranslatedDescription($locale),
                     'url' => route('filament.admin.resources.cities.edit', $city),
                     'image' => null,
                     'code' => $city->code,
                     'country_id' => $city->country_id,
-                    'zone_id' => $city->zone_id,
                     'relevance_score' => $this->calculateRelevanceScore($city->getTranslatedName($locale), $query),
                 ];
             }));
@@ -945,24 +966,26 @@ final class AutocompleteService
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
-            
+
             $orders = Order::query()
                 ->with(['user', 'items'])
                 ->where(function ($q) use ($searchTerm) {
-                    $q->where('order_number', 'like', $searchTerm)
-                      ->orWhere('reference', 'like', $searchTerm)
-                      ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
-                          $userQuery->where('name', 'like', $searchTerm)
-                                   ->orWhere('email', 'like', $searchTerm);
-                      });
+                    $q
+                        ->where('order_number', 'like', $searchTerm)
+                        ->orWhere('reference', 'like', $searchTerm)
+                        ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
+                            $userQuery
+                                ->where('name', 'like', $searchTerm)
+                                ->orWhere('email', 'like', $searchTerm);
+                        });
                 })
-                ->orderByRaw("
+                ->orderByRaw('
                     CASE 
                         WHEN order_number LIKE ? THEN 1
                         WHEN reference LIKE ? THEN 2
                         ELSE 3
                     END
-                ", ["%{$query}%", "%{$query}%"])
+                ', ["%{$query}%", "%{$query}%"])
                 ->limit($limit)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))
@@ -995,10 +1018,10 @@ final class AutocompleteService
     public function searchById(int $id, string $type): ?array
     {
         $cacheKey = "autocomplete_by_id_{$type}_{$id}_" . app()->getLocale();
-        
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($id, $type) {
             $locale = app()->getLocale();
-            
+
             return match ($type) {
                 'products' => $this->getProductById($id, $locale),
                 'categories' => $this->getCategoryById($id, $locale),
@@ -1190,7 +1213,7 @@ final class AutocompleteService
             'type' => 'address',
             'title' => $address->full_address,
             'subtitle' => $address->user?->name,
-            'description' => "Type: " . ucfirst($address->type),
+            'description' => 'Type: ' . ucfirst($address->type),
             'url' => route('filament.admin.resources.addresses.edit', $address),
             'image' => null,
             'user_id' => $address->user_id,
@@ -1256,7 +1279,7 @@ final class AutocompleteService
      */
     private function getCityById(int $id, string $locale): ?array
     {
-        $city = City::with(['country', 'zone', 'region'])
+        $city = City::with(['country', 'region'])
             ->where('id', $id)
             ->first();
 
@@ -1268,13 +1291,12 @@ final class AutocompleteService
             'id' => $city->id,
             'type' => 'city',
             'title' => $city->getTranslatedName($locale),
-            'subtitle' => $city->country?->name . ', ' . $city->zone?->name,
+            'subtitle' => $city->country?->name,
             'description' => $city->getTranslatedDescription($locale),
             'url' => route('filament.admin.resources.cities.edit', $city),
             'image' => null,
             'code' => $city->code,
             'country_id' => $city->country_id,
-            'zone_id' => $city->zone_id,
         ];
     }
 

@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\EnumManagementResource\Pages;
 
 use App\Filament\Resources\EnumManagementResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
 
 class EditEnumManagement extends EditRecord
 {

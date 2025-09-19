@@ -13,7 +13,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use BackedEnum;
-use UnitEnum;
+use App\Enums\NavigationGroup;
 
 final class SliderResource extends Resource
 {
@@ -21,8 +21,7 @@ final class SliderResource extends Resource
     /** @var string|\BackedEnum|null */
     /** @var BackedEnum|string|null */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
-    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = "Content";
+    // protected static $navigationGroup = NavigationGroup::Content;
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'title';
 

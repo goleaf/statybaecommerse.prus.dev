@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CampaignScheduleResource\Pages;
 
 use App\Filament\Resources\CampaignScheduleResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
 
 class ListCampaignSchedules extends ListRecords
 {
@@ -17,4 +17,3 @@ class ListCampaignSchedules extends ListRecords
         ];
     }
 }
-

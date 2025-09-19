@@ -19,52 +19,15 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * AttributeResource
- *
- * Filament v4 resource for Attribute management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class AttributeResource extends Resource
-{
-    protected static ?string $model = Attribute::class;
-
-    /**
-     * @var UnitEnum|string|null
-     */
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
-
-    protected static ?int $navigationSort = 8;
-
-    protected static ?string $recordTitleAttribute = 'name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('attributes.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Products';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -87,7 +50,7 @@ final class AttributeResource extends Resource
      * @param Form $schema
      * @return Form
      */
-    public static function form(Forms\Form $schema): Forms\Form
+    public static function form(Schema $schema): Schema
     {
         return $schema->components([
             Section::make(__('attributes.basic_information'))

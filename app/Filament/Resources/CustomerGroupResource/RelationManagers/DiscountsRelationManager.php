@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -19,8 +20,7 @@ final class DiscountsRelationManager extends RelationManager
         return $schema
             ->components([
                 Forms\Components\TextInput::make('name')
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\TextInput::make('code')
                     ->maxLength(50),
             ]);
@@ -28,19 +28,15 @@ final class DiscountsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('discounts.name'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 Tables\Columns\TextColumn::make('code')
                     ->label(__('discounts.code'))
-                    ->sortable(),
-                    ->badge(),
-                    ->color('primary'),
+                    ->sortable()\n                    ->badge()\n                    ->color('primary'),
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('discounts.type'))
                     ->color(fn (string $state): string => match ($state) {

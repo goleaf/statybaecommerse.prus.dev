@@ -1,6 +1,5 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
@@ -8,11 +7,11 @@ use App\Models\Campaign;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+
 /**
  * CampaignController
- * 
+ *
  * HTTP controller handling CampaignController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class CampaignController extends Controller
 {
@@ -23,7 +22,7 @@ final class CampaignController extends Controller
      */
     public function index(Request $request): View
     {
-        $campaigns = Campaign::query()->active()->byPriority()->with(['targetCategories', 'targetProducts', 'channel', 'zone'])->when($request->filled('type'), function ($query) use ($request) {
+        $campaigns = Campaign::query()->active()->byPriority()->with(['targetCategories', 'targetProducts', 'channel'])->when($request->filled('type'), function ($query) use ($request) {
             return $query->where('type', $request->get('type'));
         })->when($request->filled('category'), function ($query) use ($request) {
             return $query->whereHas('targetCategories', function ($q) use ($request) {
@@ -34,6 +33,7 @@ final class CampaignController extends Controller
         })->paginate(12);
         return view('campaigns.index', compact('campaigns'));
     }
+
     /**
      * Display the specified resource with related data.
      * @param Campaign $campaign
@@ -43,13 +43,14 @@ final class CampaignController extends Controller
     {
         // Record view for analytics
         $campaign->recordView(session()->getId(), request()->ip(), request()->userAgent(), request()->header('referer'), auth()->id());
-        $campaign->load(['targetCategories', 'targetProducts', 'targetCustomerGroups', 'channel', 'zone', 'discounts']);
+        $campaign->load(['targetCategories', 'targetProducts', 'targetCustomerGroups', 'channel', 'discounts']);
         // Get related campaigns
         $relatedCampaigns = Campaign::query()->active()->where('id', '!=', $campaign->id)->whereHas('targetCategories', function ($query) use ($campaign) {
             $query->whereIn('categories.id', $campaign->targetCategories->pluck('id'));
         })->limit(4)->get();
         return view('campaigns.show', compact('campaign', 'relatedCampaigns'));
     }
+
     /**
      * Handle click functionality with proper error handling.
      * @param Request $request
@@ -63,6 +64,7 @@ final class CampaignController extends Controller
         $campaign->recordClick($clickType, $clickedUrl, session()->getId(), request()->ip(), request()->userAgent(), auth()->id());
         return response()->json(['success' => true, 'message' => __('campaigns.messages.click_recorded')]);
     }
+
     /**
      * Handle conversion functionality with proper error handling.
      * @param Request $request
@@ -78,6 +80,7 @@ final class CampaignController extends Controller
         $campaign->recordConversion($conversionType, $conversionValue, $orderId, auth()->id(), session()->getId(), $conversionData);
         return response()->json(['success' => true, 'message' => __('campaigns.messages.conversion_recorded')]);
     }
+
     /**
      * Handle featured functionality with proper error handling.
      * @return View
@@ -87,6 +90,7 @@ final class CampaignController extends Controller
         $campaigns = Campaign::query()->featured()->active()->byPriority()->with(['targetCategories', 'channel'])->limit(6)->get();
         return view('campaigns.featured', compact('campaigns'));
     }
+
     /**
      * Handle byType functionality with proper error handling.
      * @param Request $request
@@ -98,6 +102,7 @@ final class CampaignController extends Controller
         $campaigns = Campaign::query()->active()->where('type', $type)->byPriority()->with(['targetCategories', 'targetProducts', 'channel'])->paginate(12);
         return view('campaigns.by-type', compact('campaigns', 'type'));
     }
+
     /**
      * Handle search functionality with proper error handling.
      * @param Request $request
@@ -111,6 +116,7 @@ final class CampaignController extends Controller
         })->byPriority()->with(['targetCategories', 'channel'])->paginate(12);
         return view('campaigns.search', compact('campaigns', 'query'));
     }
+
     /**
      * Handle getCampaignStatistics functionality with proper error handling.
      * @return JsonResponse
@@ -120,6 +126,7 @@ final class CampaignController extends Controller
         $statistics = ['total_campaigns' => Campaign::count(), 'active_campaigns' => Campaign::active()->count(), 'scheduled_campaigns' => Campaign::scheduled()->count(), 'completed_campaigns' => Campaign::where('status', 'completed')->count(), 'total_views' => Campaign::sum('total_views'), 'total_clicks' => Campaign::sum('total_clicks'), 'total_conversions' => Campaign::sum('total_conversions'), 'total_revenue' => Campaign::sum('total_revenue'), 'average_conversion_rate' => Campaign::where('total_views', '>', 0)->avg('conversion_rate') ?? 0, 'average_click_through_rate' => Campaign::where('total_views', '>', 0)->avg(\DB::raw('(total_clicks / total_views) * 100')) ?? 0, 'average_roi' => Campaign::where('budget', '>', 0)->avg(\DB::raw('((total_revenue - budget) / budget) * 100')) ?? 0];
         return response()->json(['success' => true, 'data' => $statistics]);
     }
+
     /**
      * Handle getCampaignTypes functionality with proper error handling.
      * @return JsonResponse
@@ -154,6 +161,7 @@ final class CampaignController extends Controller
         }
         return response()->json(['success' => true, 'data' => $formattedTypes]);
     }
+
     /**
      * Handle getCampaignPerformance functionality with proper error handling.
      * @return JsonResponse
@@ -165,6 +173,7 @@ final class CampaignController extends Controller
         })->count()];
         return response()->json(['success' => true, 'data' => $performance]);
     }
+
     /**
      * Handle getCampaignAnalytics functionality with proper error handling.
      * @param Request $request
@@ -178,6 +187,7 @@ final class CampaignController extends Controller
         $analytics = ['period' => $period, 'start_date' => $startDate->format('Y-m-d'), 'end_date' => now()->format('Y-m-d'), 'campaigns_created' => Campaign::where('created_at', '>=', $startDate)->count(), 'campaigns_started' => Campaign::where('start_date', '>=', $startDate)->count(), 'campaigns_completed' => Campaign::where('end_date', '>=', $startDate)->where('status', 'completed')->count(), 'total_views' => Campaign::where('created_at', '>=', $startDate)->sum('total_views'), 'total_clicks' => Campaign::where('created_at', '>=', $startDate)->sum('total_clicks'), 'total_conversions' => Campaign::where('created_at', '>=', $startDate)->sum('total_conversions'), 'total_revenue' => Campaign::where('created_at', '>=', $startDate)->sum('total_revenue'), 'top_performing_campaigns' => Campaign::where('created_at', '>=', $startDate)->orderBy('conversion_rate', 'desc')->limit(5)->get(['id', 'name', 'type', 'conversion_rate', 'total_revenue']), 'campaign_types_breakdown' => Campaign::where('created_at', '>=', $startDate)->selectRaw('type, COUNT(*) as count, AVG(conversion_rate) as avg_conversion_rate')->groupBy('type')->get()];
         return response()->json(['success' => true, 'data' => $analytics]);
     }
+
     /**
      * Handle getCampaignComparison functionality with proper error handling.
      * @param Request $request
@@ -195,6 +205,7 @@ final class CampaignController extends Controller
         });
         return response()->json(['success' => true, 'data' => $comparison]);
     }
+
     /**
      * Handle getCampaignRecommendations functionality with proper error handling.
      * @param Campaign $campaign

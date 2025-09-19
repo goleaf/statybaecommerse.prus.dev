@@ -12,7 +12,7 @@ enum Status: string
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ACTIVE => __('enums.status.active'),
             self::INACTIVE => __('enums.status.inactive'),
             self::PENDING => __('enums.status.pending'),
@@ -23,7 +23,7 @@ enum Status: string
 
     public function getColor(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ACTIVE => 'success',
             self::INACTIVE => 'gray',
             self::PENDING => 'warning',
@@ -34,7 +34,7 @@ enum Status: string
 
     public function getIcon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ACTIVE => 'heroicon-o-check-circle',
             self::INACTIVE => 'heroicon-o-x-circle',
             self::PENDING => 'heroicon-o-clock',

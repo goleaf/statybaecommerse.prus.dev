@@ -1,0 +1,50 @@
+<?php
+
+return [
+    'welcome' => [
+        'title' => 'Sveiki atvykę į administravimo panelę',
+        'description' => 'Valdykite savo el. prekybos sistemą iš vienos vietos',
+        'date' => 'Dabartinė data',
+    ],
+    'stats' => [
+        'total_orders' => 'Iš viso užsakymų',
+        'orders_description' => 'Bendras užsakymų skaičius',
+        'total_products' => 'Iš viso produktų',
+        'products_description' => 'Bendras produktų skaičius',
+        'total_users' => 'Iš viso vartotojų',
+        'users_description' => 'Bendras vartotojų skaičius',
+        'active_campaigns' => 'Aktyvios kampanijos',
+        'campaigns_description' => 'Aktyvių kampanijų skaičius',
+        'enum_values' => 'Enum reikšmės',
+        'enum_values_description' => 'Sistemos enum reikšmių skaičius',
+    ],
+    'quick_actions' => [
+        'title' => 'Greiti veiksmai',
+        'orders' => 'Užsakymai',
+        'manage_orders' => 'Valdyti užsakymus',
+        'products' => 'Produktai',
+        'manage_products' => 'Valdyti produktus',
+        'campaigns' => 'Kampanijos',
+        'manage_campaigns' => 'Valdyti kampanijas',
+        'system' => 'Sistema',
+        'manage_system' => 'Valdyti sistemą',
+    ],
+    'recent_activity' => [
+        'title' => 'Paskutiniai veiksmai',
+        'new_order' => 'Naujas užsakymas',
+        'order_created' => 'Užsakymas sukurtas',
+        'new_product' => 'Naujas produktas',
+        'product_created' => 'Produktas sukurtas',
+        'new_campaign' => 'Nauja kampanija',
+        'campaign_created' => 'Kampanija sukurta',
+    ],
+    'system_status' => [
+        'title' => 'Sistemos būsena',
+        'database' => 'Duomenų bazė',
+        'connected' => 'Prisijungta',
+        'cache' => 'Talpykla',
+        'operational' => 'Veikia',
+        'queue' => 'Eilė',
+        'running' => 'Veikia',
+    ],
+];

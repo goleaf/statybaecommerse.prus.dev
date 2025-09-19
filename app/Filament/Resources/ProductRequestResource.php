@@ -3,19 +3,19 @@
 namespace App\Filament\Resources;
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\ProductRequest;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
-use UnitEnum;
 use BackedEnum;
+use App\Enums\NavigationGroup;
 final class ProductRequestResource extends Resource
 {
     protected static ?string $model = ProductRequest::class;
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
-    protected static string | UnitEnum | null $navigationGroup = "Products";
+    // protected static $navigationGroup = NavigationGroup::Products;
     protected static ?int $navigationSort = 16;
     public static function form(Schema $schema): Schema
     {

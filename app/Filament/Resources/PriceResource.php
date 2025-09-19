@@ -32,7 +32,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 /**
  * PriceResource
  *
@@ -42,9 +41,7 @@ final class PriceResource extends Resource
 {
     protected static ?string $model = Price::class;
     /**
-     * @var UnitEnum|string|null
-     */    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = "Products";
+    // protected static $navigationGroup = NavigationGroup::Products;
     protected static ?int $navigationSort = 6;
     protected static ?string $recordTitleAttribute = 'priceable_type';
      * Handle getNavigationLabel functionality with proper error handling.
@@ -68,20 +65,7 @@ final class PriceResource extends Resource
      * @param Form $schema
      * @return Form
     public static function form(Schema $schema): Schema
-        return $schema->components([
-            Section::make(__('prices.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            Select::make('priceable_type')
-                                ->label(__('prices.priceable_type'))
-                                ->options([
-                                    'product' => __('prices.types.product'),
-                                    'product_variant' => __('prices.types.product_variant'),
-                                ])
-                                ->required()
-                                ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+    {
                                     $set('priceable_id', null);
                                 }),
                             Select::make('priceable_id')
@@ -141,11 +125,7 @@ final class PriceResource extends Resource
      * @param Table $table
      * @return Table
     public static function table(Table $table): Table
-        return $table
-            ->columns([
-                TextColumn::make('priceable_type')
-                    ->label(__('prices.type'))
-                    ->formatStateUsing(fn(string $state): string => __("prices.types.{$state}"))
+    {$state}"))
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'product' => 'blue',

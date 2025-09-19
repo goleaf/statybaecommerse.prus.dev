@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\ProductSimilarities\Schemas;
 
-use Filament\Forms\Components\DateTimePicker;
+use App\Models\Product;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 
 class ProductSimilarityForm
@@ -13,22 +12,28 @@ class ProductSimilarityForm
     public static function configure(Schema $schema): Schema
     {
         return $schema
-            ->components([
-                Select::make('product_id')
-                    ->relationship('product', 'name')
+            ->schema([
+                Select::make('product1_id')
+                    ->label('admin.product_similarity.product1')
+                    ->options(Product::all()->pluck('name', 'id'))
+                    ->searchable()
                     ->required(),
-                Select::make('similar_product_id')
-                    ->relationship('similarProduct', 'name')
-                    ->required(),
-                TextInput::make('algorithm_type')
+                Select::make('product2_id')
+                    ->label('admin.product_similarity.product2')
+                    ->options(Product::all()->pluck('name', 'id'))
+                    ->searchable()
                     ->required(),
                 TextInput::make('similarity_score')
-                    ->required()
-                    ->numeric(),
-                Textarea::make('calculation_data')
-                    ->columnSpanFull(),
-                DateTimePicker::make('calculated_at')
+                    ->label('admin.product_similarity.similarity_score')
+                    ->numeric()
+                    ->minValue(0)
+                    ->maxValue(1)
+                    ->step(0.01)
                     ->required(),
+                TextInput::make('similarity_data')
+                    ->label('admin.product_similarity.similarity_data')
+                    ->json()
+                    ->columnSpanFull(),
             ]);
     }
 }

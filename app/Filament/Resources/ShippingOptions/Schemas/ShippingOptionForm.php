@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ShippingOptions\Schemas;
 
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
@@ -31,9 +31,6 @@ class ShippingOptionForm
                 TextInput::make('currency_code')
                     ->required()
                     ->default('EUR'),
-                Select::make('zone_id')
-                    ->relationship('zone', 'name')
-                    ->required(),
                 Toggle::make('is_enabled')
                     ->required(),
                 Toggle::make('is_default')

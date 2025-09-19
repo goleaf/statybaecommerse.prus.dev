@@ -1,13 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Traits;
 
 use Illuminate\Support\Facades\DB;
 // Using native Laravel helpers and custom PriceData DTO
+
 /**
  * HasProductPricing
- * 
+ *
  * Trait providing reusable functionality across multiple classes.
  */
 trait HasProductPricing
@@ -24,11 +24,8 @@ trait HasProductPricing
         // Apply price lists (B2B/group/partner net pricing) if available
         try {
             $currencyId = DB::table('currencies')->where('code', $currencyCode)->value('id');
-            $zoneId = session('zone.id');
             $userId = optional(auth()->user())->id;
-            $candidate = DB::table('price_lists as pl')->where('pl.is_enabled', true)->where('pl.currency_id', $currencyId)->when($zoneId, fn($q) => $q->where(function ($qq) use ($zoneId) {
-                $qq->whereNull('pl.zone_id')->orWhere('pl.zone_id', $zoneId);
-            }))->where(function ($q) use ($userId) {
+            $candidate = DB::table('price_lists as pl')->where('pl.is_enabled', true)->where('pl.currency_id', $currencyId)->where(function ($q) use ($userId) {
                 $q->whereExists(function ($sq) use ($userId) {
                     $sq->select(DB::raw(1))->from('group_price_list as gpl')->join('customer_group_user as cgu', 'cgu.group_id', '=', 'gpl.group_id')->whereColumn('gpl.price_list_id', 'pl.id')->where('cgu.user_id', $userId);
                 })->orWhereExists(function ($sq) use ($userId) {

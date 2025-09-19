@@ -30,7 +30,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 /**
  * VariantPricingRuleResource
  *
@@ -38,8 +37,7 @@ use UnitEnum;
  */
 final class VariantPricingRuleResource extends Resource
 {
-    protected static ?string $model = VariantPricingRule::class;    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = "Products";
+    // protected static $navigationGroup = NavigationGroup::Products;
     protected static ?int $navigationSort = 10;
     protected static ?string $recordTitleAttribute = 'name';
     /**
@@ -64,95 +62,7 @@ final class VariantPricingRuleResource extends Resource
      * @param Form $schema
      * @return Form
     public static function form(Schema $schema): Schema
-        return $schema->components([
-            Section::make(__('variant_pricing_rules.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            TextInput::make('name')
-                                ->label(__('variant_pricing_rules.name'))
-                                ->required()
-                                ->maxLength(255),
-                            Select::make('type')
-                                ->label(__('variant_pricing_rules.type'))
-                                ->options([
-                                    'percentage' => __('variant_pricing_rules.types.percentage'),
-                                    'fixed' => __('variant_pricing_rules.types.fixed'),
-                                    'tier' => __('variant_pricing_rules.types.tier'),
-                                    'bulk' => __('variant_pricing_rules.types.bulk'),
-                                ])
-                                ->default('percentage')
-                                ->live(),
-                        ]),
-                    Textarea::make('description')
-                        ->label(__('variant_pricing_rules.description'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                ]),
-            Section::make(__('variant_pricing_rules.targeting'))
-                            Select::make('product_variant_id')
-                                ->label(__('variant_pricing_rules.product_variant'))
-                                ->relationship('productVariant', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->required(),
-                            Select::make('customer_group_id')
-                                ->label(__('variant_pricing_rules.customer_group'))
-                                ->relationship('customerGroup', 'name')
-                                ->createOptionForm([
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255),
-                                    Textarea::make('description')
-                                        ->maxLength(500),
-                                ]),
-            Section::make(__('variant_pricing_rules.pricing'))
-                            TextInput::make('value')
-                                ->label(__('variant_pricing_rules.value'))
-                                ->numeric()
-                                ->step(0.01)
-                                ->minValue(0)
-                                ->helperText(__('variant_pricing_rules.value_help')),
-                            TextInput::make('min_quantity')
-                                ->label(__('variant_pricing_rules.min_quantity'))
-                                ->minValue(1)
-                                ->default(1),
-                            TextInput::make('max_quantity')
-                                ->label(__('variant_pricing_rules.max_quantity'))
-                                ->minValue(1),
-                            TextInput::make('priority')
-                                ->label(__('variant_pricing_rules.priority'))
-                                ->default(0)
-                                ->helperText(__('variant_pricing_rules.priority_help')),
-            Section::make(__('variant_pricing_rules.conditions'))
-                            DateTimePicker::make('valid_from')
-                                ->label(__('variant_pricing_rules.valid_from'))
-                                ->default(now())
-                                ->displayFormat('d/m/Y H:i'),
-                            DateTimePicker::make('valid_until')
-                                ->label(__('variant_pricing_rules.valid_until'))
-                            Toggle::make('is_active')
-                                ->label(__('variant_pricing_rules.is_active'))
-                                ->default(true),
-                            Toggle::make('is_cumulative')
-                                ->label(__('variant_pricing_rules.is_cumulative'))
-                                ->default(false),
-        ]);
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-    public static function table(Table $table): Table
-        return $table
-            ->columns([
-                TextColumn::make('name')
-                    ->label(__('variant_pricing_rules.name'))
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold'),
-                TextColumn::make('type')
-                    ->label(__('variant_pricing_rules.type'))
-                    ->formatStateUsing(fn(string $state): string => __("variant_pricing_rules.types.{$state}"))
+    {$state}"))
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'percentage' => 'blue',

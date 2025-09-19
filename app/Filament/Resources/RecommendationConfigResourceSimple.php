@@ -10,7 +10,6 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Enums\NavigationGroup;
 use Filament\Forms;
-use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -34,37 +33,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-/**
- * RecommendationConfigResourceSimple
- * 
- * Filament v4 resource for RecommendationConfigSimple management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class RecommendationConfigResourceSimple extends Resource
-{
-    protected static ?string $model = RecommendationConfigSimple::class;
-    
-    protected static string | UnitEnum | null $navigationGroup = "Products";
-    
-    protected static ?int $navigationSort = 14;
-    protected static ?string $recordTitleAttribute = 'name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('recommendation_configs_simple.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return "Products";
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

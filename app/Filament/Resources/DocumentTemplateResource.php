@@ -2,14 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Models\DocumentTemplate;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\DeleteBulkAction as TableDeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\EditAction as TableEditAction;
 use Filament\Actions\ViewAction;
+use Filament\Actions\ViewAction as TableViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -19,10 +24,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
-use Filament\Actions\DeleteBulkAction as TableDeleteBulkAction;
-use Filament\Actions\EditAction as TableEditAction;
-use Filament\Actions\ViewAction as TableViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -30,7 +31,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 /**
  * DocumentTemplateResource
@@ -40,7 +40,7 @@ use UnitEnum;
 final class DocumentTemplateResource extends Resource
 {
     protected static ?string $model = DocumentTemplate::class;
-    protected static string|UnitEnum|null $navigationGroup = 'Documents';
+    // /** @var UnitEnum|string|null */\n    // protected static $navigationGroup = NavigationGroup::System;
     protected static ?int $navigationSort = 3;
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -156,7 +156,7 @@ final class DocumentTemplateResource extends Resource
                 TextColumn::make('type')
                     ->label(__('document_templates.type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'invoice' => 'success',
                         'receipt' => 'info',
                         'quote' => 'warning',
@@ -167,7 +167,7 @@ final class DocumentTemplateResource extends Resource
                 TextColumn::make('category')
                     ->label(__('document_templates.category'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'financial' => 'success',
                         'legal' => 'danger',
                         'marketing' => 'info',

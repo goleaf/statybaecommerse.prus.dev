@@ -3,10 +3,10 @@
 namespace App\Filament\Resources\ZoneResource\Pages;
 
 use App\Filament\Resources\ZoneResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
-final class EditZone extends EditRecord
+class EditZone extends EditRecord
 {
     protected static string $resource = ZoneResource::class;
 

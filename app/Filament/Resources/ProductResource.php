@@ -12,19 +12,19 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -37,7 +37,6 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
-use UnitEnum;
 
 /**
  * ProductResource
@@ -47,7 +46,7 @@ use UnitEnum;
 final class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
-    protected static string|UnitEnum|null $navigationGroup = "Products";
+    // protected static $navigationGroup = NavigationGroup::Products;
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -58,15 +57,6 @@ final class ProductResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('products.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return "Products"->value;
     }
 
     /**
@@ -88,20 +78,20 @@ final class ProductResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      * @param Schema $schema
-     * @return Schema
+     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Tabs::make(__('products.tabs.main'))
                 ->tabs([
                     Tab::make(__('products.tabs.basic_information'))
                         ->icon('heroicon-o-information-circle')
-                        ->components([
+                        ->schema([
                             Section::make(__('products.sections.basic_information'))
-                                ->components([
+                                ->schema([
                                     Grid::make(2)
-                                        ->components([
+                                        ->schema([
                                             TextInput::make('name')
                                                 ->label(__('products.fields.name'))
                                                 ->required()
@@ -125,11 +115,11 @@ final class ProductResource extends Resource
                         ]),
                     Tab::make(__('products.tabs.pricing'))
                         ->icon('heroicon-o-currency-euro')
-                        ->components([
+                        ->schema([
                             Section::make(__('products.sections.pricing'))
-                                ->components([
+                                ->schema([
                                     Grid::make(3)
-                                        ->components([
+                                        ->schema([
                                             TextInput::make('price')
                                                 ->label(__('products.fields.price'))
                                                 ->numeric()
@@ -150,11 +140,11 @@ final class ProductResource extends Resource
                         ]),
                     Tab::make(__('products.tabs.inventory'))
                         ->icon('heroicon-o-archive-box')
-                        ->components([
+                        ->schema([
                             Section::make(__('products.sections.inventory'))
-                                ->components([
+                                ->schema([
                                     Grid::make(3)
-                                        ->components([
+                                        ->schema([
                                             TextInput::make('sku')
                                                 ->label(__('products.fields.sku')),
                                             TextInput::make('barcode')
@@ -185,11 +175,11 @@ final class ProductResource extends Resource
                         ]),
                     Tab::make(__('products.tabs.organization'))
                         ->icon('heroicon-o-tag')
-                        ->components([
+                        ->schema([
                             Section::make(__('products.sections.organization'))
-                                ->components([
+                                ->schema([
                                     Grid::make(2)
-                                        ->components([
+                                        ->schema([
                                             Select::make('category_id')
                                                 ->label(__('products.fields.category'))
                                                 ->relationship('categories', 'name')
@@ -205,11 +195,11 @@ final class ProductResource extends Resource
                         ]),
                     Tab::make(__('products.tabs.visibility'))
                         ->icon('heroicon-o-eye')
-                        ->components([
+                        ->schema([
                             Section::make(__('products.sections.visibility'))
-                                ->components([
+                                ->schema([
                                     Grid::make(2)
-                                        ->components([
+                                        ->schema([
                                             Toggle::make('is_visible')
                                                 ->label(__('products.fields.is_visible'))
                                                 ->default(true),

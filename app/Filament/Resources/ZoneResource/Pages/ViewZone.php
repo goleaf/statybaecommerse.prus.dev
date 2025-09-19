@@ -3,10 +3,10 @@
 namespace App\Filament\Resources\ZoneResource\Pages;
 
 use App\Filament\Resources\ZoneResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
 
-final class ViewZone extends ViewRecord
+class ViewZone extends ViewRecord
 {
     protected static string $resource = ZoneResource::class;
 

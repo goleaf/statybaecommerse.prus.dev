@@ -5,6 +5,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 final class UsersRelationManager extends RelationManager
@@ -16,8 +17,7 @@ final class UsersRelationManager extends RelationManager
         return $schema
             ->components([
                 Forms\Components\TextInput::make('name')
-                    ->required(),
-                    ->maxLength(255),
+                    ->required()\n                    ->maxLength(255),
                 Forms\Components\TextInput::make('email')
                     ->email()
             ]);
@@ -25,18 +25,15 @@ final class UsersRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('customers.name'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('customers.email'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()\n                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('customers.created_at'))
                     ->dateTime(),

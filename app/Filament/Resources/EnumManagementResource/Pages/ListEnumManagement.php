@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\EnumManagementResource\Pages;
 
-use App\Filament\Resources\EnumManagementResource;
-use App\Enums\StatusEnum;
-use App\Enums\PriorityEnum;
 use App\Enums\CurrencyEnum;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Enums\PriorityEnum;
+use App\Enums\StatusEnum;
+use App\Filament\Resources\EnumManagementResource;
 use Filament\Resources\Components\Tab;
+use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListEnumManagement extends ListRecords
@@ -27,11 +27,11 @@ class ListEnumManagement extends ListRecords
         return [
             'all' => Tab::make('All Enums'),
             'status' => Tab::make('Status Enum')
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('enum_type', 'status')),
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('enum_type', 'status')),
             'priority' => Tab::make('Priority Enum')
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('enum_type', 'priority')),
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('enum_type', 'priority')),
             'currency' => Tab::make('Currency Enum')
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('enum_type', 'currency')),
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('enum_type', 'currency')),
         ];
     }
 }

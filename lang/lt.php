@@ -489,8 +489,6 @@ return [
     'analytics_discounts_applied_products' => 'Nuolaidos su produktais',
     'analytics_coupons_with_orders' => 'Kuponai su užsakymais',
     'analytics_coupons_used_orders' => 'Kuponai su užsakymais',
-    'analytics_locations_with_zones' => 'Vietos su zonomis',
-    'analytics_locations_zoned' => 'Vietos su zonomis',
     'analytics_products_with_media' => 'Produktai su medija',
     'analytics_products_with_images' => 'Produktai su paveikslėliais',
     'analytics_products_with_stock' => 'Produktai su atsargomis',

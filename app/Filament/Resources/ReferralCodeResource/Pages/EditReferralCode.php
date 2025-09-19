@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ReferralCodeResource\Pages;
 
 use App\Filament\Resources\ReferralCodeResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
 final class EditReferralCode extends EditRecord
 {
@@ -13,8 +13,8 @@ final class EditReferralCode extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
     }
 }
-

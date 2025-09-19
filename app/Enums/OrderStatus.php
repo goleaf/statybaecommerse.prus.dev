@@ -15,7 +15,7 @@ enum OrderStatus: string
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => __('enums.order_status.pending'),
             self::CONFIRMED => __('enums.order_status.confirmed'),
             self::PROCESSING => __('enums.order_status.processing'),
@@ -29,7 +29,7 @@ enum OrderStatus: string
 
     public function getColor(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'warning',
             self::CONFIRMED => 'info',
             self::PROCESSING => 'primary',
@@ -43,7 +43,7 @@ enum OrderStatus: string
 
     public function getIcon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'heroicon-o-clock',
             self::CONFIRMED => 'heroicon-o-check-circle',
             self::PROCESSING => 'heroicon-o-cog-6-tooth',

@@ -18,7 +18,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\BadgeColumn;
@@ -31,43 +31,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * CouponResource
- *
- * Filament v4 resource for Coupon management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class CouponResource extends Resource
-{
-    protected static ?string $model = Coupon::class;
-
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static string|UnitEnum|null $navigationGroup = "Products";
-
-    protected static ?int $navigationSort = 2;
-
-    protected static ?string $recordTitleAttribute = 'code';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('coupons.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return "Marketing"->value;
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

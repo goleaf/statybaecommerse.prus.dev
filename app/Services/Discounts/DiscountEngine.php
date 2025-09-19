@@ -2,15 +2,15 @@
 
 namespace App\Services\Discounts;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
+
 /**
  * DiscountEngine
- * 
+ *
  * Service class containing DiscountEngine business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 class DiscountEngine
 {
@@ -21,7 +21,7 @@ class DiscountEngine
      */
     public function evaluate(array $context): array
     {
-        // Context keys: zone_id, currency_code, channel_id, user_id, partner_tier, group_ids, now
+        // Context keys: currency_code, channel_id, user_id, partner_tier, group_ids, now
         // cart: items [ [product_id, variant_id, quantity, unit_price], ... ] and subtotal
         $now = $context['now'] ?? now();
         $candidateDiscounts = $this->collectCandidates($context, $now);
@@ -37,6 +37,7 @@ class DiscountEngine
         }
         return $final;
     }
+
     /**
      * Handle collectCandidates functionality with proper error handling.
      * @param array $context
@@ -46,7 +47,7 @@ class DiscountEngine
     protected function collectCandidates(array $context, $now): Collection
     {
         // Minimal placeholder: fetch active discounts by date/status and basic restrictions
-        $cacheKey = sprintf('discount:candidates:%s:%s:%s:%s:%s:%s', $context['zone_id'] ?? 'na', $context['currency_code'] ?? 'na', $context['channel_id'] ?? 'na', md5(json_encode($context['group_ids'] ?? [])), $context['partner_tier'] ?? 'na', $now->format('YmdHi'));
+        $cacheKey = sprintf('discount:candidates:%s:%s:%s:%s:%s', $context['currency_code'] ?? 'na', $context['channel_id'] ?? 'na', md5(json_encode($context['group_ids'] ?? [])), $context['partner_tier'] ?? 'na', $now->format('YmdHi'));
         // Check if cache store supports tagging
         $cacheStore = Cache::getStore();
         $supportsTags = method_exists($cacheStore, 'tags');
@@ -81,6 +82,7 @@ class DiscountEngine
             });
         }
     }
+
     /**
      * Handle filterEligibility functionality with proper error handling.
      * @param Collection $discounts
@@ -92,7 +94,6 @@ class DiscountEngine
     {
         $currency = data_get($context, 'currency_code');
         $channelId = data_get($context, 'channel_id');
-        $zoneId = data_get($context, 'zone_id');
         $userId = data_get($context, 'user_id');
         $groupIds = collect(data_get($context, 'group_ids', []))->map(fn($v) => (int) $v)->filter()->values();
         if ($groupIds->isEmpty() && $userId) {
@@ -102,8 +103,8 @@ class DiscountEngine
         if (!$partnerTier && $userId) {
             $partnerTier = DB::table('partner_users as pu')->join('partners as p', 'p.id', '=', 'pu.partner_id')->where('pu.user_id', $userId)->value('p.tier');
         }
-        // Honor weekday/time windows, currency/channel/zone restrictions; first order; customer groups; per-day limit
-        return $discounts->filter(function ($d) use ($now, $currency, $channelId, $zoneId, $userId, $groupIds, $partnerTier) {
+        // Honor weekday/time windows, currency/channel restrictions; first order; customer groups; per-day limit
+        return $discounts->filter(function ($d) use ($now, $currency, $channelId, $userId, $groupIds, $partnerTier) {
             if (!empty($d->weekday_mask)) {
                 $allowed = collect(explode(',', $d->weekday_mask))->filter()->map(fn($v) => (int) $v);
                 if (!$allowed->contains((int) $now->dayOfWeekIso)) {
@@ -159,18 +160,6 @@ class DiscountEngine
                     return false;
                 }
             }
-            // Zone condition: if present, require zone id match
-            $hasZoneCondition = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'zone')->exists();
-            if ($hasZoneCondition) {
-                $values = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'zone')->pluck('value');
-                $allowedZoneIds = collect($values)->map(function ($v) {
-                    $arr = is_string($v) ? json_decode($v, true) : (array) $v;
-                    return collect($arr)->map(fn($x) => (int) $x);
-                })->flatten()->filter()->values();
-                if ($allowedZoneIds->isNotEmpty() && $zoneId && !$allowedZoneIds->contains((int) $zoneId)) {
-                    return false;
-                }
-            }
             // User condition: if present, require explicit user id
             $hasUserCondition = DB::table('discount_conditions')->where('discount_id', $d->id)->where('type', 'user')->exists();
             if ($hasUserCondition && $userId) {
@@ -195,10 +184,10 @@ class DiscountEngine
                     return false;
                 }
             }
-            // zone-based via scope json in scope or via explicit pivot (out of scope here)
             return true;
         });
     }
+
     /**
      * Handle computeEffects functionality with proper error handling.
      * @param Collection $eligible
@@ -362,6 +351,7 @@ class DiscountEngine
         }
         return ['applied' => $applied, 'discount_total_amount' => round($discountAmount, 2), 'line_discounts' => $lineDiscounts, 'cart_discounts' => $cartDiscounts, 'shipping' => ['discount_amount' => round($shippingDiscount, 2)]];
     }
+
     /**
      * Handle compareOperator functionality with proper error handling.
      * @param mixed $left
@@ -381,6 +371,7 @@ class DiscountEngine
             default => true,
         };
     }
+
     /**
      * Handle itemMatches functionality with proper error handling.
      * @param array $item
@@ -427,6 +418,7 @@ class DiscountEngine
         }
         return false;
     }
+
     /**
      * Handle applyStackingAndPriority functionality with proper error handling.
      * @param array $calculated

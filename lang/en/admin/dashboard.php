@@ -1,0 +1,50 @@
+<?php
+
+return [
+    'welcome' => [
+        'title' => 'Welcome to Admin Panel',
+        'description' => 'Manage your e-commerce system from one place',
+        'date' => 'Current date',
+    ],
+    'stats' => [
+        'total_orders' => 'Total Orders',
+        'orders_description' => 'Total number of orders',
+        'total_products' => 'Total Products',
+        'products_description' => 'Total number of products',
+        'total_users' => 'Total Users',
+        'users_description' => 'Total number of users',
+        'active_campaigns' => 'Active Campaigns',
+        'campaigns_description' => 'Number of active campaigns',
+        'enum_values' => 'Enum Values',
+        'enum_values_description' => 'Number of system enum values',
+    ],
+    'quick_actions' => [
+        'title' => 'Quick Actions',
+        'orders' => 'Orders',
+        'manage_orders' => 'Manage orders',
+        'products' => 'Products',
+        'manage_products' => 'Manage products',
+        'campaigns' => 'Campaigns',
+        'manage_campaigns' => 'Manage campaigns',
+        'system' => 'System',
+        'manage_system' => 'Manage system',
+    ],
+    'recent_activity' => [
+        'title' => 'Recent Activity',
+        'new_order' => 'New Order',
+        'order_created' => 'Order created',
+        'new_product' => 'New Product',
+        'product_created' => 'Product created',
+        'new_campaign' => 'New Campaign',
+        'campaign_created' => 'Campaign created',
+    ],
+    'system_status' => [
+        'title' => 'System Status',
+        'database' => 'Database',
+        'connected' => 'Connected',
+        'cache' => 'Cache',
+        'operational' => 'Operational',
+        'queue' => 'Queue',
+        'running' => 'Running',
+    ],
+];

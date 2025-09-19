@@ -9,3 +9,4 @@ class CreateCampaignCustomerSegment extends CreateRecord
 {
     protected static string $resource = CampaignCustomerSegmentResource::class;
 }
+

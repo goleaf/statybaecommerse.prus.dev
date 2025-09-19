@@ -39,39 +39,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * LocationResource
- *
- * Filament v4 resource for Location management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class LocationResource extends Resource
-{
-    protected static ?string $model = Location::class;
-    /** @var UnitEnum|string|null */
-    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Products;
-    protected static ?int $navigationSort = 2;
-    protected static ?string $recordTitleAttribute = 'name';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('locations.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'System';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

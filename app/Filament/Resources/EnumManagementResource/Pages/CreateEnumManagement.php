@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\EnumManagementResource\Pages;
 
 use App\Filament\Resources\EnumManagementResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Actions;
 
 class CreateEnumManagement extends CreateRecord
 {

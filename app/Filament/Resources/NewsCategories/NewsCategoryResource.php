@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\NewsCategories;
 
+use App\Enums\NavigationGroup;
+
 use App\Filament\Resources\NewsCategories\Pages\CreateNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\EditNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\ListNewsCategories;
@@ -11,21 +13,18 @@ use App\Models\NewsCategory;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use UnitEnum;
 
 final class NewsCategoryResource extends Resource
 {
     protected static ?string $model = NewsCategory::class;
 
     /**
-     * @var UnitEnum|string|null
      */
     protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     /**
-     * @var UnitEnum|string|null
      */
-    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Content;
+    // protected static $navigationGroup = NavigationGroup::System;
 
     public static function form(Schema $schema): Schema
     {

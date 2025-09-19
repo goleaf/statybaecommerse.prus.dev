@@ -73,3 +73,4 @@ return [
     'archived_successfully' => 'Document archived successfully',
 ];
 
+

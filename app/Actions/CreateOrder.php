@@ -1,6 +1,5 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Actions;
 
 use App\Mail\OrderPlaced;
@@ -11,11 +10,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Number;
+
 /**
  * CreateOrder
- * 
+ *
  * Action class for CreateOrder single-purpose operations with validation, error handling, and result reporting.
- * 
  */
 class CreateOrder
 {
@@ -73,13 +72,12 @@ class CreateOrder
                 }
             }
             $engine = app(\App\Services\Discounts\DiscountEngine::class);
-            $result = $engine->evaluate(['zone_id' => ZoneSessionManager::getSession()->zoneId, 'currency_code' => current_currency(), 'channel_id' => null, 'user_id' => optional($customer)->id, 'now' => now(), 'code' => $codeRow ? $couponCode : null, 'cart' => ['subtotal' => $subtotal, 'items' => []]]);
+            $result = $engine->evaluate(['currency_code' => current_currency(), 'channel_id' => null, 'user_id' => optional($customer)->id, 'now' => now(), 'code' => $codeRow ? $couponCode : null, 'cart' => ['subtotal' => $subtotal, 'items' => []]]);
             $discountTotal = Number::parseFloat(data_get($result, 'discount_total_amount', 0));
-            $zoneCode = data_get(ZoneSessionManager::getSession(), 'zoneCode');
-            $taxTotal = app(\App\Services\Taxes\TaxCalculator::class)->compute(max(0.0, $subtotal - (float) $discountTotal), is_string($zoneCode) ? $zoneCode : null);
+            $taxTotal = app(\App\Services\Taxes\TaxCalculator::class)->compute(max(0.0, $subtotal - (float) $discountTotal), null);
             $grandTotal = max(0, round($subtotal - $discountTotal + $shippingTotal + $taxTotal, 2));
             /** @var Order $order */
-            $order = Order::query()->create(['number' => generate_number(), 'customer_id' => $customer->id, 'zone_id' => ZoneSessionManager::getSession()->zoneId, 'currency_code' => current_currency(), 'shipping_address_id' => $shippingAddress->id, 'billing_address_id' => $billingAddress->id, 'shipping_option_id' => data_get($checkout, 'shipping_option')[0]['id'], 'payment_method_id' => data_get($checkout, 'payment')[0]['id'], 'payment_method' => (string) data_get($checkout, 'payment')[0]['name'], 'subtotal_amount' => round($subtotal, 2), 'discount_total_amount' => round($discountTotal, 2), 'tax_total_amount' => round($taxTotal, 2), 'shipping_total_amount' => round($shippingTotal, 2), 'grand_total_amount' => $grandTotal]);
+            $order = Order::query()->create(['number' => generate_number(), 'customer_id' => $customer->id, 'currency_code' => current_currency(), 'shipping_address_id' => $shippingAddress->id, 'billing_address_id' => $billingAddress->id, 'shipping_option_id' => data_get($checkout, 'shipping_option')[0]['id'], 'payment_method_id' => data_get($checkout, 'payment')[0]['id'], 'payment_method' => (string) data_get($checkout, 'payment')[0]['name'], 'subtotal_amount' => round($subtotal, 2), 'discount_total_amount' => round($discountTotal, 2), 'tax_total_amount' => round($taxTotal, 2), 'shipping_total_amount' => round($shippingTotal, 2), 'grand_total_amount' => $grandTotal]);
             // Items
             // @phpstan-ignore-next-line
             foreach (CartFacade::session($sessionId)->getContent() as $item) {

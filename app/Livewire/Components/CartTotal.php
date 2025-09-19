@@ -1,17 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Livewire\Components;
 
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
+
 /**
  * CartTotal
- * 
+ *
  * Livewire component for CartTotal with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property float $subtotal
  * @property float $discount
  * @property float $shippingDiscount
@@ -23,6 +23,7 @@ class CartTotal extends Component
     public float $discount = 0.0;
     public float $shippingDiscount = 0.0;
     public float $total = 0.0;
+
     /**
      * Handle cartSubtotal functionality with proper error handling.
      * @return float
@@ -41,6 +42,7 @@ class CartTotal extends Component
         }
         return 0.0;
     }
+
     /**
      * Handle discountCalculation functionality with proper error handling.
      * @return array
@@ -50,6 +52,7 @@ class CartTotal extends Component
     {
         return $this->calculateDiscountsAndShipping($this->cartSubtotal);
     }
+
     /**
      * Handle finalTotal functionality with proper error handling.
      * @return float
@@ -64,6 +67,7 @@ class CartTotal extends Component
         $shipping = (float) data_get(session()->get('checkout'), 'shipping_option.0.price', 0.0);
         return max(0, $subtotal - $discount + max(0, $shipping - $shippingDiscount));
     }
+
     /**
      * Handle updateTotals functionality with proper error handling.
      * @return void
@@ -74,6 +78,7 @@ class CartTotal extends Component
     {
         $this->compute();
     }
+
     /**
      * Initialize the Livewire component with parameters.
      * @return void
@@ -82,6 +87,7 @@ class CartTotal extends Component
     {
         $this->compute();
     }
+
     /**
      * Handle compute functionality with proper error handling.
      * @return void
@@ -105,6 +111,7 @@ class CartTotal extends Component
         $shipping = (float) data_get(session()->get('checkout'), 'shipping_option.0.price', 0.0);
         $this->total = max(0, $this->subtotal - $this->discount + max(0, $shipping - $this->shippingDiscount));
     }
+
     /**
      * Handle calculateDiscountsAndShipping functionality with proper error handling.
      * @param float $amount
@@ -138,13 +145,14 @@ class CartTotal extends Component
                 // ignore if tables not present
             }
         }
-        $context = ['zone_id' => session('zone.id'), 'currency_code' => current_currency(), 'channel_id' => optional(config('app.url')), 'user_id' => $userId, 'group_ids' => $groupIds, 'partner_tier' => $partnerTier, 'now' => now(), 'code' => $code, 'cart' => ['subtotal' => $amount, 'items' => $items]];
+        $context = ['currency_code' => current_currency(), 'channel_id' => optional(config('app.url')), 'user_id' => $userId, 'group_ids' => $groupIds, 'partner_tier' => $partnerTier, 'now' => now(), 'code' => $code, 'cart' => ['subtotal' => $amount, 'items' => $items]];
         try {
             return (array) $engine->evaluate($context);
         } catch (\Throwable $e) {
             return [];
         }
     }
+
     /**
      * Render the Livewire component view with current state.
      * @return View

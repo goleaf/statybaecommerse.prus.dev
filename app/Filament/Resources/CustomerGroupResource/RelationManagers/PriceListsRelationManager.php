@@ -1,22 +1,26 @@
 <?php declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
-use Filament\Forms;
+
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 final class PriceListsRelationManager extends RelationManager
 {
     protected static string $relationship = 'priceLists';
     protected static ?string $title = 'customer_groups.relation_price_lists';
+
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Forms\Components\TextInput::make('name')
-                    ->required(),
+                    ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('currency')
                     ->maxLength(3),
@@ -25,25 +29,24 @@ final class PriceListsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('price_lists.name'))
-                    ->searchable(),
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('currency')
                     ->label(__('price_lists.currency'))
-                    ->sortable(),
-                    ->badge(),
+                    ->sortable()
+                    ->badge()
                     ->color('info'),
                 Tables\Columns\TextColumn::make('is_default')
                     ->label(__('price_lists.is_default'))
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('price_lists.created_at'))
-                    ->dateTime(),
+                    ->dateTime()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([

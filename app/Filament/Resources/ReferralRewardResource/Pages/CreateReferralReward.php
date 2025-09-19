@@ -8,5 +8,4 @@ use Filament\Resources\Pages\CreateRecord;
 final class CreateReferralReward extends CreateRecord
 {
     protected static string $resource = ReferralRewardResource::class;
-
 }

@@ -4,6 +4,12 @@ use App\Models\CustomerGroup;
 use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 
+// Include frontend routes
+require __DIR__ . '/frontend.php';
+
+// Include admin routes
+require __DIR__ . '/admin.php';
+
 Route::middleware(['web'])->group(function () {
     // Live Demo Route
     Route::get('/live-demo', App\Livewire\Pages\LiveDemo::class)->name('live-demo');
@@ -70,7 +76,6 @@ Route::middleware(['web'])->group(function () {
 
         // AJAX routes for dynamic loading
         Route::get('/api/countries', [App\Http\Controllers\Frontend\AddressController::class, 'getCountries'])->name('api.countries');
-        Route::get('/api/zones', [App\Http\Controllers\Frontend\AddressController::class, 'getZones'])->name('api.zones');
         Route::get('/api/cities', [App\Http\Controllers\Frontend\AddressController::class, 'getCities'])->name('api.cities');
     });
 
@@ -109,19 +114,6 @@ Route::middleware(['web'])->group(function () {
         Route::get('/applied', [App\Http\Controllers\Frontend\ReferralRewardController::class, 'apiApplied'])->name('applied');
         Route::get('/type/{type}', [App\Http\Controllers\Frontend\ReferralRewardController::class, 'apiByType'])->name('by-type');
         Route::get('/date-range', [App\Http\Controllers\Frontend\ReferralRewardController::class, 'apiByDateRange'])->name('by-date-range');
-    });
-
-    // Zone Frontend Routes
-    Route::prefix('zones')->name('zones.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\ZoneController::class, 'index'])->name('index');
-        Route::get('/{zone}', [App\Http\Controllers\Frontend\ZoneController::class, 'show'])->name('show');
-        Route::post('/{zone}/calculate-shipping', [App\Http\Controllers\Frontend\ZoneController::class, 'calculateShipping'])->name('calculate-shipping');
-    });
-
-    // Zone API Routes
-    Route::prefix('api/zones')->name('api.zones.')->group(function () {
-        Route::get('/by-country', [App\Http\Controllers\Frontend\ZoneController::class, 'getZonesByCountry'])->name('by-country');
-        Route::get('/default', [App\Http\Controllers\Frontend\ZoneController::class, 'getDefaultZone'])->name('default');
     });
 
     // System Settings Frontend Routes
@@ -338,7 +330,6 @@ Route::middleware(['web'])->group(function () {
 });
 
 use App\Livewire\Pages;
-use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 

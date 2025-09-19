@@ -12,7 +12,7 @@ enum Priority: string
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::LOW => __('enums.priority.low'),
             self::MEDIUM => __('enums.priority.medium'),
             self::HIGH => __('enums.priority.high'),
@@ -23,7 +23,7 @@ enum Priority: string
 
     public function getColor(): string
     {
-        return match($this) {
+        return match ($this) {
             self::LOW => 'gray',
             self::MEDIUM => 'info',
             self::HIGH => 'warning',
@@ -34,7 +34,7 @@ enum Priority: string
 
     public function getIcon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::LOW => 'heroicon-o-minus-circle',
             self::MEDIUM => 'heroicon-o-information-circle',
             self::HIGH => 'heroicon-o-exclamation-triangle',

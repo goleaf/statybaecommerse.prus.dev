@@ -1,19 +1,18 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeResource\RelationManagers;
 
 use App\Models\Product;
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class ProductsRelationManager extends RelationManager
 {
@@ -44,18 +43,15 @@ final class ProductsRelationManager extends RelationManager
                             ->minValue(0)
                             ->step(0.01),
                     ]),
-
                 Forms\Components\TextInput::make('value')
                     ->label(__('attributes.value'))
                     ->required()
                     ->maxLength(255),
-
                 Forms\Components\TextInput::make('sort_order')
                     ->label(__('attributes.sort_order'))
                     ->numeric()
                     ->default(0)
                     ->minValue(0),
-
                 Forms\Components\Toggle::make('is_active')
                     ->label(__('attributes.is_active'))
                     ->default(true),
@@ -72,7 +68,6 @@ final class ProductsRelationManager extends RelationManager
                     ->searchable()
                     ->sortable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('product.sku')
                     ->label(__('attributes.sku'))
                     ->searchable()
@@ -80,30 +75,26 @@ final class ProductsRelationManager extends RelationManager
                     ->copyable()
                     ->badge()
                     ->color('gray'),
-
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('attributes.value'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label(__('attributes.sort_order'))
                     ->sortable()
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
+                    ->color(fn(int $state): string => match (true) {
                         $state >= 100 => 'danger',
                         $state >= 50 => 'warning',
                         $state >= 20 => 'info',
                         $state >= 10 => 'success',
                         default => 'gray',
                     }),
-
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('attributes.is_active'))
                     ->boolean()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('attributes.created_at'))
                     ->dateTime()
@@ -116,7 +107,6 @@ final class ProductsRelationManager extends RelationManager
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload(),
-
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label(__('attributes.is_active'))
                     ->boolean()

@@ -33,40 +33,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-/**
- * AttributeValueResource
- *
- * Filament v4 resource for AttributeValue management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class AttributeValueResource extends Resource
-{
-    protected static ?string $model = AttributeValue::class;
-
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
-
-    protected static ?int $navigationSort = 9;
-
-    protected static ?string $recordTitleAttribute = 'value';
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('attribute_values.title');
-    }
-
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Products';
-    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
