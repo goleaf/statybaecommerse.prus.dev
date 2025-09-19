@@ -59,6 +59,7 @@ final class VariantImageResourceTest extends TestCase
         $variantImage = VariantImage::factory()->create();
         
         $data = [
+            'image_path' => ['updated-image.jpg'],
             'alt_text' => 'Updated Alt Text',
             'sort_order' => 2,
             'is_primary' => false,
@@ -73,6 +74,7 @@ final class VariantImageResourceTest extends TestCase
 
         $this->assertDatabaseHas('variant_images', [
             'id' => $variantImage->id,
+            'image_path' => 'updated-image.jpg',
             'alt_text' => 'Updated Alt Text',
             'sort_order' => 2,
             'is_primary' => false,
