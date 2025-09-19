@@ -1,18 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * OrderItem
- * 
+ *
  * Eloquent model representing the OrderItem entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property mixed $table
  * @property mixed $fillable
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem newModelQuery()
@@ -24,8 +24,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class OrderItem extends Model
 {
     use HasFactory;
+
     protected $table = 'order_items';
-    protected $fillable = ['order_id', 'product_id', 'product_variant_id', 'name', 'sku', 'quantity', 'unit_price', 'price', 'total'];
+    protected $fillable = ['order_id', 'product_id', 'product_variant_id', 'name', 'sku', 'quantity', 'unit_price', 'price', 'total', 'notes'];
+
     /**
      * Handle casts functionality with proper error handling.
      * @return array
@@ -34,6 +36,7 @@ final class OrderItem extends Model
     {
         return ['quantity' => 'integer', 'unit_price' => 'float', 'price' => 'float', 'total' => 'float'];
     }
+
     /**
      * Handle order functionality with proper error handling.
      * @return BelongsTo
@@ -42,6 +45,7 @@ final class OrderItem extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
     /**
      * Handle product functionality with proper error handling.
      * @return BelongsTo
@@ -50,6 +54,7 @@ final class OrderItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
     /**
      * Handle productVariant functionality with proper error handling.
      * @return BelongsTo
@@ -58,6 +63,7 @@ final class OrderItem extends Model
     {
         return $this->belongsTo(ProductVariant::class);
     }
+
     /**
      * Boot the service provider or trait functionality.
      * @return void

@@ -7,21 +7,29 @@ use App\Filament\Resources\LocationResource\Pages;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Location;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -41,14 +49,10 @@ use UnitEnum;
 final class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
-
-    /**
-     * @var UnitEnum|string|null
-     */    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
-
+    /** @var UnitEnum|string|null */
+    /** @var UnitEnum|string|null */
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Products;
     protected static ?int $navigationSort = 2;
-
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -66,7 +70,7 @@ final class LocationResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "System";
+        return 'System';
     }
 
     /**
@@ -89,8 +93,8 @@ final class LocationResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
+     * @param Schema $schema
+     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
@@ -105,7 +109,6 @@ final class LocationResource extends Resource
                                 ->maxLength(255),
                             TextInput::make('code')
                                 ->label(__('locations.code'))
-                                ->required()
                                 ->maxLength(10)
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
@@ -124,7 +127,6 @@ final class LocationResource extends Resource
                                 ->relationship('country', 'name')
                                 ->searchable()
                                 ->preload()
-                                ->required()
                                 ->live()
                                 ->afterStateUpdated(function ($state, Forms\Set $set) {
                                     if ($state) {
@@ -148,9 +150,6 @@ final class LocationResource extends Resource
                                         }
                                     }
                                 }),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('country_code')
                                 ->label(__('locations.country_code'))
                                 ->maxLength(3)
@@ -181,8 +180,26 @@ final class LocationResource extends Resource
                 ]),
             Section::make(__('locations.address_information'))
                 ->components([
+                    Grid::make(2)
+                        ->components([
+                            TextInput::make('address_line_1')
+                                ->label(__('locations.address_line_1'))
+                                ->maxLength(255),
+                            TextInput::make('address_line_2')
+                                ->label(__('locations.address_line_2'))
+                                ->maxLength(255),
+                            TextInput::make('city')
+                                ->label(__('locations.city'))
+                                ->maxLength(100),
+                            TextInput::make('state')
+                                ->label(__('locations.state'))
+                                ->maxLength(100),
+                            TextInput::make('postal_code')
+                                ->label(__('locations.postal_code'))
+                                ->maxLength(20),
+                        ]),
                     KeyValue::make('address')
-                        ->label(__('locations.address'))
+                        ->label(__('locations.additional_address'))
                         ->keyLabel(__('locations.address_field'))
                         ->valueLabel(__('locations.address_value'))
                         ->addActionLabel(__('locations.add_address_field')),
@@ -206,6 +223,44 @@ final class LocationResource extends Resource
                         ->maxLength(255)
                         ->columnSpanFull(),
                 ]),
+            Section::make(__('locations.opening_hours'))
+                ->components([
+                    Repeater::make('opening_hours')
+                        ->label(__('locations.opening_hours'))
+                        ->schema([
+                            Select::make('day')
+                                ->label(__('locations.day'))
+                                ->options([
+                                    'monday' => __('locations.days.monday'),
+                                    'tuesday' => __('locations.days.tuesday'),
+                                    'wednesday' => __('locations.days.wednesday'),
+                                    'thursday' => __('locations.days.thursday'),
+                                    'friday' => __('locations.days.friday'),
+                                    'saturday' => __('locations.days.saturday'),
+                                    'sunday' => __('locations.days.sunday'),
+                                ])
+                                ->required(),
+                            Toggle::make('is_closed')
+                                ->label(__('locations.is_closed'))
+                                ->live(),
+                            TimePicker::make('open_time')
+                                ->label(__('locations.open_time'))
+                                ->visible(fn($get) => !$get('is_closed')),
+                            TimePicker::make('close_time')
+                                ->label(__('locations.close_time'))
+                                ->visible(fn($get) => !$get('is_closed')),
+                        ])
+                        ->collapsible()
+                        ->itemLabel(fn(array $state): ?string => $state['day'] ?? null),
+                ]),
+            Section::make(__('locations.contact_info'))
+                ->components([
+                    KeyValue::make('contact_info')
+                        ->label(__('locations.contact_info'))
+                        ->keyLabel(__('locations.contact_field'))
+                        ->valueLabel(__('locations.contact_value'))
+                        ->addActionLabel(__('locations.add_contact_field')),
+                ]),
             Section::make(__('locations.settings'))
                 ->components([
                     Grid::make(2)
@@ -215,9 +270,6 @@ final class LocationResource extends Resource
                                 ->default(true),
                             Toggle::make('is_default')
                                 ->label(__('locations.is_default')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('locations.sort_order'))
                                 ->numeric()
@@ -254,23 +306,18 @@ final class LocationResource extends Resource
                     ->weight('bold'),
                 TextColumn::make('code')
                     ->label(__('locations.code'))
-                    ->searchable()
-                    ->sortable()
                     ->copyable()
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('country.name')
                     ->label(__('locations.country'))
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('city.name')
                     ->label(__('locations.city'))
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('type')
                     ->label(__('locations.type'))
                     ->formatStateUsing(fn(string $state): string => __("locations.types.{$state}"))
-                    ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'warehouse' => 'blue',
                         'store' => 'green',
@@ -281,15 +328,9 @@ final class LocationResource extends Resource
                     }),
                 TextColumn::make('phone')
                     ->label(__('locations.phone'))
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('email')
                     ->label(__('locations.email'))
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
                     ->label(__('locations.is_active'))
@@ -313,20 +354,25 @@ final class LocationResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('inventories_count')
+                    ->label(__('locations.inventories_count'))
+                    ->counts('inventories')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('variant_inventories_count')
+                    ->label(__('locations.variant_inventories_count'))
+                    ->counts('variantInventories')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('country_id')
-                    ->label(__('locations.country'))
                     ->relationship('country', 'name')
-                    ->searchable()
                     ->preload(),
                 SelectFilter::make('city_id')
-                    ->label(__('locations.city'))
                     ->relationship('city', 'name')
-                    ->searchable()
                     ->preload(),
                 SelectFilter::make('type')
-                    ->label(__('locations.type'))
                     ->options([
                         'warehouse' => __('locations.types.warehouse'),
                         'store' => __('locations.types.store'),
@@ -335,17 +381,41 @@ final class LocationResource extends Resource
                         'pickup_point' => __('locations.types.pickup_point'),
                     ]),
                 TernaryFilter::make('is_active')
-                    ->label(__('locations.is_active'))
-                    ->boolean()
                     ->trueLabel(__('locations.active_only'))
                     ->falseLabel(__('locations.inactive_only'))
                     ->native(false),
                 TernaryFilter::make('is_default')
-                    ->label(__('locations.is_default'))
-                    ->boolean()
                     ->trueLabel(__('locations.default_only'))
                     ->falseLabel(__('locations.non_default_only'))
                     ->native(false),
+                SelectFilter::make('has_coordinates')
+                    ->label(__('locations.has_coordinates'))
+                    ->options([
+                        'yes' => __('locations.with_coordinates'),
+                        'no' => __('locations.without_coordinates'),
+                    ])
+                    ->query(function (Builder $query, array $data): void {
+                        if ($data['value'] === 'yes') {
+                            $query->whereNotNull('latitude')->whereNotNull('longitude');
+                        } elseif ($data['value'] === 'no') {
+                            $query->where(function ($q) {
+                                $q->whereNull('latitude')->orWhereNull('longitude');
+                            });
+                        }
+                    }),
+                SelectFilter::make('has_opening_hours')
+                    ->label(__('locations.has_opening_hours'))
+                    ->options([
+                        'yes' => __('locations.with_opening_hours'),
+                        'no' => __('locations.without_opening_hours'),
+                    ])
+                    ->query(function (Builder $query, array $data): void {
+                        if ($data['value'] === 'yes') {
+                            $query->whereNotNull('opening_hours');
+                        } elseif ($data['value'] === 'no') {
+                            $query->whereNull('opening_hours');
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -356,7 +426,6 @@ final class LocationResource extends Resource
                     ->color(fn(Location $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Location $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-
                         Notification::make()
                             ->title($record->is_active ? __('locations.activated_successfully') : __('locations.deactivated_successfully'))
                             ->success()
@@ -371,16 +440,36 @@ final class LocationResource extends Resource
                     ->action(function (Location $record): void {
                         // Remove default from other locations
                         Location::where('is_default', true)->update(['is_default' => false]);
-
                         // Set this location as default
                         $record->update(['is_default' => true]);
-
                         Notification::make()
                             ->title(__('locations.set_as_default_successfully'))
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation(),
+                Action::make('view_on_map')
+                    ->label(__('locations.view_on_map'))
+                    ->icon('heroicon-o-map')
+                    ->color('info')
+                    ->url(fn(Location $record): string => $record->google_maps_url ?? '#')
+                    ->openUrlInNewTab()
+                    ->visible(fn(Location $record): bool => $record->hasCoordinates()),
+                Action::make('copy_coordinates')
+                    ->label(__('locations.copy_coordinates'))
+                    ->icon('heroicon-o-clipboard')
+                    ->color('gray')
+                    ->action(function (Location $record): void {
+                        $coordinates = $record->coordinates;
+                        if ($coordinates) {
+                            Notification::make()
+                                ->title(__('locations.coordinates_copied'))
+                                ->body($coordinates)
+                                ->success()
+                                ->send();
+                        }
+                    })
+                    ->visible(fn(Location $record): bool => $record->hasCoordinates()),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -391,7 +480,6 @@ final class LocationResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-
                             Notification::make()
                                 ->title(__('locations.bulk_activated_success'))
                                 ->success()
@@ -404,14 +492,49 @@ final class LocationResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-
                             Notification::make()
                                 ->title(__('locations.bulk_deactivated_success'))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                ]),
+                    BulkAction::make('set_default')
+                        ->label(__('locations.set_as_default_selected'))
+                        ->icon('heroicon-o-star')
+                        ->color('warning')
+                        ->action(function (Collection $records): void {
+                            // Remove default from other locations
+                            Location::where('is_default', true)->update(['is_default' => false]);
+                            // Set first selected as default
+                            $records->first()->update(['is_default' => true]);
+                            Notification::make()
+                                ->title(__('locations.bulk_set_default_success'))
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
+                    BulkAction::make('export_coordinates')
+                        ->label(__('locations.export_coordinates'))
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->color('info')
+                        ->action(function (Collection $records): void {
+                            $coordinates = $records
+                                ->filter(fn($record) => $record->hasCoordinates())
+                                ->map(fn($record) => [
+                                    'name' => $record->name,
+                                    'latitude' => $record->latitude,
+                                    'longitude' => $record->longitude,
+                                    'address' => $record->full_address,
+                                ])
+                                ->toArray();
+
+                            Notification::make()
+                                ->title(__('locations.coordinates_exported'))
+                                ->body(__('locations.coordinates_count', ['count' => count($coordinates)]))
+                                ->success()
+                                ->send();
+                        }),
+                ])
             ])
             ->defaultSort('sort_order');
     }

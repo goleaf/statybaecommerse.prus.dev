@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\VariantImageResource\Pages;
 
@@ -11,3 +9,4 @@ final class CreateVariantImage extends CreateRecord
 {
     protected static string $resource = VariantImageResource::class;
 }
+

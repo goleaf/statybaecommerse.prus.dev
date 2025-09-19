@@ -6,11 +6,14 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\DiscountCodeResource\Pages;
 use App\Models\CustomerGroup;
 use App\Models\DiscountCode;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -18,10 +21,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -42,10 +41,7 @@ final class DiscountCodeResource extends Resource
 {
     protected static ?string $model = DiscountCode::class;
 
-    /**
-     * @var UnitEnum|string|null
-     */    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
+    /**protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
@@ -66,12 +62,11 @@ final class DiscountCodeResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Marketing";
+        return 'Marketing';
     }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -80,7 +75,6 @@ final class DiscountCodeResource extends Resource
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -89,7 +83,7 @@ final class DiscountCodeResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
+     * @param Form $schema
      * @return Form
      */
     public static function form(Schema $schema): Schema
@@ -108,7 +102,6 @@ final class DiscountCodeResource extends Resource
                                 ->helperText(__('discount_codes.code_help')),
                             TextInput::make('name')
                                 ->label(__('discount_codes.name'))
-                                ->required()
                                 ->maxLength(255),
                         ]),
                     Textarea::make('description')
@@ -129,13 +122,11 @@ final class DiscountCodeResource extends Resource
                                     'free_shipping' => __('discount_codes.types.free_shipping'),
                                     'buy_x_get_y' => __('discount_codes.types.buy_x_get_y'),
                                 ])
-                                ->required()
                                 ->default('percentage')
                                 ->live(),
                             TextInput::make('value')
                                 ->label(__('discount_codes.value'))
                                 ->numeric()
-                                ->required()
                                 ->step(0.01)
                                 ->minValue(0)
                                 ->helperText(__('discount_codes.value_help')),
@@ -144,15 +135,11 @@ final class DiscountCodeResource extends Resource
                         ->components([
                             TextInput::make('minimum_amount')
                                 ->label(__('discount_codes.minimum_amount'))
-                                ->numeric()
                                 ->prefix('€')
-                                ->step(0.01)
                                 ->minValue(0),
                             TextInput::make('maximum_discount')
                                 ->label(__('discount_codes.maximum_discount'))
-                                ->numeric()
                                 ->prefix('€')
-                                ->step(0.01)
                                 ->minValue(0),
                         ]),
                 ]),
@@ -176,13 +163,11 @@ final class DiscountCodeResource extends Resource
                             TextInput::make('used_count')
                                 ->label(__('discount_codes.used_count'))
                                 ->numeric()
-                                ->minValue(0)
                                 ->default(0)
                                 ->disabled(),
                             TextInput::make('remaining_uses')
                                 ->label(__('discount_codes.remaining_uses'))
                                 ->numeric()
-                                ->minValue(0)
                                 ->disabled(),
                         ]),
                 ]),
@@ -201,24 +186,21 @@ final class DiscountCodeResource extends Resource
                 ]),
             Section::make(__('discount_codes.targeting'))
                 ->components([
-                    Grid::make(2)
-                        ->components([
-                            Select::make('customer_group_id')
-                                ->label(__('discount_codes.customer_group'))
-                                ->relationship('customerGroup', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->createOptionForm([
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255),
-                                    Textarea::make('description')
-                                        ->maxLength(500),
-                                ]),
-                            Toggle::make('is_first_time_only')
-                                ->label(__('discount_codes.is_first_time_only'))
-                                ->default(false),
+                    Select::make('customer_group_id')
+                        ->label(__('discount_codes.customer_group'))
+                        ->relationship('customerGroup', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->createOptionForm([
+                            TextInput::make('name')
+                                ->required()
+                                ->maxLength(255),
+                            Textarea::make('description')
+                                ->maxLength(500),
                         ]),
+                    Toggle::make('is_first_time_only')
+                        ->label(__('discount_codes.is_first_time_only'))
+                        ->default(false),
                 ]),
             Section::make(__('discount_codes.settings'))
                 ->components([
@@ -263,13 +245,11 @@ final class DiscountCodeResource extends Resource
                     ->color('blue'),
                 TextColumn::make('name')
                     ->label(__('discount_codes.name'))
-                    ->searchable()
-                    ->sortable()
-                    ->limit(50),
+                    ->limit(50)
+                    ->searchable(),
                 TextColumn::make('type')
                     ->label(__('discount_codes.type'))
                     ->formatStateUsing(fn(string $state): string => __("discount_codes.types.{$state}"))
-                    ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'percentage' => 'green',
                         'fixed' => 'blue',
@@ -291,75 +271,56 @@ final class DiscountCodeResource extends Resource
                 TextColumn::make('usage_limit')
                     ->label(__('discount_codes.usage_limit'))
                     ->numeric()
-                    ->sortable()
                     ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('used_count')
                     ->label(__('discount_codes.used_count'))
                     ->numeric()
-                    ->sortable()
-                    ->alignCenter()
                     ->color(fn($state, $record): string =>
                         $record->usage_limit && $state >= $record->usage_limit ? 'danger' : 'success'),
                 TextColumn::make('remaining_uses')
                     ->label(__('discount_codes.remaining_uses'))
                     ->numeric()
-                    ->sortable()
-                    ->alignCenter()
-                    ->color(fn($state): string => $state <= 0 ? 'danger' : 'success')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->color(fn($state): string => $state <= 0 ? 'danger' : 'success'),
                 TextColumn::make('customerGroup.name')
                     ->label(__('discount_codes.customer_group'))
-                    ->sortable()
-                    ->badge()
                     ->color('gray')
-                    ->toggleable(isToggledHiddenByDefault: true),
-                BadgeColumn::make('is_active')
+                    ->searchable(),
+                TextColumn::make('is_active')
                     ->label(__('discount_codes.status'))
                     ->formatStateUsing(fn(bool $state): string => $state ? __('discount_codes.active') : __('discount_codes.inactive'))
-                    ->colors([
-                        'success' => true,
-                        'danger' => false,
-                    ]),
+                    ->badge()
+                    ->color(fn(bool $state): string => $state ? 'success' : 'danger'),
                 IconColumn::make('is_public')
                     ->label(__('discount_codes.is_public'))
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->boolean(),
                 IconColumn::make('is_auto_apply')
                     ->label(__('discount_codes.is_auto_apply'))
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->boolean(),
                 IconColumn::make('is_stackable')
                     ->label(__('discount_codes.is_stackable'))
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->boolean(),
                 TextColumn::make('valid_from')
                     ->label(__('discount_codes.valid_from'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
                 TextColumn::make('valid_until')
                     ->label(__('discount_codes.valid_until'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('discount_codes.created_at'))
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->label(__('discount_codes.updated_at'))
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('type')
-                    ->label(__('discount_codes.type'))
                     ->options([
                         'percentage' => __('discount_codes.types.percentage'),
                         'fixed' => __('discount_codes.types.fixed'),
@@ -367,25 +328,20 @@ final class DiscountCodeResource extends Resource
                         'buy_x_get_y' => __('discount_codes.types.buy_x_get_y'),
                     ]),
                 SelectFilter::make('customer_group_id')
-                    ->label(__('discount_codes.customer_group'))
                     ->relationship('customerGroup', 'name')
-                    ->searchable()
                     ->preload(),
                 TernaryFilter::make('is_active')
                     ->label(__('discount_codes.is_active'))
-                    ->boolean()
                     ->trueLabel(__('discount_codes.active_only'))
                     ->falseLabel(__('discount_codes.inactive_only'))
                     ->native(false),
                 TernaryFilter::make('is_public')
                     ->label(__('discount_codes.is_public'))
-                    ->boolean()
                     ->trueLabel(__('discount_codes.public_only'))
                     ->falseLabel(__('discount_codes.private_only'))
                     ->native(false),
                 TernaryFilter::make('is_auto_apply')
                     ->label(__('discount_codes.is_auto_apply'))
-                    ->boolean()
                     ->trueLabel(__('discount_codes.auto_apply_only'))
                     ->falseLabel(__('discount_codes.manual_apply_only'))
                     ->native(false),
@@ -399,7 +355,6 @@ final class DiscountCodeResource extends Resource
                     ->color(fn(DiscountCode $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (DiscountCode $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-
                         Notification::make()
                             ->title($record->is_active ? __('discount_codes.activated_successfully') : __('discount_codes.deactivated_successfully'))
                             ->success()
@@ -433,7 +388,6 @@ final class DiscountCodeResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-
                             Notification::make()
                                 ->title(__('discount_codes.bulk_activated_success'))
                                 ->success()
@@ -446,7 +400,6 @@ final class DiscountCodeResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-
                             Notification::make()
                                 ->title(__('discount_codes.bulk_deactivated_success'))
                                 ->success()
@@ -471,7 +424,6 @@ final class DiscountCodeResource extends Resource
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

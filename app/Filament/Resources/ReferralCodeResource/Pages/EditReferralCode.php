@@ -1,12 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralCodeResource\Pages;
 
 use App\Filament\Resources\ReferralCodeResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
 
 final class EditReferralCode extends EditRecord
 {
@@ -19,3 +17,4 @@ final class EditReferralCode extends EditRecord
         ];
     }
 }
+

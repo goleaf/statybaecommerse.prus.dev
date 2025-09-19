@@ -1,0 +1,56 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit;
+
+use App\Filament\Resources\ActivityLogResource;
+use App\Models\ActivityLog;
+use Tests\TestCase;
+
+class ActivityLogResourceUnitTest extends TestCase
+{
+    public function test_activity_log_resource_has_correct_model(): void
+    {
+        $this->assertEquals(ActivityLog::class, ActivityLogResource::getModel());
+    }
+
+    public function test_activity_log_resource_has_navigation_group(): void
+    {
+        $this->assertNotNull(ActivityLogResource::getNavigationGroup());
+    }
+
+    public function test_activity_log_resource_has_navigation_sort(): void
+    {
+        $this->assertEquals(9, ActivityLogResource::getNavigationSort());
+    }
+
+    public function test_activity_log_resource_has_record_title_attribute(): void
+    {
+        $this->assertEquals('description', ActivityLogResource::getRecordTitleAttribute());
+    }
+
+    public function test_activity_log_model_exists(): void
+    {
+        $this->assertTrue(class_exists(ActivityLog::class));
+    }
+
+    public function test_activity_log_resource_form_method_exists(): void
+    {
+        $this->assertTrue(method_exists(ActivityLogResource::class, 'form'));
+    }
+
+    public function test_activity_log_resource_table_method_exists(): void
+    {
+        $this->assertTrue(method_exists(ActivityLogResource::class, 'table'));
+    }
+
+    public function test_activity_log_resource_get_pages_method_exists(): void
+    {
+        $this->assertTrue(method_exists(ActivityLogResource::class, 'getPages'));
+    }
+
+    public function test_activity_log_resource_get_relations_method_exists(): void
+    {
+        $this->assertTrue(method_exists(ActivityLogResource::class, 'getRelations'));
+    }
+}
+

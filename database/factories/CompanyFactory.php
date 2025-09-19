@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -14,78 +12,109 @@ final class CompanyFactory extends Factory
 {
     protected $model = Company::class;
 
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
-        $companyTypes = [
-            'Statybos Centras', 'Lietuvos Statybos', 'Vilniaus Statybos',
-            'Kauno Statybos', 'Klaipėdos Statybos', 'Panevėžio Statybos',
-            'Šiaulių Statybos', 'Alytaus Statybos', 'Marijampolės Statybos',
-            'Tauragės Statybos', 'UAB', 'MB', 'IĮ', 'VšĮ'
-        ];
-
         return [
-            'name' => fake()->randomElement($companyTypes) . ' ' . fake()->company(),
-            'email' => fake()->companyEmail(),
+            'name' => fake()->company(),
+            'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->phoneNumber(),
             'address' => fake()->address(),
             'website' => fake()->url(),
             'industry' => fake()->randomElement([
-                'construction', 'manufacturing', 'technology', 'retail',
-                'services', 'healthcare', 'education', 'finance'
+                'Technology',
+                'Healthcare',
+                'Finance',
+                'Education',
+                'Manufacturing',
+                'Retail',
+                'Real Estate',
+                'Consulting',
+                'Media',
+                'Transportation'
             ]),
             'size' => fake()->randomElement(['small', 'medium', 'large']),
             'description' => fake()->paragraph(),
-            'is_active' => fake()->boolean(80), // 80% chance to be active
+            'is_active' => fake()->boolean(80),  // 80% chance of being active
             'metadata' => [
                 'founded_year' => fake()->year(),
-                'employee_count' => fake()->numberBetween(1, 1000),
-                'revenue' => fake()->numberBetween(10000, 10000000),
-                'certifications' => fake()->randomElements([
-                    'ISO 9001', 'ISO 14001', 'OHSAS 18001', 'CE', 'FSC'
-                ], fake()->numberBetween(0, 3)),
+                'employee_count' => fake()->numberBetween(1, 10000),
+                'revenue' => fake()->numberBetween(100000, 10000000),
             ],
         ];
     }
 
+    /**
+     * Indicate that the company is active.
+     */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => true,
         ]);
     }
 
+    /**
+     * Indicate that the company is inactive.
+     */
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => false,
         ]);
     }
 
-    public function construction(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'industry' => 'construction',
-        ]);
-    }
-
+    /**
+     * Indicate that the company is small.
+     */
     public function small(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'size' => 'small',
         ]);
     }
 
+    /**
+     * Indicate that the company is medium.
+     */
     public function medium(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'size' => 'medium',
         ]);
     }
 
+    /**
+     * Indicate that the company is large.
+     */
     public function large(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'size' => 'large',
+        ]);
+    }
+
+    /**
+     * Indicate that the company is in technology industry.
+     */
+    public function technology(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'industry' => 'Technology',
+        ]);
+    }
+
+    /**
+     * Indicate that the company is in healthcare industry.
+     */
+    public function healthcare(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'industry' => 'Healthcare',
         ]);
     }
 }

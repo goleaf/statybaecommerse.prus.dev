@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -25,26 +23,26 @@ final class ZoneFactory extends Factory
         $types = ['shipping', 'tax', 'payment', 'delivery', 'general'];
 
         return [
-            'name' => $this->faker->words(2, true),
-            'slug' => $this->faker->slug(),
-            'code' => strtoupper($this->faker->lexify('???')),
-            'description' => $this->faker->sentence(),
+            'name' => fake()->words(2, true),
+            'slug' => fake()->slug(),
+            'code' => strtoupper(fake()->lexify('???')),
+            'description' => fake()->sentence(),
             'currency_id' => Currency::factory(),
-            'tax_rate' => $this->faker->randomFloat(2, 0, 30),
-            'shipping_rate' => $this->faker->randomFloat(2, 0, 20),
-            'type' => $this->faker->randomElement($types),
-            'priority' => $this->faker->numberBetween(0, 10),
-            'min_order_amount' => $this->faker->optional(0.3)->randomFloat(2, 10, 100),
-            'max_order_amount' => $this->faker->optional(0.2)->randomFloat(2, 500, 2000),
-            'free_shipping_threshold' => $this->faker->optional(0.4)->randomFloat(2, 50, 200),
+            'tax_rate' => fake()->randomFloat(2, 0, 30),
+            'shipping_rate' => fake()->randomFloat(2, 0, 20),
+            'type' => fake()->randomElement($types),
+            'priority' => fake()->numberBetween(0, 10),
+            'min_order_amount' => fake()->optional(0.3)->randomFloat(2, 10, 100),
+            'max_order_amount' => fake()->optional(0.2)->randomFloat(2, 500, 2000),
+            'free_shipping_threshold' => fake()->optional(0.4)->randomFloat(2, 50, 200),
             'is_enabled' => true,
             'is_active' => true,
             'is_default' => false,
-            'sort_order' => $this->faker->numberBetween(0, 100),
-            'metadata' => $this->faker->optional(0.2)->randomElements([
+            'sort_order' => fake()->numberBetween(0, 100),
+            'metadata' => fake()->optional(0.2)->randomElements([
                 'featured' => true,
                 'special_handling' => false,
-                'custom_field' => $this->faker->word(),
+                'custom_field' => fake()->word(),
             ]),
         ];
     }
@@ -54,7 +52,7 @@ final class ZoneFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => true,
         ]);
     }
@@ -64,7 +62,7 @@ final class ZoneFactory extends Factory
      */
     public function enabled(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_enabled' => true,
         ]);
     }
@@ -74,7 +72,7 @@ final class ZoneFactory extends Factory
      */
     public function default(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_default' => true,
             'is_enabled' => true,
             'is_active' => true,
@@ -86,7 +84,7 @@ final class ZoneFactory extends Factory
      */
     public function shipping(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'shipping',
         ]);
     }
@@ -96,7 +94,7 @@ final class ZoneFactory extends Factory
      */
     public function tax(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'tax',
         ]);
     }
@@ -106,7 +104,7 @@ final class ZoneFactory extends Factory
      */
     public function payment(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'payment',
         ]);
     }
@@ -116,7 +114,7 @@ final class ZoneFactory extends Factory
      */
     public function withFreeShipping(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'free_shipping_threshold' => $this->faker->randomFloat(2, 50, 200),
         ]);
     }
@@ -126,7 +124,7 @@ final class ZoneFactory extends Factory
      */
     public function withOrderLimits(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'min_order_amount' => $this->faker->randomFloat(2, 10, 50),
             'max_order_amount' => $this->faker->randomFloat(2, 500, 1000),
         ]);

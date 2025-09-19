@@ -1,0 +1,36 @@
+<?php
+
+return [
+    'title' => 'Companies',
+    'single' => 'Company',
+    'plural' => 'Companies',
+    'name' => 'Name',
+    'email' => 'Email',
+    'phone' => 'Phone',
+    'website' => 'Website',
+    'industry' => 'Industry',
+    'size' => 'Size',
+    'description' => 'Description',
+    'is_active' => 'Active',
+    'created_at' => 'Created At',
+    'updated_at' => 'Updated At',
+    'basic_information' => 'Basic Information',
+    'business_information' => 'Business Information',
+    'settings' => 'Settings',
+    'sizes' => [
+        'small' => 'Small',
+        'medium' => 'Medium',
+        'large' => 'Large',
+    ],
+    'activate' => 'Activate',
+    'deactivate' => 'Deactivate',
+    'activated_successfully' => 'Company activated successfully',
+    'deactivated_successfully' => 'Company deactivated successfully',
+    'activate_selected' => 'Activate Selected',
+    'deactivate_selected' => 'Deactivate Selected',
+    'bulk_activated_success' => 'Selected companies activated successfully',
+    'bulk_deactivated_success' => 'Selected companies deactivated successfully',
+    'active_only' => 'Active Only',
+    'inactive_only' => 'Inactive Only',
+];
+

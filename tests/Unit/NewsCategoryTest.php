@@ -1,0 +1,159 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit;
+
+use App\Models\News;
+use App\Models\NewsCategory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+final class NewsCategoryTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_can_create_news_category(): void
+    {
+        // Arrange & Act
+        $category = NewsCategory::factory()->create([
+            'is_visible' => true,
+            'sort_order' => 1,
+            'color' => '#ff0000',
+            'icon' => 'heroicon-o-rectangle-stack',
+        ]);
+
+        // Assert
+        $this->assertDatabaseHas('news_categories', [
+            'id' => $category->id,
+            'is_visible' => true,
+            'sort_order' => 1,
+            'color' => '#ff0000',
+            'icon' => 'heroicon-o-rectangle-stack',
+        ]);
+    }
+
+    public function test_can_set_parent_child_relationship(): void
+    {
+        // Arrange
+        $parent = NewsCategory::factory()->create();
+        $child = NewsCategory::factory()->create(['parent_id' => $parent->id]);
+
+        // Act & Assert
+        $this->assertEquals($parent->id, $child->parent_id);
+        $this->assertTrue($child->parent->is($parent));
+
+        // Refresh the parent to get the latest children
+        $parent->refresh();
+        $this->assertTrue($parent->children->contains($child));
+    }
+
+    public function test_can_attach_news_to_category(): void
+    {
+        // Arrange
+        $category = NewsCategory::factory()->create();
+        $news = News::factory()->create();
+
+        // Act
+        $category->news()->attach($news);
+
+        // Assert
+        $this->assertTrue($category->news->contains($news));
+        $this->assertTrue($news->categories->contains($category));
+    }
+
+    public function test_is_visible_returns_correct_boolean(): void
+    {
+        // Arrange
+        $visibleCategory = NewsCategory::factory()->create(['is_visible' => true]);
+        $hiddenCategory = NewsCategory::factory()->create(['is_visible' => false]);
+
+        // Act & Assert
+        $this->assertTrue($visibleCategory->isVisible());
+        $this->assertFalse($hiddenCategory->isVisible());
+    }
+
+    public function test_scope_visible_filters_correctly(): void
+    {
+        // Arrange
+        $visibleCategory = NewsCategory::factory()->create(['is_visible' => true]);
+        $hiddenCategory = NewsCategory::factory()->create(['is_visible' => false]);
+
+        // Act
+        $visibleCategories = NewsCategory::visible()->get();
+
+        // Assert
+        $this->assertTrue($visibleCategories->contains($visibleCategory));
+        $this->assertFalse($visibleCategories->contains($hiddenCategory));
+    }
+
+    public function test_scope_ordered_sorts_correctly(): void
+    {
+        // Arrange
+        $category1 = NewsCategory::factory()->create(['sort_order' => 2]);
+        $category2 = NewsCategory::factory()->create(['sort_order' => 1]);
+        $category3 = NewsCategory::factory()->create(['sort_order' => 3]);
+
+        // Act
+        $orderedCategories = NewsCategory::ordered()->get();
+
+        // Assert
+        $this->assertEquals($category2->id, $orderedCategories->first()->id);
+        $this->assertEquals($category1->id, $orderedCategories->skip(1)->first()->id);
+        $this->assertEquals($category3->id, $orderedCategories->last()->id);
+    }
+
+    public function test_get_route_key_name_returns_slug(): void
+    {
+        // Arrange
+        $category = NewsCategory::factory()->create();
+
+        // Act & Assert
+        $this->assertEquals('slug', $category->getRouteKeyName());
+    }
+
+    public function test_casts_are_applied_correctly(): void
+    {
+        // Arrange
+        $category = NewsCategory::factory()->create([
+            'is_visible' => '1',
+            'sort_order' => '5',
+        ]);
+
+        // Act & Assert
+        $this->assertIsBool($category->is_visible);
+        $this->assertIsInt($category->sort_order);
+        $this->assertTrue($category->is_visible);
+        $this->assertEquals(5, $category->sort_order);
+    }
+
+    public function test_fillable_attributes_are_set(): void
+    {
+        // Arrange
+        $data = [
+            'is_visible' => true,
+            'parent_id' => null,
+            'sort_order' => 1,
+            'color' => '#ff0000',
+            'icon' => 'heroicon-o-rectangle-stack',
+        ];
+
+        // Act
+        $category = NewsCategory::create($data);
+
+        // Assert
+        $this->assertEquals($data['is_visible'], $category->is_visible);
+        $this->assertEquals($data['parent_id'], $category->parent_id);
+        $this->assertEquals($data['sort_order'], $category->sort_order);
+        $this->assertEquals($data['color'], $category->color);
+        $this->assertEquals($data['icon'], $category->icon);
+    }
+
+    public function test_has_translations_trait(): void
+    {
+        // Arrange
+        $category = NewsCategory::factory()->create();
+
+        // Act & Assert
+        $this->assertTrue(method_exists($category, 'trans'));
+        $this->assertTrue(method_exists($category, 'translations'));
+    }
+}

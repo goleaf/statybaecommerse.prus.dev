@@ -5,22 +5,22 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Repeater;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -43,8 +43,8 @@ final class CollectionResource extends Resource
 
     /**
      * @var UnitEnum|string|null
-     */    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
+     */
+    protected static string|UnitEnum|null $navigationGroup = "Products";
 
     protected static ?int $navigationSort = 5;
 
@@ -65,7 +65,7 @@ final class CollectionResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Products";
+        return "Products"->value;
     }
 
     /**
@@ -88,8 +88,8 @@ final class CollectionResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
+     * @param Schema $schema
+     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
@@ -107,8 +107,6 @@ final class CollectionResource extends Resource
                                     $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
                             TextInput::make('slug')
                                 ->label(__('collections.slug'))
-                                ->required()
-                                ->maxLength(255)
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
                         ]),
@@ -129,20 +127,16 @@ final class CollectionResource extends Resource
                             '4:3',
                         ])
                         ->directory('collections/images')
-                        ->visibility('public')
-                        ->columnSpanFull(),
+                        ->visibility('public'),
                     FileUpload::make('banner')
                         ->label(__('collections.banner'))
                         ->image()
                         ->imageEditor()
                         ->imageEditorAspectRatios([
-                            '16:9',
                             '21:9',
-                            '4:3',
                         ])
                         ->directory('collections/banners')
-                        ->visibility('public')
-                        ->columnSpanFull(),
+                        ->visibility('public'),
                 ]),
             Section::make(__('collections.products'))
                 ->components([
@@ -151,77 +145,40 @@ final class CollectionResource extends Resource
                         ->relationship('products', 'name')
                         ->multiple()
                         ->searchable()
-                        ->preload()
-                        ->columnSpanFull(),
-                ]),
-            Section::make(__('collections.rules'))
-                ->components([
-                    Repeater::make('rules')
-                        ->label(__('collections.rules'))
-                        ->components([
-                            Select::make('type')
-                                ->label(__('collections.rule_type'))
-                                ->options([
-                                    'category' => __('collections.rule_types.category'),
-                                    'brand' => __('collections.rule_types.brand'),
-                                    'price' => __('collections.rule_types.price'),
-                                    'tag' => __('collections.rule_types.tag'),
-                                    'inventory' => __('collections.rule_types.inventory'),
-                                ])
-                                ->required(),
-                            TextInput::make('condition')
-                                ->label(__('collections.condition'))
-                                ->required()
-                                ->maxLength(255),
-                            TextInput::make('value')
-                                ->label(__('collections.value'))
-                                ->required()
-                                ->maxLength(255),
-                        ])
-                        ->columns(3)
-                        ->addActionLabel(__('collections.add_rule'))
-                        ->columnSpanFull(),
+                        ->preload(),
                 ]),
             Section::make(__('collections.seo'))
                 ->components([
                     TextInput::make('seo_title')
                         ->label(__('collections.seo_title'))
-                        ->maxLength(255)
-                        ->columnSpanFull(),
+                        ->maxLength(255),
                     Textarea::make('seo_description')
                         ->label(__('collections.seo_description'))
                         ->rows(2)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
+                        ->maxLength(500),
                 ]),
             Section::make(__('collections.settings'))
                 ->components([
-                    Grid::make(2)
-                        ->components([
-                            Toggle::make('is_active')
-                                ->label(__('collections.is_active'))
-                                ->default(true),
-                            Toggle::make('is_featured')
-                                ->label(__('collections.is_featured')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
-                            Select::make('sort_order')
-                                ->label(__('collections.sort_order'))
-                                ->options([
-                                    'manual' => __('collections.sort_orders.manual'),
-                                    'name_asc' => __('collections.sort_orders.name_asc'),
-                                    'name_desc' => __('collections.sort_orders.name_desc'),
-                                    'price_asc' => __('collections.sort_orders.price_asc'),
-                                    'price_desc' => __('collections.sort_orders.price_desc'),
-                                    'created_asc' => __('collections.sort_orders.created_asc'),
-                                    'created_desc' => __('collections.sort_orders.created_desc'),
-                                ])
-                                ->default('manual'),
-                            Toggle::make('auto_update')
-                                ->label(__('collections.auto_update'))
-                                ->default(false),
-                        ]),
+                    Toggle::make('is_active')
+                        ->label(__('collections.is_active'))
+                        ->default(true),
+                    Toggle::make('is_featured')
+                        ->label(__('collections.is_featured')),
+                    Select::make('sort_order')
+                        ->label(__('collections.sort_order'))
+                        ->options([
+                            'manual' => __('collections.sort_orders.manual'),
+                            'name_asc' => __('collections.sort_orders.name_asc'),
+                            'name_desc' => __('collections.sort_orders.name_desc'),
+                            'price_asc' => __('collections.sort_orders.price_asc'),
+                            'price_desc' => __('collections.sort_orders.price_desc'),
+                            'created_asc' => __('collections.sort_orders.created_asc'),
+                            'created_desc' => __('collections.sort_orders.created_desc'),
+                        ])
+                        ->default('manual'),
+                    Toggle::make('auto_update')
+                        ->label(__('collections.auto_update'))
+                        ->default(false),
                 ]),
         ]);
     }
@@ -246,8 +203,6 @@ final class CollectionResource extends Resource
                     ->weight('bold'),
                 TextColumn::make('slug')
                     ->label(__('collections.slug'))
-                    ->searchable()
-                    ->sortable()
                     ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('products_count')
@@ -256,49 +211,33 @@ final class CollectionResource extends Resource
                     ->sortable(),
                 TextColumn::make('sort_order')
                     ->label(__('collections.sort_order'))
-                    ->formatStateUsing(fn(string $state): string => __("collections.sort_orders.{$state}"))
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->formatStateUsing(fn(string $state): string => __("collections.sort_orders.{$state}")),
                 IconColumn::make('is_active')
                     ->label(__('collections.is_active'))
-                    ->boolean()
-                    ->sortable(),
+                    ->boolean(),
                 IconColumn::make('is_featured')
                     ->label(__('collections.is_featured'))
-                    ->boolean()
-                    ->sortable(),
+                    ->boolean(),
                 IconColumn::make('auto_update')
                     ->label(__('collections.auto_update'))
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->boolean(),
                 TextColumn::make('created_at')
                     ->label(__('collections.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime(),
                 TextColumn::make('updated_at')
                     ->label(__('collections.updated_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime(),
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label(__('collections.is_active'))
-                    ->boolean()
                     ->trueLabel(__('collections.active_only'))
                     ->falseLabel(__('collections.inactive_only'))
                     ->native(false),
                 TernaryFilter::make('is_featured')
-                    ->label(__('collections.is_featured'))
-                    ->boolean()
                     ->trueLabel(__('collections.featured_only'))
                     ->falseLabel(__('collections.not_featured'))
                     ->native(false),
                 TernaryFilter::make('auto_update')
-                    ->label(__('collections.auto_update'))
-                    ->boolean()
                     ->trueLabel(__('collections.auto_update_only'))
                     ->falseLabel(__('collections.manual_only'))
                     ->native(false),
@@ -312,7 +251,6 @@ final class CollectionResource extends Resource
                     ->color(fn(Collection $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Collection $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-
                         Notification::make()
                             ->title($record->is_active ? __('collections.activated_successfully') : __('collections.deactivated_successfully'))
                             ->success()
@@ -325,13 +263,12 @@ final class CollectionResource extends Resource
                     ->color('info')
                     ->visible(fn(Collection $record): bool => $record->auto_update)
                     ->action(function (Collection $record): void {
-                        // Auto-update products based on rules
+                        // Auto-update products based on collection settings
                         Notification::make()
                             ->title(__('collections.products_updated_successfully'))
                             ->success()
                             ->send();
-                    })
-                    ->requiresConfirmation(),
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -342,7 +279,6 @@ final class CollectionResource extends Resource
                         ->color('success')
                         ->action(function (EloquentCollection $records): void {
                             $records->each->update(['is_active' => true]);
-
                             Notification::make()
                                 ->title(__('collections.bulk_activated_success'))
                                 ->success()
@@ -355,7 +291,6 @@ final class CollectionResource extends Resource
                         ->color('warning')
                         ->action(function (EloquentCollection $records): void {
                             $records->each->update(['is_active' => false]);
-
                             Notification::make()
                                 ->title(__('collections.bulk_deactivated_success'))
                                 ->success()

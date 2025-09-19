@@ -1,0 +1,78 @@
+<?php
+
+return [
+    // Navigation and labels
+    'title' => 'Legal Documents',
+    'plural' => 'Legal Documents',
+    'single' => 'Legal Document',
+    // Form fields
+    'basic_information' => 'Basic Information',
+    'translations' => 'Translations',
+    'key' => 'Key',
+    'key_help' => 'Unique document key used for URL generation',
+    'type' => 'Type',
+    'is_enabled' => 'Enabled',
+    'is_required' => 'Required',
+    'sort_order' => 'Sort Order',
+    'published_at' => 'Published At',
+    'published_from' => 'Published From',
+    'published_until' => 'Published Until',
+    'meta_data' => 'Meta Data',
+    'meta_data_help' => 'Additional document data in JSON format',
+    'locale' => 'Locale',
+    'title' => 'Title',
+    'slug' => 'URL Slug',
+    'slug_help' => 'Unique URL part for this language',
+    'content' => 'Content',
+    'seo_title' => 'SEO Title',
+    'seo_description' => 'SEO Description',
+    'add_translation' => 'Add Translation',
+    // Document types
+    'types' => [
+        'privacy_policy' => 'Privacy Policy',
+        'terms_of_use' => 'Terms of Use',
+        'refund_policy' => 'Refund Policy',
+        'shipping_policy' => 'Shipping Policy',
+        'cookie_policy' => 'Cookie Policy',
+        'gdpr_policy' => 'GDPR Policy',
+        'legal_notice' => 'Legal Notice',
+        'imprint' => 'Imprint',
+        'legal_document' => 'Legal Document',
+    ],
+    // Status labels
+    'status' => 'Status',
+    'enabled' => 'Enabled',
+    'disabled' => 'Disabled',
+    'published' => 'Published',
+    'draft' => 'Draft',
+    'enabled_only' => 'Enabled Only',
+    'disabled_only' => 'Disabled Only',
+    'required_only' => 'Required Only',
+    'optional_only' => 'Optional Only',
+    // Actions
+    'enable' => 'Enable',
+    'disable' => 'Disable',
+    'publish' => 'Publish',
+    'unpublish' => 'Unpublish',
+    'duplicate' => 'Duplicate',
+    'enable_selected' => 'Enable Selected',
+    'disable_selected' => 'Disable Selected',
+    'publish_selected' => 'Publish Selected',
+    'unpublish_selected' => 'Unpublish Selected',
+    // Notifications
+    'enabled_successfully' => 'Document successfully enabled',
+    'disabled_successfully' => 'Document successfully disabled',
+    'published_successfully' => 'Document successfully published',
+    'unpublished_successfully' => 'Document successfully unpublished',
+    'duplicated_successfully' => 'Document successfully duplicated',
+    'bulk_enabled_success' => 'Selected documents successfully enabled',
+    'bulk_disabled_success' => 'Selected documents successfully disabled',
+    'bulk_published_success' => 'Selected documents successfully published',
+    'bulk_unpublished_success' => 'Selected documents successfully unpublished',
+    // Table columns
+    'created_at' => 'Created At',
+    'updated_at' => 'Updated At',
+    // Helpers
+    'untitled_document' => 'Untitled Document',
+];
+

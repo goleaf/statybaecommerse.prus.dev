@@ -3,14 +3,15 @@
 namespace App\Filament\Resources\CouponResource\RelationManagers;
 
 use App\Models\CouponUsage;
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
 
 final class UsagesRelationManager extends RelationManager
 {
@@ -22,63 +23,61 @@ final class UsagesRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Usages';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $schema): Form
     {
-        return $schema
-            ->components([
-                Forms\Components\Select::make('user_id')
-                    ->label(__('admin.common.user'))
-                    ->relationship('user', 'name')
-                    ->searchable(),
-                    ->preload(),
-                Forms\Components\Select::make('order_id')
-                    ->label(__('admin.orders.title'))
-                    ->relationship('order', 'number')
-                    ->searchable(),
-                    ->preload(),
-                Forms\Components\TextInput::make('discount_amount')
-                    ->label(__('admin.coupons.additional_fields.discount_amount'))
-                    ->numeric(),
-                    ->prefix('€'),
-                    ->required(),
-                Forms\Components\DateTimePicker::make('used_at')
-                    ->label(__('admin.coupons.additional_fields.used_at'))
-                    ->required(),
-                    ->default(now()),
-            ]);
+        return $schema->components([
+            Forms\Components\Select::make('user_id')
+                ->label(__('admin.common.user'))
+                ->relationship('user', 'name')
+                ->searchable()
+                ->preload(),
+            Forms\Components\Select::make('order_id')
+                ->label(__('admin.orders.title'))
+                ->relationship('order', 'number')
+                ->searchable()
+                ->preload(),
+            Forms\Components\TextInput::make('discount_amount')
+                ->label(__('admin.coupons.additional_fields.discount_amount'))
+                ->numeric()
+                ->prefix('€')
+                ->required(),
+            Forms\Components\DateTimePicker::make('used_at')
+                ->label(__('admin.coupons.additional_fields.used_at'))
+                ->required()
+                ->default(now()),
+        ]);
     }
 
     public function table(Table $table): Table
-    {
     {
         return $table
             ->recordTitleAttribute('used_at')
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('admin.common.user'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()
+                    ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('order.number')
                     ->label(__('admin.orders.title'))
-                    ->searchable(),
-                    ->sortable(),
+                    ->searchable()
+                    ->sortable()
                     ->url(fn($record) => $record->order ? route('filament.admin.resources.orders.view', $record->order) : null)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('discount_amount')
                     ->label(__('admin.coupons.additional_fields.discount_amount'))
-                    ->money('EUR'),
-                    ->sortable(),
+                    ->money('EUR')
+                    ->sortable()
                     ->weight('medium'),
                 Tables\Columns\TextColumn::make('used_at')
                     ->label(__('admin.coupons.additional_fields.used_at'))
-                    ->dateTime(),
-                    ->sortable(),
+                    ->dateTime()
+                    ->sortable()
                     ->weight('bold'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.coupons.fields.created_at'))
-                    ->dateTime(),
-                    ->sortable(),
+                    ->dateTime()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([

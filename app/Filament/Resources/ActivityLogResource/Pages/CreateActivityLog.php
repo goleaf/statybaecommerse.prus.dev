@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\ActivityLogResource\Pages;
 
@@ -19,11 +17,13 @@ final class CreateActivityLog extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Set default values
-        $data['user_id'] = $data['user_id'] ?? auth()->id();
+        $data['causer_id'] = $data['causer_id'] ?? auth()->id();
+        $data['causer_type'] = $data['causer_type'] ?? \App\Models\User::class;
         $data['ip_address'] = $data['ip_address'] ?? request()->ip();
         $data['user_agent'] = $data['user_agent'] ?? request()->userAgent();
         $data['created_at'] = $data['created_at'] ?? now();
-        
+
         return $data;
     }
 }
+

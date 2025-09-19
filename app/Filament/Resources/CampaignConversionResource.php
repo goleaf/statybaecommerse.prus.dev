@@ -13,14 +13,14 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -44,8 +44,8 @@ final class CampaignConversionResource extends Resource
 
     /**
      * @var UnitEnum|string|null
-     */    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
+     */
+    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Marketing;
 
     protected static ?int $navigationSort = 9;
 
@@ -66,12 +66,11 @@ final class CampaignConversionResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return 'Marketing';
+        return 'Marketing'->value;
     }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -80,7 +79,6 @@ final class CampaignConversionResource extends Resource
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -89,8 +87,8 @@ final class CampaignConversionResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
+     * @param Schema $schema
+     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
@@ -98,7 +96,7 @@ final class CampaignConversionResource extends Resource
             Section::make(__('campaign_conversions.basic_information'))
                 ->components([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Select::make('campaign_id')
                                 ->label(__('campaign_conversions.campaign'))
                                 ->relationship('campaign', 'name')
@@ -117,15 +115,14 @@ final class CampaignConversionResource extends Resource
                                 }),
                             TextInput::make('campaign_name')
                                 ->label(__('campaign_conversions.campaign_name'))
-                                ->required()
                                 ->maxLength(255)
                                 ->disabled(),
                         ]),
                     Grid::make(2)
-                        ->components([
-                            Select::make('user_id')
+                        ->schema([
+                            Select::make('customer_id')
                                 ->label(__('campaign_conversions.user'))
-                                ->relationship('user', 'name')
+                                ->relationship('customer', 'name')
                                 ->searchable()
                                 ->preload()
                                 ->live()
@@ -145,10 +142,10 @@ final class CampaignConversionResource extends Resource
                         ]),
                 ]),
             Section::make(__('campaign_conversions.conversion_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            Select::make('type')
+                ->schema([
+                    Grid::make(3)
+                        ->schema([
+                            Select::make('conversion_type')
                                 ->label(__('campaign_conversions.type'))
                                 ->options([
                                     'purchase' => __('campaign_conversions.types.purchase'),
@@ -158,40 +155,44 @@ final class CampaignConversionResource extends Resource
                                     'lead' => __('campaign_conversions.types.lead'),
                                     'custom' => __('campaign_conversions.types.custom'),
                                 ])
-                                ->required()
-                                ->default('purchase'),
-                            TextInput::make('value')
+                                ->default('purchase')
+                                ->required(),
+                            TextInput::make('conversion_value')
                                 ->label(__('campaign_conversions.value'))
                                 ->numeric()
-                                ->required()
                                 ->prefix('€')
                                 ->step(0.01)
                                 ->minValue(0)
                                 ->helperText(__('campaign_conversions.value_help')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('currency')
                                 ->label(__('campaign_conversions.currency'))
-                                ->required()
                                 ->maxLength(3)
                                 ->default('EUR')
                                 ->rules(['alpha']),
-                            TextInput::make('conversion_id')
-                                ->label(__('campaign_conversions.conversion_id'))
-                                ->maxLength(100)
-                                ->helperText(__('campaign_conversions.conversion_id_help')),
                         ]),
-                    Textarea::make('description')
-                        ->label(__('campaign_conversions.description'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
+                    Grid::make(2)
+                        ->schema([
+                            Select::make('status')
+                                ->label(__('campaign_conversions.status'))
+                                ->options([
+                                    'completed' => __('campaign_conversions.statuses.completed'),
+                                    'pending' => __('campaign_conversions.statuses.pending'),
+                                    'confirmed' => __('campaign_conversions.statuses.confirmed'),
+                                    'cancelled' => __('campaign_conversions.statuses.cancelled'),
+                                ])
+                                ->default('completed')
+                                ->required(),
+                            Textarea::make('description')
+                                ->label(__('campaign_conversions.description'))
+                                ->rows(3)
+                                ->maxLength(500)
+                                ->columnSpanFull(),
+                        ]),
                 ]),
             Section::make(__('campaign_conversions.tracking_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
+                ->schema([
+                    Grid::make(3)
+                        ->schema([
                             TextInput::make('ip_address')
                                 ->label(__('campaign_conversions.ip_address'))
                                 ->maxLength(45)
@@ -201,71 +202,56 @@ final class CampaignConversionResource extends Resource
                                 ->label(__('campaign_conversions.user_agent'))
                                 ->maxLength(500)
                                 ->helperText(__('campaign_conversions.user_agent_help')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('device_type')
                                 ->label(__('campaign_conversions.device_type'))
                                 ->maxLength(50)
                                 ->helperText(__('campaign_conversions.device_type_help')),
+                        ]),
+                    Grid::make(3)
+                        ->schema([
                             TextInput::make('browser')
                                 ->label(__('campaign_conversions.browser'))
-                                ->maxLength(100)
                                 ->helperText(__('campaign_conversions.browser_help')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('os')
                                 ->label(__('campaign_conversions.os'))
-                                ->maxLength(100)
                                 ->helperText(__('campaign_conversions.os_help')),
                             TextInput::make('country')
                                 ->label(__('campaign_conversions.country'))
-                                ->maxLength(100)
                                 ->helperText(__('campaign_conversions.country_help')),
                         ]),
                 ]),
             Section::make(__('campaign_conversions.attribution'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
+                ->schema([
+                    Grid::make(3)
+                        ->schema([
                             TextInput::make('utm_source')
                                 ->label(__('campaign_conversions.utm_source'))
-                                ->maxLength(100)
                                 ->helperText(__('campaign_conversions.utm_source_help')),
                             TextInput::make('utm_medium')
                                 ->label(__('campaign_conversions.utm_medium'))
-                                ->maxLength(100)
                                 ->helperText(__('campaign_conversions.utm_medium_help')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('utm_campaign')
                                 ->label(__('campaign_conversions.utm_campaign'))
-                                ->maxLength(100)
                                 ->helperText(__('campaign_conversions.utm_campaign_help')),
+                        ]),
+                    Grid::make(3)
+                        ->schema([
                             TextInput::make('utm_term')
                                 ->label(__('campaign_conversions.utm_term'))
-                                ->maxLength(100)
                                 ->helperText(__('campaign_conversions.utm_term_help')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('utm_content')
                                 ->label(__('campaign_conversions.utm_content'))
-                                ->maxLength(100)
                                 ->helperText(__('campaign_conversions.utm_content_help')),
                             TextInput::make('referrer_url')
                                 ->label(__('campaign_conversions.referrer_url'))
                                 ->url()
-                                ->maxLength(500)
                                 ->helperText(__('campaign_conversions.referrer_url_help')),
                         ]),
                 ]),
             Section::make(__('campaign_conversions.settings'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('is_verified')
                                 ->label(__('campaign_conversions.is_verified'))
                                 ->default(false),
@@ -274,7 +260,7 @@ final class CampaignConversionResource extends Resource
                                 ->default(true),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             DateTimePicker::make('converted_at')
                                 ->label(__('campaign_conversions.converted_at'))
                                 ->default(now())
@@ -291,7 +277,6 @@ final class CampaignConversionResource extends Resource
                     Textarea::make('notes')
                         ->label(__('campaign_conversions.notes'))
                         ->rows(3)
-                        ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
         ]);
@@ -314,20 +299,16 @@ final class CampaignConversionResource extends Resource
                     ->limit(50),
                 TextColumn::make('campaign_code')
                     ->label(__('campaign_conversions.campaign_code'))
-                    ->searchable()
-                    ->sortable()
                     ->copyable()
                     ->badge()
                     ->color('blue'),
-                TextColumn::make('user.name')
+                TextColumn::make('customer.name')
                     ->label(__('campaign_conversions.user'))
-                    ->sortable()
                     ->limit(50)
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('type')
+                TextColumn::make('conversion_type')
                     ->label(__('campaign_conversions.type'))
                     ->formatStateUsing(fn(string $state): string => __("campaign_conversions.types.{$state}"))
-                    ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'purchase' => 'green',
                         'signup' => 'blue',
@@ -337,77 +318,56 @@ final class CampaignConversionResource extends Resource
                         'custom' => 'gray',
                         default => 'gray',
                     }),
-                TextColumn::make('value')
+                TextColumn::make('conversion_value')
                     ->label(__('campaign_conversions.value'))
                     ->money('EUR')
-                    ->sortable()
-                    ->weight('bold')
                     ->alignCenter(),
+                TextColumn::make('status')
+                    ->label(__('campaign_conversions.status'))
+                    ->formatStateUsing(fn(string $state): string => __("campaign_conversions.statuses.{$state}"))
+                    ->color(fn(string $state): string => match ($state) {
+                        'completed' => 'success',
+                        'pending' => 'warning',
+                        'confirmed' => 'info',
+                        'cancelled' => 'danger',
+                        default => 'gray',
+                    })
+                    ->badge(),
                 TextColumn::make('currency')
                     ->label(__('campaign_conversions.currency'))
-                    ->sortable()
-                    ->badge()
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('conversion_id')
                     ->label(__('campaign_conversions.conversion_id'))
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('ip_address')
                     ->label(__('campaign_conversions.ip_address'))
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
-                    ->badge()
-                    ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('device_type')
                     ->label(__('campaign_conversions.device_type'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
                     ->color('purple')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('browser')
                     ->label(__('campaign_conversions.browser'))
-                    ->searchable()
-                    ->sortable()
                     ->limit(30)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('os')
                     ->label(__('campaign_conversions.os'))
-                    ->searchable()
-                    ->sortable()
-                    ->limit(30)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('country')
                     ->label(__('campaign_conversions.country'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
                     ->color('green')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('utm_source')
                     ->label(__('campaign_conversions.utm_source'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
                     ->color('orange')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('utm_medium')
                     ->label(__('campaign_conversions.utm_medium'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
                     ->color('teal')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('utm_campaign')
                     ->label(__('campaign_conversions.utm_campaign'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
                     ->color('indigo')
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_verified')
@@ -417,43 +377,28 @@ final class CampaignConversionResource extends Resource
                 IconColumn::make('is_attributed')
                     ->label(__('campaign_conversions.is_attributed'))
                     ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('converted_at')
                     ->label(__('campaign_conversions.converted_at'))
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('attribution_window')
                     ->label(__('campaign_conversions.attribution_window'))
                     ->numeric()
-                    ->sortable()
                     ->suffix(' days')
                     ->alignCenter()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
-                    ->label(__('campaign_conversions.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->label(__('campaign_conversions.updated_at'))
-                    ->dateTime()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('campaign_id')
                     ->label(__('campaign_conversions.campaign'))
                     ->relationship('campaign', 'name')
-                    ->searchable()
                     ->preload(),
-                SelectFilter::make('user_id')
+                SelectFilter::make('customer_id')
                     ->label(__('campaign_conversions.user'))
-                    ->relationship('user', 'name')
-                    ->searchable()
+                    ->relationship('customer', 'name')
                     ->preload(),
-                SelectFilter::make('type')
+                SelectFilter::make('conversion_type')
                     ->label(__('campaign_conversions.type'))
                     ->options([
                         'purchase' => __('campaign_conversions.types.purchase'),
@@ -463,15 +408,21 @@ final class CampaignConversionResource extends Resource
                         'lead' => __('campaign_conversions.types.lead'),
                         'custom' => __('campaign_conversions.types.custom'),
                     ]),
+                SelectFilter::make('status')
+                    ->label(__('campaign_conversions.status'))
+                    ->options([
+                        'completed' => __('campaign_conversions.statuses.completed'),
+                        'pending' => __('campaign_conversions.statuses.pending'),
+                        'confirmed' => __('campaign_conversions.statuses.confirmed'),
+                        'cancelled' => __('campaign_conversions.statuses.cancelled'),
+                    ]),
                 TernaryFilter::make('is_verified')
                     ->label(__('campaign_conversions.is_verified'))
-                    ->boolean()
                     ->trueLabel(__('campaign_conversions.verified_only'))
                     ->falseLabel(__('campaign_conversions.unverified_only'))
                     ->native(false),
                 TernaryFilter::make('is_attributed')
                     ->label(__('campaign_conversions.is_attributed'))
-                    ->boolean()
                     ->trueLabel(__('campaign_conversions.attributed_only'))
                     ->falseLabel(__('campaign_conversions.unattributed_only'))
                     ->native(false),
@@ -486,7 +437,6 @@ final class CampaignConversionResource extends Resource
                     ->visible(fn(CampaignConversion $record): bool => !$record->is_verified)
                     ->action(function (CampaignConversion $record): void {
                         $record->update(['is_verified' => true]);
-
                         Notification::make()
                             ->title(__('campaign_conversions.verified_successfully'))
                             ->success()
@@ -500,7 +450,6 @@ final class CampaignConversionResource extends Resource
                     ->visible(fn(CampaignConversion $record): bool => $record->is_verified)
                     ->action(function (CampaignConversion $record): void {
                         $record->update(['is_verified' => false]);
-
                         Notification::make()
                             ->title(__('campaign_conversions.unverified_successfully'))
                             ->success()
@@ -514,7 +463,6 @@ final class CampaignConversionResource extends Resource
                     ->visible(fn(CampaignConversion $record): bool => !$record->is_attributed)
                     ->action(function (CampaignConversion $record): void {
                         $record->update(['is_attributed' => true]);
-
                         Notification::make()
                             ->title(__('campaign_conversions.attributed_successfully'))
                             ->success()
@@ -528,7 +476,6 @@ final class CampaignConversionResource extends Resource
                     ->visible(fn(CampaignConversion $record): bool => $record->is_attributed)
                     ->action(function (CampaignConversion $record): void {
                         $record->update(['is_attributed' => false]);
-
                         Notification::make()
                             ->title(__('campaign_conversions.unattributed_successfully'))
                             ->success()
@@ -545,7 +492,6 @@ final class CampaignConversionResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_verified' => true]);
-
                             Notification::make()
                                 ->title(__('campaign_conversions.bulk_verified_success'))
                                 ->success()
@@ -558,7 +504,6 @@ final class CampaignConversionResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_verified' => false]);
-
                             Notification::make()
                                 ->title(__('campaign_conversions.bulk_unverified_success'))
                                 ->success()
@@ -571,7 +516,6 @@ final class CampaignConversionResource extends Resource
                         ->color('info')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_attributed' => true]);
-
                             Notification::make()
                                 ->title(__('campaign_conversions.bulk_attributed_success'))
                                 ->success()
@@ -584,16 +528,15 @@ final class CampaignConversionResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_attributed' => false]);
-
                             Notification::make()
                                 ->title(__('campaign_conversions.bulk_unattributed_success'))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                ]),
+                ])
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('converted_at', 'desc');
     }
 
     /**
@@ -609,7 +552,6 @@ final class CampaignConversionResource extends Resource
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

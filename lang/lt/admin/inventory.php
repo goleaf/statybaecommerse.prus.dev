@@ -1,0 +1,73 @@
+<?php
+
+return [
+    'title' => 'Inventorius',
+    'plural' => 'Inventorius',
+    'single' => 'Inventorius',
+    'form' => [
+        'tabs' => [
+            'basic_information' => 'Pagrindinė informacija',
+            'product_details' => 'Produkto detalės',
+            'location_details' => 'Lokacijos detalės',
+            'stock_analysis' => 'Atsargų analizė',
+        ],
+        'sections' => [
+            'basic_information' => 'Pagrindinė informacija',
+            'product_details' => 'Produkto detalės',
+            'location_details' => 'Lokacijos detalės',
+            'stock_analysis' => 'Atsargų analizė',
+        ],
+        'fields' => [
+            'product' => 'Produktas',
+            'location' => 'Lokacija',
+            'quantity' => 'Kiekis',
+            'reserved' => 'Rezervuota',
+            'incoming' => 'Gaunama',
+            'threshold' => 'Slenkstis',
+            'is_tracked' => 'Sekamas',
+            'created_at' => 'Sukurta',
+            'available_quantity' => 'Galimas kiekis',
+            'stock_status' => 'Atsargų būsena',
+            'product_name' => 'Produkto pavadinimas',
+            'product_sku' => 'Produkto SKU',
+            'product_price' => 'Produkto kaina',
+            'product_stock_status' => 'Produkto atsargų būsena',
+            'location_name' => 'Lokacijos pavadinimas',
+            'location_code' => 'Lokacijos kodas',
+            'location_address' => 'Lokacijos adresas',
+            'location_city' => 'Lokacijos miestas',
+            'stock_ratio' => 'Atsargų santykis',
+            'add_quantity' => 'Pridėti kiekį',
+            'remove_quantity' => 'Pašalinti kiekį',
+            'reserve_quantity' => 'Rezervuoti kiekį',
+        ],
+    ],
+    'stock_status' => [
+        'in_stock' => 'Yra atsargų',
+        'low_stock' => 'Mažai atsargų',
+        'out_of_stock' => 'Nėra atsargų',
+    ],
+    'actions' => [
+        'adjust_stock' => 'Koreguoti atsargas',
+        'add_stock' => 'Pridėti atsargas',
+        'remove_stock' => 'Pašalinti atsargas',
+        'reserve_stock' => 'Rezervuoti atsargas',
+        'toggle_tracking' => 'Perjungti sekimą',
+    ],
+    'filters' => [
+        'low_stock_only' => 'Tik mažai atsargų',
+        'out_of_stock_only' => 'Tik be atsargų',
+        'tracked_only' => 'Tik sekami',
+        'created_at' => 'Sukurta',
+        'quantity_from' => 'Kiekis nuo',
+        'quantity_to' => 'Kiekis iki',
+    ],
+    'notifications' => [
+        'stock_adjusted_successfully' => 'Atsargos sėkmingai pakoreguotos',
+        'stock_added_successfully' => 'Atsargos sėkmingai pridėtos',
+        'stock_removed_successfully' => 'Atsargos sėkmingai pašalintos',
+        'stock_reserved_successfully' => 'Atsargos sėkmingai rezervuotos',
+        'tracking_updated_successfully' => 'Sekimas sėkmingai atnaujintas',
+    ],
+];
+

@@ -1,53 +1,55 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
-use App\Models\User;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Enums\NavigationGroup;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Grid;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
+use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteBulkAction;
+
 /**
  * CartItemResource
- * 
+ *
  * Filament v4 resource for CartItem management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class CartItemResource extends Resource
 {
     protected static ?string $model = CartItem::class;
-    
-    /** @var UnitEnum|string|null */
-        protected static string | UnitEnum | null $navigationGroup = "Products";
-    
+
+    /**
+     * @var UnitEnum|string|null
+     */
+    protected static string|UnitEnum|null $navigationGroup = "Products";
+
     protected static ?int $navigationSort = 3;
+
     protected static ?string $recordTitleAttribute = 'product_name';
 
     /**
+     * /**
      * Handle getNavigationLabel functionality with proper error handling.
      * @return string
      */
@@ -62,7 +64,7 @@ final class CartItemResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Orders";
+        return __('cart_items.navigation_group');
     }
 
     /**
@@ -85,8 +87,8 @@ final class CartItemResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
+     * @param Schema $schema
+     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
@@ -101,12 +103,9 @@ final class CartItemResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->required(),
-                            
                             Select::make('product_id')
                                 ->label(__('cart_items.product'))
                                 ->relationship('product', 'name')
-                                ->searchable()
-                                ->preload()
                                 ->required()
                                 ->live()
                                 ->afterStateUpdated(function ($state, Forms\Set $set) {
@@ -120,75 +119,77 @@ final class CartItemResource extends Resource
                                     }
                                 }),
                         ]),
-                    
+                    Select::make('product_variant_id')
+                        ->label(__('cart_items.product_variant'))
+                        ->relationship('productVariant', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->live()
+                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                            if ($state) {
+                                $variant = ProductVariant::find($state);
+                                if ($variant) {
+                                    $set('product_name', $variant->name);
+                                    $set('product_sku', $variant->sku);
+                                    $set('unit_price', $variant->price);
+                                }
+                            }
+                        }),
+                    TextInput::make('product_name')
+                        ->label(__('cart_items.product_name'))
+                        ->maxLength(255),
+                    TextInput::make('product_sku')
+                        ->label(__('cart_items.product_sku'))
+                        ->maxLength(255),
                     Grid::make(2)
                         ->components([
-                            Select::make('product_variant_id')
-                                ->label(__('cart_items.product_variant'))
-                                ->relationship('productVariant', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                    if ($state) {
-                                        $variant = ProductVariant::find($state);
-                                        if ($variant) {
-                                            $set('product_name', $variant->name);
-                                            $set('product_sku', $variant->sku);
-                                            $set('unit_price', $variant->price);
-                                        }
-                                    }
-                                }),
-                            
-                            TextInput::make('product_name')
-                                ->label(__('cart_items.product_name'))
-                                ->required()
-                                ->maxLength(255),
-                        ]),
-                    
-                    Grid::make(2)
-                        ->components([
-                            TextInput::make('product_sku')
-                                ->label(__('cart_items.product_sku'))
-                                ->maxLength(255),
-                            
                             TextInput::make('quantity')
                                 ->label(__('cart_items.quantity'))
                                 ->numeric()
-                                ->required()
                                 ->minValue(1)
                                 ->default(1)
-                                ->live()
+                                ->required()
                                 ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $state;
                                     $total = $unitPrice * $quantity;
-                                    $set('total', number_format($total, 2, '.', ''));
+                                    $set('total_price', number_format($total, 2, '.', ''));
                                 }),
+                            TextInput::make('minimum_quantity')
+                                ->label(__('cart_items.minimum_quantity'))
+                                ->numeric()
+                                ->minValue(1)
+                                ->default(1),
                         ]),
+                    TextInput::make('session_id')
+                        ->label(__('cart_items.session_id'))
+                        ->maxLength(255)
+                        ->helperText(__('cart_items.session_id_help')),
+                    Forms\Components\Textarea::make('notes')
+                        ->label(__('cart_items.notes'))
+                        ->rows(3)
+                        ->maxLength(1000),
                 ]),
-            
             Section::make(__('cart_items.pricing'))
                 ->components([
                     Grid::make(3)
                         ->components([
                             TextInput::make('unit_price')
                                 ->label(__('cart_items.unit_price'))
+                                ->prefix('€')
                                 ->numeric()
                                 ->required()
-                                ->prefix('€')
                                 ->live()
                                 ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
                                     $unitPrice = (float) $state;
                                     $quantity = (int) $get('quantity');
                                     $total = $unitPrice * $quantity;
-                                    $set('total', number_format($total, 2, '.', ''));
+                                    $set('total_price', number_format($total, 2, '.', ''));
                                 }),
-                            
                             TextInput::make('discount_amount')
                                 ->label(__('cart_items.discount_amount'))
-                                ->numeric()
                                 ->prefix('€')
+                                ->numeric()
                                 ->default(0)
                                 ->live()
                                 ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
@@ -196,17 +197,29 @@ final class CartItemResource extends Resource
                                     $quantity = (int) $get('quantity');
                                     $discount = (float) $state;
                                     $total = ($unitPrice * $quantity) - $discount;
-                                    $set('total', number_format($total, 2, '.', ''));
+                                    $set('total_price', number_format($total, 2, '.', ''));
                                 }),
-                            
-                            TextInput::make('total')
+                            TextInput::make('total_price')
                                 ->label(__('cart_items.total'))
-                                ->numeric()
                                 ->prefix('€')
-                                ->required()
                                 ->disabled(),
                         ]),
                 ]),
+            Section::make(__('cart_items.additional_info'))
+                ->components([
+                    Forms\Components\KeyValue::make('attributes')
+                        ->label(__('cart_items.attributes'))
+                        ->keyLabel(__('cart_items.attribute_name'))
+                        ->valueLabel(__('cart_items.attribute_value'))
+                        ->addActionLabel(__('cart_items.add_attribute')),
+                    Forms\Components\KeyValue::make('product_snapshot')
+                        ->label(__('cart_items.product_snapshot'))
+                        ->keyLabel(__('cart_items.snapshot_key'))
+                        ->valueLabel(__('cart_items.snapshot_value'))
+                        ->addActionLabel(__('cart_items.add_snapshot'))
+                        ->helperText(__('cart_items.product_snapshot_help')),
+                ])
+                ->collapsible(),
         ]);
     }
 
@@ -223,49 +236,43 @@ final class CartItemResource extends Resource
                     ->label(__('cart_items.user'))
                     ->searchable()
                     ->sortable(),
-                
-                TextColumn::make('product_name')
+                TextColumn::make('product.name')
                     ->label(__('cart_items.product_name'))
-                    ->searchable()
                     ->sortable()
-                    ->limit(50),
-                
-                TextColumn::make('product_sku')
+                    ->limit(50)
+                    ->searchable(),
+                TextColumn::make('product.sku')
                     ->label(__('cart_items.product_sku'))
-                    ->searchable()
-                    ->sortable()
                     ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('quantity')
                     ->label(__('cart_items.quantity'))
                     ->numeric()
-                    ->sortable()
-                    ->alignCenter(),
-                
+                    ->alignCenter()
+                    ->sortable(),
+                TextColumn::make('minimum_quantity')
+                    ->label(__('cart_items.minimum_quantity'))
+                    ->numeric()
+                    ->alignCenter()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('unit_price')
                     ->label(__('cart_items.unit_price'))
                     ->money('EUR')
                     ->sortable(),
-                
                 TextColumn::make('discount_amount')
                     ->label(__('cart_items.discount_amount'))
                     ->money('EUR')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                
-                TextColumn::make('total')
+                    ->sortable(),
+                TextColumn::make('total_price')
                     ->label(__('cart_items.total'))
                     ->money('EUR')
-                    ->sortable()
-                    ->weight('bold'),
-                
+                    ->weight('bold')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('cart_items.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
                 TextColumn::make('updated_at')
                     ->label(__('cart_items.updated_at'))
                     ->dateTime()
@@ -274,17 +281,36 @@ final class CartItemResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('user_id')
-                    ->label(__('cart_items.user'))
                     ->relationship('user', 'name')
-                    ->searchable()
                     ->preload(),
-                
                 SelectFilter::make('product_id')
                     ->label(__('cart_items.product'))
                     ->relationship('product', 'name')
-                    ->searchable()
                     ->preload(),
-                
+                SelectFilter::make('product_variant_id')
+                    ->label(__('cart_items.product_variant'))
+                    ->relationship('productVariant', 'name')
+                    ->preload(),
+                Filter::make('quantity_range')
+                    ->form([
+                        Forms\Components\TextInput::make('quantity_from')
+                            ->label(__('cart_items.quantity_from'))
+                            ->numeric(),
+                        Forms\Components\TextInput::make('quantity_to')
+                            ->label(__('cart_items.quantity_to'))
+                            ->numeric(),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['quantity_from'],
+                                fn(Builder $query, $quantity): Builder => $query->where('quantity', '>=', $quantity),
+                            )
+                            ->when(
+                                $data['quantity_to'],
+                                fn(Builder $query, $quantity): Builder => $query->where('quantity', '<=', $quantity),
+                            );
+                    }),
                 Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
@@ -296,18 +322,17 @@ final class CartItemResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
-                
                 Action::make('move_to_wishlist')
                     ->label(__('cart_items.move_to_wishlist'))
                     ->icon('heroicon-o-heart')
@@ -324,7 +349,6 @@ final class CartItemResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    
                     BulkAction::make('clear_old_carts')
                         ->label(__('cart_items.clear_old_carts'))
                         ->icon('heroicon-o-trash')
@@ -333,9 +357,7 @@ final class CartItemResource extends Resource
                             $oldRecords = $records->filter(function ($record) {
                                 return $record->created_at->lt(now()->subDays(30));
                             });
-                            
                             $oldRecords->each->delete();
-                            
                             Notification::make()
                                 ->title(__('cart_items.old_carts_cleared_success'))
                                 ->success()

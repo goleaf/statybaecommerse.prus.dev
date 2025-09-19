@@ -1,12 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
 use App\Models\ProductVariant;
-use App\Models\VariantImage;
 use App\Models\User;
+use App\Models\VariantImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -18,20 +16,21 @@ final class VariantImageResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->actingAs(User::factory()->create());
     }
 
     public function test_can_render_variant_image_resource(): void
     {
-        $this->get('/admin/variant-images')
+        $this
+            ->get('/admin/variant-images')
             ->assertOk();
     }
 
     public function test_can_create_variant_image(): void
     {
         $variant = ProductVariant::factory()->create();
-        
+
         $data = [
             'variant_id' => $variant->id,
             'image_path' => ['test-image.jpg'],
@@ -57,7 +56,7 @@ final class VariantImageResourceTest extends TestCase
     public function test_can_edit_variant_image(): void
     {
         $variantImage = VariantImage::factory()->create();
-        
+
         $data = [
             'image_path' => ['updated-image.jpg'],
             'alt_text' => 'Updated Alt Text',

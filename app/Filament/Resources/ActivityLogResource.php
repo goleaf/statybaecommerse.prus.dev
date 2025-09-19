@@ -12,14 +12,14 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -39,8 +39,9 @@ use UnitEnum;
  */
 final class ActivityLogResource extends Resource
 {
-    protected static ?string $model = ActivityLog::class;    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
+    protected static ?string $model = ActivityLog::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 9;
 
@@ -89,11 +90,11 @@ final class ActivityLogResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $form->schema([
             Section::make(__('activity_logs.basic_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Select::make('user_id')
                                 ->label(__('activity_logs.user'))
                                 ->relationship('user', 'name')
@@ -115,22 +116,20 @@ final class ActivityLogResource extends Resource
                                 ->disabled(),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('log_name')
                                 ->label(__('activity_logs.log_name'))
-                                ->maxLength(255)
                                 ->helperText(__('activity_logs.log_name_help')),
                             TextInput::make('description')
                                 ->label(__('activity_logs.description'))
                                 ->required()
-                                ->maxLength(255)
                                 ->helperText(__('activity_logs.description_help')),
                         ]),
                 ]),
             Section::make(__('activity_logs.event_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Select::make('event')
                                 ->label(__('activity_logs.event'))
                                 ->options([
@@ -145,15 +144,13 @@ final class ActivityLogResource extends Resource
                                     'email_verified' => __('activity_logs.events.email_verified'),
                                     'custom' => __('activity_logs.events.custom'),
                                 ])
-                                ->required()
                                 ->default('custom'),
                             TextInput::make('subject_type')
                                 ->label(__('activity_logs.subject_type'))
-                                ->maxLength(255)
                                 ->helperText(__('activity_logs.subject_type_help')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('subject_id')
                                 ->label(__('activity_logs.subject_id'))
                                 ->numeric()
@@ -161,15 +158,12 @@ final class ActivityLogResource extends Resource
                                 ->helperText(__('activity_logs.subject_id_help')),
                             TextInput::make('causer_type')
                                 ->label(__('activity_logs.causer_type'))
-                                ->maxLength(255)
                                 ->helperText(__('activity_logs.causer_type_help')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('causer_id')
                                 ->label(__('activity_logs.causer_id'))
-                                ->numeric()
-                                ->minValue(1)
                                 ->helperText(__('activity_logs.causer_id_help')),
                             TextInput::make('batch_uuid')
                                 ->label(__('activity_logs.batch_uuid'))
@@ -178,7 +172,7 @@ final class ActivityLogResource extends Resource
                         ]),
                 ]),
             Section::make(__('activity_logs.properties'))
-                ->components([
+                ->schema([
                     Textarea::make('properties')
                         ->label(__('activity_logs.properties'))
                         ->rows(5)
@@ -187,9 +181,9 @@ final class ActivityLogResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('activity_logs.context_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('ip_address')
                                 ->label(__('activity_logs.ip_address'))
                                 ->maxLength(45)
@@ -201,7 +195,7 @@ final class ActivityLogResource extends Resource
                                 ->helperText(__('activity_logs.user_agent_help')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('device_type')
                                 ->label(__('activity_logs.device_type'))
                                 ->maxLength(50)
@@ -212,21 +206,19 @@ final class ActivityLogResource extends Resource
                                 ->helperText(__('activity_logs.browser_help')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('os')
                                 ->label(__('activity_logs.os'))
-                                ->maxLength(100)
                                 ->helperText(__('activity_logs.os_help')),
                             TextInput::make('country')
                                 ->label(__('activity_logs.country'))
-                                ->maxLength(100)
                                 ->helperText(__('activity_logs.country_help')),
                         ]),
                 ]),
             Section::make(__('activity_logs.settings'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('is_important')
                                 ->label(__('activity_logs.is_important'))
                                 ->default(false),
@@ -235,14 +227,13 @@ final class ActivityLogResource extends Resource
                                 ->default(false),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('severity')
                                 ->label(__('activity_logs.severity'))
                                 ->maxLength(20)
                                 ->helperText(__('activity_logs.severity_help')),
                             TextInput::make('category')
                                 ->label(__('activity_logs.category'))
-                                ->maxLength(50)
                                 ->helperText(__('activity_logs.category_help')),
                         ]),
                     Textarea::make('notes')
@@ -271,7 +262,6 @@ final class ActivityLogResource extends Resource
                     ->limit(100),
                 TextColumn::make('user.name')
                     ->label(__('activity_logs.user'))
-                    ->sortable()
                     ->limit(50)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('event')
@@ -293,73 +283,43 @@ final class ActivityLogResource extends Resource
                     }),
                 TextColumn::make('log_name')
                     ->label(__('activity_logs.log_name'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
                     ->color('gray')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 TextColumn::make('subject_type')
                     ->label(__('activity_logs.subject_type'))
-                    ->searchable()
-                    ->sortable()
-                    ->limit(50)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('subject_id')
                     ->label(__('activity_logs.subject_id'))
                     ->numeric()
-                    ->sortable()
                     ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('causer_type')
                     ->label(__('activity_logs.causer_type'))
-                    ->searchable()
-                    ->sortable()
-                    ->limit(50)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('causer_id')
                     ->label(__('activity_logs.causer_id'))
-                    ->numeric()
-                    ->sortable()
-                    ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('ip_address')
                     ->label(__('activity_logs.ip_address'))
-                    ->searchable()
-                    ->sortable()
                     ->copyable()
-                    ->badge()
-                    ->color('gray')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 TextColumn::make('device_type')
                     ->label(__('activity_logs.device_type'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
                     ->color('purple')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('browser')
                     ->label(__('activity_logs.browser'))
-                    ->searchable()
-                    ->sortable()
                     ->limit(30)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('os')
                     ->label(__('activity_logs.os'))
-                    ->searchable()
-                    ->sortable()
-                    ->limit(30)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('country')
                     ->label(__('activity_logs.country'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
                     ->color('green')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('severity')
                     ->label(__('activity_logs.severity'))
-                    ->searchable()
-                    ->sortable()
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'low' => 'green',
@@ -371,46 +331,33 @@ final class ActivityLogResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('category')
                     ->label(__('activity_logs.category'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
                     ->color('blue')
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_important')
                     ->label(__('activity_logs.is_important'))
                     ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 IconColumn::make('is_system')
                     ->label(__('activity_logs.is_system'))
                     ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 TextColumn::make('batch_uuid')
                     ->label(__('activity_logs.batch_uuid'))
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label(__('activity_logs.created_at'))
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('updated_at')
                     ->label(__('activity_logs.updated_at'))
                     ->dateTime()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('user_id')
-                    ->label(__('activity_logs.user'))
                     ->relationship('user', 'name')
-                    ->searchable()
                     ->preload(),
                 SelectFilter::make('event')
-                    ->label(__('activity_logs.event'))
                     ->options([
                         'created' => __('activity_logs.events.created'),
                         'updated' => __('activity_logs.events.updated'),
@@ -424,7 +371,6 @@ final class ActivityLogResource extends Resource
                         'custom' => __('activity_logs.events.custom'),
                     ]),
                 SelectFilter::make('log_name')
-                    ->label(__('activity_logs.log_name'))
                     ->options(function () {
                         return ActivityLog::distinct('log_name')
                             ->pluck('log_name', 'log_name')
@@ -433,7 +379,6 @@ final class ActivityLogResource extends Resource
                     })
                     ->searchable(),
                 SelectFilter::make('subject_type')
-                    ->label(__('activity_logs.subject_type'))
                     ->options(function () {
                         return ActivityLog::distinct('subject_type')
                             ->pluck('subject_type', 'subject_type')
@@ -442,7 +387,6 @@ final class ActivityLogResource extends Resource
                     })
                     ->searchable(),
                 SelectFilter::make('causer_type')
-                    ->label(__('activity_logs.causer_type'))
                     ->options(function () {
                         return ActivityLog::distinct('causer_type')
                             ->pluck('causer_type', 'causer_type')
@@ -451,7 +395,6 @@ final class ActivityLogResource extends Resource
                     })
                     ->searchable(),
                 SelectFilter::make('severity')
-                    ->label(__('activity_logs.severity'))
                     ->options([
                         'low' => __('activity_logs.severities.low'),
                         'medium' => __('activity_logs.severities.medium'),
@@ -459,7 +402,6 @@ final class ActivityLogResource extends Resource
                         'critical' => __('activity_logs.severities.critical'),
                     ]),
                 SelectFilter::make('category')
-                    ->label(__('activity_logs.category'))
                     ->options(function () {
                         return ActivityLog::distinct('category')
                             ->pluck('category', 'category')
@@ -468,20 +410,16 @@ final class ActivityLogResource extends Resource
                     })
                     ->searchable(),
                 TernaryFilter::make('is_important')
-                    ->label(__('activity_logs.is_important'))
-                    ->boolean()
                     ->trueLabel(__('activity_logs.important_only'))
                     ->falseLabel(__('activity_logs.non_important_only'))
                     ->native(false),
                 TernaryFilter::make('is_system')
-                    ->label(__('activity_logs.is_system'))
-                    ->boolean()
                     ->trueLabel(__('activity_logs.system_only'))
                     ->falseLabel(__('activity_logs.user_only'))
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                \Filament\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('mark_important')
                     ->label(__('activity_logs.mark_important'))
@@ -490,7 +428,6 @@ final class ActivityLogResource extends Resource
                     ->visible(fn(ActivityLog $record): bool => !$record->is_important)
                     ->action(function (ActivityLog $record): void {
                         $record->update(['is_important' => true]);
-
                         Notification::make()
                             ->title(__('activity_logs.marked_as_important_successfully'))
                             ->success()
@@ -504,7 +441,6 @@ final class ActivityLogResource extends Resource
                     ->visible(fn(ActivityLog $record): bool => $record->is_important)
                     ->action(function (ActivityLog $record): void {
                         $record->update(['is_important' => false]);
-
                         Notification::make()
                             ->title(__('activity_logs.unmarked_as_important_successfully'))
                             ->success()
@@ -518,7 +454,6 @@ final class ActivityLogResource extends Resource
                     ->visible(fn(ActivityLog $record): bool => !$record->is_system)
                     ->action(function (ActivityLog $record): void {
                         $record->update(['is_system' => true]);
-
                         Notification::make()
                             ->title(__('activity_logs.marked_as_system_successfully'))
                             ->success()
@@ -532,7 +467,6 @@ final class ActivityLogResource extends Resource
                     ->visible(fn(ActivityLog $record): bool => $record->is_system)
                     ->action(function (ActivityLog $record): void {
                         $record->update(['is_system' => false]);
-
                         Notification::make()
                             ->title(__('activity_logs.unmarked_as_system_successfully'))
                             ->success()
@@ -549,7 +483,6 @@ final class ActivityLogResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_important' => true]);
-
                             Notification::make()
                                 ->title(__('activity_logs.bulk_marked_as_important_success'))
                                 ->success()
@@ -562,7 +495,6 @@ final class ActivityLogResource extends Resource
                         ->color('gray')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_important' => false]);
-
                             Notification::make()
                                 ->title(__('activity_logs.bulk_unmarked_as_important_success'))
                                 ->success()
@@ -575,7 +507,6 @@ final class ActivityLogResource extends Resource
                         ->color('info')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_system' => true]);
-
                             Notification::make()
                                 ->title(__('activity_logs.bulk_marked_as_system_success'))
                                 ->success()
@@ -588,7 +519,6 @@ final class ActivityLogResource extends Resource
                         ->color('gray')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_system' => false]);
-
                             Notification::make()
                                 ->title(__('activity_logs.bulk_unmarked_as_system_success'))
                                 ->success()
@@ -613,7 +543,6 @@ final class ActivityLogResource extends Resource
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

@@ -1,11 +1,9 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Models\Country;
 use App\Models\Translations\CountryTranslation;
+use App\Models\Country;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,21 +15,21 @@ final class CountryTest extends TestCase
     {
         $country = Country::factory()->create([
             'name' => 'Lithuania',
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
-            'region' => 'Europe',
+            'code' => 'LT',
+            'iso_code' => 'LTU',
+            'region' => 'europe',
             'currency_code' => 'EUR',
         ]);
 
         $this->assertDatabaseHas('countries', [
             'name' => 'Lithuania',
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'code' => 'LT',
+            'iso_code' => 'LTU',
         ]);
 
         $this->assertEquals('Lithuania', $country->name);
-        $this->assertEquals('LT', $country->cca2);
-        $this->assertEquals('LTU', $country->cca3);
+        $this->assertEquals('LT', $country->code);
+        $this->assertEquals('LTU', $country->iso_code);
     }
 
     public function test_country_has_translations(): void

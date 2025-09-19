@@ -1,0 +1,87 @@
+<?php
+
+return [
+    'title' => 'Dokumentų šablonai',
+    'plural' => 'Dokumentų šablonai',
+    'single' => 'Dokumento šablonas',
+    
+    'form' => [
+        'tabs' => [
+            'basic_information' => 'Pagrindinė informacija',
+            'content' => 'Turinys',
+            'variables' => 'Kintamieji',
+            'settings' => 'Nustatymai',
+            'preview' => 'Peržiūra',
+        ],
+        'sections' => [
+            'basic_information' => 'Pagrindinė informacija',
+            'content' => 'Turinys',
+            'variables' => 'Kintamieji',
+            'settings' => 'Nustatymai',
+            'preview' => 'Peržiūra',
+        ],
+        'fields' => [
+            'name' => 'Pavadinimas',
+            'slug' => 'Slug',
+            'description' => 'Aprašymas',
+            'type' => 'Tipas',
+            'category' => 'Kategorija',
+            'is_active' => 'Aktyvus',
+            'content' => 'Turinys',
+            'variables' => 'Kintamieji',
+            'variable_name' => 'Kintamojo pavadinimas',
+            'variable_description' => 'Kintamojo aprašymas',
+            'settings' => 'Nustatymai',
+            'setting_key' => 'Nustatymo raktas',
+            'setting_value' => 'Nustatymo reikšmė',
+            'template_preview' => 'Šablono peržiūra',
+            'available_variables' => 'Galimi kintamieji',
+            'document_count' => 'Dokumentų skaičius',
+            'variables_count' => 'Kintamųjų skaičius',
+            'documents_count' => 'Dokumentų skaičius',
+            'created_at' => 'Sukurta',
+        ],
+    ],
+    
+    'types' => [
+        'invoice' => 'Sąskaita faktūra',
+        'quote' => 'Pasiūlymas',
+        'receipt' => 'Kvitas',
+        'contract' => 'Sutartis',
+        'report' => 'Ataskaita',
+        'email' => 'El. laiškas',
+        'other' => 'Kitas',
+    ],
+    
+    'categories' => [
+        'business' => 'Verslas',
+        'legal' => 'Teisinė',
+        'financial' => 'Finansinė',
+        'marketing' => 'Rinkodara',
+        'technical' => 'Techninė',
+        'other' => 'Kita',
+    ],
+    
+    'filters' => [
+        'type' => 'Tipas',
+        'category' => 'Kategorija',
+        'is_active' => 'Aktyvus',
+        'created_at' => 'Sukurta',
+        'with_variables' => 'Su kintamaisiais',
+        'recent' => 'Nauji (30 dienų)',
+    ],
+    
+    'actions' => [
+        'preview_template' => 'Peržiūrėti šabloną',
+        'duplicate_template' => 'Dublikuoti šabloną',
+        'activate_bulk' => 'Aktyvuoti masiniškai',
+        'deactivate_bulk' => 'Deaktyvuoti masiniškai',
+    ],
+    
+    'notifications' => [
+        'preview_opened_successfully' => 'Peržiūra sėkmingai atidaryta',
+        'duplicated_successfully' => 'Sėkmingai dublikuotas',
+        'bulk_activated_successfully' => 'Sėkmingai aktyvuoti masiniškai',
+        'bulk_deactivated_successfully' => 'Sėkmingai deaktyvuoti masiniškai',
+    ],
+];

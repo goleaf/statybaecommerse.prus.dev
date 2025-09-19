@@ -23,6 +23,7 @@ final class ActivityLogFactory extends Factory
         return [
             'log_name' => $this->faker->randomElement(['default', 'auth', 'user', 'product']),
             'description' => $this->faker->sentence(),
+            'event' => $this->faker->randomElement(['created', 'updated', 'deleted', 'login', 'logout', 'custom']),
             'subject_type' => $this->faker->randomElement([User::class, 'App\Models\Product']),
             'subject_id' => $this->faker->numberBetween(1, 100),
             'causer_type' => User::class,
@@ -32,6 +33,18 @@ final class ActivityLogFactory extends Factory
                 'new_values' => $this->faker->words(3),
                 'changes' => $this->faker->words(2),
             ],
+            'batch_uuid' => $this->faker->uuid(),
+            'ip_address' => $this->faker->ipv4(),
+            'user_agent' => $this->faker->userAgent(),
+            'device_type' => $this->faker->randomElement(['mobile', 'tablet', 'desktop']),
+            'browser' => $this->faker->randomElement(['Chrome', 'Firefox', 'Safari', 'Edge']),
+            'os' => $this->faker->randomElement(['Windows', 'macOS', 'Linux', 'iOS', 'Android']),
+            'country' => $this->faker->country(),
+            'is_important' => $this->faker->boolean(20),
+            'is_system' => $this->faker->boolean(10),
+            'severity' => $this->faker->randomElement(['low', 'medium', 'high', 'critical']),
+            'category' => $this->faker->randomElement(['authentication', 'product', 'order', 'user', 'system']),
+            'notes' => $this->faker->optional()->sentence(),
         ];
     }
 }

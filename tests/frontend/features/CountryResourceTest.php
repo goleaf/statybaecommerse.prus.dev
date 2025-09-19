@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
@@ -26,13 +24,15 @@ final class CountryResourceTest extends TestCase
     {
         Country::factory()->count(5)->create();
 
-        $this->get(route('filament.admin.resources.countries.index'))
+        $this
+            ->get(route('filament.admin.resources.countries.index'))
             ->assertOk();
     }
 
     public function test_country_resource_can_render_create_page(): void
     {
-        $this->get(route('filament.admin.resources.countries.create'))
+        $this
+            ->get(route('filament.admin.resources.countries.create'))
             ->assertOk();
     }
 
@@ -40,13 +40,16 @@ final class CountryResourceTest extends TestCase
     {
         $countryData = [
             'name' => 'Test Country',
-            'name_official' => 'Test Country Official',
-            'cca2' => 'TC',
-            'cca3' => 'TCT',
-            'region' => 'Europe',
+            'code' => 'TC',
+            'iso_code' => 'TCT',
+            'region' => 'europe',
             'currency_code' => 'EUR',
+            'currency_symbol' => '€',
+            'phone_code' => '+1',
+            'description' => 'Test country description',
             'is_active' => true,
-            'is_enabled' => true,
+            'is_default' => false,
+            'sort_order' => 1,
         ];
 
         Livewire::test(\App\Filament\Resources\CountryResource\Pages\CreateCountry::class)
@@ -56,8 +59,8 @@ final class CountryResourceTest extends TestCase
 
         $this->assertDatabaseHas('countries', [
             'name' => 'Test Country',
-            'cca2' => 'TC',
-            'cca3' => 'TCT',
+            'code' => 'TC',
+            'iso_code' => 'TCT',
         ]);
     }
 
@@ -65,7 +68,8 @@ final class CountryResourceTest extends TestCase
     {
         $country = Country::factory()->create();
 
-        $this->get(route('filament.admin.resources.countries.edit', $country))
+        $this
+            ->get(route('filament.admin.resources.countries.edit', $country))
             ->assertOk();
     }
 
@@ -73,12 +77,12 @@ final class CountryResourceTest extends TestCase
     {
         $country = Country::factory()->create([
             'name' => 'Original Name',
-            'cca2' => 'ON',
+            'code' => 'ON',
         ]);
 
         $updatedData = [
             'name' => 'Updated Name',
-            'cca2' => 'UN',
+            'code' => 'UN',
         ];
 
         Livewire::test(\App\Filament\Resources\CountryResource\Pages\EditCountry::class, [
@@ -91,7 +95,7 @@ final class CountryResourceTest extends TestCase
         $this->assertDatabaseHas('countries', [
             'id' => $country->id,
             'name' => 'Updated Name',
-            'cca2' => 'UN',
+            'code' => 'UN',
         ]);
     }
 
@@ -99,7 +103,8 @@ final class CountryResourceTest extends TestCase
     {
         $country = Country::factory()->create();
 
-        $this->get(route('filament.admin.resources.countries.view', $country))
+        $this
+            ->get(route('filament.admin.resources.countries.view', $country))
             ->assertOk();
     }
 
@@ -162,7 +167,8 @@ final class CountryResourceTest extends TestCase
     {
         Country::factory()->count(10)->create();
 
-        $this->get(route('filament.admin.resources.countries.index'))
+        $this
+            ->get(route('filament.admin.resources.countries.index'))
             ->assertOk()
             ->assertSee('Total Countries')
             ->assertSee('Active Countries');
@@ -174,19 +180,18 @@ final class CountryResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\CountryResource\Pages\CreateCountry::class)
             ->fillForm([])
             ->call('create')
-            ->assertHasFormErrors(['name', 'cca2', 'cca3']);
+            ->assertHasFormErrors(['name']);
 
         // Test unique constraints
-        Country::factory()->create(['cca2' => 'LT', 'cca3' => 'LTU']);
+        Country::factory()->create(['code' => 'LT']);
 
         Livewire::test(\App\Filament\Resources\CountryResource\Pages\CreateCountry::class)
             ->fillForm([
                 'name' => 'Lithuania',
-                'cca2' => 'LT', // Already exists
-                'cca3' => 'LTU', // Already exists
+                'code' => 'LT',  // Already exists
             ])
             ->call('create')
-            ->assertHasFormErrors(['cca2', 'cca3']);
+            ->assertHasFormErrors(['code']);
     }
 
     public function test_country_resource_translation_management(): void
@@ -196,40 +201,130 @@ final class CountryResourceTest extends TestCase
             'description' => 'A country in Europe',
         ]);
 
-        // Test adding translation
+        // Test updating country with translation data
         Livewire::test(\App\Filament\Resources\CountryResource\Pages\EditCountry::class, [
             'record' => $country->getRouteKey(),
         ])
             ->fillForm([
-                'translations' => [
-                    [
-                        'locale' => 'fr',
-                        'name' => 'France',
-                        'name_official' => 'République française',
-                        'description' => 'Un pays en Europe',
-                    ],
-                ],
+                'name' => 'France',
+                'description' => 'Un pays en Europe',
+                'region' => 'europe',
+                'currency_code' => 'EUR',
+                'currency_symbol' => '€',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('country_translations', [
-            'country_id' => $country->id,
-            'locale' => 'fr',
+        $this->assertDatabaseHas('countries', [
+            'id' => $country->id,
             'name' => 'France',
-            'name_official' => 'République française',
+            'description' => 'Un pays en Europe',
         ]);
     }
 
     public function test_country_resource_global_search(): void
     {
-        Country::factory()->create(['name' => 'Spain', 'cca2' => 'ES']);
-        Country::factory()->create(['name' => 'Portugal', 'cca2' => 'PT']);
+        Country::factory()->create(['name' => 'Spain', 'code' => 'ES']);
+        Country::factory()->create(['name' => 'Portugal', 'code' => 'PT']);
 
         // Test global search functionality
-        $this->get(route('filament.admin.resources.countries.index') . '?search=Spain')
+        $this
+            ->get(route('filament.admin.resources.countries.index') . '?search=Spain')
             ->assertOk()
             ->assertSee('Spain')
             ->assertDontSee('Portugal');
+    }
+
+    public function test_country_resource_toggle_active_action(): void
+    {
+        $country = Country::factory()->create(['is_active' => false]);
+
+        Livewire::test(\App\Filament\Resources\CountryResource\Pages\ListCountries::class)
+            ->callTableAction('toggle_active', $country)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseHas('countries', [
+            'id' => $country->id,
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_country_resource_set_default_action(): void
+    {
+        $existingDefault = Country::factory()->create(['is_default' => true]);
+        $newDefault = Country::factory()->create(['is_default' => false]);
+
+        Livewire::test(\App\Filament\Resources\CountryResource\Pages\ListCountries::class)
+            ->callTableAction('set_default', $newDefault)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseHas('countries', [
+            'id' => $existingDefault->id,
+            'is_default' => false,
+        ]);
+
+        $this->assertDatabaseHas('countries', [
+            'id' => $newDefault->id,
+            'is_default' => true,
+        ]);
+    }
+
+    public function test_country_resource_bulk_activate_action(): void
+    {
+        $countries = Country::factory()->count(3)->create(['is_active' => false]);
+
+        Livewire::test(\App\Filament\Resources\CountryResource\Pages\ListCountries::class)
+            ->callTableBulkAction('activate', $countries)
+            ->assertHasNoTableBulkActionErrors();
+
+        foreach ($countries as $country) {
+            $this->assertDatabaseHas('countries', [
+                'id' => $country->id,
+                'is_active' => true,
+            ]);
+        }
+    }
+
+    public function test_country_resource_bulk_deactivate_action(): void
+    {
+        $countries = Country::factory()->count(3)->create(['is_active' => true]);
+
+        Livewire::test(\App\Filament\Resources\CountryResource\Pages\ListCountries::class)
+            ->callTableBulkAction('deactivate', $countries)
+            ->assertHasNoTableBulkActionErrors();
+
+        foreach ($countries as $country) {
+            $this->assertDatabaseHas('countries', [
+                'id' => $country->id,
+                'is_active' => false,
+            ]);
+        }
+    }
+
+    public function test_country_resource_table_filters_work(): void
+    {
+        Country::factory()->create(['is_active' => true, 'is_default' => true]);
+        Country::factory()->create(['is_active' => false, 'is_default' => false]);
+
+        // Test active filter
+        Livewire::test(\App\Filament\Resources\CountryResource\Pages\ListCountries::class)
+            ->filterTable('is_active', '1')
+            ->assertCanSeeTableRecords(Country::where('is_active', true)->get());
+
+        // Test default filter
+        Livewire::test(\App\Filament\Resources\CountryResource\Pages\ListCountries::class)
+            ->filterTable('is_default', '1')
+            ->assertCanSeeTableRecords(Country::where('is_default', true)->get());
+    }
+
+    public function test_country_resource_table_search_works(): void
+    {
+        Country::factory()->create(['name' => 'Lithuania']);
+        Country::factory()->create(['name' => 'Germany']);
+
+        Livewire::test(\App\Filament\Resources\CountryResource\Pages\ListCountries::class)
+            ->searchTable('Lithuania')
+            ->assertCanSeeTableRecords(Country::where('name', 'Lithuania')->get())
+            ->assertCanNotSeeTableRecords(Country::where('name', 'Germany')->get());
     }
 }

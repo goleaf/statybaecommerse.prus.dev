@@ -1,0 +1,128 @@
+<?php declare(strict_types=1);
+
+return [
+    'title' => 'Veiklos žurnalai',
+    'plural' => 'Veiklos žurnalai',
+    'single' => 'Veiklos žurnalas',
+    // Basic Information
+    'basic_information' => 'Pagrindinė informacija',
+    'user' => 'Naudotojas',
+    'user_name' => 'Naudotojo vardas',
+    'user_email' => 'Naudotojo el. paštas',
+    'log_name' => 'Žurnalo pavadinimas',
+    'log_name_help' => 'Veiklos žurnalo kategorijos pavadinimas',
+    'description' => 'Aprašymas',
+    'description_help' => 'Veiklos aprašymas',
+    // Event Information
+    'event_information' => 'Įvykio informacija',
+    'event' => 'Įvykis',
+    'subject_type' => 'Objekto tipas',
+    'subject_type_help' => 'Modelio klasės pavadinimas',
+    'subject_id' => 'Objekto ID',
+    'subject_id_help' => 'Objekto identifikatorius',
+    'causer_type' => 'Sukėlėjo tipas',
+    'causer_type_help' => 'Sukėlėjo modelio klasės pavadinimas',
+    'causer_id' => 'Sukėlėjo ID',
+    'causer_id_help' => 'Sukėlėjo identifikatorius',
+    'batch_uuid' => 'Paketo UUID',
+    'batch_uuid_help' => 'Susijusių veiklų paketo identifikatorius',
+    // Events
+    'events' => [
+        'created' => 'Sukurta',
+        'updated' => 'Atnaujinta',
+        'deleted' => 'Ištrinta',
+        'restored' => 'Atkurta',
+        'login' => 'Prisijungimas',
+        'logout' => 'Atsijungimas',
+        'failed_login' => 'Nepavykęs prisijungimas',
+        'password_changed' => 'Slaptažodis pakeistas',
+        'email_verified' => 'El. paštas patvirtintas',
+        'custom' => 'Pritaikytas',
+    ],
+    // Properties
+    'properties' => 'Savybės',
+    'properties_help' => 'Papildomi duomenys JSON formatu',
+    // Context Information
+    'context_information' => 'Konteksto informacija',
+    'ip_address' => 'IP adresas',
+    'ip_address_help' => 'Naudotojo IP adresas',
+    'user_agent' => 'Naudotojo agentas',
+    'user_agent_help' => 'Naudotojo naršyklės informacija',
+    'device_type' => 'Įrenginio tipas',
+    'device_type_help' => 'Įrenginio tipas (mobilusis, planšetė, kompiuteris)',
+    'browser' => 'Naršyklė',
+    'browser_help' => 'Naršyklės pavadinimas',
+    'os' => 'Operacinė sistema',
+    'os_help' => 'Operacinės sistemos pavadinimas',
+    'country' => 'Šalis',
+    'country_help' => 'Naudotojo šalis',
+    // Settings
+    'settings' => 'Nustatymai',
+    'is_important' => 'Svarbu',
+    'is_system' => 'Sistemos',
+    'severity' => 'Svarbumas',
+    'severity_help' => 'Veiklos svarbumo lygis',
+    'category' => 'Kategorija',
+    'category_help' => 'Veiklos kategorija',
+    'notes' => 'Pastabos',
+    // Severities
+    'severities' => [
+        'low' => 'Žemas',
+        'medium' => 'Vidutinis',
+        'high' => 'Aukštas',
+        'critical' => 'Kritinis',
+    ],
+    // Filters
+    'important_only' => 'Tik svarbūs',
+    'non_important_only' => 'Tik nesvarbūs',
+    'system_only' => 'Tik sistemos',
+    'user_only' => 'Tik naudotojai',
+    // Actions
+    'mark_important' => 'Pažymėti svarbiu',
+    'unmark_important' => 'Nepažymėti svarbiu',
+    'mark_system' => 'Pažymėti sistemos',
+    'unmark_system' => 'Nepažymėti sistemos',
+    'mark_important_selected' => 'Pažymėti pasirinktus svarbiais',
+    'unmark_important_selected' => 'Nepažymėti pasirinktų svarbiais',
+    'mark_system_selected' => 'Pažymėti pasirinktus sistemos',
+    'unmark_system_selected' => 'Nepažymėti pasirinktų sistemos',
+    // Notifications
+    'marked_as_important_successfully' => 'Sėkmingai pažymėta kaip svarbu',
+    'unmarked_as_important_successfully' => 'Sėkmingai nepažymėta kaip svarbu',
+    'marked_as_system_successfully' => 'Sėkmingai pažymėta kaip sistemos',
+    'unmarked_as_system_successfully' => 'Sėkmingai nepažymėta kaip sistemos',
+    'bulk_marked_as_important_success' => 'Pasirinkti įrašai sėkmingai pažymėti svarbiais',
+    'bulk_unmarked_as_important_success' => 'Pasirinkti įrašai sėkmingai nepažymėti svarbiais',
+    'bulk_marked_as_system_success' => 'Pasirinkti įrašai sėkmingai pažymėti sistemos',
+    'bulk_unmarked_as_system_success' => 'Pasirinkti įrašai sėkmingai nepažymėti sistemos',
+    // Tabs
+    'tabs' => [
+        'all' => 'Visi',
+        'created' => 'Sukurta',
+        'updated' => 'Atnaujinta',
+        'deleted' => 'Ištrinta',
+        'login' => 'Prisijungimai',
+        'logout' => 'Atsijungimai',
+        'today' => 'Šiandien',
+        'this_week' => 'Šią savaitę',
+    ],
+    // Charts
+    'charts' => [
+        'activities_over_time' => 'Veiklos laikui bėgant',
+    ],
+    // Stats
+    'stats' => [
+        'total_activities' => 'Iš viso veiklų',
+        'total_activities_description' => 'Bendras veiklų skaičius sistemoje',
+        'today_activities' => 'Šiandienos veiklos',
+        'today_activities_description' => 'Veiklos, atliktos šiandien',
+        'week_activities' => 'Savaitės veiklos',
+        'week_activities_description' => 'Veiklos, atliktos šią savaitę',
+        'unique_users' => 'Unikalūs naudotojai',
+        'unique_users_description' => 'Unikalūs naudotojai, atlikę veiklas',
+    ],
+    // Created/Updated timestamps
+    'created_at' => 'Sukurta',
+    'updated_at' => 'Atnaujinta',
+];
+

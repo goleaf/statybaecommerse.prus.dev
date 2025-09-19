@@ -1,0 +1,73 @@
+<?php
+
+return [
+    'title' => 'Inventory',
+    'plural' => 'Inventories',
+    'single' => 'Inventory',
+    'form' => [
+        'tabs' => [
+            'basic_information' => 'Basic Information',
+            'product_details' => 'Product Details',
+            'location_details' => 'Location Details',
+            'stock_analysis' => 'Stock Analysis',
+        ],
+        'sections' => [
+            'basic_information' => 'Basic Information',
+            'product_details' => 'Product Details',
+            'location_details' => 'Location Details',
+            'stock_analysis' => 'Stock Analysis',
+        ],
+        'fields' => [
+            'product' => 'Product',
+            'location' => 'Location',
+            'quantity' => 'Quantity',
+            'reserved' => 'Reserved',
+            'incoming' => 'Incoming',
+            'threshold' => 'Threshold',
+            'is_tracked' => 'Tracked',
+            'created_at' => 'Created At',
+            'available_quantity' => 'Available Quantity',
+            'stock_status' => 'Stock Status',
+            'product_name' => 'Product Name',
+            'product_sku' => 'Product SKU',
+            'product_price' => 'Product Price',
+            'product_stock_status' => 'Product Stock Status',
+            'location_name' => 'Location Name',
+            'location_code' => 'Location Code',
+            'location_address' => 'Location Address',
+            'location_city' => 'Location City',
+            'stock_ratio' => 'Stock Ratio',
+            'add_quantity' => 'Add Quantity',
+            'remove_quantity' => 'Remove Quantity',
+            'reserve_quantity' => 'Reserve Quantity',
+        ],
+    ],
+    'stock_status' => [
+        'in_stock' => 'In Stock',
+        'low_stock' => 'Low Stock',
+        'out_of_stock' => 'Out of Stock',
+    ],
+    'actions' => [
+        'adjust_stock' => 'Adjust Stock',
+        'add_stock' => 'Add Stock',
+        'remove_stock' => 'Remove Stock',
+        'reserve_stock' => 'Reserve Stock',
+        'toggle_tracking' => 'Toggle Tracking',
+    ],
+    'filters' => [
+        'low_stock_only' => 'Low Stock Only',
+        'out_of_stock_only' => 'Out of Stock Only',
+        'tracked_only' => 'Tracked Only',
+        'created_at' => 'Created At',
+        'quantity_from' => 'Quantity From',
+        'quantity_to' => 'Quantity To',
+    ],
+    'notifications' => [
+        'stock_adjusted_successfully' => 'Stock adjusted successfully',
+        'stock_added_successfully' => 'Stock added successfully',
+        'stock_removed_successfully' => 'Stock removed successfully',
+        'stock_reserved_successfully' => 'Stock reserved successfully',
+        'tracking_updated_successfully' => 'Tracking updated successfully',
+    ],
+];
+

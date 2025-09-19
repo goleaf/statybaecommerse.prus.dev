@@ -1,12 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\VariantImageResource\Pages;
 
 use App\Filament\Resources\VariantImageResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
 
 final class EditVariantImage extends EditRecord
 {
@@ -19,3 +17,4 @@ final class EditVariantImage extends EditRecord
         ];
     }
 }
+

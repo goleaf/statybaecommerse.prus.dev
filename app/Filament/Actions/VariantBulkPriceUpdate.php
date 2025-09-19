@@ -1,23 +1,21 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Actions;
 
 use App\Models\ProductVariant;
 use Filament\Actions\Action;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 final class VariantBulkPriceUpdate extends Action
 {
-    public static function make(): static
+    public static function make(?string $name = null): static
     {
         return parent::make('bulk_price_update')
             ->label(__('product_variants.actions.bulk_price_update'))
@@ -34,7 +32,6 @@ final class VariantBulkPriceUpdate extends Action
                     ])
                     ->required()
                     ->default('price'),
-                
                 Select::make('update_type')
                     ->label(__('product_variants.fields.update_type'))
                     ->options([
@@ -45,22 +42,18 @@ final class VariantBulkPriceUpdate extends Action
                     ])
                     ->required()
                     ->default('percentage'),
-                
                 TextInput::make('update_value')
                     ->label(__('product_variants.fields.update_value'))
                     ->numeric()
                     ->step(0.01)
                     ->required()
                     ->helperText(__('product_variants.help.update_value')),
-                
                 Toggle::make('apply_to_sale_items')
                     ->label(__('product_variants.fields.apply_to_sale_items'))
                     ->default(true),
-                
                 Toggle::make('update_compare_price')
                     ->label(__('product_variants.fields.update_compare_price'))
                     ->default(false),
-                
                 Select::make('compare_price_action')
                     ->label(__('product_variants.fields.compare_price_action'))
                     ->options([
@@ -70,28 +63,23 @@ final class VariantBulkPriceUpdate extends Action
                         'increase_by_fixed_amount' => __('product_variants.compare_price_actions.increase_by_fixed_amount'),
                     ])
                     ->default('no_change')
-                    ->visible(fn (callable $get) => $get('update_compare_price')),
-                
+                    ->visible(fn(callable $get) => $get('update_compare_price')),
                 TextInput::make('compare_price_value')
                     ->label(__('product_variants.fields.compare_price_value'))
                     ->numeric()
                     ->step(0.01)
-                    ->visible(fn (callable $get) => $get('update_compare_price') && in_array($get('compare_price_action'), ['increase_by_percentage', 'increase_by_fixed_amount'])),
-                
+                    ->visible(fn(callable $get) => $get('update_compare_price') && in_array($get('compare_price_action'), ['increase_by_percentage', 'increase_by_fixed_amount'])),
                 Toggle::make('set_sale_period')
                     ->label(__('product_variants.fields.set_sale_period'))
                     ->default(false),
-                
                 DateTimePicker::make('sale_start_date')
                     ->label(__('product_variants.fields.sale_start_date'))
-                    ->visible(fn (callable $get) => $get('set_sale_period'))
+                    ->visible(fn(callable $get) => $get('set_sale_period'))
                     ->default(now()),
-                
                 DateTimePicker::make('sale_end_date')
                     ->label(__('product_variants.fields.sale_end_date'))
-                    ->visible(fn (callable $get) => $get('set_sale_period'))
+                    ->visible(fn(callable $get) => $get('set_sale_period'))
                     ->default(now()->addDays(30)),
-                
                 Textarea::make('change_reason')
                     ->label(__('product_variants.fields.change_reason'))
                     ->maxLength(500)
@@ -102,19 +90,19 @@ final class VariantBulkPriceUpdate extends Action
                 DB::transaction(function () use ($data, $records): void {
                     $updatedCount = 0;
                     $skippedCount = 0;
-                    
+
                     foreach ($records as $record) {
                         /** @var ProductVariant $record */
-                        
+
                         // Skip sale items if not applying to them
                         if (!$data['apply_to_sale_items'] && $record->is_on_sale) {
                             $skippedCount++;
                             continue;
                         }
-                        
+
                         $oldPrice = $record->{$data['price_type']} ?? 0;
                         $newPrice = $oldPrice;
-                        
+
                         // Calculate new price based on update type
                         switch ($data['update_type']) {
                             case 'fixed_amount':
@@ -130,13 +118,13 @@ final class VariantBulkPriceUpdate extends Action
                                 $newPrice = (float) $data['update_value'];
                                 break;
                         }
-                        
+
                         // Ensure price is not negative
                         $newPrice = max(0, $newPrice);
-                        
+
                         // Update the price
                         $record->{$data['price_type']} = $newPrice;
-                        
+
                         // Update compare price if requested
                         if ($data['update_compare_price']) {
                             switch ($data['compare_price_action']) {
@@ -155,16 +143,16 @@ final class VariantBulkPriceUpdate extends Action
                                     break;
                             }
                         }
-                        
+
                         // Set sale period if requested
                         if ($data['set_sale_period']) {
                             $record->is_on_sale = true;
                             $record->sale_start_date = $data['sale_start_date'];
                             $record->sale_end_date = $data['sale_end_date'];
                         }
-                        
+
                         $record->save();
-                        
+
                         // Record price change history
                         $record->recordPriceChange(
                             $oldPrice,
@@ -175,10 +163,10 @@ final class VariantBulkPriceUpdate extends Action
                             $data['sale_start_date'] ?? null,
                             $data['sale_end_date'] ?? null
                         );
-                        
+
                         $updatedCount++;
                     }
-                    
+
                     // Send notification
                     Notification::make()
                         ->title(__('product_variants.notifications.bulk_update_success'))

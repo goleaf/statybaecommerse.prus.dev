@@ -19,7 +19,7 @@ final class ValuesRelationManager extends RelationManager
 
     protected static ?string $title = 'Attribute Values';
 
-    public function form(Schema $formSchema): Schema
+    public function form(Schema $schemaSchema): Schema
     {
         return $schemaSchema
             ->components([

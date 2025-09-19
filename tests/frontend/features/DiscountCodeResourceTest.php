@@ -1,10 +1,9 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
 use App\Filament\Resources\DiscountCodeResource;
+use App\Models\CustomerGroup;
 use App\Models\DiscountCode;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,7 +26,7 @@ final class DiscountCodeResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         // Ensure minimal tables exist for this resource during tests
-        if (! Schema::hasTable('discounts')) {
+        if (!Schema::hasTable('discounts')) {
             Schema::create('discounts', function ($table) {
                 $table->id();
                 $table->string('name');
@@ -41,7 +40,7 @@ final class DiscountCodeResourceTest extends TestCase
             });
         }
 
-        if (! Schema::hasTable('discount_codes')) {
+        if (!Schema::hasTable('discount_codes')) {
             Schema::create('discount_codes', function ($table) {
                 $table->id();
                 $table->foreignId('discount_id')->nullable();
@@ -53,14 +52,14 @@ final class DiscountCodeResourceTest extends TestCase
                 $table->json('metadata')->nullable();
                 $table->timestamps();
             });
-        } elseif (! Schema::hasColumn('discount_codes', 'status')) {
+        } elseif (!Schema::hasColumn('discount_codes', 'status')) {
             Schema::table('discount_codes', function ($table) {
                 $table->string('status')->default('active');
             });
         }
 
         // Some models may still reference prefixed tables during tests. Provide minimal alias if needed.
-        if (! Schema::hasTable('sh_discounts')) {
+        if (!Schema::hasTable('sh_discounts')) {
             Schema::create('sh_discounts', function ($table) {
                 $table->id();
                 $table->string('name');
@@ -77,7 +76,8 @@ final class DiscountCodeResourceTest extends TestCase
 
     public function test_index_page_renders(): void
     {
-        $this->get(DiscountCodeResource::getUrl('index'))
+        $this
+            ->get(DiscountCodeResource::getUrl('index'))
             ->assertOk();
     }
 
@@ -107,7 +107,7 @@ final class DiscountCodeResourceTest extends TestCase
         $codes = collect(range(1, 3))->map(function () use ($discountId) {
             return DiscountCode::query()->create([
                 'discount_id' => $discountId,
-                'code' => strtoupper('CODE'.rand(1000, 9999)),
+                'code' => strtoupper('CODE' . rand(1000, 9999)),
                 'expires_at' => now()->addMonth(),
                 'max_uses' => 500,
                 'usage_count' => 0,
@@ -127,118 +127,84 @@ final class DiscountCodeResourceTest extends TestCase
 
     public function test_can_create_discount_code(): void
     {
-        $discountId = DB::table('discounts')->insertGetId([
-            'name' => 'Creatable Discount',
-            'type' => 'fixed',
-            'value' => 5,
-            'status' => 'active',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        DB::table('sh_discounts')->insert([
-            'id' => $discountId,
-            'name' => 'Creatable Discount',
-            'type' => 'fixed',
-            'value' => 5,
-            'status' => 'active',
-            'starts_at' => null,
-            'ends_at' => null,
-            'deleted_at' => null,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $customerGroup = CustomerGroup::factory()->create();
 
         Livewire::test(DiscountCodeResource\Pages\CreateDiscountCode::class)
             ->fillForm([
-                'discount_id' => $discountId,
                 'code' => 'TESTCODE',
+                'name' => 'Test Discount Code',
+                'description' => 'Test description',
+                'type' => 'percentage',
+                'value' => 10.0,
+                'minimum_amount' => 50.0,
+                'maximum_discount' => 100.0,
+                'usage_limit' => 100,
+                'usage_limit_per_user' => 1,
+                'valid_from' => now(),
+                'valid_until' => now()->addMonth(),
+                'customer_group_id' => $customerGroup->id,
+                'is_active' => true,
+                'is_public' => false,
+                'is_auto_apply' => false,
+                'is_stackable' => false,
+                'is_first_time_only' => false,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('discount_codes', [
             'code' => 'TESTCODE',
+            'name' => 'Test Discount Code',
+            'type' => 'percentage',
+            'value' => 10.0,
         ]);
     }
 
     public function test_edit_page_renders_and_updates(): void
     {
-        $discountId = DB::table('discounts')->insertGetId([
-            'name' => 'Editable Discount',
-            'type' => 'percentage',
-            'value' => 15,
-            'status' => 'active',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        DB::table('sh_discounts')->insert([
-            'id' => $discountId,
-            'name' => 'Editable Discount',
-            'type' => 'percentage',
-            'value' => 15,
-            'status' => 'active',
-            'starts_at' => null,
-            'ends_at' => null,
-            'deleted_at' => null,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        $code = DiscountCode::query()->create([
-            'discount_id' => $discountId,
+        $customerGroup = CustomerGroup::factory()->create();
+
+        $code = DiscountCode::factory()->create([
             'code' => 'EDITME',
-            'expires_at' => now()->addMonth(),
-            'max_uses' => 500,
-            'usage_count' => 0,
-            'metadata' => [],
+            'name' => 'Editable Code',
+            'type' => 'percentage',
+            'value' => 15.0,
+            'customer_group_id' => $customerGroup->id,
         ]);
 
-        $this->get(DiscountCodeResource::getUrl('edit', ['record' => $code]))
+        $this
+            ->get(DiscountCodeResource::getUrl('edit', ['record' => $code]))
             ->assertOk();
 
         Livewire::test(DiscountCodeResource\Pages\EditDiscountCode::class, [
             'record' => $code->getRouteKey(),
         ])
             ->fillForm([
-                'status' => 'inactive',
+                'name' => 'Updated Code Name',
+                'value' => 20.0,
+                'is_active' => false,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('discount_codes', [
             'id' => $code->id,
-            'status' => 'inactive',
+            'name' => 'Updated Code Name',
+            'value' => 20.0,
+            'is_active' => false,
         ]);
     }
 
     public function test_can_delete_discount_code(): void
     {
-        $discountId = DB::table('discounts')->insertGetId([
-            'name' => 'Deletable Discount',
-            'type' => 'percentage',
-            'value' => 20,
-            'status' => 'active',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        DB::table('sh_discounts')->insert([
-            'id' => $discountId,
-            'name' => 'Deletable Discount',
-            'type' => 'percentage',
-            'value' => 20,
-            'status' => 'active',
-            'starts_at' => null,
-            'ends_at' => null,
-            'deleted_at' => null,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        $code = DiscountCode::query()->create([
-            'discount_id' => $discountId,
+        $customerGroup = CustomerGroup::factory()->create();
+
+        $code = DiscountCode::factory()->create([
             'code' => 'DELME',
-            'expires_at' => now()->addMonth(),
-            'max_uses' => 500,
-            'usage_count' => 0,
-            'metadata' => [],
+            'name' => 'Deletable Code',
+            'type' => 'fixed',
+            'value' => 5.0,
+            'customer_group_id' => $customerGroup->id,
         ]);
 
         Livewire::test(DiscountCodeResource\Pages\EditDiscountCode::class, [

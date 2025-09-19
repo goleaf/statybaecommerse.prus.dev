@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
-
 use App\Filament\Resources\SystemResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
@@ -44,7 +43,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use BackedEnum;
 use UnitEnum;
-
 /**
  * System Resource - Comprehensive System Management
  *
@@ -65,20 +63,13 @@ use UnitEnum;
 final class SystemResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'System';
-
+    protected static string | UnitEnum | null $navigationGroup = "System";
     protected static ?int $navigationSort = 1;
-
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
-
     protected static ?string $navigationLabel = 'system.title';
-
     protected static ?string $modelLabel = 'system.single';
-
     protected static ?string $pluralModelLabel = 'system.plural';
-
     protected static ?string $recordTitleAttribute = 'key';
-
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -103,7 +94,6 @@ final class SystemResource extends Resource
                                                 Select::make('category_id')
                                                     ->label('Category')
                                                     ->relationship('category', 'name')
-                                                    ->required()
                                                     ->createOptionForm([
                                                         TextInput::make('name')
                                                             ->required()
@@ -113,7 +103,6 @@ final class SystemResource extends Resource
                                                         ColorPicker::make('color')
                                                             ->default('#3B82F6'),
                                                     ])
-                                                    ->columnSpan(1),
                                             ]),
                                         TextInput::make('name')
                                             ->label('Display Name')
@@ -141,15 +130,12 @@ final class SystemResource extends Resource
                                                 'url' => 'URL',
                                                 'password' => 'Password',
                                             ])
-                                            ->required()
                                             ->reactive()
                                             ->helperText('Data type for this setting'),
                                     ]),
                                 Section::make('Value Configuration')
-                                    ->components([
                                         TextInput::make('value')
                                             ->label('Setting Value')
-                                            ->required()
                                             ->visible(fn(callable $get) => in_array($get('type'), ['string', 'integer', 'email', 'url', 'password']))
                                             ->helperText('The actual value for this setting'),
                                         Toggle::make('value')
@@ -164,7 +150,6 @@ final class SystemResource extends Resource
                                             ->label('Date & Time')
                                             ->visible(fn(callable $get) => $get('type') === 'datetime')
                                             ->helperText('Select date and time'),
-                                        DateTimePicker::make('value')
                                             ->label('Date')
                                             ->displayFormat('Y-m-d')
                                             ->visible(fn(callable $get) => $get('type') === 'date')
@@ -182,13 +167,10 @@ final class SystemResource extends Resource
                                             ->visible(fn(callable $get) => $get('type') === 'array')
                                             ->helperText('Enter array items as JSON: ["item1", "item2", "item3"]')
                                             ->rows(3),
-                                    ]),
                             ]),
                         Tab::make('Advanced Settings')
                             ->icon('heroicon-o-adjustments-horizontal')
-                            ->components([
                                 Section::make('Validation & Constraints')
-                                    ->components([
                                         TextInput::make('validation_rules')
                                             ->label('Validation Rules')
                                             ->helperText('Laravel validation rules for this setting'),
@@ -201,17 +183,13 @@ final class SystemResource extends Resource
                                         Checkbox::make('is_encrypted')
                                             ->label('Encrypt Value')
                                             ->helperText('Encrypt the stored value for security'),
-                                    ]),
                                 Section::make('Access Control')
-                                    ->components([
                                         Select::make('permission_required')
                                             ->label('Required Permission')
-                                            ->options([
                                                 'admin' => 'Admin Only',
                                                 'manager' => 'Manager+',
                                                 'user' => 'Any User',
                                                 'system' => 'System Only',
-                                            ])
                                             ->helperText('Permission level required to modify this setting'),
                                         Select::make('updated_by')
                                             ->label('Updated By')
@@ -219,22 +197,18 @@ final class SystemResource extends Resource
                                             ->default(auth()->id())
                                             ->disabled()
                                             ->helperText('User who last updated this setting'),
-                                    ]),
                                 Section::make('System Integration')
-                                    ->components([
                                         TextInput::make('cache_key')
                                             ->label('Cache Key')
                                             ->helperText('Custom cache key for this setting'),
                                         Select::make('cache_ttl')
                                             ->label('Cache TTL (seconds)')
-                                            ->options([
                                                 0 => 'No Cache',
                                                 60 => '1 Minute',
                                                 300 => '5 Minutes',
                                                 900 => '15 Minutes',
                                                 3600 => '1 Hour',
                                                 86400 => '1 Day',
-                                            ])
                                             ->default(3600)
                                             ->helperText('How long to cache this setting'),
                                         Checkbox::make('is_public')
@@ -243,47 +217,28 @@ final class SystemResource extends Resource
                                         Checkbox::make('is_readonly')
                                             ->label('Read Only')
                                             ->helperText('Whether this setting can be modified'),
-                                    ]),
-                            ]),
                         Tab::make('Dependencies & Relations')
                             ->icon('heroicon-o-link')
-                            ->components([
                                 Section::make('Dependencies')
-                                    ->components([
                                         TextInput::make('dependencies_info')
                                             ->label('Dependencies')
                                             ->helperText('Dependencies are managed through the Dependencies tab in the view page')
-                                            ->disabled()
                                             ->dehydrated(false),
-                                    ]),
                                 Section::make('Relations')
-                                    ->components([
                                         TextInput::make('relations_info')
                                             ->label('Related Settings')
                                             ->helperText('Related settings are managed through the Relations tab in the view page')
-                                            ->disabled()
-                                            ->dehydrated(false),
-                                    ]),
-                            ]),
                         Tab::make('Translations')
                             ->icon('heroicon-o-language')
-                            ->components([
                                 Section::make('Multi-language Support')
-                                    ->components([
                                         TextInput::make('translations_info')
                                             ->label('Translations')
                                             ->helperText('Translations are managed through the Translations tab in the view page')
-                                            ->disabled()
-                                            ->dehydrated(false),
-                                    ]),
-                            ]),
                     ])
                     ->columnSpanFull(),
             ]);
     }
-
     public static function table(Table $table): Table
-    {
         return $table
             ->columns([
                 TextColumn::make('key')
@@ -294,8 +249,6 @@ final class SystemResource extends Resource
                     ->weight('bold'),
                 TextColumn::make('name')
                     ->label('Display Name')
-                    ->searchable()
-                    ->sortable()
                     ->limit(50),
                 TextColumn::make('category.name')
                     ->label('Category')
@@ -311,17 +264,12 @@ final class SystemResource extends Resource
                     ->sortable(),
                 TextColumn::make('type')
                     ->label('Type')
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
                         'string' => 'gray',
                         'integer' => 'blue',
                         'boolean' => 'green',
                         'json' => 'purple',
                         'array' => 'yellow',
                         'file' => 'red',
-                        default => 'gray',
-                    })
-                    ->sortable(),
                 TextColumn::make('value')
                     ->label('Value')
                     ->limit(30)
@@ -331,53 +279,35 @@ final class SystemResource extends Resource
                             return null;
                         }
                         return strlen((string) $state) > 30 ? (string) $state : null;
-                    })
                     ->formatStateUsing(function ($state, $record): string {
-                        if ($state === null || $state === false) {
                             return 'N/A';
-                        }
                         if ($record->type === 'boolean') {
                             return $state ? 'Yes' : 'No';
-                        }
                         if ($record->type === 'json') {
                             return 'JSON Data';
-                        }
                         if ($record->type === 'array') {
                             return 'Array Data';
-                        }
                         return (string) $state;
                     }),
                 IconColumn::make('is_required')
                     ->label('Required')
                     ->boolean()
-                    ->sortable(),
                 IconColumn::make('is_public')
                     ->label('Public')
-                    ->boolean()
-                    ->sortable(),
                 IconColumn::make('is_readonly')
                     ->label('Read Only')
-                    ->boolean()
-                    ->sortable(),
                 TextColumn::make('user.name')
                     ->label('Created By')
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->label('Updated')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('category')
                     ->relationship('category', 'name')
-                    ->searchable()
                     ->preload(),
                 SelectFilter::make('type')
                     ->options([
@@ -406,7 +336,6 @@ final class SystemResource extends Resource
                 Filter::make('encrypted')
                     ->label('Encrypted Settings')
                     ->query(fn(Builder $query): Builder => $query->where('is_encrypted', true)),
-            ])
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -421,13 +350,11 @@ final class SystemResource extends Resource
                             ->body("Cache cleared for setting: {$record->key}")
                             ->success()
                             ->send();
-                    })
                     ->visible(fn(SystemSetting $record): bool => !empty($record->cache_key)),
                 TableAction::make('export')
                     ->label('Export')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('info')
-                    ->action(function (SystemSetting $record) {
                         $data = [
                             'key' => $record->key,
                             'name' => $record->name,
@@ -435,14 +362,10 @@ final class SystemResource extends Resource
                             'type' => $record->type,
                             'category' => $record->category->name ?? null,
                         ];
-
                         $filename = "setting_{$record->key}_" . now()->format('Y-m-d_H-i-s') . '.json';
-
                         return response()
                             ->json($data)
                             ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
-                    }),
-            ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
@@ -468,7 +391,6 @@ final class SystemResource extends Resource
                         ->label('Export Selected')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('info')
-                        ->action(function (Collection $records) {
                             $data = $records->map(function (SystemSetting $record) {
                                 return [
                                     'key' => $record->key,
@@ -478,15 +400,11 @@ final class SystemResource extends Resource
                                     'category' => $record->category->name ?? null,
                                 ];
                             });
-
                             $filename = 'system_settings_' . now()->format('Y-m-d_H-i-s') . '.json';
-
                             return response()
                                 ->json($data->toArray())
                                 ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
-                        }),
                 ]),
-            ])
             ->headerActions([
                 TableAction::make('system_health')
                     ->label('System Health')
@@ -500,72 +418,41 @@ final class SystemResource extends Resource
                             'categories_count' => SystemSettingCategory::count(),
                             'memory_usage' => memory_get_usage(true),
                             'disk_free' => disk_free_space('/'),
-                        ];
-
-                        \Filament\Notifications\Notification::make()
                             ->title('System Health Check')
                             ->body(json_encode($health, JSON_PRETTY_PRINT))
                             ->info()
-                            ->send();
-                    }),
                 TableAction::make('optimize_system')
                     ->label('Optimize System')
                     ->icon('heroicon-o-wrench-screwdriver')
-                    ->color('info')
-                    ->action(function () {
                         Artisan::call('config:cache');
                         Artisan::call('route:cache');
                         Artisan::call('view:cache');
-
-                        \Filament\Notifications\Notification::make()
                             ->title('System Optimized')
                             ->body('Configuration, routes, and views have been cached')
-                            ->success()
-                            ->send();
-                    }),
                 TableAction::make('clear_all_caches')
                     ->label('Clear All Caches')
-                    ->icon('heroicon-o-trash')
-                    ->color('warning')
-                    ->action(function () {
                         Artisan::call('cache:clear');
                         Artisan::call('config:clear');
                         Artisan::call('route:clear');
                         Artisan::call('view:clear');
-
-                        \Filament\Notifications\Notification::make()
                             ->title('All Caches Cleared')
                             ->body('All system caches have been cleared')
-                            ->success()
-                            ->send();
-                    }),
-            ])
             ->defaultSort('created_at', 'desc')
             ->poll('30s');
-    }
-
     public static function getPages(): array
-    {
         return [
             'index' => Pages\ListSystems::route('/'),
             'create' => Pages\CreateSystem::route('/create'),
             'view' => Pages\ViewSystem::route('/{record}'),
             'edit' => Pages\EditSystem::route('/{record}/edit'),
         ];
-    }
-
     public static function getNavigationBadge(): ?string
-    {
         return (string) static::getModel()::count();
-    }
-
     public static function getNavigationBadgeColor(): ?string
-    {
         $count = static::getModel()::count();
         return match (true) {
             $count > 100 => 'success',
             $count > 50 => 'warning',
             default => 'danger',
         };
-    }
 }

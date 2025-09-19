@@ -6,24 +6,31 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Models\News;
 use App\Models\NewsCategory;
+use App\Models\NewsComment;
+use App\Models\NewsImage;
+use App\Models\NewsTag;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tab;
+use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -46,15 +53,11 @@ use UnitEnum;
 final class NewsResource extends Resource
 {
     protected static ?string $model = News::class;
-
-    /**
-     * @var UnitEnum|string|null
-     */    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
-
+    /** @var UnitEnum|string|null */
+    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Content;
     protected static ?int $navigationSort = 1;
-
     protected static ?string $recordTitleAttribute = 'title';
+    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
@@ -71,7 +74,7 @@ final class NewsResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Content";
+        return __('news.navigation_group');
     }
 
     /**
@@ -97,82 +100,77 @@ final class NewsResource extends Resource
      * @param Form $form
      * @return Form
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
-            Section::make(__('news.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
-                            TextInput::make('title')
-                                ->label(__('news.title'))
+        return $form->schema([
+            Tabs::make('news_tabs')
+                ->tabs([
+                    Tab::make(__('news.basic_information'))
+                        ->schema([
+                            Grid::make(2)
+                                ->schema([
+                                    TextInput::make('title')
+                                        ->label(__('news.title'))
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->live(onBlur: true)
+                                        ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) =>
+                                            $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                    TextInput::make('slug')
+                                        ->label(__('news.slug'))
+                                        ->unique(ignoreRecord: true)
+                                        ->rules(['alpha_dash']),
+                                ]),
+                            Textarea::make('excerpt')
+                                ->label(__('news.excerpt'))
+                                ->rows(3)
+                                ->maxLength(500)
+                                ->columnSpanFull(),
+                            RichEditor::make('content')
+                                ->label(__('news.content'))
                                 ->required()
-                                ->maxLength(255)
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) =>
-                                    $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
-                            TextInput::make('slug')
-                                ->label(__('news.slug'))
-                                ->required()
-                                ->maxLength(255)
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
+                                ->columnSpanFull()
+                                ->toolbarButtons([
+                                    'bold',
+                                    'italic',
+                                    'underline',
+                                    'strike',
+                                    'link',
+                                    'bulletList',
+                                    'orderedList',
+                                    'h2',
+                                    'h3',
+                                    'blockquote',
+                                    'codeBlock',
+                                ]),
                         ]),
-                    Textarea::make('excerpt')
-                        ->label(__('news.excerpt'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                    RichEditor::make('content')
-                        ->label(__('news.content'))
-                        ->required()
-                        ->columnSpanFull()
-                        ->toolbarButtons([
-                            'bold',
-                            'italic',
-                            'underline',
-                            'strike',
-                            'link',
-                            'bulletList',
-                            'orderedList',
-                            'h2',
-                            'h3',
-                            'blockquote',
-                            'codeBlock',
+                    Tab::make(__('news.media'))
+                        ->schema([
+                            FileUpload::make('featured_image')
+                                ->label(__('news.featured_image'))
+                                ->image()
+                                ->imageEditor()
+                                ->imageEditorAspectRatios([
+                                    '16:9',
+                                    '4:3',
+                                    '1:1',
+                                ])
+                                ->directory('news/featured')
+                                ->visibility('public'),
+                            FileUpload::make('gallery')
+                                ->label(__('news.gallery'))
+                                ->multiple()
+                                ->directory('news/gallery')
+                                ->visibility('public'),
                         ]),
-                ]),
-            Section::make(__('news.media'))
-                ->components([
-                    FileUpload::make('featured_image')
-                        ->label(__('news.featured_image'))
-                        ->image()
-                        ->imageEditor()
-                        ->imageEditorAspectRatios([
-                            '16:9',
-                            '4:3',
-                            '1:1',
-                        ])
-                        ->directory('news/featured')
-                        ->visibility('public')
-                        ->columnSpanFull(),
-                    FileUpload::make('gallery')
-                        ->label(__('news.gallery'))
-                        ->image()
-                        ->multiple()
-                        ->imageEditor()
-                        ->directory('news/gallery')
-                        ->visibility('public')
-                        ->columnSpanFull(),
-                ]),
-            Section::make(__('news.categorization'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
+                    Tab::make(__('news.categorization'))
+                        ->schema([
                             Select::make('category_id')
                                 ->label(__('news.category'))
-                                ->relationship('category', 'name')
+                                ->relationship('categories', 'name')
                                 ->searchable()
                                 ->preload()
+                                ->multiple()
                                 ->createOptionForm([
                                     TextInput::make('name')
                                         ->required()
@@ -185,19 +183,13 @@ final class NewsResource extends Resource
                                 ->placeholder(__('news.add_tag'))
                                 ->separator(','),
                         ]),
-                ]),
-            Section::make(__('news.publishing'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
+                    Tab::make(__('news.publishing'))
+                        ->schema([
                             Toggle::make('is_published')
                                 ->label(__('news.is_published'))
                                 ->default(false),
                             Toggle::make('is_featured')
                                 ->label(__('news.is_featured')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             DateTimePicker::make('published_at')
                                 ->label(__('news.published_at'))
                                 ->default(now())
@@ -206,23 +198,43 @@ final class NewsResource extends Resource
                                 ->label(__('news.expires_at'))
                                 ->displayFormat('Y-m-d H:i'),
                         ]),
-                ]),
-            Section::make(__('news.seo'))
-                ->components([
-                    TextInput::make('seo_title')
-                        ->label(__('news.seo_title'))
-                        ->maxLength(255)
-                        ->columnSpanFull(),
-                    Textarea::make('seo_description')
-                        ->label(__('news.seo_description'))
-                        ->rows(2)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                    TextInput::make('seo_keywords')
-                        ->label(__('news.seo_keywords'))
-                        ->maxLength(255)
-                        ->columnSpanFull(),
-                ]),
+                    Tab::make(__('news.seo'))
+                        ->schema([
+                            TextInput::make('seo_title')
+                                ->label(__('news.seo_title'))
+                                ->maxLength(255),
+                            Textarea::make('seo_description')
+                                ->label(__('news.seo_description'))
+                                ->rows(2)
+                                ->maxLength(500),
+                            TextInput::make('seo_keywords')
+                                ->label(__('news.seo_keywords'))
+                                ->maxLength(255),
+                        ]),
+                    Tab::make(__('news.relations'))
+                        ->schema([
+                            Repeater::make('images')
+                                ->label(__('news.images'))
+                                ->relationship()
+                                ->schema([
+                                    FileUpload::make('image_path')
+                                        ->label(__('news.image'))
+                                        ->image()
+                                        ->directory('news/images')
+                                        ->visibility('public'),
+                                    TextInput::make('alt_text')
+                                        ->label(__('news.alt_text'))
+                                        ->maxLength(255),
+                                    TextInput::make('caption')
+                                        ->label(__('news.caption'))
+                                        ->maxLength(500),
+                                ])
+                                ->collapsible()
+                                ->itemLabel(fn(array $state): ?string => $state['alt_text'] ?? null)
+                                ->defaultItems(0)
+                                ->addActionLabel(__('news.add_image')),
+                        ]),
+                ])
         ]);
     }
 
@@ -245,11 +257,11 @@ final class NewsResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->limit(50),
-                TextColumn::make('category.name')
-                    ->label(__('news.category'))
-                    ->sortable()
+                TextColumn::make('categories.name')
+                    ->label(__('news.categories'))
                     ->badge()
-                    ->color('gray'),
+                    ->color('gray')
+                    ->separator(','),
                 TextColumn::make('excerpt')
                     ->label(__('news.excerpt'))
                     ->limit(100)
@@ -268,18 +280,15 @@ final class NewsResource extends Resource
                 TextColumn::make('published_at')
                     ->label(__('news.published_at'))
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('views_count')
+                    ->sortable(),
+                TextColumn::make('view_count')
                     ->label(__('news.views_count'))
                     ->numeric()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('news.created_at'))
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('updated_at')
                     ->label(__('news.updated_at'))
                     ->dateTime()
@@ -287,20 +296,17 @@ final class NewsResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('category_id')
-                    ->label(__('news.category'))
-                    ->relationship('category', 'name')
-                    ->searchable()
-                    ->preload(),
+                SelectFilter::make('categories')
+                    ->relationship('categories', 'name')
+                    ->preload()
+                    ->multiple(),
                 TernaryFilter::make('is_published')
                     ->label(__('news.is_published'))
-                    ->boolean()
                     ->trueLabel(__('news.published_only'))
                     ->falseLabel(__('news.draft_only'))
                     ->native(false),
                 TernaryFilter::make('is_featured')
                     ->label(__('news.is_featured'))
-                    ->boolean()
                     ->trueLabel(__('news.featured_only'))
                     ->falseLabel(__('news.not_featured'))
                     ->native(false),
@@ -336,7 +342,6 @@ final class NewsResource extends Resource
                             'is_published' => true,
                             'published_at' => now(),
                         ]);
-
                         Notification::make()
                             ->title(__('news.published_successfully'))
                             ->success()
@@ -350,7 +355,6 @@ final class NewsResource extends Resource
                     ->visible(fn(News $record): bool => $record->is_published)
                     ->action(function (News $record): void {
                         $record->update(['is_published' => false]);
-
                         Notification::make()
                             ->title(__('news.unpublished_successfully'))
                             ->success()
@@ -370,7 +374,6 @@ final class NewsResource extends Resource
                                 'is_published' => true,
                                 'published_at' => now(),
                             ]);
-
                             Notification::make()
                                 ->title(__('news.bulk_published_success'))
                                 ->success()
@@ -383,7 +386,6 @@ final class NewsResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_published' => false]);
-
                             Notification::make()
                                 ->title(__('news.bulk_unpublished_success'))
                                 ->success()

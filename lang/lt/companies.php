@@ -1,0 +1,36 @@
+<?php
+
+return [
+    'title' => 'Įmonės',
+    'single' => 'Įmonė',
+    'plural' => 'Įmonės',
+    'name' => 'Pavadinimas',
+    'email' => 'El. paštas',
+    'phone' => 'Telefonas',
+    'website' => 'Svetainė',
+    'industry' => 'Pramonės šaka',
+    'size' => 'Dydis',
+    'description' => 'Aprašymas',
+    'is_active' => 'Aktyvus',
+    'created_at' => 'Sukurta',
+    'updated_at' => 'Atnaujinta',
+    'basic_information' => 'Pagrindinė informacija',
+    'business_information' => 'Verslo informacija',
+    'settings' => 'Nustatymai',
+    'sizes' => [
+        'small' => 'Maža',
+        'medium' => 'Vidutinė',
+        'large' => 'Didelė',
+    ],
+    'activate' => 'Aktyvuoti',
+    'deactivate' => 'Deaktyvuoti',
+    'activated_successfully' => 'Įmonė sėkmingai aktyvuota',
+    'deactivated_successfully' => 'Įmonė sėkmingai deaktyvuota',
+    'activate_selected' => 'Aktyvuoti pasirinktus',
+    'deactivate_selected' => 'Deaktyvuoti pasirinktus',
+    'bulk_activated_success' => 'Pasirinktos įmonės sėkmingai aktyvuotos',
+    'bulk_deactivated_success' => 'Pasirinktos įmonės sėkmingai deaktyvuotos',
+    'active_only' => 'Tik aktyvūs',
+    'inactive_only' => 'Tik neaktyvūs',
+];
+

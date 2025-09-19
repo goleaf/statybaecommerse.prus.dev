@@ -32,15 +32,30 @@ final class ActivityLog extends Model
     protected $fillable = [
         'log_name',
         'description',
+        'event',
         'subject_type',
         'subject_id',
         'causer_type',
         'causer_id',
         'properties',
+        'batch_uuid',
+        'ip_address',
+        'user_agent',
+        'device_type',
+        'browser',
+        'os',
+        'country',
+        'is_important',
+        'is_system',
+        'severity',
+        'category',
+        'notes',
     ];
 
     protected $casts = [
         'properties' => 'array',
+        'is_important' => 'boolean',
+        'is_system' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

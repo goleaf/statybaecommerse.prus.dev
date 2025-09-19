@@ -1,12 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\UserWishlistResource\Pages;
 
 use App\Filament\Resources\UserWishlistResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
 
 final class ListUserWishlists extends ListRecords
 {
@@ -19,3 +17,4 @@ final class ListUserWishlists extends ListRecords
         ];
     }
 }
+

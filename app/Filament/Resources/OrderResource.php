@@ -59,27 +59,26 @@ use UnitEnum;
  */
 final class OrderResource extends Resource
 {
-    protected static ?string $model = Order::class;    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Orders';
+    protected static ?string $model = Order::class;
+
+    /*protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Orders;
 
     protected static ?int $navigationSort = 1;
-
     protected static ?string $recordTitleAttribute = 'number';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
+    /** @var string|\BackedEnum|null */
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static ?string $navigationLabel = 'orders.title';
-
-    protected static ?string $modelLabel = 'orders.single';
-
-    protected static ?string $pluralModelLabel = 'orders.plural';
+    protected static ?string $navigationLabel = 'orders.navigation.orders';
+    protected static ?string $modelLabel = 'orders.models.order';
+    protected static ?string $pluralModelLabel = 'orders.models.orders';
 
     /**
      * Get the navigation label with translation support.
      */
     public static function getNavigationLabel(): string
     {
-        return __('orders.title');
+        return __('orders.navigation.orders');
     }
 
     /**
@@ -87,7 +86,7 @@ final class OrderResource extends Resource
      */
     public static function getPluralModelLabel(): string
     {
-        return __('orders.plural');
+        return __('orders.models.orders');
     }
 
     /**
@@ -95,7 +94,7 @@ final class OrderResource extends Resource
      */
     public static function getModelLabel(): string
     {
-        return __('orders.single');
+        return __('orders.models.order');
     }
 
     /**
@@ -105,25 +104,24 @@ final class OrderResource extends Resource
     {
         return $schema
             ->components([
-                Section::make(__('orders.basic_information'))
-                    ->description(__('orders.basic_information_description'))
+                Section::make(__('orders.sections.order_details'))
+                    ->description(__('orders.sections.customer_information'))
                     ->icon('heroicon-o-information-circle')
                     ->components([
                         Grid::make(3)
                             ->components([
                                 TextInput::make('number')
-                                    ->label(__('orders.number'))
+                                    ->label(__('orders.fields.order_number'))
                                     ->required()
                                     ->unique(ignoreRecord: true)
                                     ->maxLength(255)
                                     ->prefixIcon('heroicon-o-hashtag')
                                     ->helperText(__('orders.number_help')),
                                 Select::make('user_id')
-                                    ->label(__('orders.customer'))
+                                    ->label(__('orders.fields.customer'))
                                     ->relationship('user', 'name')
                                     ->searchable()
                                     ->preload()
-                                    ->required()
                                     ->createOptionForm([
                                         TextInput::make('name')
                                             ->required()
@@ -135,96 +133,87 @@ final class OrderResource extends Resource
                                     ])
                                     ->prefixIcon('heroicon-o-user'),
                                 Select::make('status')
-                                    ->label(__('orders.status'))
+                                    ->label(__('orders.fields.status'))
                                     ->options([
-                                        'pending' => __('orders.statuses.pending'),
-                                        'processing' => __('orders.statuses.processing'),
-                                        'shipped' => __('orders.statuses.shipped'),
-                                        'delivered' => __('orders.statuses.delivered'),
-                                        'cancelled' => __('orders.statuses.cancelled'),
-                                        'refunded' => __('orders.statuses.refunded'),
+                                        'pending' => __('orders.status.pending'),
+                                        'processing' => __('orders.status.processing'),
+                                        'shipped' => __('orders.status.shipped'),
+                                        'delivered' => __('orders.status.delivered'),
+                                        'cancelled' => __('orders.status.cancelled'),
+                                        'refunded' => __('orders.status.refunded'),
                                     ])
-                                    ->required()
                                     ->default('pending')
                                     ->prefixIcon('heroicon-o-flag'),
                             ]),
                         Grid::make(3)
                             ->components([
                                 Select::make('payment_status')
-                                    ->label(__('orders.payment_status'))
+                                    ->label(__('orders.fields.payment_status'))
                                     ->options([
-                                        'pending' => __('orders.payment_statuses.pending'),
-                                        'paid' => __('orders.payment_statuses.paid'),
-                                        'failed' => __('orders.payment_statuses.failed'),
-                                        'refunded' => __('orders.payment_statuses.refunded'),
+                                        'pending' => __('orders.payment_status.pending'),
+                                        'paid' => __('orders.payment_status.paid'),
+                                        'failed' => __('orders.payment_status.failed'),
+                                        'refunded' => __('orders.payment_status.refunded'),
                                     ])
-                                    ->required()
-                                    ->default('pending')
                                     ->prefixIcon('heroicon-o-credit-card'),
                                 Select::make('payment_method')
-                                    ->label(__('orders.payment_method'))
+                                    ->label(__('orders.fields.payment_method'))
                                     ->options([
                                         'credit_card' => __('orders.payment_methods.credit_card'),
                                         'bank_transfer' => __('orders.payment_methods.bank_transfer'),
                                         'cash_on_delivery' => __('orders.payment_methods.cash_on_delivery'),
                                         'paypal' => __('orders.payment_methods.paypal'),
                                         'stripe' => __('orders.payment_methods.stripe'),
-                                        'apple_pay' => __('orders.payment_methods.apple_pay'),
-                                        'google_pay' => __('orders.payment_methods.google_pay'),
+                                        'apple_pay' => __('orders.payment_methods.credit_card'),
+                                        'google_pay' => __('orders.payment_methods.credit_card'),
                                     ])
                                     ->prefixIcon('heroicon-o-wallet'),
                                 TextInput::make('payment_reference')
-                                    ->label(__('orders.payment_reference'))
-                                    ->maxLength(255)
+                                    ->label(__('orders.fields.tracking_number'))
                                     ->prefixIcon('heroicon-o-document-text'),
                             ]),
                     ])
                     ->collapsible(),
-                Section::make(__('orders.pricing'))
-                    ->description(__('orders.pricing_description'))
+                Section::make(__('orders.sections.order_details'))
+                    ->description(__('orders.fields.total'))
                     ->icon('heroicon-o-currency-euro')
                     ->components([
                         Grid::make(4)
                             ->components([
                                 TextInput::make('subtotal')
-                                    ->label(__('orders.subtotal'))
+                                    ->label(__('orders.fields.subtotal'))
                                     ->numeric()
                                     ->prefix('€')
-                                    ->required()
                                     ->step(0.01)
                                     ->prefixIcon('heroicon-o-calculator'),
                                 TextInput::make('tax_amount')
-                                    ->label(__('orders.tax_amount'))
+                                    ->label(__('orders.fields.tax_amount'))
                                     ->numeric()
-                                    ->prefix('€')
                                     ->default(0)
+                                    ->prefix('€')
                                     ->step(0.01)
                                     ->prefixIcon('heroicon-o-receipt-percent'),
                                 TextInput::make('shipping_amount')
-                                    ->label(__('orders.shipping_amount'))
+                                    ->label(__('orders.fields.shipping_amount'))
                                     ->numeric()
                                     ->prefix('€')
-                                    ->default(0)
                                     ->step(0.01)
                                     ->prefixIcon('heroicon-o-truck'),
                                 TextInput::make('discount_amount')
-                                    ->label(__('orders.discount_amount'))
+                                    ->label(__('orders.fields.discount_amount'))
                                     ->numeric()
                                     ->prefix('€')
-                                    ->default(0)
                                     ->step(0.01)
                                     ->prefixIcon('heroicon-o-tag'),
                             ]),
                         Placeholder::make('total')
-                            ->label(__('orders.total'))
+                            ->label(__('orders.fields.total'))
                             ->content(function (Forms\Get $get): string {
                                 $subtotal = (float) $get('subtotal') ?? 0;
                                 $tax = (float) $get('tax_amount') ?? 0;
                                 $shipping = (float) $get('shipping_amount') ?? 0;
                                 $discount = (float) $get('discount_amount') ?? 0;
-
                                 $total = $subtotal + $tax + $shipping - $discount;
-
                                 return '€' . number_format($total, 2);
                             })
                             ->prefixIcon('heroicon-o-banknotes'),
@@ -234,76 +223,75 @@ final class OrderResource extends Resource
                                 $tax = (float) $get('tax_amount') ?? 0;
                                 $shipping = (float) $get('shipping_amount') ?? 0;
                                 $discount = (float) $get('discount_amount') ?? 0;
-
                                 return $subtotal + $tax + $shipping - $discount;
                             }),
                     ])
                     ->collapsible(),
-                Section::make(__('orders.addresses'))
-                    ->description(__('orders.addresses_description'))
+                Section::make(__('orders.sections.billing_information'))
+                    ->description(__('orders.sections.shipping_information'))
                     ->icon('heroicon-o-map-pin')
                     ->components([
                         Grid::make(2)
                             ->components([
                                 KeyValue::make('billing_address')
-                                    ->label(__('orders.billing_address'))
-                                    ->keyLabel(__('orders.address_field'))
-                                    ->valueLabel(__('orders.address_value'))
-                                    ->addActionLabel(__('orders.add_address_field'))
-                                    ->helperText(__('orders.billing_address_help')),
+                                    ->label(__('orders.fields.billing_address'))
+                                    ->keyLabel(__('orders.fields.order_number'))
+                                    ->valueLabel(__('orders.fields.customer_name'))
+                                    ->addActionLabel(__('orders.actions.create'))
+                                    ->helperText(__('orders.fields.billing_address')),
                                 KeyValue::make('shipping_address')
-                                    ->label(__('orders.shipping_address'))
-                                    ->keyLabel(__('orders.address_field'))
-                                    ->valueLabel(__('orders.address_value'))
-                                    ->addActionLabel(__('orders.add_address_field'))
-                                    ->helperText(__('orders.shipping_address_help')),
-                            ]),
+                                    ->label(__('orders.fields.shipping_address'))
+                                    ->keyLabel(__('orders.fields.order_number'))
+                                    ->valueLabel(__('orders.fields.customer_name'))
+                                    ->addActionLabel(__('orders.actions.create'))
+                                    ->helperText(__('orders.fields.shipping_address')),
+                            ])
                     ])
                     ->collapsible(),
-                Section::make(__('orders.shipping_information'))
-                    ->description(__('orders.shipping_information_description'))
+                Section::make(__('orders.sections.order_shipping'))
+                    ->description(__('orders.sections.shipping_information'))
                     ->icon('heroicon-o-truck')
                     ->components([
                         Grid::make(2)
                             ->components([
                                 DateTimePicker::make('shipped_at')
-                                    ->label(__('orders.shipped_at'))
+                                    ->label(__('orders.fields.shipped_at'))
                                     ->prefixIcon('heroicon-o-truck'),
                                 DateTimePicker::make('delivered_at')
-                                    ->label(__('orders.delivered_at'))
+                                    ->label(__('orders.fields.delivered_at'))
                                     ->prefixIcon('heroicon-o-check-circle'),
                             ]),
                         TextInput::make('tracking_number')
-                            ->label(__('orders.tracking_number'))
+                            ->label(__('orders.fields.tracking_number'))
                             ->maxLength(255)
                             ->prefixIcon('heroicon-o-magnifying-glass'),
                     ])
                     ->collapsible(),
-                Section::make(__('orders.additional_information'))
-                    ->description(__('orders.additional_information_description'))
+                Section::make(__('orders.sections.order_details'))
+                    ->description(__('orders.fields.notes'))
                     ->icon('heroicon-o-document-text')
                     ->components([
                         Textarea::make('notes')
-                            ->label(__('orders.notes'))
+                            ->label(__('orders.fields.notes'))
                             ->rows(3)
                             ->columnSpanFull()
-                            ->helperText(__('orders.notes_help')),
+                                    ->helperText(__('orders.fields.internal_notes')),
                         Grid::make(3)
                             ->components([
                                 Select::make('zone_id')
-                                    ->label(__('orders.zone'))
+                                    ->label(__('orders.fields.currency'))
                                     ->relationship('zone', 'name')
                                     ->searchable()
                                     ->preload()
                                     ->prefixIcon('heroicon-o-globe-alt'),
                                 Select::make('channel_id')
-                                    ->label(__('orders.channel'))
+                                    ->label(__('orders.fields.customer'))
                                     ->relationship('channel', 'name')
                                     ->searchable()
                                     ->preload()
                                     ->prefixIcon('heroicon-o-device-phone-mobile'),
                                 Select::make('partner_id')
-                                    ->label(__('orders.partner'))
+                                    ->label(__('orders.fields.customer'))
                                     ->relationship('partner', 'name')
                                     ->searchable()
                                     ->preload()
@@ -322,23 +310,23 @@ final class OrderResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('number')
-                    ->label(__('orders.number'))
+                    ->label(__('orders.fields.order_number'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
                     ->weight('bold')
                     ->prefixIcon('heroicon-o-hashtag'),
                 TextColumn::make('user.name')
-                    ->label(__('orders.customer'))
-                    ->searchable()
-                    ->sortable()
+                    ->label(__('orders.fields.customer'))
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
                         return strlen($state) > 30 ? $state : null;
-                    }),
+                    })
+                    ->searchable()
+                    ->sortable(),
                 BadgeColumn::make('status')
-                    ->label(__('orders.status'))
+                    ->label(__('orders.fields.status'))
                     ->colors([
                         'warning' => 'pending',
                         'primary' => 'processing',
@@ -347,55 +335,54 @@ final class OrderResource extends Resource
                         'danger' => 'cancelled',
                         'secondary' => 'refunded',
                     ])
-                    ->formatStateUsing(fn(string $state): string => __("orders.statuses.{$state}")),
+                    ->formatStateUsing(fn(string $state): string => __("orders.status.{$state}"))
+                    ->sortable(),
                 BadgeColumn::make('payment_status')
-                    ->label(__('orders.payment_status'))
+                    ->label(__('orders.fields.payment_status'))
                     ->colors([
                         'warning' => 'pending',
                         'success' => 'paid',
                         'danger' => 'failed',
                         'secondary' => 'refunded',
                     ])
-                    ->formatStateUsing(fn(string $state): string => __("orders.payment_statuses.{$state}")),
+                    ->formatStateUsing(fn(string $state): string => __("orders.payment_status.{$state}"))
+                    ->sortable(),
                 TextColumn::make('total')
-                    ->label(__('orders.total'))
+                    ->label(__('orders.fields.total'))
                     ->money('EUR')
                     ->sortable()
-                    ->weight('bold')
                     ->prefixIcon('heroicon-o-banknotes'),
                 TextColumn::make('items_count')
-                    ->label(__('orders.items_count'))
+                    ->label(__('orders.fields.items_count'))
                     ->counts('items')
                     ->sortable()
                     ->prefixIcon('heroicon-o-shopping-cart'),
                 TextColumn::make('payment_method')
-                    ->label(__('orders.payment_method'))
+                    ->label(__('orders.fields.payment_method'))
                     ->formatStateUsing(fn(?string $state): string => $state ? __("orders.payment_methods.{$state}") : '-')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('zone.name')
-                    ->label(__('orders.zone'))
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('channel.name')
-                    ->label(__('orders.channel'))
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
-                    ->label(__('orders.created_at'))
-                    ->dateTime()
-                    ->sortable()
+                    ->label(__('orders.fields.currency'))
                     ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable(),
+                TextColumn::make('channel.name')
+                    ->label(__('orders.fields.customer'))
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->label(__('orders.fields.created_at'))
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
                     ->prefixIcon('heroicon-o-calendar'),
                 TextColumn::make('updated_at')
-                    ->label(__('orders.updated_at'))
+                    ->label(__('orders.fields.updated_at'))
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
                     ->prefixIcon('heroicon-o-clock'),
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label(__('orders.status'))
                     ->options([
                         'pending' => __('orders.statuses.pending'),
                         'processing' => __('orders.statuses.processing'),
@@ -406,7 +393,6 @@ final class OrderResource extends Resource
                     ])
                     ->multiple(),
                 SelectFilter::make('payment_status')
-                    ->label(__('orders.payment_status'))
                     ->options([
                         'pending' => __('orders.payment_statuses.pending'),
                         'paid' => __('orders.payment_statuses.paid'),
@@ -415,7 +401,6 @@ final class OrderResource extends Resource
                     ])
                     ->multiple(),
                 SelectFilter::make('payment_method')
-                    ->label(__('orders.payment_method'))
                     ->options([
                         'credit_card' => __('orders.payment_methods.credit_card'),
                         'bank_transfer' => __('orders.payment_methods.bank_transfer'),
@@ -427,14 +412,10 @@ final class OrderResource extends Resource
                     ])
                     ->multiple(),
                 SelectFilter::make('zone')
-                    ->label(__('orders.zone'))
                     ->relationship('zone', 'name')
-                    ->searchable()
                     ->preload(),
                 SelectFilter::make('channel')
-                    ->label(__('orders.channel'))
                     ->relationship('channel', 'name')
-                    ->searchable()
                     ->preload(),
                 TernaryFilter::make('is_paid')
                     ->label(__('orders.is_paid'))
@@ -443,7 +424,6 @@ final class OrderResource extends Resource
                         false: fn(Builder $query) => $query->whereNotIn('payment_status', ['paid', 'captured', 'settled', 'authorized']),
                     ),
                 DateFilter::make('created_at')
-                    ->label(__('orders.created_at'))
                     ->range(),
                 Filter::make('total_range')
                     ->form([
@@ -480,7 +460,6 @@ final class OrderResource extends Resource
                     ->visible(fn(Order $record): bool => $record->status === 'pending')
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'processing']);
-
                         Notification::make()
                             ->title(__('orders.processing_success'))
                             ->success()
@@ -497,7 +476,6 @@ final class OrderResource extends Resource
                             'status' => 'shipped',
                             'shipped_at' => now(),
                         ]);
-
                         Notification::make()
                             ->title(__('orders.shipped_successfully'))
                             ->success()
@@ -514,7 +492,6 @@ final class OrderResource extends Resource
                             'status' => 'delivered',
                             'delivered_at' => now(),
                         ]);
-
                         Notification::make()
                             ->title(__('orders.delivered_successfully'))
                             ->success()
@@ -528,7 +505,6 @@ final class OrderResource extends Resource
                     ->visible(fn(Order $record): bool => in_array($record->status, ['pending', 'processing']))
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'cancelled']);
-
                         Notification::make()
                             ->title(__('orders.cancelled_successfully'))
                             ->success()
@@ -542,7 +518,6 @@ final class OrderResource extends Resource
                     ->visible(fn(Order $record): bool => in_array($record->status, ['delivered', 'completed']))
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'refunded']);
-
                         Notification::make()
                             ->title(__('orders.refunded_successfully'))
                             ->success()
@@ -559,7 +534,6 @@ final class OrderResource extends Resource
                         ->color('primary')
                         ->action(function (Collection $records): void {
                             $records->each->update(['status' => 'processing']);
-
                             Notification::make()
                                 ->title(__('orders.bulk_processing_success'))
                                 ->success()
@@ -575,7 +549,6 @@ final class OrderResource extends Resource
                                 'status' => 'shipped',
                                 'shipped_at' => now(),
                             ]);
-
                             Notification::make()
                                 ->title(__('orders.bulk_shipped_success'))
                                 ->success()
@@ -591,7 +564,6 @@ final class OrderResource extends Resource
                                 'status' => 'delivered',
                                 'delivered_at' => now(),
                             ]);
-
                             Notification::make()
                                 ->title(__('orders.bulk_delivered_success'))
                                 ->success()
@@ -604,7 +576,6 @@ final class OrderResource extends Resource
                         ->color('danger')
                         ->action(function (Collection $records): void {
                             $records->each->update(['status' => 'cancelled']);
-
                             Notification::make()
                                 ->title(__('orders.bulk_cancelled_success'))
                                 ->success()
@@ -621,7 +592,8 @@ final class OrderResource extends Resource
                                 ->title(__('orders.export_success'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->requiresConfirmation(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
@@ -662,7 +634,7 @@ final class OrderResource extends Resource
     {
         return [
             'Customer' => $record->user->name ?? 'N/A',
-            'Total' => '€' . number_format($record->total, 2),
+            'Total' => '€' . number_format((float) $record->total, 2),
             'Status' => __("orders.statuses.{$record->status}"),
         ];
     }
@@ -672,15 +644,26 @@ final class OrderResource extends Resource
      */
     public static function getGlobalSearchResultActions($record): array
     {
-        return [
-            Action::make('view')
-                ->label(__('orders.view'))
+        $actions = [];
+        
+        try {
+            $actions[] = Action::make('view')
+                ->label(__('orders.actions.view'))
                 ->icon('heroicon-o-eye')
-                ->url(static::getUrl('view', ['record' => $record])),
-            Action::make('edit')
-                ->label(__('orders.edit'))
+                ->url(static::getUrl('view', ['record' => $record]));
+        } catch (\Exception $e) {
+            // Route might not exist, skip this action
+        }
+        
+        try {
+            $actions[] = Action::make('edit')
+                ->label(__('orders.actions.edit'))
                 ->icon('heroicon-o-pencil')
-                ->url(static::getUrl('edit', ['record' => $record])),
-        ];
+                ->url(static::getUrl('edit', ['record' => $record]));
+        } catch (\Exception $e) {
+            // Route might not exist, skip this action
+        }
+        
+        return $actions;
     }
 }

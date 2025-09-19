@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -29,7 +27,9 @@ final class CartItemFactory extends Factory
             'product_id' => Product::factory(),
             'variant_id' => null,  // Will be set when needed
             'quantity' => $quantity,
+            'minimum_quantity' => 1,
             'unit_price' => $unitPrice,
+            'price' => $unitPrice,  // Add the missing price field
             'total_price' => $totalPrice,
             'product_snapshot' => [
                 'name' => $this->faker->words(3, true),
@@ -59,9 +59,9 @@ final class CartItemFactory extends Factory
      */
     public function guest(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'user_id' => null,
-            'session_id' => 'guest-'.$this->faker->uuid(),
+            'session_id' => 'guest-' . $this->faker->uuid(),
         ]);
     }
 
@@ -123,7 +123,7 @@ final class CartItemFactory extends Factory
      */
     public function forSession(string $sessionId): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'session_id' => $sessionId,
         ]);
     }
@@ -133,7 +133,7 @@ final class CartItemFactory extends Factory
      */
     public function forUser(User $user): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'user_id' => $user->id,
         ]);
     }
@@ -163,7 +163,7 @@ final class CartItemFactory extends Factory
      */
     public function old(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'created_at' => $this->faker->dateTimeBetween('-30 days', '-8 days'),
             'updated_at' => $this->faker->dateTimeBetween('-30 days', '-8 days'),
         ]);
@@ -174,7 +174,7 @@ final class CartItemFactory extends Factory
      */
     public function recent(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'created_at' => $this->faker->dateTimeBetween('-1 day', 'now'),
             'updated_at' => $this->faker->dateTimeBetween('-1 day', 'now'),
         ]);
@@ -185,7 +185,7 @@ final class CartItemFactory extends Factory
      */
     public function minimalSnapshot(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'product_snapshot' => [
                 'name' => $this->faker->words(2, true),
                 'price' => $attributes['unit_price'],

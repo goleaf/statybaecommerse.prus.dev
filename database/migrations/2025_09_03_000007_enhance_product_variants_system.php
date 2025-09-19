@@ -1,13 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         // Enhance product_variants table with size-dependent pricing
@@ -23,7 +20,7 @@ return new class extends Migration
                 if (!Schema::hasColumn('product_variants', 'size_display')) {
                     $table->string('size_display')->nullable()->after('size_unit');
                 }
-                
+
                 // Add pricing modifiers
                 if (!Schema::hasColumn('product_variants', 'size_price_modifier')) {
                     $table->decimal('size_price_modifier', 8, 4)->default(0)->after('cost_price');
@@ -31,7 +28,7 @@ return new class extends Migration
                 if (!Schema::hasColumn('product_variants', 'size_weight_modifier')) {
                     $table->decimal('size_weight_modifier', 8, 4)->default(0)->after('weight');
                 }
-                
+
                 // Add variant-specific fields
                 if (!Schema::hasColumn('product_variants', 'variant_type')) {
                     $table->enum('variant_type', ['size', 'color', 'material', 'style', 'custom'])->default('size')->after('size_display');
@@ -42,7 +39,7 @@ return new class extends Migration
                 if (!Schema::hasColumn('product_variants', 'variant_sku_suffix')) {
                     $table->string('variant_sku_suffix')->nullable()->after('sku');
                 }
-                
+
                 // Add inventory tracking
                 if (!Schema::hasColumn('product_variants', 'track_inventory')) {
                     $table->boolean('track_inventory')->default(true)->after('quantity');
@@ -53,7 +50,7 @@ return new class extends Migration
                 if (!Schema::hasColumn('product_variants', 'low_stock_threshold')) {
                     $table->integer('low_stock_threshold')->default(5)->after('allow_backorder');
                 }
-                
+
                 // Add variant metadata
                 if (!Schema::hasColumn('product_variants', 'variant_metadata')) {
                     $afterColumn = Schema::hasColumn('product_variants', 'status')
@@ -62,7 +59,7 @@ return new class extends Migration
 
                     $table->json('variant_metadata')->nullable()->after($afterColumn);
                 }
-                
+
                 // Add indexes
                 $table->index(['product_id', 'variant_type']);
                 $table->index(['product_id', 'size']);
@@ -94,9 +91,9 @@ return new class extends Migration
                 $table->id();
                 $table->unsignedBigInteger('product_id');
                 $table->string('rule_name');
-                $table->string('rule_type')->default('size_based'); // size_based, quantity_based, customer_group_based
-                $table->json('conditions'); // Rule conditions
-                $table->json('pricing_modifiers'); // Price modifiers
+                $table->string('rule_type')->default('size_based');  // size_based, quantity_based, customer_group_based
+                $table->json('conditions');  // Rule conditions
+                $table->json('pricing_modifiers');  // Price modifiers
                 $table->boolean('is_active')->default(true);
                 $table->integer('priority')->default(0);
                 $table->timestamp('starts_at')->nullable();
@@ -153,7 +150,7 @@ return new class extends Migration
             Schema::create('variant_combinations', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
-                $table->json('attribute_combinations'); // Store all possible combinations
+                $table->json('attribute_combinations');  // Store all possible combinations
                 $table->boolean('is_available')->default(true);
                 $table->timestamps();
 
@@ -198,7 +195,7 @@ return new class extends Migration
                     'variant_type', 'is_default_variant', 'variant_sku_suffix', 'track_inventory',
                     'allow_backorder', 'low_stock_threshold', 'variant_metadata'
                 ];
-                
+
                 foreach ($columns as $column) {
                     if (Schema::hasColumn('product_variants', $column)) {
                         $table->dropColumn($column);

@@ -1,13 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\ActivityLogResource\Pages;
 
 use App\Filament\Resources\ActivityLogResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Actions\DeleteAction;
+use Filament\Actions;
 
 final class EditActivityLog extends EditRecord
 {
@@ -26,3 +23,4 @@ final class EditActivityLog extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 }
+

@@ -1,20 +1,20 @@
-<?php
+<?php declare(strict_types=1);
 
-declare (strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * NewsTag
- * 
+ *
  * Eloquent model representing the NewsTag entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property mixed $table
  * @property mixed $fillable
  * @property string $translationModel
@@ -28,17 +28,21 @@ final class NewsTag extends Model
 {
     use HasFactory;
     use HasTranslations;
+
     protected $table = 'news_tags';
-    protected $fillable = ['is_active', 'color'];
+    protected $fillable = ['is_visible', 'color', 'sort_order'];
+
     /**
      * Handle casts functionality with proper error handling.
      * @return array
      */
     protected function casts(): array
     {
-        return ['is_active' => 'boolean'];
+        return ['is_visible' => 'boolean', 'sort_order' => 'integer'];
     }
+
     protected string $translationModel = \App\Models\Translations\NewsTagTranslation::class;
+
     /**
      * Handle news functionality with proper error handling.
      * @return BelongsToMany
@@ -47,23 +51,26 @@ final class NewsTag extends Model
     {
         return $this->belongsToMany(News::class, 'news_tag_pivot', 'news_tag_id', 'news_id')->withTimestamps();
     }
+
     /**
-     * Handle isActive functionality with proper error handling.
+     * Handle isVisible functionality with proper error handling.
      * @return bool
      */
-    public function isActive(): bool
+    public function isVisible(): bool
     {
-        return (bool) $this->is_active;
+        return (bool) $this->is_visible;
     }
+
     /**
-     * Handle scopeActive functionality with proper error handling.
+     * Handle scopeVisible functionality with proper error handling.
      * @param Builder $query
      * @return Builder
      */
-    public function scopeActive(Builder $query): Builder
+    public function scopeVisible(Builder $query): Builder
     {
-        return $query->where('is_active', true);
+        return $query->where('is_visible', true);
     }
+
     /**
      * Handle getRouteKeyName functionality with proper error handling.
      * @return string
@@ -72,6 +79,7 @@ final class NewsTag extends Model
     {
         return 'slug';
     }
+
     /**
      * Handle getSlugAttribute functionality with proper error handling.
      * @return string
@@ -80,6 +88,7 @@ final class NewsTag extends Model
     {
         return $this->getTranslation('slug', app()->getLocale());
     }
+
     /**
      * Handle getNameAttribute functionality with proper error handling.
      * @return string
@@ -88,6 +97,7 @@ final class NewsTag extends Model
     {
         return $this->getTranslation('name', app()->getLocale());
     }
+
     /**
      * Handle getDescriptionAttribute functionality with proper error handling.
      * @return string|null

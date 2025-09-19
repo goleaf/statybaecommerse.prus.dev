@@ -48,6 +48,14 @@ Route::middleware(['web'])->group(function () {
         Route::get('/{reward}', [App\Http\Controllers\Frontend\ReferralRewardController::class, 'show'])->name('show');
     });
 
+    // Discount Redemption Frontend Routes
+    Route::middleware(['auth'])->prefix('discount-redemptions')->name('frontend.discount-redemptions.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Frontend\DiscountRedemptionController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Frontend\DiscountRedemptionController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Frontend\DiscountRedemptionController::class, 'store'])->name('store');
+        Route::get('/{redemption}', [App\Http\Controllers\Frontend\DiscountRedemptionController::class, 'show'])->name('show');
+    });
+
     // Address Frontend Routes
     Route::middleware(['auth'])->prefix('addresses')->name('frontend.addresses.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\AddressController::class, 'index'])->name('index');

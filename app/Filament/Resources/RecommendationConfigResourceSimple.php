@@ -86,7 +86,7 @@ final class RecommendationConfigResourceSimple extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
+     * @param Form $schema
      * @return Form
      */
     public static function form(Schema $schema): Schema

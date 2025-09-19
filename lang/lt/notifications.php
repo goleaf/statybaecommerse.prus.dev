@@ -7,7 +7,6 @@ return [
     'timestamps' => 'Laiko žymos',
     'notification_content' => 'Pranešimo turinys',
     'raw_data' => 'Žali duomenys',
-
     // Fields
     'id' => 'ID',
     'type' => 'Tipas',
@@ -28,14 +27,12 @@ return [
     'created_at' => 'Sukurta',
     'updated_at' => 'Atnaujinta',
     'read_status' => 'Perskaitymo būsena',
-
     // Status
     'read' => 'Perskaityta',
     'unread' => 'Neperskaityta',
     'not_read' => 'Neperskaityta',
     'all_notifications' => 'Visi pranešimai',
     'normal' => 'Įprastas',
-
     // Types
     'types' => [
         'order' => 'Užsakymas',
@@ -49,12 +46,12 @@ return [
         'newsletter' => 'Naujienlaiškis',
         'support' => 'Palaikymas',
     ],
-
     // Actions
     'actions' => 'Veiksmai',
     'view' => 'Peržiūrėti',
     'mark_as_read' => 'Pažymėti kaip perskaitytą',
     'mark_as_unread' => 'Pažymėti kaip neperskaitytą',
+    'mark_as_urgent' => 'Pažymėti kaip skubų',
     'duplicate' => 'Dubluoti',
     'delete' => 'Ištrinti',
     'mark_all_as_read' => 'Pažymėti visus kaip perskaitytus',
@@ -64,7 +61,6 @@ return [
     'bulk_actions' => 'Masiniai veiksmai',
     'export' => 'Eksportuoti',
     'cleanup_old' => 'Išvalyti senus',
-
     // Confirmations
     'mark_as_read_confirmation' => 'Ar tikrai norite pažymėti šį pranešimą kaip perskaitytą?',
     'mark_as_unread_confirmation' => 'Ar tikrai norite pažymėti šį pranešimą kaip neperskaitytą?',
@@ -73,14 +69,50 @@ return [
     'mark_all_as_unread_confirmation' => 'Ar tikrai norite pažymėti visus pranešimus kaip neperskaitytus?',
     'delete_old_confirmation' => 'Ar tikrai norite ištrinti senus pranešimus (senesnius nei 30 dienų)?',
     'cleanup_old_confirmation' => 'Ar tikrai norite išvalyti senus pranešimus (senesnius nei 30 dienų)?',
-
     // Messages
     'marked_as_read' => 'Pranešimas pažymėtas kaip perskaitytas',
     'marked_as_unread' => 'Pranešimas pažymėtas kaip neperskaitytas',
+    'marked_as_urgent' => 'Pranešimas pažymėtas kaip skubų',
     'duplicated' => 'Pranešimas dubluotas',
     'cleanup_completed' => 'Išvalyta :count senų pranešimų',
     'export_started' => 'Eksportavimas pradėtas',
-
+    // Form sections
+    'form' => [
+        'sections' => [
+            'basic_information' => 'Pagrindinė informacija',
+            'raw_data' => 'Žali duomenys',
+        ],
+        'fields' => [
+            'notifiable_type' => 'Gavėjo tipas',
+            'notifiable_id' => 'Gavėjo ID',
+            'user' => 'Naudotojas',
+            'is_read' => 'Perskaityta',
+            'urgent' => 'Skubus',
+            'title' => 'Pavadinimas',
+            'message' => 'Žinutė',
+            'color' => 'Spalva',
+            'tags' => 'Žymos',
+            'attachment' => 'Priedas',
+            'read_at' => 'Perskaityta',
+            'created_at' => 'Sukurta',
+            'raw_data' => 'Žali duomenys',
+            'key' => 'Raktas',
+            'value' => 'Reikšmė',
+            'add_field' => 'Pridėti lauką',
+        ],
+    ],
+    // Filters
+    'filters' => [
+        'today' => 'Šiandien',
+        'this_week' => 'Šią savaitę',
+        'this_month' => 'Šį mėnesį',
+    ],
+    // Tabs
+    'tabs' => [
+        'all' => 'Visi',
+        'unread' => 'Neperskaityti',
+        'read' => 'Perskaityti',
+    ],
     // Stats
     'total_notifications' => 'Iš viso pranešimų',
     'unread_notifications' => 'Neperskaitytų pranešimų',
@@ -94,7 +126,6 @@ return [
     'created_today' => 'Sukurta šiandien',
     'created_this_week' => 'Sukurta šią savaitę',
     'created_this_month' => 'Sukurta šį mėnesį',
-
     // Filters
     'read_status' => 'Perskaitymo būsena',
     'urgent_status' => 'Skubumo būsena',
@@ -102,7 +133,6 @@ return [
     'created_until' => 'Sukurta iki',
     'read_from' => 'Perskaityta nuo',
     'read_until' => 'Perskaityta iki',
-
     // Tabs
     'all_notifications' => 'Visi pranešimai',
     'unread_notifications' => 'Neperskaityti pranešimai',
@@ -110,13 +140,11 @@ return [
     'urgent_notifications' => 'Skubūs pranešimai',
     'today_notifications' => 'Šiandienos pranešimai',
     'this_week_notifications' => 'Šios savaitės pranešimai',
-
     // Charts
     'notification_count' => 'Pranešimų skaičius',
     'notification_types_distribution' => 'Pranešimų tipų pasiskirstymas',
     'notification_trends' => 'Pranešimų tendencijos (paskutinės 30 dienų)',
     'recent_notifications' => 'Paskutiniai pranešimai',
-
     // Specific notification types
     'order' => [
         'created' => 'Naujas užsakymas',
@@ -129,7 +157,6 @@ return [
         'payment_failed' => 'Mokėjimas nepavyko',
         'refund_processed' => 'Grąžinimas apdorotas',
     ],
-
     'product' => [
         'created' => 'Naujas produktas',
         'updated' => 'Produktas atnaujintas',
@@ -140,7 +167,6 @@ return [
         'price_changed' => 'Kaina pakeista',
         'review_added' => 'Pridėtas atsiliepimas',
     ],
-
     'user' => [
         'registered' => 'Naujas vartotojas',
         'profile_updated' => 'Profilis atnaujintas',
@@ -151,7 +177,6 @@ return [
         'account_suspended' => 'Paskyra sustabdyta',
         'account_activated' => 'Paskyra aktyvuota',
     ],
-
     'system' => [
         'maintenance_started' => 'Pradėtas techninis aptarnavimas',
         'maintenance_completed' => 'Techninis aptarnavimas baigtas',
@@ -160,11 +185,9 @@ return [
         'security_alert' => 'Saugumo įspėjimas',
         'performance_issue' => 'Veikimo problema',
     ],
-
     'admin' => [
         'admin_message_footer' => 'Šis pranešimas išsiųstas iš sistemos administracijos.',
     ],
-
     'low_stock' => [
         'alert_title' => 'Mažos atsargos',
         'alert_message' => 'Produktas :name turi mažai atsargų (:stock vienetų liko)',
@@ -172,4 +195,3 @@ return [
         'action_message' => 'Prašome papildyti šio produkto atsargas, kad išvengtumėte atsargų trūkumo.',
     ],
 ];
-

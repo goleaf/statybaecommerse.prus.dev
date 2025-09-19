@@ -2,7 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Notification;
 use App\Models\User;
+use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\DatabaseNotification;
 use Livewire\Livewire;
@@ -17,7 +22,7 @@ final class NotificationResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->adminUser = User::factory()->create([
             'email' => 'admin@test.com',
             'is_admin' => true,
@@ -44,7 +49,8 @@ final class NotificationResourceTest extends TestCase
             'read_at' => now(),
         ]);
 
-        $this->actingAs($this->adminUser)
+        $this
+            ->actingAs($this->adminUser)
             ->get('/admin/notifications')
             ->assertOk()
             ->assertSee('Test notification 1')
@@ -61,7 +67,8 @@ final class NotificationResourceTest extends TestCase
             'data' => ['message' => 'Test notification for viewing'],
         ]);
 
-        $this->actingAs($this->adminUser)
+        $this
+            ->actingAs($this->adminUser)
             ->get("/admin/notifications/{$notification->id}")
             ->assertOk()
             ->assertSee('Test notification for viewing');
@@ -79,7 +86,8 @@ final class NotificationResourceTest extends TestCase
 
         $this->assertNull($notification->read_at);
 
-        $this->actingAs($this->adminUser)
+        $this
+            ->actingAs($this->adminUser)
             ->post("/admin/notifications/{$notification->id}/mark-as-read")
             ->assertRedirect();
 
@@ -100,37 +108,13 @@ final class NotificationResourceTest extends TestCase
 
         $this->assertNotNull($notification->read_at);
 
-        $this->actingAs($this->adminUser)
+        $this
+            ->actingAs($this->adminUser)
             ->post("/admin/notifications/{$notification->id}/mark-as-unread")
             ->assertRedirect();
 
         $notification->refresh();
         $this->assertNull($notification->read_at);
-    }
-
-    public function test_admin_can_filter_notifications_by_type(): void
-    {
-        DatabaseNotification::create([
-            'id' => 'test-notification-type-1',
-            'type' => 'App\Notifications\OrderNotification',
-            'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Order notification'],
-        ]);
-
-        DatabaseNotification::create([
-            'id' => 'test-notification-type-2',
-            'type' => 'App\Notifications\SystemNotification',
-            'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'System notification'],
-        ]);
-
-        $this->actingAs($this->adminUser)
-            ->get('/admin/notifications?type=App\\Notifications\\OrderNotification')
-            ->assertOk()
-            ->assertSee('Order notification')
-            ->assertDontSee('System notification');
     }
 
     public function test_admin_can_filter_notifications_by_read_status(): void
@@ -152,7 +136,8 @@ final class NotificationResourceTest extends TestCase
             'data' => ['message' => 'Unread notification'],
         ]);
 
-        $this->actingAs($this->adminUser)
+        $this
+            ->actingAs($this->adminUser)
             ->get('/admin/notifications?read_at=1')
             ->assertOk()
             ->assertSee('Read notification')
@@ -180,7 +165,8 @@ final class NotificationResourceTest extends TestCase
         $this->assertNull($notification1->read_at);
         $this->assertNull($notification2->read_at);
 
-        $this->actingAs($this->adminUser)
+        $this
+            ->actingAs($this->adminUser)
             ->post('/admin/notifications/bulk-mark-as-read', [
                 'records' => [$notification1->id, $notification2->id]
             ])
@@ -202,7 +188,8 @@ final class NotificationResourceTest extends TestCase
             'data' => ['message' => 'Test notification to delete'],
         ]);
 
-        $this->actingAs($this->adminUser)
+        $this
+            ->actingAs($this->adminUser)
             ->delete("/admin/notifications/{$notification->id}")
             ->assertRedirect();
 
@@ -218,8 +205,362 @@ final class NotificationResourceTest extends TestCase
             'is_admin' => false,
         ]);
 
-        $this->actingAs($regularUser)
+        $this
+            ->actingAs($regularUser)
             ->get('/admin/notifications')
             ->assertForbidden();
+    }
+
+    public function test_admin_can_create_notification(): void
+    {
+        $user = User::factory()->create();
+
+        $this
+            ->actingAs($this->adminUser)
+            ->get('/admin/notifications/create')
+            ->assertOk();
+
+        $notificationData = [
+            'notifiable_type' => User::class,
+            'notifiable_id' => $user->id,
+            'type' => 'App\Notifications\TestNotification',
+            'data' => [
+                'title' => 'Test Notification',
+                'message' => 'This is a test notification',
+                'urgent' => false,
+                'color' => 'blue',
+                'tags' => ['test', 'notification'],
+            ],
+        ];
+
+        $this
+            ->actingAs($this->adminUser)
+            ->post('/admin/notifications', $notificationData)
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('notifications', [
+            'notifiable_type' => User::class,
+            'notifiable_id' => $user->id,
+            'type' => 'App\Notifications\TestNotification',
+        ]);
+    }
+
+    public function test_admin_can_edit_notification(): void
+    {
+        $notification = DatabaseNotification::create([
+            'id' => 'test-notification-edit',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => ['message' => 'Original message'],
+        ]);
+
+        $this
+            ->actingAs($this->adminUser)
+            ->get("/admin/notifications/{$notification->id}/edit")
+            ->assertOk();
+
+        $updatedData = [
+            'data' => [
+                'title' => 'Updated Notification',
+                'message' => 'Updated message',
+                'urgent' => true,
+            ],
+        ];
+
+        $this
+            ->actingAs($this->adminUser)
+            ->put("/admin/notifications/{$notification->id}", $updatedData)
+            ->assertRedirect();
+
+        $notification->refresh();
+        $this->assertEquals('Updated Notification', $notification->data['title']);
+        $this->assertTrue($notification->data['urgent']);
+    }
+
+    public function test_admin_can_view_notification_details(): void
+    {
+        $notification = DatabaseNotification::create([
+            'id' => 'test-notification-view',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => [
+                'title' => 'Test Notification',
+                'message' => 'This is a test notification',
+                'urgent' => true,
+            ],
+        ]);
+
+        $this
+            ->actingAs($this->adminUser)
+            ->get("/admin/notifications/{$notification->id}")
+            ->assertOk()
+            ->assertSee('Test Notification')
+            ->assertSee('This is a test notification');
+    }
+
+    public function test_admin_can_filter_notifications_by_urgent_status(): void
+    {
+        // Create urgent notification
+        DatabaseNotification::create([
+            'id' => 'urgent-notification',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => ['urgent' => true, 'message' => 'Urgent notification'],
+        ]);
+
+        // Create normal notification
+        DatabaseNotification::create([
+            'id' => 'normal-notification',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => ['urgent' => false, 'message' => 'Normal notification'],
+        ]);
+
+        $this
+            ->actingAs($this->adminUser)
+            ->get('/admin/notifications?urgent=1')
+            ->assertOk()
+            ->assertSee('Urgent notification')
+            ->assertDontSee('Normal notification');
+    }
+
+    public function test_admin_can_filter_notifications_by_type(): void
+    {
+        DatabaseNotification::create([
+            'id' => 'order-notification',
+            'type' => 'order',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => ['message' => 'Order notification'],
+        ]);
+
+        DatabaseNotification::create([
+            'id' => 'product-notification',
+            'type' => 'product',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => ['message' => 'Product notification'],
+        ]);
+
+        $this
+            ->actingAs($this->adminUser)
+            ->get('/admin/notifications?type=order')
+            ->assertOk()
+            ->assertSee('Order notification')
+            ->assertDontSee('Product notification');
+    }
+
+    public function test_admin_can_filter_notifications_by_date(): void
+    {
+        // Create today's notification
+        DatabaseNotification::create([
+            'id' => 'today-notification',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => ['message' => 'Today notification'],
+            'created_at' => now(),
+        ]);
+
+        // Create old notification
+        DatabaseNotification::create([
+            'id' => 'old-notification',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => ['message' => 'Old notification'],
+            'created_at' => now()->subDays(10),
+        ]);
+
+        $this
+            ->actingAs($this->adminUser)
+            ->get('/admin/notifications?created_at=' . now()->format('Y-m-d'))
+            ->assertOk()
+            ->assertSee('Today notification')
+            ->assertDontSee('Old notification');
+    }
+
+    public function test_admin_can_bulk_mark_notifications_as_urgent(): void
+    {
+        $notification1 = DatabaseNotification::create([
+            'id' => 'bulk-urgent-1',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => ['message' => 'Bulk urgent notification 1'],
+        ]);
+
+        $notification2 = DatabaseNotification::create([
+            'id' => 'bulk-urgent-2',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => ['message' => 'Bulk urgent notification 2'],
+        ]);
+
+        $this->assertFalse($notification1->data['urgent'] ?? false);
+        $this->assertFalse($notification2->data['urgent'] ?? false);
+
+        $this
+            ->actingAs($this->adminUser)
+            ->post('/admin/notifications/bulk-mark-as-urgent', [
+                'records' => [$notification1->id, $notification2->id]
+            ])
+            ->assertRedirect();
+
+        $notification1->refresh();
+        $notification2->refresh();
+        $this->assertTrue($notification1->data['urgent']);
+        $this->assertTrue($notification2->data['urgent']);
+    }
+
+    public function test_admin_can_bulk_duplicate_notifications(): void
+    {
+        $notification = DatabaseNotification::create([
+            'id' => 'bulk-duplicate',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => ['message' => 'Bulk duplicate notification'],
+        ]);
+
+        $originalCount = DatabaseNotification::count();
+
+        $this
+            ->actingAs($this->adminUser)
+            ->post('/admin/notifications/bulk-duplicate', [
+                'records' => [$notification->id]
+            ])
+            ->assertRedirect();
+
+        $this->assertEquals($originalCount + 1, DatabaseNotification::count());
+    }
+
+    public function test_notification_model_relationships(): void
+    {
+        $user = User::factory()->create();
+        $notification = DatabaseNotification::create([
+            'id' => 'relationship-test',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $user->id,
+            'data' => ['message' => 'Relationship test'],
+        ]);
+
+        // Test notifiable relationship
+        $this->assertInstanceOf(User::class, $notification->notifiable);
+        $this->assertEquals($user->id, $notification->notifiable->id);
+
+        // Test user relationship
+        $this->assertInstanceOf(User::class, $notification->user);
+        $this->assertEquals($user->id, $notification->user->id);
+    }
+
+    public function test_notification_model_scopes(): void
+    {
+        $user = User::factory()->create();
+
+        // Create read notification
+        DatabaseNotification::create([
+            'id' => 'read-scope-test',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $user->id,
+            'data' => ['message' => 'Read notification'],
+            'read_at' => now(),
+        ]);
+
+        // Create unread notification
+        DatabaseNotification::create([
+            'id' => 'unread-scope-test',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $user->id,
+            'data' => ['message' => 'Unread notification'],
+        ]);
+
+        // Test read scope
+        $readNotifications = DatabaseNotification::read()->get();
+        $this->assertCount(1, $readNotifications);
+        $this->assertEquals('Read notification', $readNotifications->first()->data['message']);
+
+        // Test unread scope
+        $unreadNotifications = DatabaseNotification::unread()->get();
+        $this->assertCount(1, $unreadNotifications);
+        $this->assertEquals('Unread notification', $unreadNotifications->first()->data['message']);
+    }
+
+    public function test_notification_model_accessors(): void
+    {
+        $notification = DatabaseNotification::create([
+            'id' => 'accessor-test',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => [
+                'title' => 'Test Title',
+                'message' => 'Test Message',
+                'urgent' => true,
+                'color' => 'red',
+                'tags' => ['test', 'accessor'],
+            ],
+        ]);
+
+        // Test is_read accessor
+        $this->assertFalse($notification->is_read);
+        $notification->update(['read_at' => now()]);
+        $this->assertTrue($notification->fresh()->is_read);
+
+        // Test is_urgent accessor
+        $this->assertTrue($notification->is_urgent);
+
+        // Test title accessor
+        $this->assertEquals('Test Title', $notification->title);
+
+        // Test message accessor
+        $this->assertEquals('Test Message', $notification->message);
+
+        // Test color accessor
+        $this->assertEquals('red', $notification->color);
+
+        // Test tags accessor
+        $this->assertEquals(['test', 'accessor'], $notification->tags);
+    }
+
+    public function test_notification_model_methods(): void
+    {
+        $notification = DatabaseNotification::create([
+            'id' => 'method-test',
+            'type' => 'App\Notifications\TestNotification',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $this->adminUser->id,
+            'data' => ['message' => 'Method test'],
+        ]);
+
+        // Test markAsRead method
+        $this->assertFalse($notification->is_read);
+        $notification->markAsRead();
+        $this->assertTrue($notification->fresh()->is_read);
+
+        // Test markAsUnread method
+        $notification->markAsUnread();
+        $this->assertFalse($notification->fresh()->is_read);
+
+        // Test toggleReadStatus method
+        $notification->toggleReadStatus();
+        $this->assertTrue($notification->fresh()->is_read);
+        $notification->toggleReadStatus();
+        $this->assertFalse($notification->fresh()->is_read);
+
+        // Test duplicate method
+        $originalCount = DatabaseNotification::count();
+        $duplicated = $notification->duplicate();
+        $this->assertEquals($originalCount + 1, DatabaseNotification::count());
+        $this->assertNotEquals($notification->id, $duplicated->id);
+        $this->assertNull($duplicated->read_at);
     }
 }

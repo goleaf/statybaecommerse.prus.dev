@@ -3,8 +3,8 @@
 namespace Tests\Unit;
 
 use App\Models\Coupon;
-use App\Models\User;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,7 +18,7 @@ class CouponTest extends TestCase
             'code' => 'SAVE20',
             'name' => '20% Off Coupon',
             'type' => 'percentage',
-            'value' => 20.00,
+            'value' => 20.0,
             'is_active' => true,
         ]);
 
@@ -26,7 +26,7 @@ class CouponTest extends TestCase
             'code' => 'SAVE20',
             'name' => '20% Off Coupon',
             'type' => 'percentage',
-            'value' => 20.00,
+            'value' => 20.0,
             'is_active' => true,
         ]);
     }
@@ -34,7 +34,7 @@ class CouponTest extends TestCase
     public function test_coupon_casts_work_correctly(): void
     {
         $coupon = Coupon::factory()->create([
-            'value' => 15.50,
+            'value' => 15.5,
             'is_active' => true,
             'starts_at' => now(),
             'expires_at' => now()->addDays(30),
@@ -69,7 +69,6 @@ class CouponTest extends TestCase
         $this->assertFalse($activeCoupons->contains($inactiveCoupon));
     }
 
-
     public function test_coupon_scope_valid(): void
     {
         $validCoupon = Coupon::factory()->create([
@@ -99,8 +98,8 @@ class CouponTest extends TestCase
 
     public function test_coupon_scope_by_code(): void
     {
-        $coupon1 = Coupon::factory()->create(['code' => 'SAVE20']);
-        $coupon2 = Coupon::factory()->create(['code' => 'SAVE10']);
+        $coupon1 = Coupon::factory()->active()->create(['code' => 'SAVE20']);
+        $coupon2 = Coupon::factory()->active()->create(['code' => 'SAVE10']);
 
         $save20Coupons = Coupon::byCode('SAVE20')->get();
 
@@ -110,8 +109,8 @@ class CouponTest extends TestCase
 
     public function test_coupon_scope_by_type(): void
     {
-        $percentageCoupon = Coupon::factory()->create(['type' => 'percentage']);
-        $fixedCoupon = Coupon::factory()->create(['type' => 'fixed']);
+        $percentageCoupon = Coupon::factory()->active()->create(['type' => 'percentage']);
+        $fixedCoupon = Coupon::factory()->active()->create(['type' => 'fixed']);
 
         $percentageCoupons = Coupon::byType('percentage')->get();
 
@@ -142,19 +141,19 @@ class CouponTest extends TestCase
     public function test_coupon_can_have_minimum_amount(): void
     {
         $coupon = Coupon::factory()->create([
-            'minimum_amount' => 50.00,
+            'minimum_amount' => 50.0,
         ]);
 
-        $this->assertEquals(50.00, $coupon->minimum_amount);
+        $this->assertEquals(50.0, $coupon->minimum_amount);
     }
 
     public function test_coupon_can_have_maximum_discount(): void
     {
         $coupon = Coupon::factory()->create([
-            'maximum_discount' => 25.00,
+            'maximum_discount' => 25.0,
         ]);
 
-        $this->assertEquals(25.00, $coupon->maximum_discount);
+        $this->assertEquals(25.0, $coupon->maximum_discount);
     }
 
     public function test_coupon_can_have_products(): void
@@ -168,12 +167,11 @@ class CouponTest extends TestCase
         $this->assertInstanceOf(Product::class, $coupon->products->first());
     }
 
-
     public function test_coupon_can_calculate_discount(): void
     {
         $percentageCoupon = Coupon::factory()->create([
             'type' => 'percentage',
-            'value' => 20.00,
+            'value' => 20.0,
             'is_active' => true,
             'starts_at' => now()->subDay(),
             'expires_at' => now()->addDay(),
@@ -181,14 +179,14 @@ class CouponTest extends TestCase
 
         $fixedCoupon = Coupon::factory()->create([
             'type' => 'fixed',
-            'value' => 15.00,
+            'value' => 15.0,
             'is_active' => true,
             'starts_at' => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
-        $this->assertEquals(20.00, $percentageCoupon->calculateDiscount(100.00));
-        $this->assertEquals(15.00, $fixedCoupon->calculateDiscount(100.00));
+        $this->assertEquals(20.0, $percentageCoupon->calculateDiscount(100.0));
+        $this->assertEquals(15.0, $fixedCoupon->calculateDiscount(100.0));
     }
 
     public function test_coupon_can_check_validity(): void
@@ -245,5 +243,4 @@ class CouponTest extends TestCase
 
         $this->assertEquals('Save 20% on your next purchase', $coupon->description);
     }
-
 }

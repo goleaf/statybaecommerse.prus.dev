@@ -39,7 +39,7 @@ final class Collection extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $table = 'collections';
-    protected $fillable = ['name', 'slug', 'description', 'is_visible', 'sort_order', 'seo_title', 'seo_description', 'is_automatic', 'max_products', 'is_active', 'meta_title', 'meta_description', 'meta_keywords', 'display_type', 'products_per_page', 'show_filters'];
+    protected $fillable = ['name', 'slug', 'description', 'is_visible', 'sort_order', 'seo_title', 'seo_description', 'is_automatic', 'is_active', 'meta_title', 'meta_description', 'meta_keywords', 'display_type', 'products_per_page', 'show_filters'];
     public static $translatable = ['name', 'description', 'meta_title', 'meta_description', 'meta_keywords'];
 
     /**
@@ -48,7 +48,7 @@ final class Collection extends Model implements HasMedia
      */
     protected function casts(): array
     {
-        return ['is_visible' => 'boolean', 'sort_order' => 'integer', 'is_automatic' => 'boolean', 'rules' => 'array', 'is_active' => 'boolean', 'products_per_page' => 'integer', 'show_filters' => 'boolean', 'meta_keywords' => 'array'];
+        return ['is_visible' => 'boolean', 'sort_order' => 'integer', 'is_automatic' => 'boolean', 'is_active' => 'boolean', 'products_per_page' => 'integer', 'show_filters' => 'boolean', 'meta_keywords' => 'array'];
     }
 
     /**

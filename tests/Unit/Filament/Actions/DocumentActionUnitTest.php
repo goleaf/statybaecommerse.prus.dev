@@ -1,0 +1,50 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit\Filament\Actions;
+
+use App\Filament\Actions\DocumentAction;
+use Filament\Actions\Action;
+use Tests\TestCase;
+
+final class DocumentActionUnitTest extends TestCase
+{
+    public function test_document_action_class_exists(): void
+    {
+        expect(class_exists(DocumentAction::class))
+            ->toBeTrue();
+    }
+
+    public function test_can_create_document_action(): void
+    {
+        $action = DocumentAction::make();
+
+        expect($action)
+            ->toBeInstanceOf(Action::class);
+    }
+
+    public function test_action_has_correct_properties(): void
+    {
+        $action = DocumentAction::make();
+
+        expect($action->getLabel())
+            ->toBe(__('admin.actions.generate_document'))
+            ->and($action->getIcon())
+            ->toBe('heroicon-m-document-text')
+            ->and($action->getColor())
+            ->toBe('info');
+    }
+
+    public function test_action_has_form_schema(): void
+    {
+        $action = DocumentAction::make();
+
+        // Test that the action has a form configuration
+        expect($action)
+            ->not
+            ->toBeNull();
+
+        // Test that the action has the correct name
+        expect($action->getName())
+            ->toBe('generate_document');
+    }
+}

@@ -5,11 +5,14 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Models\CustomerGroup;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -17,11 +20,10 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -38,11 +40,8 @@ use UnitEnum;
 final class CustomerGroupResource extends Resource
 {
     protected static ?string $model = CustomerGroup::class;
-
-    protected static string | UnitEnum | null $navigationGroup = "Products";
-
+    protected static string|UnitEnum|null $navigationGroup = "Products";
     protected static ?int $navigationSort = 2;
-
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -60,7 +59,7 @@ final class CustomerGroupResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Customers";
+        return 'Customers';
     }
 
     /**
@@ -83,8 +82,8 @@ final class CustomerGroupResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
+     * @param Schema $schema
+     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
@@ -99,7 +98,6 @@ final class CustomerGroupResource extends Resource
                                 ->maxLength(255),
                             TextInput::make('code')
                                 ->label(__('customer_groups.code'))
-                                ->required()
                                 ->maxLength(50)
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
@@ -124,10 +122,7 @@ final class CustomerGroupResource extends Resource
                                 ->helperText(__('customer_groups.discount_percentage_help')),
                             TextInput::make('discount_fixed')
                                 ->label(__('customer_groups.discount_fixed'))
-                                ->numeric()
                                 ->prefix('€')
-                                ->step(0.01)
-                                ->minValue(0)
                                 ->helperText(__('customer_groups.discount_fixed_help')),
                         ]),
                     Grid::make(2)
@@ -150,9 +145,6 @@ final class CustomerGroupResource extends Resource
                             Toggle::make('can_place_orders')
                                 ->label(__('customer_groups.can_place_orders'))
                                 ->default(true),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             Toggle::make('can_view_catalog')
                                 ->label(__('customer_groups.can_view_catalog'))
                                 ->default(true),
@@ -169,7 +161,8 @@ final class CustomerGroupResource extends Resource
                                 ->label(__('customer_groups.is_active'))
                                 ->default(true),
                             Toggle::make('is_default')
-                                ->label(__('customer_groups.is_default')),
+                                ->label(__('customer_groups.is_default'))
+                                ->default(false),
                         ]),
                     Grid::make(2)
                         ->components([
@@ -209,15 +202,12 @@ final class CustomerGroupResource extends Resource
                     ->weight('bold'),
                 TextColumn::make('code')
                     ->label(__('customer_groups.code'))
-                    ->searchable()
-                    ->sortable()
                     ->copyable()
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('type')
                     ->label(__('customer_groups.type'))
                     ->formatStateUsing(fn(string $state): string => __("customer_groups.types.{$state}"))
-                    ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'regular' => 'blue',
                         'vip' => 'gold',
@@ -229,66 +219,47 @@ final class CustomerGroupResource extends Resource
                 TextColumn::make('discount_percentage')
                     ->label(__('customer_groups.discount_percentage'))
                     ->numeric()
-                    ->sortable()
                     ->formatStateUsing(fn($state): string => $state ? $state . '%' : '-')
                     ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('discount_fixed')
                     ->label(__('customer_groups.discount_fixed'))
-                    ->money('EUR')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->money('EUR'),
                 TextColumn::make('customers_count')
                     ->label(__('customer_groups.customers_count'))
                     ->counts('customers')
-                    ->sortable()
                     ->alignCenter(),
                 IconColumn::make('has_special_pricing')
                     ->label(__('customer_groups.has_special_pricing'))
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->boolean(),
                 IconColumn::make('has_volume_discounts')
                     ->label(__('customer_groups.has_volume_discounts'))
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->boolean(),
                 IconColumn::make('can_view_prices')
                     ->label(__('customer_groups.can_view_prices'))
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->boolean(),
                 IconColumn::make('can_place_orders')
                     ->label(__('customer_groups.can_place_orders'))
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->boolean(),
                 IconColumn::make('is_active')
                     ->label(__('customer_groups.is_active'))
                     ->boolean()
                     ->sortable(),
                 IconColumn::make('is_default')
                     ->label(__('customer_groups.is_default'))
-                    ->boolean()
-                    ->sortable(),
+                    ->boolean(),
                 TextColumn::make('sort_order')
                     ->label(__('customer_groups.sort_order'))
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->numeric(),
                 TextColumn::make('created_at')
                     ->label(__('customer_groups.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime(),
                 TextColumn::make('updated_at')
                     ->label(__('customer_groups.updated_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime(),
             ])
             ->filters([
                 SelectFilter::make('type')
-                    ->label(__('customer_groups.type'))
                     ->options([
                         'regular' => __('customer_groups.types.regular'),
                         'vip' => __('customer_groups.types.vip'),
@@ -297,32 +268,24 @@ final class CustomerGroupResource extends Resource
                         'corporate' => __('customer_groups.types.corporate'),
                     ]),
                 TernaryFilter::make('is_active')
-                    ->label(__('customer_groups.is_active'))
-                    ->boolean()
                     ->trueLabel(__('customer_groups.active_only'))
                     ->falseLabel(__('customer_groups.inactive_only'))
                     ->native(false),
                 TernaryFilter::make('is_default')
-                    ->label(__('customer_groups.is_default'))
-                    ->boolean()
                     ->trueLabel(__('customer_groups.default_only'))
                     ->falseLabel(__('customer_groups.non_default_only'))
                     ->native(false),
                 TernaryFilter::make('has_special_pricing')
-                    ->label(__('customer_groups.has_special_pricing'))
-                    ->boolean()
                     ->trueLabel(__('customer_groups.special_pricing_only'))
                     ->falseLabel(__('customer_groups.no_special_pricing'))
                     ->native(false),
                 TernaryFilter::make('has_volume_discounts')
-                    ->label(__('customer_groups.has_volume_discounts'))
-                    ->boolean()
                     ->trueLabel(__('customer_groups.volume_discounts_only'))
                     ->falseLabel(__('customer_groups.no_volume_discounts'))
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
                     ->label(fn(CustomerGroup $record): string => $record->is_active ? __('customer_groups.deactivate') : __('customer_groups.activate'))
@@ -330,7 +293,6 @@ final class CustomerGroupResource extends Resource
                     ->color(fn(CustomerGroup $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (CustomerGroup $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-
                         Notification::make()
                             ->title($record->is_active ? __('customer_groups.activated_successfully') : __('customer_groups.deactivated_successfully'))
                             ->success()
@@ -345,10 +307,8 @@ final class CustomerGroupResource extends Resource
                     ->action(function (CustomerGroup $record): void {
                         // Remove default from other customer groups
                         CustomerGroup::where('is_default', true)->update(['is_default' => false]);
-
                         // Set this customer group as default
                         $record->update(['is_default' => true]);
-
                         Notification::make()
                             ->title(__('customer_groups.set_as_default_successfully'))
                             ->success()
@@ -365,7 +325,6 @@ final class CustomerGroupResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-
                             Notification::make()
                                 ->title(__('customer_groups.bulk_activated_success'))
                                 ->success()
@@ -378,7 +337,6 @@ final class CustomerGroupResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-
                             Notification::make()
                                 ->title(__('customer_groups.bulk_deactivated_success'))
                                 ->success()

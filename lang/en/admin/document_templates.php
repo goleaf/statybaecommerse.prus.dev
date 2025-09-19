@@ -1,0 +1,87 @@
+<?php
+
+return [
+    'title' => 'Document Templates',
+    'plural' => 'Document Templates',
+    'single' => 'Document Template',
+    
+    'form' => [
+        'tabs' => [
+            'basic_information' => 'Basic Information',
+            'content' => 'Content',
+            'variables' => 'Variables',
+            'settings' => 'Settings',
+            'preview' => 'Preview',
+        ],
+        'sections' => [
+            'basic_information' => 'Basic Information',
+            'content' => 'Content',
+            'variables' => 'Variables',
+            'settings' => 'Settings',
+            'preview' => 'Preview',
+        ],
+        'fields' => [
+            'name' => 'Name',
+            'slug' => 'Slug',
+            'description' => 'Description',
+            'type' => 'Type',
+            'category' => 'Category',
+            'is_active' => 'Is Active',
+            'content' => 'Content',
+            'variables' => 'Variables',
+            'variable_name' => 'Variable Name',
+            'variable_description' => 'Variable Description',
+            'settings' => 'Settings',
+            'setting_key' => 'Setting Key',
+            'setting_value' => 'Setting Value',
+            'template_preview' => 'Template Preview',
+            'available_variables' => 'Available Variables',
+            'document_count' => 'Document Count',
+            'variables_count' => 'Variables Count',
+            'documents_count' => 'Documents Count',
+            'created_at' => 'Created At',
+        ],
+    ],
+    
+    'types' => [
+        'invoice' => 'Invoice',
+        'quote' => 'Quote',
+        'receipt' => 'Receipt',
+        'contract' => 'Contract',
+        'report' => 'Report',
+        'email' => 'Email',
+        'other' => 'Other',
+    ],
+    
+    'categories' => [
+        'business' => 'Business',
+        'legal' => 'Legal',
+        'financial' => 'Financial',
+        'marketing' => 'Marketing',
+        'technical' => 'Technical',
+        'other' => 'Other',
+    ],
+    
+    'filters' => [
+        'type' => 'Type',
+        'category' => 'Category',
+        'is_active' => 'Is Active',
+        'created_at' => 'Created At',
+        'with_variables' => 'With Variables',
+        'recent' => 'Recent (30 days)',
+    ],
+    
+    'actions' => [
+        'preview_template' => 'Preview Template',
+        'duplicate_template' => 'Duplicate Template',
+        'activate_bulk' => 'Bulk Activate',
+        'deactivate_bulk' => 'Bulk Deactivate',
+    ],
+    
+    'notifications' => [
+        'preview_opened_successfully' => 'Preview opened successfully',
+        'duplicated_successfully' => 'Duplicated successfully',
+        'bulk_activated_successfully' => 'Bulk activated successfully',
+        'bulk_deactivated_successfully' => 'Bulk deactivated successfully',
+    ],
+];

@@ -1,12 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductFeatureResource\Pages;
 
 use App\Filament\Resources\ProductFeatureResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
 
 final class EditProductFeature extends EditRecord
 {
@@ -19,3 +17,4 @@ final class EditProductFeature extends EditRecord
         ];
     }
 }
+

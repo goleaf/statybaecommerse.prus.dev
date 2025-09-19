@@ -47,11 +47,8 @@ use UnitEnum;
 final class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
-
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
-
+    protected static string|UnitEnum|null $navigationGroup = "Products";
     protected static ?int $navigationSort = 1;
-
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -69,12 +66,11 @@ final class ProductResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return 'Products';
+        return "Products"->value;
     }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -83,7 +79,6 @@ final class ProductResource extends Resource
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -114,9 +109,8 @@ final class ProductResource extends Resource
                                                 ->columnSpan(1),
                                             TextInput::make('slug')
                                                 ->label(__('products.fields.slug'))
-                                                ->maxLength(255)
                                                 ->unique(ignoreRecord: true)
-                                                ->columnSpan(1),
+                                                ->columnSpan(1)
                                         ]),
                                     RichEditor::make('description')
                                         ->label(__('products.fields.description'))
@@ -125,9 +119,9 @@ final class ProductResource extends Resource
                                         ->label(__('products.fields.short_description'))
                                         ->maxLength(500)
                                         ->rows(3)
-                                        ->columnSpanFull(),
+                                        ->columnSpanFull()
                                 ])
-                                ->columns(1),
+                                ->columns(1)
                         ]),
                     Tab::make(__('products.tabs.pricing'))
                         ->icon('heroicon-o-currency-euro')
@@ -138,74 +132,56 @@ final class ProductResource extends Resource
                                         ->components([
                                             TextInput::make('price')
                                                 ->label(__('products.fields.price'))
-                                                ->required()
                                                 ->numeric()
                                                 ->step(0.01)
-                                                ->prefix('€')
-                                                ->columnSpan(1),
+                                                ->prefix('€'),
                                             TextInput::make('compare_price')
                                                 ->label(__('products.fields.compare_price'))
                                                 ->numeric()
                                                 ->step(0.01)
-                                                ->prefix('€')
-                                                ->columnSpan(1),
+                                                ->prefix('€'),
                                             TextInput::make('cost_price')
                                                 ->label(__('products.fields.cost_price'))
                                                 ->numeric()
                                                 ->step(0.01)
                                                 ->prefix('€')
-                                                ->columnSpan(1),
-                                        ]),
+                                        ])
                                 ])
-                                ->columns(1),
                         ]),
                     Tab::make(__('products.tabs.inventory'))
                         ->icon('heroicon-o-archive-box')
                         ->components([
                             Section::make(__('products.sections.inventory'))
                                 ->components([
-                                    Grid::make(2)
-                                        ->components([
-                                            TextInput::make('sku')
-                                                ->label(__('products.fields.sku'))
-                                                ->required()
-                                                ->unique(ignoreRecord: true)
-                                                ->maxLength(255)
-                                                ->columnSpan(1),
-                                            TextInput::make('barcode')
-                                                ->label(__('products.fields.barcode'))
-                                                ->maxLength(255)
-                                                ->columnSpan(1),
-                                        ]),
                                     Grid::make(3)
                                         ->components([
+                                            TextInput::make('sku')
+                                                ->label(__('products.fields.sku')),
+                                            TextInput::make('barcode')
+                                                ->label(__('products.fields.barcode')),
                                             Toggle::make('manage_stock')
                                                 ->label(__('products.fields.manage_stock'))
                                                 ->default(true)
-                                                ->columnSpan(1),
+                                        ]),
+                                    Grid::make(2)
+                                        ->components([
                                             TextInput::make('stock_quantity')
                                                 ->label(__('products.fields.stock_quantity'))
                                                 ->numeric()
-                                                ->default(0)
-                                                ->columnSpan(1),
+                                                ->default(0),
                                             TextInput::make('low_stock_threshold')
                                                 ->label(__('products.fields.low_stock_threshold'))
                                                 ->numeric()
                                                 ->default(5)
-                                                ->columnSpan(1),
                                         ]),
                                     Grid::make(2)
                                         ->components([
                                             Toggle::make('allow_backorder')
-                                                ->label(__('products.fields.allow_backorder'))
-                                                ->columnSpan(1),
+                                                ->label(__('products.fields.allow_backorder')),
                                             Toggle::make('track_stock')
                                                 ->label(__('products.fields.track_stock'))
-                                                ->default(true)
-                                                ->columnSpan(1),
-                                        ]),
+                                        ])
                                 ])
-                                ->columns(1),
                         ]),
                     Tab::make(__('products.tabs.organization'))
                         ->icon('heroicon-o-tag')
@@ -218,17 +194,14 @@ final class ProductResource extends Resource
                                                 ->label(__('products.fields.category'))
                                                 ->relationship('categories', 'name')
                                                 ->searchable()
-                                                ->preload()
-                                                ->columnSpan(1),
+                                                ->preload(),
                                             Select::make('brand_id')
                                                 ->label(__('products.fields.brand'))
                                                 ->relationship('brand', 'name')
                                                 ->searchable()
                                                 ->preload()
-                                                ->columnSpan(1),
-                                        ]),
+                                        ])
                                 ])
-                                ->columns(1),
                         ]),
                     Tab::make(__('products.tabs.visibility'))
                         ->icon('heroicon-o-eye')
@@ -239,20 +212,19 @@ final class ProductResource extends Resource
                                         ->components([
                                             Toggle::make('is_visible')
                                                 ->label(__('products.fields.is_visible'))
-                                                ->default(true)
-                                                ->columnSpan(1),
+                                                ->default(true),
                                             Toggle::make('is_featured')
                                                 ->label(__('products.fields.is_featured'))
-                                                ->columnSpan(1),
+                                                ->default(false)
                                         ]),
                                     DateTimePicker::make('published_at')
                                         ->label(__('products.fields.published_at'))
-                                        ->default(now()),
+                                        ->default(now())
+                                        ->columnSpanFull()
                                 ])
-                                ->columns(1),
-                        ]),
+                        ])
                 ])
-                ->columnSpanFull(),
+                ->columnSpanFull()
         ]);
     }
 
@@ -314,12 +286,10 @@ final class ProductResource extends Resource
                 SelectFilter::make('brand_id')
                     ->label(__('products.fields.brand'))
                     ->relationship('brand', 'name')
-                    ->searchable()
                     ->preload(),
                 SelectFilter::make('category_id')
                     ->label(__('products.fields.category'))
                     ->relationship('categories', 'name')
-                    ->searchable()
                     ->preload(),
                 TernaryFilter::make('is_visible')
                     ->label(__('products.fields.is_visible')),
@@ -334,7 +304,6 @@ final class ProductResource extends Resource
                 BulkActionGroup::make([
                     BulkAction::make('publish')
                         ->label(__('products.actions.publish'))
-                        ->icon('heroicon-o-eye')
                         ->action(function (Collection $records) {
                             $records->each->update(['is_visible' => true, 'published_at' => now()]);
                             Notification::make()

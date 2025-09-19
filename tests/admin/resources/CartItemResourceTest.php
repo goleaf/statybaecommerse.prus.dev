@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -17,7 +15,7 @@ final class CartItemResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->actingAs(User::factory()->create());
     }
 
@@ -25,13 +23,17 @@ final class CartItemResourceTest extends TestCase
     {
         $user = User::factory()->create();
         $product = Product::factory()->create();
-        
+
         $cartItemData = [
             'user_id' => $user->id,
             'product_id' => $product->id,
             'quantity' => 2,
-            'is_active' => true,
-            'is_saved_for_later' => false,
+            'unit_price' => 10.5,
+            'price' => 10.5,
+            'total_price' => 21.0,
+            'session_id' => 'test-session-123',
+            'minimum_quantity' => 1,
+            'notes' => 'Test cart item',
         ];
 
         $cartItem = CartItem::create($cartItemData);
@@ -40,15 +42,18 @@ final class CartItemResourceTest extends TestCase
             'user_id' => $user->id,
             'product_id' => $product->id,
             'quantity' => 2,
-            'is_active' => true,
-            'is_saved_for_later' => false,
+            'unit_price' => 10.5,
+            'total_price' => 21.0,
+            'session_id' => 'test-session-123',
+            'minimum_quantity' => 1,
+            'notes' => 'Test cart item',
         ]);
 
         $this->assertEquals($user->id, $cartItem->user_id);
         $this->assertEquals($product->id, $cartItem->product_id);
         $this->assertEquals(2, $cartItem->quantity);
-        $this->assertTrue($cartItem->is_active);
-        $this->assertFalse($cartItem->is_saved_for_later);
+        $this->assertEquals(10.5, $cartItem->unit_price);
+        $this->assertEquals(21.0, $cartItem->total_price);
     }
 
     public function test_can_update_cart_item(): void
@@ -57,39 +62,44 @@ final class CartItemResourceTest extends TestCase
 
         $cartItem->update([
             'quantity' => 5,
-            'is_saved_for_later' => true,
+            'unit_price' => 15.75,
+            'total_price' => 78.75,
+            'notes' => 'Updated notes',
         ]);
 
         $this->assertEquals(5, $cartItem->quantity);
-        $this->assertTrue($cartItem->is_saved_for_later);
+        $this->assertEquals(15.75, $cartItem->unit_price);
+        $this->assertEquals(78.75, $cartItem->total_price);
+        $this->assertEquals('Updated notes', $cartItem->notes);
     }
 
-    public function test_can_filter_cart_items_by_active_status(): void
+    public function test_can_filter_cart_items_by_quantity(): void
     {
-        CartItem::factory()->create(['is_active' => true]);
-        CartItem::factory()->create(['is_active' => false]);
+        $currentUser = auth()->user();
 
-        $activeCartItems = CartItem::where('is_active', true)->get();
-        $inactiveCartItems = CartItem::where('is_active', false)->get();
+        CartItem::factory()->create(['quantity' => 5, 'user_id' => $currentUser->id]);
+        CartItem::factory()->create(['quantity' => 10, 'user_id' => $currentUser->id]);
 
-        $this->assertCount(1, $activeCartItems);
-        $this->assertCount(1, $inactiveCartItems);
-        $this->assertTrue($activeCartItems->first()->is_active);
-        $this->assertFalse($inactiveCartItems->first()->is_active);
+        $lowQuantityItems = CartItem::where('quantity', '<=', 5)->get();
+        $highQuantityItems = CartItem::where('quantity', '>', 5)->get();
+
+        $this->assertCount(1, $lowQuantityItems);
+        $this->assertCount(1, $highQuantityItems);
+        $this->assertEquals(5, $lowQuantityItems->first()->quantity);
+        $this->assertEquals(10, $highQuantityItems->first()->quantity);
     }
 
-    public function test_can_filter_cart_items_by_saved_for_later(): void
+    public function test_can_filter_cart_items_by_user(): void
     {
-        CartItem::factory()->create(['is_saved_for_later' => true]);
-        CartItem::factory()->create(['is_saved_for_later' => false]);
+        $currentUser = auth()->user();
 
-        $savedCartItems = CartItem::where('is_saved_for_later', true)->get();
-        $regularCartItems = CartItem::where('is_saved_for_later', false)->get();
+        CartItem::factory()->create(['user_id' => $currentUser->id]);
 
-        $this->assertCount(1, $savedCartItems);
-        $this->assertCount(1, $regularCartItems);
-        $this->assertTrue($savedCartItems->first()->is_saved_for_later);
-        $this->assertFalse($regularCartItems->first()->is_saved_for_later);
+        // Test that we can find the cart item for the current user
+        $userCartItems = CartItem::where('user_id', $currentUser->id)->get();
+
+        $this->assertCount(1, $userCartItems);
+        $this->assertEquals($currentUser->id, $userCartItems->first()->user_id);
     }
 
     public function test_can_get_cart_item_with_user_relationship(): void
@@ -112,26 +122,32 @@ final class CartItemResourceTest extends TestCase
 
     public function test_can_calculate_total_cart_value(): void
     {
-        $user = User::factory()->create();
-        
+        $currentUser = auth()->user();
+
         $product1 = Product::factory()->create();
         $product2 = Product::factory()->create();
-        
+
         CartItem::factory()->create([
-            'user_id' => $user->id,
+            'user_id' => $currentUser->id,
             'product_id' => $product1->id,
             'quantity' => 2,
+            'unit_price' => 10.0,
+            'total_price' => 20.0,
         ]);
-        
+
         CartItem::factory()->create([
-            'user_id' => $user->id,
+            'user_id' => $currentUser->id,
             'product_id' => $product2->id,
             'quantity' => 3,
+            'unit_price' => 15.0,
+            'total_price' => 45.0,
         ]);
 
-        $totalItems = CartItem::where('user_id', $user->id)->sum('quantity');
+        $totalItems = CartItem::where('user_id', $currentUser->id)->sum('quantity');
+        $totalValue = CartItem::where('user_id', $currentUser->id)->sum('total_price');
 
         $this->assertEquals(5, $totalItems);
+        $this->assertEquals(65.0, $totalValue);
     }
 
     public function test_can_soft_delete_cart_item(): void
@@ -143,5 +159,88 @@ final class CartItemResourceTest extends TestCase
         $this->assertSoftDeleted('cart_items', [
             'id' => $cartItem->id,
         ]);
+    }
+
+    public function test_can_update_quantity_and_recalculate_total(): void
+    {
+        $cartItem = CartItem::factory()->create([
+            'quantity' => 2,
+            'unit_price' => 10.0,
+            'total_price' => 20.0,
+        ]);
+
+        $cartItem->updateQuantity(5);
+
+        $this->assertEquals(5, $cartItem->quantity);
+        $this->assertEquals(50.0, $cartItem->total_price);
+    }
+
+    public function test_can_increment_quantity(): void
+    {
+        $cartItem = CartItem::factory()->create([
+            'quantity' => 2,
+            'unit_price' => 10.0,
+            'total_price' => 20.0,
+        ]);
+
+        $cartItem->incrementQuantity(3);
+
+        $this->assertEquals(5, $cartItem->quantity);
+        $this->assertEquals(50.0, $cartItem->total_price);
+    }
+
+    public function test_can_decrement_quantity(): void
+    {
+        $cartItem = CartItem::factory()->create([
+            'quantity' => 5,
+            'unit_price' => 10.0,
+            'total_price' => 50.0,
+        ]);
+
+        $cartItem->decrementQuantity(2);
+
+        $this->assertEquals(3, $cartItem->quantity);
+        $this->assertEquals(30.0, $cartItem->total_price);
+    }
+
+    public function test_decrement_quantity_to_zero_deletes_item(): void
+    {
+        $cartItem = CartItem::factory()->create([
+            'quantity' => 2,
+        ]);
+
+        $cartItem->decrementQuantity(2);
+
+        $this->assertDatabaseMissing('cart_items', [
+            'id' => $cartItem->id,
+        ]);
+    }
+
+    public function test_can_get_formatted_prices(): void
+    {
+        $cartItem = CartItem::factory()->create([
+            'unit_price' => 12.5,
+            'total_price' => 25.0,
+        ]);
+
+        // The accessor returns localized currency format like "12,50 €"
+        $this->assertStringContainsString('12,50', $cartItem->formatted_unit_price);
+        $this->assertStringContainsString('25,00', $cartItem->formatted_total_price);
+    }
+
+    public function test_can_check_if_needs_restocking(): void
+    {
+        $cartItemLow = CartItem::factory()->create([
+            'quantity' => 5,
+            'minimum_quantity' => 10,
+        ]);
+
+        $cartItemHigh = CartItem::factory()->create([
+            'quantity' => 15,
+            'minimum_quantity' => 10,
+        ]);
+
+        $this->assertTrue($cartItemLow->needsRestocking());
+        $this->assertFalse($cartItemHigh->needsRestocking());
     }
 }

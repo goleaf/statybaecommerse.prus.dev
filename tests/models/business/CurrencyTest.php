@@ -114,10 +114,19 @@ describe('Currency Model', function () {
             'name',
             'code',
             'symbol',
+            'iso_code',
+            'description',
             'exchange_rate',
+            'base_currency',
+            'decimal_places',
+            'symbol_position',
+            'thousands_separator',
+            'decimal_separator',
+            'is_active',
             'is_default',
             'is_enabled',
-            'decimal_places',
+            'sort_order',
+            'auto_update_rate'
         ];
 
         $currency = new Currency();

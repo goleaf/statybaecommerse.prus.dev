@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\PartnerResource\Pages;
 
@@ -11,3 +9,4 @@ final class CreatePartner extends CreateRecord
 {
     protected static string $resource = PartnerResource::class;
 }
+

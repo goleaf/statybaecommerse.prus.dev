@@ -19,7 +19,7 @@ final class DocumentsRelationManager extends RelationManager
 
     protected static ?string $title = 'Collection Documents';
 
-    public function form(Schema $formSchema): Schema
+    public function form(Schema $schemaSchema): Schema
     {
         return $schemaSchema
             ->components([

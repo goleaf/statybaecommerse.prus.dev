@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use Illuminate\Support\Collection;
+use UnitEnum;
 
 /**
  * NavigationGroup
@@ -23,6 +24,7 @@ enum NavigationGroup: string
     case Inventory = 'Inventory';
     case Reports = 'Reports';
     case Locations = 'Locations';
+    case Discounts = 'Discounts';
 
     public function label(): string
     {
@@ -39,6 +41,7 @@ enum NavigationGroup: string
             self::Inventory => __('translations.nav_group_inventory'),
             self::Reports => __('translations.nav_group_reports'),
             self::Locations => __('translations.nav_group_locations'),
+            self::Discounts => __('translations.nav_group_discounts'),
         };
     }
 
@@ -57,6 +60,7 @@ enum NavigationGroup: string
             self::Inventory => __('translations.nav_group_inventory_description'),
             self::Reports => __('translations.nav_group_reports_description'),
             self::Locations => __('translations.nav_group_locations_description'),
+            self::Discounts => __('translations.nav_group_discounts_description'),
         };
     }
 
@@ -75,6 +79,7 @@ enum NavigationGroup: string
             self::Inventory => 'archive-box',
             self::Reports => 'document-chart-bar',
             self::Locations => 'globe-alt',
+            self::Discounts => 'tag',
         };
     }
 
@@ -93,6 +98,7 @@ enum NavigationGroup: string
             self::Inventory => 'teal',
             self::Reports => 'cyan',
             self::Locations => 'emerald',
+            self::Discounts => 'rose',
         };
     }
 
@@ -104,20 +110,21 @@ enum NavigationGroup: string
             self::Users => 3,
             self::Inventory => 4,
             self::Locations => 5,
-            self::Marketing => 6,
-            self::Analytics => 7,
-            self::Reports => 8,
-            self::Content => 9,
-            self::Referral => 10,
-            self::Settings => 11,
-            self::System => 12,
+            self::Discounts => 6,
+            self::Marketing => 7,
+            self::Analytics => 8,
+            self::Reports => 9,
+            self::Content => 10,
+            self::Referral => 11,
+            self::Settings => 12,
+            self::System => 13,
         };
     }
 
     public function isCore(): bool
     {
         return match ($this) {
-            self::Products, self::Orders, self::Users, self::Inventory, self::Locations => true,
+            self::Products, self::Orders, self::Users, self::Inventory, self::Locations, self::Discounts => true,
             default => false,
         };
     }
@@ -133,7 +140,7 @@ enum NavigationGroup: string
     public function isPublic(): bool
     {
         return match ($this) {
-            self::Products, self::Content, self::Marketing, self::Locations => true,
+            self::Products, self::Content, self::Marketing, self::Locations, self::Discounts => true,
             default => false,
         };
     }

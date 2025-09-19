@@ -26,7 +26,6 @@ return [
     'placeholder' => 'Placeholder',
     'help_text' => 'Help Text',
     'meta_data' => 'Meta Data',
-
     // Helpers
     'full_display_name' => 'Full Display Name',
     'attribute_info' => 'Attribute Information',
@@ -36,7 +35,6 @@ return [
     'values_count' => 'Values Count',
     'usage_count' => 'Usage Count',
     'popularity_score' => 'Popularity Score',
-
     // Types
     'text' => 'Text',
     'number' => 'Number',
@@ -48,14 +46,12 @@ return [
     'textarea' => 'Textarea',
     'file' => 'File',
     'image' => 'Image',
-
     // Status
     'disabled' => 'Disabled',
     'required' => 'Required',
     'filterable' => 'Filterable',
     'standard' => 'Standard',
     'unknown' => 'Unknown',
-
     // Filters
     'filters' => [
         'type' => 'Type',
@@ -66,7 +62,6 @@ return [
         'enabled_only' => 'Enabled Only',
         'with_values_only' => 'With Values Only',
     ],
-
     // Actions
     'actions' => [
         'view' => 'View',
@@ -77,14 +72,12 @@ return [
         'duplicate' => 'Duplicate',
         'merge' => 'Merge',
     ],
-
     // Empty states
     'empty_states' => [
         'no_attributes' => 'No attributes found',
         'no_values' => 'No values for this attribute',
         'no_translations' => 'No translations available',
     ],
-
     // Messages
     'messages' => [
         'created' => 'Attribute created successfully',
@@ -94,7 +87,6 @@ return [
         'duplicated' => 'Attribute duplicated successfully',
         'merged' => 'Attributes merged successfully',
     ],
-
     // Validation
     'validation' => [
         'name_required' => 'Name is required',
@@ -104,7 +96,6 @@ return [
         'description_max' => 'Description cannot exceed 1000 characters',
         'sort_order_numeric' => 'Sort order must be a number',
     ],
-
     // Statistics
     'stats' => [
         'total_attributes' => 'Total Attributes',
@@ -115,15 +106,14 @@ return [
         'attributes_with_values' => 'Attributes with Values',
         'avg_values_per_attribute' => 'Average Values per Attribute',
         'most_popular_type' => 'Most Popular Type',
-        'all_attributes' => 'All attributes in the system',
-        'enabled_for_use' => 'Enabled for use',
-        'required_for_products' => 'Required for products',
-        'can_be_filtered' => 'Can be filtered',
-        'can_be_searched' => 'Can be searched',
+        'all_attributes' => 'All System Attributes',
+        'enabled_for_use' => 'Enabled for Use',
+        'required_for_products' => 'Required for Products',
+        'can_be_filtered' => 'Can be Filtered',
+        'can_be_searched' => 'Can be Searched',
         'have_values' => 'Attributes that have values',
         'average_values' => 'Average number of values',
     ],
-
     // Widgets
     'widgets' => [
         'stats_heading' => 'Attribute Statistics',
@@ -137,7 +127,6 @@ return [
             'popularity_trends' => 'Popularity Trends',
         ],
     ],
-
     // Form labels
     'attribute_name' => 'Attribute Name',
     'attribute_description' => 'Attribute Description',
@@ -147,12 +136,11 @@ return [
     'attribute_properties_description' => 'Define the behavior and visibility of this attribute',
     'numeric_settings' => 'Numeric Settings',
     'numeric_settings_description' => 'Configure numeric constraints for this attribute',
-
     // Help text
     'help' => [
-        'type' => 'The type of input field for this attribute',
-        'sort_order' => 'Order in which attributes are displayed',
-        'group_name' => 'Group to organize related attributes',
+        'type' => 'The input field type for this attribute',
+        'sort_order' => 'The order in which attributes are displayed',
+        'group_name' => 'Group for organizing related attributes',
         'icon' => 'Icon to display for this attribute',
         'color' => 'Color theme for this attribute',
         'required' => 'Whether this attribute is required',
@@ -167,10 +155,9 @@ return [
         'step_value' => 'Step value for numeric attributes',
         'default_value' => 'Default value for this attribute',
         'placeholder' => 'Placeholder text for input fields',
-        'help_text' => 'Help text to guide users',
-        'slug_auto_generated' => 'Slug will be auto-generated from name',
+        'help_text' => 'Help text for user guidance',
+        'slug_auto_generated' => 'Slug will be automatically generated from name',
     ],
-
     // Placeholders
     'placeholders' => [
         'name' => 'Enter attribute name',
@@ -182,4 +169,77 @@ return [
         'help_text' => 'Enter help text',
         'default_value' => 'Enter default value',
     ],
+    // Additional translations for the resource
+    'title' => 'Attributes',
+    'plural' => 'Attributes',
+    'single' => 'Attribute',
+    'basic_information' => 'Basic Information',
+    'type_settings' => 'Type Settings',
+    'validation' => 'Validation',
+    'options' => 'Options',
+    'settings' => 'Settings',
+    'input_type' => 'Input Type',
+    'min_length' => 'Min Length',
+    'max_length' => 'Max Length',
+    'option_value' => 'Option Value',
+    'option_label' => 'Option Label',
+    'option_sort_order' => 'Option Sort Order',
+    'option_is_active' => 'Option Is Active',
+    'add_option' => 'Add Option',
+    'group' => 'Group',
+    'options_count' => 'Options Count',
+    'created_at' => 'Created At',
+    'updated_at' => 'Updated At',
+    'activate' => 'Activate',
+    'deactivate' => 'Deactivate',
+    'activated_successfully' => 'Activated Successfully',
+    'deactivated_successfully' => 'Deactivated Successfully',
+    'activate_selected' => 'Activate Selected',
+    'deactivate_selected' => 'Deactivate Selected',
+    'bulk_activated_success' => 'Selected attributes activated successfully',
+    'bulk_deactivated_success' => 'Selected attributes deactivated successfully',
+    'required_only' => 'Required Only',
+    'optional_only' => 'Optional Only',
+    'filterable_only' => 'Filterable Only',
+    'not_filterable' => 'Not Filterable',
+    'searchable_only' => 'Searchable Only',
+    'not_searchable' => 'Not Searchable',
+    'active_only' => 'Active Only',
+    'inactive_only' => 'Inactive Only',
+    // Type options
+    'types' => [
+        'text' => 'Text',
+        'number' => 'Number',
+        'select' => 'Select',
+        'multiselect' => 'Multi Select',
+        'boolean' => 'Boolean',
+        'date' => 'Date',
+        'datetime' => 'Date Time',
+        'color' => 'Color',
+        'file' => 'File',
+        'url' => 'URL',
+    ],
+    // Input type options
+    'input_types' => [
+        'text' => 'Text',
+        'textarea' => 'Textarea',
+        'number' => 'Number',
+        'email' => 'Email',
+        'url' => 'URL',
+        'tel' => 'Telephone',
+        'password' => 'Password',
+        'search' => 'Search',
+    ],
+    // Group options
+    'groups' => [
+        'general' => 'General',
+        'technical' => 'Technical',
+        'appearance' => 'Appearance',
+        'dimensions' => 'Dimensions',
+        'shipping' => 'Shipping',
+        'seo' => 'SEO',
+        'other' => 'Other',
+    ],
+    // Validation rules help
+    'validation_rules_help' => 'Enter validation rules separated by comma (e.g., required,min:3,max:255)',
 ];

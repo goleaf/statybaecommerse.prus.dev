@@ -5,20 +5,20 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CurrencyResource\Pages;
 use App\Models\Currency;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -37,14 +37,9 @@ use UnitEnum;
 final class CurrencyResource extends Resource
 {
     protected static ?string $model = Currency::class;
-
-    /**
-     * @var UnitEnum|string|null
-     */    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
-
+    /** @var UnitEnum|string|null */
+    protected static string|UnitEnum|null $navigationGroup = "Products";
     protected static ?int $navigationSort = 7;
-
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -62,7 +57,7 @@ final class CurrencyResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "System";
+        return "System"->value;
     }
 
     /**
@@ -85,8 +80,8 @@ final class CurrencyResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
+     * @param Schema $schema
+     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
@@ -101,7 +96,6 @@ final class CurrencyResource extends Resource
                                 ->maxLength(255),
                             TextInput::make('code')
                                 ->label(__('currencies.code'))
-                                ->required()
                                 ->maxLength(3)
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha'])
@@ -111,15 +105,10 @@ final class CurrencyResource extends Resource
                         ->components([
                             TextInput::make('symbol')
                                 ->label(__('currencies.symbol'))
-                                ->required()
                                 ->maxLength(10)
                                 ->helperText(__('currencies.symbol_help')),
                             TextInput::make('iso_code')
                                 ->label(__('currencies.iso_code'))
-                                ->required()
-                                ->maxLength(3)
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha'])
                                 ->helperText(__('currencies.iso_code_help')),
                         ]),
                     Textarea::make('description')
@@ -141,8 +130,6 @@ final class CurrencyResource extends Resource
                                 ->helperText(__('currencies.exchange_rate_help')),
                             TextInput::make('base_currency')
                                 ->label(__('currencies.base_currency'))
-                                ->maxLength(3)
-                                ->rules(['alpha'])
                                 ->default('EUR')
                                 ->helperText(__('currencies.base_currency_help')),
                         ]),
@@ -154,7 +141,6 @@ final class CurrencyResource extends Resource
                             TextInput::make('decimal_places')
                                 ->label(__('currencies.decimal_places'))
                                 ->numeric()
-                                ->minValue(0)
                                 ->maxValue(4)
                                 ->default(2),
                             Select::make('symbol_position')
@@ -220,67 +206,43 @@ final class CurrencyResource extends Resource
                     ->weight('bold'),
                 TextColumn::make('code')
                     ->label(__('currencies.code'))
-                    ->searchable()
-                    ->sortable()
                     ->copyable()
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('symbol')
                     ->label(__('currencies.symbol'))
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
-                    ->badge()
                     ->color('blue'),
                 TextColumn::make('iso_code')
                     ->label(__('currencies.iso_code'))
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
-                    ->badge()
                     ->color('green')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('exchange_rate')
                     ->label(__('currencies.exchange_rate'))
                     ->numeric()
-                    ->sortable()
                     ->formatStateUsing(fn($state): string => number_format($state, 6)),
                 TextColumn::make('base_currency')
                     ->label(__('currencies.base_currency'))
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
-                    ->badge()
-                    ->color('purple')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->color('purple'),
                 TextColumn::make('decimal_places')
                     ->label(__('currencies.decimal_places'))
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->numeric(),
                 TextColumn::make('symbol_position')
                     ->label(__('currencies.symbol_position'))
                     ->formatStateUsing(fn(string $state): string => __("currencies.positions.{$state}"))
-                    ->badge()
-                    ->color('orange')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->color('orange'),
                 IconColumn::make('is_active')
                     ->label(__('currencies.is_active'))
                     ->boolean()
                     ->sortable(),
                 IconColumn::make('is_default')
                     ->label(__('currencies.is_default'))
-                    ->boolean()
-                    ->sortable(),
+                    ->boolean(),
                 IconColumn::make('auto_update_rate')
                     ->label(__('currencies.auto_update_rate'))
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->boolean(),
                 TextColumn::make('sort_order')
                     ->label(__('currencies.sort_order'))
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->numeric(),
                 TextColumn::make('created_at')
                     ->label(__('currencies.created_at'))
                     ->dateTime()
@@ -294,20 +256,14 @@ final class CurrencyResource extends Resource
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label(__('currencies.is_active'))
-                    ->boolean()
                     ->trueLabel(__('currencies.active_only'))
                     ->falseLabel(__('currencies.inactive_only'))
                     ->native(false),
                 TernaryFilter::make('is_default')
-                    ->label(__('currencies.is_default'))
-                    ->boolean()
                     ->trueLabel(__('currencies.default_only'))
                     ->falseLabel(__('currencies.non_default_only'))
                     ->native(false),
                 TernaryFilter::make('auto_update_rate')
-                    ->label(__('currencies.auto_update_rate'))
-                    ->boolean()
                     ->trueLabel(__('currencies.auto_update_only'))
                     ->falseLabel(__('currencies.manual_update_only'))
                     ->native(false),
@@ -321,7 +277,6 @@ final class CurrencyResource extends Resource
                     ->color(fn(Currency $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Currency $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-
                         Notification::make()
                             ->title($record->is_active ? __('currencies.activated_successfully') : __('currencies.deactivated_successfully'))
                             ->success()
@@ -336,10 +291,8 @@ final class CurrencyResource extends Resource
                     ->action(function (Currency $record): void {
                         // Remove default from other currencies
                         Currency::where('is_default', true)->update(['is_default' => false]);
-
                         // Set this currency as default
                         $record->update(['is_default' => true]);
-
                         Notification::make()
                             ->title(__('currencies.set_as_default_successfully'))
                             ->success()
@@ -368,7 +321,6 @@ final class CurrencyResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-
                             Notification::make()
                                 ->title(__('currencies.bulk_activated_success'))
                                 ->success()
@@ -381,7 +333,6 @@ final class CurrencyResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-
                             Notification::make()
                                 ->title(__('currencies.bulk_deactivated_success'))
                                 ->success()

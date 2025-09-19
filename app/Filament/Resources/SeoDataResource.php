@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
-
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\SeoDataResource\Pages;
 use App\Models\Category;
@@ -32,7 +31,6 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
 /**
  * SeoDataResource
  *
@@ -41,12 +39,9 @@ use UnitEnum;
 final class SeoDataResource extends Resource
 {
     protected static ?string $model = SeoData::class;    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
-
+    protected static string | UnitEnum | null $navigationGroup = "Products";
     protected static ?int $navigationSort = 3;
-
     protected static ?string $recordTitleAttribute = 'title';
-
     /**
      * Handle getNavigationLabel functionality with proper error handling.
      * @return string
@@ -55,41 +50,20 @@ final class SeoDataResource extends Resource
     {
         return __('seo_data.title');
     }
-
-    /**
      * Handle getNavigationGroup functionality with proper error handling.
      * @return string|null
-     */
     public static function getNavigationGroup(): ?string
-    {
         return "Content";
-    }
-
-    /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
-     */
     public static function getPluralModelLabel(): string
-    {
         return __('seo_data.plural');
-    }
-
-    /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
-     */
     public static function getModelLabel(): string
-    {
         return __('seo_data.single');
-    }
-
-    /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
+     * @param Form $schema
      * @return Form
-     */
     public static function form(Schema $schema): Schema
-    {
         return $schema->components([
             Section::make(__('seo_data.basic_information'))
                 ->components([
@@ -102,8 +76,6 @@ final class SeoDataResource extends Resource
                                 ->helperText(__('seo_data.title_help')),
                             TextInput::make('slug')
                                 ->label(__('seo_data.slug'))
-                                ->required()
-                                ->maxLength(255)
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash'])
                                 ->helperText(__('seo_data.slug_help')),
@@ -116,111 +88,66 @@ final class SeoDataResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('seo_data.meta_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('meta_title')
                                 ->label(__('seo_data.meta_title'))
-                                ->maxLength(255)
                                 ->helperText(__('seo_data.meta_title_help')),
                             TextInput::make('meta_description')
                                 ->label(__('seo_data.meta_description'))
                                 ->maxLength(500)
                                 ->helperText(__('seo_data.meta_description_help')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('meta_keywords')
                                 ->label(__('seo_data.meta_keywords'))
-                                ->maxLength(500)
                                 ->helperText(__('seo_data.meta_keywords_help')),
                             TextInput::make('meta_robots')
                                 ->label(__('seo_data.meta_robots'))
                                 ->maxLength(100)
                                 ->default('index, follow')
                                 ->helperText(__('seo_data.meta_robots_help')),
-                        ]),
-                ]),
             Section::make(__('seo_data.open_graph'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('og_title')
                                 ->label(__('seo_data.og_title'))
-                                ->maxLength(255)
                                 ->helperText(__('seo_data.og_title_help')),
                             TextInput::make('og_description')
                                 ->label(__('seo_data.og_description'))
-                                ->maxLength(500)
                                 ->helperText(__('seo_data.og_description_help')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('og_image')
                                 ->label(__('seo_data.og_image'))
                                 ->url()
-                                ->maxLength(500)
                                 ->helperText(__('seo_data.og_image_help')),
                             TextInput::make('og_type')
                                 ->label(__('seo_data.og_type'))
                                 ->maxLength(50)
                                 ->default('website')
                                 ->helperText(__('seo_data.og_type_help')),
-                        ]),
-                ]),
             Section::make(__('seo_data.twitter_card'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('twitter_title')
                                 ->label(__('seo_data.twitter_title'))
-                                ->maxLength(255)
                                 ->helperText(__('seo_data.twitter_title_help')),
                             TextInput::make('twitter_description')
                                 ->label(__('seo_data.twitter_description'))
-                                ->maxLength(500)
                                 ->helperText(__('seo_data.twitter_description_help')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('twitter_image')
                                 ->label(__('seo_data.twitter_image'))
-                                ->url()
-                                ->maxLength(500)
                                 ->helperText(__('seo_data.twitter_image_help')),
                             TextInput::make('twitter_card')
                                 ->label(__('seo_data.twitter_card'))
-                                ->maxLength(50)
                                 ->default('summary_large_image')
                                 ->helperText(__('seo_data.twitter_card_help')),
-                        ]),
-                ]),
             Section::make(__('seo_data.structured_data'))
-                ->components([
                     KeyValue::make('structured_data')
                         ->label(__('seo_data.structured_data'))
                         ->keyLabel(__('seo_data.structured_data_key'))
                         ->valueLabel(__('seo_data.structured_data_value'))
                         ->addActionLabel(__('seo_data.add_structured_data_field'))
-                        ->columnSpanFull(),
-                ]),
             Section::make(__('seo_data.settings'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('seo_data.is_active'))
                                 ->default(true),
                             Toggle::make('is_canonical')
                                 ->label(__('seo_data.is_canonical'))
                                 ->default(false),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('canonical_url')
                                 ->label(__('seo_data.canonical_url'))
-                                ->url()
-                                ->maxLength(500)
                                 ->helperText(__('seo_data.canonical_url_help')),
                             TextInput::make('priority')
                                 ->label(__('seo_data.priority'))
@@ -230,23 +157,13 @@ final class SeoDataResource extends Resource
                                 ->maxValue(1)
                                 ->step(0.1)
                                 ->helperText(__('seo_data.priority_help')),
-                        ]),
                     Textarea::make('notes')
                         ->label(__('seo_data.notes'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                ]),
         ]);
-    }
-
-    /**
      * Configure the Filament table with columns, filters, and actions.
      * @param Table $table
      * @return Table
-     */
     public static function table(Table $table): Table
-    {
         return $table
             ->columns([
                 TextColumn::make('title')
@@ -257,8 +174,6 @@ final class SeoDataResource extends Resource
                     ->limit(100),
                 TextColumn::make('slug')
                     ->label(__('seo_data.slug'))
-                    ->searchable()
-                    ->sortable()
                     ->copyable()
                     ->badge()
                     ->color('gray'),
@@ -268,111 +183,57 @@ final class SeoDataResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('meta_title')
                     ->label(__('seo_data.meta_title'))
-                    ->searchable()
-                    ->sortable()
-                    ->limit(100)
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('meta_description')
                     ->label(__('seo_data.meta_description'))
-                    ->limit(100)
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('meta_keywords')
                     ->label(__('seo_data.meta_keywords'))
-                    ->limit(100)
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('meta_robots')
                     ->label(__('seo_data.meta_robots'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
                     ->color('blue')
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('og_title')
                     ->label(__('seo_data.og_title'))
-                    ->searchable()
-                    ->sortable()
-                    ->limit(100)
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('og_description')
                     ->label(__('seo_data.og_description'))
-                    ->limit(100)
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('og_image')
                     ->label(__('seo_data.og_image'))
                     ->limit(50)
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('og_type')
                     ->label(__('seo_data.og_type'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
                     ->color('purple')
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('twitter_title')
                     ->label(__('seo_data.twitter_title'))
-                    ->searchable()
-                    ->sortable()
-                    ->limit(100)
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('twitter_description')
                     ->label(__('seo_data.twitter_description'))
-                    ->limit(100)
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('twitter_image')
                     ->label(__('seo_data.twitter_image'))
-                    ->limit(50)
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('twitter_card')
                     ->label(__('seo_data.twitter_card'))
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
-                    ->color('blue')
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('canonical_url')
                     ->label(__('seo_data.canonical_url'))
-                    ->limit(50)
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('priority')
                     ->label(__('seo_data.priority'))
                     ->numeric()
-                    ->sortable()
                     ->alignCenter()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
                     ->label(__('seo_data.is_active'))
                     ->boolean()
                     ->sortable(),
                 IconColumn::make('is_canonical')
                     ->label(__('seo_data.is_canonical'))
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label(__('seo_data.created_at'))
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->label(__('seo_data.updated_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label(__('seo_data.is_active'))
-                    ->boolean()
                     ->trueLabel(__('seo_data.active_only'))
                     ->falseLabel(__('seo_data.inactive_only'))
                     ->native(false),
                 TernaryFilter::make('is_canonical')
-                    ->label(__('seo_data.is_canonical'))
-                    ->boolean()
                     ->trueLabel(__('seo_data.canonical_only'))
                     ->falseLabel(__('seo_data.non_canonical_only'))
-                    ->native(false),
-            ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
@@ -382,7 +243,6 @@ final class SeoDataResource extends Resource
                     ->color(fn(SeoData $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (SeoData $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-
                         Notification::make()
                             ->title($record->is_active ? __('seo_data.activated_successfully') : __('seo_data.deactivated_successfully'))
                             ->success()
@@ -394,20 +254,11 @@ final class SeoDataResource extends Resource
                     ->icon('heroicon-o-link')
                     ->color('info')
                     ->visible(fn(SeoData $record): bool => !$record->is_canonical)
-                    ->action(function (SeoData $record): void {
                         // Remove canonical from other SEO data
                         SeoData::where('is_canonical', true)->update(['is_canonical' => false]);
-
                         // Set this SEO data as canonical
                         $record->update(['is_canonical' => true]);
-
-                        Notification::make()
                             ->title(__('seo_data.set_as_canonical_successfully'))
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
-            ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
@@ -417,7 +268,6 @@ final class SeoDataResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-
                             Notification::make()
                                 ->title(__('seo_data.bulk_activated_success'))
                                 ->success()
@@ -428,42 +278,19 @@ final class SeoDataResource extends Resource
                         ->label(__('seo_data.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
-                        ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-
-                            Notification::make()
                                 ->title(__('seo_data.bulk_deactivated_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
-                ]),
-            ])
             ->defaultSort('created_at', 'desc');
-    }
-
-    /**
      * Get the relations for this resource.
      * @return array
-     */
     public static function getRelations(): array
-    {
         return [
             //
         ];
-    }
-
-    /**
      * Get the pages for this resource.
-     * @return array
-     */
     public static function getPages(): array
-    {
-        return [
             'index' => Pages\ListSeoData::route('/'),
             'create' => Pages\CreateSeoData::route('/create'),
             'view' => Pages\ViewSeoData::route('/{record}'),
             'edit' => Pages\EditSeoData::route('/{record}/edit'),
-        ];
-    }
 }

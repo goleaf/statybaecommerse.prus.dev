@@ -11,14 +11,14 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -42,8 +42,8 @@ final class CityResource extends Resource
 
     /**
      * @var UnitEnum|string|null
-     */    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
+     */
+    protected static string|UnitEnum|null $navigationGroup = "Products";
 
     protected static ?int $navigationSort = 5;
 
@@ -64,12 +64,11 @@ final class CityResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return "System"->value;
     }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -78,7 +77,6 @@ final class CityResource extends Resource
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -87,23 +85,22 @@ final class CityResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
+     * @param Schema $schema
+     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             Section::make(__('cities.basic_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('name')
                                 ->label(__('cities.name'))
                                 ->required()
                                 ->maxLength(255),
                             TextInput::make('code')
                                 ->label(__('cities.code'))
-                                ->required()
                                 ->maxLength(10)
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
@@ -124,14 +121,13 @@ final class CityResource extends Resource
                             }
                         }),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('country_code')
                                 ->label(__('cities.country_code'))
                                 ->maxLength(3)
                                 ->disabled(),
                             TextInput::make('state_province')
                                 ->label(__('cities.state_province'))
-                                ->maxLength(255),
                         ]),
                     Textarea::make('description')
                         ->label(__('cities.description'))
@@ -140,9 +136,9 @@ final class CityResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('cities.coordinates'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('latitude')
                                 ->label(__('cities.latitude'))
                                 ->numeric()
@@ -158,9 +154,9 @@ final class CityResource extends Resource
                         ]),
                 ]),
             Section::make(__('cities.settings'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('is_active')
                                 ->label(__('cities.is_active'))
                                 ->default(true),
@@ -168,7 +164,7 @@ final class CityResource extends Resource
                                 ->label(__('cities.is_capital')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('population')
                                 ->label(__('cities.population'))
                                 ->numeric()
@@ -176,8 +172,7 @@ final class CityResource extends Resource
                             TextInput::make('sort_order')
                                 ->label(__('cities.sort_order'))
                                 ->numeric()
-                                ->default(0)
-                                ->minValue(0),
+                                ->default(0),
                         ]),
                 ]),
         ]);
@@ -199,33 +194,22 @@ final class CityResource extends Resource
                     ->weight('bold'),
                 TextColumn::make('code')
                     ->label(__('cities.code'))
-                    ->searchable()
-                    ->sortable()
                     ->copyable()
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('country.name')
                     ->label(__('cities.country'))
-                    ->sortable()
-                    ->badge()
                     ->color('blue'),
                 TextColumn::make('country_code')
                     ->label(__('cities.country_code'))
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
-                    ->badge()
                     ->color('green')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('state_province')
                     ->label(__('cities.state_province'))
-                    ->searchable()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('population')
                     ->label(__('cities.population'))
                     ->numeric()
-                    ->sortable()
                     ->formatStateUsing(fn($state): string => $state ? number_format($state) : '-')
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
@@ -235,10 +219,10 @@ final class CityResource extends Resource
                 IconColumn::make('is_capital')
                     ->label(__('cities.is_capital'))
                     ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('sort_order')
                     ->label(__('cities.sort_order'))
+                    ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
@@ -254,19 +238,13 @@ final class CityResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('country_id')
-                    ->label(__('cities.country'))
                     ->relationship('country', 'name')
-                    ->searchable()
                     ->preload(),
                 TernaryFilter::make('is_active')
-                    ->label(__('cities.is_active'))
-                    ->boolean()
                     ->trueLabel(__('cities.active_only'))
                     ->falseLabel(__('cities.inactive_only'))
                     ->native(false),
                 TernaryFilter::make('is_capital')
-                    ->label(__('cities.is_capital'))
-                    ->boolean()
                     ->trueLabel(__('cities.capital_only'))
                     ->falseLabel(__('cities.non_capital_only'))
                     ->native(false),
@@ -280,7 +258,6 @@ final class CityResource extends Resource
                     ->color(fn(City $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (City $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-
                         Notification::make()
                             ->title($record->is_active ? __('cities.activated_successfully') : __('cities.deactivated_successfully'))
                             ->success()
@@ -297,7 +274,6 @@ final class CityResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-
                             Notification::make()
                                 ->title(__('cities.bulk_activated_success'))
                                 ->success()
@@ -310,7 +286,6 @@ final class CityResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-
                             Notification::make()
                                 ->title(__('cities.bulk_deactivated_success'))
                                 ->success()
@@ -335,7 +310,6 @@ final class CityResource extends Resource
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

@@ -2,15 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CustomerManagementResource\Pages;
 use App\Models\User;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -18,9 +20,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -45,8 +45,8 @@ final class CustomerManagementResource extends Resource
 
     /**
      * @var UnitEnum|string|null
-     */    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
+     */
+    protected static string|UnitEnum|null $navigationGroup = "Products";
 
     protected static ?int $navigationSort = 1;
 
@@ -54,7 +54,6 @@ final class CustomerManagementResource extends Resource
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
      */
     public static function getNavigationLabel(): string
     {
@@ -63,16 +62,14 @@ final class CustomerManagementResource extends Resource
 
     /**
      * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Customers";
+        return 'Customers';
     }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -81,7 +78,6 @@ final class CustomerManagementResource extends Resource
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -90,8 +86,6 @@ final class CustomerManagementResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
-     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -107,9 +101,7 @@ final class CustomerManagementResource extends Resource
                             TextInput::make('email')
                                 ->label(__('customers.email'))
                                 ->email()
-                                ->required()
-                                ->unique(ignoreRecord: true)
-                                ->maxLength(255),
+                                ->unique(ignoreRecord: true),
                         ]),
                     Grid::make(2)
                         ->components([
@@ -139,9 +131,6 @@ final class CustomerManagementResource extends Resource
                         ->searchable()
                         ->preload()
                         ->createOptionForm([
-                            TextInput::make('name')
-                                ->required()
-                                ->maxLength(255),
                             Textarea::make('description')
                                 ->maxLength(500),
                         ]),
@@ -151,21 +140,22 @@ final class CustomerManagementResource extends Resource
                     Grid::make(2)
                         ->components([
                             TextInput::make('first_name')
-                                ->label(__('customers.first_name'))
-                                ->maxLength(255),
+                                ->label(__('customers.first_name')),
                             TextInput::make('last_name')
-                                ->label(__('customers.last_name'))
-                                ->maxLength(255),
+                                ->label(__('customers.last_name')),
                         ]),
-                    DateTimePicker::make('date_of_birth')
-                        ->label(__('customers.date_of_birth'))
-                        ->displayFormat('Y-m-d'),
-                    Select::make('gender')
-                        ->label(__('customers.gender'))
-                        ->options([
-                            'male' => __('customers.genders.male'),
-                            'female' => __('customers.genders.female'),
-                            'other' => __('customers.genders.other'),
+                    Grid::make(2)
+                        ->components([
+                            DateTimePicker::make('date_of_birth')
+                                ->label(__('customers.date_of_birth'))
+                                ->displayFormat('Y-m-d'),
+                            Select::make('gender')
+                                ->label(__('customers.gender'))
+                                ->options([
+                                    'male' => __('customers.genders.male'),
+                                    'female' => __('customers.genders.female'),
+                                    'other' => __('customers.genders.other'),
+                                ]),
                         ]),
                 ]),
             Section::make(__('customers.address_information'))
@@ -178,34 +168,38 @@ final class CustomerManagementResource extends Resource
                 ]),
             Section::make(__('customers.preferences'))
                 ->components([
-                    Select::make('preferred_language')
-                        ->label(__('customers.preferred_language'))
-                        ->options([
-                            'lt' => __('customers.languages.lt'),
-                            'en' => __('customers.languages.en'),
-                        ])
-                        ->default('lt'),
-                    Select::make('preferred_currency')
-                        ->label(__('customers.preferred_currency'))
-                        ->options([
-                            'EUR' => 'EUR (€)',
-                            'USD' => 'USD ($)',
-                        ])
-                        ->default('EUR'),
-                    Toggle::make('newsletter_subscription')
-                        ->label(__('customers.newsletter_subscription'))
-                        ->default(false),
-                    Toggle::make('sms_notifications')
-                        ->label(__('customers.sms_notifications'))
-                        ->default(false),
+                    Grid::make(2)
+                        ->components([
+                            Select::make('preferred_language')
+                                ->label(__('customers.preferred_language'))
+                                ->options([
+                                    'lt' => __('customers.languages.lt'),
+                                    'en' => __('customers.languages.en'),
+                                ])
+                                ->default('lt'),
+                            Select::make('preferred_currency')
+                                ->label(__('customers.preferred_currency'))
+                                ->options([
+                                    'EUR' => 'EUR (€)',
+                                    'USD' => 'USD ($)',
+                                ])
+                                ->default('EUR'),
+                        ]),
+                    Grid::make(2)
+                        ->components([
+                            Toggle::make('newsletter_subscription')
+                                ->label(__('customers.newsletter_subscription'))
+                                ->default(false),
+                            Toggle::make('sms_notifications')
+                                ->label(__('customers.sms_notifications'))
+                                ->default(false),
+                        ]),
                 ]),
         ]);
     }
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -218,19 +212,14 @@ final class CustomerManagementResource extends Resource
                     ->weight('bold'),
                 TextColumn::make('email')
                     ->label(__('customers.email'))
-                    ->searchable()
-                    ->sortable()
                     ->copyable(),
                 TextColumn::make('phone')
                     ->label(__('customers.phone'))
-                    ->searchable()
-                    ->sortable()
                     ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('customerGroup.name')
                     ->label(__('customers.customer_group'))
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 BadgeColumn::make('email_verified_at')
                     ->label(__('customers.email_status'))
                     ->formatStateUsing(fn($state): string => $state ? __('customers.verified') : __('customers.unverified'))
@@ -249,34 +238,26 @@ final class CustomerManagementResource extends Resource
                 TextColumn::make('total_spent')
                     ->label(__('customers.total_spent'))
                     ->money('EUR')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('customers.created_at'))
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('updated_at')
                     ->label(__('customers.updated_at'))
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('customer_group_id')
-                    ->label(__('customers.customer_group'))
                     ->relationship('customerGroup', 'name')
-                    ->searchable()
                     ->preload(),
                 TernaryFilter::make('email_verified_at')
                     ->label(__('customers.email_verified'))
-                    ->boolean()
                     ->trueLabel(__('customers.verified_only'))
                     ->falseLabel(__('customers.unverified_only'))
                     ->native(false),
                 TernaryFilter::make('is_active')
-                    ->label(__('customers.is_active'))
-                    ->boolean()
                     ->trueLabel(__('customers.active_only'))
                     ->falseLabel(__('customers.inactive_only'))
                     ->native(false),
@@ -300,7 +281,7 @@ final class CustomerManagementResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 Action::make('verify_email')
                     ->label(__('customers.verify_email'))
@@ -309,7 +290,6 @@ final class CustomerManagementResource extends Resource
                     ->visible(fn(User $record): bool => !$record->email_verified_at)
                     ->action(function (User $record): void {
                         $record->update(['email_verified_at' => now()]);
-
                         Notification::make()
                             ->title(__('customers.email_verified_successfully'))
                             ->success()
@@ -322,7 +302,6 @@ final class CustomerManagementResource extends Resource
                     ->color(fn(User $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (User $record): void {
                         $record->update(['is_active' => !$record->is_active]);
-
                         Notification::make()
                             ->title($record->is_active ? __('customers.activated_successfully') : __('customers.deactivated_successfully'))
                             ->success()
@@ -339,7 +318,6 @@ final class CustomerManagementResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['email_verified_at' => now()]);
-
                             Notification::make()
                                 ->title(__('customers.bulk_verified_success'))
                                 ->success()
@@ -352,7 +330,6 @@ final class CustomerManagementResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
-
                             Notification::make()
                                 ->title(__('customers.bulk_activated_success'))
                                 ->success()
@@ -365,7 +342,6 @@ final class CustomerManagementResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
-
                             Notification::make()
                                 ->title(__('customers.bulk_deactivated_success'))
                                 ->success()
@@ -379,7 +355,6 @@ final class CustomerManagementResource extends Resource
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -390,7 +365,6 @@ final class CustomerManagementResource extends Resource
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 return [
     'brand_name' => 'Statyba E-Commerce',
@@ -345,7 +343,6 @@ return [
             'details' => 'Details',
         ],
     ],
-
     // Relation Managers
     'orders' => [
         'title' => 'Orders',
@@ -392,7 +389,6 @@ return [
         'not_shipped' => 'Not Shipped',
         'not_delivered' => 'Not Delivered',
     ],
-
     'addresses' => [
         'title' => 'Addresses',
         'address_information' => 'Address Information',
@@ -422,27 +418,58 @@ return [
         'default_only' => 'Default Only',
         'non_default_only' => 'Non Default Only',
     ],
-
     'cart_items' => [
         'title' => 'Cart Items',
-        'cart_information' => 'Cart Information',
-        'fields' => [
-            'product' => 'Product',
-            'sku' => 'SKU',
-            'quantity' => 'Quantity',
-            'price' => 'Price',
-            'total' => 'Total',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
-        ],
-        'filters' => [
-            'product' => 'Product',
-            'created_at' => 'Created Date',
-            'updated_at' => 'Updated Date',
+        'single' => 'Cart Item',
+        'plural' => 'Cart Items',
+        'navigation_group' => 'Orders',
+        'basic_information' => 'Basic Information',
+        'pricing' => 'Pricing',
+        'additional_info' => 'Additional Information',
+        'user' => 'User',
+        'product' => 'Product',
+        'product_variant' => 'Product Variant',
+        'product_name' => 'Product Name',
+        'product_sku' => 'Product SKU',
+        'quantity' => 'Quantity',
+        'minimum_quantity' => 'Minimum Quantity',
+        'unit_price' => 'Unit Price',
+        'discount_amount' => 'Discount Amount',
+        'total' => 'Total',
+        'total_price' => 'Total Price',
+        'session_id' => 'Session ID',
+        'session_id_help' => 'Unique session identifier',
+        'notes' => 'Notes',
+        'attributes' => 'Attributes',
+        'attribute_name' => 'Attribute Name',
+        'attribute_value' => 'Attribute Value',
+        'add_attribute' => 'Add Attribute',
+        'product_snapshot' => 'Product Snapshot',
+        'snapshot_key' => 'Snapshot Key',
+        'snapshot_value' => 'Snapshot Value',
+        'add_snapshot' => 'Add Snapshot',
+        'product_snapshot_help' => 'Product data snapshot at cart creation time',
+        'created_at' => 'Created At',
+        'updated_at' => 'Updated At',
+        'created_from' => 'Created From',
+        'created_until' => 'Created Until',
+        'quantity_from' => 'Quantity From',
+        'quantity_to' => 'Quantity To',
+        'move_to_wishlist' => 'Move to Wishlist',
+        'moved_to_wishlist_success' => 'Successfully moved to wishlist',
+        'clear_old_carts' => 'Clear Old Carts',
+        'old_carts_cleared_success' => 'Old carts successfully cleared',
+        'tabs' => [
+            'all' => 'All',
+            'active' => 'Active',
+            'saved' => 'Saved',
+            'low_stock' => 'Low Stock',
+            'out_of_stock' => 'Out of Stock',
+            'recent' => 'Recent',
+            'abandoned' => 'Abandoned',
         ],
         'create' => 'Add to Cart',
     ],
-
     'reviews' => [
         'title' => 'Reviews',
         'review_information' => 'Review Information',
@@ -473,7 +500,6 @@ return [
         'featured' => 'Featured',
         'not_featured' => 'Not Featured',
     ],
-
     'wishlist' => [
         'title' => 'Wishlist',
         'wishlist_information' => 'Wishlist Information',
@@ -496,7 +522,6 @@ return [
         'active' => 'Active',
         'inactive' => 'Inactive',
     ],
-
     'documents' => [
         'title' => 'Documents',
         'document_information' => 'Document Information',
@@ -539,21 +564,18 @@ return [
         'generated_successfully_description' => 'Document "{title}" was generated successfully',
         'generation_failed' => 'Document generation failed',
     ],
-
     // Document Generation
     'documents' => [
         'generated_successfully' => 'Document generated successfully',
         'generated_successfully_description' => 'Document "{title}" was generated successfully',
         'generation_failed' => 'Document generation failed',
     ],
-
     // Locales
     'locales' => [
         'lithuanian' => 'Lithuanian',
         'english' => 'English',
         'german' => 'German',
     ],
-
     // Customer Groups
     'customer_groups' => [
         'title' => 'Customer Groups',
@@ -564,7 +586,6 @@ return [
         'discount_percentage' => 'Discount Percentage',
         'is_enabled' => 'Is Enabled',
     ],
-
     // Actions
     'actions' => [
         'view' => 'View',
@@ -595,7 +616,6 @@ return [
         'generate_document' => 'Generate Document',
         'download' => 'Download',
     ],
-
     // Fields
     'fields' => [
         'order_reference' => 'Order Reference',
@@ -796,7 +816,6 @@ return [
             'images' => 'Images',
         ],
     ],
-
     // Enhanced Product translations
     'tabs' => [
         'basic_information' => 'Basic Information',
@@ -808,7 +827,6 @@ return [
         'translations' => 'Translations',
         'advanced' => 'Advanced Settings',
     ],
-
     'sections' => [
         'product_information' => 'Product Information',
         'descriptions' => 'Descriptions',
@@ -824,7 +842,6 @@ return [
         'digital_products' => 'Digital Products',
         'metadata' => 'Metadata',
     ],
-
     'fields' => [
         'name' => 'Name',
         'slug' => 'Slug',
@@ -882,7 +899,6 @@ return [
         'key' => 'Key',
         'value' => 'Value',
     ],
-
     'helpers' => [
         'slug' => 'URL part that will be used for the product page',
         'sku' => 'Unique product identification code',
@@ -907,38 +923,32 @@ return [
         'metadata' => 'Additional data in JSON format',
         'sort_order' => 'Product sorting order',
     ],
-
     'statuses' => [
         'draft' => 'Draft',
         'published' => 'Published',
         'archived' => 'Archived',
     ],
-
     'types' => [
         'simple' => 'Simple',
         'variable' => 'Variable',
         'grouped' => 'Grouped',
         'external' => 'External',
     ],
-
     'tax_classes' => [
         'standard' => 'Standard',
         'reduced' => 'Reduced',
         'zero' => 'Zero',
     ],
-
     'shipping_classes' => [
         'standard' => 'Standard',
         'express' => 'Express',
         'heavy' => 'Heavy',
         'fragile' => 'Fragile',
     ],
-
     'languages' => [
         'lithuanian' => 'Lithuanian',
         'english' => 'English',
     ],
-
     'filters' => [
         'visible_only' => 'Visible Only',
         'featured_only' => 'Featured Only',
@@ -955,7 +965,6 @@ return [
         'price_from' => 'Price From',
         'price_to' => 'Price To',
     ],
-
     'actions' => [
         'activate_selected' => 'Activate Selected',
         'deactivate_selected' => 'Deactivate Selected',
@@ -973,7 +982,6 @@ return [
         'disable' => 'Disable',
         'bulk_actions' => 'Bulk Actions',
     ],
-
     'dashboard' => [
         'total_products' => 'Total Products',
         'published_products' => 'Published Products',
@@ -1004,7 +1012,6 @@ return [
         'customer_feedback' => 'Customer Feedback',
         'stars_out_of_5' => 'stars out of 5',
     ],
-
     'units' => [
         'days' => 'days',
         'kg' => 'kg',
@@ -1149,7 +1156,6 @@ return [
             'privacy_settings' => 'Privacy Settings',
         ],
     ],
-
     'users' => [
         'title' => 'Users',
         'create' => 'Create User',
@@ -1192,25 +1198,21 @@ return [
             'url' => 'URL',
         ],
     ],
-
     'user_status' => [
         'active' => 'Active',
         'inactive' => 'Inactive',
         'suspended' => 'Suspended',
         'pending' => 'Pending',
     ],
-
     'gender' => [
         'male' => 'Male',
         'female' => 'Female',
         'other' => 'Other',
     ],
-
     'locales' => [
         'english' => 'English',
         'lithuanian' => 'Lithuanian',
     ],
-
     'notifications' => [
         'email_marketing' => 'Marketing Emails',
         'email_orders' => 'Order Emails',
@@ -1223,7 +1225,6 @@ return [
         'password_reset_sent' => 'Password reset link sent',
         'export_completed' => 'Export completed',
     ],
-
     'privacy' => [
         'profile_public' => 'Profile Public',
         'show_email' => 'Show Email',
@@ -1232,12 +1233,10 @@ return [
         'show_online_status' => 'Show Online Status',
         'data_analytics' => 'Data Analytics',
     ],
-
     'modals' => [
         'impersonate_user' => 'Impersonate User',
         'impersonate_description' => 'Are you sure you want to impersonate this user? You will be able to perform actions on their behalf.',
     ],
-
     'notifications' => [
         'user_created' => 'User Created',
         'user_created_description' => 'User :name has been created successfully',
@@ -1245,7 +1244,6 @@ return [
         'impersonation_started' => 'Impersonation Started',
         'impersonating_user' => 'Now impersonating :name',
     ],
-
     'tabs' => [
         'all_users' => 'All Users',
         'active_users' => 'Active Users',
@@ -1254,7 +1252,6 @@ return [
         'users_with_orders' => 'Users with Orders',
         'recent_users' => 'Recent Users',
     ],
-
     'table' => [
         'avatar' => 'Avatar',
         'name' => 'Name',
@@ -1279,13 +1276,11 @@ return [
         'last_login' => 'Last Login',
         'last_activity' => 'Last Activity',
     ],
-
     'charts' => [
         'user_registrations' => 'User Registrations',
         'gender_distribution' => 'Gender Distribution',
         'engagement_levels' => 'Engagement Levels',
     ],
-
     'engagement' => [
         'high' => 'High',
         'medium' => 'Medium',
@@ -2587,7 +2582,6 @@ return [
     ],
     'super_administrator' => 'Super Administrator',
     'inventory_management' => 'Inventory Management',
-
     // Inventory translations
     'inventory' => [
         'stock_management' => 'Stock Management',
@@ -2598,7 +2592,6 @@ return [
         'stock_in' => 'Stock In',
         'stock_out' => 'Stock Out',
         'unknown' => 'Unknown',
-
         // Basic information
         'basic_information' => 'Basic Information',
         'product' => 'Product',
@@ -2612,7 +2605,6 @@ return [
         'city' => 'City',
         'postal_code' => 'Postal Code',
         'is_enabled' => 'Enabled',
-
         // Stock levels
         'stock_levels' => 'Stock Levels',
         'current_stock' => 'Current Stock',
@@ -2628,7 +2620,6 @@ return [
         'reorder_point_help' => 'Stock level at which a new order should be placed',
         'max_stock_level' => 'Max Stock Level',
         'max_stock_level_help' => 'Maximum stock quantity that can be held at this location',
-
         // Additional information
         'additional_information' => 'Additional Information',
         'supplier' => 'Supplier',
@@ -2644,21 +2635,18 @@ return [
         'tracked' => 'Tracked',
         'track_inventory_help' => 'Whether this product should be tracked in the inventory system',
         'notes' => 'Notes',
-
         // Timestamps
         'timestamps' => 'Timestamps',
         'last_restocked_at' => 'Last Restocked',
         'last_sold_at' => 'Last Sold',
         'created_at' => 'Created',
         'updated_at' => 'Updated',
-
         // Status labels
         'not_tracked' => 'Not Tracked',
         'out_of_stock' => 'Out of Stock',
         'low_stock' => 'Low Stock',
         'needs_reorder' => 'Needs Reorder',
         'in_stock' => 'In Stock',
-
         // Movement reasons
         'reason_sale' => 'Sale',
         'reason_return' => 'Return',
@@ -2668,7 +2656,6 @@ return [
         'reason_damage' => 'Damage',
         'reason_theft' => 'Theft',
         'reason_transfer' => 'Transfer',
-
         // Actions
         'adjust_stock' => 'Adjust Stock',
         'adjustment_quantity' => 'Adjustment Quantity',
@@ -2677,7 +2664,6 @@ return [
         'adjustment_notes' => 'Adjustment Notes',
         'stock_adjusted' => 'Stock Adjusted',
         'stock_adjusted_message' => 'Stock adjusted: :quantity units for product :product',
-
         'reserve_stock' => 'Reserve Stock',
         'reserve_quantity' => 'Reserve Quantity',
         'reserve_notes' => 'Reserve Notes',
@@ -2685,13 +2671,11 @@ return [
         'stock_reserved_message' => 'Reserved :quantity units for product :product',
         'reserve_failed' => 'Reserve Failed',
         'reserve_failed_message' => 'Insufficient stock for reservation',
-
         'unreserve_stock' => 'Unreserve Stock',
         'unreserve_quantity' => 'Unreserve Quantity',
         'unreserve_notes' => 'Unreserve Notes',
         'stock_unreserved' => 'Stock Unreserved',
         'stock_unreserved_message' => 'Unreserved :quantity units for product :product',
-
         // Bulk actions
         'bulk_adjust_stock' => 'Bulk Adjust Stock',
         'bulk_stock_adjusted' => 'Bulk Stock Adjusted',
@@ -2699,7 +2683,6 @@ return [
         'export_stock' => 'Export Stock',
         'export_started' => 'Export Started',
         'export_started_message' => 'Exporting :count items',
-
         // Tabs
         'all_stock' => 'All Stock',
         'low_stock_items' => 'Low Stock',
@@ -2707,7 +2690,6 @@ return [
         'needs_reorder_items' => 'Needs Reorder',
         'expiring_soon_items' => 'Expiring Soon',
         'tracked_only' => 'Tracked Only',
-
         // Widgets
         'total_items' => 'Total Items',
         'total_items_description' => 'Total number of stock items',
@@ -2724,7 +2706,6 @@ return [
         'available_stock_value' => 'Available Stock Value',
         'reserved_stock_value' => 'Reserved Stock Value',
         'recent_stock_movements' => 'Recent Stock Movements',
-
         // Stock details
         'current_stock_description' => 'Current stock quantity',
         'reserved_stock_description' => 'Reserved stock quantity',
@@ -2732,14 +2713,12 @@ return [
         'incoming_stock_description' => 'Incoming stock quantity',
         'stock_value_description' => 'Stock value',
         'total_value_description' => 'Total value',
-
         // Restock
         'restock' => 'Restock',
         'restock_quantity' => 'Restock Quantity',
         'restock_notes' => 'Restock Notes',
         'restock_successful' => 'Restock Successful',
         'restock_successful_message' => 'Restocked :quantity units for product :product',
-
         // Filters
         'all_items' => 'All Items',
         'tracked_only' => 'Tracked Only',
@@ -2749,7 +2728,6 @@ return [
         'this_month' => 'This Month',
         'this_year' => 'This Year',
         'recent_movements' => 'Recent Movements',
-
         // Groups
         'group_by_location' => 'Group by Location',
         'group_by_product' => 'Group by Product',
@@ -2758,7 +2736,6 @@ return [
         'group_by_type' => 'Group by Type',
         'group_by_reason' => 'Group by Reason',
         'group_by_date' => 'Group by Date',
-
         // Movement types
         'movement_type' => 'Movement Type',
         'quantity' => 'Quantity',
@@ -2776,11 +2753,9 @@ return [
         'never' => 'Never',
         'yes' => 'Yes',
         'no' => 'No',
-
         // Financial
         'financial_information' => 'Financial Information',
         'reserved_value' => 'Reserved Stock Value',
-
         // Create/Edit messages
         'create_stock_item' => 'Create Stock Item',
         'edit_stock_item' => 'Edit Stock Item',
@@ -2791,12 +2766,10 @@ return [
         'stock_item_updated' => 'Stock Item Updated',
         'stock_item_updated_message' => 'Updated stock item :product at location :location',
         'initial_stock_creation' => 'Initial Stock Creation',
-
         // Import/Export
         'import_stock' => 'Import Stock',
         'export_stock' => 'Export Stock',
         'stock_report' => 'Stock Report',
-
         // Frontend specific
         'stock_management_description' => 'Manage all stock items, track movements and monitor stock levels',
         'search' => 'Search',
@@ -2856,7 +2829,6 @@ return [
     'Slaptažodis' => 'Password',
     'Prisiminti mane' => 'Remember me',
     'Prisijungti' => 'Sign in',
-
     // Categories specific translations
     'categories' => [
         'title' => 'Categories',
@@ -2916,7 +2888,6 @@ return [
             'translate' => 'Translations',
         ],
     ],
-
     // Common translations
     'common' => [
         'copied' => 'Copied',
@@ -2926,7 +2897,6 @@ return [
         'featured' => 'Featured',
         'not_featured' => 'Not Featured',
     ],
-
     // Additional translations for new features
     'other_customers' => 'Other customers',
     'orders_count' => 'Orders count',
@@ -2971,10 +2941,9 @@ return [
     'is_approved_help' => 'Whether the review is approved and visible',
     'is_featured_help' => 'Whether the review is featured',
     'is_verified_purchase_help' => 'Whether the review was written after a verified purchase',
-    'is_default_help' => 'Whether this is the customer\'s default address',
+    'is_default_help' => "Whether this is the customer's default address",
     'is_billing_help' => 'Whether this is a billing address',
     'is_shipping_help' => 'Whether this is a shipping address',
-
     // Enhanced filtering translations
     'total_spent_range' => 'Total Spent Range',
     'min_spent' => 'Minimum Spent',
@@ -2999,7 +2968,6 @@ return [
     'billing_address' => 'Billing Address',
     'shipping_address' => 'Shipping Address',
     'default_address' => 'Default Address',
-    
     // User Management
     'user' => [
         'personal_information' => 'Personal Information',
@@ -3039,7 +3007,6 @@ return [
         'updated_at' => 'Updated At',
         'last_login_at' => 'Last Login At',
     ],
-    
     // Product Variant
     'product_variant' => [
         'basic_information' => 'Basic Information',
@@ -3068,7 +3035,6 @@ return [
         'created_at' => 'Created At',
         'updated_at' => 'Updated At',
     ],
-    
     // Order Item
     'order_item' => [
         'basic_information' => 'Basic Information',
@@ -3086,7 +3052,6 @@ return [
         'created_at' => 'Created At',
         'updated_at' => 'Updated At',
     ],
-    
     // Coupon
     'coupon' => [
         'basic_information' => 'Basic Information',
@@ -3119,13 +3084,11 @@ return [
         'created_at' => 'Created At',
         'updated_at' => 'Updated At',
     ],
-    
     // Locale
     'locale' => [
         'lithuanian' => 'Lithuanian',
         'english' => 'English',
     ],
-
     // User Resource
     'users' => [
         'title' => 'Users',
@@ -3173,7 +3136,6 @@ return [
             'bulk_deactivate_success' => 'Users deactivated successfully',
         ],
     ],
-
     // Product Resource
     'products' => [
         'title' => 'Products',

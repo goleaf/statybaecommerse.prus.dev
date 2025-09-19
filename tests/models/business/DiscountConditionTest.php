@@ -2,9 +2,9 @@
 
 namespace Tests\Unit;
 
+use App\Models\Translations\DiscountConditionTranslation;
 use App\Models\Discount;
 use App\Models\DiscountCondition;
-use App\Models\Translations\DiscountConditionTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,60 +15,20 @@ final class DiscountConditionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
-        // Disable foreign key checks for testing
-        \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys=OFF');
-        
-        // Drop and recreate the discount_conditions table without foreign key constraints
-        \Illuminate\Support\Facades\Schema::dropIfExists('discount_conditions');
-        \Illuminate\Support\Facades\Schema::create('discount_conditions', function (\Illuminate\Database\Schema\Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('discount_id');
-            $table->string('type');
-            $table->string('operator');
-            $table->json('value')->nullable();
-            $table->unsignedInteger('position')->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->integer('priority')->default(0);
-            $table->json('metadata')->nullable();
-            $table->timestamps();
-        });
-        
-        // Create the discounts table structure for testing if it doesn't exist
-        if (!\Illuminate\Support\Facades\Schema::hasTable('discounts')) {
-            \Illuminate\Support\Facades\Schema::create('discounts', function (\Illuminate\Database\Schema\Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('slug')->nullable()->unique();
-            $table->text('description')->nullable();
-            $table->string('type');
-            $table->decimal('value', 10, 2)->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->boolean('is_enabled')->default(true);
-            $table->dateTime('starts_at')->nullable();
-            $table->dateTime('ends_at')->nullable();
-            $table->unsignedInteger('usage_limit')->nullable();
-            $table->unsignedInteger('usage_count')->default(0);
-            $table->decimal('minimum_amount', 10, 2)->nullable();
-            $table->decimal('maximum_amount', 10, 2)->nullable();
-            $table->string('status')->nullable();
-            $table->json('scope')->nullable();
-            $table->string('stacking_policy')->nullable();
-            $table->json('metadata')->nullable();
-            $table->integer('priority')->default(0);
-            $table->boolean('exclusive')->default(false);
-            $table->boolean('applies_to_shipping')->default(false);
-            $table->boolean('free_shipping')->default(false);
-            $table->boolean('first_order_only')->default(false);
-            $table->unsignedInteger('per_customer_limit')->nullable();
-            $table->unsignedInteger('per_code_limit')->nullable();
-            $table->unsignedInteger('per_day_limit')->nullable();
-            $table->json('channel_restrictions')->nullable();
-            $table->json('currency_restrictions')->nullable();
-            $table->string('weekday_mask')->nullable();
-            $table->json('time_window')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
+
+        // Create the discount_condition_translations table if it doesn't exist
+        if (!\Illuminate\Support\Facades\Schema::hasTable('discount_condition_translations')) {
+            \Illuminate\Support\Facades\Schema::create('discount_condition_translations', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('discount_condition_id');
+                $table->string('locale', 5);
+                $table->string('name')->nullable();
+                $table->text('description')->nullable();
+                $table->json('metadata')->nullable();
+                $table->timestamps();
+
+                $table->unique(['discount_condition_id', 'locale']);
+                $table->index(['locale']);
             });
         }
     }
@@ -76,7 +36,7 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_can_be_created(): void
     {
         $discount = Discount::factory()->create();
-        
+
         // Insert directly to avoid foreign key constraint issues
         $conditionId = \Illuminate\Support\Facades\DB::table('discount_conditions')->insertGetId([
             'discount_id' => $discount->id,
@@ -90,7 +50,7 @@ final class DiscountConditionTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        
+
         $condition = DiscountCondition::find($conditionId);
 
         $this->assertDatabaseHas('discount_conditions', [
@@ -117,7 +77,7 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_has_translations(): void
     {
         $condition = DiscountCondition::factory()->create();
-        
+
         $translation = DiscountConditionTranslation::create([
             'discount_condition_id' => $condition->id,
             'locale' => 'lt',
@@ -201,44 +161,48 @@ final class DiscountConditionTest extends TestCase
 
     public function test_discount_condition_scope_active(): void
     {
-        DiscountCondition::factory()->create(['is_active' => true]);
-        DiscountCondition::factory()->create(['is_active' => false]);
+        $discount = Discount::factory()->create();
+        DiscountCondition::factory()->create(['discount_id' => $discount->id, 'is_active' => true]);
+        DiscountCondition::factory()->create(['discount_id' => $discount->id, 'is_active' => false]);
 
         $activeConditions = DiscountCondition::active()->get();
-        
+
         $this->assertCount(1, $activeConditions);
         $this->assertTrue($activeConditions->first()->is_active);
     }
 
     public function test_discount_condition_scope_by_type(): void
     {
-        DiscountCondition::factory()->create(['type' => 'cart_total']);
-        DiscountCondition::factory()->create(['type' => 'product']);
+        $discount = Discount::factory()->create();
+        DiscountCondition::factory()->create(['discount_id' => $discount->id, 'type' => 'cart_total']);
+        DiscountCondition::factory()->create(['discount_id' => $discount->id, 'type' => 'product']);
 
         $cartConditions = DiscountCondition::byType('cart_total')->get();
-        
+
         $this->assertCount(1, $cartConditions);
         $this->assertEquals('cart_total', $cartConditions->first()->type);
     }
 
     public function test_discount_condition_scope_by_operator(): void
     {
-        DiscountCondition::factory()->create(['operator' => 'greater_than']);
-        DiscountCondition::factory()->create(['operator' => 'equals_to']);
+        $discount = Discount::factory()->create();
+        DiscountCondition::factory()->create(['discount_id' => $discount->id, 'operator' => 'greater_than']);
+        DiscountCondition::factory()->create(['discount_id' => $discount->id, 'operator' => 'equals_to']);
 
         $greaterThanConditions = DiscountCondition::byOperator('greater_than')->get();
-        
+
         $this->assertCount(1, $greaterThanConditions);
         $this->assertEquals('greater_than', $greaterThanConditions->first()->operator);
     }
 
     public function test_discount_condition_scope_by_priority(): void
     {
-        DiscountCondition::factory()->active()->create(['priority' => 1]);
-        DiscountCondition::factory()->active()->create(['priority' => 10]);
+        $discount = Discount::factory()->create();
+        DiscountCondition::factory()->active()->create(['discount_id' => $discount->id, 'priority' => 1]);
+        DiscountCondition::factory()->active()->create(['discount_id' => $discount->id, 'priority' => 10]);
 
         $conditions = DiscountCondition::byPriority('asc')->get();
-        
+
         $this->assertEquals(1, $conditions->first()->priority);
         $this->assertEquals(10, $conditions->last()->priority);
     }
@@ -246,7 +210,7 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_get_types(): void
     {
         $types = DiscountCondition::getTypes();
-        
+
         $this->assertIsArray($types);
         $this->assertArrayHasKey('product', $types);
         $this->assertArrayHasKey('cart_total', $types);
@@ -256,7 +220,7 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_get_operators(): void
     {
         $operators = DiscountCondition::getOperators();
-        
+
         $this->assertIsArray($operators);
         $this->assertArrayHasKey('equals_to', $operators);
         $this->assertArrayHasKey('greater_than', $operators);
@@ -267,11 +231,11 @@ final class DiscountConditionTest extends TestCase
     {
         $numericOperators = DiscountCondition::getOperatorsForType('cart_total');
         $stringOperators = DiscountCondition::getOperatorsForType('product');
-        
+
         $this->assertArrayHasKey('greater_than', $numericOperators);
         $this->assertArrayHasKey('less_than', $numericOperators);
         $this->assertArrayNotHasKey('contains', $numericOperators);
-        
+
         $this->assertArrayHasKey('contains', $stringOperators);
         $this->assertArrayHasKey('starts_with', $stringOperators);
         $this->assertArrayNotHasKey('greater_than', $stringOperators);
@@ -280,7 +244,7 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_get_type_label(): void
     {
         $condition = DiscountCondition::factory()->create(['type' => 'cart_total']);
-        
+
         $this->assertIsString($condition->getTypeLabel());
         $this->assertNotEmpty($condition->getTypeLabel());
     }
@@ -288,7 +252,7 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_get_operator_label(): void
     {
         $condition = DiscountCondition::factory()->create(['operator' => 'greater_than']);
-        
+
         $this->assertIsString($condition->getOperatorLabel());
         $this->assertNotEmpty($condition->getOperatorLabel());
     }
@@ -300,7 +264,7 @@ final class DiscountConditionTest extends TestCase
             'operator' => 'greater_than',
             'value' => 100,
         ]);
-        
+
         $this->assertIsString($condition->human_readable_condition);
         $this->assertNotEmpty($condition->human_readable_condition);
     }
@@ -308,26 +272,26 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_translated_name(): void
     {
         $condition = DiscountCondition::factory()->create();
-        
+
         $translation = DiscountConditionTranslation::create([
             'discount_condition_id' => $condition->id,
             'locale' => 'lt',
             'name' => 'Test Name',
         ]);
-        
+
         $this->assertEquals('Test Name', $condition->translated_name);
     }
 
     public function test_discount_condition_translated_description(): void
     {
         $condition = DiscountCondition::factory()->create();
-        
+
         $translation = DiscountConditionTranslation::create([
             'discount_condition_id' => $condition->id,
             'locale' => 'lt',
             'description' => 'Test Description',
         ]);
-        
+
         $this->assertEquals('Test Description', $condition->translated_description);
     }
 
@@ -340,7 +304,7 @@ final class DiscountConditionTest extends TestCase
             'priority' => 5,
             'position' => 1,
         ]);
-        
+
         $this->assertIsArray($condition->value);
         $this->assertIsArray($condition->metadata);
         $this->assertIsBool($condition->is_active);

@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
-
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\PostResource\Pages;
 use App\Models\Post;
@@ -37,7 +36,6 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
 /**
  * PostResource
  *
@@ -46,17 +44,12 @@ use UnitEnum;
 final class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
-
     /**
      * @var UnitEnum|string|null
      */    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
-
+    protected static string | UnitEnum | null $navigationGroup = "Products";
     protected static ?int $navigationSort = 2;
-
     protected static ?string $recordTitleAttribute = 'title';
-
-    /**
      * Handle getNavigationLabel functionality with proper error handling.
      * @return string
      */
@@ -64,41 +57,20 @@ final class PostResource extends Resource
     {
         return __('posts.title');
     }
-
-    /**
      * Handle getNavigationGroup functionality with proper error handling.
      * @return string|null
-     */
     public static function getNavigationGroup(): ?string
-    {
         return "Content";
-    }
-
-    /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
-     */
     public static function getPluralModelLabel(): string
-    {
         return __('posts.plural');
-    }
-
-    /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
-     */
     public static function getModelLabel(): string
-    {
         return __('posts.single');
-    }
-
-    /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $form
+     * @param Form $schema
      * @return Form
-     */
     public static function form(Schema $schema): Schema
-    {
         return $schema->components([
             Section::make(__('posts.basic_information'))
                 ->components([
@@ -113,8 +85,6 @@ final class PostResource extends Resource
                                     $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
                             TextInput::make('slug')
                                 ->label(__('posts.slug'))
-                                ->required()
-                                ->maxLength(255)
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
                         ]),
@@ -139,10 +109,8 @@ final class PostResource extends Resource
                             'h3',
                             'blockquote',
                             'codeBlock',
-                        ]),
                 ]),
             Section::make(__('posts.media'))
-                ->components([
                     FileUpload::make('featured_image')
                         ->label(__('posts.featured_image'))
                         ->image()
@@ -154,20 +122,11 @@ final class PostResource extends Resource
                         ])
                         ->directory('posts/featured')
                         ->visibility('public')
-                        ->columnSpanFull(),
                     FileUpload::make('gallery')
                         ->label(__('posts.gallery'))
-                        ->image()
                         ->multiple()
-                        ->imageEditor()
                         ->directory('posts/gallery')
-                        ->visibility('public')
-                        ->columnSpanFull(),
-                ]),
             Section::make(__('posts.categorization'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
                             Select::make('author_id')
                                 ->label(__('posts.author'))
                                 ->relationship('author', 'name')
@@ -178,55 +137,32 @@ final class PostResource extends Resource
                                 ->label(__('posts.tags'))
                                 ->placeholder(__('posts.add_tag'))
                                 ->separator(','),
-                        ]),
-                ]),
             Section::make(__('posts.publishing'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
                             Toggle::make('is_published')
                                 ->label(__('posts.is_published'))
                                 ->default(false),
                             Toggle::make('is_featured')
                                 ->label(__('posts.is_featured')),
-                        ]),
-                    Grid::make(2)
-                        ->components([
                             DateTimePicker::make('published_at')
                                 ->label(__('posts.published_at'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
                             DateTimePicker::make('expires_at')
                                 ->label(__('posts.expires_at'))
-                                ->displayFormat('d/m/Y H:i'),
-                        ]),
-                ]),
             Section::make(__('posts.seo'))
-                ->components([
                     TextInput::make('seo_title')
                         ->label(__('posts.seo_title'))
                         ->maxLength(255)
-                        ->columnSpanFull(),
                     Textarea::make('seo_description')
                         ->label(__('posts.seo_description'))
                         ->rows(2)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
                     TextInput::make('seo_keywords')
                         ->label(__('posts.seo_keywords'))
-                        ->maxLength(255)
-                        ->columnSpanFull(),
-                ]),
         ]);
-    }
-
-    /**
      * Configure the Filament table with columns, filters, and actions.
      * @param Table $table
      * @return Table
-     */
     public static function table(Table $table): Table
-    {
         return $table
             ->columns([
                 ImageColumn::make('featured_image')
@@ -241,7 +177,6 @@ final class PostResource extends Resource
                     ->limit(50),
                 TextColumn::make('author.name')
                     ->label(__('posts.author'))
-                    ->sortable()
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('excerpt')
@@ -262,42 +197,26 @@ final class PostResource extends Resource
                 TextColumn::make('published_at')
                     ->label(__('posts.published_at'))
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('views_count')
                     ->label(__('posts.views_count'))
                     ->numeric()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label(__('posts.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->label(__('posts.updated_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('author_id')
-                    ->label(__('posts.author'))
                     ->relationship('author', 'name')
-                    ->searchable()
                     ->preload(),
                 TernaryFilter::make('is_published')
                     ->label(__('posts.is_published'))
-                    ->boolean()
                     ->trueLabel(__('posts.published_only'))
                     ->falseLabel(__('posts.draft_only'))
                     ->native(false),
                 TernaryFilter::make('is_featured')
-                    ->label(__('posts.is_featured'))
-                    ->boolean()
                     ->trueLabel(__('posts.featured_only'))
                     ->falseLabel(__('posts.not_featured'))
-                    ->native(false),
                 Filter::make('published_at')
                     ->form([
                         Forms\Components\DatePicker::make('published_from')
@@ -311,12 +230,10 @@ final class PostResource extends Resource
                                 $data['published_from'],
                                 fn(Builder $query, $date): Builder => $query->whereDate('published_at', '>=', $date),
                             )
-                            ->when(
                                 $data['published_until'],
                                 fn(Builder $query, $date): Builder => $query->whereDate('published_at', '<=', $date),
                             );
                     }),
-            ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
@@ -330,7 +247,6 @@ final class PostResource extends Resource
                             'is_published' => true,
                             'published_at' => now(),
                         ]);
-
                         Notification::make()
                             ->title(__('posts.published_successfully'))
                             ->success()
@@ -342,16 +258,8 @@ final class PostResource extends Resource
                     ->icon('heroicon-o-eye-slash')
                     ->color('warning')
                     ->visible(fn(Post $record): bool => $record->is_published)
-                    ->action(function (Post $record): void {
                         $record->update(['is_published' => false]);
-
-                        Notification::make()
                             ->title(__('posts.unpublished_successfully'))
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
-            ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
@@ -364,7 +272,6 @@ final class PostResource extends Resource
                                 'is_published' => true,
                                 'published_at' => now(),
                             ]);
-
                             Notification::make()
                                 ->title(__('posts.bulk_published_success'))
                                 ->success()
@@ -375,42 +282,19 @@ final class PostResource extends Resource
                         ->label(__('posts.unpublish_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
-                        ->action(function (Collection $records): void {
                             $records->each->update(['is_published' => false]);
-
-                            Notification::make()
                                 ->title(__('posts.bulk_unpublished_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
-                ]),
-            ])
             ->defaultSort('published_at', 'desc');
-    }
-
-    /**
      * Get the relations for this resource.
      * @return array
-     */
     public static function getRelations(): array
-    {
         return [
             //
         ];
-    }
-
-    /**
      * Get the pages for this resource.
-     * @return array
-     */
     public static function getPages(): array
-    {
-        return [
             'index' => Pages\ListPosts::route('/'),
             'create' => Pages\CreatePost::route('/create'),
             'view' => Pages\ViewPost::route('/{record}'),
             'edit' => Pages\EditPost::route('/{record}/edit'),
-        ];
-    }
 }

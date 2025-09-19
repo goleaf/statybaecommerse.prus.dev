@@ -1,0 +1,128 @@
+<?php declare(strict_types=1);
+
+return [
+    'title' => 'Activity Logs',
+    'plural' => 'Activity Logs',
+    'single' => 'Activity Log',
+    // Basic Information
+    'basic_information' => 'Basic Information',
+    'user' => 'User',
+    'user_name' => 'User Name',
+    'user_email' => 'User Email',
+    'log_name' => 'Log Name',
+    'log_name_help' => 'Activity log category name',
+    'description' => 'Description',
+    'description_help' => 'Activity description',
+    // Event Information
+    'event_information' => 'Event Information',
+    'event' => 'Event',
+    'subject_type' => 'Subject Type',
+    'subject_type_help' => 'Model class name',
+    'subject_id' => 'Subject ID',
+    'subject_id_help' => 'Subject identifier',
+    'causer_type' => 'Causer Type',
+    'causer_type_help' => 'Causer model class name',
+    'causer_id' => 'Causer ID',
+    'causer_id_help' => 'Causer identifier',
+    'batch_uuid' => 'Batch UUID',
+    'batch_uuid_help' => 'Related activities batch identifier',
+    // Events
+    'events' => [
+        'created' => 'Created',
+        'updated' => 'Updated',
+        'deleted' => 'Deleted',
+        'restored' => 'Restored',
+        'login' => 'Login',
+        'logout' => 'Logout',
+        'failed_login' => 'Failed Login',
+        'password_changed' => 'Password Changed',
+        'email_verified' => 'Email Verified',
+        'custom' => 'Custom',
+    ],
+    // Properties
+    'properties' => 'Properties',
+    'properties_help' => 'Additional data in JSON format',
+    // Context Information
+    'context_information' => 'Context Information',
+    'ip_address' => 'IP Address',
+    'ip_address_help' => 'User IP address',
+    'user_agent' => 'User Agent',
+    'user_agent_help' => 'User browser information',
+    'device_type' => 'Device Type',
+    'device_type_help' => 'Device type (mobile, tablet, desktop)',
+    'browser' => 'Browser',
+    'browser_help' => 'Browser name',
+    'os' => 'Operating System',
+    'os_help' => 'Operating system name',
+    'country' => 'Country',
+    'country_help' => 'User country',
+    // Settings
+    'settings' => 'Settings',
+    'is_important' => 'Important',
+    'is_system' => 'System',
+    'severity' => 'Severity',
+    'severity_help' => 'Activity severity level',
+    'category' => 'Category',
+    'category_help' => 'Activity category',
+    'notes' => 'Notes',
+    // Severities
+    'severities' => [
+        'low' => 'Low',
+        'medium' => 'Medium',
+        'high' => 'High',
+        'critical' => 'Critical',
+    ],
+    // Filters
+    'important_only' => 'Important Only',
+    'non_important_only' => 'Non-Important Only',
+    'system_only' => 'System Only',
+    'user_only' => 'User Only',
+    // Actions
+    'mark_important' => 'Mark as Important',
+    'unmark_important' => 'Unmark as Important',
+    'mark_system' => 'Mark as System',
+    'unmark_system' => 'Unmark as System',
+    'mark_important_selected' => 'Mark Selected as Important',
+    'unmark_important_selected' => 'Unmark Selected as Important',
+    'mark_system_selected' => 'Mark Selected as System',
+    'unmark_system_selected' => 'Unmark Selected as System',
+    // Notifications
+    'marked_as_important_successfully' => 'Successfully marked as important',
+    'unmarked_as_important_successfully' => 'Successfully unmarked as important',
+    'marked_as_system_successfully' => 'Successfully marked as system',
+    'unmarked_as_system_successfully' => 'Successfully unmarked as system',
+    'bulk_marked_as_important_success' => 'Selected records successfully marked as important',
+    'bulk_unmarked_as_important_success' => 'Selected records successfully unmarked as important',
+    'bulk_marked_as_system_success' => 'Selected records successfully marked as system',
+    'bulk_unmarked_as_system_success' => 'Selected records successfully unmarked as system',
+    // Tabs
+    'tabs' => [
+        'all' => 'All',
+        'created' => 'Created',
+        'updated' => 'Updated',
+        'deleted' => 'Deleted',
+        'login' => 'Logins',
+        'logout' => 'Logouts',
+        'today' => 'Today',
+        'this_week' => 'This Week',
+    ],
+    // Charts
+    'charts' => [
+        'activities_over_time' => 'Activities Over Time',
+    ],
+    // Stats
+    'stats' => [
+        'total_activities' => 'Total Activities',
+        'total_activities_description' => 'Total number of activities in the system',
+        'today_activities' => "Today's Activities",
+        'today_activities_description' => 'Activities performed today',
+        'week_activities' => "Week's Activities",
+        'week_activities_description' => 'Activities performed this week',
+        'unique_users' => 'Unique Users',
+        'unique_users_description' => 'Unique users who performed activities',
+    ],
+    // Created/Updated timestamps
+    'created_at' => 'Created At',
+    'updated_at' => 'Updated At',
+];
+

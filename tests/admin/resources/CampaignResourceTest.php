@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -16,7 +14,7 @@ final class CampaignResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->actingAs(User::factory()->create());
     }
 
@@ -25,23 +23,19 @@ final class CampaignResourceTest extends TestCase
         $campaignData = [
             'name' => 'Test Campaign',
             'slug' => 'test-campaign',
-            'description' => 'Test campaign description',
-            'type' => 'email',
             'status' => 'draft',
             'is_active' => true,
         ];
 
         $campaign = Campaign::create($campaignData);
 
-        $this->assertDatabaseHas('campaigns', [
-            'name' => json_encode(['lt' => 'Test Campaign']),
+        $this->assertDatabaseHas('discount_campaigns', [
+            'name' => 'Test Campaign',
             'slug' => 'test-campaign',
-            'type' => 'email',
             'status' => 'draft',
         ]);
 
         $this->assertEquals('Test Campaign', $campaign->name);
-        $this->assertEquals('email', $campaign->type);
         $this->assertEquals('draft', $campaign->status);
     }
 
@@ -51,13 +45,11 @@ final class CampaignResourceTest extends TestCase
 
         $campaign->update([
             'name' => 'Updated Campaign Name',
-            'description' => 'Updated description',
-            'status' => 'running',
+            'status' => 'active',
         ]);
 
-        $this->assertEquals('Updated Campaign Name', $campaign->getTranslation('name', 'lt'));
-        $this->assertEquals('Updated description', $campaign->getTranslation('description', 'lt'));
-        $this->assertEquals('running', $campaign->status);
+        $this->assertEquals('Updated Campaign Name', $campaign->name);
+        $this->assertEquals('active', $campaign->status);
     }
 
     public function test_can_delete_campaign(): void
@@ -66,37 +58,42 @@ final class CampaignResourceTest extends TestCase
 
         $campaign->delete();
 
-        $this->assertSoftDeleted('campaigns', [
+        $this->assertSoftDeleted('discount_campaigns', [
             'id' => $campaign->id,
         ]);
     }
 
-    public function test_can_filter_campaigns_by_type(): void
-    {
-        Campaign::factory()->create(['type' => 'email']);
-        Campaign::factory()->create(['type' => 'sms']);
-
-        $emailCampaigns = Campaign::where('type', 'email')->get();
-        $smsCampaigns = Campaign::where('type', 'sms')->get();
-
-        $this->assertCount(1, $emailCampaigns);
-        $this->assertCount(1, $smsCampaigns);
-        $this->assertEquals('email', $emailCampaigns->first()->type);
-        $this->assertEquals('sms', $smsCampaigns->first()->type);
-    }
-
     public function test_can_filter_campaigns_by_status(): void
     {
-        Campaign::factory()->create(['status' => 'running']);
-        Campaign::factory()->create(['status' => 'paused']);
+        // Create campaigns with different statuses
+        $activeCampaign = Campaign::factory()->active()->create();
+        $pausedCampaign = Campaign::factory()->create(['status' => 'paused']);
 
-        $runningCampaigns = Campaign::where('status', 'running')->get();
+        // Debug: Check what was actually created
+        $allCampaigns = Campaign::all();
+        $this->assertCount(2, $allCampaigns, 'Should have 2 campaigns total');
+
+        $activeCampaigns = Campaign::where('status', 'active')->get();
         $pausedCampaigns = Campaign::where('status', 'paused')->get();
 
-        $this->assertCount(1, $runningCampaigns);
+        $this->assertCount(1, $activeCampaigns);
         $this->assertCount(1, $pausedCampaigns);
-        $this->assertEquals('running', $runningCampaigns->first()->status);
+        $this->assertEquals('active', $activeCampaigns->first()->status);
         $this->assertEquals('paused', $pausedCampaigns->first()->status);
+    }
+
+    public function test_can_filter_campaigns_by_different_status(): void
+    {
+        Campaign::factory()->draft()->create();
+        Campaign::factory()->scheduled()->create();
+
+        $draftCampaigns = Campaign::where('status', 'draft')->get();
+        $scheduledCampaigns = Campaign::where('status', 'scheduled')->get();
+
+        $this->assertCount(1, $draftCampaigns);
+        $this->assertCount(1, $scheduledCampaigns);
+        $this->assertEquals('draft', $draftCampaigns->first()->status);
+        $this->assertEquals('scheduled', $scheduledCampaigns->first()->status);
     }
 
     public function test_can_filter_campaigns_by_active_status(): void

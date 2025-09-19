@@ -1,14 +1,12 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Region;
-use App\Models\Zone;
 use App\Models\User;
+use App\Models\Zone;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,7 +19,7 @@ final class CityResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->adminUser = User::factory()->create([
             'email' => 'admin@example.com',
             'is_admin' => true,
@@ -32,7 +30,8 @@ final class CityResourceTest extends TestCase
     {
         City::factory()->count(3)->create();
 
-        $response = $this->actingAs($this->adminUser)
+        $response = $this
+            ->actingAs($this->adminUser)
             ->get(route('filament.admin.resources.cities.index'));
 
         $response->assertOk();
@@ -41,29 +40,26 @@ final class CityResourceTest extends TestCase
     public function test_can_create_city(): void
     {
         $country = Country::factory()->create();
-        $region = Region::factory()->create(['country_id' => $country->id]);
-        $zone = Zone::factory()->create();
 
         $cityData = [
             'name' => 'Test City',
-            'slug' => 'test-city',
             'code' => 'TC',
             'description' => 'Test description',
             'country_id' => $country->id,
-            'region_id' => $region->id,
-            'zone_id' => $zone->id,
-            'is_enabled' => true,
+            'is_active' => true,
             'is_capital' => false,
-            'level' => 0,
+            'population' => 100000,
+            'sort_order' => 1,
         ];
 
-        $response = $this->actingAs($this->adminUser)
+        $response = $this
+            ->actingAs($this->adminUser)
             ->post(route('filament.admin.resources.cities.create'), $cityData);
 
         $this->assertDatabaseHas('cities', [
             'name' => 'Test City',
-            'slug' => 'test-city',
             'code' => 'TC',
+            'country_id' => $country->id,
         ]);
     }
 
@@ -78,7 +74,8 @@ final class CityResourceTest extends TestCase
             'is_capital' => true,
         ];
 
-        $response = $this->actingAs($this->adminUser)
+        $response = $this
+            ->actingAs($this->adminUser)
             ->put(route('filament.admin.resources.cities.update', ['record' => $city->id]), $updateData);
 
         $this->assertDatabaseHas('cities', [
@@ -93,7 +90,8 @@ final class CityResourceTest extends TestCase
     {
         $city = City::factory()->create();
 
-        $response = $this->actingAs($this->adminUser)
+        $response = $this
+            ->actingAs($this->adminUser)
             ->delete(route('filament.admin.resources.cities.destroy', ['record' => $city->id]));
 
         $this->assertSoftDeleted('cities', ['id' => $city->id]);
@@ -103,7 +101,8 @@ final class CityResourceTest extends TestCase
     {
         $city = City::factory()->create();
 
-        $response = $this->actingAs($this->adminUser)
+        $response = $this
+            ->actingAs($this->adminUser)
             ->get(route('filament.admin.resources.cities.view', ['record' => $city->id]));
 
         $response->assertOk();

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -21,13 +19,13 @@ final class VariantImageFactory extends Factory
             'image_path' => $this->faker->imageUrl(800, 600, 'products'),
             'alt_text' => $this->faker->sentence(3),
             'sort_order' => $this->faker->numberBetween(0, 100),
-            'is_primary' => $this->faker->boolean(20), // 20% chance of being primary
+            'is_primary' => $this->faker->boolean(20),  // 20% chance of being primary
         ];
     }
 
     public function primary(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_primary' => true,
             'sort_order' => 0,
         ]);
@@ -35,9 +33,10 @@ final class VariantImageFactory extends Factory
 
     public function secondary(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_primary' => false,
             'sort_order' => $this->faker->numberBetween(1, 10),
         ]);
     }
 }
+

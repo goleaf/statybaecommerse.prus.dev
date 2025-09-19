@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
-
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\StockMovement;
 use App\Models\User;
@@ -23,7 +22,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-
 /**
  * StockMovementResource
  *
@@ -32,37 +30,23 @@ use UnitEnum;
 final class StockMovementResource extends Resource
 {
     protected static ?string $model = StockMovement::class;    /** @var UnitEnum|string|null */
-    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
-
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Inventory;
     protected static ?int $navigationSort = 3;
-
     protected static ?string $recordTitleAttribute = 'id';
-
     public static function getNavigationLabel(): string
     {
         return __('stock_movement.title');
     }
-
     public static function getNavigationGroup(): ?string
-    {
-        return 'Inventory';
-    }
-
+        return NavigationGroup::Inventory->value;
     public static function getPluralModelLabel(): string
-    {
         return __('stock_movement.plural');
-    }
-
     public static function getModelLabel(): string
-    {
         return __('stock_movement.single');
-    }
-
     /**
      * Configure the Filament form schema with fields and validation.
      */
     public static function form(Schema $schema): Schema
-    {
         return $schema->components([
             Section::make(__('stock_movement.sections.basic_information'))
                 ->components([
@@ -78,18 +62,10 @@ final class StockMovementResource extends Resource
                             Select::make('user_id')
                                 ->label(__('stock_movement.fields.user'))
                                 ->relationship('user', 'name')
-                                ->required()
-                                ->searchable()
-                                ->preload()
-                                ->columnSpan(1),
                         ]),
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('quantity')
                                 ->label(__('stock_movement.fields.quantity'))
                                 ->numeric()
-                                ->required()
-                                ->columnSpan(1),
                             Select::make('type')
                                 ->label(__('stock_movement.fields.type'))
                                 ->options([
@@ -98,24 +74,14 @@ final class StockMovementResource extends Resource
                                     'adjustment' => __('stock_movement.types.adjustment'),
                                     'transfer' => __('stock_movement.types.transfer'),
                                 ])
-                                ->required()
-                                ->columnSpan(1),
-                        ]),
                 ])
                 ->columns(1),
             Section::make(__('stock_movement.sections.details'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
                             TextInput::make('reason')
                                 ->label(__('stock_movement.fields.reason'))
                                 ->maxLength(255)
-                                ->columnSpan(1),
                             TextInput::make('reference')
                                 ->label(__('stock_movement.fields.reference'))
-                                ->maxLength(255)
-                                ->columnSpan(1),
-                        ]),
                     Textarea::make('notes')
                         ->label(__('stock_movement.fields.notes'))
                         ->maxLength(1000)
@@ -124,16 +90,9 @@ final class StockMovementResource extends Resource
                         ->label(__('stock_movement.fields.moved_at'))
                         ->required()
                         ->default(now()),
-                ])
-                ->columns(1),
         ]);
-    }
-
-    /**
      * Configure the Filament table with columns, filters, and actions.
-     */
     public static function table(Table $table): Table
-    {
         return $table
             ->columns([
                 TextColumn::make('variantInventory.variant.name')
@@ -142,12 +101,9 @@ final class StockMovementResource extends Resource
                     ->sortable(),
                 TextColumn::make('user.name')
                     ->label(__('stock_movement.fields.user'))
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('quantity')
                     ->label(__('stock_movement.fields.quantity'))
                     ->numeric()
-                    ->sortable(),
                 TextColumn::make('type')
                     ->label(__('stock_movement.fields.type'))
                     ->badge()
@@ -160,20 +116,15 @@ final class StockMovementResource extends Resource
                     }),
                 TextColumn::make('reason')
                     ->label(__('stock_movement.fields.reason'))
-                    ->searchable()
                     ->toggleable(),
                 TextColumn::make('reference')
                     ->label(__('stock_movement.fields.reference'))
-                    ->searchable()
-                    ->toggleable(),
                 TextColumn::make('moved_at')
                     ->label(__('stock_movement.fields.moved_at'))
                     ->dateTime()
-                    ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('type')
-                    ->label(__('stock_movement.fields.type'))
                     ->options([
                         'in' => __('stock_movement.types.in'),
                         'out' => __('stock_movement.types.out'),
@@ -181,31 +132,22 @@ final class StockMovementResource extends Resource
                         'transfer' => __('stock_movement.types.transfer'),
                     ]),
                 SelectFilter::make('user_id')
-                    ->label(__('stock_movement.fields.user'))
                     ->relationship('user', 'name')
-                    ->searchable()
                     ->preload(),
                 DateFilter::make('moved_at')
                     ->label(__('stock_movement.fields.moved_at')),
-            ])
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
-            ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ])
             ->defaultSort('moved_at', 'desc');
-    }
-
     public static function getPages(): array
-    {
         return [
             'index' => Pages\ListStockMovements::route('/'),
             'create' => Pages\CreateStockMovement::route('/create'),
             'edit' => Pages\EditStockMovement::route('/{record}/edit'),
         ];
-    }
 }
