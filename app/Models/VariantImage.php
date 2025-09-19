@@ -91,7 +91,8 @@ final class VariantImage extends Model implements HasMedia
         }
         
         $pathInfo = pathinfo($this->image_path);
-        $thumbnailPath = $pathInfo['dirname'] . '/thumbnails/' . $pathInfo['filename'] . '_thumb.' . $pathInfo['extension'];
+        $extension = $pathInfo['extension'] ?? 'jpg';
+        $thumbnailPath = $pathInfo['dirname'] . '/thumbnails/' . $pathInfo['filename'] . '_thumb.' . $extension;
         
         return asset('storage/' . $thumbnailPath);
     }

@@ -54,6 +54,7 @@ final class AdminPanelProvider extends PanelProvider
                 \App\Filament\Resources\BrandResource::class,
                 \App\Filament\Resources\CollectionResource::class,
                 \App\Filament\Resources\ProductVariantResource::class,
+                \App\Filament\Resources\VariantImageResource::class,
                 // Orders
                 \App\Filament\Resources\OrderResource::class,
                 \App\Filament\Resources\CartItemResource::class,

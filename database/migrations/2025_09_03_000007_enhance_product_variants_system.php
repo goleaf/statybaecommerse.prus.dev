@@ -140,6 +140,7 @@ return new class extends Migration
                 $table->integer('sort_order')->default(0);
                 $table->boolean('is_primary')->default(false);
                 $table->timestamps();
+                $table->softDeletes();
 
                 $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
                 $table->index(['variant_id', 'sort_order']);
