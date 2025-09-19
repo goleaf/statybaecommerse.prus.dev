@@ -2,16 +2,16 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Dashboard as BaseDashboard;
 use BackedEnum;
-use UnitEnum;
+use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-home';
     protected static ?int $navigationSort = 1;
+    
     protected static ?string $navigationLabel = 'Dashboard';
-    protected static string $routePath = '';
+    
+    protected static ?string $title = 'Dashboard';
 
     public function getTitle(): string
     {
@@ -38,6 +38,6 @@ class Dashboard extends BaseDashboard
 
     public static function canAccess(): bool
     {
-        return true; // Temporarily allow access for testing
+        return true;  // Temporarily allow access for testing
     }
 }

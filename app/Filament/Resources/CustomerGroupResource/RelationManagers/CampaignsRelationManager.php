@@ -19,7 +19,7 @@ final class CampaignsRelationManager extends RelationManager
         return $schema
             ->components([
                 Forms\Components\TextInput::make('name')
-                    ->required(),
+                    ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('status')
                     ->options([
@@ -33,17 +33,16 @@ final class CampaignsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-    {
         return $table
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('campaigns.name'))
-                    ->searchable(),
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('campaigns.status'))
-                    ->badge(),
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'active' => 'success',
                         'draft' => 'gray',

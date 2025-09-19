@@ -34,27 +34,25 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use BackedEnum;
 
 final class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static string|UnitEnum|null $navigationGroup = 'Content';
 
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Tabs::make('Slider Content')
                     ->tabs([
                         Tab::make('Lithuanian (LT)')
                             ->icon('heroicon-o-flag')
-                            ->schema([
+                            ->components([
                                 TextInput::make('title')
                                     ->label(__('translations.title') . ' (LT)')
                                     ->required()
@@ -72,10 +70,10 @@ final class SliderResource extends Resource
                             ]),
                         Tab::make('English (EN)')
                             ->icon('heroicon-o-language')
-                            ->schema([
+                            ->components([
                                 Repeater::make('translations')
                                     ->relationship('translations')
-                                    ->schema([
+                                    ->components([
                                         Hidden::make('locale')
                                             ->default('en'),
                                         TextInput::make('title')
@@ -99,7 +97,7 @@ final class SliderResource extends Resource
                             ]),
                         Tab::make('Media & Styling')
                             ->icon('heroicon-o-photo')
-                            ->schema([
+                            ->components([
                                 FileUpload::make('slider_image')
                                     ->label(__('translations.slider_image'))
                                     ->image()
@@ -139,7 +137,7 @@ final class SliderResource extends Resource
                             ]),
                         Tab::make('Settings & Behavior')
                             ->icon('heroicon-o-cog-6-tooth')
-                            ->schema([
+                            ->components([
                                 TextInput::make('button_url')
                                     ->label(__('translations.button_url'))
                                     ->url()
@@ -178,7 +176,7 @@ final class SliderResource extends Resource
                             ]),
                         Tab::make('Advanced Settings')
                             ->icon('heroicon-o-adjustments-horizontal')
-                            ->schema([
+                            ->components([
                                 KeyValue::make('settings')
                                     ->label(__('translations.advanced_settings'))
                                     ->keyLabel(__('translations.setting_key'))

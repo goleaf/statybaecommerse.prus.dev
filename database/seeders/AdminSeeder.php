@@ -79,7 +79,7 @@ final class AdminSeeder extends Seeder
         $this->createOrderShipping($orders);
         
         // Create documents
-        $this->createDocuments($orders);
+        // $this->createDocuments($orders); // Temporarily disabled - requires document_template_id
         
         // Create discount codes
         $this->createDiscountCodes();
@@ -554,12 +554,10 @@ final class AdminSeeder extends Seeder
                 ['order_id' => $order->id],
                 [
                     'order_id' => $order->id,
-                    'shipping_method' => ['standard', 'express', 'overnight'][rand(0, 2)],
-                    'carrier' => ['DHL', 'UPS', 'FedEx', 'Post'][rand(0, 3)],
+                    'carrier_name' => ['DHL', 'UPS', 'FedEx', 'Post'][rand(0, 3)],
+                    'service' => ['standard', 'express', 'overnight'][rand(0, 2)],
                     'tracking_number' => 'TRK' . rand(100000, 999999),
-                    'status' => ['pending', 'shipped', 'in_transit', 'delivered'][rand(0, 3)],
-                    'base_cost' => rand(10, 50),
-                    'total_cost' => rand(15, 75),
+                    'cost' => rand(15, 75),
                 ]
             );
         }
@@ -572,16 +570,16 @@ final class AdminSeeder extends Seeder
         foreach ($orders as $order) {
             Document::firstOrCreate(
                 [
-                    'order_id' => $order->id,
-                    'type' => 'invoice',
+                    'documentable_type' => Order::class,
+                    'documentable_id' => $order->id,
                 ],
                 [
-                    'order_id' => $order->id,
-                    'type' => 'invoice',
+                    'documentable_type' => Order::class,
+                    'documentable_id' => $order->id,
                     'title' => 'Invoice for Order ' . $order->number,
                     'content' => 'Sample document content',
-                    'is_public' => rand(0, 1),
                     'status' => ['draft', 'approved', 'rejected'][rand(0, 2)],
+                    'format' => 'pdf',
                 ]
             );
         }
@@ -785,22 +783,18 @@ final class AdminSeeder extends Seeder
             [
                 'name' => 'Main Warehouse',
                 'type' => 'warehouse',
-                'address' => '123 Warehouse Street',
+                'address_line_1' => '123 Warehouse Street',
                 'city' => 'Vilnius',
                 'country_code' => 'LT',
-                'country_id' => $countries[0]->id,
-                'zone_id' => $zones[0]->id,
-                'is_active' => true,
+                'is_enabled' => true,
             ],
             [
                 'name' => 'Store Location',
                 'type' => 'store',
-                'address' => '456 Main Street',
+                'address_line_1' => '456 Main Street',
                 'city' => 'Vilnius',
                 'country_code' => 'LT',
-                'country_id' => $countries[0]->id,
-                'zone_id' => $zones[0]->id,
-                'is_active' => true,
+                'is_enabled' => true,
             ],
         ];
 

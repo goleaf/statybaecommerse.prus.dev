@@ -28,16 +28,13 @@ final class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static string | UnitEnum | null $navigationGroup = "Locations";
+    protected static string|UnitEnum|null $navigationGroup = 'Geography';
 
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
-
-    protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup | UnitEnum | protected static string | UnitEnum | null $navigationGroup|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
+    
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-globe-alt';
 
     public static function form(Schema $schema): Schema
     {

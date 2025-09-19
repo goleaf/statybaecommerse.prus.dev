@@ -52,6 +52,7 @@ final class AdminPanelProvider extends PanelProvider
                 \App\Filament\Resources\OrderResource::class,
                 \App\Filament\Resources\AddressResource::class,
                 \App\Filament\Resources\SystemResource::class,
+                // \App\Filament\Resources\Sliders\SliderResource::class, // Temporarily disabled due to Filament v4 compatibility issues
                 // \App\Filament\Resources\VariantPricingRuleResource::class, // Temporarily disabled - class not found
                 // \App\Filament\Resources\LegalResource::class, // Temporarily disabled
                 // \App\Filament\Resources\RecommendationConfigResource::class, // Temporarily disabled due to Filament v4 compatibility issues
@@ -60,7 +61,6 @@ final class AdminPanelProvider extends PanelProvider
                 // \App\Filament\Resources\PostResource::class, // Temporarily disabled due to Filament v4 compatibility issues
                 // \App\Filament\Resources\SystemSettingsResource::class, // Disabled due to Filament v4 compatibility issues
             ])
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
                 \App\Filament\Pages\Dashboard::class,
                 \App\Filament\Pages\SliderAnalytics::class,
