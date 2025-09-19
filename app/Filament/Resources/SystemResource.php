@@ -218,12 +218,12 @@ final class SystemResource extends Resource
                                                 'system' => 'System Only',
                                             ])
                                             ->helperText('Permission level required to modify this setting'),
-                                        Select::make('user_id')
-                                            ->label('Created By')
-                                            ->relationship('user', 'name')
+                                        Select::make('updated_by')
+                                            ->label('Updated By')
+                                            ->relationship('updatedBy', 'name')
                                             ->default(auth()->id())
                                             ->disabled()
-                                            ->helperText('User who created this setting'),
+                                            ->helperText('User who last updated this setting'),
                                     ]),
                                 Section::make('System Integration')
                                     ->schema([
