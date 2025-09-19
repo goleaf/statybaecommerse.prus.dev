@@ -12,9 +12,6 @@ return [
     ],
     // Navigation
     'nav_home' => 'Pradžia',
-    'nav_categories' => 'Kategorijos',
-    'nav_collections' => 'Kolekcijos',
-    'nav_brands' => 'Prekės ženklai',
     'nav_search' => 'Paieška',
     'nav_cart' => 'Krepšelis',
     'nav_admin' => 'Admin',
@@ -209,9 +206,6 @@ return [
     'admin_navigation_catalog' => 'Katalogas',
     'admin_navigation_orders' => 'Užsakymai',
     'admin_navigation_products' => 'Produktai',
-    'admin_navigation_categories' => 'Kategorijos',
-    'admin_navigation_brands' => 'Prekės ženklai',
-    'admin_navigation_collections' => 'Kolekcijos',
     'admin_navigation_attributes' => 'Atributai',
     'admin_navigation_inventory' => 'Atsargos',
     'admin_navigation_promotions' => 'Akcijos',
@@ -673,8 +667,6 @@ return [
                 'track_stock' => 'Sekti atsargas',
                 'allow_backorder' => 'Leisti užsakymus be atsargų',
                 'brand' => 'Prekės ženklas',
-                'categories' => 'Kategorijos',
-                'collections' => 'Kolekcijos',
                 'images' => 'Nuotraukos',
                 'is_published' => 'Publikuotas',
                 'is_featured' => 'Rekomenduojamas',
@@ -690,7 +682,6 @@ return [
                 'is_published' => 'Būsena',
                 'is_featured' => 'Rekomenduojamas',
                 'brand' => 'Prekės ženklas',
-                'categories' => 'Kategorijos',
                 'stock_status' => 'Atsargų būsena',
                 'in_stock' => 'Yra atsargų',
                 'low_stock' => 'Mažai atsargų',
@@ -858,9 +849,6 @@ return [
     'JSON format Laravel validation rules' => 'JSON formato Laravel validavimo taisyklės',
     'Enter valid JSON format' => 'Įveskite tinkamą JSON formatą',
     'admin_products' => 'Produktai',
-    'admin_categories' => 'Kategorijos',
-    'admin_brands' => 'Prekės ženklai',
-    'admin_collections' => 'Kolekcijos',
     'admin_orders' => 'Užsakymai',
     'admin_customers' => 'Klientai',
     'admin_settings' => 'Nustatymai',
@@ -909,9 +897,6 @@ return [
     'filter_clear' => 'Išvalyti filtrus',
     'filter_apply' => 'Taikyti filtrus',
     'filters' => 'Filtrai',
-    'filter_categories' => 'Kategorijos',
-    'filter_collections' => 'Kolekcijos',
-    'filter_brands' => 'Prekės ženklai',
     'filter_price' => 'Kainų intervalas',
     'filter_min' => 'Min',
     'filter_max' => 'Maks',
@@ -1542,7 +1527,6 @@ return [
             'tags_help' => 'Žymės atskiriamos kableliais, pvz.: tag1, tag2, tag3',
         ],
     ],
-    
     // Newsletter translations
     'newsletter' => [
         'email_address' => 'El. pašto adresas',
@@ -1564,10 +1548,8 @@ return [
         'subscribing' => 'Prenumeruojama...',
         'privacy_notice' => 'Prenumeruodami sutinkate su mūsų privatumo politika',
     ],
-    
     // Product image alt text
     'product_image_alt' => 'Produkto nuotrauka',
-    
     // Additional search translations
     'search_for' => 'pagal',
     'search_result_count' => ':count rezultatas rastas|:count rezultatai rasti|:count rezultatų rasta',

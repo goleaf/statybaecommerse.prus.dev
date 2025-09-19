@@ -2,10 +2,6 @@
 
 return [
     // General translations
-    'categories' => 'Kategorijos',
-    'collections' => 'Kolekcijos',
-    'brands' => 'Prekės ženklai',
-    'support_centre' => 'Pagalbos centras',
     'home' => 'Pradžia',
     'breadcrumb' => 'Navigacijos kelias',
     'catalogue_overview' => 'Katalogo apžvalga',
@@ -34,9 +30,6 @@ return [
     'adjust_filters' => 'Pakoreguokite filtrus, kad personalizuotumėte katalogo rodymą.',
     'close' => 'Uždaryti',
     'explore_comprehensive_range' => 'Naršykite mūsų išsamų kategorijų asortimentą',
-    'support_centre' => 'Pagalbos centras',
-    'collections' => 'Kolekcijos',
-    'brands' => 'Prekės ženklai',
     'login' => 'Prisijungti',
     'items_in_cart' => 'prekių krepšelyje',
     'view_cart' => 'peržiūrėti krepšelį',
@@ -58,23 +51,17 @@ return [
     'monday_friday' => 'Pirmadienis - Penktadienis: 9:00 - 17:00',
     'shipping_to' => 'Pristatymas į',
     'change_zone' => 'keisti zoną',
-    'Support centre' => 'Pagalbos centras',
     'Check availability' => 'Patikrinti prieinamumą',
     '+370 600 00 000' => '+370 600 00 000',
     'Fast next-day delivery across Lithuania' => 'Greitas pristatymas per dieną visoje Lietuvoje',
     'Secure payments & 30-day returns' => 'Saugūs mokėjimai ir 30 dienų grąžinimas',
     'Store locator' => 'Parduotuvių paieška',
-    'Support centre' => 'Pagalbos centras',
-    'support_centre' => 'Pagalbos centras',
-    
     'navigation' => [
         'products' => 'Produktai',
         'campaigns' => 'Kampanijos',
         'orders' => 'Užsakymai',
         'addresses' => 'Adresai',
         'countries' => 'Šalys',
-        'categories' => 'Kategorijos',
-        'brands' => 'Prekės ženklai',
         'news' => 'Naujienos',
         'locations' => 'Vietos',
         'referrals' => 'Rekomendacijos',
@@ -84,9 +71,6 @@ return [
         'checkout' => 'Atsiskaitymas',
         'account' => 'Paskyra',
         'notifications' => 'Pranešimai',
-        'support_centre' => 'Pagalbos centras',
-        'collections' => 'Kolekcijos',
-        'Support centre' => 'Pagalbos centras',
     ],
     'brands' => [
         'title' => 'Prekės ženklai',
@@ -311,20 +295,14 @@ return [
             'notes' => 'Pastabos',
         ],
     ],
-    
     // Header and navigation translations
     'header' => [
         'search_placeholder' => 'Ieškoti produktų...',
-        'categories' => 'Kategorijos',
-        'collections' => 'Kolekcijos',
-        'brands' => 'Prekių ženklai',
-        'support_centre' => 'Pagalbos centras',
         'login' => 'Prisijungti',
         'cart' => 'Krepšelis',
         'items_in_cart' => 'prekių krepšelyje, peržiūrėti krepšelį',
         'view_cart' => 'Peržiūrėti krepšelį',
     ],
-    
     // Homepage translations
     'home' => [
         'limited_time' => 'Ribotas laikas: greitas paėmimas per 2 valandas Vilniaus užsakymams.',
@@ -334,10 +312,8 @@ return [
         'store_locator' => 'Parduotuvių paieška',
         'support_email' => 'support@statybae.com',
     ],
-    
     // Categories page translations
     'categories' => [
-        'title' => 'Kategorijos',
         'catalogue_overview' => 'Katalogo apžvalga',
         'description' => 'Atraskite kiekvieną StatyBae Commerce skyrių',
         'subtitle' => 'Naršykite struktūrizuotas kategorijas, kurias paruošė mūsų prekių specialistai, kad padėtų profesionalams ir savo rankomis dirbantiems entuziastams greičiau rasti tinkamas medžiagas.',
@@ -374,7 +350,6 @@ return [
         'try_other_keywords' => 'Išbandykite kitus raktažodžius',
         'view_all_results' => 'Peržiūrėti visus rezultatus',
     ],
-    
     // General UI translations
     'ui' => [
         'limited_time' => 'Ribotas laikas',
@@ -433,7 +408,6 @@ return [
         'adjust_filters' => 'Pakoreguokite filtrus, kad personalizuotumėte katalogo rodymą.',
         'close' => 'Uždaryti',
     ],
-    
     // Collections translations
     'collections' => [
         'electrical_lighting' => 'Elektros ir apšvietimas',
@@ -443,7 +417,6 @@ return [
         'plumbing_hvac' => 'Santechnika ir oro kondicionavimas',
         'roofing_weatherproofing' => 'Stogai ir hidroizoliacija',
     ],
-    
     // Footer translations
     'footer' => [
         'title' => 'Statybos įrankių parduotuvė',
@@ -454,9 +427,6 @@ return [
         'secure_payment' => 'Saugus mokėjimas',
         'contacts' => 'Kontaktai',
         'store' => 'Parduotuvė',
-        'categories' => 'Kategorijos',
-        'collections' => 'Kolekcijos',
-        'brands' => 'Prekių ženklai',
         'delivery' => 'Pristatymas',
         'returns_compensation' => 'Grąžinimai ir kompensacijos',
         'newsletter_title' => 'Prenumeruokite naujienlaiškį',
@@ -484,7 +454,6 @@ return [
         'change_zone' => 'keisti zoną',
         'copyright' => '© 2025 Laravel, Inc. Visos teisės saugomos Sukurta su Filament',
     ],
-
     // Product page specific translations
     'limited_time' => 'Ribotas laikas',
     'express_pickup' => 'ekspresinis paėmimas per 2 valandas Vilniaus užsakymams',
@@ -572,7 +541,6 @@ return [
     'all_rights_reserved' => 'Visos teisės saugomos',
     'created_with' => 'Sukurta su',
     'filament' => 'Filament',
-    
     // Product history page translations
     'products' => [
         'history' => 'Produkto istorija',
@@ -616,7 +584,6 @@ return [
         'new_value' => 'Nauja reikšmė',
         'additional_info' => 'Papildoma informacija',
     ],
-    
     // Additional missing translations
     'building_supplies_marketplace' => 'Statybos medžiagų prekybos platforma',
     'phone_number' => '+370 600 00 000',
@@ -645,13 +612,11 @@ return [
     'country_flag' => 'šalies vėliava',
     'change_zone' => 'keisti zoną',
     'copyright' => '© 2025 Laravel, Inc. Visos teisės saugomos Sukurta su Filament',
-    
     // New comprehensive translations from user content
     'check_availability' => 'Patikrinti prieinamumą',
     'fast_next_day_delivery' => 'Greitas pristatymas per dieną visoje Lietuvoje',
     'secure_payments_returns' => 'Saugūs mokėjimai ir 30 dienų grąžinimas',
     'store_locator' => 'Parduotuvių paieška',
-    'support_centre' => 'Pagalbos centras',
     'search_products_placeholder' => 'Ieškoti produktų...',
     'power_tools' => 'Elektroįrankiai',
     'hand_tools' => 'Rankų įrankiai',
@@ -697,7 +662,6 @@ return [
     'time_5_04s' => '5.04s',
     'size_26mb' => '26MB',
     'get_account_orders' => 'GET account/orders',
-    
     // Newsletter translations
     'newsletter' => [
         'email_address' => 'El. pašto adresas',

@@ -81,6 +81,8 @@ class DatabaseSeeder extends Seeder
             LegalSeeder::class,
             // Build header menu from categories
             MenuSeeder::class,
+            // Sliders for homepage
+            SliderSeeder::class,
         ]);
 
         if (! $wasLoggingDisabled) {

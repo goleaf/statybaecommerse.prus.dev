@@ -40,8 +40,8 @@ return [
         'brands' => 'brands',
         'contact_us' => 'Contact Us',
         'browse_products' => 'Browse Products',
-        'cant_find_brand' => 'Can\'t find your brand?',
-        'partnership_text' => 'We\'re always looking to partner with new brands. Contact us to discuss partnership opportunities.',
+        'cant_find_brand' => "Can't find your brand?",
+        'partnership_text' => "We're always looking to partner with new brands. Contact us to discuss partnership opportunities.",
         'about_brand' => 'About :brand',
         'brand_information' => 'Brand Information',
         'brand_name' => 'Brand Name',
@@ -205,7 +205,7 @@ return [
         ],
         'empty' => [
             'title' => 'No Redemptions',
-            'description' => 'You don\'t have any discount redemptions yet.',
+            'description' => "You don't have any discount redemptions yet.",
         ],
         'actions' => [
             'filter' => 'Filter',
@@ -242,7 +242,6 @@ return [
             'notes' => 'Notes',
         ],
     ],
-    
     // Header and navigation translations
     'header' => [
         'search_placeholder' => 'Search products...',
@@ -255,7 +254,6 @@ return [
         'items_in_cart' => 'items in cart, view cart',
         'view_cart' => 'View Cart',
     ],
-    
     // Homepage translations
     'home' => [
         'check_availability' => 'Check availability',
@@ -264,7 +262,6 @@ return [
         'store_locator' => 'Store locator',
         'support_email' => 'support@statybae.com',
     ],
-    
     // Categories page translations
     'categories' => [
         'title' => 'Categories',
@@ -297,17 +294,13 @@ return [
         'showing_results' => 'Showing :from–:to of :total results',
         'showing_to' => 'Showing :from to :to of :total results',
     ],
-    
     // Collections translations
     'collections' => [
-        'electrical_lighting' => 'Electrical & Lighting',
         'foundation_structure' => 'Foundation & Structure',
         'interior_finishing' => 'Interior Finishing Essentials',
         'outdoor_landscaping' => 'Outdoor & Landscaping',
-        'plumbing_hvac' => 'Plumbing & HVAC',
         'roofing_weatherproofing' => 'Roofing & Weatherproofing',
     ],
-    
     // Footer translations
     'footer' => [
         'title' => 'Construction Tools Store',

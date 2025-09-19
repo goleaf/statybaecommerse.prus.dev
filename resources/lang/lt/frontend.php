@@ -1,14 +1,9 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 return [
     'navigation' => [
         'home' => 'Pagrindinis',
         'products' => 'Produktai',
-        'categories' => 'Kategorijos',
-        'brands' => 'Prekės ženklai',
-        'collections' => 'Kolekcijos',
         'about' => 'Apie mus',
         'contact' => 'Kontaktai',
     ],
@@ -150,8 +145,6 @@ return [
         'filters' => 'Filtrai',
         'clear_filters' => 'Valyti filtrus',
         'price_range' => 'Kainų intervalas',
-        'brands' => 'Prekės ženklai',
-        'categories' => 'Kategorijos',
         'attributes' => 'Savybės',
         'availability' => 'Prieinamumas',
         'in_stock' => 'Yra atsargose',
@@ -175,34 +168,31 @@ return [
         'clear_recent' => 'Išvalyti neseniai',
         'no_suggestions' => 'Nėra pasiūlymų',
         'start_typing' => 'Pradėkite rašyti, kad pamatytumėte pasiūlymus',
-    'tip_1' => 'Naudokite ↑↓ navigacijai',
-    'tip_2' => 'Paspauskite Enter pasirinkimui',
-    'voice_placeholder' => 'Ieškokite balsu...',
-    'start_listening' => 'Pradėti balso paiešką',
-    'stop_listening' => 'Sustabdyti balso paiešką',
-    'voice_not_supported' => 'Balso paieška nepalaikoma',
-    'voice_tip_1' => 'Spustelėkite mikrofoną pradėti',
-    'voice_tip_2' => 'Kalbėkite aiškiai geriausiems rezultatams',
-    'mobile_placeholder' => 'Ieškoti produktų...',
-    'view_all_results' => 'Peržiūrėti visus rezultatus',
-    'advanced_placeholder' => 'Išplėstinė paieška su filtrais...',
-    'show_filters' => 'Rodyti filtrus',
-    'hide_filters' => 'Slėpti filtrus',
-    'categories' => 'Kategorijos',
-    'brands' => 'Prekės ženklai',
-    'collections' => 'Kolekcijos',
-    'price_range' => 'Kainų diapazonas',
-    'min_price' => 'Min. kaina',
-    'max_price' => 'Maks. kaina',
-    'availability' => 'Prieinamumas',
-    'in_stock_only' => 'Tik sandėlyje',
-    'sort_by' => 'Rūšiuoti pagal',
-    'relevance' => 'Aktualumas',
-    'name' => 'Pavadinimas',
-    'price_low_to_high' => 'Kaina: nuo žemiausios',
-    'price_high_to_low' => 'Kaina: nuo aukščiausios',
-    'clear_filters' => 'Išvalyti filtrus',
-    'results' => 'rezultatai',
+        'tip_1' => 'Naudokite ↑↓ navigacijai',
+        'tip_2' => 'Paspauskite Enter pasirinkimui',
+        'voice_placeholder' => 'Ieškokite balsu...',
+        'start_listening' => 'Pradėti balso paiešką',
+        'stop_listening' => 'Sustabdyti balso paiešką',
+        'voice_not_supported' => 'Balso paieška nepalaikoma',
+        'voice_tip_1' => 'Spustelėkite mikrofoną pradėti',
+        'voice_tip_2' => 'Kalbėkite aiškiai geriausiems rezultatams',
+        'mobile_placeholder' => 'Ieškoti produktų...',
+        'view_all_results' => 'Peržiūrėti visus rezultatus',
+        'advanced_placeholder' => 'Išplėstinė paieška su filtrais...',
+        'show_filters' => 'Rodyti filtrus',
+        'hide_filters' => 'Slėpti filtrus',
+        'price_range' => 'Kainų diapazonas',
+        'min_price' => 'Min. kaina',
+        'max_price' => 'Maks. kaina',
+        'availability' => 'Prieinamumas',
+        'in_stock_only' => 'Tik sandėlyje',
+        'sort_by' => 'Rūšiuoti pagal',
+        'relevance' => 'Aktualumas',
+        'name' => 'Pavadinimas',
+        'price_low_to_high' => 'Kaina: nuo žemiausios',
+        'price_high_to_low' => 'Kaina: nuo aukščiausios',
+        'clear_filters' => 'Išvalyti filtrus',
+        'results' => 'rezultatai',
         'live_search_module' => 'Tiesioginės paieškos modulis',
         'module_description' => 'Įveskite tekstą į paieškos lauką žemiau, kad pamatytumėte tiesioginius rezultatus. Paieška apima produktus, kategorijas ir prekės ženklus su protingu aktualumo įvertinimu.',
         'features_title' => 'Pagrindinės funkcijos',
@@ -299,7 +289,6 @@ return [
     'home_shop_by_collection' => 'Pirkti pagal kolekciją',
     'home_collections_desc' => 'Ištyrinėkite mūsų kruopščiai parinktų aukščiausios kokybės produktų kolekcijas',
     'home_trending_products' => 'Populiarūs produktai',
-
     // Product section
     'product' => [
         'request_info_title' => 'Užsakomas produktas',
@@ -330,7 +319,6 @@ return [
         'back_to_news' => 'Grįžti į naujienas',
         'back_to_home' => 'Grįžti į pagrindinį',
     ],
-    
     // Product page specific translations
     'products' => [
         'description' => 'Aukštos kokybės produktas profesionalams ir mėgėjams.',
@@ -357,7 +345,6 @@ return [
         'loyalty_rewards' => 'Lojalumo atlygiai',
         'loyalty_rewards_desc' => 'Gaukite taškus už kiekvieną pirkimą',
     ],
-    
     // Image and format translations
     'images' => [
         'random_image' => 'Atsitiktinis paveikslėlis',
@@ -367,16 +354,12 @@ return [
         'image_optimization' => 'Paveikslėlių optimizavimas',
         'no_image' => 'Nėra paveikslėlio',
     ],
-    
     // Footer translations
     'footer' => [
         'documentation' => 'Dokumentacija',
         'github' => 'GitHub',
         'secure_payment' => 'Saugus mokėjimas',
         'store' => 'Parduotuvė',
-        'categories' => 'Kategorijos',
-        'collections' => 'Kolekcijos',
-        'brands' => 'Prekių ženklai',
         'delivery' => 'Pristatymas',
         'returns_compensation' => 'Grąžinimai ir kompensacijos',
         'subscribe_newsletter' => 'Prenumeruokite naujienlaiškį',
@@ -391,7 +374,6 @@ return [
         'copyright' => 'Visos teisės saugomos',
         'created_with' => 'Sukurta su',
     ],
-    
     // Product history translations
     'total_changes' => 'Iš viso pakeitimų',
     'price_changes' => 'Kainų pakeitimai',
@@ -434,20 +416,17 @@ return [
         'status' => 'Būsena',
         'is_visible' => 'Mato',
         'description' => 'Aprašymas',
-        'categories' => 'Kategorijos',
     ],
     'metadata' => [
         'product_name' => 'Produkto pavadinimas',
         'product_sku' => 'Produkto SKU',
         'brand' => 'Prekės ženklas',
-        'categories' => 'Kategorijos',
         'timestamp' => 'Laiko žymė',
         'reason' => 'Priežastis',
         'price_change_percentage' => 'Kainos pakeitimo procentas',
         'stock_change' => 'Atsargų pakeitimas',
         'supplier' => 'Tiekėjas',
     ],
-
     // Infinite Scroll Search
     'filters' => 'Filtrai',
     'clear_all_filters' => 'Išvalyti visus filtrus',
