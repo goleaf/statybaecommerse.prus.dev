@@ -11,19 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sliders', function (Blueprint $table) {
+        Schema::create('slider_translations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('slider_id')->constrained()->onDelete('cascade');
+            $table->string('locale', 5)->index();
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('button_text')->nullable();
-            $table->string('button_url')->nullable();
-            $table->string('image')->nullable();
-            $table->string('background_color')->default('#ffffff');
-            $table->string('text_color')->default('#000000');
-            $table->integer('sort_order')->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->json('settings')->nullable();
             $table->timestamps();
+            
+            $table->unique(['slider_id', 'locale']);
+            $table->index(['locale', 'title']);
         });
     }
 
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sliders');
+        Schema::dropIfExists('slider_translations');
     }
 };
