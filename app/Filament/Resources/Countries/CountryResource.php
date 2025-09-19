@@ -1,9 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\Countries;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\Countries\Pages\CreateCountry;
 use App\Filament\Resources\Countries\Pages\EditCountry;
 use App\Filament\Resources\Countries\Pages\ListCountries;
@@ -11,32 +10,34 @@ use App\Filament\Resources\Countries\Pages\ViewCountry;
 use App\Filament\Resources\Countries\Schemas\CountryForm;
 use App\Filament\Resources\Countries\Tables\CountriesTable;
 use App\Models\Country;
-use App\Enums\NavigationGroup;
-use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use BackedEnum;
 use UnitEnum;
-use Filament\Forms\Form;
 
 /**
  * CountryResource
- * 
+ *
  * Filament v4 resource for Country management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
 final class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    /** @var UnitEnum|string|null */
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Locations;
+    /**
+     * @var UnitEnum|string|null
+     */
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Locations;
 
     protected static ?int $navigationSort = 1;
+
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedGlobeAlt;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
 
     public static function form(Form $form): Form
     {

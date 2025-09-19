@@ -10,15 +10,17 @@
         <div class="flex justify-between items-center h-14">
             <!-- Quick Navigation Links -->
             <div class="flex items-center space-x-6">
-                <a href="{{ route('filament.admin.pages.dashboard') }}" class="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-primary-600">
+                <a href="{{ route('filament.admin.pages.dashboard') }}"
+                   class="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-primary-600">
                     <x-heroicon-o-home class="h-4 w-4" />
                     <span>{{ __('admin.navigation.dashboard') }}</span>
                 </a>
-                
-                @foreach($navigationGroups->take(6) as $group)
-                    @if($group->isCore() || $group->isPublic())
+
+                @foreach ($navigationGroups->take(6) as $group)
+                    @if ($group->isCore() || $group->isPublic())
                         <div class="relative group">
-                            <button class="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                            <button
+                                    class="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
                                 <x-dynamic-component :component="'heroicon-o-' . $group->icon()" class="h-4 w-4" />
                                 <span>{{ $group->label() }}</span>
                             </button>
@@ -31,7 +33,8 @@
             <div class="flex items-center space-x-4">
                 <!-- Language Switcher -->
                 <div class="flex items-center space-x-1">
-                    <button class="flex items-center space-x-1 px-2 py-1 rounded text-xs font-medium text-gray-600 hover:text-primary-600">
+                    <button
+                            class="flex items-center space-x-1 px-2 py-1 rounded text-xs font-medium text-gray-600 hover:text-primary-600">
                         <x-heroicon-o-language class="h-3 w-3" />
                         <span>{{ app()->getLocale() === 'lt' ? 'LT' : 'EN' }}</span>
                     </button>

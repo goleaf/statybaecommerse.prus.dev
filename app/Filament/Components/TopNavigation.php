@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Components;
 
@@ -11,15 +9,15 @@ use Illuminate\Support\Facades\Auth;
 class TopNavigation extends Widget
 {
     protected static string $view = 'filament.components.top-navigation';
-    
-    protected int | string | array $columnSpan = 'full';
-    
+
+    protected int|string|array $columnSpan = 'full';
+
     protected static ?int $sort = -100;
 
     public function getViewData(): array
     {
         $user = Auth::user();
-        
+
         return [
             'navigationGroups' => $this->getNavigationGroups(),
             'user' => $user,
@@ -30,7 +28,7 @@ class TopNavigation extends Widget
     protected function getNavigationGroups(): array
     {
         $groups = [];
-        
+
         foreach (NavigationGroup::ordered() as $group) {
             if ($this->canAccessGroup($group)) {
                 $groups[] = [
@@ -48,28 +46,28 @@ class TopNavigation extends Widget
                 ];
             }
         }
-        
+
         return $groups;
     }
 
     protected function canAccessGroup(NavigationGroup $group): bool
     {
         $user = Auth::user();
-        
+
         if (!$user) {
             return false;
         }
-        
+
         // Check if group requires specific permissions
         if ($group->requiresPermission()) {
             return $user->can($group->getPermission());
         }
-        
+
         // Admin-only groups
         if ($group->isAdminOnly()) {
             return $user->is_admin || $user->hasAnyRole(['admin', 'Admin']);
         }
-        
+
         return true;
     }
 }

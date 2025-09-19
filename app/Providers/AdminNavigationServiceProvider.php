@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Providers;
 
@@ -16,7 +14,7 @@ class AdminNavigationServiceProvider extends ServiceProvider
             // Add custom render hook for top navigation
             Filament::renderHook(
                 'panels::topbar.start',
-                fn (): string => view('filament.components.admin-top-menu')->render()
+                fn(): string => view('filament.components.admin-top-menu')->render()
             );
         });
     }

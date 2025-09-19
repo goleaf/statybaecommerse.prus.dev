@@ -3,37 +3,36 @@
 namespace App\Filament\Pages;
 
 use App\Models\Slider;
-use Filament\Pages\Page;
-use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
+use Filament\Actions\Action;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Pages\Page;
 use Filament\Support\Enums\ActionSize;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 use BackedEnum;
+use UnitEnum;
 
 class SliderManagement extends Page implements HasForms, HasActions
 {
     use InteractsWithForms, InteractsWithActions;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationLabel = 'Slider Management';
     protected static ?string $title = 'Slider Management';
     protected static ?string $slug = 'slider-management';
     protected static ?int $navigationSort = 1;
-
-    protected static string | UnitEnum | null $navigationGroup = 'Content';
+    protected static string|UnitEnum|null $navigationGroup = 'Content';
 
     public Collection $sliders;
 
@@ -61,45 +60,36 @@ class SliderManagement extends Page implements HasForms, HasActions
                     ->label(__('translations.title'))
                     ->required()
                     ->maxLength(255),
-                
                 Textarea::make('description')
                     ->label(__('translations.description'))
                     ->maxLength(1000)
                     ->rows(3),
-                
                 TextInput::make('button_text')
                     ->label(__('translations.button_text'))
                     ->maxLength(255),
-                
                 TextInput::make('button_url')
                     ->label(__('translations.button_url'))
                     ->url()
                     ->maxLength(255),
-                
                 FileUpload::make('slider_image')
                     ->label(__('translations.slider_image'))
                     ->image()
                     ->directory('sliders/images')
                     ->visibility('public')
                     ->imageEditor(),
-                
                 ColorPicker::make('background_color')
                     ->label(__('translations.background_color'))
                     ->default('#ffffff'),
-                
                 ColorPicker::make('text_color')
                     ->label(__('translations.text_color'))
                     ->default('#000000'),
-                
                 TextInput::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->numeric()
                     ->default(0),
-                
                 Toggle::make('is_active')
                     ->label(__('translations.is_active'))
                     ->default(true),
-                
                 Select::make('animation_type')
                     ->label(__('translations.animation_type'))
                     ->options([
@@ -109,13 +99,11 @@ class SliderManagement extends Page implements HasForms, HasActions
                         'flip' => __('translations.flip'),
                     ])
                     ->default('fade'),
-                
                 TextInput::make('duration')
                     ->label(__('translations.duration'))
                     ->numeric()
                     ->default(5000)
                     ->suffix('ms'),
-                
                 Toggle::make('autoplay')
                     ->label(__('translations.autoplay'))
                     ->default(true),
@@ -136,15 +124,16 @@ class SliderManagement extends Page implements HasForms, HasActions
                         'autoplay' => $data['autoplay'],
                     ],
                 ]);
-                
+
                 // Handle file upload
                 if (isset($data['slider_image'])) {
-                    $slider->addMediaFromDisk($data['slider_image'], 'public')
+                    $slider
+                        ->addMediaFromDisk($data['slider_image'], 'public')
                         ->toMediaCollection('slider_images');
                 }
-                
+
                 $this->loadSliders();
-                
+
                 Notification::make()
                     ->title(__('translations.slider_created'))
                     ->success()
@@ -163,7 +152,7 @@ class SliderManagement extends Page implements HasForms, HasActions
             ->action(function (): void {
                 $activeCount = Slider::where('is_active', true)->count();
                 $inactiveCount = Slider::where('is_active', false)->count();
-                
+
                 if ($activeCount > $inactiveCount) {
                     Slider::query()->update(['is_active' => false]);
                     $message = __('translations.all_sliders_deactivated');
@@ -171,9 +160,9 @@ class SliderManagement extends Page implements HasForms, HasActions
                     Slider::query()->update(['is_active' => true]);
                     $message = __('translations.all_sliders_activated');
                 }
-                
+
                 $this->loadSliders();
-                
+
                 Notification::make()
                     ->title($message)
                     ->success()
@@ -202,22 +191,22 @@ class SliderManagement extends Page implements HasForms, HasActions
                 $newSlider->title = $slider->title . ' (Copy)';
                 $newSlider->sort_order = Slider::max('sort_order') + 1;
                 $newSlider->save();
-                
+
                 // Copy translations
                 foreach ($slider->translations as $translation) {
                     $newTranslation = $translation->replicate();
                     $newTranslation->slider_id = $newSlider->id;
                     $newTranslation->save();
                 }
-                
+
                 // Copy media
                 if ($slider->hasImage()) {
                     $media = $slider->getFirstMedia('slider_images');
                     $media->copy($newSlider, 'slider_images');
                 }
-                
+
                 $this->loadSliders();
-                
+
                 Notification::make()
                     ->title(__('translations.slider_duplicated'))
                     ->success()
@@ -234,9 +223,9 @@ class SliderManagement extends Page implements HasForms, HasActions
             ->action(function () use ($slider): void {
                 $slider->update(['is_active' => !$slider->is_active]);
                 $this->loadSliders();
-                
+
                 Notification::make()
-                    ->title($slider->is_active 
+                    ->title($slider->is_active
                         ? __('translations.slider_activated')
                         : __('translations.slider_deactivated'))
                     ->success()
@@ -254,7 +243,7 @@ class SliderManagement extends Page implements HasForms, HasActions
             ->action(function () use ($slider): void {
                 $slider->delete();
                 $this->loadSliders();
-                
+
                 Notification::make()
                     ->title(__('translations.slider_deleted'))
                     ->success()

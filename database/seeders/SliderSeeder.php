@@ -170,7 +170,7 @@ final class SliderSeeder extends Seeder
     {
         $imagePaths = [
             1 => 'sliders/sample-1.jpg',
-            2 => 'sliders/sample-2.jpg', 
+            2 => 'sliders/sample-2.jpg',
             3 => 'sliders/sample-3.jpg',
             4 => 'sliders/sample-4.jpg',
             5 => 'sliders/sample-5.jpg',
@@ -178,9 +178,10 @@ final class SliderSeeder extends Seeder
         ];
 
         $imagePath = $imagePaths[$sortOrder] ?? null;
-        
+
         if ($imagePath && file_exists(public_path($imagePath))) {
-            $slider->addMediaFromDisk($imagePath, 'public')
+            $slider
+                ->addMediaFromDisk($imagePath, 'public')
                 ->toMediaCollection('slider_images');
         } else {
             // Create a placeholder image using a simple colored rectangle
@@ -191,43 +192,44 @@ final class SliderSeeder extends Seeder
     private function createPlaceholderImage(Slider $slider, int $sortOrder): void
     {
         $colors = [
-            1 => '#3B82F6', // Blue
-            2 => '#10B981', // Green  
-            3 => '#F59E0B', // Yellow
-            4 => '#EF4444', // Red
-            5 => '#8B5CF6', // Purple
-            6 => '#06B6D4', // Cyan
+            1 => '#3B82F6',  // Blue
+            2 => '#10B981',  // Green
+            3 => '#F59E0B',  // Yellow
+            4 => '#EF4444',  // Red
+            5 => '#8B5CF6',  // Purple
+            6 => '#06B6D4',  // Cyan
         ];
 
         $color = $colors[$sortOrder] ?? '#6B7280';
-        
+
         // Create a simple colored image
         $image = imagecreate(1200, 600);
         $bgColor = $this->hexToRgb($color);
         $backgroundColor = imagecolorallocate($image, $bgColor['r'], $bgColor['g'], $bgColor['b']);
         imagefill($image, 0, 0, $backgroundColor);
-        
+
         // Add text
         $textColor = imagecolorallocate($image, 255, 255, 255);
-        $font = 5; // Built-in font
+        $font = 5;  // Built-in font
         $text = "Slider {$sortOrder}";
         $textWidth = imagefontwidth($font) * strlen($text);
         $textHeight = imagefontheight($font);
         $x = (int) ((1200 - $textWidth) / 2);
         $y = (int) ((600 - $textHeight) / 2);
         imagestring($image, $font, $x, $y, $text, $textColor);
-        
+
         // Save to temporary file
         $tempPath = sys_get_temp_dir() . "/slider-{$sortOrder}.jpg";
         imagejpeg($image, $tempPath, 90);
         imagedestroy($image);
-        
+
         // Add to media library
-        $slider->addMedia($tempPath)
+        $slider
+            ->addMedia($tempPath)
             ->usingName("Slider {$sortOrder} Placeholder")
             ->usingFileName("slider-{$sortOrder}.jpg")
             ->toMediaCollection('slider_images');
-        
+
         // Clean up
         if (file_exists($tempPath)) {
             unlink($tempPath);

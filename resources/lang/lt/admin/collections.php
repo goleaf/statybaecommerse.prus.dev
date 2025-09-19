@@ -1,11 +1,9 @@
 <?php
 
 return [
-    'title' => 'Kolekcijos',
     
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
-        'collection_settings' => 'Kolekcijos nustatymai',
         'seo_settings' => 'SEO nustatymai',
         'media' => 'Medija',
     ],
@@ -121,7 +119,6 @@ return [
         'auto_generated' => 'Automatiškai generuojamos',
         'manual_collections' => 'Rankinės kolekcijos',
         'manually_created' => 'Rankiniu būdu sukurtos',
-        'collections_with_products' => 'Kolekcijos su produktais',
         'have_products' => 'Turi produktų',
         'avg_products_per_collection' => 'Vid. produktų per kolekciją',
         'average_products' => 'Vidutinis produktų skaičius',
@@ -133,6 +130,5 @@ return [
     ],
     
     'widgets' => [
-        'products_heading' => 'Kolekcijos su produktais',
     ],
 ];
