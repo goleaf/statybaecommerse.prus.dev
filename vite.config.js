@@ -14,6 +14,7 @@ export default defineConfig({
     laravel({
       input: [
         'resources/css/app.css',
+        'resources/css/category-show.css',
         'resources/js/app.js',
         'resources/js/live-notifications.js',
         'resources/images/hero.png',
