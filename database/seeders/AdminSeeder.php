@@ -97,7 +97,7 @@ final class AdminSeeder extends Seeder
         $this->createSubscribers();
         
         // Create referral rewards
-        $this->createReferralRewards($admin);
+        // $this->createReferralRewards($admin); // Temporarily disabled - requires referral_id
         
         // Create product history
         $this->createProductHistory($products);
@@ -760,9 +760,10 @@ final class AdminSeeder extends Seeder
             ['user_id' => $admin->id],
             [
                 'user_id' => $admin->id,
-                'referral_code' => 'ADMIN' . rand(100, 999),
-                'reward_type' => 'discount',
-                'reward_value' => 15.0,
+                'type' => 'referrer_bonus',
+                'amount' => 15.0,
+                'currency_code' => 'EUR',
+                'status' => 'pending',
                 'is_active' => true,
                 'expires_at' => now()->addMonths(6),
             ]
@@ -782,9 +783,11 @@ final class AdminSeeder extends Seeder
                 [
                     'product_id' => $product->id,
                     'action' => 'created',
-                    'old_data' => null,
-                    'new_data' => json_encode($product->toArray()),
+                    'old_value' => null,
+                    'new_value' => $product->toArray(),
                     'user_id' => 1, // Admin user
+                    'causer_type' => 'App\Models\User',
+                    'causer_id' => 1, // Admin user
                 ]
             );
         }

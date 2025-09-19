@@ -60,18 +60,18 @@
 
                                     @if ($group->value === 'Products')
                                         @if (Route::has('filament.admin.resources.products.index'))
-                                        <a href="{{ route('filament.admin.resources.products.index') }}"
-                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <x-heroicon-o-cube class="h-4 w-4 mr-3" />
-                                            {{ __('admin.models.products') }}
-                                        </a>
+                                            <a href="{{ route('filament.admin.resources.products.index') }}"
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <x-heroicon-o-cube class="h-4 w-4 mr-3" />
+                                                {{ __('admin.models.products') }}
+                                            </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.categories.index'))
-                                        <a href="{{ route('filament.admin.resources.categories.index') }}"
-                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <x-heroicon-o-tag class="h-4 w-4 mr-3" />
-                                            {{ __('admin.models.categories') }}
-                                        </a>
+                                            <a href="{{ route('filament.admin.resources.categories.index') }}"
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <x-heroicon-o-tag class="h-4 w-4 mr-3" />
+                                                {{ __('admin.models.categories') }}
+                                            </a>
                                         @endif
                                         <a href="{{ route('filament.admin.resources.brands.index') }}"
                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">

@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace App\Livewire\Components\Checkout;
 
 use App\Models\Country;
+use App\Models\ShippingOption;
 use App\Models\Zone;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
@@ -47,7 +48,7 @@ class Delivery extends StepComponent
     {
         $this->validate();
         session()->forget('checkout.shipping_option');
-        $option = CarrierOption::query()->find($this->currentSelected)->toArray();
+        $option = ShippingOption::query()->find($this->currentSelected)->toArray();
         // Apply shipping discount context if any (free shipping or cap)
         $engine = app(\App\Services\Discounts\DiscountEngine::class);
         $context = ['zone_id' => session('zone.id'), 'currency_code' => current_currency(), 'channel_id' => optional(config('app.url')), 'user_id' => optional(auth()->user())->id, 'now' => now(), 'cart' => ['subtotal' => (float) (session('cart.subtotal') ?? 0), 'items' => []], 'shipping' => ['base_amount' => (float) ($option['price'] ?? 0)]];

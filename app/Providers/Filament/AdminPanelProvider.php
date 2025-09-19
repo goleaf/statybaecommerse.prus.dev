@@ -48,17 +48,62 @@ final class AdminPanelProvider extends PanelProvider
             ])
             // ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources([
+                // Products
                 \App\Filament\Resources\ProductResource::class,
+                \App\Filament\Resources\CategoryResource::class,
+                \App\Filament\Resources\BrandResource::class,
+                \App\Filament\Resources\CollectionResource::class,
+                \App\Filament\Resources\ProductVariantResource::class,
+                
+                // Orders
+                \App\Filament\Resources\OrderResource::class,
+                \App\Filament\Resources\CartItemResource::class,
+                
+                // Users
+                \App\Filament\Resources\UserResource::class,
+                \App\Filament\Resources\CustomerGroupResource::class,
+                \App\Filament\Resources\CustomerManagementResource::class,
+                
+                // Inventory
+                \App\Filament\Resources\StockResource::class,
+                
+                // Locations
+                \App\Filament\Resources\LocationResource::class,
+                \App\Filament\Resources\CountryResource::class,
+                \App\Filament\Resources\ZoneResource::class,
+                
+                // Marketing
+                \App\Filament\Resources\CampaignResource::class,
+                \App\Filament\Resources\DiscountCodeResource::class,
+                \App\Filament\Resources\CouponResource::class,
+                
+                // Analytics
+                \App\Filament\Resources\AnalyticsEventResource::class,
+                
+                // Reports
+                \App\Filament\Resources\ReportResource::class,
+                
+                // Content
+                \App\Filament\Resources\NewsResource::class,
+                \App\Filament\Resources\PostResource::class,
+                \App\Filament\Resources\LegalResource::class,
+                
+                // System
+                \App\Filament\Resources\SystemSettingResource::class,
+                \App\Filament\Resources\ActivityLogResource::class,
+                
+                // Sliders
+                \App\Filament\Resources\Sliders\SliderResource::class,
             ])
             ->pages([
                 \App\Filament\Pages\Dashboard::class,
                 \App\Filament\Pages\SliderAnalytics::class,
             ])
-            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\Filament\Clusters')
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
-                AccountWidget::class,
-            ])
+            // ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\Filament\Clusters')
+            // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            // ->widgets([
+            //     AccountWidget::class,
+            // ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

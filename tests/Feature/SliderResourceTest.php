@@ -15,11 +15,11 @@ final class SliderResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create test user
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
-        
+
         // Create test sliders
         $this->createTestSliders();
     }
@@ -62,7 +62,8 @@ final class SliderResourceTest extends TestCase
 
     public function test_can_access_slider_resource_list(): void
     {
-        $this->get('/admin/sliders')
+        $this
+            ->get('/admin/sliders')
             ->assertStatus(200);
     }
 
@@ -219,7 +220,7 @@ final class SliderResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
             ->fillForm([
-                'title' => '', // Required field
+                'title' => '',  // Required field
             ])
             ->call('create')
             ->assertHasFormErrors(['title']);
@@ -230,7 +231,7 @@ final class SliderResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
             ->fillForm([
                 'title' => 'Test Slider',
-                'button_url' => 'invalid-url', // Invalid URL format
+                'button_url' => 'invalid-url',  // Invalid URL format
             ])
             ->call('create')
             ->assertHasFormErrors(['button_url']);
@@ -322,8 +323,9 @@ final class SliderResourceTest extends TestCase
     public function test_slider_resource_requires_authentication(): void
     {
         auth()->logout();
-        
-        $this->get('/admin/sliders')
+
+        $this
+            ->get('/admin/sliders')
             ->assertRedirect('/admin/login');
     }
 

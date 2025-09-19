@@ -2,15 +2,15 @@
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
+use BackedEnum;
 
 class Dashboard extends BaseDashboard
 {
     protected static ?int $navigationSort = 1;
-    
+
     protected static ?string $navigationLabel = 'Dashboard';
-    
+
     protected static ?string $title = 'Dashboard';
 
     public function getTitle(): string

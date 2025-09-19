@@ -93,6 +93,14 @@ final class Zone extends Model
         return $this->hasMany(Order::class);
     }
     /**
+     * Handle shippingOptions functionality with proper error handling.
+     * @return HasMany
+     */
+    public function shippingOptions(): HasMany
+    {
+        return $this->hasMany(ShippingOption::class);
+    }
+    /**
      * Handle priceLists functionality with proper error handling.
      * @return HasMany
      */
