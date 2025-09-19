@@ -22,7 +22,7 @@
      x-on:close-modal.window="show = false"
      x-on:open-modal.window="show = true"
      class="fixed inset-0 z-50 overflow-y-auto"
-     style="display: none;">
+     x-cloak>
     {{-- Backdrop --}}
     <div
          x-show="show"

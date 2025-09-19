@@ -107,7 +107,7 @@
         class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
         @click="showLightbox = false"
         @keydown.escape.window="showLightbox = false"
-        style="display: none;"
+        x-cloak
     >
         <div class="relative max-w-4xl max-h-full" @click.stop>
             <img 

@@ -212,14 +212,4 @@
     </div>
 </div>
 
-<!-- Print Styles -->
-<style media="print">
-    @media print {
-        .no-print { display: none !important; }
-        body { font-size: 12pt; line-height: 1.4; }
-        .prose { max-width: none; }
-        .prose h1, .prose h2, .prose h3 { page-break-after: avoid; }
-        .prose p, .prose li { orphans: 3; widows: 3; }
-    }
-</style>
 @endsection

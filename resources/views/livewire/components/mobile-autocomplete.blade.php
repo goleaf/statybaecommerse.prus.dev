@@ -104,8 +104,8 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-50 bg-white"
-         style="display: none;">
+         x-cloak
+         class="fixed inset-0 z-50 bg-white">
         
         {{-- Full Screen Header --}}
         <div class="flex items-center justify-between p-4 border-b border-gray-200">
@@ -246,8 +246,8 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
-         class="absolute z-40 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto"
-         style="display: none;">
+         x-cloak
+         class="absolute z-40 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
         
         <div class="py-2">
             <template x-for="(result, index) in results.slice(0, 3)" :key="result.id">

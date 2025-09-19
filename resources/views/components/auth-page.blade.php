@@ -16,8 +16,8 @@
         <div class="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900/95 to-indigo-950"></div>
         <div class="absolute -top-32 -left-24 h-80 w-80 rounded-full bg-indigo-600/25 blur-3xl"></div>
         <div class="absolute -bottom-40 -right-24 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl"></div>
-        <div class="absolute inset-0 opacity-[0.18]" style="background-image: radial-gradient(circle at 10% 20%, rgba(99,102,241,0.25) 0, transparent 55%), radial-gradient(circle at 90% 10%, rgba(56,189,248,0.15) 0, transparent 55%), radial-gradient(circle at 50% 80%, rgba(129,140,248,0.22) 0, transparent 60%);"></div>
-        <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd" opacity="0.6"%3E%3Cg stroke="%23FFFFFF" stroke-opacity="0.08"%3E%3Cpath d="M0 79.5H79.5V0"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        <div class="absolute inset-0 opacity-[0.18] bg-auth-radial"></div>
+        <div class="absolute inset-0 opacity-20 bg-pattern-grid-80-white"></div>
     </div>
 
     <div class="relative z-10 flex min-h-screen items-center py-12 sm:py-16">

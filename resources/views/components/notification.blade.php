@@ -51,7 +51,7 @@
      x-transition:leave-start="opacity-100 transform scale-100"
      x-transition:leave-end="opacity-0 transform scale-95"
      class="fixed top-4 right-4 z-50 max-w-sm w-full {{ $config['bg'] }} {{ $config['border'] }} border rounded-xl shadow-large"
-     style="display: none;">
+     x-cloak>
     <div class="p-4">
         <div class="flex items-start">
             <div class="flex-shrink-0">

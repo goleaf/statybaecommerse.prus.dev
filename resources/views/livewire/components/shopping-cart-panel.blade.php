@@ -27,8 +27,8 @@
         x-transition:leave="transform transition ease-in-out duration-300"
         x-transition:leave-start="translate-x-0"
         x-transition:leave-end="translate-x-full"
+        x-cloak
         class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-gray-800 shadow-xl"
-        style="display: none;"
     >
         <!-- Cart Header -->
         <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
@@ -252,7 +252,7 @@
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
         @click="$wire.toggleCart()"
+        x-cloak
         class="fixed inset-0 bg-black bg-opacity-50 z-40"
-        style="display: none;"
     ></div>
 </div>

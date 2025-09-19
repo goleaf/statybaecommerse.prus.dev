@@ -84,7 +84,7 @@
                     <span class="text-gray-900 dark:text-white">{{ number_format($inStockPercent, 1) }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div class="bg-green-500 h-2 rounded-full" style="width: {{ $inStockPercent }}%"></div>
+                    <div class="inventory-progress-bar in-stock" data-width="{{ $inStockPercent }}"></div>
                 </div>
             </div>
 
@@ -94,7 +94,7 @@
                     <span class="text-gray-900 dark:text-white">{{ number_format($lowStockPercent, 1) }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div class="bg-yellow-500 h-2 rounded-full" style="width: {{ $lowStockPercent }}%"></div>
+                    <div class="inventory-progress-bar low-stock" data-width="{{ $lowStockPercent }}"></div>
                 </div>
             </div>
 
@@ -104,7 +104,7 @@
                     <span class="text-gray-900 dark:text-white">{{ number_format($outOfStockPercent, 1) }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div class="bg-red-500 h-2 rounded-full" style="width: {{ $outOfStockPercent }}%"></div>
+                    <div class="inventory-progress-bar out-of-stock" data-width="{{ $outOfStockPercent }}"></div>
                 </div>
             </div>
         </div>

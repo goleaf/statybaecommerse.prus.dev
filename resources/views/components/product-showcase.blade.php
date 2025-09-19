@@ -226,7 +226,7 @@
                     </div>
 
                     {{-- List View --}}
-                    <div x-show="viewMode === 'list'" class="space-y-4 mb-8" style="display: none;">
+                    <div x-show="viewMode === 'list'" class="space-y-4 mb-8" x-cloak>
                         @foreach ($products as $product)
                             <div
                                  class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-medium transition-shadow duration-200">

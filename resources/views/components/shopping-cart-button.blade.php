@@ -28,7 +28,7 @@
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
          class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-large border border-gray-200 z-50"
-         style="display: none;">
+         x-cloak>
 
         <div class="p-4">
             <div class="flex items-center justify-between mb-4">

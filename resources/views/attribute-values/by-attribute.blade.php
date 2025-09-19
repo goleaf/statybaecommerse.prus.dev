@@ -40,8 +40,7 @@
                         <div class="p-6">
                             <!-- Color indicator -->
                             @if ($attributeValue->color_code)
-                                <div class="w-full h-4 rounded mb-4"
-                                     style="background-color: {{ $attributeValue->color_code }}"></div>
+                                <div class="w-full h-4 rounded mb-4 bg-var" data-color="{{ $attributeValue->color_code }}"></div>
                             @endif
 
                             <!-- Value -->

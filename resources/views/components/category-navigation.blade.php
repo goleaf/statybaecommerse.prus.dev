@@ -61,8 +61,8 @@
                              x-transition:leave="transition ease-in duration-150"
                              x-transition:leave-start="opacity-100 scale-100"
                              x-transition:leave-end="opacity-0 scale-95"
-                             class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-large border border-gray-200 py-2 z-50"
-                             style="display: none;">
+                             x-cloak
+                             class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-large border border-gray-200 py-2 z-50">
 
                             <div class="px-4 py-2 border-b border-gray-100">
                                 <h3 class="text-sm font-semibold text-gray-900">{{ $category->name }}</h3>

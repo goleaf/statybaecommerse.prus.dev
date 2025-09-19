@@ -28,14 +28,13 @@
         <!-- Slider Container -->
         <div class="relative h-96 md:h-[500px] lg:h-[600px]">
             @foreach($this->sliders as $index => $slider)
-                <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+                <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out bg-var"
                      :class="{ 'opacity-100': currentSlide === {{ $index }}, 'opacity-0': currentSlide !== {{ $index }} }"
-                     style="background-color: {{ $slider->background_color }};">
+                     data-color="{{ $slider->background_color }}">
                     
                     <!-- Background Image -->
                     @if($slider->image)
-                        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                             style="background-image: url('{{ asset('storage/' . $slider->image) }}');">
+                        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat bg-img-var" data-bg-img="{{ asset('storage/' . $slider->image) }}">
                         </div>
                     @endif
                     
@@ -47,15 +46,13 @@
                         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                             <div class="space-y-6">
                                 <!-- Title -->
-                                <h1 class="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight"
-                                    style="color: {{ $slider->text_color }};">
+                                <h1 class="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight text-var" data-text-color="{{ $slider->text_color }}">
                                     {{ $slider->getTranslatedTitle() }}
                                 </h1>
                                 
                                 <!-- Description -->
                                 @if($slider->getTranslatedDescription())
-                                    <p class="text-lg sm:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed"
-                                       style="color: {{ $slider->text_color }}; opacity: 0.9;">
+                                    <p class="text-lg sm:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed text-var opacity-90" data-text-color="{{ $slider->text_color }}">
                                         {{ $slider->getTranslatedDescription() }}
                                     </p>
                                 @endif

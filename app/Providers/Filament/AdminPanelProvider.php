@@ -159,6 +159,7 @@ final class AdminPanelProvider extends PanelProvider
                 // FilamentSocialitePlugin::make(),
                 // FilamentLogManagerPlugin::make(),
             ])
+            ->viteTheme('resources/css/filament-enhancements.css')
             ->spa()
             // ->renderHook(
             //     'panels::topbar.end',

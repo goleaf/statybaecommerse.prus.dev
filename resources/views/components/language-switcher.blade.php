@@ -43,8 +43,8 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
-         class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-large border border-slate-200 py-2 z-50"
-         style="display: none;">
+         x-cloak
+         class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-large border border-slate-200 py-2 z-50">
         @foreach ($supportedLocales as $locale)
             @if ($locale !== $currentLocale)
                 @php

@@ -14,7 +14,7 @@
     <div class="bg-white text-slate-900">
         <section class="relative overflow-hidden">
             <div class="absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-blue-50"></div>
-            <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" stroke=\"%2363748f\" stroke-opacity=\"0.08\"%3E%3Cpath d=\"M0 79.5H79.5V0\"/%3E%3C/g%3E%3C/svg%3E');"></div>
+            <div class="absolute inset-0 bg-pattern-grid-80"></div>
 
             <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 lg:pb-24 space-y-6">
                 <span class="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-blue-600">

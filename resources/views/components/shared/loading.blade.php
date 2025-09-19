@@ -59,8 +59,8 @@ function renderLoadingContent($type, $sizeClasses, $text) {
             return '
                 <div class="flex items-center justify-center space-x-1">
                     <div class="animate-bounce bg-blue-600 rounded-full w-2 h-2"></div>
-                    <div class="animate-bounce bg-blue-600 rounded-full w-2 h-2" style="animation-delay: 0.1s"></div>
-                    <div class="animate-bounce bg-blue-600 rounded-full w-2 h-2" style="animation-delay: 0.2s"></div>
+                    <div class="animate-bounce bg-blue-600 rounded-full w-2 h-2 delay" data-delay="0.1"></div>
+                    <div class="animate-bounce bg-blue-600 rounded-full w-2 h-2 delay" data-delay="0.2"></div>
                     ' . ($text ? '<span class="ml-3 text-sm text-gray-600 dark:text-gray-300">' . $text . '</span>' : '') . '
                 </div>
             ';
@@ -99,8 +99,8 @@ function renderLoadingContent($type, $sizeClasses, $text) {
 @elseif($type === 'dots')
     <div class="flex items-center justify-center space-x-1">
         <div class="animate-bounce bg-blue-600 rounded-full w-2 h-2"></div>
-        <div class="animate-bounce bg-blue-600 rounded-full w-2 h-2" style="animation-delay: 0.1s"></div>
-        <div class="animate-bounce bg-blue-600 rounded-full w-2 h-2" style="animation-delay: 0.2s"></div>
+        <div class="animate-bounce bg-blue-600 rounded-full w-2 h-2 delay" data-delay="0.1"></div>
+        <div class="animate-bounce bg-blue-600 rounded-full w-2 h-2 delay" data-delay="0.2"></div>
         @if($text)
             <span class="ml-3 text-sm text-gray-600 dark:text-gray-300">{{ $text }}</span>
         @endif

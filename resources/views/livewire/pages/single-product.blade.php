@@ -436,17 +436,6 @@
     @endif
 </div>
 
-@push('styles')
-    <style>
-        .variant-selector-card h1 {
-            display: none;
-        }
-
-        .variant-selector-card form {
-            margin-top: 1.5rem;
-        }
-    </style>
-@endpush
 
 @push('scripts')
     @php
@@ -511,4 +500,3 @@
         <script type="application/ld+json">{!! json_encode($reviewsSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
     @endif
 @endpush
-</div>

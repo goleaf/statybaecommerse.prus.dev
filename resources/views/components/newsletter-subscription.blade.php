@@ -19,8 +19,8 @@
         {{-- Animated background elements for hero variant --}}
         <div class="absolute inset-0 overflow-hidden">
             <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-float"></div>
-            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-float"
-                 style="animation-delay: 2s;"></div>
+            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-float animate-delay"
+                 data-delay="2"></div>
         </div>
     @endif
 
@@ -40,8 +40,7 @@
 
             {{-- Subscription Form --}}
             <form @submit.prevent="subscribe"
-                  class="{{ $isCompact ? 'max-w-md mx-auto flex flex-col sm:flex-row gap-3' : 'max-w-lg mx-auto flex flex-col sm:flex-row gap-4' }} {{ $isHero ? 'animate-fade-in-up' : '' }}"
-                  style="{{ $isHero ? 'animation-delay: 0.3s;' : '' }}">
+                  class="{{ $isCompact ? 'max-w-md mx-auto flex flex-col sm:flex-row gap-3' : 'max-w-lg mx-auto flex flex-col sm:flex-row gap-4' }} {{ $isHero ? 'animate-fade-in-up delay-300' : '' }}">
 
                 <div class="flex-1 relative">
                     <input
@@ -104,8 +103,8 @@
                  x-transition:leave-end="opacity-0 transform scale-95"
                  class="mt-4 p-4 rounded-xl"
                  :class="messageType === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
-                     'bg-red-50 text-red-800 border border-red-200'"
-                 style="display: none;">
+                    'bg-red-50 text-red-800 border border-red-200'"
+                 x-cloak>
                 <div class="flex items-center gap-2">
                     <svg x-show="messageType === 'success'" class="w-5 h-5 text-green-600" fill="none"
                          stroke="currentColor" viewBox="0 0 24 24">

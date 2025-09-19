@@ -115,8 +115,7 @@
                         </div>
                         <div class="flex items-center space-x-2">
                             <div class="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full" 
-                                     style="width: {{ $stats['total'] > 0 ? ($count / $stats['total']) * 100 : 0 }}%"></div>
+                                <div class="bg-blue-600 h-2 rounded-full w-var" data-width="{{ $stats['total'] > 0 ? ($count / $stats['total']) * 100 : 0 }}"></div>
                             </div>
                             <span class="text-sm font-medium text-gray-900 dark:text-white w-12 text-right">
                                 {{ number_format($count) }}
@@ -155,8 +154,7 @@
                         </div>
                         <div class="flex items-center space-x-2">
                             <div class="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-green-600 h-2 rounded-full" 
-                                     style="width: {{ $stats['total'] > 0 ? ($count / $stats['total']) * 100 : 0 }}%"></div>
+                                <div class="bg-green-600 h-2 rounded-full w-var" data-width="{{ $stats['total'] > 0 ? ($count / $stats['total']) * 100 : 0 }}"></div>
                             </div>
                             <span class="text-sm font-medium text-gray-900 dark:text-white w-12 text-right">
                                 {{ number_format($count) }}

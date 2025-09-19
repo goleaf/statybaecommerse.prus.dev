@@ -41,8 +41,7 @@
 
                         <!-- Color indicator -->
                         @if ($attributeValue->color_code)
-                            <div class="w-16 h-16 rounded-lg border-2 border-gray-200 dark:border-gray-600"
-                                 style="background-color: {{ $attributeValue->color_code }}"></div>
+                            <div class="w-16 h-16 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-var" data-color="{{ $attributeValue->color_code }}"></div>
                         @endif
                     </div>
 

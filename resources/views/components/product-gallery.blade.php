@@ -50,9 +50,10 @@
                          x-transition:leave-start="opacity-100"
                          x-transition:leave-end="opacity-0"
                          class="absolute inset-0 bg-black/20 pointer-events-none"
-                         style="display: none;">
-                        <div class="absolute w-32 h-32 border-2 border-white rounded-lg pointer-events-none"
-                             :style="`left: ${zoomX - 64}px; top: ${zoomY - 64}px;`"></div>
+                         x-cloak>
+                        <div class="zoom-marker"
+                             :data-left="zoomX - 64"
+                             :data-top="zoomY - 64"></div>
                     </div>
 
                     {{-- Navigation Arrows --}}
@@ -142,7 +143,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 bg-black z-50 flex items-center justify-center"
-         style="display: none;"
+         x-cloak
          @click="closeFullscreen()"
          @keydown.escape="closeFullscreen()">
 

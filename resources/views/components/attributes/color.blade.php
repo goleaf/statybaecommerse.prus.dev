@@ -33,7 +33,7 @@
                     <span
                         aria-hidden="true"
                         class="size-8"
-                        style="background-color: {{ $value->key }}"
+                        data-color="{{ $value->key }}"
                     ></span>
                 </button>
             @endforeach

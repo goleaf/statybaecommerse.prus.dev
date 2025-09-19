@@ -1,4 +1,3 @@
-@vite('resources/css/category-show.css')
 <div x-data="{ showFilters: false, viewMode: 'grid' }" class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <x-container class="py-8 lg:py-12">
         <!-- Enhanced Breadcrumbs -->
@@ -231,7 +230,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
                          :class="viewMode === 'list' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'">
                         @foreach ($products as $product)
-                            <div class="animate-fade-in-up" style="animation-delay: {{ $loop->index * 0.1 }}s">
+                            <div class="animate-fade-in-up animate-delay" data-delay="{{ $loop->index * 0.1 }}">
                                 <x-product-card :product="$product" :show-quick-add="true" :show-wishlist="true" :show-compare="true" />
                             </div>
                         @endforeach

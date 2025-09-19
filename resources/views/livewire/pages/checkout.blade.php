@@ -110,7 +110,7 @@
                                  class="fixed inset-0 bg-black bg-opacity-25"
                                  @click="open = !open"
                                  aria-hidden="true"
-                                 style="display: none"></div>
+                                 x-cloak></div>
 
                             <div
                                  x-show="open"
@@ -123,7 +123,7 @@
                                  class="relative bg-white px-4 py-6 sm:px-6"
                                  x-ref="panel"
                                  @click.away="open = false"
-                                 style="display: none">
+                                 x-cloak>
                                 <dl class="mx-auto max-w-lg space-y-6">
                                     <div class="flex items-center justify-between">
                                         <dt class="text-gray-400">{{ __('Sub total') }}</dt>

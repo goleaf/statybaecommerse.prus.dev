@@ -117,8 +117,8 @@
 
             {{-- Testimonials Container --}}
             <div class="overflow-hidden">
-                <div class="flex transition-transform duration-500 ease-in-out"
-                     :style="`transform: translateX(-${currentSlide * 100}%)`">
+                <div class="flex transition-transform duration-500 ease-in-out translate-x-var"
+                     :data-transform="`-${currentSlide * 100}%`">
                     @foreach ($testimonials->chunk(3) as $chunk)
                         <div class="w-full flex-shrink-0">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

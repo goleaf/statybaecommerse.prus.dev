@@ -99,7 +99,7 @@
         <div class="mt-8">
             <div class="bg-gray-200 rounded-full h-2 overflow-hidden">
                 <div class="bg-gradient-to-r from-blue-500 to-green-500 h-full transition-all duration-500 ease-out"
-                     style="width: {{ ($currentStep / count($steps)) * 100 }}%"></div>
+                     data-width="{{ ($currentStep / count($steps)) * 100 }}"></div>
             </div>
             <div class="flex justify-between text-xs text-gray-500 mt-2">
                 <span>{{ __('Progress') }}</span>

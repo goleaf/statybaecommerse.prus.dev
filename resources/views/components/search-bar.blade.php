@@ -51,7 +51,7 @@
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-95"
              class="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-large border border-gray-200 py-2 z-50"
-             style="display: none;">
+             x-cloak>
 
             {{-- Search Suggestions --}}
             <template x-if="suggestions.length > 0">

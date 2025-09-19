@@ -138,7 +138,7 @@
                      class="mt-6 p-4 rounded-xl"
                      :class="messageType === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
                          'bg-red-50 text-red-800 border border-red-200'"
-                     style="display: none;">
+                     x-cloak>
                     <div class="flex items-center gap-2">
                         <svg x-show="messageType === 'success'" class="w-5 h-5 text-green-600" fill="none"
                              stroke="currentColor" viewBox="0 0 24 24">

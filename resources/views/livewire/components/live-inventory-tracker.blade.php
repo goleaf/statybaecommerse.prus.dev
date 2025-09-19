@@ -299,7 +299,7 @@
                                 <div class="flex items-center">
                                     <span class="text-sm font-medium text-gray-900">{{ $item['stock_quantity'] }}</span>
                                     <div class="ml-2 w-16 bg-gray-200 rounded-full h-2">
-                                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $item['stock_percentage'] }}%"></div>
+                                        <div class="bg-blue-600 h-2 rounded-full w-var" data-width="{{ $item['stock_percentage'] }}"></div>
                                     </div>
                                 </div>
                             </td>

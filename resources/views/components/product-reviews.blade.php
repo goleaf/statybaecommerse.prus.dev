@@ -94,7 +94,7 @@
                                     </svg>
                                     <div class="flex-1 bg-gray-200 rounded-full h-2">
                                         <div class="bg-yellow-400 h-2 rounded-full"
-                                             style="width: {{ $totalReviews > 0 ? ($ratingDistribution[$i] / $totalReviews) * 100 : 0 }}%">
+                                             data-width="{{ $totalReviews > 0 ? ($ratingDistribution[$i] / $totalReviews) * 100 : 0 }}">
                                         </div>
                                     </div>
                                     <span class="text-sm text-gray-600 w-8">{{ $ratingDistribution[$i] }}</span>

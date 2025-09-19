@@ -95,8 +95,7 @@
                             
                         @case('color')
                             <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 rounded-lg border-2 border-gray-300 dark:border-gray-600" 
-                                     style="background-color: {{ $setting->value }}"></div>
+                                <div class="w-12 h-12 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-var" data-color="{{ $setting->value }}"></div>
                                 <span class="text-lg font-mono text-gray-800 dark:text-gray-200">{{ $setting->value }}</span>
                             </div>
                             @break

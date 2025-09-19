@@ -130,13 +130,11 @@
                             <!-- Color Indicators -->
                             <div class="flex items-center space-x-2 mb-4">
                                 <div class="flex items-center space-x-1">
-                                    <div class="w-4 h-4 rounded border"
-                                         style="background-color: {{ $slider->getEffectiveBackgroundColor() }}"></div>
+                                    <div class="w-4 h-4 rounded border bg-var" data-color="{{ $slider->getEffectiveBackgroundColor() }}"></div>
                                     <span class="text-xs text-gray-500">{{ __('translations.background') }}</span>
                                 </div>
                                 <div class="flex items-center space-x-1">
-                                    <div class="w-4 h-4 rounded border"
-                                         style="background-color: {{ $slider->getEffectiveTextColor() }}"></div>
+                                    <div class="w-4 h-4 rounded border bg-var" data-color="{{ $slider->getEffectiveTextColor() }}"></div>
                                     <span class="text-xs text-gray-500">{{ __('translations.text') }}</span>
                                 </div>
                             </div>

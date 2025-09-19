@@ -11,7 +11,7 @@
      x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
      x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-     style="display: none;" @click="closeModal()" @keydown.escape="closeModal()">
+     x-cloak @click="closeModal()" @keydown.escape="closeModal()">
 
     <div class="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto" @click.stop>
         {{-- Header --}}

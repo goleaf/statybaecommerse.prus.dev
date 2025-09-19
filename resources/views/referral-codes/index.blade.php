@@ -141,7 +141,7 @@
                                     @if($referralCode->usage_limit)
                                         / {{ $referralCode->usage_limit }}
                                         <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $referralCode->usage_percentage ?? 0 }}%"></div>
+                                            <div class="bg-blue-600 h-2 rounded-full w-var" data-width="{{ $referralCode->usage_percentage ?? 0 }}"></div>
                                         </div>
                                     @endif
                                 </td>

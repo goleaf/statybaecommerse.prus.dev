@@ -37,8 +37,8 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
+         x-cloak
          class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-         style="display: none;"
          @click="open = false">
     </div>
 
@@ -50,8 +50,8 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="transform translate-x-0"
          x-transition:leave-end="transform -translate-x-full"
-         class="fixed inset-y-0 left-0 z-50 w-80 max-w-sm bg-white shadow-xl overflow-y-auto"
-         style="display: none;">
+         x-cloak
+         class="fixed inset-y-0 left-0 z-50 w-80 max-w-sm bg-white shadow-xl overflow-y-auto">
 
         {{-- Menu Header --}}
         <div class="flex items-center justify-between p-4 border-b border-gray-200">
@@ -139,8 +139,8 @@
                                      x-transition:leave="transition ease-in duration-150"
                                      x-transition:leave-start="opacity-100 transform scale-100"
                                      x-transition:leave-end="opacity-0 transform scale-95"
-                                     class="ml-4 space-y-1"
-                                     style="display: none;">
+                                     x-cloak
+                                     class="ml-4 space-y-1">
                                     @foreach ($category->children as $subcategory)
                                         <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $subcategory->slug]) }}"
                                            class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">

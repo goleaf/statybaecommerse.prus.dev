@@ -19,21 +19,5 @@ title(__('Invoice'));
         </x-buttons.default>
     </div>
 
-    <style>
-        @media print {
-
-            header,
-            footer,
-            nav,
-            .print\:hidden {
-                display: none !important;
-            }
-
-            body {
-                background: white !important;
-            }
-        }
-    </style>
-
     <x-order.invoice :order="$order" />
 </div>

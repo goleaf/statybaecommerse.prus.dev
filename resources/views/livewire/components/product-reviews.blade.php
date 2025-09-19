@@ -55,7 +55,7 @@
                         <div class="flex items-center text-sm">
                             <span class="w-8 text-gray-600">{{ $rating }}★</span>
                             <div class="flex-1 mx-3 bg-gray-200 rounded-full h-2">
-                                <div class="bg-yellow-400 h-2 rounded-full" style="width: {{ $percentage }}%"></div>
+                                <div class="bg-yellow-400 h-2 rounded-full w-var" data-width="{{ $percentage }}"></div>
                             </div>
                             <span class="w-8 text-right text-gray-600">{{ $count }}</span>
                         </div>

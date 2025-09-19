@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeSearchEnhancements();
     initializeLoadingStates();
     initializeThemeSystem();
+    initializeDataAttributes();
 });
 
 // Scroll-triggered animations
@@ -293,6 +294,56 @@ function smoothScrollTo(element, offset = 0) {
     window.scrollTo({
         top: targetPosition,
         behavior: 'smooth'
+    });
+}
+
+// Initialize data attributes for dynamic styling
+function initializeDataAttributes() {
+    // Handle animation delays
+    document.querySelectorAll('[data-delay]').forEach(element => {
+        const delay = element.getAttribute('data-delay');
+        element.style.setProperty('--delay', `${delay}s`);
+    });
+
+    // Handle progress bar widths
+    document.querySelectorAll('[data-width]').forEach(element => {
+        const width = element.getAttribute('data-width');
+        element.style.setProperty('--w', `${width}%`);
+    });
+
+    // Handle dynamic transforms
+    document.querySelectorAll('[data-transform]').forEach(element => {
+        const transform = element.getAttribute('data-transform');
+        element.style.setProperty('--tx', transform);
+    });
+
+    // Handle dynamic colors
+    document.querySelectorAll('[data-color]').forEach(element => {
+        const color = element.getAttribute('data-color');
+        element.style.setProperty('--color', color);
+    });
+
+    // Handle dynamic background images
+    document.querySelectorAll('[data-bg-img]').forEach(element => {
+        const bgImg = element.getAttribute('data-bg-img');
+        element.style.setProperty('--bg-img', `url('${bgImg}')`);
+    });
+
+    // Handle dynamic text colors
+    document.querySelectorAll('[data-text-color]').forEach(element => {
+        const textColor = element.getAttribute('data-text-color');
+        element.style.setProperty('--text-color', textColor);
+    });
+
+    // Handle dynamic positioning
+    document.querySelectorAll('[data-left]').forEach(element => {
+        const left = element.getAttribute('data-left');
+        element.style.setProperty('--left', `${left}px`);
+    });
+
+    document.querySelectorAll('[data-top]').forEach(element => {
+        const top = element.getAttribute('data-top');
+        element.style.setProperty('--top', `${top}px`);
     });
 }
 
