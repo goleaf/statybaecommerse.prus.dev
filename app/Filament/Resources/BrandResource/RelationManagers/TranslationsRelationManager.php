@@ -23,7 +23,7 @@ final class TranslationsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('locale')
                     ->label(__('brands.locale'))
                     ->options([

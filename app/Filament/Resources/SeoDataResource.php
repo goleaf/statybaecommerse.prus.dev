@@ -16,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -92,11 +91,11 @@ final class SeoDataResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('seo_data.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('title')
                                 ->label(__('seo_data.title'))
                                 ->required()
@@ -118,9 +117,9 @@ final class SeoDataResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('seo_data.meta_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('meta_title')
                                 ->label(__('seo_data.meta_title'))
                                 ->maxLength(255)
@@ -131,7 +130,7 @@ final class SeoDataResource extends Resource
                                 ->helperText(__('seo_data.meta_description_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('meta_keywords')
                                 ->label(__('seo_data.meta_keywords'))
                                 ->maxLength(500)
@@ -144,9 +143,9 @@ final class SeoDataResource extends Resource
                         ]),
                 ]),
             Section::make(__('seo_data.open_graph'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('og_title')
                                 ->label(__('seo_data.og_title'))
                                 ->maxLength(255)
@@ -157,7 +156,7 @@ final class SeoDataResource extends Resource
                                 ->helperText(__('seo_data.og_description_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('og_image')
                                 ->label(__('seo_data.og_image'))
                                 ->url()
@@ -171,9 +170,9 @@ final class SeoDataResource extends Resource
                         ]),
                 ]),
             Section::make(__('seo_data.twitter_card'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('twitter_title')
                                 ->label(__('seo_data.twitter_title'))
                                 ->maxLength(255)
@@ -184,7 +183,7 @@ final class SeoDataResource extends Resource
                                 ->helperText(__('seo_data.twitter_description_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('twitter_image')
                                 ->label(__('seo_data.twitter_image'))
                                 ->url()
@@ -198,7 +197,7 @@ final class SeoDataResource extends Resource
                         ]),
                 ]),
             Section::make(__('seo_data.structured_data'))
-                ->schema([
+                ->components([
                     KeyValue::make('structured_data')
                         ->label(__('seo_data.structured_data'))
                         ->keyLabel(__('seo_data.structured_data_key'))
@@ -207,9 +206,9 @@ final class SeoDataResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('seo_data.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('seo_data.is_active'))
                                 ->default(true),
@@ -218,7 +217,7 @@ final class SeoDataResource extends Resource
                                 ->default(false),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('canonical_url')
                                 ->label(__('seo_data.canonical_url'))
                                 ->url()

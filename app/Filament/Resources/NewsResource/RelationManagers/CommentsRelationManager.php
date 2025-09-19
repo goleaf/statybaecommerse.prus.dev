@@ -24,7 +24,7 @@ final class CommentsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('comment_id')
                     ->label(__('news.comment'))
                     ->relationship('comment', 'content')

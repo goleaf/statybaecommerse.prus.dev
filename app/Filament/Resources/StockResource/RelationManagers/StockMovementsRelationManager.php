@@ -49,7 +49,7 @@ class StockMovementsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 TextInput::make('quantity')
                     ->label(__('inventory.quantity'))
                     ->numeric(),

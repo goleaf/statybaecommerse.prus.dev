@@ -24,7 +24,7 @@ final class PartnersRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('company_id')
                     ->label(__('price_lists.partner'))
                     ->relationship('company', 'name')

@@ -14,7 +14,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -89,11 +88,11 @@ final class CustomerGroupResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('customer_groups.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('customer_groups.name'))
                                 ->required()
@@ -112,9 +111,9 @@ final class CustomerGroupResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('customer_groups.pricing_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('discount_percentage')
                                 ->label(__('customer_groups.discount_percentage'))
                                 ->numeric()
@@ -132,7 +131,7 @@ final class CustomerGroupResource extends Resource
                                 ->helperText(__('customer_groups.discount_fixed_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('has_special_pricing')
                                 ->label(__('customer_groups.has_special_pricing'))
                                 ->default(false),
@@ -142,9 +141,9 @@ final class CustomerGroupResource extends Resource
                         ]),
                 ]),
             Section::make(__('customer_groups.permissions'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('can_view_prices')
                                 ->label(__('customer_groups.can_view_prices'))
                                 ->default(true),
@@ -153,7 +152,7 @@ final class CustomerGroupResource extends Resource
                                 ->default(true),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('can_view_catalog')
                                 ->label(__('customer_groups.can_view_catalog'))
                                 ->default(true),
@@ -163,9 +162,9 @@ final class CustomerGroupResource extends Resource
                         ]),
                 ]),
             Section::make(__('customer_groups.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('customer_groups.is_active'))
                                 ->default(true),
@@ -173,7 +172,7 @@ final class CustomerGroupResource extends Resource
                                 ->label(__('customer_groups.is_default')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('customer_groups.sort_order'))
                                 ->numeric()

@@ -21,12 +21,12 @@ final class CountryForm
     public static function configure(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 // Basic Information Section
                 Section::make(__('countries.basic_information'))
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('name')
                                     ->label(__('countries.name'))
                                     ->required()
@@ -39,7 +39,7 @@ final class CountryForm
                             ]),
                         
                         Grid::make(3)
-                            ->schema([
+                            ->components([
                                 TextInput::make('cca2')
                                     ->label(__('countries.cca2'))
                                     ->required()
@@ -68,9 +68,9 @@ final class CountryForm
                 
                 // Geographic Information Section
                 Section::make(__('countries.geographic_information'))
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('region')
                                     ->label(__('countries.region'))
                                     ->maxLength(255),
@@ -81,7 +81,7 @@ final class CountryForm
                             ]),
                         
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('latitude')
                                     ->label(__('countries.latitude'))
                                     ->numeric()
@@ -96,9 +96,9 @@ final class CountryForm
                 
                 // Currency and Economic Information Section
                 Section::make(__('countries.currency_economic'))
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('currency_code')
                                     ->label(__('countries.currency_code'))
                                     ->maxLength(3)
@@ -110,7 +110,7 @@ final class CountryForm
                             ]),
                         
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('vat_rate')
                                     ->label(__('countries.vat_rate'))
                                     ->numeric()
@@ -132,9 +132,9 @@ final class CountryForm
                 
                 // Contact Information Section
                 Section::make(__('countries.contact_information'))
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('phone_code')
                                     ->label(__('countries.phone_code'))
                                     ->tel()
@@ -147,7 +147,7 @@ final class CountryForm
                             ]),
                         
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('flag')
                                     ->label(__('countries.flag'))
                                     ->maxLength(255)
@@ -162,7 +162,7 @@ final class CountryForm
                 
                 // Additional Information Section
                 Section::make(__('countries.additional_information'))
-                    ->schema([
+                    ->components([
                         Textarea::make('languages')
                             ->label(__('countries.languages'))
                             ->rows(2)
@@ -181,9 +181,9 @@ final class CountryForm
                 
                 // Status and Settings Section
                 Section::make(__('countries.status_settings'))
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 Toggle::make('is_active')
                                     ->label(__('countries.is_active'))
                                     ->default(true),
@@ -194,7 +194,7 @@ final class CountryForm
                             ]),
                         
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 Toggle::make('is_eu_member')
                                     ->label(__('countries.is_eu_member'))
                                     ->default(false),

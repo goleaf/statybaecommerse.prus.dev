@@ -54,13 +54,13 @@ final class OrderDocumentsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Section::make(__('orders.document_information'))
                     ->description(__('orders.document_information_description'))
                     ->icon('heroicon-o-document')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('name')
                                     ->label(__('orders.document_name'))
                                     ->required()
@@ -82,7 +82,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                                     ->prefixIcon('heroicon-o-tag'),
                             ]),
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('version')
                                     ->label(__('orders.document_version'))
                                     ->maxLength(50)
@@ -106,7 +106,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                 Section::make(__('orders.file_upload'))
                     ->description(__('orders.file_upload_description'))
                     ->icon('heroicon-o-cloud-arrow-up')
-                    ->schema([
+                    ->components([
                         FileUpload::make('file_path')
                             ->label(__('orders.document_file'))
                             ->required()
@@ -116,7 +116,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                             ->visibility('private')
                             ->prefixIcon('heroicon-o-cloud-arrow-up'),
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('file_size')
                                     ->label(__('orders.file_size'))
                                     ->numeric()
@@ -132,9 +132,9 @@ final class OrderDocumentsRelationManager extends RelationManager
                 Section::make(__('orders.access_control'))
                     ->description(__('orders.access_control_description'))
                     ->icon('heroicon-o-shield-check')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 Toggle::make('is_public')
                                     ->label(__('orders.is_public'))
                                     ->default(false)
@@ -145,7 +145,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                                     ->helperText(__('orders.is_downloadable_help')),
                             ]),
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('access_password')
                                     ->label(__('orders.access_password'))
                                     ->password()
@@ -161,7 +161,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                 Section::make(__('orders.additional_details'))
                     ->description(__('orders.additional_details_description'))
                     ->icon('heroicon-o-document-text')
-                    ->schema([
+                    ->components([
                         Textarea::make('description')
                             ->label(__('orders.document_description'))
                             ->rows(3)

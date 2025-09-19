@@ -35,8 +35,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * PriceListItemResource
  * 
@@ -94,11 +92,11 @@ final class PriceListItemResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('price_list_items.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('price_list_id')
                                 ->label(__('price_list_items.price_list'))
                                 ->relationship('priceList', 'name')
@@ -134,9 +132,9 @@ final class PriceListItemResource extends Resource
                 ]),
             
             Section::make(__('price_list_items.pricing'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('base_price')
                                 ->label(__('price_list_items.base_price'))
                                 ->numeric()
@@ -156,7 +154,7 @@ final class PriceListItemResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('discount_percentage')
                                 ->label(__('price_list_items.discount_percentage'))
                                 ->numeric()
@@ -175,7 +173,7 @@ final class PriceListItemResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('max_quantity')
                                 ->label(__('price_list_items.max_quantity'))
                                 ->numeric()
@@ -191,12 +189,12 @@ final class PriceListItemResource extends Resource
                 ]),
             
             Section::make(__('price_list_items.tiered_pricing'))
-                ->schema([
+                ->components([
                     Forms\Components\Repeater::make('tiered_pricing')
                         ->label(__('price_list_items.tiered_pricing'))
-                        ->schema([
+                        ->components([
                             Grid::make(3)
-                                ->schema([
+                                ->components([
                                     TextInput::make('min_quantity')
                                         ->label(__('price_list_items.tier_min_quantity'))
                                         ->numeric()
@@ -224,9 +222,9 @@ final class PriceListItemResource extends Resource
                 ]),
             
             Section::make(__('price_list_items.validity'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('valid_from')
                                 ->label(__('price_list_items.valid_from'))
                                 ->default(now())
@@ -239,7 +237,7 @@ final class PriceListItemResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('price_list_items.is_active'))
                                 ->default(true),
@@ -251,7 +249,7 @@ final class PriceListItemResource extends Resource
                 ]),
             
             Section::make(__('price_list_items.settings'))
-                ->schema([
+                ->components([
                     Textarea::make('notes')
                         ->label(__('price_list_items.notes'))
                         ->rows(3)

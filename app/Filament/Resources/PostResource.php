@@ -18,7 +18,6 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -100,11 +99,11 @@ final class PostResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('posts.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('title')
                                 ->label(__('posts.title'))
                                 ->required()
@@ -143,7 +142,7 @@ final class PostResource extends Resource
                         ]),
                 ]),
             Section::make(__('posts.media'))
-                ->schema([
+                ->components([
                     FileUpload::make('featured_image')
                         ->label(__('posts.featured_image'))
                         ->image()
@@ -166,9 +165,9 @@ final class PostResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('posts.categorization'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('author_id')
                                 ->label(__('posts.author'))
                                 ->relationship('author', 'name')
@@ -182,9 +181,9 @@ final class PostResource extends Resource
                         ]),
                 ]),
             Section::make(__('posts.publishing'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_published')
                                 ->label(__('posts.is_published'))
                                 ->default(false),
@@ -192,7 +191,7 @@ final class PostResource extends Resource
                                 ->label(__('posts.is_featured')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('published_at')
                                 ->label(__('posts.published_at'))
                                 ->default(now())
@@ -203,7 +202,7 @@ final class PostResource extends Resource
                         ]),
                 ]),
             Section::make(__('posts.seo'))
-                ->schema([
+                ->components([
                     TextInput::make('seo_title')
                         ->label(__('posts.seo_title'))
                         ->maxLength(255)

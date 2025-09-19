@@ -55,13 +55,13 @@ final class OrderItemsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Section::make(__('orders.item_information'))
                     ->description(__('orders.item_information_description'))
                     ->icon('heroicon-o-cube')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 Select::make('product_variant_id')
                                     ->label(__('orders.product_variant'))
                                     ->relationship('productVariant', 'name')
@@ -93,7 +93,7 @@ final class OrderItemsRelationManager extends RelationManager
                                     ->prefixIcon('heroicon-o-hashtag'),
                             ]),
                         Grid::make(3)
-                            ->schema([
+                            ->components([
                                 TextInput::make('unit_price')
                                     ->label(__('orders.unit_price'))
                                     ->numeric()
@@ -146,7 +146,7 @@ final class OrderItemsRelationManager extends RelationManager
                 Section::make(__('orders.additional_details'))
                     ->description(__('orders.additional_details_description'))
                     ->icon('heroicon-o-document-text')
-                    ->schema([
+                    ->components([
                         Textarea::make('notes')
                             ->label(__('orders.item_notes'))
                             ->rows(3)

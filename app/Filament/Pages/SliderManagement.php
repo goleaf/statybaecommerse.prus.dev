@@ -10,13 +10,10 @@ use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -24,9 +21,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Placeholder;
+use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Collection;
@@ -67,8 +66,8 @@ class SliderManagement extends Page implements HasForms, HasActions
             ->size(Size::Large)
             ->form([
                 Section::make(__('translations.basic_information'))
-                    ->schema([
-                        Grid::make(2)->schema([
+                    ->components([
+                        Grid::make(2)->components([
                             TextInput::make('title')
                                 ->label(__('translations.title'))
                                 ->required()
@@ -95,7 +94,7 @@ class SliderManagement extends Page implements HasForms, HasActions
                                 'bulletList',
                                 'orderedList',
                             ]),
-                        Grid::make(2)->schema([
+                        Grid::make(2)->components([
                             TextInput::make('button_text')
                                 ->label(__('translations.button_text'))
                                 ->maxLength(255),
@@ -107,7 +106,7 @@ class SliderManagement extends Page implements HasForms, HasActions
                     ])
                     ->collapsible(),
                 Section::make(__('translations.media'))
-                    ->schema([
+                    ->components([
                         FileUpload::make('slider_image')
                             ->label(__('translations.slider_image'))
                             ->image()
@@ -130,8 +129,8 @@ class SliderManagement extends Page implements HasForms, HasActions
                     ])
                     ->collapsible(),
                 Section::make(__('translations.design'))
-                    ->schema([
-                        Grid::make(3)->schema([
+                    ->components([
+                        Grid::make(3)->components([
                             ColorPicker::make('background_color')
                                 ->label(__('translations.background_color'))
                                 ->default('#ffffff'),
@@ -142,7 +141,7 @@ class SliderManagement extends Page implements HasForms, HasActions
                                 ->label(__('translations.button_color'))
                                 ->default('#007bff'),
                         ]),
-                        Grid::make(2)->schema([
+                        Grid::make(2)->components([
                             Select::make('text_alignment')
                                 ->label(__('translations.text_alignment'))
                                 ->options([
@@ -169,8 +168,8 @@ class SliderManagement extends Page implements HasForms, HasActions
                     ])
                     ->collapsible(),
                 Section::make(__('translations.animation_settings'))
-                    ->schema([
-                        Grid::make(2)->schema([
+                    ->components([
+                        Grid::make(2)->components([
                             Select::make('animation_type')
                                 ->label(__('translations.animation_type'))
                                 ->options([
@@ -191,7 +190,7 @@ class SliderManagement extends Page implements HasForms, HasActions
                                 ->minValue(1000)
                                 ->maxValue(30000),
                         ]),
-                        Grid::make(2)->schema([
+                        Grid::make(2)->components([
                             Toggle::make('autoplay')
                                 ->label(__('translations.autoplay'))
                                 ->default(true)
@@ -212,8 +211,8 @@ class SliderManagement extends Page implements HasForms, HasActions
                     ])
                     ->collapsible(),
                 Section::make(__('translations.scheduling'))
-                    ->schema([
-                        Grid::make(2)->schema([
+                    ->components([
+                        Grid::make(2)->components([
                             DateTimePicker::make('start_date')
                                 ->label(__('translations.start_date'))
                                 ->default(now()),
@@ -228,8 +227,8 @@ class SliderManagement extends Page implements HasForms, HasActions
                     ])
                     ->collapsible(),
                 Section::make(__('translations.advanced_settings'))
-                    ->schema([
-                        Grid::make(2)->schema([
+                    ->components([
+                        Grid::make(2)->components([
                             TextInput::make('sort_order')
                                 ->label(__('translations.sort_order'))
                                 ->numeric()
@@ -254,7 +253,7 @@ class SliderManagement extends Page implements HasForms, HasActions
                             ->valueLabel(__('translations.attribute_value')),
                         Repeater::make('slides')
                             ->label(__('translations.additional_slides'))
-                            ->schema([
+                            ->components([
                                 TextInput::make('title')
                                     ->label(__('translations.slide_title'))
                                     ->required(),
@@ -271,8 +270,8 @@ class SliderManagement extends Page implements HasForms, HasActions
                     ])
                     ->collapsible(),
                 Section::make(__('translations.status'))
-                    ->schema([
-                        Grid::make(2)->schema([
+                    ->components([
+                        Grid::make(2)->components([
                             Toggle::make('is_active')
                                 ->label(__('translations.is_active'))
                                 ->default(true),
@@ -538,7 +537,7 @@ class SliderManagement extends Page implements HasForms, HasActions
             ->color('gray')
             ->form([
                 Section::make(__('translations.global_settings'))
-                    ->schema([
+                    ->components([
                         Toggle::make('auto_optimize_images')
                             ->label(__('translations.auto_optimize_images'))
                             ->default(true),

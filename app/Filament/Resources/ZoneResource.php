@@ -15,7 +15,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -91,11 +90,11 @@ final class ZoneResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('zones.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('zones.name'))
                                 ->required()
@@ -114,7 +113,7 @@ final class ZoneResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('zones.countries'))
-                ->schema([
+                ->components([
                     Select::make('countries')
                         ->label(__('zones.countries'))
                         ->relationship('countries', 'name')
@@ -124,9 +123,9 @@ final class ZoneResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('zones.shipping_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('shipping_cost')
                                 ->label(__('zones.shipping_cost'))
                                 ->numeric()
@@ -141,7 +140,7 @@ final class ZoneResource extends Resource
                                 ->minValue(0),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('estimated_delivery_days')
                                 ->label(__('zones.estimated_delivery_days'))
                                 ->numeric()
@@ -152,9 +151,9 @@ final class ZoneResource extends Resource
                         ]),
                 ]),
             Section::make(__('zones.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('zones.is_active'))
                                 ->default(true),
@@ -162,7 +161,7 @@ final class ZoneResource extends Resource
                                 ->label(__('zones.is_default')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('zones.sort_order'))
                                 ->numeric()

@@ -51,7 +51,7 @@ final class SliderAnalytics extends BaseDashboard
             FilterAction::make()
                 ->label('Filter Analytics')
                 ->icon('heroicon-o-funnel')
-                ->schema([
+                ->components([
                     DatePicker::make('startDate')
                         ->label('Start Date')
                         ->default(now()->subDays(30))

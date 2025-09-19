@@ -17,7 +17,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -93,11 +92,11 @@ final class CityResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('cities.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('cities.name'))
                                 ->required()
@@ -125,7 +124,7 @@ final class CityResource extends Resource
                             }
                         }),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('country_code')
                                 ->label(__('cities.country_code'))
                                 ->maxLength(3)
@@ -141,9 +140,9 @@ final class CityResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('cities.coordinates'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('latitude')
                                 ->label(__('cities.latitude'))
                                 ->numeric()
@@ -159,9 +158,9 @@ final class CityResource extends Resource
                         ]),
                 ]),
             Section::make(__('cities.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('cities.is_active'))
                                 ->default(true),
@@ -169,7 +168,7 @@ final class CityResource extends Resource
                                 ->label(__('cities.is_capital')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('population')
                                 ->label(__('cities.population'))
                                 ->numeric()

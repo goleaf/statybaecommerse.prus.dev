@@ -15,7 +15,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -91,11 +90,11 @@ final class ReferralResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('referrals.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('referrer_id')
                                 ->label(__('referrals.referrer'))
                                 ->relationship('referrer', 'name')
@@ -119,7 +118,7 @@ final class ReferralResource extends Resource
                                 ->disabled(),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('referred_id')
                                 ->label(__('referrals.referred'))
                                 ->relationship('referred', 'name')
@@ -151,9 +150,9 @@ final class ReferralResource extends Resource
                         ->helperText(__('referrals.referral_code_help')),
                 ]),
             Section::make(__('referrals.reward_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('referrer_reward')
                                 ->label(__('referrals.referrer_reward'))
                                 ->numeric()
@@ -172,7 +171,7 @@ final class ReferralResource extends Resource
                                 ->helperText(__('referrals.referred_reward_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('referrer_reward_percentage')
                                 ->label(__('referrals.referrer_reward_percentage'))
                                 ->numeric()
@@ -192,9 +191,9 @@ final class ReferralResource extends Resource
                         ]),
                 ]),
             Section::make(__('referrals.status_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('status')
                                 ->label(__('referrals.status'))
                                 ->options([
@@ -211,7 +210,7 @@ final class ReferralResource extends Resource
                                 ->displayFormat('d/m/Y H:i'),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('completed_at')
                                 ->label(__('referrals.completed_at'))
                                 ->displayFormat('d/m/Y H:i'),
@@ -221,9 +220,9 @@ final class ReferralResource extends Resource
                         ]),
                 ]),
             Section::make(__('referrals.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('referrals.is_active'))
                                 ->default(true),

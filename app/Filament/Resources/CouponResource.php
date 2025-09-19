@@ -34,8 +34,6 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * CouponResource
  * 
@@ -94,11 +92,11 @@ final class CouponResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('coupons.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('code')
                                 ->label(__('coupons.code'))
                                 ->required()
@@ -121,9 +119,9 @@ final class CouponResource extends Resource
                 ]),
             
             Section::make(__('coupons.discount_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('type')
                                 ->label(__('coupons.type'))
                                 ->options([
@@ -145,7 +143,7 @@ final class CouponResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('minimum_amount')
                                 ->label(__('coupons.minimum_amount'))
                                 ->numeric()
@@ -163,9 +161,9 @@ final class CouponResource extends Resource
                 ]),
             
             Section::make(__('coupons.usage_limits'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('usage_limit')
                                 ->label(__('coupons.usage_limit'))
                                 ->numeric()
@@ -180,7 +178,7 @@ final class CouponResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('used_count')
                                 ->label(__('coupons.used_count'))
                                 ->numeric()
@@ -197,9 +195,9 @@ final class CouponResource extends Resource
                 ]),
             
             Section::make(__('coupons.validity'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('valid_from')
                                 ->label(__('coupons.valid_from'))
                                 ->default(now())
@@ -212,9 +210,9 @@ final class CouponResource extends Resource
                 ]),
             
             Section::make(__('coupons.targeting'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('customer_group_id')
                                 ->label(__('coupons.customer_group'))
                                 ->relationship('customerGroup', 'name')
@@ -235,9 +233,9 @@ final class CouponResource extends Resource
                 ]),
             
             Section::make(__('coupons.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('coupons.is_active'))
                                 ->default(true),
@@ -248,7 +246,7 @@ final class CouponResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_auto_apply')
                                 ->label(__('coupons.is_auto_apply'))
                                 ->default(false),

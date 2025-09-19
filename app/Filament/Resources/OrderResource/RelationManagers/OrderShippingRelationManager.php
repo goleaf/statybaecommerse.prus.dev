@@ -54,13 +54,13 @@ final class OrderShippingRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Section::make(__('orders.shipping_information'))
                     ->description(__('orders.shipping_information_description'))
                     ->icon('heroicon-o-truck')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 Select::make('shipping_method')
                                     ->label(__('orders.shipping_method'))
                                     ->options([
@@ -78,7 +78,7 @@ final class OrderShippingRelationManager extends RelationManager
                                     ->prefixIcon('heroicon-o-magnifying-glass'),
                             ]),
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TextInput::make('carrier')
                                     ->label(__('orders.carrier'))
                                     ->maxLength(255)
@@ -93,9 +93,9 @@ final class OrderShippingRelationManager extends RelationManager
                 Section::make(__('orders.shipping_costs'))
                     ->description(__('orders.shipping_costs_description'))
                     ->icon('heroicon-o-currency-euro')
-                    ->schema([
+                    ->components([
                         Grid::make(3)
-                            ->schema([
+                            ->components([
                                 TextInput::make('base_cost')
                                     ->label(__('orders.base_cost'))
                                     ->numeric()
@@ -121,9 +121,9 @@ final class OrderShippingRelationManager extends RelationManager
                 Section::make(__('orders.delivery_information'))
                     ->description(__('orders.delivery_information_description'))
                     ->icon('heroicon-o-map-pin')
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 DateTimePicker::make('shipped_at')
                                     ->label(__('orders.shipped_at'))
                                     ->prefixIcon('heroicon-o-truck'),
@@ -132,7 +132,7 @@ final class OrderShippingRelationManager extends RelationManager
                                     ->prefixIcon('heroicon-o-calendar'),
                             ]),
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 DateTimePicker::make('delivered_at')
                                     ->label(__('orders.delivered_at'))
                                     ->prefixIcon('heroicon-o-check-circle'),
@@ -154,7 +154,7 @@ final class OrderShippingRelationManager extends RelationManager
                 Section::make(__('orders.additional_details'))
                     ->description(__('orders.additional_details_description'))
                     ->icon('heroicon-o-document-text')
-                    ->schema([
+                    ->components([
                         Textarea::make('notes')
                             ->label(__('orders.shipping_notes'))
                             ->rows(3)

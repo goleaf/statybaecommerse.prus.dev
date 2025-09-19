@@ -5,24 +5,23 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -66,7 +65,7 @@ final class UserResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Users";
+        return 'Users';
     }
 
     /**
@@ -96,9 +95,9 @@ final class UserResource extends Resource
     {
         return $schema->components([
             Section::make(__('users.sections.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('users.fields.name'))
                                 ->required()
@@ -113,7 +112,7 @@ final class UserResource extends Resource
                                 ->columnSpan(1),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('phone')
                                 ->label(__('users.fields.phone'))
                                 ->tel()
@@ -130,9 +129,9 @@ final class UserResource extends Resource
                 ])
                 ->columns(1),
             Section::make(__('users.sections.preferences'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('locale')
                                 ->label(__('users.fields.locale'))
                                 ->options([
@@ -159,9 +158,9 @@ final class UserResource extends Resource
                 ])
                 ->columns(1),
             Section::make(__('users.sections.status'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('users.fields.is_active'))
                                 ->default(true)

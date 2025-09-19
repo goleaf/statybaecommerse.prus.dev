@@ -34,8 +34,6 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * CampaignClickResource
  * 
@@ -94,11 +92,11 @@ final class CampaignClickResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('campaign_clicks.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('campaign_id')
                                 ->label(__('campaign_clicks.campaign'))
                                 ->relationship('campaign', 'name')
@@ -124,7 +122,7 @@ final class CampaignClickResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('user_id')
                                 ->label(__('campaign_clicks.user'))
                                 ->relationship('user', 'name')
@@ -149,9 +147,9 @@ final class CampaignClickResource extends Resource
                 ]),
             
             Section::make(__('campaign_clicks.click_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('click_url')
                                 ->label(__('campaign_clicks.click_url'))
                                 ->required()
@@ -167,7 +165,7 @@ final class CampaignClickResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('ip_address')
                                 ->label(__('campaign_clicks.ip_address'))
                                 ->maxLength(45)
@@ -181,7 +179,7 @@ final class CampaignClickResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('device_type')
                                 ->label(__('campaign_clicks.device_type'))
                                 ->maxLength(50)
@@ -194,7 +192,7 @@ final class CampaignClickResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('os')
                                 ->label(__('campaign_clicks.os'))
                                 ->maxLength(100)
@@ -208,9 +206,9 @@ final class CampaignClickResource extends Resource
                 ]),
             
             Section::make(__('campaign_clicks.tracking_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('session_id')
                                 ->label(__('campaign_clicks.session_id'))
                                 ->maxLength(100)
@@ -223,7 +221,7 @@ final class CampaignClickResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('utm_medium')
                                 ->label(__('campaign_clicks.utm_medium'))
                                 ->maxLength(100)
@@ -236,7 +234,7 @@ final class CampaignClickResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('utm_term')
                                 ->label(__('campaign_clicks.utm_term'))
                                 ->maxLength(100)
@@ -250,9 +248,9 @@ final class CampaignClickResource extends Resource
                 ]),
             
             Section::make(__('campaign_clicks.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_conversion')
                                 ->label(__('campaign_clicks.is_conversion'))
                                 ->default(false),
@@ -263,7 +261,7 @@ final class CampaignClickResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('conversion_value')
                                 ->label(__('campaign_clicks.conversion_value'))
                                 ->numeric()

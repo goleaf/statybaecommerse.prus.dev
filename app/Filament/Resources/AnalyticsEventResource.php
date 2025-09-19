@@ -34,8 +34,6 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * AnalyticsEventResource
  * 
@@ -94,11 +92,11 @@ final class AnalyticsEventResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('analytics_events.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('event_name')
                                 ->label(__('analytics_events.event_name'))
                                 ->required()
@@ -132,9 +130,9 @@ final class AnalyticsEventResource extends Resource
                 ]),
             
             Section::make(__('analytics_events.user_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('user_id')
                                 ->label(__('analytics_events.user'))
                                 ->relationship('user', 'name')
@@ -158,7 +156,7 @@ final class AnalyticsEventResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('session_id')
                                 ->label(__('analytics_events.session_id'))
                                 ->maxLength(100)
@@ -172,7 +170,7 @@ final class AnalyticsEventResource extends Resource
                 ]),
             
             Section::make(__('analytics_events.event_data'))
-                ->schema([
+                ->components([
                     KeyValue::make('event_data')
                         ->label(__('analytics_events.event_data'))
                         ->keyLabel(__('analytics_events.event_data_key'))
@@ -182,9 +180,9 @@ final class AnalyticsEventResource extends Resource
                 ]),
             
             Section::make(__('analytics_events.context_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('ip_address')
                                 ->label(__('analytics_events.ip_address'))
                                 ->maxLength(45)
@@ -198,7 +196,7 @@ final class AnalyticsEventResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('browser')
                                 ->label(__('analytics_events.browser'))
                                 ->maxLength(100)
@@ -211,7 +209,7 @@ final class AnalyticsEventResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('country')
                                 ->label(__('analytics_events.country'))
                                 ->maxLength(100)
@@ -225,9 +223,9 @@ final class AnalyticsEventResource extends Resource
                 ]),
             
             Section::make(__('analytics_events.referral_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('referrer_url')
                                 ->label(__('analytics_events.referrer_url'))
                                 ->url()
@@ -241,7 +239,7 @@ final class AnalyticsEventResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('utm_medium')
                                 ->label(__('analytics_events.utm_medium'))
                                 ->maxLength(100)
@@ -254,7 +252,7 @@ final class AnalyticsEventResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('utm_term')
                                 ->label(__('analytics_events.utm_term'))
                                 ->maxLength(100)
@@ -268,9 +266,9 @@ final class AnalyticsEventResource extends Resource
                 ]),
             
             Section::make(__('analytics_events.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_important')
                                 ->label(__('analytics_events.is_important'))
                                 ->default(false),
@@ -281,7 +279,7 @@ final class AnalyticsEventResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('conversion_value')
                                 ->label(__('analytics_events.conversion_value'))
                                 ->numeric()

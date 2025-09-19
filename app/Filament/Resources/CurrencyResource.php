@@ -13,7 +13,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -91,11 +90,11 @@ final class CurrencyResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('currencies.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('currencies.name'))
                                 ->required()
@@ -109,7 +108,7 @@ final class CurrencyResource extends Resource
                                 ->helperText(__('currencies.code_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('symbol')
                                 ->label(__('currencies.symbol'))
                                 ->required()
@@ -130,9 +129,9 @@ final class CurrencyResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('currencies.exchange_rates'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('exchange_rate')
                                 ->label(__('currencies.exchange_rate'))
                                 ->numeric()
@@ -149,9 +148,9 @@ final class CurrencyResource extends Resource
                         ]),
                 ]),
             Section::make(__('currencies.formatting'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('decimal_places')
                                 ->label(__('currencies.decimal_places'))
                                 ->numeric()
@@ -167,7 +166,7 @@ final class CurrencyResource extends Resource
                                 ->default('after'),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('thousands_separator')
                                 ->label(__('currencies.thousands_separator'))
                                 ->maxLength(1)
@@ -181,9 +180,9 @@ final class CurrencyResource extends Resource
                         ]),
                 ]),
             Section::make(__('currencies.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('currencies.is_active'))
                                 ->default(true),
@@ -191,7 +190,7 @@ final class CurrencyResource extends Resource
                                 ->label(__('currencies.is_default')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('currencies.sort_order'))
                                 ->numeric()

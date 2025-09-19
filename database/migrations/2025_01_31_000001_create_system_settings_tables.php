@@ -1,13 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         // System Setting Categories Table
@@ -17,7 +14,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->string('icon')->nullable();
-            $table->string('color')->default('primary');
+            $table->string('color')->nullable()->default('primary');
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('parent_id')->nullable();
@@ -36,7 +33,7 @@ return new class extends Migration
             $table->string('key')->unique();
             $table->string('name');
             $table->text('value')->nullable();
-            $table->string('type')->default('string'); // string, text, number, boolean, array, json, file, image, select, color, date, datetime
+            $table->string('type')->default('string');  // string, text, number, boolean, array, json, file, image, select, color, date, datetime
             $table->string('group')->default('general');
             $table->text('description')->nullable();
             $table->text('help_text')->nullable();
@@ -45,7 +42,7 @@ return new class extends Migration
             $table->boolean('is_encrypted')->default(false);
             $table->boolean('is_readonly')->default(false);
             $table->json('validation_rules')->nullable();
-            $table->json('options')->nullable(); // For select, checkbox, radio options
+            $table->json('options')->nullable();  // For select, checkbox, radio options
             $table->text('default_value')->nullable();
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
@@ -113,7 +110,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('setting_id');
             $table->unsignedBigInteger('depends_on_setting_id');
-            $table->json('condition')->nullable(); // JSON with operator and value
+            $table->json('condition')->nullable();  // JSON with operator and value
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 

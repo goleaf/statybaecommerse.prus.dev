@@ -16,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -93,11 +92,11 @@ final class ReviewResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('reviews.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('product_id')
                                 ->label(__('reviews.product'))
                                 ->relationship('product', 'name')
@@ -122,9 +121,9 @@ final class ReviewResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('reviews.rating'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Rating::make('rating')
                                 ->label(__('reviews.rating'))
                                 ->required()
@@ -137,9 +136,9 @@ final class ReviewResource extends Resource
                         ]),
                 ]),
             Section::make(__('reviews.additional_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('pros')
                                 ->label(__('reviews.pros'))
                                 ->maxLength(500),

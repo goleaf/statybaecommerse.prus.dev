@@ -39,19 +39,17 @@ class VariantInventorySeeder extends Seeder
                         'warehouse_code' => $location->code ?? 'main',
                     ],
                     [
-                        'location_id' => $location->id,
                         'stock' => fake()->numberBetween(0, 500),
                         'reserved' => fake()->numberBetween(0, 50),
-                        'incoming' => fake()->numberBetween(0, 100),
-                        'threshold' => fake()->numberBetween(10, 50),
+                        'available' => fake()->numberBetween(0, 100),
                         'reorder_point' => fake()->numberBetween(5, 25),
+                        'reorder_quantity' => fake()->numberBetween(10, 50),
                         'max_stock_level' => fake()->numberBetween(200, 1000),
                         'cost_per_unit' => fake()->randomFloat(2, 5, 100),
                         'supplier_id' => $suppliers->isNotEmpty() ? $suppliers->random()->id : null,
                         'batch_number' => fake()->optional(0.7)->regexify('[A-Z0-9]{8}'),
                         'expiry_date' => fake()->optional(0.3)->dateTimeBetween('now', '+2 years'),
                         'status' => fake()->randomElement(['active', 'active', 'active', 'inactive']),  // 75% active
-                        'is_tracked' => fake()->boolean(85),  // 85% tracked
                         'notes' => fake()->optional(0.4)->sentence(),
                         'last_restocked_at' => fake()->optional(0.6)->dateTimeBetween('-6 months', 'now'),
                         'last_sold_at' => fake()->optional(0.8)->dateTimeBetween('-1 month', 'now'),
@@ -105,17 +103,15 @@ class VariantInventorySeeder extends Seeder
                     'warehouse_code' => $locations->first()->code ?? 'main',
                 ],
                 [
-                    'location_id' => $locations->first()->id,
                     'supplier_id' => $suppliers->isNotEmpty() ? $suppliers->first()->id : null,
                     'stock' => 5,  // Low stock
                     'reserved' => 0,
-                    'incoming' => 0,
-                    'threshold' => 10,
+                    'available' => 0,
                     'reorder_point' => 5,
+                    'reorder_quantity' => 10,
                     'max_stock_level' => 100,
                     'cost_per_unit' => 10.0,
                     'status' => 'active',
-                    'is_tracked' => true,
                 ]
             );
         }
@@ -128,17 +124,15 @@ class VariantInventorySeeder extends Seeder
                     'warehouse_code' => $locations->first()->code ?? 'main',
                 ],
                 [
-                    'location_id' => $locations->first()->id,
                     'supplier_id' => $suppliers->isNotEmpty() ? $suppliers->first()->id : null,
                     'stock' => 0,  // Out of stock
                     'reserved' => 0,
-                    'incoming' => 0,
-                    'threshold' => 10,
+                    'available' => 0,
                     'reorder_point' => 5,
+                    'reorder_quantity' => 10,
                     'max_stock_level' => 100,
                     'cost_per_unit' => 10.0,
                     'status' => 'active',
-                    'is_tracked' => true,
                 ]
             );
         }
@@ -151,17 +145,15 @@ class VariantInventorySeeder extends Seeder
                     'warehouse_code' => $locations->first()->code ?? 'main',
                 ],
                 [
-                    'location_id' => $locations->first()->id,
                     'supplier_id' => $suppliers->isNotEmpty() ? $suppliers->first()->id : null,
                     'stock' => 50,
                     'reserved' => 0,
-                    'incoming' => 0,
-                    'threshold' => 10,
+                    'available' => 0,
                     'reorder_point' => 5,
+                    'reorder_quantity' => 10,
                     'max_stock_level' => 100,
                     'cost_per_unit' => 10.0,
                     'status' => 'active',
-                    'is_tracked' => true,
                     'expiry_date' => now()->addDays(7),  // Expiring soon
                 ]
             );
@@ -175,17 +167,15 @@ class VariantInventorySeeder extends Seeder
                     'warehouse_code' => $locations->first()->code ?? 'main',
                 ],
                 [
-                    'location_id' => $locations->first()->id,
                     'supplier_id' => $suppliers->isNotEmpty() ? $suppliers->first()->id : null,
                     'stock' => 3,  // Needs reorder
                     'reserved' => 0,
-                    'incoming' => 0,
-                    'threshold' => 10,
+                    'available' => 0,
                     'reorder_point' => 5,
+                    'reorder_quantity' => 10,
                     'max_stock_level' => 100,
                     'cost_per_unit' => 10.0,
                     'status' => 'active',
-                    'is_tracked' => true,
                 ]
             );
         }

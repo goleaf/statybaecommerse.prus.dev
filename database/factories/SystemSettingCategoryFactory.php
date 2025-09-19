@@ -27,7 +27,6 @@ final class SystemSettingCategoryFactory extends Factory
 
         return [
             'name' => $this->faker->words(2, true),
-            'slug' => $this->faker->unique()->slug(2),
             'description' => $this->faker->paragraph(),
             'icon' => $this->faker->randomElement($icons),
             'color' => $this->faker->randomElement($colors),
@@ -39,7 +38,7 @@ final class SystemSettingCategoryFactory extends Factory
             'is_collapsible' => $this->faker->boolean(80),  // 80% chance of being collapsible
             'show_in_sidebar' => $this->faker->boolean(90),  // 90% chance of showing in sidebar
             'permission' => $this->faker->boolean(40) ? $this->faker->word() : null,
-            'tags' => $this->faker->boolean(50) ? implode(',', $this->faker->words(3)) : null,
+            'tags' => $this->faker->boolean(50) ? json_encode($this->faker->words(3)) : null,
         ];
     }
 

@@ -24,7 +24,7 @@ final class CartItemsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('cart_item_id')
                     ->label(__('customers.cart_item'))
                     ->relationship('cartItem', 'id')

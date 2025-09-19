@@ -5,23 +5,22 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -64,7 +63,7 @@ final class CategoryResource extends Resource
      */
     public static function getNavigationGroup(): ?string
     {
-        return "Products";
+        return 'Products';
     }
 
     /**
@@ -92,11 +91,11 @@ final class CategoryResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('categories.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('categories.name'))
                                 ->required()
@@ -131,7 +130,7 @@ final class CategoryResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('categories.media'))
-                ->schema([
+                ->components([
                     FileUpload::make('image')
                         ->label(__('categories.image'))
                         ->image()
@@ -158,9 +157,9 @@ final class CategoryResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('categories.appearance'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             ColorPicker::make('color')
                                 ->label(__('categories.color'))
                                 ->hex(),
@@ -172,7 +171,7 @@ final class CategoryResource extends Resource
                         ]),
                 ]),
             Section::make(__('categories.seo'))
-                ->schema([
+                ->components([
                     TextInput::make('seo_title')
                         ->label(__('categories.seo_title'))
                         ->maxLength(255)
@@ -184,9 +183,9 @@ final class CategoryResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('categories.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('categories.is_active'))
                                 ->default(true),

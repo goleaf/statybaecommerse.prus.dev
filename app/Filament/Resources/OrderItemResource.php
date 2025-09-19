@@ -15,7 +15,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -94,11 +93,11 @@ final class OrderItemResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('order_items.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('order_id')
                                 ->label(__('order_items.order'))
                                 ->relationship('order', 'number')
@@ -124,7 +123,7 @@ final class OrderItemResource extends Resource
                                 }),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('product_variant_id')
                                 ->label(__('order_items.product_variant'))
                                 ->relationship('productVariant', 'name')
@@ -147,7 +146,7 @@ final class OrderItemResource extends Resource
                                 ->maxLength(255),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('product_sku')
                                 ->label(__('order_items.product_sku'))
                                 ->maxLength(255),
@@ -167,9 +166,9 @@ final class OrderItemResource extends Resource
                         ]),
                 ]),
             Section::make(__('order_items.pricing'))
-                ->schema([
+                ->components([
                     Grid::make(3)
-                        ->schema([
+                        ->components([
                             TextInput::make('unit_price')
                                 ->label(__('order_items.unit_price'))
                                 ->numeric()
@@ -204,7 +203,7 @@ final class OrderItemResource extends Resource
                         ]),
                 ]),
             Section::make(__('order_items.additional_information'))
-                ->schema([
+                ->components([
                     Textarea::make('notes')
                         ->label(__('order_items.notes'))
                         ->rows(3)

@@ -19,7 +19,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -95,11 +94,11 @@ final class CampaignConversionResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('campaign_conversions.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('campaign_id')
                                 ->label(__('campaign_conversions.campaign'))
                                 ->relationship('campaign', 'name')
@@ -123,7 +122,7 @@ final class CampaignConversionResource extends Resource
                                 ->disabled(),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('user_id')
                                 ->label(__('campaign_conversions.user'))
                                 ->relationship('user', 'name')
@@ -146,9 +145,9 @@ final class CampaignConversionResource extends Resource
                         ]),
                 ]),
             Section::make(__('campaign_conversions.conversion_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('type')
                                 ->label(__('campaign_conversions.type'))
                                 ->options([
@@ -171,7 +170,7 @@ final class CampaignConversionResource extends Resource
                                 ->helperText(__('campaign_conversions.value_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('currency')
                                 ->label(__('campaign_conversions.currency'))
                                 ->required()
@@ -190,9 +189,9 @@ final class CampaignConversionResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('campaign_conversions.tracking_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('ip_address')
                                 ->label(__('campaign_conversions.ip_address'))
                                 ->maxLength(45)
@@ -204,7 +203,7 @@ final class CampaignConversionResource extends Resource
                                 ->helperText(__('campaign_conversions.user_agent_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('device_type')
                                 ->label(__('campaign_conversions.device_type'))
                                 ->maxLength(50)
@@ -215,7 +214,7 @@ final class CampaignConversionResource extends Resource
                                 ->helperText(__('campaign_conversions.browser_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('os')
                                 ->label(__('campaign_conversions.os'))
                                 ->maxLength(100)
@@ -227,9 +226,9 @@ final class CampaignConversionResource extends Resource
                         ]),
                 ]),
             Section::make(__('campaign_conversions.attribution'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('utm_source')
                                 ->label(__('campaign_conversions.utm_source'))
                                 ->maxLength(100)
@@ -240,7 +239,7 @@ final class CampaignConversionResource extends Resource
                                 ->helperText(__('campaign_conversions.utm_medium_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('utm_campaign')
                                 ->label(__('campaign_conversions.utm_campaign'))
                                 ->maxLength(100)
@@ -251,7 +250,7 @@ final class CampaignConversionResource extends Resource
                                 ->helperText(__('campaign_conversions.utm_term_help')),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('utm_content')
                                 ->label(__('campaign_conversions.utm_content'))
                                 ->maxLength(100)
@@ -264,9 +263,9 @@ final class CampaignConversionResource extends Resource
                         ]),
                 ]),
             Section::make(__('campaign_conversions.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_verified')
                                 ->label(__('campaign_conversions.is_verified'))
                                 ->default(false),
@@ -275,7 +274,7 @@ final class CampaignConversionResource extends Resource
                                 ->default(true),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('converted_at')
                                 ->label(__('campaign_conversions.converted_at'))
                                 ->default(now())

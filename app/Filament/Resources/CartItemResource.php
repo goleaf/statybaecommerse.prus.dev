@@ -32,8 +32,6 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Form;
-
 /**
  * CartItemResource
  * 
@@ -92,11 +90,11 @@ final class CartItemResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('cart_items.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('user_id')
                                 ->label(__('cart_items.user'))
                                 ->relationship('user', 'name')
@@ -124,7 +122,7 @@ final class CartItemResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('product_variant_id')
                                 ->label(__('cart_items.product_variant'))
                                 ->relationship('productVariant', 'name')
@@ -149,7 +147,7 @@ final class CartItemResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('product_sku')
                                 ->label(__('cart_items.product_sku'))
                                 ->maxLength(255),
@@ -171,9 +169,9 @@ final class CartItemResource extends Resource
                 ]),
             
             Section::make(__('cart_items.pricing'))
-                ->schema([
+                ->components([
                     Grid::make(3)
-                        ->schema([
+                        ->components([
                             TextInput::make('unit_price')
                                 ->label(__('cart_items.unit_price'))
                                 ->numeric()

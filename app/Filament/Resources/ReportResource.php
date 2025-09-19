@@ -36,8 +36,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Filament\Forms\Form;
-
 /**
  * ReportResource
  * 
@@ -95,11 +93,11 @@ final class ReportResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('reports.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('reports.name'))
                                 ->required()
@@ -121,9 +119,9 @@ final class ReportResource extends Resource
                 ]),
             
             Section::make(__('reports.report_settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('type')
                                 ->label(__('reports.type'))
                                 ->options([
@@ -152,7 +150,7 @@ final class ReportResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('frequency')
                                 ->label(__('reports.frequency'))
                                 ->options([
@@ -177,9 +175,9 @@ final class ReportResource extends Resource
                 ]),
             
             Section::make(__('reports.scheduling'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             DateTimePicker::make('scheduled_at')
                                 ->label(__('reports.scheduled_at'))
                                 ->helperText(__('reports.scheduled_at_help')),
@@ -198,7 +196,7 @@ final class ReportResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_scheduled')
                                 ->label(__('reports.is_scheduled'))
                                 ->default(false)
@@ -212,9 +210,9 @@ final class ReportResource extends Resource
                 ]),
             
             Section::make(__('reports.recipients'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('recipients')
                                 ->label(__('reports.recipients'))
                                 ->relationship('users', 'name')
@@ -240,12 +238,12 @@ final class ReportResource extends Resource
                 ]),
             
             Section::make(__('reports.parameters'))
-                ->schema([
+                ->components([
                     Forms\Components\Repeater::make('parameters')
                         ->label(__('reports.parameters'))
-                        ->schema([
+                        ->components([
                             Grid::make(3)
-                                ->schema([
+                                ->components([
                                     TextInput::make('name')
                                         ->label(__('reports.parameter_name'))
                                         ->required()
@@ -282,9 +280,9 @@ final class ReportResource extends Resource
                 ]),
             
             Section::make(__('reports.output'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             FileUpload::make('template_file')
                                 ->label(__('reports.template_file'))
                                 ->acceptedFileTypes(['pdf', 'xlsx', 'xls', 'csv', 'html'])
@@ -298,7 +296,7 @@ final class ReportResource extends Resource
                         ]),
                     
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('reports.is_active'))
                                 ->default(true),
@@ -312,7 +310,7 @@ final class ReportResource extends Resource
                 ]),
             
             Section::make(__('reports.settings'))
-                ->schema([
+                ->components([
                     Textarea::make('notes')
                         ->label(__('reports.notes'))
                         ->rows(3)

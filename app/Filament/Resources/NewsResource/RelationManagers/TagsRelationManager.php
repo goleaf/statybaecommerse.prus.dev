@@ -24,7 +24,7 @@ final class TagsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('tag_id')
                     ->label(__('news.tag'))
                     ->relationship('tag', 'name')

@@ -16,7 +16,7 @@ final class UsersRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\TextInput::make('name')
                     ->label(__('Name'))
                     ->required(),

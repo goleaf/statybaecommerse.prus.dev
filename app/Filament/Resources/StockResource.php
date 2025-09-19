@@ -16,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -92,11 +91,11 @@ final class StockResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             Section::make(__('stocks.basic_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('product_id')
                                 ->label(__('stocks.product'))
                                 ->relationship('product', 'name')
@@ -130,7 +129,7 @@ final class StockResource extends Resource
                                 }),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('product_name')
                                 ->label(__('stocks.product_name'))
                                 ->required()
@@ -147,9 +146,9 @@ final class StockResource extends Resource
                         ->required(),
                 ]),
             Section::make(__('stocks.stock_information'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('quantity')
                                 ->label(__('stocks.quantity'))
                                 ->numeric()
@@ -163,7 +162,7 @@ final class StockResource extends Resource
                                 ->default(0),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('available_quantity')
                                 ->label(__('stocks.available_quantity'))
                                 ->numeric()
@@ -178,9 +177,9 @@ final class StockResource extends Resource
                         ]),
                 ]),
             Section::make(__('stocks.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('stocks.is_active'))
                                 ->default(true),
@@ -189,7 +188,7 @@ final class StockResource extends Resource
                                 ->default(true),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('allow_backorder')
                                 ->label(__('stocks.allow_backorder'))
                                 ->default(false),

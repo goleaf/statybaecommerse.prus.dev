@@ -24,7 +24,7 @@ final class CustomerGroupsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('customer_group_id')
                     ->label(__('price_lists.customer_group'))
                     ->relationship('customerGroup', 'name')

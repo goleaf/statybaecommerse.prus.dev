@@ -17,7 +17,6 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -63,10 +62,10 @@ final class ProductHistoryResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Section::make(__('product_history.basic_information'))
                     ->columns(2)
-                    ->schema([
+                    ->components([
                         Select::make('product_id')
                             ->label(__('product_history.product'))
                             ->relationship('product', 'name')
@@ -103,7 +102,7 @@ final class ProductHistoryResource extends Resource
                     ]),
                 Section::make(__('product_history.change_values'))
                     ->columns(2)
-                    ->schema([
+                    ->components([
                         Textarea::make('old_value')
                             ->label(__('product_history.old_value'))
                             ->rows(4)
@@ -122,7 +121,7 @@ final class ProductHistoryResource extends Resource
                             ->columnSpanFull(),
                     ]),
                 Section::make(__('product_history.metadata'))
-                    ->schema([
+                    ->components([
                         KeyValue::make('metadata')
                             ->label(__('product_history.metadata'))
                             ->keyLabel(__('translations.metadata_key'))
