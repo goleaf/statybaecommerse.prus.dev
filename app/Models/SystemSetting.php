@@ -32,8 +32,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 final class SystemSetting extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia, LogsActivity, SoftDeletes;
-    protected $fillable = ['category_id', 'key', 'name', 'value', 'type', 'group', 'description', 'help_text', 'is_public', 'is_required', 'is_encrypted', 'is_readonly', 'validation_rules', 'options', 'default_value', 'sort_order', 'is_active', 'updated_by'];
-    protected $casts = ['is_public' => 'boolean', 'is_required' => 'boolean', 'is_encrypted' => 'boolean', 'is_readonly' => 'boolean', 'is_active' => 'boolean', 'validation_rules' => 'json', 'options' => 'json', 'sort_order' => 'integer'];
+    protected $fillable = ['category_id', 'key', 'name', 'value', 'type', 'group', 'description', 'help_text', 'is_public', 'is_required', 'is_encrypted', 'is_readonly', 'validation_rules', 'options', 'default_value', 'sort_order', 'is_active', 'updated_by', 'placeholder', 'tooltip', 'metadata', 'validation_message', 'is_cacheable', 'cache_ttl', 'cache_key', 'environment', 'tags', 'version', 'access_count', 'last_accessed_at'];
+    protected $casts = ['is_public' => 'boolean', 'is_required' => 'boolean', 'is_encrypted' => 'boolean', 'is_readonly' => 'boolean', 'is_active' => 'boolean', 'is_cacheable' => 'boolean', 'validation_rules' => 'json', 'options' => 'json', 'metadata' => 'json', 'tags' => 'json', 'sort_order' => 'integer', 'cache_ttl' => 'integer', 'access_count' => 'integer', 'last_accessed_at' => 'datetime'];
     /**
      * Handle value functionality with proper error handling.
      * @return Attribute

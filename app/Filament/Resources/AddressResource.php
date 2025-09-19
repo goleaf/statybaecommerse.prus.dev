@@ -319,11 +319,16 @@ final class AddressResource extends Resource
                 SelectFilter::make('type')
                     ->label(__('translations.type'))
                     ->options(AddressType::options()),
-                SelectFilter::make('country_id')
+                SelectFilter::make('country_code')
                     ->label(__('translations.country'))
-                    ->relationship('country', 'name')
-                    ->searchable()
-                    ->preload(),
+                    ->options([
+                        'LT' => 'Lithuania',
+                        'US' => 'United States',
+                        'DE' => 'Germany',
+                        'FR' => 'France',
+                        'GB' => 'United Kingdom',
+                    ])
+                    ->searchable(),
                 SelectFilter::make('user_id')
                     ->label(__('translations.user'))
                     ->relationship('user', 'name')

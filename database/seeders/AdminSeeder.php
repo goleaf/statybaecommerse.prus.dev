@@ -539,8 +539,8 @@ final class AdminSeeder extends Seeder
                         'name' => $variant->name,
                         'sku' => $variant->sku,
                         'quantity' => rand(1, 5),
-                        'unit_price' => abs($variant->price),
-                        'total' => abs($variant->price) * rand(1, 5),
+                        'unit_price' => abs((float) $variant->price),
+                        'total' => abs((float) $variant->price) * rand(1, 5),
                     ]
                 );
             }

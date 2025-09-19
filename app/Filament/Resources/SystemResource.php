@@ -178,15 +178,11 @@ final class SystemResource extends Resource
                                             ->label('Key-Value Pairs')
                                             ->visible(fn(callable $get) => $get('type') === 'json')
                                             ->helperText('Configure key-value pairs'),
-                                        Repeater::make('value')
-                                            ->label('Array Items')
+                                        Textarea::make('value')
+                                            ->label('Array Items (JSON)')
                                             ->visible(fn(callable $get) => $get('type') === 'array')
-                                            ->schema([
-                                                TextInput::make('item')
-                                                    ->label('Item')
-                                                    ->required(),
-                                            ])
-                                            ->helperText('Add items to the array'),
+                                            ->helperText('Enter array items as JSON: ["item1", "item2", "item3"]')
+                                            ->rows(3),
                                     ]),
                             ]),
                         Tab::make('Advanced Settings')

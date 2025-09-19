@@ -128,7 +128,8 @@ final class AddressResourceTest extends TestCase
             ->callTableAction('delete', $address)
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseMissing('addresses', [
+        // Check that the address is soft deleted
+        $this->assertSoftDeleted('addresses', [
             'id' => $address->id,
         ]);
     }
@@ -246,20 +247,20 @@ final class AddressResourceTest extends TestCase
 
         Address::factory()->create([
             'user_id' => $this->user->id,
-            'country_id' => $country1->id,
+            'country_code' => $country1->cca2,
         ]);
 
         Address::factory()->create([
             'user_id' => $this->user->id,
-            'country_id' => $country2->id,
+            'country_code' => $country2->cca2,
         ]);
 
         $component = Livewire::test(AddressResource\Pages\ListAddresses::class);
 
         $component
-            ->filterTable('country_id', $country1->id)
+            ->filterTable('country_code', $country1->cca2)
             ->assertCanSeeTableRecords(
-                Address::where('country_id', $country1->id)->get()
+                Address::where('country_code', $country1->cca2)->get()
             );
     }
 
