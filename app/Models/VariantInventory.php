@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\StockMovement;
 
 /**
  * VariantInventory
@@ -83,6 +84,15 @@ final class VariantInventory extends Model
     public function variant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class, 'variant_id');
+    }
+
+    /**
+     * Handle stockMovements functionality with proper error handling.
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function stockMovements(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(StockMovement::class, 'variant_inventory_id');
     }
 
     /**
