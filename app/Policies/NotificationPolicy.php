@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Policies;
 
@@ -148,7 +146,7 @@ final class NotificationPolicy
 
     private function canAdminister(?AuthenticatableContract $user, string $permission): bool
     {
-        if (! $user) {
+        if (!$user) {
             return false;
         }
 
