@@ -2001,6 +2001,7 @@ return array (
     9 => 'News Images',
     10 => 'News Images',
     11 => 'News Images',
+    12 => 'News Images',
   ),
   'admin.news_images.plural_model_label' => 
   array (
@@ -2016,6 +2017,7 @@ return array (
     9 => 'News Images',
     10 => 'News Images',
     11 => 'News Images',
+    12 => 'News Images',
   ),
   'admin.news_images.model_label' => 
   array (
@@ -2031,6 +2033,7 @@ return array (
     9 => 'News Image',
     10 => 'News Image',
     11 => 'News Image',
+    12 => 'News Image',
   ),
   'admin.news_images.tabs' => 
   array (
@@ -2046,6 +2049,7 @@ return array (
     9 => 'Tabs',
     10 => 'Tabs',
     11 => 'Tabs',
+    12 => 'Tabs',
   ),
   'admin.news_images.basic_information' => 
   array (
@@ -2061,6 +2065,7 @@ return array (
     9 => 'Basic Information',
     10 => 'Basic Information',
     11 => 'Basic Information',
+    12 => 'Basic Information',
   ),
   'admin.news_images.basic_information_description' => 
   array (
@@ -2076,6 +2081,7 @@ return array (
     9 => 'Basic information about the news image',
     10 => 'Basic information about the news image',
     11 => 'Basic information about the news image',
+    12 => 'Basic information about the news image',
   ),
   'admin.news_images.news' => 
   array (
@@ -2091,6 +2097,7 @@ return array (
     9 => 'News',
     10 => 'News',
     11 => 'News',
+    12 => 'News',
   ),
   'admin.news_images.file_path' => 
   array (
@@ -2106,6 +2113,7 @@ return array (
     9 => 'File Path',
     10 => 'File Path',
     11 => 'File Path',
+    12 => 'File Path',
   ),
   'admin.news_images.alt_text' => 
   array (
@@ -2121,6 +2129,7 @@ return array (
     9 => 'Alt Text',
     10 => 'Alt Text',
     11 => 'Alt Text',
+    12 => 'Alt Text',
   ),
   'admin.news_images.alt_text_help' => 
   array (
@@ -2136,6 +2145,7 @@ return array (
     9 => 'Alternative text for the image for SEO purposes',
     10 => 'Alternative text for the image for SEO purposes',
     11 => 'Alternative text for the image for SEO purposes',
+    12 => 'Alternative text for the image for SEO purposes',
   ),
   'admin.news_images.sort_order' => 
   array (
@@ -2151,6 +2161,7 @@ return array (
     9 => 'Sort Order',
     10 => 'Sort Order',
     11 => 'Sort Order',
+    12 => 'Sort Order',
   ),
   'admin.news_images.sort_order_help' => 
   array (
@@ -2166,6 +2177,7 @@ return array (
     9 => 'Display order of images in the news',
     10 => 'Display order of images in the news',
     11 => 'Display order of images in the news',
+    12 => 'Display order of images in the news',
   ),
   'admin.news_images.caption' => 
   array (
@@ -2181,6 +2193,7 @@ return array (
     9 => 'Caption',
     10 => 'Caption',
     11 => 'Caption',
+    12 => 'Caption',
   ),
   'admin.news_images.caption_help' => 
   array (
@@ -2196,6 +2209,7 @@ return array (
     9 => 'Image caption',
     10 => 'Image caption',
     11 => 'Image caption',
+    12 => 'Image caption',
   ),
   'admin.news_images.is_featured' => 
   array (
@@ -2211,6 +2225,7 @@ return array (
     9 => 'Is Featured',
     10 => 'Is Featured',
     11 => 'Is Featured',
+    12 => 'Is Featured',
   ),
   'admin.news_images.is_featured_help' => 
   array (
@@ -2226,6 +2241,7 @@ return array (
     9 => 'Whether this is the main image',
     10 => 'Whether this is the main image',
     11 => 'Whether this is the main image',
+    12 => 'Whether this is the main image',
   ),
   'admin.news_images.file_size' => 
   array (
@@ -2241,6 +2257,7 @@ return array (
     9 => 'File Size',
     10 => 'File Size',
     11 => 'File Size',
+    12 => 'File Size',
   ),
   'admin.news_images.mime_type' => 
   array (
@@ -2256,6 +2273,7 @@ return array (
     9 => 'MIME Type',
     10 => 'MIME Type',
     11 => 'MIME Type',
+    12 => 'MIME Type',
   ),
   'admin.news_images.technical_details' => 
   array (
@@ -2271,6 +2289,7 @@ return array (
     9 => 'Technical Details',
     10 => 'Technical Details',
     11 => 'Technical Details',
+    12 => 'Technical Details',
   ),
   'admin.news_images.technical_details_description' => 
   array (
@@ -2286,6 +2305,7 @@ return array (
     9 => 'Technical information about the image',
     10 => 'Technical information about the image',
     11 => 'Technical information about the image',
+    12 => 'Technical information about the image',
   ),
   'admin.news_images.width' => 
   array (
@@ -2301,6 +2321,7 @@ return array (
     9 => 'Width',
     10 => 'Width',
     11 => 'Width',
+    12 => 'Width',
   ),
   'admin.news_images.height' => 
   array (
@@ -2316,6 +2337,7 @@ return array (
     9 => 'Height',
     10 => 'Height',
     11 => 'Height',
+    12 => 'Height',
   ),
   'admin.news_images.file_info' => 
   array (
@@ -2331,6 +2353,7 @@ return array (
     9 => 'File Information',
     10 => 'File Information',
     11 => 'File Information',
+    12 => 'File Information',
   ),
   'admin.news_images.dimensions' => 
   array (
@@ -2346,6 +2369,7 @@ return array (
     9 => 'Dimensions',
     10 => 'Dimensions',
     11 => 'Dimensions',
+    12 => 'Dimensions',
   ),
   'admin.news_images.seo_metadata' => 
   array (
@@ -2361,6 +2385,7 @@ return array (
     9 => 'SEO Metadata',
     10 => 'SEO Metadata',
     11 => 'SEO Metadata',
+    12 => 'SEO Metadata',
   ),
   'admin.news_images.seo_metadata_description' => 
   array (
@@ -2376,6 +2401,7 @@ return array (
     9 => 'SEO metadata for the image',
     10 => 'SEO metadata for the image',
     11 => 'SEO metadata for the image',
+    12 => 'SEO metadata for the image',
   ),
   'admin.news_images.alt_text_seo_help' => 
   array (
@@ -2391,6 +2417,7 @@ return array (
     9 => 'Alternative text for search engines',
     10 => 'Alternative text for search engines',
     11 => 'Alternative text for search engines',
+    12 => 'Alternative text for search engines',
   ),
   'admin.news_images.caption_seo_help' => 
   array (
@@ -2406,6 +2433,7 @@ return array (
     9 => 'Caption for SEO purposes',
     10 => 'Caption for SEO purposes',
     11 => 'Caption for SEO purposes',
+    12 => 'Caption for SEO purposes',
   ),
   'admin.news_images.image' => 
   array (
@@ -2421,6 +2449,7 @@ return array (
     9 => 'Image',
     10 => 'Image',
     11 => 'Image',
+    12 => 'Image',
   ),
   'admin.news_images.no_alt_text' => 
   array (
@@ -2436,6 +2465,7 @@ return array (
     9 => 'No alt text',
     10 => 'No alt text',
     11 => 'No alt text',
+    12 => 'No alt text',
   ),
   'admin.news_images.no_caption' => 
   array (
@@ -2451,6 +2481,7 @@ return array (
     9 => 'No caption',
     10 => 'No caption',
     11 => 'No caption',
+    12 => 'No caption',
   ),
   'admin.news_images.large_files' => 
   array (
@@ -2466,6 +2497,7 @@ return array (
     9 => 'Large Files',
     10 => 'Large Files',
     11 => 'Large Files',
+    12 => 'Large Files',
   ),
   'admin.news_images.recent_uploads' => 
   array (
@@ -2481,6 +2513,7 @@ return array (
     9 => 'Recent Uploads',
     10 => 'Recent Uploads',
     11 => 'Recent Uploads',
+    12 => 'Recent Uploads',
   ),
   'admin.news_images.duplicate' => 
   array (
@@ -2496,6 +2529,7 @@ return array (
     9 => 'Duplicate',
     10 => 'Duplicate',
     11 => 'Duplicate',
+    12 => 'Duplicate',
   ),
   'admin.news_images.download' => 
   array (
@@ -2511,6 +2545,7 @@ return array (
     9 => 'Download',
     10 => 'Download',
     11 => 'Download',
+    12 => 'Download',
   ),
   'admin.news_images.set_featured' => 
   array (
@@ -2526,6 +2561,7 @@ return array (
     9 => 'Set as Featured',
     10 => 'Set as Featured',
     11 => 'Set as Featured',
+    12 => 'Set as Featured',
   ),
   'admin.news_images.unset_featured' => 
   array (
@@ -2541,6 +2577,7 @@ return array (
     9 => 'Unset Featured',
     10 => 'Unset Featured',
     11 => 'Unset Featured',
+    12 => 'Unset Featured',
   ),
   'admin.news_images.reorder' => 
   array (
@@ -2556,6 +2593,7 @@ return array (
     9 => 'Reorder',
     10 => 'Reorder',
     11 => 'Reorder',
+    12 => 'Reorder',
   ),
   'admin.common.yes' => 
   array (
@@ -2571,6 +2609,7 @@ return array (
     9 => 'Yes',
     10 => 'Yes',
     11 => 'Yes',
+    12 => 'Yes',
   ),
   'admin.common.no' => 
   array (
@@ -2586,6 +2625,7 @@ return array (
     9 => 'No',
     10 => 'No',
     11 => 'No',
+    12 => 'No',
   ),
   'admin.common.view' => 
   array (
@@ -2601,6 +2641,7 @@ return array (
     9 => 'View',
     10 => 'View',
     11 => 'View',
+    12 => 'View',
   ),
   'admin.common.edit' => 
   array (
@@ -2616,6 +2657,7 @@ return array (
     9 => 'Edit',
     10 => 'Edit',
     11 => 'Edit',
+    12 => 'Edit',
   ),
   'admin.common.delete' => 
   array (
@@ -2631,6 +2673,7 @@ return array (
     9 => 'Delete',
     10 => 'Delete',
     11 => 'Delete',
+    12 => 'Delete',
   ),
   'admin.common.actions' => 
   array (
@@ -2646,6 +2689,7 @@ return array (
     9 => 'Actions',
     10 => 'Actions',
     11 => 'Actions',
+    12 => 'Actions',
   ),
   'admin.common.delete_selected' => 
   array (
@@ -2661,6 +2705,7 @@ return array (
     9 => 'Delete Selected',
     10 => 'Delete Selected',
     11 => 'Delete Selected',
+    12 => 'Delete Selected',
   ),
   'admin.common.created_at' => 
   array (
@@ -2676,6 +2721,7 @@ return array (
     9 => 'Created At',
     10 => 'Created At',
     11 => 'Created At',
+    12 => 'Created At',
   ),
   'admin.common.updated_at' => 
   array (
@@ -2691,6 +2737,7 @@ return array (
     9 => 'Updated At',
     10 => 'Updated At',
     11 => 'Updated At',
+    12 => 'Updated At',
   ),
   'admin.common.all' => 
   array (
@@ -2706,5 +2753,6 @@ return array (
     9 => 'All',
     10 => 'All',
     11 => 'All',
+    12 => 'All',
   ),
 );

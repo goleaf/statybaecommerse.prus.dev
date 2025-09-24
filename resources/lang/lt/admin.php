@@ -2041,6 +2041,7 @@ return array (
     9 => 'Naujienų paveikslėliai',
     10 => 'Naujienų paveikslėliai',
     11 => 'Naujienų paveikslėliai',
+    12 => 'Naujienų paveikslėliai',
   ),
   'admin.news_images.plural_model_label' => 
   array (
@@ -2056,6 +2057,7 @@ return array (
     9 => 'Naujienų paveikslėliai',
     10 => 'Naujienų paveikslėliai',
     11 => 'Naujienų paveikslėliai',
+    12 => 'Naujienų paveikslėliai',
   ),
   'admin.news_images.model_label' => 
   array (
@@ -2071,6 +2073,7 @@ return array (
     9 => 'Naujienų paveikslėlis',
     10 => 'Naujienų paveikslėlis',
     11 => 'Naujienų paveikslėlis',
+    12 => 'Naujienų paveikslėlis',
   ),
   'admin.news_images.tabs' => 
   array (
@@ -2086,6 +2089,7 @@ return array (
     9 => 'Skirtukai',
     10 => 'Skirtukai',
     11 => 'Skirtukai',
+    12 => 'Skirtukai',
   ),
   'admin.news_images.basic_information' => 
   array (
@@ -2101,6 +2105,7 @@ return array (
     9 => 'Pagrindinė informacija',
     10 => 'Pagrindinė informacija',
     11 => 'Pagrindinė informacija',
+    12 => 'Pagrindinė informacija',
   ),
   'admin.news_images.basic_information_description' => 
   array (
@@ -2116,6 +2121,7 @@ return array (
     9 => 'Naujienų paveikslėlio pagrindinė informacija',
     10 => 'Naujienų paveikslėlio pagrindinė informacija',
     11 => 'Naujienų paveikslėlio pagrindinė informacija',
+    12 => 'Naujienų paveikslėlio pagrindinė informacija',
   ),
   'admin.news_images.news' => 
   array (
@@ -2131,6 +2137,7 @@ return array (
     9 => 'Naujiena',
     10 => 'Naujiena',
     11 => 'Naujiena',
+    12 => 'Naujiena',
   ),
   'admin.news_images.file_path' => 
   array (
@@ -2146,6 +2153,7 @@ return array (
     9 => 'Failo kelias',
     10 => 'Failo kelias',
     11 => 'Failo kelias',
+    12 => 'Failo kelias',
   ),
   'admin.news_images.alt_text' => 
   array (
@@ -2161,6 +2169,7 @@ return array (
     9 => 'Alternatyvus tekstas',
     10 => 'Alternatyvus tekstas',
     11 => 'Alternatyvus tekstas',
+    12 => 'Alternatyvus tekstas',
   ),
   'admin.news_images.alt_text_help' => 
   array (
@@ -2176,6 +2185,7 @@ return array (
     9 => 'Paveikslėlio alternatyvus tekstas SEO tikslams',
     10 => 'Paveikslėlio alternatyvus tekstas SEO tikslams',
     11 => 'Paveikslėlio alternatyvus tekstas SEO tikslams',
+    12 => 'Paveikslėlio alternatyvus tekstas SEO tikslams',
   ),
   'admin.news_images.sort_order' => 
   array (
@@ -2191,6 +2201,7 @@ return array (
     9 => 'Rūšiavimo eilė',
     10 => 'Rūšiavimo eilė',
     11 => 'Rūšiavimo eilė',
+    12 => 'Rūšiavimo eilė',
   ),
   'admin.news_images.sort_order_help' => 
   array (
@@ -2206,6 +2217,7 @@ return array (
     9 => 'Paveikslėlių rodymo eilė naujienoje',
     10 => 'Paveikslėlių rodymo eilė naujienoje',
     11 => 'Paveikslėlių rodymo eilė naujienoje',
+    12 => 'Paveikslėlių rodymo eilė naujienoje',
   ),
   'admin.news_images.caption' => 
   array (
@@ -2221,6 +2233,7 @@ return array (
     9 => 'Antraštė',
     10 => 'Antraštė',
     11 => 'Antraštė',
+    12 => 'Antraštė',
   ),
   'admin.news_images.caption_help' => 
   array (
@@ -2236,6 +2249,7 @@ return array (
     9 => 'Paveikslėlio antraštė',
     10 => 'Paveikslėlio antraštė',
     11 => 'Paveikslėlio antraštė',
+    12 => 'Paveikslėlio antraštė',
   ),
   'admin.news_images.is_featured' => 
   array (
@@ -2251,6 +2265,7 @@ return array (
     9 => 'Ar pagrindinis',
     10 => 'Ar pagrindinis',
     11 => 'Ar pagrindinis',
+    12 => 'Ar pagrindinis',
   ),
   'admin.news_images.is_featured_help' => 
   array (
@@ -2266,6 +2281,7 @@ return array (
     9 => 'Ar tai pagrindinis paveikslėlis',
     10 => 'Ar tai pagrindinis paveikslėlis',
     11 => 'Ar tai pagrindinis paveikslėlis',
+    12 => 'Ar tai pagrindinis paveikslėlis',
   ),
   'admin.news_images.file_size' => 
   array (
@@ -2281,6 +2297,7 @@ return array (
     9 => 'Failo dydis',
     10 => 'Failo dydis',
     11 => 'Failo dydis',
+    12 => 'Failo dydis',
   ),
   'admin.news_images.mime_type' => 
   array (
@@ -2296,6 +2313,7 @@ return array (
     9 => 'MIME tipas',
     10 => 'MIME tipas',
     11 => 'MIME tipas',
+    12 => 'MIME tipas',
   ),
   'admin.news_images.technical_details' => 
   array (
@@ -2311,6 +2329,7 @@ return array (
     9 => 'Techninė informacija',
     10 => 'Techninė informacija',
     11 => 'Techninė informacija',
+    12 => 'Techninė informacija',
   ),
   'admin.news_images.technical_details_description' => 
   array (
@@ -2326,6 +2345,7 @@ return array (
     9 => 'Paveikslėlio techninė informacija',
     10 => 'Paveikslėlio techninė informacija',
     11 => 'Paveikslėlio techninė informacija',
+    12 => 'Paveikslėlio techninė informacija',
   ),
   'admin.news_images.width' => 
   array (
@@ -2341,6 +2361,7 @@ return array (
     9 => 'Plotis',
     10 => 'Plotis',
     11 => 'Plotis',
+    12 => 'Plotis',
   ),
   'admin.news_images.height' => 
   array (
@@ -2356,6 +2377,7 @@ return array (
     9 => 'Aukštis',
     10 => 'Aukštis',
     11 => 'Aukštis',
+    12 => 'Aukštis',
   ),
   'admin.news_images.file_info' => 
   array (
@@ -2371,6 +2393,7 @@ return array (
     9 => 'Failo informacija',
     10 => 'Failo informacija',
     11 => 'Failo informacija',
+    12 => 'Failo informacija',
   ),
   'admin.news_images.dimensions' => 
   array (
@@ -2386,6 +2409,7 @@ return array (
     9 => 'Matmenys',
     10 => 'Matmenys',
     11 => 'Matmenys',
+    12 => 'Matmenys',
   ),
   'admin.news_images.seo_metadata' => 
   array (
@@ -2401,6 +2425,7 @@ return array (
     9 => 'SEO metaduomenys',
     10 => 'SEO metaduomenys',
     11 => 'SEO metaduomenys',
+    12 => 'SEO metaduomenys',
   ),
   'admin.news_images.seo_metadata_description' => 
   array (
@@ -2416,6 +2441,7 @@ return array (
     9 => 'Paveikslėlio SEO metaduomenys',
     10 => 'Paveikslėlio SEO metaduomenys',
     11 => 'Paveikslėlio SEO metaduomenys',
+    12 => 'Paveikslėlio SEO metaduomenys',
   ),
   'admin.news_images.alt_text_seo_help' => 
   array (
@@ -2431,6 +2457,7 @@ return array (
     9 => 'Alternatyvus tekstas paieškos sistemoms',
     10 => 'Alternatyvus tekstas paieškos sistemoms',
     11 => 'Alternatyvus tekstas paieškos sistemoms',
+    12 => 'Alternatyvus tekstas paieškos sistemoms',
   ),
   'admin.news_images.caption_seo_help' => 
   array (
@@ -2446,6 +2473,7 @@ return array (
     9 => 'Antraštė SEO tikslams',
     10 => 'Antraštė SEO tikslams',
     11 => 'Antraštė SEO tikslams',
+    12 => 'Antraštė SEO tikslams',
   ),
   'admin.news_images.image' => 
   array (
@@ -2461,6 +2489,7 @@ return array (
     9 => 'Paveikslėlis',
     10 => 'Paveikslėlis',
     11 => 'Paveikslėlis',
+    12 => 'Paveikslėlis',
   ),
   'admin.news_images.no_alt_text' => 
   array (
@@ -2476,6 +2505,7 @@ return array (
     9 => 'Be alternatyvaus teksto',
     10 => 'Be alternatyvaus teksto',
     11 => 'Be alternatyvaus teksto',
+    12 => 'Be alternatyvaus teksto',
   ),
   'admin.news_images.no_caption' => 
   array (
@@ -2491,6 +2521,7 @@ return array (
     9 => 'Nėra antraštės',
     10 => 'Nėra antraštės',
     11 => 'Nėra antraštės',
+    12 => 'Nėra antraštės',
   ),
   'admin.news_images.large_files' => 
   array (
@@ -2506,6 +2537,7 @@ return array (
     9 => 'Dideli failai',
     10 => 'Dideli failai',
     11 => 'Dideli failai',
+    12 => 'Dideli failai',
   ),
   'admin.news_images.recent_uploads' => 
   array (
@@ -2521,6 +2553,7 @@ return array (
     9 => 'Naujausi įkėlimai',
     10 => 'Naujausi įkėlimai',
     11 => 'Naujausi įkėlimai',
+    12 => 'Naujausi įkėlimai',
   ),
   'admin.news_images.duplicate' => 
   array (
@@ -2536,6 +2569,7 @@ return array (
     9 => 'Kopijuoti',
     10 => 'Kopijuoti',
     11 => 'Kopijuoti',
+    12 => 'Kopijuoti',
   ),
   'admin.news_images.download' => 
   array (
@@ -2551,6 +2585,7 @@ return array (
     9 => 'Atsisiųsti',
     10 => 'Atsisiųsti',
     11 => 'Atsisiųsti',
+    12 => 'Atsisiųsti',
   ),
   'admin.news_images.set_featured' => 
   array (
@@ -2566,6 +2601,7 @@ return array (
     9 => 'Nustatyti kaip pagrindinį',
     10 => 'Nustatyti kaip pagrindinį',
     11 => 'Nustatyti kaip pagrindinį',
+    12 => 'Nustatyti kaip pagrindinį',
   ),
   'admin.news_images.unset_featured' => 
   array (
@@ -2581,6 +2617,7 @@ return array (
     9 => 'Pašalinti iš pagrindinių',
     10 => 'Pašalinti iš pagrindinių',
     11 => 'Pašalinti iš pagrindinių',
+    12 => 'Pašalinti iš pagrindinių',
   ),
   'admin.news_images.reorder' => 
   array (
@@ -2596,6 +2633,7 @@ return array (
     9 => 'Pertvarkyti',
     10 => 'Pertvarkyti',
     11 => 'Pertvarkyti',
+    12 => 'Pertvarkyti',
   ),
   'admin.common.yes' => 
   array (
@@ -2611,6 +2649,7 @@ return array (
     9 => 'Taip',
     10 => 'Taip',
     11 => 'Taip',
+    12 => 'Taip',
   ),
   'admin.common.no' => 
   array (
@@ -2626,6 +2665,7 @@ return array (
     9 => 'Ne',
     10 => 'Ne',
     11 => 'Ne',
+    12 => 'Ne',
   ),
   'admin.common.view' => 
   array (
@@ -2641,6 +2681,7 @@ return array (
     9 => 'Peržiūrėti',
     10 => 'Peržiūrėti',
     11 => 'Peržiūrėti',
+    12 => 'Peržiūrėti',
   ),
   'admin.common.edit' => 
   array (
@@ -2656,6 +2697,7 @@ return array (
     9 => 'Redaguoti',
     10 => 'Redaguoti',
     11 => 'Redaguoti',
+    12 => 'Redaguoti',
   ),
   'admin.common.delete' => 
   array (
@@ -2671,6 +2713,7 @@ return array (
     9 => 'Ištrinti',
     10 => 'Ištrinti',
     11 => 'Ištrinti',
+    12 => 'Ištrinti',
   ),
   'admin.common.actions' => 
   array (
@@ -2686,6 +2729,7 @@ return array (
     9 => 'Veiksmai',
     10 => 'Veiksmai',
     11 => 'Veiksmai',
+    12 => 'Veiksmai',
   ),
   'admin.common.delete_selected' => 
   array (
@@ -2701,6 +2745,7 @@ return array (
     9 => 'Ištrinti pasirinktus',
     10 => 'Ištrinti pasirinktus',
     11 => 'Ištrinti pasirinktus',
+    12 => 'Ištrinti pasirinktus',
   ),
   'admin.common.created_at' => 
   array (
@@ -2716,6 +2761,7 @@ return array (
     9 => 'Sukurta',
     10 => 'Sukurta',
     11 => 'Sukurta',
+    12 => 'Sukurta',
   ),
   'admin.common.updated_at' => 
   array (
@@ -2731,6 +2777,7 @@ return array (
     9 => 'Atnaujinta',
     10 => 'Atnaujinta',
     11 => 'Atnaujinta',
+    12 => 'Atnaujinta',
   ),
   'admin.common.all' => 
   array (
@@ -2746,5 +2793,6 @@ return array (
     9 => 'Visi',
     10 => 'Visi',
     11 => 'Visi',
+    12 => 'Visi',
   ),
 );

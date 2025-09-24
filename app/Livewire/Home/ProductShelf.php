@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Livewire\Home;
 
@@ -41,9 +39,9 @@ final class ProductShelf extends Component implements HasSchemas
 
         $this->title = $title !== ''
             ? $title
-            : __('frontend/home.products.sections.'.$sectionKey.'.title');
+            : __('frontend/home.products.sections.' . $sectionKey . '.title');
 
-        $this->subtitle = $subtitle ?? __('frontend/home.products.sections.'.$sectionKey.'.subtitle');
+        $this->subtitle = $subtitle ?? __('frontend/home.products.sections.' . $sectionKey . '.subtitle');
     }
 
     #[Computed]
@@ -84,13 +82,13 @@ final class ProductShelf extends Component implements HasSchemas
         return $query->limit($this->limit)->get();
     }
 
-    public function productShelfSchema(Schema $schema): Schema
+    public function productShelf(Schema $schema): Schema
     {
         return $schema->components([
             ViewEntry::make('products')
                 ->label('')
                 ->view('livewire.home.partials.product-shelf')
-                ->viewData(fn (): array => [
+                ->viewData(fn(): array => [
                     'products' => $this->products(),
                     'title' => $this->title,
                     'subtitle' => $this->subtitle,

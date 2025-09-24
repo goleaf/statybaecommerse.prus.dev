@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Livewire\Home;
 
@@ -19,7 +17,7 @@ final class CategoriesShowcase extends Component implements HasSchemas
     use InteractsWithSchemas;
 
     #[Computed]
-    public function categories(): EloquentCollection
+    public function categoryList(): EloquentCollection
     {
         return Category::query()
             ->with('media')
@@ -29,14 +27,14 @@ final class CategoriesShowcase extends Component implements HasSchemas
             ->get();
     }
 
-    public function categoriesSchema(Schema $schema): Schema
+    public function categories(Schema $schema): Schema
     {
         return $schema->components([
             ViewEntry::make('categories')
                 ->label('')
                 ->view('livewire.home.partials.categories-grid')
-                ->viewData(fn (): array => [
-                    'categories' => $this->categories(),
+                ->viewData(fn(): array => [
+                    'categories' => $this->categoryList(),
                 ]),
         ]);
     }

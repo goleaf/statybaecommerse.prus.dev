@@ -25,31 +25,33 @@
     <div class="mt-8 grid grid-cols-2 gap-6">
         <div>
             <h3 class="font-semibold uppercase text-xs tracking-wider text-gray-500">{{ __('Ship to') }}</h3>
-            @php($shipping = $order->shippingAddress ?? $order->addresses->firstWhere('address_type', 'shipping'))
-            @if ($shipping)
-                <p class="mt-2">{{ $shipping->first_name }} {{ $shipping->last_name }}</p>
-                <p>{{ $shipping->address_line1 }}</p>
-                @if ($shipping->address_line2)
-                    <p>{{ $shipping->address_line2 }}</p>
+            @php($sa = is_string($order->shipping_address) ? json_decode($order->shipping_address, true) : $order->shipping_address)
+            @if ($sa)
+                <p class="mt-2">{{ $sa['first_name'] ?? '' }} {{ $sa['last_name'] ?? '' }}</p>
+                <p>{{ $sa['street_address'] ?? ($sa['address_line1'] ?? '') }}</p>
+                @if (!empty($sa['street_address_plus'] ?? ($sa['address_line2'] ?? null)))
+                    <p>{{ $sa['street_address_plus'] ?? $sa['address_line2'] }}</p>
                 @endif
-                <p>{{ $shipping->postal_code }} {{ $shipping->city }}, {{ $shipping->country_code }}</p>
-                @if ($shipping->phone)
-                    <p>{{ __('Phone') }}: {{ $shipping->phone }}</p>
+                <p>{{ $sa['postal_code'] ?? '' }} {{ $sa['city'] ?? '' }},
+                    {{ $sa['country_code'] ?? ($sa['country_name'] ?? ($sa['country'] ?? '')) }}</p>
+                @if (!empty($sa['phone'] ?? ($sa['phone_number'] ?? null)))
+                    <p>{{ __('Phone') }}: {{ $sa['phone'] ?? $sa['phone_number'] }}</p>
                 @endif
             @endif
         </div>
         <div>
             <h3 class="font-semibold uppercase text-xs tracking-wider text-gray-500">{{ __('Billing') }}</h3>
-            @php($billing = $order->billingAddress ?? $order->addresses->firstWhere('address_type', 'billing'))
-            @if ($billing)
-                <p class="mt-2">{{ $billing->first_name }} {{ $billing->last_name }}</p>
-                <p>{{ $billing->address_line1 }}</p>
-                @if ($billing->address_line2)
-                    <p>{{ $billing->address_line2 }}</p>
+            @php($ba = is_string($order->billing_address) ? json_decode($order->billing_address, true) : $order->billing_address)
+            @if ($ba)
+                <p class="mt-2">{{ $ba['first_name'] ?? '' }} {{ $ba['last_name'] ?? '' }}</p>
+                <p>{{ $ba['street_address'] ?? ($ba['address_line1'] ?? '') }}</p>
+                @if (!empty($ba['street_address_plus'] ?? ($ba['address_line2'] ?? null)))
+                    <p>{{ $ba['street_address_plus'] ?? $ba['address_line2'] }}</p>
                 @endif
-                <p>{{ $billing->postal_code }} {{ $billing->city }}, {{ $billing->country_code }}</p>
-                @if ($billing->phone)
-                    <p>{{ __('Phone') }}: {{ $billing->phone }}</p>
+                <p>{{ $ba['postal_code'] ?? '' }} {{ $ba['city'] ?? '' }},
+                    {{ $ba['country_code'] ?? ($ba['country_name'] ?? ($ba['country'] ?? '')) }}</p>
+                @if (!empty($ba['phone'] ?? ($ba['phone_number'] ?? null)))
+                    <p>{{ __('Phone') }}: {{ $ba['phone'] ?? $ba['phone_number'] }}</p>
                 @endif
             @endif
         </div>

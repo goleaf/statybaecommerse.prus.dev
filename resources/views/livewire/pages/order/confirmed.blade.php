@@ -51,7 +51,7 @@ layout('components.layouts.base');
 state(['order' => null]);
 
 mount(function (string $number): void {
-    $this->order = Order::with(['items', 'items.product', 'shippingOption', 'shippingAddress', 'paymentMethod'])
+    $this->order = Order::with(['items', 'items.product', 'shippingOption', 'paymentMethod'])
         ->where('number', $number)
         ->firstOrFail();
 });

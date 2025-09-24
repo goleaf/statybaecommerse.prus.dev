@@ -1,4 +1,6 @@
-@php($chunked = $categories->chunk(12))
+@php
+    $chunked = $categories->chunk(12);
+@endphp
 
 <div class="space-y-12">
     @foreach ($chunked as $index => $chunk)
@@ -22,12 +24,15 @@
                             <img src="{{ $image }}" alt="{{ $category->name }}"
                                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                         @else
-                            <div class="h-full w-full bg-gradient-to-br {{ $fallbackColor }} flex items-center justify-center text-white text-4xl font-semibold">
+                            <div
+                                 class="h-full w-full bg-gradient-to-br {{ $fallbackColor }} flex items-center justify-center text-white text-4xl font-semibold">
                                 {{ mb_substr($category->name, 0, 1) }}
                             </div>
                         @endif
 
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent opacity-90"></div>
+                        <div
+                             class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent opacity-90">
+                        </div>
 
                         <div class="absolute bottom-4 left-4 right-4 space-y-2 text-white">
                             <h3 class="text-lg font-semibold leading-tight line-clamp-2">
@@ -35,14 +40,17 @@
                             </h3>
                             <div class="flex items-center justify-between text-xs font-medium text-white/80">
                                 <span class="inline-flex items-center gap-1">
-                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18" />
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M3 7h18M3 12h18M3 17h18" />
                                     </svg>
                                     {{ trans_choice('{0}Нет товаров|{1}1 товар|[2,*]:count товаров', $category->products_count, ['count' => $category->products_count]) }}
                                 </span>
                                 <span class="inline-flex items-center gap-1 text-white/70">
                                     {{ __('Открыть') }}
-                                    <svg class="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <svg class="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
+                                         fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                     </svg>
                                 </span>

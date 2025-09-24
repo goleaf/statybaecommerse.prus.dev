@@ -16,7 +16,7 @@
             ],
             [
                 'key' => 'collections',
-                'label' => __('translations.collections') ?? __('Collections'),
+                'label' => __('nav_collections'),
                 'url' => Route::has('localized.collections.index')
                     ? route('localized.collections.index', ['locale' => $locale])
                     : url('/' . $locale . '/collections'),
@@ -30,7 +30,7 @@
             ],
             [
                 'key' => 'support',
-                'label' => __('Support centre'),
+                'label' => __('support_centre'),
                 'url' => 'mailto:support@statybae.com',
             ],
         ])->filter(fn($link) => !empty($link['url']));
@@ -88,16 +88,16 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M2.25 6.75c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75S8.838 3 6 3 2.25 4.612 2.25 6.75zM2.25 17.25c0 2.138 1.912 3.75 3.75 3.75S9.75 19.388 9.75 17.25 7.838 13.5 6 13.5s-3.75 1.612-3.75 3.75zM14.25 6.75c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75S20.088 3 18.25 3s-3.75 1.612-3.75 3.75zM14.25 17.25c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75-1.912-3.75-3.75-3.75-3.75 1.612-3.75 3.75z" />
                         </svg>
-                        +370 600 00 000
+                        {{ __('company_phone') }}
                     </span>
-                    <a href="mailto:support@statybae.com"
+                    <a href="mailto:{{ __('company_email') }}"
                        class="inline-flex items-center gap-2 hover:text-white transition-colors">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        support@statybae.com
+                        {{ __('company_email') }}
                     </a>
                 </div>
             </div>
@@ -302,7 +302,7 @@
                     @if ($quickLinks->firstWhere('key', 'support'))
                         <a href="{{ $quickLinks->firstWhere('key', 'support')['url'] }}"
                            class="rounded-lg bg-slate-100 px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition">
-                            {{ __('Support centre') }}
+                            {{ __('support_centre') }}
                         </a>
                     @endif
                     @if (Route::has('localized.locations.index'))

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Livewire\Pages;
@@ -28,8 +26,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::view('confirm-password', 'livewire.pages.auth.confirm-password')->name('password.confirm');
 
-    // Account dashboard (use view to avoid Volt alias issues)
-    Route::view('/account', 'livewire.pages.account.index')->name('account');
+    // Account dashboard route is defined in routes/web.php
 
     Route::prefix('account')->as('account.')->group(function (): void {
         Route::get('profile', \App\Livewire\Pages\Account\Profile::class)->name('profile');

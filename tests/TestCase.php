@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests;
 
@@ -16,6 +14,9 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
         Config::set('database.default', 'sqlite');
         Config::set('database.connections.sqlite.database', ':memory:');
+        // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
+        Config::set('telescope.enabled', false);
+        Config::set('telescope.storage.database.connection', 'sqlite');
         $this->withoutMiddleware([
             \App\Http\Middleware\ZoneDetector::class,
             \App\Http\Middleware\SetLocale::class,

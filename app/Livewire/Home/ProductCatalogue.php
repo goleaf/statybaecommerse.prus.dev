@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Livewire\Home;
 
@@ -75,14 +73,14 @@ final class ProductCatalogue extends Component implements HasSchemas
             ->where('published_at', '<=', now());
 
         if ($this->category) {
-            $query->whereHas('categories', fn ($relation) => $relation->where('categories.id', $this->category));
+            $query->whereHas('categories', fn($relation) => $relation->where('categories.id', $this->category));
         }
 
         if (filled($this->search)) {
             $query->where(function ($builder): void {
                 $builder
-                    ->where('name', 'like', '%'.$this->search.'%')
-                    ->orWhere('sku', 'like', '%'.$this->search.'%');
+                    ->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('sku', 'like', '%' . $this->search . '%');
             });
         }
 
@@ -96,13 +94,13 @@ final class ProductCatalogue extends Component implements HasSchemas
         return $query->paginate($this->perPage);
     }
 
-    public function productCatalogueSchema(Schema $schema): Schema
+    public function catalogue(Schema $schema): Schema
     {
         return $schema->components([
             ViewEntry::make('catalogue')
                 ->label('')
                 ->view('livewire.home.product-catalogue')
-                ->viewData(fn (): array => [
+                ->viewData(fn(): array => [
                     'products' => $this->products(),
                     'categories' => $this->categories(),
                     'sort' => $this->sort,
