@@ -155,16 +155,15 @@
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-6 p-6 lg:p-8">
                             <div class="flex items-center justify-between">
-                                <h2 class="text-lg font-semibold text-slate-900">{{ __('Key Features') }}</h2>
+                                <h2 class="text-lg font-semibold text-slate-900">
+                                    {{ __('product_page.features_title') }}</h2>
                                 <span
                                       class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ $this->attributeFeatures->count() }}
                                     {{ __('Features') }}</span>
                             </div>
 
                             @if ($this->attributeFeatures->isEmpty())
-                                <p class="text-sm text-slate-500">
-                                    {{ __('No additional feature information is available for this product yet.') }}
-                                </p>
+                                <p class="text-sm text-slate-500">{{ __('product_page.features_empty') }}</p>
                             @else
                                 <div class="grid gap-4 sm:grid-cols-2">
                                     @foreach ($this->attributeFeatures as $feature)
@@ -188,10 +187,11 @@
 
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-6 p-6 lg:p-8">
-                            <h2 class="text-lg font-semibold text-slate-900">{{ __('Detailed Description') }}</h2>
+                            <h2 class="text-lg font-semibold text-slate-900">
+                                {{ __('product_page.detailed_description') }}</h2>
                             <div class="prose prose-slate max-w-none text-slate-700">
                                 {!! $product->trans('description') ??
-                                    ($product->description ?? '<p>' . __('No description provided for this product yet.') . '</p>') !!}
+                                    ($product->description ?? '<p>' . __('product_page.no_description') . '</p>') !!}
                             </div>
                         </div>
                     </section>
@@ -238,7 +238,8 @@
 
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-6 p-6 lg:p-8">
-                            <h2 class="text-lg font-semibold text-slate-900">{{ __('Technical Details') }}</h2>
+                            <h2 class="text-lg font-semibold text-slate-900">{{ __('product_page.technical_details') }}
+                            </h2>
                             <dl class="grid gap-4 sm:grid-cols-2">
                                 @foreach ($technicalMetrics as $metric)
                                     @if (filled($metric['value']))
@@ -257,12 +258,13 @@
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-6 p-6 lg:p-8">
                             <div class="flex flex-wrap items-center justify-between gap-4">
-                                <h2 class="text-lg font-semibold text-slate-900">{{ __('Change History Snapshot') }}
+                                <h2 class="text-lg font-semibold text-slate-900">
+                                    {{ __('product_page.change_history') }}
                                 </h2>
                                 <a href="{{ route('localized.products.history', ['locale' => app()->getLocale(), 'product' => $product->trans('slug') ?? $product->slug]) }}"
                                    class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700">
                                     <x-heroicon-o-clock class="h-4 w-4" />
-                                    {{ __('frontend.products.view_full_history') }}
+                                    {{ __('product_page.view_full_history') }}
                                 </a>
                             </div>
                             <div class="grid gap-4 sm:grid-cols-3">
@@ -282,11 +284,10 @@
                                 </div>
                                 <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
                                     <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                        {{ __('Change frequency (30 days)') }}</p>
+                                        {{ __('product_page.change_frequency_30') }}</p>
                                     <p class="mt-2 text-2xl font-semibold text-slate-900">
                                         {{ $product->getChangeFrequency(30) }}</p>
-                                    <p class="text-xs text-slate-400">
-                                        {{ __('Average changes per day (last 30 days)') }}</p>
+                                    <p class="text-xs text-slate-400">{{ __('product_page.avg_changes_30') }}</p>
                                 </div>
                             </div>
 
@@ -326,11 +327,10 @@
 
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-6 p-6 lg:p-8">
-                            <h2 class="text-lg font-semibold text-slate-900">{{ __('All Variants & Options') }}</h2>
+                            <h2 class="text-lg font-semibold text-slate-900">
+                                {{ __('product_page.all_variants_options') }}</h2>
                             @if ($this->variantMatrix->isEmpty())
-                                <p class="text-sm text-slate-600">
-                                    {{ __('This product is available in a single configuration. Variant options will appear here for configurable products.') }}
-                                </p>
+                                <p class="text-sm text-slate-600">{{ __('product_page.single_configuration') }}</p>
                             @else
                                 <div class="space-y-4">
                                     @foreach ($this->variantMatrix as $variant)
@@ -390,7 +390,8 @@
                     @if ($product->documents && $product->documents->isNotEmpty())
                         <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                             <div class="space-y-6 p-6 lg:p-8">
-                                <h2 class="text-lg font-semibold text-slate-900">{{ __('Downloads & Guides') }}</h2>
+                                <h2 class="text-lg font-semibold text-slate-900">
+                                    {{ __('product_page.downloads_guides') }}</h2>
                                 <ul class="space-y-3 text-sm text-slate-600">
                                     @foreach ($product->documents as $document)
                                         <li
@@ -413,7 +414,8 @@
                     @if ((bool) (config('app-features.features.review') ?? true))
                         <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                             <div class="space-y-6 p-6 lg:p-8">
-                                <h2 class="text-lg font-semibold text-slate-900">{{ __('Customer Feedback') }}</h2>
+                                <h2 class="text-lg font-semibold text-slate-900">
+                                    {{ __('product_page.customer_feedback') }}</h2>
                                 <livewire:components.product.reviews :productId="$product->id" />
                                 <livewire:components.product.review-form :productId="$product->id" />
                             </div>
@@ -429,7 +431,7 @@
                                     <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
                                         {{ __('translations.brand') }}</p>
                                     <p class="text-lg font-semibold text-slate-900">
-                                        {{ $brandLabel ?? __('Unknown brand') }}</p>
+                                        {{ $brandLabel ?? __('product_page.unknown_brand') }}</p>
                                 </div>
                                 @if ($currentPrice)
                                     <p class="text-3xl font-semibold text-primary-600">
@@ -440,7 +442,7 @@
                             <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 text-sm text-slate-600">
                                 <p class="flex items-center gap-2 text-slate-700">
                                     <x-heroicon-o-shield-check class="h-5 w-5 text-primary-500" />
-                                    {{ __('Original supplier certified quality guarantee.') }}
+                                    {{ __('product_page.quality_guarantee') }}
                                 </p>
                             </div>
                             <div class="variant-selector-card">
@@ -451,7 +453,8 @@
 
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-4 p-6 lg:p-8">
-                            <h2 class="text-base font-semibold text-slate-900">{{ __('Quick Facts') }}</h2>
+                            <h2 class="text-base font-semibold text-slate-900">{{ __('product_page.quick_facts') }}
+                            </h2>
                             <dl class="grid gap-4 sm:grid-cols-2">
                                 @foreach ($this->productQuickFacts as $fact)
                                     <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
@@ -467,7 +470,8 @@
 
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-4 p-6 lg:p-8">
-                            <h2 class="text-base font-semibold text-slate-900">{{ __('Shipping & Service') }}</h2>
+                            <h2 class="text-base font-semibold text-slate-900">
+                                {{ __('product_page.shipping_service') }}</h2>
                             <div class="space-y-4">
                                 <div
                                      class="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
@@ -495,10 +499,9 @@
 
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-4 p-6 lg:p-8">
-                            <h2 class="text-base font-semibold text-slate-900">{{ __('Need a tailored offer?') }}</h2>
-                            <p class="text-sm text-slate-600">
-                                {{ __('Contact our specialists for bulk pricing, project support, or technical consultations.') }}
-                            </p>
+                            <h2 class="text-base font-semibold text-slate-900">
+                                {{ __('product_page.need_tailored_offer') }}</h2>
+                            <p class="text-sm text-slate-600">{{ __('product_page.tailored_offer_desc') }}</p>
                             <a href="{{ $contactUrl }}"
                                class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">
                                 <x-heroicon-o-phone class="mr-2 h-4 w-4" />

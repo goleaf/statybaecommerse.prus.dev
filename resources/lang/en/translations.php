@@ -7,7 +7,6 @@ return [
     'product_slug' => 'Product Slug',
     'product_short_description' => 'Short Description',
     'product_description' => 'Description',
-
     // Product pricing and inventory
     'product_pricing_inventory' => 'Pricing & Inventory',
     'product_sku' => 'SKU',
@@ -20,14 +19,12 @@ return [
     'product_track_stock' => 'Track Stock',
     'product_stock_quantity' => 'Stock Quantity',
     'product_low_stock_threshold' => 'Low Stock Threshold',
-
     // Product physical attributes
     'product_physical_attributes' => 'Physical Attributes',
     'product_weight' => 'Weight',
     'product_length' => 'Length',
     'product_width' => 'Width',
     'product_height' => 'Height',
-
     // Product categorization
     'product_categorization' => 'Categorization',
     'product_brand' => 'Brand',
@@ -36,7 +33,6 @@ return [
     'product_type_variable' => 'Variable',
     'product_categories' => 'Categories',
     'product_collections' => 'Collections',
-
     // Product visibility and status
     'product_visibility_status' => 'Visibility & Status',
     'product_is_visible' => 'Visible',
@@ -47,7 +43,6 @@ return [
     'product_status_archived' => 'Archived',
     'product_published_at' => 'Published At',
     'product_sort_order' => 'Sort Order',
-
     // Live Dashboard
     'live_dashboard' => 'Live Dashboard',
     'real_time_analytics' => 'Real-time Analytics',
@@ -82,7 +77,6 @@ return [
     'bounce_rate' => 'Bounce Rate',
     'avg_session_duration' => 'Avg Session Duration',
     'conversion_rate' => 'Conversion Rate',
-
     // Enhanced Search
     'enhanced_search' => 'Enhanced Search',
     'enhanced_placeholder' => 'Search products, categories, brands...',
@@ -121,7 +115,6 @@ return [
     '50_100' => '€50 - €100',
     '100_500' => '€100 - €500',
     'clear_filters' => 'Clear Filters',
-
     // Live Inventory Tracker
     'live_inventory_tracker' => 'Live Inventory Tracker',
     'real_time_stock_monitoring' => 'Real-time Stock Monitoring',
@@ -145,7 +138,6 @@ return [
     'total_value' => 'Total Value',
     'status' => 'Status',
     'no_inventory_items_found' => 'No inventory items found',
-
     // Live Demo
     'live_demo_title' => 'Live Demo - Enhanced Frontend',
     'live_demo_subtitle' => 'Experience the power of real-time updates, enhanced performance, and modern design',
@@ -183,13 +175,11 @@ return [
     'ready_to_experience_description' => 'Explore our enhanced frontend with real-time capabilities',
     'explore_homepage' => 'Explore Homepage',
     'browse_products' => 'Browse Products',
-
     // Product SEO
     'product_seo' => 'SEO',
     'product_seo_title' => 'SEO Title',
     'product_seo_description' => 'SEO Description',
     'product_meta_keywords' => 'Meta Keywords',
-
     // Product additional settings
     'product_additional_settings' => 'Additional Settings',
     'product_tax_class' => 'Tax Class',
@@ -200,12 +190,10 @@ return [
     'product_button_text' => 'Button Text',
     'product_video_url' => 'Video URL',
     'product_metadata' => 'Metadata',
-
     // Product table columns
     'product_image' => 'Image',
     'product_stock' => 'Stock',
     'product_sale_price' => 'Sale Price',
-
     // Product filters
     'all_products' => 'All Products',
     'published_products' => 'Published Products',
@@ -213,19 +201,16 @@ return [
     'featured_products' => 'Featured Products',
     'low_stock_products' => 'Low Stock',
     'out_of_stock_products' => 'Out of Stock',
-
     // Product actions
     'duplicate' => 'Duplicate',
     'publish' => 'Publish',
     'unpublish' => 'Unpublish',
     'feature' => 'Feature',
     'unfeature' => 'Unfeature',
-
     // Product stock status
     'product_low_stock' => 'Low Stock',
     'product_out_of_stock' => 'Out of Stock',
     'product_published' => 'Published',
-
     // General translations
     'all_products_in_system' => 'All products in system',
     'visible_to_customers' => 'Visible to customers',
@@ -235,7 +220,6 @@ return [
     'no_inventory' => 'No inventory',
     'current_stock_value' => 'Current stock value',
     'mean_price_across_products' => 'Mean price across products',
-
     // Product stats
     'total_products' => 'Total Products',
     'published_products' => 'Published Products',
@@ -245,7 +229,6 @@ return [
     'out_of_stock_products' => 'Out of Stock',
     'total_inventory_value' => 'Total Inventory Value',
     'average_product_price' => 'Average Product Price',
-
     // Product chart
     'products_by_status' => 'Products by Status',
     'products_by_visibility' => 'Products by Visibility',
@@ -254,7 +237,6 @@ return [
     'archived' => 'Archived',
     'visible' => 'Visible',
     'hidden' => 'Hidden',
-
     // Common fields
     'created_at' => 'Created At',
     'updated_at' => 'Updated At',
@@ -267,19 +249,16 @@ return [
     'is_approved' => 'Approved',
     'yes' => 'Yes',
     'no' => 'No',
-
     // Categories and collections
     'category' => 'Category',
     'category_name' => 'Category Name',
     'collection' => 'Collection',
     'collection_name' => 'Collection Name',
-
     // Images
     'image' => 'Image',
     'alt_text' => 'Alt Text',
     'title' => 'Title',
     'set_primary' => 'Set as Primary',
-
     // Variants
     'variant_name' => 'Variant Name',
     'variant_sku' => 'Variant SKU',
@@ -289,7 +268,6 @@ return [
     'variant_stock_quantity' => 'Variant Stock Quantity',
     'variant_weight' => 'Variant Weight',
     'variant_stock' => 'Variant Stock',
-
     // Reviews
     'reviewer_name' => 'Reviewer Name',
     'reviewer_email' => 'Reviewer Email',
@@ -300,7 +278,6 @@ return [
     'review_content' => 'Review Content',
     'approve' => 'Approve',
     'disapprove' => 'Disapprove',
-
     // Attributes
     'attribute' => 'Attribute',
     'attribute_name' => 'Attribute Name',
@@ -311,7 +288,6 @@ return [
     'boolean' => 'Boolean',
     'date' => 'Date',
     'select' => 'Select',
-
     // Documents
     'document_name' => 'Document Name',
     'document_title' => 'Document Title',
@@ -325,12 +301,10 @@ return [
     'other' => 'Other',
     'file_size' => 'File Size',
     'download' => 'Download',
-
     // Common actions
     'key' => 'Key',
     'value' => 'Value',
     'days' => 'days',
-
     // Additional missing translations from frontend
     'items_in_cart' => 'items in cart, view cart',
     'view_cart' => 'view cart',
@@ -403,4 +377,82 @@ return [
     'all_rights_reserved' => 'All rights reserved',
     'created_with_filament' => 'Created with Filament',
     'confirm_remove_category_selection' => 'Are you sure you want to remove this category selection?',
+    // Header & navigation
+    'header_fast_delivery' => 'Fast delivery across Lithuania in one day',
+    'header_secure_payments_returns' => 'Secure payments and 30-day returns',
+    'header_store_locator' => 'Store locator',
+    'header_phone' => '+370 600 00 000',
+    'header_email' => 'support@statybae.com',
+    'marketplace_tagline' => 'Construction materials marketplace',
+    'search_products_placeholder' => 'Search products...',
+    'nav_categories' => 'Categories',
+    'nav_collections' => 'Collections',
+    'nav_brands' => 'Brands',
+    'nav_account' => 'Account',
+    'nav_help_center' => 'Help center',
+    // Breadcrumbs
+    'breadcrumb_home' => 'Home',
+    'breadcrumb_products' => 'Products',
+    'back_to_products' => 'Back to products',
+    // Common simple labels used in product pages
+    'brand' => 'Brand',
+    'sku' => 'SKU',
+    'availability' => 'Availability',
+    'in_stock' => 'In stock',
+    'quick_facts' => 'Quick facts',
+    'key_features' => 'Key Features',
+    'detailed_description' => 'Detailed Description',
+    'technical_details' => 'Technical Details',
+    'color' => 'Color',
+    'images' => 'Images',
+    'images_count' => 'Images: :count',
+    'dimensions' => 'Dimensions',
+    'last_updated' => 'Last updated',
+    // History / analytics snippets around product
+    'change_history_snapshot' => 'Change History Snapshot',
+    'view_full_history' => 'View full history',
+    'total_changes' => 'Total changes',
+    'last_30_days' => 'Last 30 days',
+    'price_changes' => 'Price changes',
+    'change_frequency_30_days' => 'Change frequency (30 days)',
+    'avg_changes_per_day_30_days' => 'Average changes per day (last 30 days)',
+    'viewed' => 'Viewed',
+    // Variants & options section helper
+    'all_variants_options' => 'All Variants & Options',
+    'single_configuration_note' => 'This product is available in a single configuration. Variant options will appear here for configurable products.',
+    // Reviews blocks
+    'customer_feedback' => 'Customer Feedback',
+    'submit_review' => 'Submit review',
+    // Shipping & services CTA
+    'shipping_service' => 'Shipping & Service',
+    'need_tailored_offer' => 'Need a tailored offer?',
+    'contact_specialists_hint' => 'Contact our specialists for bulk pricing, project support, or technical consultations.',
+    'contact_specialists_cta' => 'Contact',
+    // Footer extras
+    'footer_documentation' => 'Documentation',
+    'footer_secure_payment' => 'Secure payment',
+    'footer_contact' => 'Contact',
+    'footer_shop' => 'Shop',
+    'footer_subscribe_title' => 'Subscribe to newsletter',
+    'footer_subscribe_desc' => 'Receive news, offers, and event updates.',
+    'footer_hours' => 'Opening hours',
+    'footer_powered_by_filament' => 'Powered by Filament',
+    // Newsletter section
+    'newsletter' => [
+        'email_placeholder' => 'Email address *',
+        'first_name' => 'First name',
+        'first_name_placeholder' => 'Enter first name',
+        'last_name' => 'Last name',
+        'last_name_placeholder' => 'Enter last name',
+        'company' => 'Company',
+        'company_placeholder' => 'Enter company name',
+        'interests_products' => 'Products',
+        'interests_promotions' => 'Promotions',
+        'interests_news' => 'News',
+        'interests_events' => 'Events',
+        'interests_blog' => 'Blog',
+        'interests_technical' => 'Technical',
+        'subscribe_button' => 'Subscribe',
+        'privacy_notice' => 'Privacy notice',
+    ],
 ];

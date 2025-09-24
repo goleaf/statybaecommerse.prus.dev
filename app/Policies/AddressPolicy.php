@@ -1,10 +1,9 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Policies;
 
 use App\Models\Address;
+use App\Models\AdminUser;
 use App\Models\User;
 
 /**
@@ -17,7 +16,7 @@ final class AddressPolicy
     /**
      * Handle viewAny functionality with proper error handling.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(User|AdminUser $user): bool
     {
         return true;
     }
@@ -25,15 +24,19 @@ final class AddressPolicy
     /**
      * Handle view functionality with proper error handling.
      */
-    public function view(User $user, Address $address): bool
+    public function view(User|AdminUser $user, Address $address): bool
     {
-        return $user->id === $address->user_id || $user->is_admin;
+        if ($user instanceof AdminUser) {
+            return true;
+        }
+
+        return $user->id === $address->user_id || ($user->is_admin ?? false);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(User $user): bool
+    public function create(User|AdminUser $user): bool
     {
         return true;
     }
@@ -41,32 +44,48 @@ final class AddressPolicy
     /**
      * Update the specified resource in storage with validation.
      */
-    public function update(User $user, Address $address): bool
+    public function update(User|AdminUser $user, Address $address): bool
     {
-        return $user->id === $address->user_id || $user->is_admin;
+        if ($user instanceof AdminUser) {
+            return true;
+        }
+
+        return $user->id === $address->user_id || ($user->is_admin ?? false);
     }
 
     /**
      * Handle delete functionality with proper error handling.
      */
-    public function delete(User $user, Address $address): bool
+    public function delete(User|AdminUser $user, Address $address): bool
     {
-        return $user->id === $address->user_id || $user->is_admin;
+        if ($user instanceof AdminUser) {
+            return true;
+        }
+
+        return $user->id === $address->user_id || ($user->is_admin ?? false);
     }
 
     /**
      * Handle restore functionality with proper error handling.
      */
-    public function restore(User $user, Address $address): bool
+    public function restore(User|AdminUser $user, Address $address): bool
     {
-        return $user->is_admin;
+        if ($user instanceof AdminUser) {
+            return true;
+        }
+
+        return ($user->is_admin ?? false);
     }
 
     /**
      * Handle forceDelete functionality with proper error handling.
      */
-    public function forceDelete(User $user, Address $address): bool
+    public function forceDelete(User|AdminUser $user, Address $address): bool
     {
-        return $user->is_admin;
+        if ($user instanceof AdminUser) {
+            return true;
+        }
+
+        return ($user->is_admin ?? false);
     }
 }
